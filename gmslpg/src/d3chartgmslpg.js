@@ -4,7 +4,7 @@
 
 	var isInternetExplorer = userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1 ? true : false;
 
-	var cssLink = "../combinedCSS/d3chartstyles.css";
+	var cssLink = "https://cbpfgms.github.io/css/d3chartstyles.css";
 
 	var externalCSS = document.createElement("link");
 	externalCSS.setAttribute("rel", "stylesheet");
