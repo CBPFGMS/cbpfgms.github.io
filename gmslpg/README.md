@@ -1,6 +1,6 @@
 # GMS Landing Page
 
-Data visualisation for the Grant Management System landing page. The datavis contains two grouped bar charts (contributions & allocations, partners & projects) and two line charts.
+Data visualisation for the Grant Management System landing page. The datavis contains two grouped bar charts (contributions & allocations, projects & partners) and two line charts.
 
 This chart is an SVG that stretches to the width of the containing element. Recommended size: 900px x 350px.
 
