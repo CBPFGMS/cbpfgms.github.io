@@ -73,6 +73,13 @@
 
 		var containerDiv = d3.select("#d3chartcontainergmslpg");
 
+		var selectedResponsiveness = containerDiv.node().getAttribute("data-responsive");
+
+		if (selectedResponsiveness === "false") {
+			containerDiv.style("width", width + "px")
+				.style("height", height + "px");
+		};
+
 		var svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
