@@ -8,7 +8,7 @@ Data visualisation for the Grant Management System landing page. The datavis con
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainergmslpg" data-year="2018" data-sorting="contributions" data-responsive="false"></div><script type="text/javascript" src="https://cbpfgms.github.io/gmslpg/src/d3chartgmslpg.js"></script>```
+```<div id="d3chartcontainergmslpg" data-year="2018" data-sorting="contributions" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/gmslpg/src/d3chartgmslpg.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
