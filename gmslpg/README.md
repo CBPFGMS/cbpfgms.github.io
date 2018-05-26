@@ -25,8 +25,6 @@ There are two parameters:
 - `"2016"`
 - `"2015"`
 - `"2014"`
-- `"2013"`
-- `"2012"`
 
 **`data-sorting`**: defines the initial sorting criterion when the chart loads. Accepted values:
 
