@@ -228,7 +228,7 @@
 			removeProgressWheel();
 
 			var currentYear = new Date().getFullYear();
-			var minimumYear = currentYear - 6;
+			var minimumYear = currentYear - 4;
 			var mergedData = [];
 			var tempSet = new Set();
 
