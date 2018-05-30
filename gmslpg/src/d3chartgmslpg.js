@@ -208,7 +208,15 @@
 			.tickSizeInner(4)
 			.tickSizeOuter(0);
 
-		var selectedYear = +containerDiv.node().getAttribute("data-year");
+		var selectedYear = +containerDiv.node().getAttribute("data-yearSelected");
+
+		var startingYear = +containerDiv.node().getAttribute("data-yearStart");
+
+		var endingYear = +containerDiv.node().getAttribute("data-yearEnd");
+
+		if (selectedYear > endingYear || selectedYear < startingYear) {
+			selectedYear = endingYear
+		};
 
 		var selectedSorting = containerDiv.node().getAttribute("data-sorting");
 
@@ -227,13 +235,11 @@
 
 			removeProgressWheel();
 
-			var currentYear = new Date().getFullYear();
-			var minimumYear = currentYear - 4;
 			var mergedData = [];
 			var tempSet = new Set();
 
 			allFiles[0].forEach(function(d) {
-				if (!tempSet.has(d.FiscalYear + d.PooledFundName) && d.FiscalYear <= currentYear && d.FiscalYear >= minimumYear) {
+				if (!tempSet.has(d.FiscalYear + d.PooledFundName) && d.FiscalYear <= endingYear && d.FiscalYear >= startingYear) {
 					mergedData.push({
 						year: +d.FiscalYear,
 						pooledFundName: d.PooledFundName
@@ -342,10 +348,8 @@
 				.attr("dy", "-1px")
 				.style("fill", "darkslategray")
 				.style("font-size", "12px")
-				.text(" Contributions");
-
-			contributionsTitle.append("tspan")
-				.text(" & ");
+				.attr("xml:space", "preserve")
+				.text(" Contributions (paid only)   ");
 
 			contributionsTitle.append("tspan")
 				.attr("class", "gmslpgallocationsSpan")
@@ -364,9 +368,6 @@
 				.style("font-size", "12px")
 				.text(" Allocations");
 
-			contributionsTitle.append("tspan")
-				.text(" (in USD)");
-
 			projectsTitle.append("tspan")
 				.attr("class", "gmslpgprojectsSpan")
 				.datum({
@@ -382,10 +383,8 @@
 				.attr("dy", "-1px")
 				.style("fill", "darkslategray")
 				.style("font-size", "12px")
-				.text(" Projects Funded");
-
-			projectsTitle.append("tspan")
-				.text(" & ");
+				.attr("xml:space", "preserve")
+				.text(" Projects Funded   ");
 
 			projectsTitle.append("tspan")
 				.attr("class", "gmslpgpartnersSpan")
@@ -423,10 +422,8 @@
 				.classed("contributionColorFill", false)
 				.style("fill", "darkslategray")
 				.style("font-size", "12px")
-				.text(" Contributions");
-
-			contributionsLineTitle.append("tspan")
-				.text(" & ");
+				.attr("xml:space", "preserve")
+				.text(" Contributions (paid only)    ");
 
 			contributionsLineTitle.append("tspan")
 				.attr("class", "gmslpgallocationsLineSpan")
@@ -461,10 +458,8 @@
 				.classed("contributionColorFill", false)
 				.style("fill", "darkslategray")
 				.style("font-size", "12px")
-				.text(" Projects Funded");
-
-			projectsLineTitle.append("tspan")
-				.text(" & ");
+				.attr("xml:space", "preserve")
+				.text(" Projects Funded    ");
 
 			projectsLineTitle.append("tspan")
 				.attr("class", "gmslpgpartnersLineSpan")
@@ -1453,6 +1448,8 @@
 					d.clicked = d.value === chartState.sorting ? true : false;
 				});
 
+				var yearsGroupSpacing = yearListData.length < 10 ? controlPanelSpacing : (controlPanelSpacing * 9) / yearListData.length;
+
 				var yearTitle = controlPanel.main.append("text")
 					.attr("class", "gmslpgyearTitle")
 					.attr("y", controlPanel.padding[0])
@@ -1468,7 +1465,7 @@
 						return d.clicked ? 1 : 0.7;
 					})
 					.attr("transform", function(_, i) {
-						return "translate(" + controlPanel.padding[3] + "," + (controlPanel.padding[0] + controlPanelVerticalPadding + controlPanelSpacing * i) + ")"
+						return "translate(" + controlPanel.padding[3] + "," + (controlPanel.padding[0] + controlPanelVerticalPadding + yearsGroupSpacing * i) + ")"
 					});
 
 				var yearsOuterCircle = yearsGroup.append("circle")
@@ -1492,7 +1489,7 @@
 						return d.year;
 					});
 
-				var sortTitleVerticalPosition = controlPanel.padding[0] + (controlPanelVerticalPadding * 2) + (controlPanelSpacing * yearListData.length)
+				var sortTitleVerticalPosition = controlPanel.padding[0] + (controlPanelVerticalPadding * 2) + (yearsGroupSpacing * yearListData.length)
 
 				var sortTitle = controlPanel.main.append("text")
 					.attr("class", "gmslpgsortTitle")
