@@ -8,7 +8,7 @@ Data visualisation for the Grant Management System landing page. The datavis con
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainergmslpg" data-year="2018" data-sorting="contributions" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/gmslpg/src/d3chartgmslpg.js"></script>```
+```<div id="d3chartcontainergmslpg" data-yearStart="2014" data-yearEnd="2018" data-yearSelected="2018" data-sorting="contributions" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/gmslpg/src/d3chartgmslpg.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -16,15 +16,25 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and 
 
 ## Parameters
 
-There are two parameters:
+There are four parameters:
 
-**`data-year`**: defines the initial year when the chart loads. Accepted values:
+**`data-yearStart`**: defines the starting year for the radio buttons. The value has to be the year with century as a decimal number, such as:
 
-- `"2018"`
-- `"2017"`
-- `"2016"`
-- `"2015"`
-- `"2014"`
+ `"2014"`
+
+For the accepted values please refer to the data API.
+
+**`data-yearEnd`**: defines the ending year for the radio buttons. The value has to be the year with century as a decimal number, such as:
+
+ `"2018"`
+
+For the accepted values please refer to the data API.
+
+**`data-yearSelected`**: defines the selected year when the chart loads. The value has to be the year with century as a decimal number, such as:
+
+ `"2018"`
+
+If the value is not between `data-yearStart`  and `data-yearEnd` it defaults to `data-yearEnd`.
 
 **`data-sorting`**: defines the initial sorting criterion when the chart loads. Accepted values:
 
