@@ -112,11 +112,11 @@ These styles apply to all D3 charts*/
 	fill: #75c0de;
 }
 
-.UNPartnerColor {
+.UNAgencyPartnerColor {
 	fill: #b5dffd;
 }
 
-.RedCrossCrescentMovementPartnerColor {
+.OthersPartnerColor {
 	fill: #f02720;
 }
 
