@@ -264,7 +264,6 @@ These styles apply to all D3 charts*/
 .cbpfbptopValueMain {
 	font-family: "Arial", sans-serif;
 	font-size: 60px;
-	dominant-baseline: central;
 }
 
 .cbpfbptopValueUnits {
