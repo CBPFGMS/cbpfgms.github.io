@@ -279,10 +279,12 @@
 				var tempObject = aggregatedDataAllocations.find(function(e) {
 					return e.cbpf === d.PooledFundName
 				});
-				tempObject.donors.push({
-					donor: d.GMSDonorName,
-					amount: +d.PaidAmt
-				});
+				if (tempObject) {
+					tempObject.donors.push({
+						donor: d.GMSDonorName,
+						amount: +d.PaidAmt
+					});
+				}
 			});
 
 			var partnersList = [...new Set(rawData[1].map(function(d) {
@@ -565,7 +567,7 @@
 				.attr("class", function(_, i) {
 					return i ? "cbpfbptopValueMain allocationColorFill" : "cbpfbptopValueMain contributionColorFill";
 				})
-				.attr("y", 56)
+				.attr("y", 77)
 				.attr("x", topPanel.moneyBagPadding);
 
 			topValueMain.transition()
@@ -634,15 +636,13 @@
 			var barsContributionsTitle = barsPanel.main.append("text")
 				.attr("text-anchor", "end")
 				.attr("class", "cbpfbpbarsPanelTitle")
-				.attr("y", barsPanel.padding[0] - 12)
-				.attr("dominant-baseline", "ideographic")
+				.attr("y", barsPanel.padding[0] - 7)
 				.attr("x", barsPanel.barsSpace)
 				.text("Top 10 Contributions");
 
 			var barsAllocationsTitle = barsPanel.main.append("text")
 				.attr("class", "cbpfbpbarsPanelTitle")
-				.attr("y", barsPanel.padding[0] - 12)
-				.attr("dominant-baseline", "ideographic")
+				.attr("y", barsPanel.padding[0] - 7)
 				.attr("x", barsPanel.barsSpace + barsPanel.centralSpace)
 				.text("Top 10 Allocations");
 
@@ -748,9 +748,8 @@
 			var barsContributionsLabels = barsContributions.append("text")
 				.attr("class", "cbpfbpbarsLabels")
 				.attr("text-anchor", "end")
-				.attr("dominant-baseline", "central")
 				.attr("x", barsPanel.barsSpace - barsContributionsLabelsPadding)
-				.attr("y", barsContributionsYScale.bandwidth() / 2);
+				.attr("y", 4 + barsContributionsYScale.bandwidth() / 2);
 
 			barsContributionsLabels.transition(barsTransition)
 				.attr("x", function(d) {
@@ -766,9 +765,8 @@
 
 			var barsAllocationsLabels = barsAllocations.append("text")
 				.attr("class", "cbpfbpbarsLabels")
-				.attr("dominant-baseline", "central")
 				.attr("x", barsContributionsLabelsPadding)
-				.attr("y", barsAllocationsYScale.bandwidth() / 2);
+				.attr("y", 4 + barsAllocationsYScale.bandwidth() / 2);
 
 			barsAllocationsLabels.transition(barsTransition)
 				.attr("x", function(d) {
@@ -822,15 +820,13 @@
 
 			var barsContributionsOverText = barsContributions.append("text")
 				.attr("class", "cbpfbpbarsContributionsOverText")
-				.attr("dominant-baseline", "middle")
-				.attr("y", barsContributionsYScale.bandwidth() / 2)
+				.attr("y", 3 + barsContributionsYScale.bandwidth() / 2)
 				.attr("x", barsPanel.barsSpace)
 				.style("opacity", 0);
 
 			var barsAllocationsOverText = barsAllocations.append("text")
 				.attr("class", "cbpfbpbarsAllocationsOverText")
-				.attr("dominant-baseline", "middle")
-				.attr("y", barsAllocationsYScale.bandwidth() / 2)
+				.attr("y", 3 + barsAllocationsYScale.bandwidth() / 2)
 				.attr("x", 0)
 				.style("opacity", 0);
 
@@ -839,7 +835,6 @@
 				.attr("pointer-events", "none")
 				.attr("x", barsPanel.width / 2)
 				.attr("y", barsPanel.padding[0] - 8)
-				.attr("dominant-baseline", "ideographic")
 				.attr("text-anchor", "middle")
 				.style("opacity", 0);
 
@@ -1142,10 +1137,9 @@
 				.enter()
 				.append("text")
 				.attr("class", "cbpfbpbottomNames")
-				.attr("dominant-baseline", "hanging")
 				.attr("text-anchor", "middle")
 				.style("opacity", 0)
-				.attr("y", bottomPanel.height - bottomPanel.padding[2])
+				.attr("y", bottomPanel.height - bottomPanel.padding[2] + 11)
 				.text(function(d) {
 					return d.name;
 				});
@@ -1266,22 +1260,22 @@
 							.transition()
 							.duration(shortDuration)
 							.style("opacity", 1)
-							.attr("width", barsAllocationsXScale(donorFound.amount));
+							.attr("width", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)));
 						thisGroup.select(".cbpfbpbarsAllocationsOverLine")
 							.transition()
 							.duration(shortDuration)
 							.style("opacity", 1)
-							.attr("x1", barsAllocationsXScale(donorFound.amount))
-							.attr("x2", barsAllocationsXScale(donorFound.amount));
+							.attr("x1", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)))
+							.attr("x2", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)));
 						thisGroup.select(".cbpfbpbarsAllocationsOverText")
 							.transition()
 							.duration(shortDuration)
-							.style("opacity", (barsAllocationsXScale(e.totalBudget) - barsAllocationsXScale(donorFound.amount)) < 20 && barsAllocationsXScale(donorFound.mount) < 20 ? 0 : 1)
-							.attr("x", barsAllocationsXScale(donorFound.amount) > 24 ?
-								barsAllocationsXScale(donorFound.amount) - 4 :
-								barsAllocationsXScale(donorFound.amount) + 4)
-							.attr("text-anchor", barsAllocationsXScale(donorFound.amount) > 24 ? "end" : "start")
-							.text(formatPercent(donorFound.amount / e.totalBudget) === "0%" ? "<1%" : formatPercent(donorFound.amount / e.totalBudget))
+							.style("opacity", (barsAllocationsXScale(e.totalBudget) - barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget))) < 20 && barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) < 20 ? 0 : 1)
+							.attr("x", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) > 24 ?
+								barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) - 4 :
+								barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) + 4)
+							.attr("text-anchor", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) > 24 ? "end" : "start")
+							.text(formatPercent(Math.min(donorFound.amount, e.totalBudget) / e.totalBudget) === "0%" ? "<1%" : formatPercent(Math.min(donorFound.amount, e.totalBudget) / e.totalBudget))
 					}
 				});
 				var donorText = d.donor === "Other Donors" ? "Donors" : "Donor"
@@ -1350,23 +1344,23 @@
 							.transition()
 							.duration(shortDuration)
 							.style("opacity", 1)
-							.attr("x", barsContributionsXScale(cbpfFound.amountPaid))
-							.attr("width", barsPanel.barsSpace - barsContributionsXScale(cbpfFound.amountPaid));
+							.attr("x", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)))
+							.attr("width", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)));
 						thisGroup.select(".cbpfbpbarsContributionsOverLine")
 							.transition()
 							.duration(shortDuration)
 							.style("opacity", 1)
-							.attr("x1", barsContributionsXScale(cbpfFound.amountPaid))
-							.attr("x2", barsContributionsXScale(cbpfFound.amountPaid));
+							.attr("x1", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)))
+							.attr("x2", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)));
 						thisGroup.select(".cbpfbpbarsContributionsOverText")
 							.transition()
 							.duration(shortDuration)
-							.style("opacity", (barsContributionsXScale(cbpfFound.amountPaid) - barsContributionsXScale(e.totalPaidPlusPledge)) < 20 && barsPanel.barsSpace - barsContributionsXScale(cbpfFound.amountPaid) < 20 ? 0 : 1)
-							.attr("x", barsPanel.barsSpace - barsContributionsXScale(cbpfFound.amountPaid) < 24 ?
-								barsContributionsXScale(cbpfFound.amountPaid) - 4 :
-								barsContributionsXScale(cbpfFound.amountPaid) + 4)
-							.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(cbpfFound.amountPaid) < 24 ? "end" : "start")
-							.text(formatPercent(cbpfFound.amountPaid / e.totalPaidPlusPledge) === "0%" ? "<1%" : formatPercent(cbpfFound.amountPaid / e.totalPaidPlusPledge));
+							.style("opacity", (barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) - barsContributionsXScale(e.totalPaidPlusPledge)) < 20 && barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 20 ? 0 : 1)
+							.attr("x", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 24 ?
+								barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) - 4 :
+								barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) + 4)
+							.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 24 ? "end" : "start")
+							.text(formatPercent(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge) / e.totalPaidPlusPledge) === "0%" ? "<1%" : formatPercent(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge) / e.totalPaidPlusPledge));
 					}
 				});
 				var cbpfText = d.cbpf === "Other CBPFs" ? "CBPFs" : "CBPF"
@@ -1460,47 +1454,52 @@
 				gBarsAllocationsYAxis.selectAll(".tick").style("opacity", function(e) {
 					return e === d.target.cbpf ? 1 : 0.15
 				});
+
 				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverRect")
 					.transition()
 					.duration(shortDuration)
 					.style("opacity", 1)
-					.attr("x", barsContributionsXScale(d.source.value))
-					.attr("width", barsPanel.barsSpace - barsContributionsXScale(d.source.value));
+					.attr("x", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)))
+					.attr("width", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)));
 				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverLine")
 					.transition()
 					.duration(shortDuration)
 					.style("opacity", 1)
-					.attr("x1", barsContributionsXScale(d.source.value))
-					.attr("x2", barsContributionsXScale(d.source.value));
+					.attr("x1", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)))
+					.attr("x2", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)));
 				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverText")
 					.transition()
 					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("x", barsPanel.barsSpace - barsContributionsXScale(d.source.value) < 24 ?
-						barsContributionsXScale(d.source.value) - 4 :
-						barsContributionsXScale(d.source.value) + 4)
-					.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(d.source.value) < 24 ? "end" : "start")
-					.text(formatPercent(d.source.value / thisDonor.totalPaidPlusPledge));
+					.style("opacity", (barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) - barsContributionsXScale(thisDonor.totalPaidPlusPledge)) < 20 &&
+						barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 20 ? 0 : 1)
+					.attr("x", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 24 ?
+						barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) - 4 :
+						barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) + 4)
+					.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 24 ? "end" : "start")
+					.text(formatPercent(Math.min(d.source.value, thisDonor.totalPaidPlusPledge) / thisDonor.totalPaidPlusPledge));
+
 				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverRect")
 					.transition()
 					.duration(shortDuration)
 					.style("opacity", 1)
-					.attr("width", barsAllocationsXScale(d.target.value));
+					.attr("width", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)));
 				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverLine")
 					.transition()
 					.duration(shortDuration)
 					.style("opacity", 1)
-					.attr("x1", barsAllocationsXScale(d.target.value))
-					.attr("x2", barsAllocationsXScale(d.target.value));
+					.attr("x1", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)))
+					.attr("x2", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)));
 				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverText")
 					.transition()
 					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("x", barsAllocationsXScale(d.target.value) > 24 ?
-						barsAllocationsXScale(d.target.value) - 4 :
-						barsAllocationsXScale(d.target.value) + 4)
-					.attr("text-anchor", barsAllocationsXScale(d.target.value) > 24 ? "end" : "start")
-					.text(formatPercent(d.target.value / thisCbpf.totalBudget));
+					.style("opacity", (barsAllocationsXScale(thisCbpf.totalBudget) - barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget))) < 20 &&
+						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) < 20 ? 0 : 1)
+					.attr("x", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) > 24 ?
+						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) - 4 :
+						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) + 4)
+					.attr("text-anchor", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) > 24 ? "end" : "start")
+					.text(formatPercent(Math.min(d.target.value, thisCbpf.totalBudget) / thisCbpf.totalBudget));
+
 				var thisCbpfName = d.target.cbpf === "Other CBPFs" ? "Other CBPFs (" + d.target.cbpfNameInOthers + ")" : d.target.cbpf;
 				var thisDonorName = d.source.donor === "Other Donors" ? "Other Donors (" + d.source.donorNames.join(", ") + ")" : d.source.donor;
 				tooltip.style("display", "block").html("Donor: <strong><span class='contributionColorHTMLcolor'>" +
@@ -1952,8 +1951,17 @@
 		};
 
 		function wrapLabels(label, element) {
-			var splitLabel = label.split(" ");
-			var em = 1.2;
+			var splitLabel = label;
+			if (splitLabel.length > 12) {
+				splitLabel = splitLabel.split(" ");
+			} else {
+				splitLabel = splitLabel.split()
+			}
+			if (splitLabel.length > 2) {
+				var middleElement = splitLabel.splice(1, 1);
+				splitLabel[0] = splitLabel[0] + " " + middleElement;
+			}
+			var em = 1;
 			var dy = parseFloat(d3.select(element).attr("dy"));
 			var x = d3.select(element).attr("x");
 			if (splitLabel.length > 1) {
