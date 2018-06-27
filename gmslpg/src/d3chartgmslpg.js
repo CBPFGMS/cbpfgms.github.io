@@ -38,7 +38,8 @@
 			height = 350,
 			padding = [2, 6, 2, 4],
 			formatNumberSI = d3.format(".3s"),
-			formatNumberSI2 = d3.format(".0s"),
+			formatNumberSI2 = d3.format("~s"),
+			formatNumberSI3 = d3.format(".0s"),
 			formatComma = d3.format(","),
 			primaryColors = ["#418fde", "#ECA154"],
 			secondaryColor = "#888888",
@@ -1073,7 +1074,7 @@
 				function createTooltipSVG(donors) {
 
 					var svgTooltipWidth = 240,
-						tooltipPadding = [0, 16, 16, 86],
+						tooltipPadding = [0, 16, 16, 100],
 						svgTooltipHeight = 14.8 * donors.length + tooltipPadding[2];
 
 					var svgTooltip = d3.select("#gmslpgtooltipdiv")
@@ -1108,7 +1109,7 @@
 						.tickSizeOuter(0)
 						.tickSizeInner(4)
 						.tickFormat(function(d) {
-							return "$" + formatNumberSI2(d)
+							return "$" + formatNumberSI3(d)
 						});
 
 					var bars = svgTooltip.selectAll(null)
