@@ -356,8 +356,24 @@ These styles apply to all D3 charts*/
 	font-size: 14px;
 }
 
-.cbpfbpbottomNames {
-	fill: #888;
-	font-family: "Roboto", sans-serif;
-	font-size: 14px;
+.cbpfbpxAxisTooltip text, .cbpfbpyAxisTooltip text {
+	fill: #555;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.cbpfbpxAxisTooltip, .cbpfbpyAxisTooltip {
+	shape-rendering: crispEdges;
+}
+
+.cbpfbpxAxisTooltip path {
+	stroke: none;
+}
+
+.cbpfbpyAxisTooltip path {
+	stroke: #ccc;
+}
+
+.cbpfbpxAxisTooltip line {
+	stroke: #ccc;
 }
