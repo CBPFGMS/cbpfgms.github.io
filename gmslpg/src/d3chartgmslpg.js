@@ -76,7 +76,7 @@
 
 		var selectedResponsiveness = containerDiv.node().getAttribute("data-responsive");
 
-		if (selectedResponsiveness === "false") {
+		if (selectedResponsiveness === "false" || isInternetExplorer) {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
@@ -1869,7 +1869,9 @@
 		}
 
 		function removeProgressWheel() {
-			d3.select(".gmslpgwheelGroup").select("path").interrupt().remove();
+			var wheelGroup = d3.select(".gmslpgwheelGroup");
+			wheelGroup.select("path").interrupt();
+			wheelGroup.remove();
 		}
 
 		//end of d3Chart
