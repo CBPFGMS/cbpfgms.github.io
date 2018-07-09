@@ -2076,7 +2076,7 @@
 				yearsArray.sort();
 				return d3.range(yearsArray[0], yearsArray[1] + 1, 1)
 			} else {
-				return [new Date().getFullYear()]
+				return yearsArray = [new Date().getFullYear()]
 			}
 		}
 
