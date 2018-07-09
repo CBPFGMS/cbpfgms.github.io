@@ -1,3 +1,4 @@
+
 # OCHA Charts
 
 This is the repository for the charts and data visualisations at the OCHA sites. 
@@ -19,7 +20,7 @@ Chart for the Grant Management System landing page.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/gmslpg.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg)
 
-This chart shows Contributions, Allocations, Partners and Projects for the last 7 years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg) for more information.
+This chart shows Contributions, Allocations, Partners and Projects for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg) for more information.
 
 - **CBPF Blog Page**
 
@@ -27,7 +28,7 @@ Chart for the Country-based Pooled Funds (CBPF) Page at the OCHA blog (Humanitar
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/cbpfbp.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/cbpfbp)
 
-This charts shows the top 10 Contributions and the top 10 Allocations. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/cbpfbp) for more information.
+This charts shows the top 10 Donors and the top 10 CBPFs. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/cbpfbp) for more information.
 
 ## Chart codes
 
