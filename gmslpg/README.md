@@ -49,6 +49,8 @@ If the value is not between `data-yearStart`  and `data-yearEnd` it defaults to 
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
 - `"false"`: the SVG will be created with a fixed size, which is 900px width and 350px height.
 
+Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
+
 *Recommended size*: 900px x 350px.
 
 
