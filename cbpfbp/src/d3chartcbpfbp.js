@@ -34,30 +34,28 @@
 
 	function d3Chart() {
 
-		var width = 1160,
-			height = 750,
+		var width = 743,
+			height = 600,
 			padding = [4, 4, 4, 4],
-			topPanelHeightFactor = 0.12,
-			barsPanelHeightFactor = 0.55,
-			beeswarmPanelHeightFactor = 0.22,
-			bottomPanelHeightFactor = 0.11,
+			topPanelHeightFactor = 0.17,
+			barsPanelHeightFactor = 0.63,
+			beeswarmPanelHeightFactor = 0.2,
 			panelHorizontalPadding = 6,
 			duration = 1500,
 			shortDuration = 200,
-			secondDelay = duration,
-			thirdDelay = secondDelay + duration,
 			started = false,
 			formatMoney2Decimals = d3.format(",.2f"),
-			formatInteger = d3.format(".0f"),
 			formatPercent = d3.format(".0%"),
-			formatPercent2Decimals = d3.format(".2%"),
+			formatSI2Decimals = d3.format(".2s"),
+			formatSIaxes = d3.format("~s"),
 			topPanelGroupWidth = 288,
-			barsContributionsLabelsPadding = 4,
+			barsDonorsLabelsPadding = 4,
 			localVariable = d3.local(),
 			circleRadius = 4,
-			bottomBarsHeight = 16,
 			beeswarmTransitionEnded = false,
 			flagPadding = 30,
+			yearsArray,
+			barsHeightUnit = ((height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * barsPanelHeightFactor) / 11,
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/";
 
 		var moneyBagd1 = "M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z";
@@ -71,18 +69,28 @@
 
 		var selectedResponsiveness = containerDiv.node().getAttribute("data-responsive");
 
-		if (selectedResponsiveness === "false") {
+		if (selectedResponsiveness !== "true" && selectedResponsiveness !== "false") {
+			selectedResponsiveness = "true"
+		};
+
+		if (selectedResponsiveness === "false" || isInternetExplorer) {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
 
 		var distancetoTop = containerDiv.node().offsetTop;
 
-		var year = +containerDiv.node().getAttribute("data-year");
+		var years = extractYear(containerDiv.node().getAttribute("data-year"));
 
 		var svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
+
+		var actualSvgSize = svg.node().getBoundingClientRect();
+
+		var actualWidth = actualSvgSize.width;
+
+		var actualHeight = actualSvgSize.height;
 
 		createProgressWhell();
 
@@ -90,15 +98,12 @@
 			.attr("id", "cbpfbptooltipdiv")
 			.style("display", "none");
 
-		var preloadedImagesDiv = d3.select("body").append("div")
-			.style("display", "none");
-
 		var topPanel = {
 			main: svg.append("g")
 				.attr("class", "cbpfbptopPanel")
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (3 * panelHorizontalPadding)) * topPanelHeightFactor,
+			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * topPanelHeightFactor,
 			moneyBagPadding: 70,
 			paidValuePadding: 330
 		};
@@ -108,9 +113,9 @@
 				.attr("class", "cbpfbpbarsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (3 * panelHorizontalPadding)) * barsPanelHeightFactor,
-			padding: [42, 30, 20, 30],
-			centralSpace: 250 + flagPadding,
+			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * barsPanelHeightFactor,
+			padding: [22, 32, 20, 32],
+			centralSpace: 220 + flagPadding,
 			get barsSpace() {
 				return (this.width - this.centralSpace) / 2;
 			}
@@ -121,38 +126,28 @@
 				.attr("class", "cbpfbpbeeswarmPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + barsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (3 * panelHorizontalPadding)) * beeswarmPanelHeightFactor,
-			padding: [40, 10, 24, 124],
+			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * beeswarmPanelHeightFactor,
+			padding: [18, 10, 20, 124],
 			titlePadding: 10
 		};
 
-		var bottomPanel = {
-			main: svg.append("g")
-				.attr("class", "cbpfbpbottomPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + barsPanel.height + beeswarmPanel.height + (3 * panelHorizontalPadding)) + ")"),
-			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (3 * panelHorizontalPadding)) * bottomPanelHeightFactor,
-			padding: [26, 10, 16, 10]
-		};
-
-		var barsContributionsYScale = d3.scaleBand()
+		var barsDonorsYScale = d3.scaleBand()
 			.range([barsPanel.padding[0], barsPanel.height - barsPanel.padding[2]])
 			.paddingOuter(0.1)
 			.paddingInner(0.4);
 
-		var barsAllocationsYScale = d3.scaleBand()
+		var barsCbpfsYScale = d3.scaleBand()
 			.range([barsPanel.padding[0], barsPanel.height - barsPanel.padding[2]])
 			.paddingOuter(0.1)
 			.paddingInner(0.4);
 
-		var barsContributionsXScale = d3.scaleLinear()
+		var barsDonorsXScale = d3.scaleLinear()
 			.range([barsPanel.barsSpace, barsPanel.padding[3]]);
 
-		var barsAllocationsXScale = d3.scaleLinear()
+		var barsCbpfsXScale = d3.scaleLinear()
 			.range([0, barsPanel.barsSpace - barsPanel.padding[1]]);
 
-		var linksWidthScale = d3.scaleLinear()
-			.range([1, 12]);
+		var linksWidthScale = d3.scaleLinear();
 
 		var linksYPosScale = d3.scalePoint();
 
@@ -160,39 +155,36 @@
 			.range([beeswarmPanel.padding[3], beeswarmPanel.width - beeswarmPanel.padding[1]]);
 
 		var beeswarmYScale = d3.scalePoint()
-			.domain(["Contributions", "Allocations"])
+			.domain(["Donors", "CBPFs"])
 			.range([beeswarmPanel.padding[0], beeswarmPanel.height - beeswarmPanel.padding[2]])
 			.padding(0.75);
 
-		var bottomScaleValues = d3.scaleLinear()
-			.range([bottomPanel.padding[3], bottomPanel.width - bottomPanel.padding[1]]);
-
-		var barsContributionsYAxis = d3.axisRight(barsContributionsYScale)
+		var barsDonorsYAxis = d3.axisRight(barsDonorsYScale)
 			.tickPadding(flagPadding);
 
-		var barsAllocationsYAxis = d3.axisLeft(barsAllocationsYScale);
+		var barsCbpfsYAxis = d3.axisLeft(barsCbpfsYScale);
 
-		var barsContributionsXAxis = d3.axisBottom(barsContributionsXScale)
+		var barsDonorsXAxis = d3.axisBottom(barsDonorsXScale)
 			.tickPadding(2)
 			.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]))
 			.tickSizeOuter(0)
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
-				return "$" + formatSIInteger(d)
+				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
-		var barsAllocationsXAxis = d3.axisBottom(barsAllocationsXScale)
+		var barsCbpfsXAxis = d3.axisBottom(barsCbpfsXScale)
 			.tickPadding(2)
 			.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]))
 			.tickSizeOuter(0)
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
-				return "$" + formatSIInteger(d)
+				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
 		var beeswarmXAxis = d3.axisBottom(beeswarmXScale)
 			.tickFormat(function(d) {
-				return "$" + formatSIInteger(d)
+				return "$" + formatSIaxes(d).replace("G", "B");
 			})
 			.tickSizeOuter(0)
 			.ticks(5);
@@ -201,121 +193,119 @@
 			.tickPadding(30)
 			.tickSizeInner(-(beeswarmPanel.width - beeswarmPanel.padding[1] - beeswarmPanel.padding[3]));
 
-		var file1 = d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv", filterYearContribution);
+		var linkGenerator = d3.linkHorizontal()
+			.x(function(d) {
+				return d.x;
+			})
+			.y(function(d) {
+				return d.y;
+			});
 
-		var file2 = d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv", filterYearAllocation);
-
-		Promise.all([file1, file2]).then(function(rawData) {
+		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv", filterYear).then(function(rawData) {
 
 			removeProgressWheel();
 
-			var aggregatedDataContributions = [];
+			var aggregatedDonors = [];
 
-			var aggregatedDataAllocations = [];
+			var aggregatedCbpfs = [];
 
-			var tempSet = new Set();
+			var tempSetDonors = [];
 
-			rawData[0].forEach(function(d) {
-				if (tempSet.has(d.GMSDonorName)) {
-					var tempObject = aggregatedDataContributions.find(function(e) {
+			var tempSetCbpfs = [];
+
+			rawData.forEach(function(d) {
+				if (tempSetDonors.indexOf(d.GMSDonorName) > -1) {
+					var tempObject = aggregatedDonors.filter(function(e) {
 						return e.donor === d.GMSDonorName
-					});
-					tempObject.donations.push({
-						cbpf: d.PooledFundName,
-						amountPaid: +d.PaidAmt,
-						amountPledge: +d.PledgeAmt
-					});
+					})[0];
+					var foundDonations = tempObject.donations.filter(function(e) {
+						return e.cbpf === d.PooledFundName
+					})[0];
+					if (foundDonations) {
+						foundDonations.amountPaid += +d.PaidAmt;
+						foundDonations.amountPledge += +d.PledgeAmt;
+						foundDonations.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+					} else {
+						tempObject.donations.push({
+							cbpf: d.PooledFundName,
+							amountPaid: +d.PaidAmt,
+							amountPledge: +d.PledgeAmt,
+							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+						});
+					}
 					tempObject.totalPaid += +d.PaidAmt;
 					tempObject.totalPledge += +d.PledgeAmt;
+					tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
 				} else {
-					aggregatedDataContributions.push({
+					aggregatedDonors.push({
 						donor: d.GMSDonorName,
 						isoCode: d.GMSDonorISO2Code.toLowerCase(),
 						donations: [{
 							cbpf: d.PooledFundName,
 							amountPaid: +d.PaidAmt,
-							amountPledge: +d.PledgeAmt
+							amountPledge: +d.PledgeAmt,
+							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
 						}],
 						totalPaid: +d.PaidAmt,
-						totalPledge: +d.PledgeAmt
+						totalPledge: +d.PledgeAmt,
+						totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
 					});
-					tempSet.add(d.GMSDonorName);
-				}
-			});
-
-			tempSet.clear();
-
-			rawData[1].forEach(function(d) {
-				if (tempSet.has(d.PooledFundName)) {
-					var tempObject = aggregatedDataAllocations.find(function(e) {
+					tempSetDonors.push(d.GMSDonorName);
+				};
+				if (tempSetCbpfs.indexOf(d.PooledFundName) > -1) {
+					var tempObject = aggregatedCbpfs.filter(function(e) {
 						return e.cbpf === d.PooledFundName
-					});
-					tempObject.organizations.push({
-						type: d.OrganizationType,
-						budget: +d.ApprovedBudget
-					});
-					tempObject.totalBudget += +d.ApprovedBudget;
-					tempObject.totalReserve += +d.ApprovedReserveBudget;
-					tempObject.totalStandard += +d.ApprovedStandardBudget;
-					tempObject.totalPipeline += +d.PipelineBudget;
+					})[0];
+					var foundDonor = tempObject.donors.filter(function(e) {
+						return e.donor === d.GMSDonorName
+					})[0];
+					if (foundDonor) {
+						foundDonor.amountPaid += +d.PaidAmt;
+						foundDonor.amountPledge += +d.PledgeAmt;
+						foundDonor.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+					} else {
+						tempObject.donors.push({
+							donor: d.GMSDonorName,
+							amountPaid: +d.PaidAmt,
+							amountPledge: +d.PledgeAmt,
+							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+						});
+					}
+					tempObject.totalPaid += +d.PaidAmt;
+					tempObject.totalPledge += +d.PledgeAmt;
+					tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
 				} else {
-					aggregatedDataAllocations.push({
+					aggregatedCbpfs.push({
 						cbpf: d.PooledFundName,
-						organizations: [{
-							type: d.OrganizationType,
-							budget: +d.ApprovedBudget
+						isoCode: d.PooledFundISO2Code.toLowerCase(),
+						donors: [{
+							donor: d.GMSDonorName,
+							amountPaid: +d.PaidAmt,
+							amountPledge: +d.PledgeAmt,
+							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
 						}],
-						totalBudget: +d.ApprovedBudget,
-						totalReserve: +d.ApprovedReserveBudget,
-						totalStandard: +d.ApprovedStandardBudget,
-						totalPipeline: +d.PipelineBudget,
-						donors: []
+						totalPaid: +d.PaidAmt,
+						totalPledge: +d.PledgeAmt,
+						totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
 					});
-					tempSet.add(d.PooledFundName);
-				}
+					tempSetCbpfs.push(d.PooledFundName);
+				};
 			});
 
-			rawData[0].forEach(function(d) {
-				var tempObject = aggregatedDataAllocations.find(function(e) {
-					return e.cbpf === d.PooledFundName
-				});
-				if (tempObject) {
-					tempObject.donors.push({
-						donor: d.GMSDonorName,
-						amount: +d.PaidAmt
-					});
-				}
+			tempSetDonors = [];
+
+			tempSetCbpfs = [];
+
+			aggregatedDonors.sort(function(a, b) {
+				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
 			});
 
-			var partnersList = [...new Set(rawData[1].map(function(d) {
-				return d.OrganizationType
-			}))];
+			aggregatedCbpfs.sort(function(a, b) {
+				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
+			});
 
-			tempSet.clear();
-
-			var allDonorFlags = aggregatedDataContributions.map(function(d) {
+			var allDonorFlags = aggregatedDonors.map(function(d) {
 				return d.isoCode;
-			});
-
-			var preloadedImages = preloadedImagesDiv.selectAll(null)
-				.data(allDonorFlags)
-				.enter()
-				.append("img")
-				.attr("src", function(d) {
-					return flagsDirectory + d + ".png";
-				});
-
-			preloadedImages.on("load", function(d) {
-				var canvas = document.createElement("canvas");
-				canvas.width = 24;
-				canvas.height = 24;
-
-				var context = canvas.getContext("2d");
-				context.drawImage(this, 0, 0);
-
-				var dataURL = canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-
-				localStorage.setItem("storedFlag" + d, dataURL);
 			});
 
 			d3.select(window).on("scroll", function() {
@@ -325,7 +315,7 @@
 				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
 					amountScrolled < (distancetoTop + height * 0.9)) {
 					if (!started) {
-						draw(aggregatedDataContributions, aggregatedDataAllocations, partnersList);
+						draw(aggregatedDonors, aggregatedCbpfs);
 					}
 				}
 
@@ -345,7 +335,7 @@
 				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
 					amountScrolled < (distancetoTop + height * 0.9)) {
 					if (!started) {
-						draw(aggregatedDataContributions, aggregatedDataAllocations, partnersList);
+						draw(aggregatedDonors, aggregatedCbpfs);
 					}
 				}
 
@@ -357,198 +347,192 @@
 				}
 
 			})();
+
+			//end of d3.csv
 		});
 
-		function draw(dataContributions, dataAllocations, partnersList) {
+		function draw(dataDonors, dataCbpfs) {
 
 			started = true;
 
-			dataContributions.forEach(function(d) {
-				d.totalPaidPlusPledge = d.totalPaid + d.totalPledge;
-			});
+			var maxBarsNumber = Math.max(dataDonors.length, dataCbpfs.length);
 
-			dataContributions.sort(function(a, b) {
-				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
-			});
+			if (maxBarsNumber < 11) {
 
-			dataAllocations.sort(function(a, b) {
-				return d3.descending(a.totalBudget, b.totalBudget)
-			});
+				barsPanel.height = barsHeightUnit * maxBarsNumber;
+				beeswarmPanel.main.attr("transform", "translate(" + padding[3] + "," +
+					(padding[0] + topPanel.height + barsPanel.height + (2 * panelHorizontalPadding)) + ")");
+				var newHeight = ~~(padding[3] + padding[0] + topPanel.height + barsPanel.height + beeswarmPanel.height + (2 * panelHorizontalPadding));
+				svg.attr("viewBox", "0 0 " + width + " " + newHeight);
+				if (selectedResponsiveness === "false") {
+					containerDiv.style("height", newHeight + "px");
+				};
+				barsDonorsYScale.range([barsPanel.padding[0], (dataDonors.length * barsHeightUnit) -
+					(dataDonors.length > dataCbpfs.length ? barsPanel.padding[2] : 0)
+				]);
+				barsCbpfsYScale.range([barsPanel.padding[0], (dataCbpfs.length * barsHeightUnit) -
+					(dataCbpfs.length > dataDonors.length ? barsPanel.padding[2] : 0)
+				]);
+				barsDonorsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
+				barsCbpfsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
 
-			var top10Contributions = dataContributions.slice(0, 10);
-
-			var top10Allocations = dataAllocations.slice(0, 10);
-
-			var otherContributions = {
-				donor: "Other Donors",
-				donorsList: [],
-				donations: [],
-				totalPaid: 0,
-				totalPledge: 0
 			};
 
-			dataContributions.slice(10).forEach(function(d) {
-				otherContributions.totalPaid += d.totalPaid;
-				otherContributions.totalPledge += d.totalPledge;
-				otherContributions.donorsList.push(d.donor)
-				d.donations.forEach(function(e) {
-					var found = otherContributions.donations.filter(function(f) {
-						return e.cbpf === f.cbpf
-					})[0];
-					if (found) {
-						found.amountPaid += e.amountPaid;
-						found.amountPledge += e.amountPledge;
-						found.donorsFromOthers.push(d.donor);
-					} else {
-						otherContributions.donations.push({
-							cbpf: e.cbpf,
-							amountPaid: e.amountPaid,
-							amountPledge: e.amountPledge,
-							donorsFromOthers: [d.donor]
-						})
-					}
-				})
-			});
+			var top10Donors = dataDonors.slice(0, 10);
 
-			otherContributions.totalPaidPlusPledge = otherContributions.totalPaid + otherContributions.totalPledge;
+			var top10Cbpfs = dataCbpfs.slice(0, 10);
 
-			var otherAllocations = {
-				cbpf: "Other CBPFs",
-				cbpfList: [],
-				donors: [],
-				organizations: [],
-				totalBudget: 0,
-				totalReserve: 0,
-				totalStandard: 0,
-				totalPipeline: 0
+			if (dataDonors.length > 10) {
+
+				var otherDonors = {
+					donor: "Other Donors",
+					donorsList: [],
+					donations: [],
+					totalPaid: 0,
+					totalPledge: 0
+				};
+
+				dataDonors.slice(10).forEach(function(d) {
+					otherDonors.totalPaid += d.totalPaid;
+					otherDonors.totalPledge += d.totalPledge;
+					otherDonors.donorsList.push(d.donor)
+					d.donations.forEach(function(e) {
+						var found = otherDonors.donations.filter(function(f) {
+							return e.cbpf === f.cbpf
+						})[0];
+						if (found) {
+							found.amountPaid += e.amountPaid;
+							found.amountPledge += e.amountPledge;
+							found.amountPaidPlusPledge += e.amountPaid + e.amountPledge;
+							found.donorsFromOthers.push(d.donor);
+						} else {
+							otherDonors.donations.push({
+								cbpf: e.cbpf,
+								amountPaid: e.amountPaid,
+								amountPledge: e.amountPledge,
+								amountPaidPlusPledge: e.amountPaid + e.amountPledge,
+								donorsFromOthers: [d.donor]
+							})
+						}
+					})
+				});
+
+				otherDonors.totalPaidPlusPledge = otherDonors.totalPaid + otherDonors.totalPledge;
+
+				top10Donors.push(otherDonors);
+
 			};
 
-			dataAllocations.slice(10).forEach(function(d) {
-				otherAllocations.totalBudget += d.totalBudget;
-				otherAllocations.totalReserve += d.totalReserve;
-				otherAllocations.totalStandard += d.totalStandard;
-				otherAllocations.totalPipeline += d.totalPipeline;
-				otherAllocations.cbpfList.push(d.cbpf);
-				d.donors.forEach(function(e) {
-					var found = otherAllocations.donors.filter(function(f) {
-						return e.donor === f.donor
-					})[0];
-					if (found) {
-						found.amount += e.amount;
-					} else {
-						otherAllocations.donors.push({
-							donor: e.donor,
-							amount: e.amount
-						})
-					}
+			if (dataCbpfs.length > 10) {
+
+				var otherCbpfs = {
+					cbpf: "Other CBPFs",
+					cbpfList: [],
+					donors: [],
+					totalPaid: 0,
+					totalPledge: 0
+				};
+
+				dataCbpfs.slice(10).forEach(function(d) {
+					otherCbpfs.totalPaid += d.totalPaid;
+					otherCbpfs.totalPledge += d.totalPledge;
+					otherCbpfs.cbpfList.push(d.cbpf)
+					d.donors.forEach(function(e) {
+						var found = otherCbpfs.donors.filter(function(f) {
+							return e.donor === f.donor
+						})[0];
+						if (found) {
+							found.amountPaid += e.amountPaid;
+							found.amountPledge += e.amountPledge;
+							found.amountPaidPlusPledge += e.amountPaid + e.amountPledge;
+							found.cbpfFromOthers.push(d.cbpf);
+						} else {
+							otherCbpfs.donors.push({
+								donor: e.donor,
+								amountPaid: e.amountPaid,
+								amountPledge: e.amountPledge,
+								amountPaidPlusPledge: e.amountPaid + e.amountPledge,
+								cbpfFromOthers: [d.cbpf]
+							})
+						}
+					})
 				});
-				d.organizations.forEach(function(e) {
-					var found = otherAllocations.organizations.filter(function(f) {
-						return e.type === f.type
-					})[0];
-					if (found) {
-						found.budget += e.budget;
-					} else {
-						otherAllocations.organizations.push({
-							type: e.type,
-							budget: e.budget
-						})
-					}
-				});
-			});
 
-			top10Contributions.push(otherContributions);
+				otherCbpfs.totalPaidPlusPledge = otherCbpfs.totalPaid + otherCbpfs.totalPledge;
 
-			top10Allocations.push(otherAllocations);
+				top10Cbpfs.push(otherCbpfs);
 
-			var totalPaidAllCountries = d3.sum(dataContributions, function(d) {
+			};
+
+			var totalPaidAllCountries = d3.sum(dataDonors, function(d) {
 				return d.totalPaid;
 			});
 
-			var totalPledgeAllCountries = d3.sum(dataContributions, function(d) {
+			var totalPledgeAllCountries = d3.sum(dataDonors, function(d) {
 				return d.totalPledge;
 			});
 
 			var totalAmountAllCountries = totalPaidAllCountries + totalPledgeAllCountries;
 
-			var totalAllocatedAllCountries = d3.sum(dataAllocations, function(d) {
-				return d.totalBudget;
-			});
-
-			var totalPipelineAllCountries = d3.sum(dataAllocations, function(d) {
-				return d.totalPipeline;
-			});
-
-			var top10ContributionsNames = top10Contributions.map(function(d) {
+			var top10DonorsNames = top10Donors.map(function(d) {
 				return d.donor
 			});
 
-			var top10AllocationsNames = top10Allocations.map(function(d) {
+			var top10CbpfsNames = top10Cbpfs.map(function(d) {
 				return d.cbpf
 			});
 
-			var partnersData = partnersList.map(function(d) {
-				return {
-					partner: d,
-					value: d3.sum(dataAllocations, function(e) {
-						var found = e.organizations.find(function(f) {
-							return f.type === d
-						});
-						return found ? found.budget : 0;
-					}),
-					get percentage() {
-						return this.value / totalAllocatedAllCountries;
-					}
-				}
-			});
+			barsDonorsYScale.domain(top10DonorsNames);
 
-			barsContributionsYScale.domain(top10ContributionsNames);
+			barsCbpfsYScale.domain(top10CbpfsNames);
 
-			barsAllocationsYScale.domain(top10AllocationsNames);
+			linksYPosScale.range([-barsDonorsYScale.bandwidth() / 4, barsDonorsYScale.bandwidth() / 4]);
 
-			linksYPosScale.range([-barsContributionsYScale.bandwidth() / 4, barsContributionsYScale.bandwidth() / 4])
+			linksWidthScale.range([1, barsDonorsYScale.bandwidth()]);
 
-			var maxXValue = d3.max([d3.max(top10Contributions, function(d) {
+			var maxXValue = d3.max([d3.max(top10Donors, function(d) {
 				return d.totalPaidPlusPledge
-			}), d3.max(top10Allocations, function(d) {
-				return d.totalBudget
+			}), d3.max(top10Cbpfs, function(d) {
+				return d.totalPaidPlusPledge
 			})]);
 
-			barsContributionsXScale.domain([0, ~~(maxXValue * 1.05)]);
+			barsDonorsXScale.domain([0, ~~(maxXValue * 1.05)]);
 
-			barsAllocationsXScale.domain([0, ~~(maxXValue * 1.05)]);
+			barsCbpfsXScale.domain([0, ~~(maxXValue * 1.05)]);
 
 			beeswarmXScale.domain([0, ~~(maxXValue * 1.05)]);
 
+
 			//TOP PANEL
 
-			var topPanelTitle = topPanel.main.selectAll(null)
-				.data([year + " CBPF Contributions", year + " CBPF Allocations"])
-				.enter()
-				.append("text")
+			var topPanelTitle = topPanel.main.append("text")
 				.attr("class", "cbpfbptopPanelTitle")
 				.attr("text-anchor", "middle")
 				.attr("y", 16)
-				.attr("x", function(_, i) {
-					return i ? (barsPanel.barsSpace * 1.5) + barsPanel.centralSpace : barsPanel.barsSpace / 2;
-				})
-				.text(function(d) {
-					return d
-				});
+				.attr("x", topPanel.width / 2)
+				.text(yearsArray.length === 1 ? yearsArray[0] + " Contributions" :
+					yearsArray[0] + " to " + yearsArray[1] + " Contributions");
 
-			var topPanelGroup = topPanel.main.selectAll(null)
-				.data([totalAmountAllCountries, totalAllocatedAllCountries])
-				.enter()
-				.append("g")
-				.attr("transform", function(_, i) {
-					return "translate(" + (i ? (barsPanel.barsSpace * 1.5) + barsPanel.centralSpace - (topPanelGroupWidth / 2) :
-						(barsPanel.barsSpace / 2) - (topPanelGroupWidth / 2)) + ",0)"
-				});
+			var placeholderText1 = svg.append("text")
+				.style("opacity", "0")
+				.attr("class", "cbpfbptopValueMain")
+				.text(formatSIFloat(totalAmountAllCountries));
+
+			var placeholderText2 = svg.append("text")
+				.style("opacity", "0")
+				.attr("class", "cbpfbptopValueUnits")
+				.text("Donated");
+
+			var placeholderWidths = placeholderText1.node().getBBox().width + placeholderText2.node().getBBox().width;
+
+			placeholderText1.remove();
+			placeholderText2.remove();
+
+			var topPanelGroup = topPanel.main.append("g")
+				.attr("transform", "translate(" + (width / 2 - (topPanel.moneyBagPadding + placeholderWidths) / 2) + ",0)")
 
 			var topPanelMoneyBag = topPanelGroup.append("g")
-				.attr("class", function(_, i) {
-					return i ? "allocationColorFill" : "contributionColorFill";
-				})
+				.attr("class", "contributionColorFill")
 				.attr("transform", "translate(0,26) scale(0.6)");
 
 			topPanelMoneyBag.append("path")
@@ -564,31 +548,31 @@
 				.attr("d", moneyBagd4);
 
 			var topValueMain = topPanelGroup.append("text")
-				.attr("class", function(_, i) {
-					return i ? "cbpfbptopValueMain allocationColorFill" : "cbpfbptopValueMain contributionColorFill";
-				})
-				.attr("y", 77)
+				.attr("class", "cbpfbptopValueMain contributionColorFill")
+				.attr("y", 78)
 				.attr("x", topPanel.moneyBagPadding);
 
 			topValueMain.transition()
 				.duration(duration)
 				.tween("text", function(d) {
 					var node = this;
-					var i = d3.interpolate(0, d);
+					var i = d3.interpolate(0, totalAmountAllCountries);
 					return function(t) {
-						var siString = formatSIInteger(i(t))
+						var siString = formatSIFloat(i(t))
 						node.textContent = "$" + siString.substring(0, siString.length - 1);
 					};
 				})
 				.on("end", function(d, i) {
-					var finalValue = formatSIInteger(d);
+
+					var finalValue = formatSIFloat(totalAmountAllCountries);
 					var unit = finalValue[finalValue.length - 1]
 					var thisBox = this.getBBox();
+
 					var topValueUnits = d3.select(this.parentNode).append("text")
 						.style("opacity", 0)
 						.attr("pointer-events", "none")
 						.attr("class", "cbpfbptopValueUnits")
-						.attr("y", 52)
+						.attr("y", 54)
 						.attr("x", thisBox.x + thisBox.width + 10);
 
 					topValueUnits.append("tspan")
@@ -596,30 +580,26 @@
 						.append("tspan")
 						.attr("dy", "1.1em")
 						.attr("x", thisBox.x + thisBox.width + 10)
-						.text(i ? "Allocated" : "Received");
+						.text("Donated");
 
 					topValueUnits.transition()
 						.duration(duration / 2)
 						.style("opacity", 1);
+
 				});
 
-			var topPanelRects = topPanel.main.selectAll(null)
-				.data([1, 1])
-				.enter()
-				.append("rect")
-				.attr("x", function(_, i) {
-					return i ? topPanel.width / 2 : 0
-				})
+			var topPanelRect = topPanel.main.append("rect")
+				.attr("x", width / 2 - (topPanel.moneyBagPadding + placeholderWidths) / 2)
 				.attr("y", 26)
-				.attr("width", topPanel.width / 2 - 2)
+				.attr("width", (topPanel.moneyBagPadding + placeholderWidths))
 				.attr("height", topPanel.height - 26)
 				.style("opacity", 0)
-				.on("mousemove", function(_, i) {
+				.on("mousemove", function() {
 					var mouse = d3.mouse(this)[0];
-					tooltip.style("display", "block").html(i ? "Received amount: <span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(totalAllocatedAllCountries) +
-						"</span><br>Under approval: <span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(totalPipelineAllCountries) + "</span>" :
-						"Paid amount: <span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(totalPaidAllCountries) +
-						"</span><br>Pledged amount: <span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(totalPledgeAllCountries) + "</span>");
+					tooltip.style("display", "block")
+						.html("Paid amount: <span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(totalPaidAllCountries) +
+							"</span><br>Pledged amount: <span class='contributionColorHTMLcolor'>$" +
+							formatMoney2Decimals(totalPledgeAllCountries) + "</span>");
 					var tooltipSize = tooltip.node().getBoundingClientRect();
 					tooltip.style("top", d3.event.pageY - 26 + "px")
 						.style("left", mouse < topPanel.width - 16 - tooltipSize.width ?
@@ -633,64 +613,64 @@
 
 			//BARS PANEL
 
-			var barsContributionsTitle = barsPanel.main.append("text")
+			var barsDonorsTitle = barsPanel.main.append("text")
 				.attr("text-anchor", "end")
 				.attr("class", "cbpfbpbarsPanelTitle")
 				.attr("y", barsPanel.padding[0] - 7)
 				.attr("x", barsPanel.barsSpace)
-				.text("Top 10 Contributions");
+				.text(dataDonors.length > 10 ? "Top 10 Donors" : "Donors");
 
-			var barsAllocationsTitle = barsPanel.main.append("text")
+			var barsCbpfsTitle = barsPanel.main.append("text")
 				.attr("class", "cbpfbpbarsPanelTitle")
 				.attr("y", barsPanel.padding[0] - 7)
 				.attr("x", barsPanel.barsSpace + barsPanel.centralSpace)
-				.text("Top 10 Allocations");
+				.text(dataCbpfs.length > 10 ? "Top 10 CBPFs" : "CBPFs");
 
 			var barsTransition = d3.transition()
 				.duration(duration);
 
-			var gBarsContributionsYAxis = barsPanel.main.append("g")
+			var gBarsDonorsYAxis = barsPanel.main.append("g")
 				.attr("class", "cbpfbpgBarsContributionsYAxis")
 				.attr("transform", "translate(" + barsPanel.barsSpace + ",0)")
 				.style("opacity", 0)
-				.call(barsContributionsYAxis);
+				.call(barsDonorsYAxis);
 
-			gBarsContributionsYAxis.transition(barsTransition)
+			gBarsDonorsYAxis.transition(barsTransition)
 				.style("opacity", 1);
 
-			var gBarsAllocationsYAxis = barsPanel.main.append("g")
+			var gBarsCbpfsYAxis = barsPanel.main.append("g")
 				.attr("class", "cbpfbpgBarsAllocationsYAxis")
 				.attr("transform", "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + ",0)")
 				.style("opacity", 0)
-				.call(barsAllocationsYAxis);
+				.call(barsCbpfsYAxis);
 
-			gBarsAllocationsYAxis.transition(barsTransition)
+			gBarsCbpfsYAxis.transition(barsTransition)
 				.style("opacity", 1);
 
-			gBarsContributionsYAxis.selectAll(".tick text").each(function(d) {
+			gBarsDonorsYAxis.selectAll(".tick text").each(function(d) {
 				wrapLabels(d, this);
 			});
 
-			gBarsAllocationsYAxis.selectAll(".tick text").each(function(d) {
+			gBarsCbpfsYAxis.selectAll(".tick text").each(function(d) {
 				wrapLabels(d, this);
 			});
 
-			var gBarsContributionsXAxis = barsPanel.main.append("g")
+			var gBarsDonorsXAxis = barsPanel.main.append("g")
 				.attr("class", "cbpfbpgBarsContributionsXAxis")
 				.attr("transform", "translate(0, " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.style("opacity", 0)
-				.call(barsContributionsXAxis);
+				.call(barsDonorsXAxis);
 
-			gBarsContributionsXAxis.transition(barsTransition)
+			gBarsDonorsXAxis.transition(barsTransition)
 				.style("opacity", 1);
 
-			var gBarsAllocationsXAxis = barsPanel.main.append("g")
+			var gBarsCbpfsXAxis = barsPanel.main.append("g")
 				.attr("class", "cbpfbpgBarsAllocationsXAxis")
 				.attr("transform", "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + ", " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.style("opacity", 0)
-				.call(barsAllocationsXAxis);
+				.call(barsCbpfsXAxis);
 
-			gBarsAllocationsXAxis.transition(barsTransition)
+			gBarsCbpfsXAxis.transition(barsTransition)
 				.style("opacity", 1);
 
 			d3.selectAll(".cbpfbpgBarsContributionsXAxis, .cbpfbpgBarsAllocationsXAxis")
@@ -700,153 +680,138 @@
 				})
 				.remove();
 
-			var barsContributions = barsPanel.main.selectAll(null)
-				.data(top10Contributions)
+			var barsDonors = barsPanel.main.selectAll(null)
+				.data(top10Donors)
 				.enter()
 				.append("g")
 				.attr("transform", function(d) {
-					return "translate(0," + barsContributionsYScale(d.donor) + ")"
+					return "translate(0," + barsDonorsYScale(d.donor) + ")"
 				});
 
-			var barsContributionsRects = barsContributions.append("rect")
+			var barsDonorsRects = barsDonors.append("rect")
 				.attr("class", "cbpfbpbarsContributionsRects")
 				.attr("x", barsPanel.barsSpace)
 				.attr("y", 0)
 				.attr("width", 0)
-				.attr("height", barsContributionsYScale.bandwidth())
+				.attr("height", barsDonorsYScale.bandwidth())
 				.classed("contributionColorFill", true);
 
-			barsContributionsRects.transition(barsTransition)
+			barsDonorsRects.transition(barsTransition)
 				.attr("x", function(d) {
-					return barsContributionsXScale(d.totalPaidPlusPledge)
+					return barsDonorsXScale(d.totalPaidPlusPledge)
 				})
 				.attr("width", function(d) {
-					return barsPanel.barsSpace - barsContributionsXScale(d.totalPaidPlusPledge)
+					return barsPanel.barsSpace - barsDonorsXScale(d.totalPaidPlusPledge)
 				});
 
-			var barsAllocations = barsPanel.main.selectAll(null)
-				.data(top10Allocations)
+			var barsCbpfs = barsPanel.main.selectAll(null)
+				.data(top10Cbpfs)
 				.enter()
 				.append("g")
 				.attr("transform", function(d) {
-					return "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + "," + barsAllocationsYScale(d.cbpf) + ")"
+					return "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + "," + barsCbpfsYScale(d.cbpf) + ")"
 				});
 
-			var barsAllocationsRects = barsAllocations.append("rect")
+			var barsCbpfsRects = barsCbpfs.append("rect")
 				.attr("class", "cbpfbpbarsAllocationsRects")
 				.attr("x", 0)
 				.attr("y", 0)
 				.attr("width", 0)
-				.attr("height", barsAllocationsYScale.bandwidth())
+				.attr("height", barsCbpfsYScale.bandwidth())
 				.classed("allocationColorFill", true);
 
-			barsAllocationsRects.transition(barsTransition)
+			barsCbpfsRects.transition(barsTransition)
 				.attr("width", function(d) {
-					return barsAllocationsXScale(d.totalBudget);
+					return barsCbpfsXScale(d.totalPaidPlusPledge);
 				});
 
-			var barsContributionsLabels = barsContributions.append("text")
+			var barsDonorsLabels = barsDonors.append("text")
 				.attr("class", "cbpfbpbarsLabels")
 				.attr("text-anchor", "end")
-				.attr("x", barsPanel.barsSpace - barsContributionsLabelsPadding)
-				.attr("y", 4 + barsContributionsYScale.bandwidth() / 2);
+				.attr("x", barsPanel.barsSpace - barsDonorsLabelsPadding)
+				.attr("y", 4 + barsDonorsYScale.bandwidth() / 2);
 
-			barsContributionsLabels.transition(barsTransition)
+			barsDonorsLabels.transition(barsTransition)
 				.attr("x", function(d) {
-					return barsContributionsXScale(d.totalPaidPlusPledge) - barsContributionsLabelsPadding
+					return barsDonorsXScale(d.totalPaidPlusPledge) - barsDonorsLabelsPadding
 				})
 				.tween("text", function(d) {
 					var node = this;
 					var i = d3.interpolate(0, d.totalPaidPlusPledge);
 					return function(t) {
-						node.textContent = "$" + formatSIInteger(i(t));
+						node.textContent = "$" + formatSIFloat1decimal(i(t));
 					};
 				});
 
-			var barsAllocationsLabels = barsAllocations.append("text")
+			var barsCbpfsLabels = barsCbpfs.append("text")
 				.attr("class", "cbpfbpbarsLabels")
-				.attr("x", barsContributionsLabelsPadding)
-				.attr("y", 4 + barsAllocationsYScale.bandwidth() / 2);
+				.attr("x", barsDonorsLabelsPadding)
+				.attr("y", 4 + barsCbpfsYScale.bandwidth() / 2);
 
-			barsAllocationsLabels.transition(barsTransition)
+			barsCbpfsLabels.transition(barsTransition)
 				.attr("x", function(d) {
-					return barsAllocationsXScale(d.totalBudget) + barsContributionsLabelsPadding
+					return barsCbpfsXScale(d.totalPaidPlusPledge) + barsDonorsLabelsPadding;
 				})
 				.tween("text", function(d) {
 					var node = this;
-					var i = d3.interpolate(0, d.totalBudget);
+					var i = d3.interpolate(0, d.totalPaidPlusPledge);
 					return function(t) {
-						node.textContent = "$" + formatSIInteger(i(t));
+						node.textContent = "$" + formatSIFloat1decimal(i(t));
 					};
 				});
 
-			var barsContributionsOverRect = barsContributions.append("rect")
+			var barsDonorsOverRect = barsDonors.append("rect")
 				.attr("class", "cbpfbpbarsContributionsOverRect")
 				.style("opacity", 0)
 				.attr("x", barsPanel.barsSpace)
 				.attr("y", 0)
 				.attr("width", 0)
-				.attr("height", barsContributionsYScale.bandwidth())
+				.attr("height", barsDonorsYScale.bandwidth())
 				.classed("contributionColorDarkerFill", true);
 
-			var barsAllocationsOverRect = barsAllocations.append("rect")
+			var barsCbpfsOverRect = barsCbpfs.append("rect")
 				.attr("class", "cbpfbpbarsAllocationsOverRect")
 				.style("opacity", 0)
 				.attr("x", 0)
 				.attr("y", 0)
 				.attr("width", 0)
-				.attr("height", barsAllocationsYScale.bandwidth())
+				.attr("height", barsCbpfsYScale.bandwidth())
 				.classed("allocationColorDarkerFill", true);
 
-			var barsContributionsOverLine = barsContributions.append("line")
+			var barsDonorsOverLine = barsDonors.append("line")
 				.attr("class", "cbpfbpbarsContributionsOverLine")
 				.style("opacity", 0)
 				.style("stroke", "white")
-				.style("stroke-width", "2px")
+				.style("stroke-width", "1px")
 				.attr("x1", barsPanel.barsSpace)
 				.attr("x2", barsPanel.barsSpace)
 				.attr("y1", 0)
-				.attr("y2", barsContributionsYScale.bandwidth());
+				.attr("y2", barsDonorsYScale.bandwidth());
 
-			var barsAllocationsOverLine = barsAllocations.append("line")
+			var barsCbpfsOverLine = barsCbpfs.append("line")
 				.attr("class", "cbpfbpbarsAllocationsOverLine")
 				.style("opacity", 0)
 				.style("stroke", "white")
-				.style("stroke-width", "2px")
+				.style("stroke-width", "1px")
 				.attr("x1", 0)
 				.attr("x2", 0)
 				.attr("y1", 0)
-				.attr("y2", barsAllocationsYScale.bandwidth());
-
-			var barsContributionsOverText = barsContributions.append("text")
-				.attr("class", "cbpfbpbarsContributionsOverText")
-				.attr("y", 3 + barsContributionsYScale.bandwidth() / 2)
-				.attr("x", barsPanel.barsSpace)
-				.style("opacity", 0);
-
-			var barsAllocationsOverText = barsAllocations.append("text")
-				.attr("class", "cbpfbpbarsAllocationsOverText")
-				.attr("y", 3 + barsAllocationsYScale.bandwidth() / 2)
-				.attr("x", 0)
-				.style("opacity", 0);
+				.attr("y2", barsCbpfsYScale.bandwidth());
 
 			var barsMiddleText = barsPanel.main.append("text")
 				.attr("class", "cbpfbpbarsMiddleText")
 				.attr("pointer-events", "none")
-				.attr("x", barsPanel.width / 2)
-				.attr("y", barsPanel.padding[0] - 8)
-				.attr("text-anchor", "middle")
-				.style("opacity", 0);
+				.attr("x", barsPanel.width / 2 + flagPadding / 2)
+				.attr("y", barsPanel.padding[0] - 26)
+				.attr("text-anchor", "middle");
 
-			var flags = barsContributions.append("image")
+			var flags = barsDonors.append("image")
 				.attr("width", 24)
 				.attr("height", 24)
 				.attr("y", -3)
 				.attr("x", barsPanel.barsSpace + 8)
 				.attr("xlink:href", function(d) {
-					return d.donor === "Other Donors" ? null :
-						localStorage.getItem("storedFlag" + d.isoCode) ? "data:image/png;base64," + localStorage.getItem("storedFlag" + d.isoCode) :
-						flagsDirectory + d.isoCode + ".png";
+					return d.donor === "Other Donors" ? null : flagsDirectory + d.isoCode + ".png";
 				})
 				.style("opacity", 0);
 
@@ -855,54 +820,49 @@
 
 			var linksData = [];
 
-			top10Contributions.forEach(function(d) {
+			linksWidthScale.domain([0, totalAmountAllCountries]);
+
+			top10Donors.forEach(function(d) {
 				var counter = -1;
-				var thisBoxContributions = gBarsContributionsYAxis.selectAll(".tick text")
+				var thisBoxDonors = gBarsDonorsYAxis.selectAll(".tick text")
 					.filter(function(e) {
 						return e === d.donor;
 					}).node().getBBox();
-				linksWidthScale.domain([0, d.totalPaid]);
 				var numberOfLinks = d.donations.length;
 				linksYPosScale.domain(d3.range(numberOfLinks));
 				d.donations.forEach(function(e) {
 					var donorsNames = e.donorsFromOthers ? e.donorsFromOthers : null;
-					var cbpfName = otherAllocations.cbpfList.indexOf(e.cbpf) > -1 ? "Other CBPFs" : e.cbpf;
-					if (top10AllocationsNames.indexOf(cbpfName) > -1) {
+					var cbpfName = otherCbpfs && otherCbpfs.cbpfList.indexOf(e.cbpf) > -1 ? "Other CBPFs" : e.cbpf;
+					if (top10CbpfsNames.indexOf(cbpfName) > -1) {
 						counter += 1;
-						var thisBoxAllocations = gBarsAllocationsYAxis.selectAll(".tick text")
+						var thisBoxCbpfs = gBarsCbpfsYAxis.selectAll(".tick text")
 							.filter(function(f) {
 								return f === cbpfName;
 							}).node().getBBox();
 						linksData.push({
 							source: {
-								value: e.amountPaid,
+								valuePaid: e.amountPaid,
+								valuePledge: e.amountPledge,
 								donor: d.donor,
 								donorNames: donorsNames,
-								x: barsPanel.barsSpace + thisBoxContributions.width + barsContributionsYAxis.tickPadding() +
-									barsContributionsYAxis.tickSizeInner() + 4,
-								y: barsContributionsYScale(d.donor) + barsContributionsYScale.bandwidth() / 2 - linksYPosScale(counter)
+								x: barsPanel.barsSpace + thisBoxDonors.width + barsDonorsYAxis.tickPadding() +
+									barsDonorsYAxis.tickSizeInner() + 4,
+								y: barsDonorsYScale(d.donor) + barsDonorsYScale.bandwidth() / 2 - linksYPosScale(counter)
 							},
 							target: {
-								value: e.amountPaid,
+								valuePaid: e.amountPaid,
+								valuePledge: e.amountPledge,
 								cbpf: cbpfName,
 								cbpfNameInOthers: e.cbpf,
-								x: barsPanel.barsSpace + barsPanel.centralSpace - thisBoxAllocations.width - barsAllocationsYAxis.tickPadding() -
-									barsAllocationsYAxis.tickSizeInner() - 4,
-								y: barsAllocationsYScale(cbpfName) + barsAllocationsYScale.bandwidth() / 2
+								x: barsPanel.barsSpace + barsPanel.centralSpace - thisBoxCbpfs.width - barsCbpfsYAxis.tickPadding() -
+									barsCbpfsYAxis.tickSizeInner() - 4,
+								y: barsCbpfsYScale(cbpfName) + barsCbpfsYScale.bandwidth() / 2
 							},
-							width: linksWidthScale(e.amountPaid)
+							width: linksWidthScale(e.amountPaid + e.amountPledge)
 						})
 					}
 				})
 			});
-
-			var linkGenerator = d3.linkHorizontal()
-				.x(function(d) {
-					return d.x;
-				})
-				.y(function(d) {
-					return d.y;
-				});
 
 			var links = barsPanel.main.selectAll(null)
 				.data(linksData)
@@ -920,52 +880,53 @@
 			links.transition(barsTransition)
 				.style("opacity", 0.1);
 
-			var barsContributionsTooltipRect = barsContributions.append("rect")
+			var barsDonorsTooltipRect = barsDonors.append("rect")
 				.attr("x", 0)
 				.attr("y", 0)
-				.attr("height", barsContributionsYScale.bandwidth())
+				.attr("height", barsDonorsYScale.bandwidth())
 				.attr("width", function(d) {
-					var thisTick = gBarsContributionsYAxis.selectAll(".tick text")
+					var thisTick = gBarsDonorsYAxis.selectAll(".tick text")
 						.filter(function(e) {
 							return e === d.donor
 						}).node().getBBox().width;
-					return barsPanel.barsSpace + thisTick + barsContributionsYAxis.tickPadding() +
-						barsContributionsYAxis.tickSizeInner();
+					return barsPanel.barsSpace + thisTick + barsDonorsYAxis.tickPadding() +
+						barsDonorsYAxis.tickSizeInner();
 				})
 				.style("opacity", 0)
 				.attr("pointer-events", "none");
 
-			var barsAllocationsTooltipRect = barsAllocations.append("rect")
+			var barsCbpfsTooltipRect = barsCbpfs.append("rect")
 				.attr("y", 0)
-				.attr("height", barsAllocationsYScale.bandwidth())
+				.attr("height", barsCbpfsYScale.bandwidth())
 				.attr("width", function(d) {
-					var thisTick = gBarsAllocationsYAxis.selectAll(".tick text")
+					var thisTick = gBarsCbpfsYAxis.selectAll(".tick text")
 						.filter(function(e) {
 							return e === d.cbpf
 						}).node().getBBox().width;
 					localVariable.set(this, thisTick)
-					return barsPanel.barsSpace + thisTick;
+					return barsPanel.barsSpace + thisTick + barsCbpfsYAxis.tickPadding() +
+						barsCbpfsYAxis.tickSizeInner();
 				})
 				.attr("x", function() {
-					return -localVariable.get(this) - barsAllocationsYAxis.tickPadding() -
-						barsAllocationsYAxis.tickSizeInner();
+					return -localVariable.get(this) - barsCbpfsYAxis.tickPadding() -
+						barsCbpfsYAxis.tickSizeInner();
 				})
 				.style("opacity", 0)
 				.attr("pointer-events", "none");
 
 			d3.timeout(function() {
-				barsContributionsTooltipRect.attr("pointer-events", "all");
-				barsAllocationsTooltipRect.attr("pointer-events", "all");
+				barsDonorsTooltipRect.attr("pointer-events", "all");
+				barsCbpfsTooltipRect.attr("pointer-events", "all");
 				links.attr("pointer-events", "auto");
-			}, duration);
+			}, duration * 2);
 
-			barsContributionsTooltipRect.on("mouseenter", mouseenterBarsContributions)
-				.on("mousemove", mousemoveBarsContributions)
-				.on("mouseout", mouseoutBarsContributions);
+			barsDonorsTooltipRect.on("mouseenter", mouseenterBarsDonors)
+				.on("mousemove", mousemoveBarsDonors)
+				.on("mouseout", mouseoutBarsDonors);
 
-			barsAllocationsTooltipRect.on("mouseenter", mouseenterBarsAllocations)
-				.on("mousemove", mousemoveBarsAllocations)
-				.on("mouseout", mouseoutBarsAllocations);
+			barsCbpfsTooltipRect.on("mouseenter", mouseenterBarsCbpfs)
+				.on("mousemove", mousemoveBarsCbpfs)
+				.on("mouseout", mouseoutBarsCbpfs);
 
 			links.on("mouseenter", mouseenterLinks)
 				.on("mousemove", mousemoveLinks)
@@ -975,11 +936,18 @@
 
 			//BEESWARM PANEL
 
+			circleRadius = dataDonors.length > 100 ? 1 :
+				dataDonors.length > 50 ? 2 :
+				dataDonors.length > 40 ? 2.5 :
+				dataDonors.length > 30 ? 3 :
+				dataDonors.length > 25 ? 3.5 :
+				circleRadius;
+
 			var beeswarmTitle = beeswarmPanel.main.append("text")
 				.attr("class", "cbpfbpbarsPanelTitle")
 				.attr("y", beeswarmPanel.padding[0] - 2)
 				.attr("x", beeswarmPanel.titlePadding)
-				.text("All Contributions and Allocations");
+				.text("All Donors and CBPFs");
 
 			var gBeeswarmXAxis = beeswarmPanel.main.append("g")
 				.attr("class", "cbpfbpgBeeswarmXAxis")
@@ -1003,22 +971,21 @@
 
 			function drawBeeswarm(category) {
 
-				var beeswarmData = category === "Contributions" ? JSON.parse(JSON.stringify(dataContributions)) :
-					JSON.parse(JSON.stringify(dataAllocations));
+				var beeswarmData = category === "Donors" ? JSON.parse(JSON.stringify(dataDonors)) :
+					JSON.parse(JSON.stringify(dataCbpfs));
 
-				var maximumTicks = d3.min([beeswarmData.length * 2, 150]);
+				var maximumTicks = Math.max(beeswarmData.length * 3, 150);
 
 				var simulation = d3.forceSimulation(beeswarmData)
 					.force("x", d3.forceX(function(d) {
-						return category === "Contributions" ? beeswarmXScale(d.totalPaidPlusPledge) :
-							beeswarmXScale(d.totalBudget)
-					}).strength(1))
+						return beeswarmXScale(d.totalPaidPlusPledge);
+					}).strength(0.9))
 					.force("y", d3.forceY(function(d) {
 						return beeswarmYScale(category)
-					}).strength(0.1))
+					}).strength(0.2))
 					.force("collide", d3.forceCollide(function(d) {
 						return (circleRadius) + 0.5;
-					}))
+					}).strength(1))
 					.stop();
 
 				for (var i = 0; i < maximumTicks; i++) simulation.tick();
@@ -1030,205 +997,110 @@
 					.attr("r", circleRadius)
 					.attr("cx", beeswarmXScale(0))
 					.attr("cy", beeswarmYScale(category))
-					.attr("class", category === "Contributions" ? "contributionColorFill" : "allocationColorFill");
+					.attr("class", category === "Donors" ? "contributionColorFill" : "allocationColorFill");
 
 				circles.transition()
-					.delay(secondDelay)
+					.delay(duration)
 					.duration(duration)
 					.attr("cx", function(d) {
 						return d.x
 					})
 					.attr("cy", function(d) {
-						return d.y
+						return Math.max(d.y, beeswarmPanel.padding[0] + circleRadius)
 					})
 					.on("end", function() {
 						beeswarmTransitionEnded = true;
 					});
 
 				circles.on("mouseover", function(d) {
-						var name = category === "Contributions" ? "donor" : "cbpf";
-						var value = category === "Contributions" ? "totalPaidPlusPledge" : "totalBudget";
-						var displayName = category === "Contributions" ? "Donor" : "CBPF";
-						var circleClass = category === "Contributions" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
-						verticalLine.attr("x1", beeswarmXScale(d[value]))
-							.attr("x2", beeswarmXScale(d[value]))
+
+						var name = category === "Donors" ? "donor" : "cbpf";
+						var displayName = category === "Donors" ? "Donor" : "CBPF";
+						var circleClass = category === "Donors" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
+						var description = category === "Donors" ? "Total donated" : "Total received";
+
+						if (category === "Donors") {
+							var imageSource = flagsDirectory + d.isoCode + ".png";
+						}
+
+						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:1px;'><br style='line-height:180%;'/>";
+
+						verticalLine.attr("x1", beeswarmXScale(d.totalPaidPlusPledge))
+							.attr("x2", beeswarmXScale(d.totalPaidPlusPledge))
 							.attr("y1", d.y)
 							.attr("y2", beeswarmPanel.height - beeswarmPanel.padding[2])
 							.style("opacity", 1);
+
 						gBeeswarmXAxis.select("path").style("stroke", "#ccc");
+
 						beeswarmPanel.main.selectAll("circle")
 							.style("opacity", function(e) {
-								return e[name] === d[name] ? 1 : 0.15;
+								return e[name] === d[name] ? 1 : 0.1;
 							});
-						tooltip.style("display", "block").html(displayName + ": <strong><span class=" + circleClass + ">" + d[name] + "</span></strong><br>" +
-							category + ": $" + formatMoney2Decimals(d[value]));
+
+						tooltip.style("display", "block").html(displayName + ": <strong><span class=" + circleClass + ">" + d[name] + "</span></strong> " + flag +
+							description + ": $" + formatMoney2Decimals(d.totalPaidPlusPledge));
+
 						var mouse = d3.mouse(this)[0];
 						var tooltipSize = tooltip.node().getBoundingClientRect();
+
 						tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
 							.style("left", mouse > beeswarmPanel.width - (tooltipSize.width / 2) ? d3.event.pageX - (mouse - (beeswarmPanel.width - (tooltipSize.width))) + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+
+						var enlargedCircle = d3.select(this).clone(false)
+							.attr("class", "clonedCircle")
+							.attr("pointer-events", "none")
+							.style("fill-opacity", 0)
+							.style("stroke", d3.select(this).style("fill"))
+							.transition()
+							.duration(shortDuration * 2)
+							.attr("r", circleRadius + 2);
+
 					})
 					.on("mouseout", function() {
 						beeswarmPanel.main.selectAll("circle").style("opacity", 1);
 						tooltip.style("display", "none");
 						verticalLine.style("opacity", 0);
 						gBeeswarmXAxis.select("path").style("stroke", "none");
+						d3.select(".clonedCircle").remove();
 					});
 
 				//end of drawBeeswarm
 			}
 
-			//ENDS BEESWARM PANEL
+			//END BEESWARM PANEL
 
-			//BOTTOM PANEL
+			//CONTROL FUNCTIONS
 
-			var sortingOrder = ["National NGO", "UN", "Red Cross/Crescent Movement", "International NGO"];
+			function mouseenterBarsDonors(d, barNumber) {
 
-			partnersData.sort(function(a, b) {
-				return sortingOrder.indexOf(a.partner) > sortingOrder.indexOf(b.partner) ? 1 : -1
-			});
+				barsPanel.main.selectAll("*").interrupt();
 
-			var partnersNamesData = partnersData.map(function(d) {
-				return {
-					name: d.partner
-				}
-			});
-
-			var bottomPanelTitle = bottomPanel.main.append("text")
-				.attr("class", "cbpfbpbarsPanelTitle")
-				.attr("y", bottomPanel.padding[0])
-				.attr("x", bottomPanel.padding[3])
-				.text("All Allocations by Partner");
-
-			var bottomBars = bottomPanel.main.selectAll(null)
-				.data(partnersData)
-				.enter()
-				.append("rect")
-				.attr("class", function(d) {
-					return d.partner.replace(/[^a-zA-Z]+/g, '') + "PartnerColor";
-				})
-				.attr("y", bottomPanel.padding[0] + 10)
-				.attr("x", bottomPanel.padding[3])
-				.attr("height", bottomBarsHeight)
-				.attr("width", 0)
-				.attr("stroke", "white");
-
-			bottomBars.transition()
-				.delay(thirdDelay)
-				.duration(duration)
-				.attr("x", (d, i) => {
-					if (i === 0) {
-						d.cumulativePercentage = 0;
-						return bottomScaleValues(0);
-					} else {
-						var counter = 0;
-						for (var j = 0; j < i; j++) {
-							counter += partnersData[j].percentage;
-						};
-						d.cumulativePercentage = counter;
-						return bottomScaleValues(counter);
-					}
-				})
-				.attr("width", function(d) {
-					return bottomScaleValues(d.percentage) - bottomPanel.padding[3]
+				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
+					return e.donor === d.donor ? 1 : 0.05
 				});
 
-			var bottomNames = bottomPanel.main.selectAll(null)
-				.data(partnersNamesData)
-				.enter()
-				.append("text")
-				.attr("class", "cbpfbpbottomNames")
-				.attr("text-anchor", "middle")
-				.style("opacity", 0)
-				.attr("y", bottomPanel.height - bottomPanel.padding[2] + 11)
-				.text(function(d) {
-					return d.name;
+				gBarsDonorsYAxis.selectAll(".tick").style("opacity", function(e) {
+					return e === d.donor ? 1 : 0.05
 				});
 
-			bottomNames.attr("x", function(d, i) {
-				var found = partnersData.find(function(e) {
-					return e.partner === d.name
-				});
-				var middlePosition = bottomScaleValues(found.cumulativePercentage) + (bottomScaleValues(found.percentage) - bottomPanel.padding[3]) / 2;
-				if (!i) {
-					var thisBox = this.getBBox().width;
-					return (found.textPosition = middlePosition < (bottomPanel.padding[3] + thisBox / 2) ?
-						(bottomPanel.padding[3] + thisBox / 2) : middlePosition);
-				} else {
-					var previousPosition = this.previousSibling.getBBox();
-					var thisBox = this.getBBox();
-					return (found.textPosition = middlePosition - (thisBox.width / 2) < previousPosition.x + previousPosition.width ?
-						previousPosition.x + previousPosition.width + 16 + (thisBox.width / 2) : middlePosition);
-				}
-			});
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
 
-			var bottomPolylines = bottomPanel.main.selectAll(null)
-				.data(partnersData)
-				.enter()
-				.append("polyline")
-				.style("stroke-width", "1px")
-				.style("stroke", "#888")
-				.style("fill", "none")
-				.style("opacity", 0)
-				.attr("points", function(d) {
-					return "" + (bottomScaleValues(d.cumulativePercentage) - bottomPanel.padding[3] / 2 + bottomScaleValues(d.percentage) / 2) + "," +
-						(bottomPanel.padding[0] + 12 + bottomBarsHeight) + " " + (bottomScaleValues(d.cumulativePercentage) - bottomPanel.padding[3] / 2 + bottomScaleValues(d.percentage) / 2) +
-						"," + (bottomPanel.padding[0] + 16 + bottomBarsHeight) + " " + d.textPosition + "," + (bottomPanel.padding[0] + 16 + bottomBarsHeight) +
-						" " + d.textPosition + "," + (bottomPanel.height - bottomPanel.padding[2] - 2)
-				});
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
 
-			bottomNames.transition()
-				.delay(thirdDelay)
-				.duration(duration)
-				.style("opacity", 1);
-
-			bottomPolylines.transition()
-				.delay(thirdDelay)
-				.duration(duration)
-				.style("opacity", 1);
-
-			bottomBars.on("mousemove", function(d, i) {
-					bottomBars.style("opacity", function(_, j) {
-						return i === j ? 1 : 0.15
-					});
-					bottomNames.style("opacity", function(e) {
-						return e.name === d.partner ? 1 : 0.15;
-					});
-					bottomPolylines.style("opacity", function(e) {
-						return e.partner === d.partner ? 1 : 0.15;
-					});
-					tooltip.style("display", "block").html("Partner: " + d.partner + "<br>Allocation: $" + formatMoney2Decimals(d.value) +
-						"<br>(" + formatPercent2Decimals(d.percentage) + " of the total)");
-					var mouse = d3.mouse(this)[0];
-					var tooltipSize = tooltip.node().getBoundingClientRect();
-					tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
-						.style("left", mouse > bottomPanel.width - (tooltipSize.width / 2) ?
-							d3.event.pageX - (mouse - (bottomPanel.width - (tooltipSize.width))) + "px" :
-							mouse < (tooltipSize.width / 2) ?
-							d3.event.pageX - mouse + "px" :
-							d3.event.pageX - tooltipSize.width / 2 + "px");
-				})
-				.on("mouseout", function() {
-					bottomPolylines.style("opacity", 1)
-					bottomNames.style("opacity", 1);
-					bottomBars.style("opacity", 1);
-					tooltip.style("display", "none");
-				});
-
-			//END BOTTOM PANEL
-
-			function mouseenterBarsContributions(d, barNumber) {
-				barsContributions.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
-					return e.donor === d.donor ? 1 : 0.15
-				});
-				gBarsContributionsYAxis.selectAll(".tick").style("opacity", function(e) {
-					return e === d.donor ? 1 : 0.15
-				});
 				links.style("opacity", function(e) {
 					return e.source.donor === d.donor ? 0.2 : 0;
 				});
-				barsAllocations.each(function(e) {
+
+				flags.style("opacity", function(e) {
+					return e.donor === d.donor ? 1 : 0.05;
+				});
+
+				barsCbpfs.each(function(e) {
+
 					var thisGroup = d3.select(this);
 					var donorFound;
+
 					if (d.donor === "Other Donors") {
 						donorFound = e.donors.filter(function(f) {
 							return d.donorsList.indexOf(f.donor) > -1
@@ -1237,7 +1109,9 @@
 							donorFound = donorFound.reduce(function(a, b) {
 								return {
 									donor: a.donor + ";" + b.donor,
-									amount: a.amount + b.amount
+									amountPaid: a.amountPaid + b.amountPaid,
+									amountPledge: a.amountPledge + b.amountPledge,
+									amountPaidPlusPledge: a.amountPaidPlusPledge + b.amountPaidPlusPledge
 								}
 							});
 						} else {
@@ -1248,69 +1122,124 @@
 							return f.donor === d.donor
 						});
 					};
-					if (donorFound === undefined || donorFound.amount === 0) {
+					if (donorFound === undefined || donorFound.amountPaidPlusPledge === 0) {
 						thisGroup.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
-							.style("opacity", 0.15);
-						gBarsAllocationsYAxis.selectAll(".tick").filter(function(f) {
+							.style("opacity", 0.05);
+						gBarsCbpfsYAxis.selectAll(".tick").filter(function(f) {
 								return f === e.cbpf;
 							})
-							.style("opacity", 0.15);
+							.style("opacity", 0.05);
 					} else {
+
 						thisGroup.select(".cbpfbpbarsAllocationsOverRect")
 							.transition()
-							.duration(shortDuration)
+							.duration(shortDuration * 2)
 							.style("opacity", 1)
-							.attr("width", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)));
+							.attr("width", barsCbpfsXScale(donorFound.amountPaid));
+
 						thisGroup.select(".cbpfbpbarsAllocationsOverLine")
 							.transition()
-							.duration(shortDuration)
+							.duration(shortDuration * 2)
 							.style("opacity", 1)
-							.attr("x1", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)))
-							.attr("x2", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)));
-						thisGroup.select(".cbpfbpbarsAllocationsOverText")
+							.attr("x1", barsCbpfsXScale(donorFound.amountPaid))
+							.attr("x2", barsCbpfsXScale(donorFound.amountPaid));
+
+						thisGroup.select(".cbpfbpbarsAllocationsRects")
 							.transition()
-							.duration(shortDuration)
-							.style("opacity", (barsAllocationsXScale(e.totalBudget) - barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget))) < 20 && barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) < 20 ? 0 : 1)
-							.attr("x", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) > 24 ?
-								barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) - 4 :
-								barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) + 4)
-							.attr("text-anchor", barsAllocationsXScale(Math.min(donorFound.amount, e.totalBudget)) > 24 ? "end" : "start")
-							.text(formatPercent(Math.min(donorFound.amount, e.totalBudget) / e.totalBudget) === "0%" ? "<1%" : formatPercent(Math.min(donorFound.amount, e.totalBudget) / e.totalBudget))
+							.duration(shortDuration * 2)
+							.attr("width", barsCbpfsXScale(donorFound.amountPaidPlusPledge));
+
+						thisGroup.select(".cbpfbpbarsLabels")
+							.transition()
+							.duration(shortDuration * 2)
+							.attr("x", function() {
+								return barsCbpfsXScale(donorFound.amountPaidPlusPledge) + barsDonorsLabelsPadding;
+							})
+							.tween("text", function() {
+								var percentPaid = " (" + formatPercent(donorFound.amountPaid / donorFound.amountPaidPlusPledge) +
+									" paid)";
+								localVariable.set(this, donorFound.amountPaidPlusPledge);
+								var node = this;
+								var i = d3.interpolate(e.totalPaidPlusPledge, donorFound.amountPaidPlusPledge);
+								return function(t) {
+									d3.select(node).text("$" + formatSIFloat1decimal(i(t)))
+										.append("tspan")
+										.attr("class", "cbpfbpbarsMiddleText")
+										.attr("dy", "-1px")
+										.text(percentPaid);
+								};
+							});
 					}
 				});
+
 				var donorText = d.donor === "Other Donors" ? "Donors" : "Donor"
 				var donorCountry = d.donor === "Other Donors" ? generateOtherDonorsList(d.donorsList) : d.donor;
-				tooltip.style("display", "block").html(donorText + ": <strong><span class='contributionColorHTMLcolor'>" + donorCountry +
-					"</span></strong><br style=\"line-height:170%;\"/><div id=contributionsTooltipBar></div>Total Paid: <span class='contributionColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPaid) +
-					" (" + formatPercent(d.totalPaid / d.totalPaidPlusPledge) +
-					")</span><br>Total Pledged: <span class='contributionColorHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPledge) +
-					" (" + formatPercent(d.totalPledge / d.totalPaidPlusPledge) + ")</span>");
-				createContributionsTooltipBar(d);
+
+				var cbpfsInOthers = d.donations.filter(function(e) {
+					return otherCbpfs ? otherCbpfs.cbpfList.indexOf(e.cbpf) > -1 : false;
+				});
+
+				var cbpfsInOthersText = cbpfsInOthers.length === 0 ? "" : "<br><br>Other CBPFs <span style='color:#666;'>(" +
+					formatSIFloat1decimal(d3.sum(cbpfsInOthers, function(e) {
+						return e.amountPaidPlusPledge
+					})) +
+					")</span>:<br style='line-height:170%;'/>";
+
+				tooltip.style("display", "block")
+					.html(donorText + ": <strong><span class='contributionColorHTMLcolor'>" + donorCountry +
+						"</span></strong><br style='line-height:170%;'/><div id=contributionsTooltipBar></div>Total Paid: <span class='contributionColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPaid) +
+						" (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
+						")</span><br>Total Pledged: <span class='contributionColorHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPledge) +
+						" (" + (formatPercent(d.totalPledge / d.totalPaidPlusPledge) === "0%" && d.totalPledge !== 0 ? "<1%" : formatPercent(d.totalPledge / d.totalPaidPlusPledge)) + ")</span>" + cbpfsInOthersText);
+
+				createDonorsTooltipBar(d);
+
+				if (cbpfsInOthers.length > 0) createTooltipSVG(cbpfsInOthers, "cbpf", "allocationColorFill");
+
 				var tooltipSize = tooltip.node().getBoundingClientRect();
 				localVariable.set(tooltip.node(), tooltipSize);
 				var mouse = d3.mouse(this)[0];
-				tooltip.style("top", barNumber === 10 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
+
+				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 12 + "px" : d3.event.pageY + 20 + "px")
 					.style("left", mouse < (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
-				barsMiddleText.text("Donated to...")
-					.style("opacity", 1);
-				highlightBeeswarm(d, "Contributions");
-				flags.style("opacity", function(e) {
-					return e.donor === d.donor ? 1 : 0.15;
-				});
-				//end of mouseenterBarsContributions
+
+				barsMiddleText.text("Donated to... (darker color indicates")
+					.append("tspan")
+					.attr("x", barsPanel.width / 2 + flagPadding / 2)
+					.attr("dy", "1em")
+					.text("paid amount, lighter color")
+					.append("tspan")
+					.attr("x", barsPanel.width / 2 + flagPadding / 2)
+					.attr("dy", "1em")
+					.text("indicates pledged amount)");
+
+				highlightBeeswarm(d, "Donors");
+
+				//end of mouseenterBarsDonors
 			};
 
-			function mouseenterBarsAllocations(d, barNumber) {
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
-					return e.cbpf === d.cbpf ? 1 : 0.15
+			function mouseenterBarsCbpfs(d, barNumber) {
+
+				barsPanel.main.selectAll("*").interrupt();
+
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
+					return e.cbpf === d.cbpf ? 1 : 0.05
 				});
-				gBarsAllocationsYAxis.selectAll(".tick").style("opacity", function(e) {
-					return e === d.cbpf ? 1 : 0.15
+
+				gBarsCbpfsYAxis.selectAll(".tick").style("opacity", function(e) {
+					return e === d.cbpf ? 1 : 0.05
 				});
+
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
+
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
+
 				links.style("opacity", function(e) {
 					return e.target.cbpf === d.cbpf ? 0.2 : 0;
-				})
-				barsContributions.each(function(e) {
+				});
+
+				barsDonors.each(function(e) {
+
 					var thisGroup = d3.select(this);
 					var cbpfFound;
 					if (d.cbpf === "Other CBPFs") {
@@ -1321,7 +1250,9 @@
 							cbpfFound = cbpfFound.reduce(function(a, b) {
 								return {
 									cbpf: a.cbpf + ";" + b.cbpf,
-									amountPaid: a.amountPaid + b.amountPaid
+									amountPaid: a.amountPaid + b.amountPaid,
+									amountPledge: a.amountPledge + b.amountPledge,
+									amountPaidPlusPledge: a.amountPaidPlusPledge + b.amountPaidPlusPledge
 								}
 							});
 						} else {
@@ -1332,258 +1263,528 @@
 							return f.cbpf === d.cbpf
 						});
 					};
-					if (cbpfFound === undefined || cbpfFound.amountPaid === 0) {
+					if (cbpfFound === undefined || cbpfFound.amountPaidPlusPledge === 0) {
 						thisGroup.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
-							.style("opacity", 0.15);
-						gBarsContributionsYAxis.selectAll(".tick").filter(function(f) {
+							.style("opacity", 0.05);
+						gBarsDonorsYAxis.selectAll(".tick").filter(function(f) {
 								return f === e.donor;
 							})
-							.style("opacity", 0.15);
+							.style("opacity", 0.05);
 					} else {
+
 						thisGroup.select(".cbpfbpbarsContributionsOverRect")
 							.transition()
-							.duration(shortDuration)
+							.duration(shortDuration * 2)
 							.style("opacity", 1)
-							.attr("x", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)))
-							.attr("width", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)));
+							.attr("x", barsDonorsXScale(cbpfFound.amountPaid))
+							.attr("width", barsPanel.barsSpace - barsDonorsXScale(cbpfFound.amountPaid));
+
 						thisGroup.select(".cbpfbpbarsContributionsOverLine")
 							.transition()
-							.duration(shortDuration)
+							.duration(shortDuration * 2)
 							.style("opacity", 1)
-							.attr("x1", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)))
-							.attr("x2", barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)));
-						thisGroup.select(".cbpfbpbarsContributionsOverText")
+							.attr("x1", barsDonorsXScale(cbpfFound.amountPaid))
+							.attr("x2", barsDonorsXScale(cbpfFound.amountPaid));
+
+						thisGroup.select(".cbpfbpbarsContributionsRects")
 							.transition()
-							.duration(shortDuration)
-							.style("opacity", (barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) - barsContributionsXScale(e.totalPaidPlusPledge)) < 20 && barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 20 ? 0 : 1)
-							.attr("x", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 24 ?
-								barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) - 4 :
-								barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) + 4)
-							.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge)) < 24 ? "end" : "start")
-							.text(formatPercent(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge) / e.totalPaidPlusPledge) === "0%" ? "<1%" : formatPercent(Math.min(cbpfFound.amountPaid, e.totalPaidPlusPledge) / e.totalPaidPlusPledge));
+							.duration(shortDuration * 2)
+							.attr("x", barsDonorsXScale(cbpfFound.amountPaidPlusPledge))
+							.attr("width", barsPanel.barsSpace - barsDonorsXScale(cbpfFound.amountPaidPlusPledge));
+
+						thisGroup.select(".cbpfbpbarsLabels")
+							.transition()
+							.duration(shortDuration * 2)
+							.attr("x", function() {
+								return barsDonorsXScale(cbpfFound.amountPaidPlusPledge) - barsDonorsLabelsPadding;
+							})
+							.tween("text", function() {
+								var percentPaid = " (" + formatPercent(cbpfFound.amountPaid / cbpfFound.amountPaidPlusPledge) +
+									" paid) ";
+								localVariable.set(this, cbpfFound.amountPaidPlusPledge);
+								var node = this;
+								var i = d3.interpolate(e.totalPaidPlusPledge, cbpfFound.amountPaidPlusPledge);
+								return function(t) {
+									d3.select(node).text("")
+										.append("tspan")
+										.attr("class", "cbpfbpbarsMiddleText")
+										.attr("dy", "-1px")
+										.text(percentPaid)
+										.append("tspan")
+										.attr("class", "cbpfbpbarsLabels")
+										.text("$" + formatSIFloat1decimal(i(t)));
+								};
+							});
+
 					}
 				});
-				var cbpfText = d.cbpf === "Other CBPFs" ? "CBPFs" : "CBPF"
-				var cbpfCountry = d.cbpf === "Other CBPFs" ? d.cbpfList.slice(0, d.cbpfList.length - 1).join(", ") + " and " + d.cbpfList[d.cbpfList.length - 1] : d.cbpf;
-				tooltip.style("display", "block").html(cbpfText + ": <strong><span class='allocationColorHTMLcolor'>" + cbpfCountry + "</span></strong><br style=\"line-height:170%;\"/>Total received: $" + formatMoney2Decimals(d.totalBudget) +
-					"<br>Under approval: $" + formatMoney2Decimals(d.totalPipeline) + "<br style=\"line-height:170%;\"/><div id=allocationsTooltipBar></div>Standard: <span class='allocationColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalStandard) +
-					" (" + formatPercent(d.totalStandard / d.totalBudget) +
-					")</span><br>Reserve: <span class='allocationColorHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalReserve) + " (" + formatPercent(d.totalReserve / d.totalBudget) +
-					")</span><br style=\"line-height:170%;\"/>Allocations by Partner:<div id='cbpfbptooltipDonutDiv'></div>");
-				createAllocationsTooltipBar(d);
-				createTooltipSVG(d.organizations);
+
+				var cbpfText = d.cbpf === "Other CBPFs" ? "CBPFs" : "CBPF";
+
+				var cbpfCountry = "";
+
+				if (d.cbpf === "Other CBPFs") {
+					for (var index = 0; index < d.cbpfList.length - 1; index++) {
+						var thisCbpfAmount = dataCbpfs.filter(function(e) {
+							return e.cbpf === d.cbpfList[index]
+						})[0].totalPaidPlusPledge;
+						if (index === 0) {
+							cbpfCountry += d.cbpfList[index] + " <span style='color:#666;font-size:12px;font-weight:300;'>(" +
+								formatSIFloat1decimal(thisCbpfAmount) + ")</span><br>";
+						} else {
+							cbpfCountry += "<span style='margin-left:52px;'>" + d.cbpfList[index] + " </span><span style='color:#666;font-size:12px;font-weight:300;'>(" +
+								formatSIFloat1decimal(thisCbpfAmount) + ")</span><br>";
+						};
+					};
+					cbpfCountry = cbpfCountry.slice(0, cbpfCountry.length - 4);
+				} else {
+					cbpfCountry = d.cbpf;
+				};
+
+				var donorsInOthers = d.donors.filter(function(e) {
+					return otherDonors ? otherDonors.donorsList.indexOf(e.donor) > -1 : false;
+				});
+
+				var donorsInOthersText = donorsInOthers.length === 0 ? "" : "<br><br>Other donors <span style='color:#666;'>(" +
+					formatSIFloat1decimal(d3.sum(donorsInOthers, function(e) {
+						return e.amountPaidPlusPledge
+					})) +
+					")</span>:<br style='line-height:170%;'/>";
+
+				tooltip.style("display", "block")
+					.html(cbpfText + ": <strong><span class='allocationColorHTMLcolor'>" + cbpfCountry +
+						"</span></strong><br style=\"line-height:170%;\"/><div id=allocationsTooltipBar></div>Paid donations: <span class='allocationColorDarkerHTMLcolor' style='font-weight:700;'>$" +
+						formatMoney2Decimals(d.totalPaid) + " (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
+						")</span><br>Pledged donations: <span class='allocationColorHTMLcolor' style='font-weight:700;'>$" +
+						formatMoney2Decimals(d.totalPledge) + " (" + (formatPercent(d.totalPledge / d.totalPaidPlusPledge) === "0%" && d.totalPledge !== 0 ? "<1%" : formatPercent(d.totalPledge / d.totalPaidPlusPledge)) +
+						")</span>" + donorsInOthersText);
+
+				createCbpfsTooltipBar(d);
+
+				if (donorsInOthers.length > 0) createTooltipSVG(donorsInOthers, "donor", "contributionColorFill");
+
 				var tooltipSize = tooltip.node().getBoundingClientRect();
 				localVariable.set(tooltip.node(), tooltipSize);
 				var mouse = d3.mouse(this)[0];
+
 				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
 					.style("left", mouse > barsPanel.width - (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
-				barsMiddleText.text("Received from...")
-					.style("opacity", 1);
-				highlightBeeswarm(d, "Allocations");
+
+				barsMiddleText.text("Received from... (darker color indicates")
+					.append("tspan")
+					.attr("x", barsPanel.width / 2 + flagPadding / 2)
+					.attr("dy", "1em")
+					.text("paid amount, lighter color")
+					.append("tspan")
+					.attr("x", barsPanel.width / 2 + flagPadding / 2)
+					.attr("dy", "1em")
+					.text("indicates pledged amount)");
+
+				highlightBeeswarm(d, "CBPFs");
+
 				var donorsList = d.donors.map(function(e) {
 					return e.donor
 				});
+
 				flags.style("opacity", function(e) {
-					return donorsList.indexOf(e.donor) > -1 ? 1 : 0.15;
+					return donorsList.indexOf(e.donor) > -1 ? 1 : 0.05;
 				});
-				//end of mouseenterBarsAllocations
+
+				//end of mouseenterBarsCbpfs
 			};
 
-			function mousemoveBarsContributions(_, barNumber) {
+			function mouseenterLinks(d) {
+
+				links.style("opacity", 0);
+
+				d3.select(this).style("opacity", 0.4);
+
+				var thisBarsDonorsGroup = barsDonors.filter(function(e) {
+					return e.donor === d.source.donor;
+				});
+
+				var thisBarsCbpfsGroup = barsCbpfs.filter(function(e) {
+					return e.cbpf === d.target.cbpf;
+				});
+
+				var thisDonor = top10Donors.find(function(e) {
+					return e.donor === d.source.donor
+				});
+
+				var thisCbpf = top10Cbpfs.find(function(e) {
+					return e.cbpf === d.target.cbpf
+				});
+
+				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+					.style("opacity", function(e) {
+						return e.donor === d.source.donor ? 1 : 0.05;
+					});
+
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+					.style("opacity", function(e) {
+						return e.cbpf === d.target.cbpf ? 1 : 0.05;
+					});
+
+				gBarsDonorsYAxis.selectAll(".tick").style("opacity", function(e) {
+					return e === d.source.donor ? 1 : 0.05
+				});
+
+				gBarsCbpfsYAxis.selectAll(".tick").style("opacity", function(e) {
+					return e === d.target.cbpf ? 1 : 0.05
+				});
+
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
+
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
+
+				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsOverRect")
+					.transition()
+					.duration(shortDuration * 2)
+					.style("opacity", 1)
+					.attr("width", barsCbpfsXScale(d.source.valuePaid));
+
+				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsOverLine")
+					.transition()
+					.duration(shortDuration * 2)
+					.style("opacity", 1)
+					.attr("x1", barsCbpfsXScale(d.source.valuePaid))
+					.attr("x2", barsCbpfsXScale(d.source.valuePaid));
+
+				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsRects")
+					.transition()
+					.duration(shortDuration * 2)
+					.attr("width", barsCbpfsXScale((d.source.valuePaid + d.source.valuePledge)));
+
+				thisBarsCbpfsGroup.select(".cbpfbpbarsLabels")
+					.transition()
+					.duration(shortDuration * 2)
+					.attr("x", function() {
+						return barsCbpfsXScale((d.source.valuePaid + d.source.valuePledge)) + barsDonorsLabelsPadding;
+					})
+					.tween("text", function() {
+						var percentPaid = " (" + formatPercent(d.source.valuePaid / (d.source.valuePaid + d.source.valuePledge)) +
+							" paid)";
+						localVariable.set(this, (d.source.valuePaid + d.source.valuePledge));
+						var node = this;
+						var i = d3.interpolate(thisDonor.totalPaidPlusPledge, (d.source.valuePaid + d.source.valuePledge));
+						return function(t) {
+							d3.select(node).text("$" + formatSIFloat1decimal(i(t)))
+								.append("tspan")
+								.attr("class", "cbpfbpbarsMiddleText")
+								.attr("dy", "-1px")
+								.text(percentPaid);
+						};
+					});
+
+				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsOverRect")
+					.transition()
+					.duration(shortDuration * 2)
+					.style("opacity", 1)
+					.attr("x", barsDonorsXScale(d.target.valuePaid))
+					.attr("width", barsPanel.barsSpace - barsDonorsXScale(d.target.valuePaid));
+
+				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsOverLine")
+					.transition()
+					.duration(shortDuration * 2)
+					.style("opacity", 1)
+					.attr("x1", barsDonorsXScale(d.target.valuePaid))
+					.attr("x2", barsDonorsXScale(d.target.valuePaid));
+
+				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsRects")
+					.transition()
+					.duration(shortDuration * 2)
+					.attr("x", barsDonorsXScale((d.target.valuePaid + d.target.valuePledge)))
+					.attr("width", barsPanel.barsSpace - barsDonorsXScale((d.target.valuePaid + d.target.valuePledge)));
+
+				thisBarsDonorsGroup.select(".cbpfbpbarsLabels")
+					.transition()
+					.duration(shortDuration * 2)
+					.attr("x", function() {
+						return barsDonorsXScale((d.target.valuePaid + d.target.valuePledge)) - barsDonorsLabelsPadding;
+					})
+					.tween("text", function() {
+						var percentPaid = " (" + formatPercent(d.target.valuePaid / (d.target.valuePaid + d.target.valuePledge)) +
+							" paid) ";
+						localVariable.set(this, (d.target.valuePaid + d.target.valuePledge));
+						var node = this;
+						var i = d3.interpolate(thisCbpf.totalPaidPlusPledge, (d.target.valuePaid + d.target.valuePledge));
+						return function(t) {
+							d3.select(node).text("")
+								.append("tspan")
+								.attr("class", "cbpfbpbarsMiddleText")
+								.attr("dy", "-1px")
+								.text(percentPaid)
+								.append("tspan")
+								.attr("class", "cbpfbpbarsLabels")
+								.text("$" + formatSIFloat1decimal(i(t)));
+						};
+					});
+
+				var thisCbpfName = d.target.cbpf === "Other CBPFs" ? "Other CBPFs (" + d.target.cbpfNameInOthers + ")" : d.target.cbpf;
+				var thisDonorName = d.source.donor === "Other Donors" ? "Other Donors (" + d.source.donorNames.join(", ") + ")" : d.source.donor;
+
+				tooltip.style("display", "block")
+					.html("Donor: <strong><span class='contributionColorHTMLcolor'>" +
+						thisDonorName + "</span></strong><br>CBPF: <strong><span class='allocationColorHTMLcolor'>" + thisCbpfName + "</span></strong><br style='line-height:230%;'/>Total paid: $" +
+						formatMoney2Decimals(d.source.valuePaid) + "<br>Total pledged: $" + formatMoney2Decimals(d.source.valuePledge));
+
+				var tooltipSize = tooltip.node().getBoundingClientRect();
+				localVariable.set(tooltip.node(), tooltipSize);
+
+				tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
+					.style("left", d3.event.pageX - tooltipSize.width / 2 + "px");
+
+				flags.style("opacity", function(e) {
+					return e.donor === thisDonor.donor ? 1 : 0.15;
+				});
+
+				highlightBeeswarmLinks(d.source, d.target);
+
+				//end of mouseenterLinks
+			};
+
+			function mousemoveBarsDonors(_, barNumber) {
 				var tooltipSize = localVariable.get(tooltip.node());
 				var mouse = d3.mouse(this)[0];
-				tooltip.style("top", barNumber === 10 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
+				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 12 + "px" : d3.event.pageY + 20 + "px")
 					.style("left", mouse < (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
-			}
+			};
 
-			function mousemoveBarsAllocations(_, barNumber) {
+			function mousemoveBarsCbpfs(_, barNumber) {
 				var tooltipSize = localVariable.get(tooltip.node());
 				var mouse = d3.mouse(this)[0];
 				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
 					.style("left", mouse > barsPanel.barsSpace - (tooltipSize.width / 2) ? d3.event.pageX - (mouse - (barsPanel.barsSpace - (tooltipSize.width))) + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
-			}
-
-			function mouseoutBarsContributions(d) {
-				barsPanel.main.selectAll("*").interrupt();
-				clearContributions();
-				tooltip.style("display", "none");
-				barsMiddleText.style("opacity", 0);
-				links.style("opacity", 0.1);
-				restoreBeeswarm();
-				flags.style("opacity", 1);
-				//end of mouseoutBarsContributions
-			};
-
-			function mouseoutBarsAllocations(d) {
-				barsPanel.main.selectAll("*").interrupt();
-				clearAllocations();
-				tooltip.style("display", "none");
-				barsMiddleText.style("opacity", 0);
-				links.style("opacity", 0.1);
-				restoreBeeswarm();
-				flags.style("opacity", 1);
-				//end of mouseoutBarsAllocations
-			};
-
-			function mouseenterLinks(d) {
-				links.style("opacity", 0);
-				d3.select(this).style("opacity", 0.4);
-				var thisBarsContributionsGroup = barsContributions.filter(function(e) {
-					return e.donor === d.source.donor;
-				});
-				var thisBarsAllocationsGroup = barsAllocations.filter(function(e) {
-					return e.cbpf === d.target.cbpf;
-				});
-				var thisDonor = top10Contributions.find(function(e) {
-					return e.donor === d.source.donor
-				});
-				var thisCbpf = top10Allocations.find(function(e) {
-					return e.cbpf === d.target.cbpf
-				});
-				barsContributions.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
-					.style("opacity", function(e) {
-						return e.donor === d.source.donor ? 1 : 0.15;
-					});
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
-					.style("opacity", function(e) {
-						return e.cbpf === d.target.cbpf ? 1 : 0.15;
-					});
-				gBarsContributionsYAxis.selectAll(".tick").style("opacity", function(e) {
-					return e === d.source.donor ? 1 : 0.15
-				});
-				gBarsAllocationsYAxis.selectAll(".tick").style("opacity", function(e) {
-					return e === d.target.cbpf ? 1 : 0.15
-				});
-
-				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverRect")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("x", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)))
-					.attr("width", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)));
-				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverLine")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("x1", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)))
-					.attr("x2", barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)));
-				thisBarsContributionsGroup.select(".cbpfbpbarsContributionsOverText")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", (barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) - barsContributionsXScale(thisDonor.totalPaidPlusPledge)) < 20 &&
-						barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 20 ? 0 : 1)
-					.attr("x", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 24 ?
-						barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) - 4 :
-						barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) + 4)
-					.attr("text-anchor", barsPanel.barsSpace - barsContributionsXScale(Math.min(d.source.value, thisDonor.totalPaidPlusPledge)) < 24 ? "end" : "start")
-					.text(formatPercent(Math.min(d.source.value, thisDonor.totalPaidPlusPledge) / thisDonor.totalPaidPlusPledge));
-
-				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverRect")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("width", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)));
-				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverLine")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", 1)
-					.attr("x1", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)))
-					.attr("x2", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)));
-				thisBarsAllocationsGroup.select(".cbpfbpbarsAllocationsOverText")
-					.transition()
-					.duration(shortDuration)
-					.style("opacity", (barsAllocationsXScale(thisCbpf.totalBudget) - barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget))) < 20 &&
-						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) < 20 ? 0 : 1)
-					.attr("x", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) > 24 ?
-						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) - 4 :
-						barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) + 4)
-					.attr("text-anchor", barsAllocationsXScale(Math.min(d.target.value, thisCbpf.totalBudget)) > 24 ? "end" : "start")
-					.text(formatPercent(Math.min(d.target.value, thisCbpf.totalBudget) / thisCbpf.totalBudget));
-
-				var thisCbpfName = d.target.cbpf === "Other CBPFs" ? "Other CBPFs (" + d.target.cbpfNameInOthers + ")" : d.target.cbpf;
-				var thisDonorName = d.source.donor === "Other Donors" ? "Other Donors (" + d.source.donorNames.join(", ") + ")" : d.source.donor;
-				tooltip.style("display", "block").html("Donor: <strong><span class='contributionColorHTMLcolor'>" +
-					thisDonorName + "</span></strong><br>CBPF: <strong><span class='allocationColorHTMLcolor'>" + thisCbpfName + "</span></strong><br style=\"line-height:170%;\"/>Value: $" +
-					formatMoney2Decimals(d.source.value));
-				var tooltipSize = tooltip.node().getBoundingClientRect();
-				localVariable.set(tooltip.node(), tooltipSize);
-				tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
-					.style("left", d3.event.pageX - tooltipSize.width / 2 + "px");
-				flags.style("opacity", function(e) {
-					return e.donor === thisDonor.donor ? 1 : 0.15;
-				});
-				highlightBeeswarmLinks(d.source, d.target);
-				//end of mouseenterLinks
 			};
 
 			function mousemoveLinks(d) {
 				var tooltipSize = localVariable.get(tooltip.node());
 				tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
 					.style("left", d3.event.pageX - tooltipSize.width / 2 + "px");
-				//end of mousemoveLinks
+			};
+
+			function mouseoutBarsDonors(d) {
+				barsPanel.main.selectAll("*").interrupt();
+				clearDonors();
+				tooltip.style("display", "none");
+				barsMiddleText.text(null);
+				links.style("opacity", 0.1);
+				restoreBeeswarm();
+				flags.style("opacity", 1);
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
+			};
+
+			function mouseoutBarsCbpfs(d) {
+				barsPanel.main.selectAll("*").interrupt();
+				clearCbpfs();
+				tooltip.style("display", "none");
+				barsMiddleText.text(null);
+				links.style("opacity", 0.1);
+				restoreBeeswarm();
+				flags.style("opacity", 1);
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
 			};
 
 			function mouseoutLinks() {
 				barsPanel.main.selectAll("*").interrupt();
-				clearContributions();
-				clearAllocations();
+				clearDonors();
+				clearCbpfs();
 				links.style("opacity", 0.1);
 				tooltip.style("display", "none");
 				flags.style("opacity", 1);
 				restoreBeeswarm();
-				//end of mouseoutLinks
+				gBarsDonorsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
+				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 1);
 			};
 
-			function clearContributions() {
-				barsContributions.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+			function createDonorsTooltipBar(datum) {
+
+				var containerDiv = d3.select("#contributionsTooltipBar");
+
+				containerDiv.style("margin-bottom", "8px")
+					.style("width", "250px");
+
+				var scaleDiv = d3.scaleLinear()
+					.domain([0, datum.totalPaidPlusPledge])
+					.range([0, 250]);
+
+				var div1 = containerDiv.append("div")
+					.style("float", "left")
+					.classed("contributionColorDarkerHTMLbc", true)
+					.style("height", "14px")
+					.style("width", "0px")
+					.style("border-right", scaleDiv(datum.totalPaid) < 1 ? "0px solid white" : "1px solid white");
+
+				div1.transition()
+					.duration(shortDuration)
+					.style("width", scaleDiv(datum.totalPaid) + "px");
+
+				var div2 = containerDiv.append("div")
+					.classed("contributionColorHTMLbc", true)
+					.style("margin-left", "0px")
+					.style("height", "14px")
+					.style("width", "0px");
+
+				div2.transition()
+					.duration(shortDuration)
+					.style("margin-left", scaleDiv(datum.totalPaid) + 1 + "px")
+					.style("width", scaleDiv(datum.totalPledge) + "px");
+
+				//end of createDonorsTooltipBar
+			};
+
+			function createCbpfsTooltipBar(datum) {
+
+				var containerDiv = d3.select("#allocationsTooltipBar");
+
+				containerDiv.style("margin-bottom", "8px")
+					.style("width", "250px");
+
+				var scaleDiv = d3.scaleLinear()
+					.domain([0, datum.totalPaidPlusPledge])
+					.range([0, 250]);
+
+				var div1 = containerDiv.append("div")
+					.style("float", "left")
+					.classed("allocationColorDarkerHTMLbc", true)
+					.style("height", "14px")
+					.style("width", "0px")
+					.style("border-right", scaleDiv(datum.totalPaid) < 1 ? "0px solid white" : "1px solid white");
+
+				div1.transition()
+					.duration(shortDuration)
+					.style("width", scaleDiv(datum.totalPaid) + "px");
+
+				var div2 = containerDiv.append("div")
+					.classed("allocationColorHTMLbc", true)
+					.style("margin-left", "0px")
+					.style("height", "14px")
+					.style("width", "0px");
+
+				div2.transition()
+					.duration(shortDuration)
+					.style("margin-left", scaleDiv(datum.totalPaid) + 1 + "px")
+					.style("width", scaleDiv(datum.totalPledge) + "px");
+
+				//end of createAllocationsTooltipBar
+			}
+
+			function clearDonors() {
+
+				barsCbpfsTooltipRect.attr("pointer-events", "none");
+
+				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
 					.style("opacity", 1);
-				gBarsContributionsYAxis.selectAll(".tick")
+				gBarsDonorsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
 					.style("opacity", 1);
-				gBarsAllocationsYAxis.selectAll(".tick")
+				gBarsCbpfsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsOverRect")
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsOverRect")
 					.style("opacity", 0)
 					.attr("width", 0);
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsOverLine")
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsOverLine")
 					.style("opacity", 0)
 					.attr("x1", 0)
 					.attr("x2", 0);
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsOverText")
-					.style("opacity", 0)
-					.attr("x", 0);
+
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects")
+					.transition()
+					.duration(shortDuration)
+					.attr("width", function(d) {
+						return barsCbpfsXScale(d.totalPaidPlusPledge)
+					})
+					.on("end", function() {
+						barsCbpfsTooltipRect.attr("pointer-events", "all");
+					})
+
+				barsCbpfs.selectAll(".cbpfbpbarsLabels")
+					.transition()
+					.duration(shortDuration)
+					.attr("x", function(d) {
+						return barsCbpfsXScale(d.totalPaidPlusPledge) + barsDonorsLabelsPadding;
+					})
+					.tween("text", function(d) {
+						if (!localVariable.get(this)) return;
+						var node = this;
+						var i = d3.interpolate(localVariable.get(this), d.totalPaidPlusPledge);
+						return function(t) {
+							node.textContent = "$" + formatSIFloat1decimal(i(t));
+						};
+					})
+					.on("end", function() {
+						localVariable.remove(this);
+					});
+
 				//end of clearContributions
 			};
 
-			function clearAllocations() {
-				barsAllocations.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+			function clearCbpfs() {
+
+				barsDonorsTooltipRect.attr("pointer-events", "none");
+
+				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
 					.style("opacity", 1);
-				gBarsAllocationsYAxis.selectAll(".tick")
+				gBarsCbpfsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsContributions.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
 					.style("opacity", 1);
-				gBarsContributionsYAxis.selectAll(".tick")
+				gBarsDonorsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsContributions.selectAll(".cbpfbpbarsContributionsOverRect")
+				barsDonors.selectAll(".cbpfbpbarsContributionsOverRect")
 					.style("opacity", 0)
 					.attr("x", barsPanel.barsSpace)
 					.attr("width", 0);
-				barsContributions.selectAll(".cbpfbpbarsContributionsOverLine")
+				barsDonors.selectAll(".cbpfbpbarsContributionsOverLine")
 					.style("opacity", 0)
 					.attr("x1", barsPanel.barsSpace)
 					.attr("x2", barsPanel.barsSpace);
-				barsContributions.selectAll(".cbpfbpbarsContributionsOverText")
-					.style("opacity", 0)
-					.attr("x", barsPanel.barsSpace);
+
+				barsDonors.selectAll(".cbpfbpbarsContributionsRects")
+					.transition()
+					.duration(shortDuration)
+					.attr("x", function(d) {
+						return barsDonorsXScale(d.totalPaidPlusPledge)
+					})
+					.attr("width", function(d) {
+						return barsPanel.barsSpace - barsDonorsXScale(d.totalPaidPlusPledge)
+					})
+					.on("end", function() {
+						barsDonorsTooltipRect.attr("pointer-events", "all");
+					})
+
+				barsDonors.selectAll("text.cbpfbpbarsLabels")
+					.transition()
+					.duration(shortDuration)
+					.attr("x", function(d) {
+						return barsDonorsXScale(d.totalPaidPlusPledge) - barsDonorsLabelsPadding;
+					})
+					.tween("text", function(d) {
+						if (!localVariable.get(this)) return;
+						var node = this;
+						var i = d3.interpolate(localVariable.get(this), d.totalPaidPlusPledge);
+						return function(t) {
+							node.textContent = "$" + formatSIFloat1decimal(i(t));
+						};
+					})
+					.on("end", function() {
+						localVariable.remove(this);
+					});
+
 				//end of clearAllocations
 			};
 
 			function highlightBeeswarm(datum, type) {
+
 				if (!beeswarmTransitionEnded) return;
+
 				var dataList = datum.donor === "Other Donors" ? "donorsList" : datum.cbpf === "Other CBPFs" ? "cbpfList" : null;
 				var thisCircle = [];
-				var prop = type === "Contributions" ? "donor" : "cbpf";
+				var prop = type === "Donors" ? "donor" : "cbpf";
+
 				beeswarmPanel.main.selectAll("circle")
 					.style("opacity", function(d) {
 						var found = false;
@@ -1594,7 +1795,7 @@
 								y: d3.select(this).attr("cy"),
 								fill: d3.select(this).style("fill")
 							});
-						}
+						};
 						if (d[prop] === datum[prop]) {
 							found = true;
 							thisCircle.push({
@@ -1602,18 +1803,22 @@
 								y: d3.select(this).attr("cy"),
 								fill: d3.select(this).style("fill")
 							});
-						}
-						return found ? 1 : 0.15;
+						};
+						return found ? 1 : 0.1;
 					});
-				verticalLine.attr("x1", beeswarmXScale(datum.totalPaidPlusPledge || datum.totalBudget))
-					.attr("x2", beeswarmXScale(datum.totalPaidPlusPledge || datum.totalBudget))
-					.attr("y1", Object.keys(datum)[0] === "donor" ? beeswarmYScale("Contributions") : beeswarmYScale("Allocations"))
+
+				verticalLine.attr("x1", beeswarmXScale(datum.totalPaidPlusPledge))
+					.attr("x2", beeswarmXScale(datum.totalPaidPlusPledge))
+					.attr("y1", Object.keys(datum)[0] === "donor" ? beeswarmYScale("Donors") : beeswarmYScale("CBPFs"))
 					.attr("y2", beeswarmPanel.height - beeswarmPanel.padding[2])
 					.style("opacity", 1);
+
 				if (datum.donor === "Other Donors" || datum.cbpf === "Other CBPFs") {
 					verticalLine.style("opacity", 0)
 				};
+
 				gBeeswarmXAxis.select("path").style("stroke", "#ccc");
+
 				var enlargedCircles = beeswarmPanel.main.selectAll(null)
 					.data(thisCircle)
 					.enter()
@@ -1633,12 +1838,16 @@
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("r", circleRadius + 2);
+
 				//end of highlightBeeswarm
 			};
 
 			function highlightBeeswarmLinks(source, target) {
+
 				if (!beeswarmTransitionEnded) return;
+
 				var theseCircles = [];
+
 				beeswarmPanel.main.selectAll("circle")
 					.style("opacity", function(d) {
 						var found = false;
@@ -1681,6 +1890,7 @@
 						}
 						return found ? 1 : 0.15;
 					});
+
 				var enlargedCircles = beeswarmPanel.main.selectAll(null)
 					.data(theseCircles)
 					.enter()
@@ -1700,26 +1910,32 @@
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("r", circleRadius + 2);
-				var secondLine = verticalLine.clone();
+
+				var secondLine = verticalLine.clone(false);
+
 				var circleDonor = theseCircles.find(function(d) {
 					return d.type === "donor"
 				});
+
 				var circleCBPF = theseCircles.find(function(d) {
 					return d.type === "cbpf"
 				});
+
 				verticalLine.attr("x1", circleDonor ? circleDonor.x : 0)
 					.attr("x2", circleDonor ? circleDonor.x : 0)
-					.attr("y1", beeswarmYScale("Contributions"))
+					.attr("y1", beeswarmYScale("Donors"))
 					.attr("y2", beeswarmPanel.height - beeswarmPanel.padding[2])
 					.style("opacity", circleDonor ? 1 : 0);
+
 				secondLine.attr("class", "cbpfbpsecondVerticalLine")
 					.attr("x1", circleCBPF.x)
 					.attr("x2", circleCBPF.x)
-					.attr("y1", beeswarmYScale("Allocations"))
+					.attr("y1", beeswarmYScale("CBPFs"))
 					.attr("y2", beeswarmPanel.height - beeswarmPanel.padding[2])
 					.style("opacity", 1);
 
 				gBeeswarmXAxis.select("path").style("stroke", "#ccc");
+
 				//end of highlightBeeswarmLinks
 			}
 
@@ -1730,229 +1946,149 @@
 				gBeeswarmXAxis.select("path").style("stroke", "none");
 				d3.selectAll(".cbpfbpenlargedCircles").remove();
 				d3.select(".cbpfbpsecondVerticalLine").remove();
-				//end of restoreBeeswarm
 			};
 
-			function createTooltipSVG(partners) {
+			function generateOtherDonorsList(donorsList) {
+				var div = "<div style='margin-left:54px;margin-top:-20px;margin-bottom:-14px'>";
+				donorsList.forEach(function(d) {
+					var thisDonor = dataDonors.filter(function(e) {
+						return e.donor === d;
+					})[0];
+					var thisIsoCode = thisDonor.isoCode;
+					var thisAmount = thisDonor.totalPaidPlusPledge;
+					var imageSource = flagsDirectory + thisIsoCode + ".png";
+					div += "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:0px;'>  " + d +
+						" <span style='color:#666;font-size:12px;font-weight:300;'>(" + formatSIFloat1decimal(thisAmount) + ")</span><br>";
+				});
+				div += "</div>";
+				return div;
+			};
 
-				partners.sort(function(a, b) {
-					return d3.ascending(a.budget, b.budget)
+			function createTooltipSVG(othersData, type, colorFill) {
+
+				othersData.sort(function(a, b) {
+					return d3.descending(a.amountPaidPlusPledge, b.amountPaidPlusPledge)
 				});
 
-				var svgTooltipWidth = 250,
-					svgTooltipGroupSpace = 18,
-					squareSize = 14,
-					svgTooltipPaddings = [10, 50, 10, 50],
-					donutRadius = (svgTooltipWidth - svgTooltipPaddings[3] - svgTooltipPaddings[1]) / 2,
-					textRadius = donutRadius - 10,
-					svgTooltipHeight = (svgTooltipWidth - svgTooltipPaddings[3] - svgTooltipPaddings[1] + svgTooltipPaddings[0] +
-						svgTooltipPaddings[2]) + (svgTooltipGroupSpace * partners.length) - (svgTooltipGroupSpace - squareSize);
+				var svgTooltipWidth = 260,
+					yAxisPadding = 8,
+					tooltipPadding = [0, 16, 15, 0],
+					svgTooltipHeight = 15 * othersData.length + tooltipPadding[2];
 
-				var svgTooltip = d3.select("#cbpfbptooltipDonutDiv")
+				var svgTooltip = d3.select("#cbpfbptooltipdiv")
 					.append("svg")
 					.attr("width", svgTooltipWidth)
 					.attr("height", svgTooltipHeight)
 					.style("background-color", "#f1f1f1");
 
-				var totalValue = d3.sum(partners, function(d) {
-					return d.budget;
+				var yScaleTooltip = d3.scaleBand()
+					.domain(othersData.map(function(d) {
+						return d[type];
+					}))
+					.range([tooltipPadding[0], svgTooltipHeight - tooltipPadding[2]])
+					.paddingInner(.5)
+					.paddingOuter(0.25);
+
+				var yAxisTooltip = d3.axisLeft(yScaleTooltip)
+					.tickSizeOuter(0)
+					.tickSizeInner(0);
+
+				var gY = svgTooltip.append("g")
+					.attr("class", "cbpfbpyAxisTooltip")
+					.call(yAxisTooltip);
+
+				var axisBox = gY.node().getBBox();
+
+				tooltipPadding[3] = axisBox.width + yAxisPadding;
+
+				gY.attr("transform", "translate(" + tooltipPadding[3] + ",0)");
+
+				var xScaleTooltip = d3.scaleLinear()
+					.domain([0, d3.max(othersData, function(d) {
+						return d.amountPaidPlusPledge
+					})])
+					.range([tooltipPadding[3], svgTooltipWidth - tooltipPadding[1]]);
+
+				var tickValuesArray = d3.range(3).map(function(d) {
+					return xScaleTooltip.domain()[1] * ((d + 1) / 3)
 				});
 
-				var pie = d3.pie()
-					.sort(null)
-					.value(function(d) {
-						return d.budget;
+				var xAxisTooltip = d3.axisBottom(xScaleTooltip)
+					.tickValues(tickValuesArray)
+					.tickSizeOuter(0)
+					.tickSizeInner(4)
+					.tickFormat(function(d) {
+						return "$" + formatSIFloat1decimal(d)
 					});
 
-				var arc = d3.arc()
-					.outerRadius(donutRadius - 15)
-					.innerRadius(donutRadius - 45);
-
-				var donutGroup = svgTooltip.append("g")
-					.attr("transform", "translate(" + (svgTooltipPaddings[3] + donutRadius) + "," + (svgTooltipPaddings[0] + donutRadius) + ")");
-
-				var donutSlice = donutGroup.selectAll(null)
-					.data(pie(partners))
+				var bars = svgTooltip.selectAll(null)
+					.data(othersData)
 					.enter()
-					.append("g");
-
-				var donutSlicePath = donutSlice.append("path")
-					.attr("class", function(d) {
-						return d.data.type.replace(/[^a-zA-Z]+/g, '') + "PartnerColor"
+					.append("rect")
+					.attr("x", tooltipPadding[3])
+					.attr("y", function(d) {
+						return yScaleTooltip(d[type])
 					})
+					.attr("height", yScaleTooltip.bandwidth())
+					.attr("width", 0)
+					.attr("class", colorFill)
 					.transition()
-					.duration(shortDuration)
-					.attrTween("d", function(d) {
-						d.innerRadius = 0;
-						var i = d3.interpolate({
-							startAngle: 0,
-							endAngle: 0
-						}, d);
-						return function(t) {
-							return arc(i(t));
-						};
+					.duration(shortDuration * 2)
+					.attr("width", function(d) {
+						return xScaleTooltip(d.amountPaidPlusPledge) - tooltipPadding[3]
 					});
 
-				var donutSliceText = donutSlice.append("text")
-					.attr("font-size", "12px")
-					.attr("font-family", "Roboto")
-					.style("fill", "darkslategray")
-					.attr("text-anchor", function(d, i) {
-						return i === 0 && (d.value / totalValue) < 0.1 ? "middle" : (d.endAngle + d.startAngle) / 2 > Math.PI ? "end" : "start";
+				var gX = svgTooltip.append("g")
+					.attr("class", "cbpfbpxAxisTooltip")
+					.attr("transform", "translate(0," + (svgTooltipHeight - tooltipPadding[2]) + ")")
+					.call(xAxisTooltip);
+
+				d3.select(".cbpfbpxAxisTooltip")
+					.selectAll(".tick")
+					.filter(function(d) {
+						return d === 0;
 					})
-					.attr("dy", function(d) {
-						return (d.endAngle + d.startAngle) / 2 < Math.PI / 2 || (d.endAngle + d.startAngle) / 2 > Math.PI * 1.5 ? "0em" : "0.5em";
-					})
-					.attr("transform", function(d) {
-						var c = arc.centroid(d),
-							xPos = c[0],
-							yPos = c[1],
-							h = Math.sqrt(xPos * xPos + yPos * yPos);
-						return "translate(" + (xPos / h * textRadius) + "," + (yPos / h * textRadius) + ")";
-					})
-					.text(function(d) {
-						return d3.format(".0%")(d.value / totalValue)
-					});
-
-				var legendsGroup = svgTooltip.selectAll(null)
-					.data(partners)
-					.enter()
-					.append("g")
-					.attr("transform", function(_, i) {
-						return "translate(0," + ((donutRadius * 2 + svgTooltipPaddings[0] + svgTooltipPaddings[2]) + i * svgTooltipGroupSpace) + ")";
-					});
-
-				legendsGroup.append("rect")
-					.attr("width", squareSize)
-					.attr("height", squareSize)
-					.attr("class", function(d) {
-						return d.type.replace(/[^a-zA-Z]+/g, '') + "PartnerColor"
-					});
-
-				legendsGroup.append("text")
-					.style("font-family", "Roboto")
-					.style("font-size", "12px")
-					.style("fill", "darkslategray")
-					.attr("x", 20)
-					.attr("y", 11)
-					.text(function(d) {
-						return d.type
-					});
+					.remove();
 
 				//end of createTooltipSVG
-			};
-
-			function createContributionsTooltipBar(datum) {
-
-				var containerDiv = d3.select("#contributionsTooltipBar");
-
-				containerDiv.style("margin-bottom", "8px")
-					.style("width", "250px");
-
-				var scaleDiv = d3.scaleLinear()
-					.domain([0, datum.totalPaidPlusPledge])
-					.range([0, 250]);
-
-				var div1 = containerDiv.append("div")
-					.style("float", "left")
-					.classed("contributionColorDarkerHTMLbc", true)
-					.style("height", "14px")
-					.style("width", "0px")
-					.style("border-right", "1px solid white");
-
-				div1.transition()
-					.duration(shortDuration)
-					.style("width", scaleDiv(datum.totalPaid) + "px");
-
-				var div2 = containerDiv.append("div")
-					.classed("contributionColorHTMLbc", true)
-					.style("margin-left", "0px")
-					.style("height", "14px")
-					.style("width", "0px");
-
-				div2.transition()
-					.duration(shortDuration)
-					.style("margin-left", scaleDiv(datum.totalPaid) + 1 + "px")
-					.style("width", scaleDiv(datum.totalPledge) + "px");
-
-				//end of createContributionsTooltipBar
-			};
-
-			function createAllocationsTooltipBar(datum) {
-
-				var containerDiv = d3.select("#allocationsTooltipBar");
-
-				containerDiv.style("margin-bottom", "8px")
-					.style("width", "250px");
-
-				var scaleDiv = d3.scaleLinear()
-					.domain([0, datum.totalBudget])
-					.range([0, 250]);
-
-				var div1 = containerDiv.append("div")
-					.style("float", "left")
-					.classed("allocationColorDarkerHTMLbc", true)
-					.style("height", "14px")
-					.style("width", "0px")
-					.style("border-right", scaleDiv(datum.totalStandard) < 1 ? "0px solid white" : "1px solid white");
-
-				div1.transition()
-					.duration(shortDuration)
-					.style("width", scaleDiv(datum.totalStandard) + "px");
-
-				var div2 = containerDiv.append("div")
-					.classed("allocationColorHTMLbc", true)
-					.style("margin-left", "0px")
-					.style("height", "14px")
-					.style("width", "0px");
-
-				div2.transition()
-					.duration(shortDuration)
-					.style("margin-left", scaleDiv(datum.totalStandard) + 1 + "px")
-					.style("width", scaleDiv(datum.totalReserve) + "px");
-
-				//end of createAllocationsTooltipBar
 			}
 
-			function generateOtherDonorsList(donorsList) {
-				var div = "<div style='margin-left:54px;margin-top:-20px;margin-bottom:-14px'>";
-				donorsList.forEach(function(d) {
-					var thisIsoCode = dataContributions.filter(function(e) {
-						return e.donor === d;
-					})[0].isoCode;
-					var imageSource = localStorage.getItem("storedFlag" + thisIsoCode) ? "data:image/png;base64," + localStorage.getItem("storedFlag" + thisIsoCode) : flagsDirectory + thisIsoCode + ".png";
-					div += "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:1px;'>  " + d + "<br>";
-				});
-				div += "</div>";
-				return div;
-			}
+			//END CONTROL FUNCTIONS
 
 			//end of draw
 		};
 
 		function restart() {
 			started = false;
-			var all = svg.selectAll(".cbpfbptopPanel, .cbpfbpbarsPanel, .cbpfbpbeeswarmPanel, .cbpfbpbottomPanel")
+			var all = svg.selectAll(".cbpfbptopPanel, .cbpfbpbarsPanel, .cbpfbpbeeswarmPanel")
 				.selectAll("*");
 			all.interrupt();
 			all.remove();
 		};
 
-		function filterYearContribution(d) {
-			if (+d.FiscalYear === year) {
-				return d
-			};
-		};
+		function extractYear(yearParameter) {
+			yearsArray = yearParameter.split(",").map(function(d) {
+				return +d
+			});
+			if (yearsArray.length === 1 && yearsArray[0] === yearsArray[0]) {
+				return yearsArray
+			} else if (yearsArray.length === 2 && yearsArray[0] === yearsArray[0] && yearsArray[1] === yearsArray[1]) {
+				yearsArray.sort();
+				return d3.range(yearsArray[0], yearsArray[1] + 1, 1)
+			} else {
+				return [new Date().getFullYear()]
+			}
+		}
 
-		function filterYearAllocation(d) {
-			if (+d.AllocationYear === year) {
+		function filterYear(d) {
+			if (years.indexOf(+d.FiscalYear) > -1) {
 				return d
 			};
 		};
 
 		function wrapLabels(label, element) {
 			var splitLabel = label;
-			if (splitLabel.length > 12) {
+			if (splitLabel.length > 10) {
 				splitLabel = splitLabel.split(" ");
 			} else {
 				splitLabel = splitLabel.split()
@@ -1974,14 +2110,26 @@
 			}
 		};
 
+		function formatSIFloat(value) {
+			var length = (~~Math.log10(value) + 1) % 3;
+			var digits = length === 1 ? 2 : length === 2 ? 1 : 0;
+			return d3.formatPrefix("." + digits, value)(value);
+		};
+
+		function formatSIFloat1decimal(value) {
+			var length = (~~Math.log10(value) + 1) % 3;
+			var digits = length === 1 ? 1 : 0;
+			return d3.formatPrefix("." + digits, value)(value).replace("G", "B");
+		};
+
 		function formatSIInteger(value) {
 			return d3.formatPrefix(".0", value)(value);
 		};
 
 		function createProgressWhell() {
 			var wheelGroup = svg.append("g")
-				.attr("class", "gmslpgwheelGroup")
-				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
+				.attr("class", "cbpfbpwheelGroup")
+				.attr("transform", "translate(" + width / 2 + "," + height / 3 + ")");
 
 			var arc = d3.arc()
 				.outerRadius(30)
@@ -2030,11 +2178,50 @@
 		}
 
 		function removeProgressWheel() {
-			d3.select(".gmslpgwheelGroup").select("path").interrupt().remove();
+			var wheelGroup = d3.select(".cbpfbpwheelGroup");
+			wheelGroup.select("path").interrupt();
+			wheelGroup.remove();
 		}
 
 		//end of d3Chart
 	}
 
-	//end of cbpfPageChart
+	//POLYFILLS
+
+	//Array.prototype.find()
+
+	if (!Array.prototype.find) {
+		Object.defineProperty(Array.prototype, 'find', {
+			value: function(predicate) {
+				if (this == null) {
+					throw new TypeError('"this" is null or not defined');
+				}
+				var o = Object(this);
+				var len = o.length >>> 0;
+				if (typeof predicate !== 'function') {
+					throw new TypeError('predicate must be a function');
+				}
+				var thisArg = arguments[1];
+				var k = 0;
+				while (k < len) {
+					var kValue = o[k];
+					if (predicate.call(thisArg, kValue, k, o)) {
+						return kValue;
+					}
+					k++;
+				}
+				return undefined;
+			},
+			configurable: true,
+			writable: true
+		});
+	};
+
+	//Math.log10
+
+	Math.log10 = Math.log10 || function(x) {
+		return Math.log(x) * Math.LOG10E;
+	};
+
+	//end of d3ChartIIFE
 }());
