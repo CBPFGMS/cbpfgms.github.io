@@ -1,11 +1,10 @@
 # CBPF Unocha Page
 
-Data visualisation for the Country-based Pooled Funds (CBPF) page at unocha.org . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) page at [unocha.org](http://www.unocha.org/our-work/humanitarian-financing/country-based-pooled-funds-cbpfs) . The datavis contains several elements:
 
-- A top banner showing the total contributions and allocations;
-- A bar chart showing the top 10 contributions and the top 10 allocations, plus other contributions and allocations;
-- A beeswarm chart showing all contributions and allocations;
-- A stacked bar showing allocations by partners; 
+- A top banner showing the total contributions for the selected year or period;
+- A bar chart showing the top 10 donors and the top 10 CBPFs, plus other donors and CBPFs for the selected year or period, and the relationship between donors and CBPFs;
+- A beeswarm chart showing all donors and CBPFs for the selected year or period;
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/cbpfbp.png" width="450">
 
@@ -13,7 +12,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) page at unocha.org 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainercbpfbp" data-year="2017" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/cbpfbp/src/d3chartcbpfbp.js"></script>```
+```<div id="d3chartcontainercbpfbp" data-year="2018" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/cbpfbp/src/d3chartcbpfbp.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -25,18 +24,28 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and 
 
 There are two parameters:
 
-**`data-yearStart`**: defines the year depicted by the data visualisation. The value has to be the year with century as a decimal number, such as:
+**`data-year`**: defines the year depicted by the data visualisation. The value has to be the year with century as a decimal number, such as:
 
- `"2017"`
+ `"2018"`
 
-For the accepted values please refer to the data API.
+Alternatively, for defining a period, provide two years (with century) separated by comma. For instance:
+
+`"2016, 2018"`
+
+Will create a chart showing all donations from 2016 to 2018 (both start and end values included). If the years are not in the correct sequence the datavis will take the smallest value as the start year and the biggest value as the end year.
+
+If the provided value is not a valid number or if the provided period is not separated by a comma, the datavis will default to the current year.
+
+For the accepted values for the years/periods please refer to the data API.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
-- `"false"`: the SVG will be created with a fixed size, which is 1160px width and 750px height.
+- `"false"`: the SVG will be created with a fixed size, which is 743px width and 600px height.
 
-*Recommended size*: 1160px x 750px.
+Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
+
+*Recommended size*: 743px x 600px.
 
 
 ## CSS
