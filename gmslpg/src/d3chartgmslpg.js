@@ -206,7 +206,7 @@
 			.tickSizeOuter(0);
 
 		var xAxisLine = d3.axisBottom(xScaleLine)
-			.tickSizeInner(4)
+			.tickSizeInner(2)
 			.tickSizeOuter(0);
 
 		var selectedYear = +containerDiv.node().getAttribute("data-yearSelected");
