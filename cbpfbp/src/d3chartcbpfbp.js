@@ -82,6 +82,8 @@
 
 		var years = extractYear(containerDiv.node().getAttribute("data-year"));
 
+		var lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+
 		var svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
@@ -308,8 +310,14 @@
 				return d.isoCode;
 			});
 
-			d3.select(window).on("scroll", function() {
+			if (!lazyLoad) {
+				draw(aggregatedDonors, aggregatedCbpfs);
+			} else {
+				d3.select(window).on("scroll", checkPosition);
+				checkPosition();
+			};
 
+			function checkPosition() {
 				var amountScrolled = window.pageYOffset;
 
 				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
@@ -326,27 +334,8 @@
 					}
 				}
 
-			});
-
-			(function checkPosition() {
-
-				var amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(aggregatedDonors, aggregatedCbpfs);
-					}
-				}
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				}
-
-			})();
+				//end of checkPosition
+			}
 
 			//end of d3.csv
 		});
@@ -2175,13 +2164,13 @@
 			};
 
 			//end of createProgressWheel
-		}
+		};
 
 		function removeProgressWheel() {
 			var wheelGroup = d3.select(".cbpfbpwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
-		}
+		};
 
 		//end of d3Chart
 	}
