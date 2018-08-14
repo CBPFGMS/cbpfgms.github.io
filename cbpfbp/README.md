@@ -12,7 +12,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) page at [unocha.org
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainercbpfbp" data-year="2018" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/cbpfbp/src/d3chartcbpfbp.js"></script>```
+```<div id="d3chartcontainercbpfbp" data-year="2018" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/cbpfbp/src/d3chartcbpfbp.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -22,7 +22,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and 
 
 ## Parameters
 
-There are two parameters:
+There are three parameters:
 
 **`data-year`**: defines the year depicted by the data visualisation. The value has to be the year with century as a decimal number, such as:
 
@@ -44,6 +44,13 @@ For the accepted values for the years/periods please refer to the data API.
 - `"false"`: the SVG will be created with a fixed size, which is 743px width and 600px height.
 
 Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
+
+**`data-lazyload`**: defines is the animation starts when the SVG is visible. Accepted values:
+
+- `"true"`: the animation starts only when the SVG is visible in the browser window.
+- `"false"`: the animation starts when the page is loaded, regardless if the SVG is visible.
+
+If the value is neither `"true" ` or `"false"`, it defaults to `"false" `.
 
 *Recommended size*: 743px x 600px.
 
