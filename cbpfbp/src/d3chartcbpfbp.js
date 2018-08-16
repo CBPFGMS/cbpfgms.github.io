@@ -1012,7 +1012,7 @@
 							var imageSource = flagsDirectory + d.isoCode + ".png";
 						}
 
-						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='padding:1px;'><br style='line-height:180%;'/>";
+						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:1px;'><br style='line-height:180%;'/>";
 
 						verticalLine.attr("x1", beeswarmXScale(d.totalPaidPlusPledge))
 							.attr("x2", beeswarmXScale(d.totalPaidPlusPledge))
@@ -1946,7 +1946,7 @@
 					var thisIsoCode = thisDonor.isoCode;
 					var thisAmount = thisDonor.totalPaidPlusPledge;
 					var imageSource = flagsDirectory + thisIsoCode + ".png";
-					div += "<img src='" + imageSource + "' height='24' width='24' style='padding:0px;'>  " + d +
+					div += "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:0px;'>  " + d +
 						" <span style='color:#666;font-size:12px;font-weight:300;'>(" + formatSIFloat1decimal(thisAmount) + ")</span><br>";
 				});
 				div += "</div>";
