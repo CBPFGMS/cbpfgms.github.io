@@ -45,7 +45,7 @@ For the accepted values for the years/periods please refer to the data API.
 
 Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
 
-**`data-lazyload`**: defines is the animation starts when the SVG is visible. Accepted values:
+**`data-lazyload`**: defines if the animation starts when the SVG is visible. Accepted values:
 
 - `"true"`: the animation starts only when the SVG is visible in the browser window.
 - `"false"`: the animation starts when the page is loaded, regardless if the SVG is visible.
