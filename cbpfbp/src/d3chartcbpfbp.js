@@ -1012,7 +1012,7 @@
 							var imageSource = flagsDirectory + d.isoCode + ".png";
 						}
 
-						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:1px;'><br style='line-height:180%;'/>";
+						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='padding:0px;'><br style='line-height:180%;'/>";
 
 						verticalLine.attr("x1", beeswarmXScale(d.totalPaidPlusPledge))
 							.attr("x2", beeswarmXScale(d.totalPaidPlusPledge))
@@ -1027,7 +1027,7 @@
 								return e[name] === d[name] ? 1 : 0.1;
 							});
 
-						tooltip.style("display", "block").html(displayName + ": <strong><span class=" + circleClass + ">" + d[name] + "</span></strong> " + flag +
+						tooltip.style("display", "block").html("<div style='display:flex;'><span style='margin-top:3px;white-space:pre;'>" + displayName + ": </span><span style='margin-top:3px;white-space:pre;font-weight:bold;' class=" + circleClass + ">" + d[name] + " </span> " + flag + "</div>" +
 							description + ": $" + formatMoney2Decimals(d.totalPaidPlusPledge));
 
 						var mouse = d3.mouse(this)[0];
@@ -1161,7 +1161,7 @@
 					}
 				});
 
-				var donorText = d.donor === "Other Donors" ? "Donors" : "Donor"
+				var donorText = d.donor === "Other Donors" ? "Donors:<br>" : "Donor: "
 				var donorCountry = d.donor === "Other Donors" ? generateOtherDonorsList(d.donorsList) : d.donor;
 
 				var cbpfsInOthers = d.donations.filter(function(e) {
@@ -1175,7 +1175,7 @@
 					")</span>:<br style='line-height:170%;'/>";
 
 				tooltip.style("display", "block")
-					.html(donorText + ": <strong><span class='contributionColorHTMLcolor'>" + donorCountry +
+					.html(donorText + "<strong><span class='contributionColorHTMLcolor'>" + donorCountry +
 						"</span></strong><br style='line-height:170%;'/><div id=contributionsTooltipBar></div>Total Paid: <span class='contributionColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPaid) +
 						" (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
 						")</span><br>Total Pledged: <span class='contributionColorHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPledge) +
@@ -1938,7 +1938,7 @@
 			};
 
 			function generateOtherDonorsList(donorsList) {
-				var div = "<div style='margin-left:54px;margin-top:-20px;margin-bottom:-14px'>";
+				var div = "<div style='margin-left:0px;margin-top:0px;margin-bottom:-14px;display:flex;flex-wrap: wrap;'>";
 				donorsList.forEach(function(d) {
 					var thisDonor = dataDonors.filter(function(e) {
 						return e.donor === d;
@@ -1946,8 +1946,8 @@
 					var thisIsoCode = thisDonor.isoCode;
 					var thisAmount = thisDonor.totalPaidPlusPledge;
 					var imageSource = flagsDirectory + thisIsoCode + ".png";
-					div += "<img src='" + imageSource + "' height='24' width='24' style='margin-bottom:-8px;padding:0px;'>  " + d +
-						" <span style='color:#666;font-size:12px;font-weight:300;'>(" + formatSIFloat1decimal(thisAmount) + ")</span><br>";
+					div += "<div style='display:flex;flex:0 50%;white-space:pre;margin-top:0px;margin-bottom:-5px;'><img src='" + imageSource + "' height='24' width='24' style='padding:0px;'>  <span style='margin-top:4px;font-size:12px;'> " + d +
+						"</span><span style='margin-top:4px;color:#666;font-size:10px;font-weight:300;'> (" + formatSIFloat1decimal(thisAmount) + ")</span></div>";
 				});
 				div += "</div>";
 				return div;
