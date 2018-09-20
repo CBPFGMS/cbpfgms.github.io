@@ -39,7 +39,6 @@
 			padding = [2, 6, 2, 4],
 			formatNumberSI = d3.format(".3s"),
 			formatNumberSI2 = d3.format("~s"),
-			formatNumberSI3 = d3.format(".0s"),
 			formatComma = d3.format(","),
 			primaryColors = ["#418fde", "#ECA154"],
 			secondaryColor = "#888888",
@@ -85,7 +84,7 @@
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
-		createProgressWhell();
+		createProgressWheel();
 
 		var tooltip = d3.select("body").append("div")
 			.attr("id", "gmslpgtooltipdiv")
@@ -1109,7 +1108,8 @@
 						.tickSizeOuter(0)
 						.tickSizeInner(4)
 						.tickFormat(function(d) {
-							return "$" + formatNumberSI3(d)
+							var prefix = d3.formatPrefix(".0", d)
+							return "$" + prefix(d)
 						});
 
 					var bars = svgTooltip.selectAll(null)
@@ -1817,7 +1817,7 @@
 			//end of render
 		}
 
-		function createProgressWhell() {
+		function createProgressWheel() {
 			var wheelGroup = svg.append("g")
 				.attr("class", "gmslpgwheelGroup")
 				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
