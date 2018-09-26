@@ -52,6 +52,7 @@
 			circleRadius = 2.5,
 			controlPanelVerticalPadding = 20,
 			controlPanelSpacing = 18,
+			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			sortingCriteria = [{
 				value: "contributions",
 				text: "Contributions"
@@ -1072,9 +1073,29 @@
 
 				function createTooltipSVG(donors) {
 
+					var allDonors = donors.map(function(d) {
+						return d.GMSDonorName;
+					});
+
+					var allDonorsSizes = [];
+
+					allDonors.forEach(function(d) {
+						var fakeText = svg.append("text")
+							.attr("font-family", "Arial")
+							.attr("font-size", "10px")
+							.style("opacity", 0)
+							.text(d);
+
+						allDonorsSizes.push(Math.ceil(fakeText.node().getBBox().width));
+
+						fakeText.remove();
+					});
+
+					var biggestTick = d3.max(allDonorsSizes);
+
 					var svgTooltipWidth = 240,
-						tooltipPadding = [0, 16, 16, 100],
-						svgTooltipHeight = 14.8 * donors.length + tooltipPadding[2];
+						tooltipPadding = [0, 34, 0, biggestTick + 20],
+						svgTooltipHeight = 16 * donors.length + tooltipPadding[2];
 
 					var svgTooltip = d3.select("#gmslpgtooltipdiv")
 						.append("svg")
@@ -1082,9 +1103,7 @@
 						.attr("height", svgTooltipHeight);
 
 					var yScaleTooltip = d3.scaleBand()
-						.domain(donors.map(function(d) {
-							return d.GMSDonorName;
-						}))
+						.domain(allDonors)
 						.range([tooltipPadding[0], svgTooltipHeight - tooltipPadding[2]])
 						.paddingInner(.7)
 						.paddingOuter(0.25);
@@ -1101,16 +1120,8 @@
 
 					var yAxisTooltip = d3.axisLeft(yScaleTooltip)
 						.tickSizeOuter(0)
-						.tickSizeInner(0);
-
-					var xAxisTooltip = d3.axisBottom(xScaleTooltip)
-						.tickValues(tickValuesArray)
-						.tickSizeOuter(0)
-						.tickSizeInner(4)
-						.tickFormat(function(d) {
-							var prefix = d3.formatPrefix(".0", d)
-							return "$" + prefix(d)
-						});
+						.tickSizeInner(0)
+						.tickPadding(20);
 
 					var bars = svgTooltip.selectAll(null)
 						.data(donors)
@@ -1129,17 +1140,41 @@
 							return xScaleTooltip(d.PaidAmt) - tooltipPadding[3]
 						});
 
-					var gX = svgTooltip.append("g")
-						.attr("class", "gmslpgxAxisTooltip")
-						.attr("transform", "translate(0," + (svgTooltipHeight - tooltipPadding[2]) + ")")
-						.call(xAxisTooltip);
-
-					d3.select(".gmslpgxAxisTooltip")
-						.selectAll(".tick")
-						.filter(function(d) {
-							return d === 0;
+					var barsLabels = svgTooltip.selectAll(null)
+						.data(donors)
+						.enter()
+						.append("text")
+						.attr("x", tooltipPadding[3])
+						.attr("y", function(d) {
+							return yScaleTooltip(d.GMSDonorName) + 5
 						})
-						.remove();
+						.style("fill", "#555")
+						.attr("font-family", "Arial")
+						.attr("font-size", "9px")
+						.style("opacity", 0)
+						.transition()
+						.duration(duration)
+						.attr("x", function(d) {
+							return xScaleTooltip(d.PaidAmt) + 2;
+						})
+						.style("opacity", 1)
+						.text(function(d) {
+							return formatNumberSI(d.PaidAmt)
+						});
+
+					var flags = svgTooltip.selectAll(null)
+						.data(donors)
+						.enter()
+						.append("image")
+						.attr("width", 16)
+						.attr("height", 16)
+						.attr("y", function(d) {
+							return yScaleTooltip(d.GMSDonorName) - 5
+						})
+						.attr("x", tooltipPadding[3] - 18)
+						.attr("xlink:href", function(d) {
+							return flagsDirectory + (d.GMSDonorISO2Code.toLowerCase()) + ".png";
+						})
 
 					var gY = svgTooltip.append("g")
 						.attr("class", "gmslpgyAxisTooltip")
