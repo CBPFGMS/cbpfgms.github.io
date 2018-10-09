@@ -377,3 +377,111 @@ These styles apply to all D3 charts*/
 .cbpfbpxAxisTooltip line {
 	stroke: #ccc;
 }
+
+/*Public BI, Contributions tab, lollipop chart (code: pbiclc)*/
+
+#pbiclctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 270px;
+}
+
+.pbiclctopPanelMainValue, .pbiclctopPanelDonorsNumber, .pbiclctopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 60px;
+}
+
+.pbiclctopPanelMainText, .pbiclctopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #888;
+}
+
+.pbiclctopPanelDonorsText, .pbiclctopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	fill: #888;
+}
+
+.pbiclcbuttonsText, .pbiclcbuttonsContributionsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiclcleftArrowText, .pbiclcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbiclcDonorsPanelTitle, .pbiclcCbpfsPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+}
+
+.pbiclcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbiclcDonorLabel, .pbiclcCbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiclcDonorLabelPercentage {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonorsFake {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonors text, .pbiclcgroupYAxisCbpfs text {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonors path, .pbiclcgroupYAxisDonors line, .pbiclcgroupYAxisCbpfs path, .pbiclcgroupYAxisCbpfs line {
+	stroke: none;
+}
+
+.pbiclcgroupXAxisDonors text, .pbiclcgroupXAxisCbpfs text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiclcgroupXAxisDonors path, .pbiclcgroupXAxisCbpfs path{
+	stroke: none;
+}
+
+.pbiclcgroupXAxisDonors line, .pbiclcgroupXAxisCbpfs line{
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
