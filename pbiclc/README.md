@@ -6,7 +6,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 - A control banner allowing the selection of the year and the contribution (paid, pledge or total) and downloading the corresponding CSV;
 - Two lollipop charts, one for the donors and one for the CBPFs, according to the selected year and contribution type.
 
-<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiclc.png" width="450">
+<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiclc.png?" width="450">
 
 ## Getting started
 
