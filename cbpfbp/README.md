@@ -50,7 +50,7 @@ Note: On Internet Explorer this parameter will default to `"false"`, meaning tha
 - `"true"`: the animation starts only when the SVG is visible in the browser window.
 - `"false"`: the animation starts when the page is loaded, regardless if the SVG is visible.
 
-If the value is neither `"true" ` or `"false"`, it defaults to `"false" `.
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 *Recommended size*: 743px x 600px.
 
