@@ -977,7 +977,7 @@
 						const node = this;
 						const percentPaid = chartState.selectedContribution === "total" ?
 							" (" + formatPercent(d.paid / d.total) + " paid)" : "";
-						const i = d3.interpolate(reverseFormat(node.textContent), d[chartState.selectedContribution]);
+						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
 						return function(t) {
 							d3.select(node).text(formatNumberSI(i(t)))
 								.append("tspan")
@@ -997,7 +997,7 @@
 					donorTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
 						.on("mousemove", mousemoveTooltipRectangle)
 						.on("mouseout", mouseoutTooltipRectangle);
-				}, duration);
+				}, duration * 1.1);
 
 				xAxisDonors.tickSizeInner(-(lollipopGroupHeight * donorsArray.length));
 
@@ -1081,9 +1081,13 @@
 
 				};
 
-				donorGroup.on("mouseout", function() {
-					createCbpfsPanel(data.dataCbpfs, null);
-				});
+				donorGroup.on("mouseout", null);
+
+				setTimeout(function() {
+					donorGroup.on("mouseout", function() {
+						createCbpfsPanel(data.dataCbpfs, null);
+					});
+				}, duration * 1.1);
 
 				//end of createDonorsPanel
 			};
@@ -1210,7 +1214,7 @@
 						const node = this;
 						const percentPaid = chartState.selectedContribution === "total" ?
 							" (" + formatPercent(d.paid / d.total) + " received)" : "";
-						const i = d3.interpolate(reverseFormat(node.textContent), d[chartState.selectedContribution]);
+						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
 						return function(t) {
 							d3.select(node).text(formatNumberSI(i(t)))
 								.append("tspan")
@@ -1230,7 +1234,7 @@
 					cbpfTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
 						.on("mousemove", mousemoveTooltipRectangle)
 						.on("mouseout", mouseoutTooltipRectangle);
-				}, duration);
+				}, duration * 1.1);
 
 				xAxisCbpfs.tickSizeInner(-(lollipopGroupHeight * cbpfsArray.length));
 
@@ -1314,9 +1318,13 @@
 
 				};
 
-				cbpfGroup.on("mouseout", function() {
-					createDonorsPanel(data.dataDonors, null);
-				});
+				cbpfGroup.on("mouseout", null);
+
+				setTimeout(function() {
+					cbpfGroup.on("mouseout", function() {
+						createDonorsPanel(data.dataDonors, null);
+					});
+				}, duration * 1.1);
 
 				//end of createCbpfsPanel
 			};
@@ -1534,6 +1542,12 @@
 				};
 
 			});
+
+			const macedoniaObject = aggregatedDonors.find(function(d) {
+				return d.donor.indexOf("Macedonia") > -1;
+			});
+
+			if (macedoniaObject) macedoniaObject.donor = "Macedonia";
 
 			tempSetDonors = [];
 
@@ -1794,7 +1808,7 @@
 				}
 			});
 			return returnValue;
-		}
+		};
 
 		//end of d3Chart
 	};
