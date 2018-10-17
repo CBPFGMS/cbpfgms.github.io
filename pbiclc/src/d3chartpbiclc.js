@@ -1415,7 +1415,7 @@
 		function restart() {
 			started = false;
 			const all = svg.selectAll(".pbiclcTopPanel, .pbiclcButtonPanel, .pbiclcDonorsPanel, .pbiclcCbpfsPanel")
-				.selectAll("*");
+				.selectAll("*:not(.pbiclcgroupXAxisDonors, .pbiclcgroupXAxisCbpfs, .pbiclcgroupYAxisDonors, .pbiclcgroupYAxisCbpfs)");
 			all.interrupt();
 			all.remove();
 		};
