@@ -42,7 +42,7 @@ This charts shows the Donors and the CBPFs for selected years. See the [chart's 
 
 Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
 
-[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc)
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbicli)
 
 This charts shows the changes for Donors and CBPFs over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbicli) for more information.
 
