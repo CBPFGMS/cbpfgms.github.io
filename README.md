@@ -1,4 +1,4 @@
-
+  
 # OCHA Charts
 
 This is the repository for the charts and data visualisations at the OCHA sites. 
@@ -38,6 +38,14 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc) for more information.
 
+- **GMS BI: CBPF Contributions, line graph**
+
+Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc)
+
+This charts shows the changes for Donors and CBPFs over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbicli) for more information.
+
 ## Chart codes
 
 Each chart and data visualisation is identified by a unique six-letter code. 
@@ -51,3 +59,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 | GMS Landing Page chart  | `gmslpg`  |
 | CBPF Blog Page chart  | `cbpfbp`  |
 |GMS BI: CBPF Contributions, lollipop chart|`pbiclc`|
+|GMS BI: CBPF Contributions, line graph|`pbicli`|
