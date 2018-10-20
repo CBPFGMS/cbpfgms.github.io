@@ -485,3 +485,97 @@ These styles apply to all D3 charts*/
 	stroke: #ddd;
 	stroke-dasharray: 2, 2;
 }
+
+/*Public BI, Contributions tab, line graph (code: pbicli)*/
+
+#pbiclitooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 270px;
+}
+
+.pbicliButtonsTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #666;
+}
+
+.pbicliButtonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #888;
+}
+
+.pbicliUpArrow, .pbicliDownArrow {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+}
+
+.pbicliArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+}
+
+.pbicligroupXAxisDonors text, .pbicligroupXAxisCbpfs text, .pbicligroupYAxisDonors text, .pbicligroupYAxisCbpfs text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbicligroupXAxisDonors path, .pbicligroupXAxisCbpfs path, .pbicligroupYAxisDonors path, .pbicligroupYAxisCbpfs path{
+	stroke: gray;
+}
+
+.pbicligroupXAxisDonors line, .pbicligroupXAxisCbpfs line, .pbicligroupYAxisDonors line, .pbicligroupYAxisCbpfs line{
+	stroke: gray;
+}
+
+.pbicliFutureDonationsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbicliYAxisLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 8px;
+	fill: #888;
+}
+
+.pbicliLabelText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbicliFutureDonationsTextControl {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #444;
+}
+
+.pbicliDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbicliUnselectedPath {
+	stroke: #eee;
+}
+
+.pbicliUnselectedCircle {
+	fill: #eee;
+}
