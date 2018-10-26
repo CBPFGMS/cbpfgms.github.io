@@ -97,7 +97,9 @@
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
-		chartState.selectedPartner = containerDiv.node().getAttribute("data-partner");
+		chartState.selectedPartner = partnerListWithTotal.indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
+			containerDiv.node().getAttribute("data-partner") :
+			"total";
 
 		if (selectedResponsiveness === "false" || isInternetExplorer) {
 			containerDiv.style("width", width + "px")
