@@ -1006,9 +1006,9 @@
 							mouse[0] > (lollipopPanel.width - tooltipSize.width / 2) ?
 							d3.event.pageX - (mouse[0] - (lollipopPanel.width - tooltipSize.width)) + "px" :
 							d3.event.pageX - (tooltipSize.width / 2) + "px")
-						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + 10 ?
-							d3.event.pageY - tooltipSize.height - 10 + "px" :
-							d3.event.pageY + 10 + "px");
+						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + lollipopGroupHeight ?
+							d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
+							d3.event.pageY + lollipopGroupHeight + "px");
 
 				};
 
@@ -1025,9 +1025,9 @@
 							mouse[0] > (lollipopPanel.width - tooltipSize.width / 2) ?
 							d3.event.pageX - (mouse[0] - (lollipopPanel.width - tooltipSize.width)) + "px" :
 							d3.event.pageX - (tooltipSize.width / 2) + "px")
-						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + 10 ?
-							d3.event.pageY - tooltipSize.height - 10 + "px" :
-							d3.event.pageY + 10 + "px");
+						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + lollipopGroupHeight ?
+							d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
+							d3.event.pageY + lollipopGroupHeight + "px");
 
 				};
 
