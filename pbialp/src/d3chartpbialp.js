@@ -238,45 +238,32 @@
 
 			chartState.selectedYear = validateYear(selectedYearString);
 
-			d3.select(window).on("scroll", function() {
+			if (!lazyLoad) {
+				draw(rawData);
+			} else {
+				d3.select(window).on("scroll", checkPosition);
+				checkPosition();
+			};
 
-				var amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(rawData);
-					}
-				}
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				}
-
-			});
-
-			(function checkPosition() {
-
-				var amountScrolled = window.pageYOffset;
+			function checkPosition() {
+				const amountScrolled = window.pageYOffset;
 
 				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
 					amountScrolled < (distancetoTop + height * 0.9)) {
 					if (!started) {
 						draw(rawData);
 					}
-				}
+				};
 
 				if (started) {
 					if (amountScrolled < (distancetoTop - windowHeight) ||
 						amountScrolled > (distancetoTop + height)) {
 						restart();
 					}
-				}
+				};
 
-			})();
+				//end of checkPosition
+			};
 
 			//end of d3.csv
 		});
