@@ -2,9 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
 
-	//const cssLink = "https://cbpfgms.github.io/css/d3chartstyles.css";
-
-	const cssLink = "../combinedCSS/d3chartstyles.css"
+	const cssLink = "https://cbpfgms.github.io/css/d3chartstyles.css";
 
 	const externalCSS = document.createElement("link");
 	externalCSS.setAttribute("rel", "stylesheet");
