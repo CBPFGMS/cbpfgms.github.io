@@ -775,3 +775,82 @@ These styles apply to all D3 charts*/
 .pbialpUnderApprovalHTMLClass {
 	color: #8392a2;
 }
+
+/*Public BI, Allocations tab, line graph (code: pbiali)*/
+
+#pbialitooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 270px;
+}
+
+.pbialiMainPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #666;
+}
+
+.pbialigroupXAxisMainPanel text, .pbialigroupYAxisMainPanel text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbialigroupXAxisMainPanel path, .pbialigroupYAxisMainPanel path {
+	stroke: gray;
+}
+
+.pbialigroupXAxisMainPanel line {
+	stroke: gray;
+}
+
+.pbialigroupYAxisMainPanel line {
+	stroke: #e4e4e4;
+	stroke-dasharray: 2, 2;
+}
+
+.pbialiYAxisLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 8px;
+	fill: #888;
+}
+
+.pbialiButtonTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	text-transform: uppercase;
+}
+
+.pbialiUnselectedPath {
+	stroke: #eee;
+}
+
+.pbialiButtonsOrderControl {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbialiDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbialiLabelText {
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+	fill: #666;
+}
