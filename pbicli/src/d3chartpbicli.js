@@ -135,6 +135,9 @@
 			padding: [4, 40, 16, 32]
 		};
 
+		const maxSelectedNumber = ~~(Math.max(donorsLinesPanel.height - donorsLinesPanel.padding[0] - donorsLinesPanel.padding[2],
+			cbpfsLinesPanel.height - cbpfsLinesPanel.padding[0] - cbpfsLinesPanel.padding[2]) / labelGroupHeight);
+
 		const xScaleDonors = d3.scaleTime()
 			.range([donorsLinesPanel.padding[3], donorsLinesPanel.width - donorsLinesPanel.padding[1]]);
 
@@ -351,7 +354,7 @@
 				});
 
 				donorsButtonGroup.on("click", function(d) {
-						clickedButtons(d, this);
+						clickedButtons(d, "donor", this);
 					})
 					.on("mouseover", function(d) {
 						mouseOverButtons(d, "donor", this);
@@ -382,7 +385,7 @@
 				const cbpfsButtonGroup = cbpfsButtonsPanel.main.selectAll(".pbicliButtonsGroupcbpf");
 
 				cbpfsButtonGroup.on("click", function(d) {
-						clickedButtons(d, this);
+						clickedButtons(d, "cbpf", this);
 					})
 					.on("mouseover", function(d) {
 						mouseOverButtons(d, "cbpf", this);
@@ -787,9 +790,9 @@
 						.attr("width", cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] - cbpfsLinesPanel.padding[3] -
 							xAxisCbpfsRightMargin + circleRadius);
 
-					redrawLineGraph("donor");
+					redrawLineGraph("donor", true);
 
-					redrawLineGraph("cbpf");
+					redrawLineGraph("cbpf", true);
 
 					donorsLinesPanel.main.select(".pbicligroupXAxisDonors")
 						.transition(transition)
@@ -811,7 +814,36 @@
 
 				downloadGroup.on("click", function() {
 
-					//CODE HERE
+					const csv = createCSV(data.donors, data.cbpfs);
+
+					const fileName = "contributions.csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
 
 				});
 
@@ -820,40 +852,39 @@
 
 			function mouseOverButtons(datum, type, self) {
 
-				if (datum.clicked) return;
+				const thisSelectedArray = type === "donor" ? chartState.selectedDonors : chartState.selectedCbpfs;
 
-				if (type === "donor") {
-					chartState.selectedDonors.push(datum.donor)
-				} else {
-					chartState.selectedCbpfs.push(datum.cbpf)
+				if (!datum.clicked) {
+					thisSelectedArray.push(datum[type]);
 				};
 
 				d3.select(self).select("rect")
 					.style("fill", "gainsboro")
 					.style("stroke", "#000");
 
-				redrawLineGraph(type);
+				redrawLineGraph(type, false);
 
 				//end of mouseOverButtons
 			};
 
 			function mouseOutButtons(datum, type, self) {
 
-				if (datum.clicked) return;
+				const thisSelectedArray = type === "donor" ? chartState.selectedDonors : chartState.selectedCbpfs;
 
-				if (type === "donor") {
-					const index = chartState.selectedDonors.indexOf(datum.donor);
-					chartState.selectedDonors.splice(index, 1);
-				} else {
-					const index = chartState.selectedCbpfs.indexOf(datum.cbpf);
-					chartState.selectedCbpfs.splice(index, 1);
+				if (!datum.clicked) {
+					const index = thisSelectedArray.indexOf(datum[type]);
+					if (index > -1) {
+						thisSelectedArray.splice(index, 1);
+					};
 				};
 
-				d3.select(self).select("rect")
-					.style("fill", "white")
-					.style("stroke", "#444");
+				if (!datum.clicked) {
+					d3.select(self).select("rect")
+						.style("fill", "white")
+						.style("stroke", "#444");
+				};
 
-				redrawLineGraph(type);
+				redrawLineGraph(type, false);
 
 				//end of mouseOutButtons
 			};
@@ -868,7 +899,7 @@
 
 				const mouse = d3.mouse(thisPanel.main.node());
 
-				const mouseYear = xScale.invert(mouse[0]).getFullYear().toString();
+				const mouseYear = d3.timeMonth.offset(xScale.invert(mouse[0]), 6).getFullYear().toString();
 
 				const thisData = [];
 
@@ -989,9 +1020,22 @@
 				thisPanel.main.select(".pbicliTooltipGroup").remove();
 			};
 
-			function clickedButtons(datum, self) {
+			function clickedButtons(datum, type, self) {
+
+				const thisSelectedArray = type === "donor" ? chartState.selectedDonors : chartState.selectedCbpfs;
 
 				datum.clicked = !datum.clicked;
+
+				if (!datum.clicked) {
+					const index = thisSelectedArray.indexOf(datum[type]);
+					thisSelectedArray.splice(index, 1);
+				} else {
+					if (thisSelectedArray.indexOf(datum[type]) === -1) {
+						thisSelectedArray.push(datum[type]);
+					}
+				};
+
+				redrawLineGraph(type, false);
 
 				if (datum.clicked) {
 					d3.select(self).select("rect")
@@ -1006,7 +1050,7 @@
 				//end of clickedButtons
 			};
 
-			function redrawLineGraph(type) {
+			function redrawLineGraph(type, fromShow) {
 
 				const thisSelectedArray = type === "donor" ? chartState.selectedDonors : chartState.selectedCbpfs;
 
@@ -1019,6 +1063,8 @@
 				const yScale = type === "donor" ? yScaleDonors : yScaleCbpfs;
 
 				const xScale = type === "donor" ? xScaleDonors : xScaleCbpfs;
+
+				if (thisSelectedArray.length > maxSelectedNumber) return;
 
 				const selectedGroups = thisPanel.main.selectAll(".pbicliLineGroup")
 					.filter(function(d) {
@@ -1050,25 +1096,28 @@
 					.attr("class", "pbicliUnselectedCircle")
 					.style("opacity", 0);
 
-				let labelsGroup = thisPanel.main.selectAll(".labelsGroup")
-					.data(thisSelectedArray.map(function(d) {
-						const thisCountry = data[type + "s"].find(function(e) {
-							return e[type] === d;
+				const labelsData = thisSelectedArray.map(function(d) {
+					const thisCountry = data[type + "s"].find(function(e) {
+						return e[type] === d;
+					});
+					let thisDatum;
+					if (chartState.futureDonations) {
+						thisDatum = thisCountry.values[thisCountry.values.length - 1];
+					} else {
+						const filteredCountry = thisCountry.values.filter(function(e) {
+							return e.year <= currentYear.toString();
 						});
-						let thisDatum;
-						if (chartState.futureDonations) {
-							thisDatum = thisCountry.values[thisCountry.values.length - 1];
-						} else {
-							const filteredCountry = thisCountry.values.filter(function(e) {
-								return e.year <= currentYear.toString();
-							});
-							thisDatum = filteredCountry[filteredCountry.length - 1];
-						};
-						return {
-							name: thisCountry.isoCode.toUpperCase(),
-							datum: thisDatum
-						};
-					}), function(d) {
+						thisDatum = filteredCountry[filteredCountry.length - 1];
+					};
+					return {
+						name: thisCountry.isoCode.toUpperCase(),
+						datum: thisDatum,
+						yPos: yScale(thisDatum.total)
+					};
+				});
+
+				let labelsGroup = thisPanel.main.selectAll(".pbicliLabelsGroup")
+					.data(labelsData, function(d) {
 						return d.name;
 					});
 
@@ -1076,10 +1125,9 @@
 
 				const labelsGroupEnter = labelsGroup.enter()
 					.append("g")
-					.attr("class", "labelsGroup");
+					.attr("class", "pbicliLabelsGroup");
 
 				labelsGroupEnter.attr("transform", function(d) {
-					d.yPos = yScale(d.datum.total);
 					return "translate(" + (thisPanel.width - thisPanel.padding[1] + labelPadding) + "," +
 						d.yPos + ")";
 				});
@@ -1093,7 +1141,7 @@
 
 				const labelLine = labelsGroupEnter.append("polyline")
 					.style("stroke-width", "1px")
-					.style("stroke", "#222")
+					.style("stroke", "#999")
 					.style("fill", "none")
 					.attr("points", function(d) {
 						return (xScale(parseTime(d.datum.year)) - (thisPanel.width - thisPanel.padding[1] + labelPadding) + 5) + ",0 " +
@@ -1102,10 +1150,6 @@
 							(xScale(parseTime(d.datum.year)) - (thisPanel.width - thisPanel.padding[1] + labelPadding) + 5) + ",0"
 					});
 
-				labelsGroup.each(function(d) {
-					d.yPos = localVariable.get(this);
-				});
-
 				labelsGroup = labelsGroupEnter.merge(labelsGroup);
 
 				labelsGroup.raise();
@@ -1113,18 +1157,18 @@
 				collideLabels(labelsGroup.data(), thisPanel.height - thisPanel.padding[2]);
 
 				labelsGroup.attr("transform", function(d) {
-						return "translate(" + (thisPanel.width - thisPanel.padding[1] + labelPadding) + "," +
-							d.yPos + ")";
-					})
-					.each(function(d) {
-						localVariable.set(this, d.yPos);
-					});
+					return "translate(" + (thisPanel.width - thisPanel.padding[1] + labelPadding) + "," +
+						d.yPos + ")";
+				});
 
 				labelsGroup.select("text").text(function(d) {
 					return isoAlpha2to3[d.name] ? isoAlpha2to3[d.name] : d.name;
 				});
 
 				labelsGroup.select("polyline")
+					.style("opacity", 0)
+					.transition()
+					.duration(fromShow ? duration : 0)
 					.attr("points", function(d, i) {
 						if (!chartState.futureDonations) {
 							return (xScale(parseTime(d.datum.year)) - (thisPanel.width - thisPanel.padding[1] + labelPadding) + 5) +
@@ -1139,6 +1183,9 @@
 								-(labelPadding + i * 2) + "," + 0 + " " +
 								-labelPadding / 2 + "," + 0;
 						}
+					})
+					.on("end", function() {
+						d3.select(this).style("opacity", 1);
 					});
 
 				thisPanel.main.select(".pbicliRectOverlay").raise();
@@ -1274,7 +1321,7 @@
 			//end of setYDomain
 		};
 
-		function collideLabels(dataArray, maxValue) {
+		function collideLabels(dataArray, maxValue, minValue) {
 
 			if (dataArray.length < 2) return;
 
@@ -1293,6 +1340,14 @@
 					};
 				};
 			};
+
+			dataArray.forEach(function(_, i, arr) {
+				if (arr[i + 1]) {
+					if (arr[i + 1].yPos > arr[i].yPos - labelGroupHeight) {
+						collideLabels(dataArray, maxValue, minValue);
+					};
+				};
+			});
 
 			function isColliding(objA, objB) {
 				return !((objA.yPos + labelGroupHeight) < objB.yPos ||
@@ -1449,6 +1504,76 @@
 			return data;
 
 			//end of processData
+		};
+
+		function createCSV(sourceDataDonors, sourceDataCbpfs) {
+
+			const clonedDataDonors = JSON.parse(JSON.stringify(sourceDataDonors));
+
+			const clonedDataCbpfs = JSON.parse(JSON.stringify(sourceDataCbpfs));
+
+			clonedDataDonors.forEach(function(d) {
+				d.values.forEach(function(e) {
+					e.country = d.donor;
+					e.type = "donor";
+					e.year = +e.year;
+					e.total = Math.round(e.total * 100) / 100;
+					e.paid = Math.round(e.paid * 100) / 100;
+					e.pledge = Math.round(e.pledge * 100) / 100;
+					delete e.donor;
+				});
+			});
+
+			clonedDataCbpfs.forEach(function(d) {
+				d.values.forEach(function(e) {
+					e.country = d.cbpf;
+					e.type = "CBPF";
+					e.year = +e.year;
+					e.total = Math.round(e.total * 100) / 100;
+					e.paid = Math.round(e.paid * 100) / 100;
+					e.pledge = Math.round(e.pledge * 100) / 100;
+					delete e.cbpf;
+				});
+			});
+
+			const concatenatedDataDonors = clonedDataDonors.reduce(function(acc, curr) {
+				return acc.concat(curr.values);
+			}, []);
+
+			const concatenatedDataCbpfs = clonedDataCbpfs.reduce(function(acc, curr) {
+				return acc.concat(curr.values);
+			}, []);
+
+			const concatenatedData = concatenatedDataDonors.concat(concatenatedDataCbpfs);
+
+			concatenatedData.sort(function(a, b) {
+				return b.year - a.year ||
+					(a.country.toLowerCase() < b.country.toLowerCase() ? -1 :
+						a.country.toLowerCase() > b.country.toLowerCase() ? 1 : 0);
+			});
+
+			const header = Object.keys(concatenatedData[0]);
+
+			header.sort(function(a, b) {
+				return a === "year" || b === "year" ? 1 : (a < b ? -1 :
+					a > b ? 1 : 0);
+			});
+
+			const replacer = function(key, value) {
+				return value === null ? '' : value
+			};
+
+			let rows = concatenatedData.map(function(row) {
+				return header.map(function(fieldName) {
+					return JSON.stringify(row[fieldName], replacer)
+				}).join(',')
+			});
+
+			rows.unshift(header.join(','));
+
+			return rows.join('\r\n');
+
+			//end of createCSV
 		};
 
 		function restart() {
