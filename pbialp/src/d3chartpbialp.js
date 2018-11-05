@@ -1958,7 +1958,7 @@
 					.attr("x", 14)
 					.attr("class", "pbialpTooltipLegendDonut")
 					.text(function(_, i) {
-						return !i ? "This Partner" : "Other Partner";
+						return !i ? "This partner" : "Other partner";
 					});
 
 				legend.append("text")
