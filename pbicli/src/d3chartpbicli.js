@@ -70,7 +70,8 @@
 			};
 
 		let started = false,
-			maxButtonRows = 0;
+			maxButtonRows = 0,
+			realSVGwidth;
 
 		const containerDiv = d3.select("#d3chartcontainerpbicli");
 
@@ -226,6 +227,8 @@
 		function draw(data) {
 
 			started = true;
+
+			realSVGwidth = svg.node().width.baseVal.value;
 
 			const timeExtent = setTimeExtent(data.years);
 
@@ -860,7 +863,7 @@
 
 				d3.select(self).select("rect")
 					.style("fill", "gainsboro")
-					.style("stroke", "#000");
+					.style("stroke", "#444");
 
 				redrawLineGraph(type, false);
 
@@ -881,7 +884,7 @@
 				if (!datum.clicked) {
 					d3.select(self).select("rect")
 						.style("fill", "white")
-						.style("stroke", "#444");
+						.style("stroke", "#aaa");
 				};
 
 				redrawLineGraph(type, false);
@@ -1040,11 +1043,11 @@
 				if (datum.clicked) {
 					d3.select(self).select("rect")
 						.style("fill", "gainsboro")
-						.style("stroke", "#000");
+						.style("stroke", "#444");
 				} else {
 					d3.select(self).select("rect")
 						.style("fill", "white")
-						.style("stroke", "#444");
+						.style("stroke", "#aaa");
 				};
 
 				//end of clickedButtons
@@ -1232,7 +1235,7 @@
 							thisTextLength + 2 * buttonInternalPadding;
 					})
 					.style("fill", "white")
-					.style("stroke", "#444")
+					.style("stroke", "#aaa")
 					.style("stroke-width", "1px")
 					.attr("rx", buttonsBorderRadius)
 					.attr("ry", buttonsBorderRadius)
@@ -1255,7 +1258,7 @@
 				};
 
 				buttonsGroup.each(function() {
-					const thisWidth = this.getBoundingClientRect().width;
+					const thisWidth = this.getBoundingClientRect().width / (realSVGwidth / width);
 					if (rowWidth + thisWidth + buttonMargin > thisPanel.width - thisPanel.padding[3] - thisPanel.padding[1]) {
 						row += 1;
 						rowWidth = 0;
