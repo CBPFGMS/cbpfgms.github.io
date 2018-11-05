@@ -180,6 +180,14 @@
 		const yScaleParallel = d3.scaleLinear()
 			.range([parallelPanel.height - parallelPanel.padding[2], parallelPanel.padding[0]]);
 
+		const partnersColorsScale = d3.scaleOrdinal()
+			.domain(partnerList)
+			.range(["InternationalNGOPartnerColor", "NationalNGOPartnerColor", "OthersPartnerColor", "UNAgencyPartnerColor"]);
+
+		const partnersTextScale = d3.scaleOrdinal()
+			.domain(partnerList)
+			.range(["Int. NGO", "Nat. NGO", "RC/CM", "UN"]);
+
 		const xAxisLollipop = d3.axisTop(xScaleLollipop)
 			.tickSizeOuter(0)
 			.ticks(5)
@@ -1743,10 +1751,6 @@
 					.domain(modalities)
 					.range(["allocationColorDarkerFill", "allocationColorFill", "pbialpUnderApprovalClass"]);
 
-				const axisScale = d3.scaleOrdinal()
-					.domain(partnerList)
-					.range(["Int. NGO", "Nat. NGO", "RC/CM", "UN"]);
-
 				const axisNameScale = d3.scaleOrdinal()
 					.domain(modalities)
 					.range(["Standard", "Reserve", "Under Approval"]);
@@ -1838,7 +1842,7 @@
 				const tooltipXAxis = d3.axisBottom(xScaleOuter)
 					.tickPadding(0)
 					.tickFormat(function(d) {
-						return axisScale(d)
+						return partnersTextScale(d)
 					});
 
 				const tooltipGX = tooltipSvg.append("g")
@@ -1870,9 +1874,13 @@
 						return d.value;
 					});
 
-				const arc = d3.arc()
+				const arcSel = d3.arc()
 					.outerRadius(donutRadius)
 					.innerRadius(donutRadius - 20);
+
+				const arc = d3.arc()
+					.outerRadius(donutRadius - 4)
+					.innerRadius(donutRadius - 16);
 
 				const modalities = ["standard", "reserve", "underApproval"];
 
@@ -1886,6 +1894,8 @@
 								partner: e.partner,
 								value: e[d]
 							};
+						}).filter(function(e) {
+							return e.value;
 						})
 					});
 				});
@@ -1919,9 +1929,7 @@
 				const donutPath = donutSlice.append("path")
 					.style("stroke", "#f1f1f1")
 					.attr("class", function(d) {
-						return d.data.partner === chartState.selectedPartner ?
-							"allocationColorDarkerFill" :
-							"allocationColorFill";
+						return partnersColorsScale(d.data.partner);
 					})
 					.transition()
 					.duration(shortDuration)
@@ -1931,42 +1939,40 @@
 							startAngle: 0,
 							endAngle: 0
 						}, d);
-						return function(t) {
-							return arc(i(t));
-						};
+						if (d.data.partner === chartState.selectedPartner) {
+							return function(t) {
+								return arcSel(i(t));
+							};
+						} else {
+							return function(t) {
+								return arc(i(t));
+							};
+						}
 					});
 
 				const legend = tooltipSvg.selectAll(null)
-					.data([1, 1])
+					.data(partnerList)
 					.enter()
 					.append("g")
 					.attr("transform", function(_, i) {
-						return "translate(" + (tooltipSvgWidth - tooltipSvgpadding[1] + 15) + "," + (25 + i * 35) + ")";
+						return "translate(" + (tooltipSvgWidth - tooltipSvgpadding[1] + 25) + "," + (10 + i * 20) + ")";
 					});
 
 				legend.append("rect")
 					.attr("width", 10)
 					.attr("height", 10)
 					.style("stroke", "darkslategray")
-					.attr("class", function(_, i) {
-						return !i ? "allocationColorDarkerFill" :
-							"allocationColorFill";
+					.attr("class", function(d) {
+						return partnersColorsScale(d);
 					});
 
 				legend.append("text")
 					.attr("y", 9)
 					.attr("x", 14)
 					.attr("class", "pbialpTooltipLegendDonut")
-					.text(function(_, i) {
-						return !i ? "This partner" : "Other partner";
-					});
-
-				legend.append("text")
-					.attr("y", 22)
-					.attr("x", 15)
-					.attr("class", "pbialpTooltipLegendDonut")
-					.text(function(_, i) {
-						return !i ? "type" : "types";
+					.text(function(d) {
+						const bullet = d === chartState.selectedPartner ? " \u2190" : "";
+						return partnersTextScale(d) + bullet;
 					});
 
 				const tooltipAxis = d3.axisBottom(xScaleTooltip)
