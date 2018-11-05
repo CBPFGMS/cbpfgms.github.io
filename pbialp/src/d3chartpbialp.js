@@ -122,7 +122,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
-			leftPadding: [218, 648, 80],
+			leftPadding: [218, 82, 116],
 			mainValueVerPadding: 14,
 			mainValueHorPadding: 4
 		};
@@ -164,7 +164,7 @@
 		const lollipopPanelClip = lollipopPanel.main.append("clipPath")
 			.attr("id", "pbialpLollipopPanelClip")
 			.append("rect")
-			.attr("width", lollipopPanel.width - lollipopPanel.padding[1])
+			.attr("width", lollipopPanel.width)
 			.attr("transform", "translate(0," + (-lollipopPanel.padding[0]) + ")");
 
 		const xScaleLollipop = d3.scaleLinear();
@@ -418,11 +418,24 @@
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalValue allocationColorFill")
 					.attr("text-anchor", "end")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.5)
 					.merge(topPanelUnderApprovalValue);
 
+				const fakeUnderApprovalValue = topPanel.main.append("text")
+					.attr("class", "pbialptopPanelUnderApprovalValue")
+					.style("opacity", 0)
+					.text(function() {
+						const siString = formatSIFloat(valueUnderApproval);
+						return "$" + siString.substring(0, siString.length - 1);
+					});
+
+				const underApprovalValueTextLength = ~~(fakeUnderApprovalValue.node().getComputedTextLength());
+
+				fakeUnderApprovalValue.remove();
+
 				topPanelUnderApprovalValue.transition(transition)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
+						topPanel.leftPadding[1] - topPanel.mainValueHorPadding / 2)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousUnderApprovalValue, d);
@@ -440,11 +453,12 @@
 					.attr("class", "pbialptopPanelUnderApprovalText")
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.5)
 					.merge(topPanelUnderApprovalText);
 
 				topPanelUnderApprovalText.transition(transition)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
+						topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
 					.style("opacity", 1)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
@@ -461,11 +475,12 @@
 					.attr("class", "pbialptopPanelUnderApprovalSubText")
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.merge(topPanelUnderApprovalSubText)
 
 				topPanelUnderApprovalSubText.transition(transition)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
+						(topPanel.leftPadding[1] - underApprovalValueTextLength - (topPanel.mainValueHorPadding / 2)))
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(" +
@@ -966,7 +981,7 @@
 								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve <span style='color: #888;'>(" + (formatPercent(datum[thisReserve] / datum[thisTotal])) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(datum[thisReserve]) +
 								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" + formatMoney2Decimals(datum[thisUnderApproval]) +
-								"</span></div></div><div style='margin-top:6px;'>Allocations by Partner and Modality:<div><div id=pbialpLollipopTooltipChart></div>");
+								"</span></div></div><div style='margin-top:6px;'>Allocations by Partner Type and Modality:<div><div id=pbialpLollipopTooltipChart></div>");
 
 						createTooltipBar(datum, "pbialpLollipopTooltipBar", lollipopTooltipWidth, thisTotal, thisStandard, thisReserve);
 
@@ -1347,7 +1362,36 @@
 
 				downloadGroup.on("click", function() {
 
-					//CODE HERE
+					const csv = createCSV(data);
+
+					const fileName = "Allocations" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
 
 				});
 
@@ -1897,7 +1941,7 @@
 					.enter()
 					.append("g")
 					.attr("transform", function(_, i) {
-						return "translate(" + (tooltipSvgWidth - tooltipSvgpadding[1] + 15) + "," + (30 + i * 15) + ")";
+						return "translate(" + (tooltipSvgWidth - tooltipSvgpadding[1] + 15) + "," + (25 + i * 35) + ")";
 					});
 
 				legend.append("rect")
@@ -1914,7 +1958,15 @@
 					.attr("x", 14)
 					.attr("class", "pbialpTooltipLegendDonut")
 					.text(function(_, i) {
-						return !i ? "This Partner" : "Other Partners";
+						return !i ? "This Partner" : "Other Partner";
+					});
+
+				legend.append("text")
+					.attr("y", 22)
+					.attr("x", 15)
+					.attr("class", "pbialpTooltipLegendDonut")
+					.text(function(_, i) {
+						return !i ? "type" : "types";
 					});
 
 				const tooltipAxis = d3.axisBottom(xScaleTooltip)
@@ -2150,6 +2202,65 @@
 			return aggregatedAllocations;
 
 			//end of processData
+		};
+
+		function createCSV(sourceData) {
+
+			const clonedData = JSON.parse(JSON.stringify(sourceData));
+
+			clonedData.forEach(function(d) {
+				d["total-International NGO"] = d["International NGO"];
+				d["total-National NGO"] = d["National NGO"];
+				d["total-Red Cross/Crescent Movement"] = d["Red Cross/Crescent Movement"];
+				d["total-UN Agency"] = d["UN Agency"];
+
+				delete d["International NGO"];
+				delete d["National NGO"];
+				delete d["Red Cross/Crescent Movement"];
+				delete d["UN Agency"];
+				delete d.clicked;
+				delete d.parallelData;
+
+				for (let key in d) {
+					if (key !== "cbpf") {
+						d[key] = Math.round(d[key] * 100) / 100;
+					};
+				};
+			});
+
+			const concatenatedData = clonedData.reduce(function(acc, curr) {
+				return acc.concat(curr);
+			}, []);
+
+			concatenatedData.sort(function(a, b) {
+				return b.total - a.total ||
+					(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
+						a.cbpf.toLowerCase() > b.cbpf.toLowerCase() ? 1 : 0);
+			});
+
+			const header = Object.keys(concatenatedData[0]);
+
+			const headerOrder = ["total-UN Agency", "total-Red Cross/Crescent Movement", "total-National NGO", "total-International NGO", "total", "cbpf"];
+
+			header.sort(function(a, b) {
+				return ((headerOrder.indexOf(b) + 1) - (headerOrder.indexOf(a) + 1)) || (a < b ? -1 : a > b ? 1 : 0);
+			});
+
+			const replacer = function(key, value) {
+				return value === null ? '' : value
+			};
+
+			let rows = concatenatedData.map(function(row) {
+				return header.map(function(fieldName) {
+					return JSON.stringify(row[fieldName], replacer)
+				}).join(',')
+			});
+
+			rows.unshift(header.join(','));
+
+			return rows.join('\r\n');
+
+			//end of createCSV
 		};
 
 		function restart() {
