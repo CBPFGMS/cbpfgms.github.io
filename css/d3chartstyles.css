@@ -606,14 +606,25 @@ These styles apply to all D3 charts*/
 	pointer-events: none;
 }
 
-.pbialptopPanelMainValue, .pbialptopPanelUnderApprovalValue, .pbialptopPanelCbpfsNumber {
+.pbialptopPanelMainValue, .pbialptopPanelCbpfsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 60px;
 }
 
-.pbialptopPanelMainText, .pbialptopPanelSubText, .pbialptopPanelUnderApprovalText, .pbialptopPanelUnderApprovalSubText {
+.pbialptopPanelUnderApprovalValue {
+	font-family: "Arial", sans-serif;
+	font-size: 32px;
+}
+
+.pbialptopPanelMainText, .pbialptopPanelSubText {
 	font-family: "Arial", sans-serif;
 	font-size: 20px;
+	fill: #888;
+}
+
+.pbialptopPanelUnderApprovalText, .pbialptopPanelUnderApprovalSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
 	fill: #888;
 }
 
