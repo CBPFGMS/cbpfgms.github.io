@@ -80,7 +80,7 @@
 			chartState = {
 				selectedYear: null,
 				showMap: null,
-				showNames: true
+				showNames: null
 			},
 			centroids = {};
 
@@ -96,6 +96,8 @@
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
 		const showMapOption = (containerDiv.node().getAttribute("data-showmap") === "true");
+
+		const showNamesOption = (containerDiv.node().getAttribute("data-shownames") === "true");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -247,6 +249,8 @@
 			chartState.selectedYear = validateYear(selectedYearString);
 
 			chartState.showMap = showMapOption;
+
+			chartState.showNames = showNamesOption;
 
 			if (!lazyLoad) {
 				draw(rawData);
