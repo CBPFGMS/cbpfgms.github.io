@@ -212,7 +212,7 @@
 			.range([1, maxLinkWidthMap]);
 
 		const strokeOpacityScale = d3.scaleLinear()
-			.range([0.25, 0.75]);
+			.range([0.5, 1]);
 
 		const xScaleLegend = d3.scaleLinear();
 
@@ -327,7 +327,7 @@
 					.attr("d", mapPath(dataMap))
 					.attr("clip-path", "url(#pbifdcMapClip)")
 					.attr("fill", "none")
-					.attr("stroke", "#eaeafa")
+					.attr("stroke", "#e1e1f1")
 					.attr("stroke-width", "1px");
 
 				//end of createMap
