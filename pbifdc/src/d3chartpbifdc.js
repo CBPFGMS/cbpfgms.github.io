@@ -302,11 +302,11 @@
 
 			createButtonsPanel();
 
+			createNodesPanel(dataObject.nodes, dataObject.links);
+
 			drawLegendBorder();
 
 			drawLegend(dataObject.nodes, dataObject.links);
-
-			createNodesPanel(dataObject.nodes, dataObject.links);
 
 			function createMap(dataMap) {
 
