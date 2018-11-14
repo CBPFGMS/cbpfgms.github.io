@@ -865,3 +865,140 @@ These styles apply to all D3 charts*/
 	font-size: 14px;
 	fill: #666;
 }
+
+/*Public BI, Force-directed chart (code: pbifdc)*/
+
+#pbifdctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 270px;
+}
+
+.pbifdctopPanelMainValue {
+	font-family: "Arial", sans-serif;
+	font-size: 60px;
+}
+
+.pbifdctopPanelDonorsNumber, .pbifdctopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 44px;
+}
+
+.pbifdctopPanelMainText, .pbifdctopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #888;
+}
+
+.pbifdctopPanelDonorsText, .pbifdctopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
+}
+
+.pbifdcbuttonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbifdcleftArrowText, .pbifdcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbifdcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbifdcShowMapTextControl {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbifdcNodesLabelBack {
+	font-family: "Roboto", sans-serif;
+	fill: white;
+	font-size: 10px;
+	stroke: white;
+	stroke-width: 3px;
+}
+
+.pbifdcNodesLabel {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 10px;
+}
+
+.pbifdcLegendTitle {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 18px;
+}
+
+.pbifdcLegendSubTitle {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 14px;
+}
+
+.pbifdcLegendTextSmall {
+	font-family: "Roboto", sans-serif;
+	fill: #777;
+	font-size: 12px;
+}
+
+.pbifdcLegendTextSmall2 {
+	font-family: "Crimson Text", serif;
+	fill: #888;
+	font-size: 13px;
+}
+
+.pbifdcYAxisLegendGroup path {
+	stroke: none;
+}
+
+.pbifdcYAxisLegendGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbifdcXAxisLegendGroup path {
+	stroke: none;
+}
+
+.pbifdcXAxisLegendGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbifdcXAxisLegendGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbiclcLegendLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #777;
+	pointer-events: none;
+}
