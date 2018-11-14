@@ -28,7 +28,7 @@ There are four parameters:
 
  `"2018"`
 
-If the provided value is not a valid number or if the provided period is not separated by a comma, the datavis will default to the current year.
+If the provided value is not a valid number the datavis will default to the current year.
 
 For the accepted values for the years/periods please refer to the data API.
 
