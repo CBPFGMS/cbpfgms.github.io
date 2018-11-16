@@ -1,0 +1,142 @@
+/*CBPF blog chart (code: cbpfbp)*/
+
+#cbpfbptooltipdiv{    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 290px;
+}
+
+.cbpfbptopPanelTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 20px;
+	font-weight: 700;
+	fill: #545454;
+}
+
+.cbpfbptopValueMain {
+	font-family: "Arial", sans-serif;
+	font-size: 60px;
+}
+
+.cbpfbptopValueUnits {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.cbpfbpbarsPanelTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 18px;
+	fill: #545454;
+}
+
+.cbpfbpbarsLabels {
+	fill: darkslategray;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.cbpfbpbarsContributionsOverText, .cbpfbpbarsAllocationsOverText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: white;
+}
+
+.cbpfbpbarsMiddleText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+}
+
+.cbpfbpgBarsContributionsYAxis, .cbpfbpgBarsAllocationsYAxis, .cbpfbpgBarsContributionsXAxis, .cbpfbpgBarsAllocationsXAxis, .cbpfbpgBeeswarmXAxis, .cbpfbpgBeeswarmYAxis {
+	shape-rendering: crispEdges;
+}
+
+.cbpfbpgBarsContributionsYAxis path, .cbpfbpgBarsAllocationsYAxis path {
+	stroke: none;
+}
+
+.cbpfbpgBarsContributionsYAxis line, .cbpfbpgBarsAllocationsYAxis line {
+	stroke: #888;
+}
+
+.cbpfbpgBarsContributionsYAxis text, .cbpfbpgBarsAllocationsYAxis text {
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.cbpfbpgBarsContributionsXAxis path, .cbpfbpgBarsAllocationsXAxis path {
+	stroke: none;
+}
+
+.cbpfbpgBarsContributionsXAxis line, .cbpfbpgBarsAllocationsXAxis line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.cbpfbpgBarsContributionsXAxis text, .cbpfbpgBarsAllocationsXAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.cbpfbpgBeeswarmXAxis path, .cbpfbpgBeeswarmYAxis path {
+	shape-rendering: crispEdges;
+	stroke: none;
+}
+
+.cbpfbpgBeeswarmYAxis line {
+	stroke: #eee;
+	stroke-dasharray: 2, 2;
+}
+
+.cbpfbpgBeeswarmXAxis line {
+	stroke: #ddd;
+}
+
+.cbpfbpgBeeswarmXAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.cbpfbpgBeeswarmYAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+}
+
+.cbpfbpxAxisTooltip text, .cbpfbpyAxisTooltip text {
+	fill: #555;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.cbpfbpxAxisTooltip, .cbpfbpyAxisTooltip {
+	shape-rendering: crispEdges;
+}
+
+.cbpfbpxAxisTooltip path {
+	stroke: none;
+}
+
+.cbpfbpyAxisTooltip path {
+	stroke: #ccc;
+}
+
+.cbpfbpxAxisTooltip line {
+	stroke: #ccc;
+}

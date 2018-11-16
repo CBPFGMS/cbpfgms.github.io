@@ -1,0 +1,106 @@
+/*GMS landing page chart (code: gmslpg)*/
+
+#gmslpgtooltipdiv{    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 6px;
+	line-height: 110%;
+	font-size: 12px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 250px;
+}
+
+.gmslpgcontributionsTitle, .gmslpgcontributionsLineTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+}
+
+.gmslpgprojectsTitle, .gmslpgprojectsLineTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+}
+
+.gmslpglabelContributions, .gmslpglabelAllocations, .gmslpglabelProjects, .gmslpglabelPartners {
+	font-family: "Arial";
+	font-size: 8px;
+	fill: #666;
+}
+
+.gmslpgyearTitle, .gmslpgsortTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	font-weight: 600;
+	fill: darkslategray;
+}
+
+.gmslpgyearsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+}
+
+.gmslpgyAxis text {
+	fill: #777;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.gmslpgyAxisLine text {
+	fill: #777;
+	font-family: "Arial";
+	font-size: 8px;
+}
+
+.gmslpgxAxis text, .gmslpgxAxisLine text {
+	fill: #777;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.gmslpgxAxisTooltip text, .gmslpgyAxisTooltip text {
+	fill: #555;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.gmslpgxAxis, .gmslpgyAxis, .gmslpgxAxisLine, .gmslpgyAxisLine {
+	shape-rendering: crispEdges;
+}
+
+.gmslpgxAxisLine path, .gmslpgyAxisLine path {
+	stroke: #ccc;
+}
+
+.gmslpgxAxisLine line, .gmslpgyAxisLine line {
+	stroke: #ccc;
+}
+
+.gmslpgxAxisTooltip, .gmslpgyAxisTooltip {
+	shape-rendering: crispEdges;
+}
+
+.gmslpgxAxis path, .gmslpgxAxisTooltip path {
+	stroke: none;
+}
+
+.gmslpgyAxis path, .gmslpgyAxisTooltip path {
+	stroke: #ccc;
+}
+
+.gmslpgxAxisTooltip line {
+	stroke: #ccc;
+}
+
+.gmslpgxAxis line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}

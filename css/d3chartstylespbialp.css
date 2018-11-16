@@ -1,0 +1,206 @@
+/*Public BI, Allocations tab, lollipop and parallel coordinates (code: pbialp)*/
+
+#pbialptooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 470px;
+}
+
+.pbialpgroupYAxisFake {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbialptopPanelMainValue, .pbialptopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 60px;
+}
+
+.pbialptopPanelUnderApprovalValue {
+	font-family: "Arial", sans-serif;
+	font-size: 32px;
+}
+
+.pbialptopPanelMainText, .pbialptopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #888;
+}
+
+.pbialptopPanelUnderApprovalText, .pbialptopPanelUnderApprovalSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
+}
+
+.pbialptopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	fill: #888;
+}
+
+.pbialpbuttonsText, .pbialpbuttonsPartnersText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbialpleftArrowText, .pbialprightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbialpLollipopPanelTitle, .pbialpParallelPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+}
+
+.pbialpCbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbialpCbpfLabelPercentage {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbialpgroupYAxisLollipop text {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbialpgroupYAxisLollipop path {
+	stroke: none;
+}
+
+.pbialpgroupXAxisLollipop text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbialpgroupXAxisLollipop path, .pbialpgroupXAxisParallel path{
+	stroke: none;
+}
+
+.pbialpgroupXAxisLollipop line{
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbialpgroupXAxisParallel text{
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbialpgroupXAxisParallel line{
+	stroke: #ccc;
+	stroke-dasharray: 2, 2;
+}
+
+.pbialpPercentNumbersText, .pbialpCbpfParallelText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbialpUnselectedPath {
+	stroke: #eee;
+}
+
+.pbialpUnselectedCircle {
+	fill: #eee;
+}
+
+.pbialpAverageTextControl {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbialpDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbialpLabelText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbialpTooltipGroupedBarXAxis path, .pbialpTooltipDonutXAxis path, .pbialpTooltipGroupedBarXAxis line, .pbialpTooltipDonutXAxis line {
+	stroke: none;
+}
+
+.pbialpTooltipGroupedBarXAxis text, .pbialpTooltipDonutXAxis text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbialpTooltipGroupedBarYAxis text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbialpTooltipGroupedBarYAxis path {
+	stroke: none;
+}
+
+.pbialpTooltipGroupedBarYAxis line{
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbialpTooltipLegend {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbialpTooltipLegendDonut {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbialpUnderApprovalClass {
+	fill: #8392a2;
+}
+
+.pbialpUnderApprovalHTMLClass {
+	color: #8392a2;
+}
