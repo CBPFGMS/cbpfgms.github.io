@@ -619,6 +619,25 @@
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
+				const showMapGroupLegend = buttonsPanel.main.append("g")
+					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
+						(buttonsPanel.height * 0.6) + ")")
+					.style("opacity", 0)
+					.attr("pointer-events", "none");
+
+				const showMapGroupLegendText = showMapGroupLegend.append("text")
+					.attr("class", "pbifdcShowMapGroupLegendText")
+					.text("Show the nodes in their corresponding geographic coordinates")
+					.attr("x", 0)
+					.attr("y", 0)
+					.call(wrapText, 150);
+
+				const showMapGroupLegendLine = showMapGroupLegend.append("polyline")
+					.attr("points", "56,30 0,30 0,40")
+					.style("fill", "none")
+					.style("stroke", "#aaa")
+					.style("stroke-width", "1px");
+
 				const outerCircle = showMapGroup.append("circle")
 					.attr("r", 6)
 					.attr("cy", -4)
@@ -641,6 +660,25 @@
 						(buttonsPanel.height * 0.6) + ")")
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
+
+				const showNamesGroupLegend = buttonsPanel.main.append("g")
+					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + "," +
+						(buttonsPanel.height * 0.6) + ")")
+					.style("opacity", 0)
+					.attr("pointer-events", "none");
+
+				const showNamesGroupLegendText = showNamesGroupLegend.append("text")
+					.attr("class", "pbifdcShowMapGroupLegendText")
+					.text("Show or hide the name of each node. Hiding the name is useful in the map view")
+					.attr("x", 0)
+					.attr("y", 0)
+					.call(wrapText, 150);
+
+				const showNamesGroupLegendLine = showNamesGroupLegend.append("polyline")
+					.attr("points", "76,30 0,30 0,40")
+					.style("fill", "none")
+					.style("stroke", "#aaa")
+					.style("stroke-width", "1px");
 
 				const outerCircleShowNames = showNamesGroup.append("circle")
 					.attr("r", 6)
@@ -761,11 +799,24 @@
 
 				});
 
-				showMapGroup.on("click", function() {
+				showMapGroup.on("mouseover", function() {
+					showMapGroupLegend.transition()
+						.duration(duration)
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + ",-36)")
+						.style("opacity", 1);
+				}).on("mouseout", function() {
+					showMapGroupLegend.interrupt()
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
+							(buttonsPanel.height * 0.6) + ")")
+						.style("opacity", 0);
+				}).on("click", function() {
 
 					chartState.showMap = !chartState.showMap;
 
 					innerCircle.attr("fill", chartState.showMap ? "darkslategray" : "white");
+
+					showMapGroupLegend.interrupt()
+						.style("opacity", 0);
 
 					mapLayer.transition()
 						.duration(duration)
@@ -779,11 +830,24 @@
 
 				});
 
-				showNamesGroup.on("click", function() {
+				showNamesGroup.on("mouseover", function() {
+					showNamesGroupLegend.transition()
+						.duration(duration)
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + ",-36)")
+						.style("opacity", 1);
+				}).on("mouseout", function() {
+					showNamesGroupLegend.interrupt()
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + "," +
+							(buttonsPanel.height * 0.6) + ")")
+						.style("opacity", 0);
+				}).on("click", function() {
 
 					chartState.showNames = !chartState.showNames;
 
 					innerCircleShowNames.attr("fill", chartState.showNames ? "darkslategray" : "white");
+
+					showNamesGroupLegend.interrupt()
+						.style("opacity", 0);
 
 					nodesLabelLayer.selectAll(".pbifdcNodesLabelBack, .pbifdcNodesLabel")
 						.style("opacity", chartState.showNames ? 1 : 0);
@@ -1194,7 +1258,7 @@
 				const colorTitle = legendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 56)
+					.attr("y", legendPanel.padding[0] + 66)
 					.text("COLOR:");
 
 				const legendColorGroups = legendGroup.selectAll(null)
@@ -1202,7 +1266,7 @@
 					.enter()
 					.append("g")
 					.attr("transform", function(_, i) {
-						return "translate(" + legendPanel.padding[3] + "," + (legendPanel.padding[0] + 66 + i * 20) + ")";
+						return "translate(" + legendPanel.padding[3] + "," + (legendPanel.padding[0] + 76 + i * 20) + ")";
 					});
 
 				legendColorGroups.append("rect")
@@ -1227,15 +1291,26 @@
 				const sizeTitle = legendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 132)
+					.attr("y", legendPanel.padding[0] + 192)
 					.text("SIZE:");
+
+				const sizeSubTitle = sizeTitle.append("tspan")
+					.attr("class", "pbifdcLegendTextSmall2")
+					.text(" (hover for info)");
 
 				const sizeText = legendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall2")
+					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 152)
-					.text("The size of each node represents the total amount received by the respective CBPF or donated by the respective donor. The larger the node the bigger the amount.")
+					.attr("y", legendPanel.padding[0] + 162)
+					.text("The size of each node represents the total amount received (CBPF) or donated (donor). The larger the node the bigger the amount.")
 					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
+
+				const sizeRectangle = legendGroup.append("rect")
+					.attr("y", legendPanel.padding[0] + 122)
+					.attr("width", legendPanel.width)
+					.attr("height", 80)
+					.style("opacity", 0);
 
 				const nodeSizeData = d3.extent(dataNodes, function(d) {
 					return d.total;
@@ -1255,7 +1330,7 @@
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", function(_, i) {
-						return i ? legendPanel.padding[0] + 220 + (thisNodeScale.range()[1] * 2) + 50 : legendPanel.padding[0] + 220;
+						return i ? legendPanel.padding[0] + 216 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 216;
 					})
 					.text(function(_, i) {
 						return i ? "Smallest node:" : "Biggest node:"
@@ -1266,35 +1341,96 @@
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", function(_, i) {
-						return i ? legendPanel.padding[0] + 236 + (thisNodeScale.range()[1] * 2) + 50 : legendPanel.padding[0] + 236;
+						return i ? legendPanel.padding[0] + 232 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 232;
 					})
 					.text(function(d) {
 						return d.name + " (" + d.category + "): $" + formatMoney2Decimals(d.total);
 					});
 
-				const nodeSizeCircles = nodeSizeGroup.append("circle")
+				const maxNodeValue = d3.max(dataNodes, function(d) {
+					return d.total;
+				});
+
+				const sizeCirclesData = [0, maxNodeValue / 4, maxNodeValue / 2, maxNodeValue];
+
+				const nodeSizeCircleGroup = legendGroup.selectAll(null)
+					.data(sizeCirclesData)
+					.enter()
+					.append("g");
+
+				const nodeSizeLines = nodeSizeCircleGroup.append("line")
+					.attr("x1", legendPanel.padding[3] + thisNodeScale.range()[1])
+					.attr("x2", legendPanel.padding[3] + thisNodeScale.range()[1] + 70)
+					.attr("y1", function(d) {
+						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
+							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
+					})
+					.attr("y2", function(d) {
+						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
+							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
+					})
+					.style("stroke", "#ddd")
+					.style("stroke-dasharray", "2,2")
+					.style("stroke-width", "1px");
+
+				const nodeSizeCircles = nodeSizeCircleGroup.append("circle")
 					.attr("cx", legendPanel.padding[3] + thisNodeScale.range()[1])
-					.attr("cy", function(d, i) {
-						return legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d.total) - i;
+					.attr("cy", function(d) {
+						return legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d);
 					})
 					.attr("r", function(d) {
-						return thisNodeScale(d.total);
+						return !d ? 0 : thisNodeScale(d);
 					})
-					.style("fill", "white")
+					.style("fill", "none")
 					.style("stroke", "darkslategray");
+
+				const nodeSizeCirclesText = nodeSizeCircleGroup.append("text")
+					.attr("class", "pbifdcLegendTextSmall3")
+					.attr("x", legendPanel.padding[3] + thisNodeScale.range()[1] + 74)
+					.attr("y", function(d, i) {
+						if (chartState.showMap) {
+							return i === 1 ? legendPanel.padding[0] + 255 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
+								!i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) :
+								legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2;
+						} else {
+							return i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
+								legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2);
+						}
+					})
+					.text(function(d) {
+						if (!d) {
+							return "0"
+						} else {
+							let valueSI = d3.formatPrefix(".0", d)(d);
+							const unit = valueSI[valueSI.length - 1];
+							valueSI = valueSI.slice(0, -1);
+							return valueSI + (unit === "k" ? " Thousand" : unit === "M" ? " Million" : unit === "G" ? " Billion" : "");
+						};
+					});
 
 				const linkTitle = legendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 320 + (thisNodeScale.range()[1] * 2))
+					.attr("y", legendPanel.padding[0] + 364 + (thisNodeScale.range()[1] * 2))
 					.text("LINKS:");
+
+				const linkSubTitle = linkTitle.append("tspan")
+					.attr("class", "pbifdcLegendTextSmall2")
+					.text(" (hover for info)");
 
 				const linkText = legendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall2")
+					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 340 + (thisNodeScale.range()[1] * 2))
 					.text("The width of each link represents the amount donated from a donor to a CBPF. The wider the link the bigger the amount donated/received.")
 					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
+
+				const linkRectangle = legendGroup.append("rect")
+					.attr("y", legendPanel.padding[0] + 300 + (thisNodeScale.range()[1] * 2))
+					.attr("width", legendPanel.width)
+					.attr("height", 80)
+					.style("opacity", 0);
 
 				const linkWidthData = d3.extent(dataLinks, function(d) {
 					return d.total;
@@ -1364,9 +1500,6 @@
 				}).on("mouseout", restoreNodesPanel);
 
 				nodeSizeGroup.on("mouseover", function(d) {
-					nodeSizeCircles.style("opacity", function(e) {
-						return e.uniqueId === d.uniqueId ? 1 : 0;
-					})
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
 						.style("opacity", function(e) {
 							return e.uniqueId === d.uniqueId ? 1 : 0;
@@ -1389,6 +1522,44 @@
 						});
 				}).on("mouseout", restoreNodesPanel);
 
+				sizeRectangle.on("mouseover", function() {
+					sizeTitle.transition()
+						.duration(duration)
+						.attr("y", legendPanel.padding[0] + 142);
+					sizeSubTitle.transition()
+						.duration(duration)
+						.style("opacity", 0);
+					sizeText.transition()
+						.duration(duration)
+						.style("opacity", 1);
+				}).on("mouseout", function() {
+					sizeTitle.interrupt()
+						.attr("y", legendPanel.padding[0] + 192);
+					sizeSubTitle.interrupt()
+						.style("opacity", 1);
+					sizeText.interrupt()
+						.style("opacity", 0);
+				});
+
+				linkRectangle.on("mouseover", function() {
+					linkTitle.transition()
+						.duration(duration)
+						.attr("y", legendPanel.padding[0] + 320 + (thisNodeScale.range()[1] * 2));
+					linkSubTitle.transition()
+						.duration(duration)
+						.style("opacity", 0);
+					linkText.transition()
+						.duration(duration)
+						.style("opacity", 1);
+				}).on("mouseout", function() {
+					linkTitle.interrupt()
+						.attr("y", legendPanel.padding[0] + 364 + (thisNodeScale.range()[1] * 2))
+					linkSubTitle.interrupt()
+						.style("opacity", 1);
+					linkText.interrupt()
+						.style("opacity", 0);
+				});
+
 				function restoreNodesPanel() {
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
 						.style("opacity", 1);
@@ -1408,8 +1579,6 @@
 				otherGroups.selectAll("*").interrupt();
 
 				otherGroups.remove();
-
-				const transition = setTransition(duration);
 
 				const nodeLegendGroup = legendPanel.main.append("g")
 					.attr("class", "pbifdcNodeLegendGroup");
@@ -1579,17 +1748,20 @@
 					.attr("y", verticalLabelPadding)
 					.text(formatNumberSI(0));
 
-				lollipopStick.transition(transition)
+				lollipopStick.transition()
+					.duration(duration)
 					.attr("width", function(d) {
 						return xScaleLegend(d.total) - xScaleLegend(0);
 					});
 
-				lollipop.transition(transition)
+				lollipop.transition()
+					.duration(duration)
 					.attr("cx", function(d) {
 						return xScaleLegend(d.total);
 					});
 
-				legendLabel.transition(transition)
+				legendLabel.transition()
+					.duration(duration)
 					.attr("x", function(d) {
 						return xScaleLegend(d.total) + legendLabelPadding;
 					})
@@ -1947,40 +2119,6 @@
 			return [matrix.e, matrix.f];
 		};
 
-		function reverseFormat(s) {
-			if (+s === 0) return 0;
-			let returnValue;
-			const transformation = {
-				Y: Math.pow(10, 24),
-				Z: Math.pow(10, 21),
-				E: Math.pow(10, 18),
-				P: Math.pow(10, 15),
-				T: Math.pow(10, 12),
-				G: Math.pow(10, 9),
-				M: Math.pow(10, 6),
-				k: Math.pow(10, 3),
-				h: Math.pow(10, 2),
-				da: Math.pow(10, 1),
-				d: Math.pow(10, -1),
-				c: Math.pow(10, -2),
-				m: Math.pow(10, -3),
-				μ: Math.pow(10, -6),
-				n: Math.pow(10, -9),
-				p: Math.pow(10, -12),
-				f: Math.pow(10, -15),
-				a: Math.pow(10, -18),
-				z: Math.pow(10, -21),
-				y: Math.pow(10, -24)
-			};
-			Object.keys(transformation).some(function(k) {
-				if (s.indexOf(k) > 0) {
-					returnValue = parseFloat(s.split(k)[0]) * transformation[k];
-					return true;
-				}
-			});
-			return returnValue;
-		};
-
 		function wrapText(text, width) {
 			text.each(function() {
 				let text = d3.select(this),
@@ -2030,9 +2168,18 @@
 				.attr("class", "gmslpgwheelGroup")
 				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
 
+			const loadingText = wheelGroup.append("text")
+				.attr("text-anchor", "middle")
+				.style("font-family", "Roboto")
+				.style("font-weight", "bold")
+				.style("font-size", "11px")
+				.attr("y", 50)
+				.attr("class", "contributionColorFill")
+				.text("Loading visualisation...");
+
 			const arc = d3.arc()
-				.outerRadius(30)
-				.innerRadius(25);
+				.outerRadius(25)
+				.innerRadius(20);
 
 			const wheel = wheelGroup.append("path")
 				.datum({
