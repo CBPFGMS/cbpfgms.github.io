@@ -101,6 +101,12 @@
 	font-size: 13px;
 }
 
+.pbifdcLegendTextSmall3 {
+	font-family: "Crimson Text", serif;
+	fill: #888;
+	font-size: 11px;
+}
+
 .pbifdcYAxisLegendGroup path {
 	stroke: none;
 }
@@ -133,4 +139,10 @@
 	font-size: 10px;
 	fill: #777;
 	pointer-events: none;
+}
+
+.pbifdcShowMapGroupLegendText {
+	font-family: "Crimson Text", serif;
+	fill: #aaa;
+	font-size: 12px;
 }
