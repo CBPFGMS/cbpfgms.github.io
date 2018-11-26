@@ -20,9 +20,16 @@ The styles in that section apply to:
 
 Changing any of these values will change the style of all the charts in this repository.
 
+## UN Colors
+
+Currently, the common style sheet uses a combination of two colours (and their tints and shades), as described in the *OCHA Graphics Stylebook*:
+
+- HEX: #418FDE (Pantone 279C)
+- HEX: #ECA154 (Pantone 157C)
+
 ## Specific styles
 
-Below this section come the specific styles for each chart. Comments with the chart code describe the respective chart.
+Besides the common CSS file each data visualisation uses a specific CSS file. The name of this specific CSS file is made by `"d3chartstyles"` followed by the 6-letter code of the respective chart.
 
 ## Fonts
 
