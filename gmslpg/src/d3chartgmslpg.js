@@ -4,13 +4,17 @@
 
 	var isInternetExplorer = userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1 ? true : false;
 
-	var cssLink = "https://cbpfgms.github.io/css/d3chartstyles.css";
+	var cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylesgmslpg.css"];
 
-	var externalCSS = document.createElement("link");
-	externalCSS.setAttribute("rel", "stylesheet");
-	externalCSS.setAttribute("type", "text/css");
-	externalCSS.setAttribute("href", cssLink);
-	document.getElementsByTagName("head")[0].appendChild(externalCSS);
+	cssLinks.forEach(function(cssLink) {
+
+		var externalCSS = document.createElement("link");
+		externalCSS.setAttribute("rel", "stylesheet");
+		externalCSS.setAttribute("type", "text/css");
+		externalCSS.setAttribute("href", cssLink);
+		document.getElementsByTagName("head")[0].appendChild(externalCSS);
+
+	});
 
 	function loadScript(url, callback) {
 		var head = document.getElementsByTagName('head')[0];
@@ -1854,12 +1858,21 @@
 
 		function createProgressWheel() {
 			var wheelGroup = svg.append("g")
-				.attr("class", "gmslpgwheelGroup")
+				.attr("class", "d3chartwheelGroup")
 				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+			var loadingText = wheelGroup.append("text")
+				.attr("text-anchor", "middle")
+				.style("font-family", "Roboto")
+				.style("font-weight", "bold")
+				.style("font-size", "11px")
+				.attr("y", 50)
+				.attr("class", "contributionColorFill")
+				.text("Loading visualisation...");
+
 			var arc = d3.arc()
-				.outerRadius(30)
-				.innerRadius(25);
+				.outerRadius(25)
+				.innerRadius(20);
 
 			var wheel = wheelGroup.append("path")
 				.datum({
@@ -1904,7 +1917,7 @@
 		}
 
 		function removeProgressWheel() {
-			var wheelGroup = d3.select(".gmslpgwheelGroup");
+			var wheelGroup = d3.select(".d3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		}
