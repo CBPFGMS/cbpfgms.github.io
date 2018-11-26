@@ -50,7 +50,7 @@
 			excelIconSize = 20,
 			contributionType = ["paid", "pledge", "total"],
 			formatSIaxes = d3.format("~s"),
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
 			flagPadding = 22,
@@ -438,7 +438,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Donated in " + chartState.selectedYear;
+							" received in " + chartState.selectedYear;
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiclctopPanelSubText")
@@ -456,8 +456,8 @@
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.style("opacity", 1)
 					.text(function(d) {
-						return "(total " +
-							(chartState.selectedContribution === "total" ? "contributions" : chartState.selectedContribution) +
+						return "(Total " +
+							(chartState.selectedContribution === "total" ? "Contributions" : chartState.selectedContribution) +
 							")"
 					});
 
@@ -983,7 +983,7 @@
 							" (" + formatPercent(d.paid / d.total) + " paid)" : "";
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
 						return function(t) {
-							d3.select(node).text(formatNumberSI(i(t)))
+							d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)))
 								.append("tspan")
 								.attr("class", "pbiclcDonorLabelPercentage")
 								.attr("dy", "-0.5px")
@@ -1032,11 +1032,11 @@
 					const mouse = d3.mouse(this.parentNode.parentNode);
 
 					tooltip.style("display", "block")
-						.html("Donor: <strong>" + datum.donor + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:262px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.total) +
+						.html("Donor: <strong>" + datum.donor + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:262px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
-							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.paid) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
-							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.pledge) + "</span></div></div>");
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.paid) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
 					const tooltipSize = tooltip.node().getBoundingClientRect();
 
@@ -1220,7 +1220,7 @@
 							" (" + formatPercent(d.paid / d.total) + " received)" : "";
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
 						return function(t) {
-							d3.select(node).text(formatNumberSI(i(t)))
+							d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)))
 								.append("tspan")
 								.attr("class", "pbiclcDonorLabelPercentage")
 								.attr("dy", "-0.5px")
@@ -1269,11 +1269,11 @@
 					const mouse = d3.mouse(this.parentNode.parentNode);
 
 					tooltip.style("display", "block")
-						.html("CBPF: <strong>" + datum.cbpf + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:262px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.total) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total received <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
-							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.paid) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
-							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(datum.pledge) + "</span></div></div>");
+						.html("CBPF: <strong>" + datum.cbpf + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:290px;'><div style='display:flex;flex:0 62%;'>Total contributions:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
+							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
+							")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.paid) +
+							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution unpaid <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
+							")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
 					const tooltipSize = tooltip.node().getBoundingClientRect();
 
@@ -1338,11 +1338,11 @@
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
-					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.total) +
+					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.total) +
 						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(contributionsTotals.paid / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.paid) +
+						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.paid) +
 						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercent(contributionsTotals.pledge / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.pledge) + "</span></div></div>");
+						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.pledge) + "</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
