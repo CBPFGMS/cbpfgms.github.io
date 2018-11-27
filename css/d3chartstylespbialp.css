@@ -204,3 +204,24 @@
 .pbialpUnderApprovalHTMLClass {
 	color: #8392a2;
 }
+
+.pbialpSlicePercent {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbialpAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 18px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbialpAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #222;
+	pointer-events: none;
+}
