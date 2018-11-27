@@ -61,7 +61,7 @@
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
 			formatSIaxes = d3.format("~s"),
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
 			localVariable = d3.local(),
@@ -86,6 +86,7 @@
 			};
 
 		let started = false,
+			firstTime = true,
 			height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
 			yearsArray;
 
@@ -164,6 +165,12 @@
 			padding: [40, 54, 44, 0],
 			labelPadding: 6
 		};
+
+		const bottomButtonsGroup = svg.append("g")
+			.attr("class", "pbialpBottomButtonsGroup");
+
+		const annotationPanel = svg.append("g")
+			.attr("class", "pbialpAnnotationPanel");
 
 		const lollipopPanelClip = lollipopPanel.main.append("clipPath")
 			.attr("id", "pbialpLollipopPanelClip")
@@ -300,6 +307,8 @@
 
 			createBottomButtons();
 
+			if (firstTime) createAnnotationsPanel();
+
 			function createTopPanel(data) {
 
 				const transition = setTransition(duration);
@@ -325,7 +334,7 @@
 
 				topPanelMoneyBag.enter()
 					.append("g")
-					.attr("class", "pbialptopPanelMoneyBag allocationColorFill")
+					.attr("class", "pbialptopPanelMoneyBag contributionColorFill")
 					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)")
 					.each(function(_, i, n) {
 						moneyBagdAttribute.forEach(function(d) {
@@ -356,7 +365,7 @@
 
 				topPanelMainValue = topPanelMainValue.enter()
 					.append("text")
-					.attr("class", "pbialptopPanelMainValue allocationColorFill")
+					.attr("class", "pbialptopPanelMainValue contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
@@ -428,7 +437,7 @@
 
 				topPanelUnderApprovalValue = topPanelUnderApprovalValue.enter()
 					.append("text")
-					.attr("class", "pbialptopPanelUnderApprovalValue allocationColorFill")
+					.attr("class", "pbialptopPanelUnderApprovalValue contributionColorFill")
 					.attr("text-anchor", "end")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.5)
 					.merge(topPanelUnderApprovalValue);
@@ -476,7 +485,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" under approval";
+							" under Approval";
 					});
 
 				let topPanelUnderApprovalSubText = underApprovalValueGroup.selectAll(".pbialptopPanelUnderApprovalSubText")
@@ -496,7 +505,7 @@
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(" +
-							(chartState.selectedPartner === "total" ? "all partners" :
+							(chartState.selectedPartner === "total" ? "All Partners" :
 								chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
 								chartState.selectedPartner) +
 							")";
@@ -507,7 +516,7 @@
 
 				topPanelCbpfsNumber = topPanelCbpfsNumber.enter()
 					.append("text")
-					.attr("class", "pbialptopPanelCbpfsNumber allocationColorFill")
+					.attr("class", "pbialptopPanelCbpfsNumber contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
@@ -830,14 +839,14 @@
 					.attr("y", -(stickHeight / 2 - (stickHeight / 4)))
 					.attr("height", stickHeight)
 					.attr("width", 0)
-					.classed("allocationColorFill", true);
+					.classed("contributionColorFill", true);
 
 				const cbpfLollipopEnter = cbpfGroupEnter.append("circle")
 					.attr("class", "pbialpCbpfLollipop")
 					.attr("cx", lollipopPanel.padding[3])
 					.attr("cy", (stickHeight / 4))
 					.attr("r", lollipopRadius)
-					.classed("allocationColorFill", true);
+					.classed("contributionColorFill", true);
 
 				const cbpfStandardIndicatorEnter = cbpfGroupEnter.append("path")
 					.attr("class", "pbialpCbpfStandardIndicator")
@@ -981,19 +990,23 @@
 
 					const mouse = d3.mouse(lollipopPanel.main.node());
 
+					const tooltipChartTitle = chartState.selectedPartner === "total" ?
+						"Allocations by Partner Type and Modality:" :
+						"Allocations for this Partner Type (" + partnersTextScale(chartState.selectedPartner) + ") by Modality, in %:";
+
 					if (datum[thisTotal]) {
 						tooltip.style("display", "block")
-							.html("<strong><span class='allocationColorDarkerHTMLcolor'>" + datum.cbpf +
+							.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + datum.cbpf +
 								"</span></strong> (" + (chartState.selectedPartner === "total" ? "All Partners" : chartState.selectedPartner) +
 								")<br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
-								lollipopTooltipWidth + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" + formatMoney2Decimals(datum[thisTotal]) +
+								lollipopTooltipWidth + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" + formatMoney0Decimals(datum[thisTotal]) +
 								"</div></div>Allocation Modalities:<div id=pbialpLollipopTooltipBar></div><div style='margin:0px;display:flex;flex-wrap:wrap;width:" +
 								lollipopTooltipWidth + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard <span style='color: #888;'>(" +
-								(formatPercent(datum[thisStandard] / datum[thisTotal])) + ")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorDarkerHTMLcolor'>$" + formatMoney2Decimals(datum[thisStandard]) +
+								(formatPercent(datum[thisStandard] / datum[thisTotal])) + ")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" + formatMoney0Decimals(datum[thisStandard]) +
 								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve <span style='color: #888;'>(" + (formatPercent(datum[thisReserve] / datum[thisTotal])) +
-								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(datum[thisReserve]) +
-								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" + formatMoney2Decimals(datum[thisUnderApproval]) +
-								"</span></div></div><div style='margin-top:6px;'>Allocations by Partner Type and Modality:<div><div id=pbialpLollipopTooltipChart></div>");
+								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum[thisReserve]) +
+								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" + formatMoney0Decimals(datum[thisUnderApproval]) +
+								"</span></div></div><div style='margin-top:6px;'>" + tooltipChartTitle + "<div><div id=pbialpLollipopTooltipChart></div>");
 
 						createTooltipBar(datum, "pbialpLollipopTooltipBar", lollipopTooltipWidth, thisTotal, thisStandard, thisReserve);
 
@@ -1004,10 +1017,10 @@
 						};
 					} else {
 						tooltip.style("display", "block")
-							.html("<strong><span class='allocationColorDarkerHTMLcolor'>" + datum.cbpf +
+							.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + datum.cbpf +
 								"</span></strong><br style='line-height:170%;'/>Partner: <strong>" + (chartState.selectedPartner === "total" ? "All Partners" : chartState.selectedPartner) +
 								"</strong><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
-								(lollipopTooltipWidth * 0.75) + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorDarkerHTMLcolor'>$" + formatMoney2Decimals(datum[thisTotal]) +
+								(lollipopTooltipWidth * 0.75) + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" + formatMoney0Decimals(datum[thisTotal]) +
 								"</span></div></div>");
 					};
 
@@ -1097,8 +1110,8 @@
 
 					cbpfGroup.each(function(d) {
 						d3.select(this).selectAll("rect, circle")
-							.classed("allocationColorFill", !d.clicked)
-							.classed("allocationColorDarkerFill", d.clicked);
+							.classed("contributionColorFill", !d.clicked)
+							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
 					highlightParallel(data);
@@ -1316,7 +1329,7 @@
 
 			function createBottomButtons() {
 
-				const showAverageGroup = svg.append("g")
+				const showAverageGroup = bottomButtonsGroup.append("g")
 					.attr("class", "pbialpShowAverageGroup")
 					.attr("transform", "translate(" + (width - padding[1] - showAverageGroupPadding) + "," +
 						(height - padding[2] / 2) + ")")
@@ -1340,7 +1353,7 @@
 					.text("Show Average")
 					.attr("y", 5);
 
-				const downloadGroup = svg.append("g")
+				const downloadGroup = bottomButtonsGroup.append("g")
 					.attr("class", "pbialpDownloadGroup")
 					.attr("transform", "translate(" + (width - padding[1] - excelIconSize - 6) + "," +
 						(height - padding[2] / 2) + ")");
@@ -1410,6 +1423,98 @@
 				//end of createBottomButtons
 			};
 
+			function createAnnotationsPanel() {
+
+				const arrowMarker = annotationPanel.append("defs")
+					.append("marker")
+					.attr("id", "pbialpArrowMarker")
+					.attr("viewBox", "0 -5 10 10")
+					.attr("refX", 0)
+					.attr("refY", 0)
+					.attr("markerWidth", 12)
+					.attr("markerHeight", 12)
+					.attr("orient", "auto")
+					.append("path")
+					.style("fill", "#E56A54")
+					.attr("d", "M0,-5L10,0L0,5");
+
+				const overRectangle = annotationPanel.append("rect")
+					.attr("width", width)
+					.attr("height", height)
+					.style("fill", "white")
+					.style("opacity", 0.8);
+
+				const mainText = annotationPanel.append("text")
+					.attr("class", "pbialpAnnotationMainText contributionColorFill")
+					.attr("text-anchor", "middle")
+					.attr("x", width / 2)
+					.attr("y", 280)
+					.text("CLICK ANYWHERE TO START");
+
+				const yearsButtonsAnnotation = annotationPanel.append("text")
+					.attr("class", "pbialpAnnotationText")
+					.attr("x", 280)
+					.attr("y", 130)
+					.text("Click these buttons to select the year. Click the left and right arrows to show more years.")
+					.call(wrapText2, 200);
+
+				const yearsButtonPath = annotationPanel.append("path")
+					.style("fill", "none")
+					.style("stroke", "#E56A54")
+					.attr("pointer-events", "none")
+					.attr("marker-end", "url(#pbialpArrowMarker)")
+					.attr("d", "M270,140 Q250,140 250,125");
+
+				const partnersButtonsAnnotation = annotationPanel.append("text")
+					.attr("class", "pbialpAnnotationText")
+					.attr("x", 680)
+					.attr("y", 180)
+					.text("Click these buttons to select the partner type.")
+					.call(wrapText2, 200);
+
+				const partnersButtonPath = annotationPanel.append("path")
+					.style("fill", "none")
+					.style("stroke", "#E56A54")
+					.attr("pointer-events", "none")
+					.attr("marker-end", "url(#pbialpArrowMarker)")
+					.attr("d", "M880,185 Q920,185 920,130");
+
+				const lollipopAnnotation = annotationPanel.append("text")
+					.attr("class", "pbialpAnnotationText")
+					.attr("x", 220)
+					.attr("y", 350)
+					.text("Hover over the CBPFs to get the additional info and to highlight the corresponding line on the right-hand side. Clicking a CBPF keeps it selected. You can click more than one CBPF.")
+					.call(wrapText2, 300);
+
+				const lollipopPath = annotationPanel.append("path")
+					.style("fill", "none")
+					.style("stroke", "#E56A54")
+					.attr("pointer-events", "none")
+					.attr("marker-end", "url(#pbialpArrowMarker)")
+					.attr("d", "M210,370 Q180,370 170,340");
+
+				const parallelAnnotation = annotationPanel.append("text")
+					.attr("class", "pbialpAnnotationText")
+					.attr("x", 800)
+					.attr("y", 300)
+					.text("This area shows the allocations by partner type for all CBPFs. Clicking a CBPF on the right-hand side keeps the respective line highlighted. Hover over the line to get additional info. The dotted line is the average for all CBPFs.")
+					.call(wrapText2, 260);
+
+				const parallelPath = annotationPanel.append("path")
+					.style("fill", "none")
+					.style("stroke", "#E56A54")
+					.attr("pointer-events", "none")
+					.attr("marker-end", "url(#pbialpArrowMarker)")
+					.attr("d", "M790,320 Q760,320 740,360");
+
+				overRectangle.on("click", function() {
+					firstTime = false;
+					annotationPanel.remove();
+				});
+
+				//end of createAnnotationsPanel
+			};
+
 			function highlightParallel(data) {
 
 				const transition = setTransition(duration);
@@ -1429,11 +1534,11 @@
 					});
 
 				selectedGroups.select("path")
-					.attr("class", "allocationColorStroke")
+					.attr("class", "contributionColorStroke")
 					.style("stroke-width", "2px");
 
 				selectedGroups.selectAll("circle")
-					.attr("class", "allocationColorFill")
+					.attr("class", "contributionColorFill")
 					.on("mouseover", mouseOverSelectedCircles)
 					.on("mouseout", mouseOutSelectedCircles);
 
@@ -1575,10 +1680,10 @@
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
-					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:270px;'><div style='display:flex;flex:0 54%;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(partnersTotals.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under approval <span style='color: #888;'>(" + (formatPercent(partnersUnderApproval.total / (partnersTotals.total + partnersUnderApproval.total))) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(partnersUnderApproval.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(partnersTotals.total + partnersUnderApproval.total) + "</span></div></div>");
+					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:270px;'><div style='display:flex;flex:0 54%;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total) +
+						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval <span style='color: #888;'>(" + (formatPercent(partnersUnderApproval.total / (partnersTotals.total + partnersUnderApproval.total))) +
+						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersUnderApproval.total) +
+						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total + partnersUnderApproval.total) + "</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
@@ -1643,26 +1748,26 @@
 				if (datum.value) {
 
 					tooltip.style("display", "block")
-						.html("<strong><span class='allocationColorDarkerHTMLcolor'>" + thisCbpf +
+						.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + thisCbpf +
 							"</span></strong><br style='line-height:170%;'/>Partner: <strong>" + datum.partner +
 							"</strong><br style='line-height:170%;'/><div>Allocations: $" +
-							formatMoney2Decimals(datum.value) + "<br>(" + (~~(datum.percentage * 10000) / 100) +
+							formatMoney0Decimals(datum.value) + "<br>(" + (~~(datum.percentage * 10000) / 100) +
 							"% of total)</div><br style='line-height:170%;'/>Allocation modalities for this partner:<div id=pbialpParallelTooltipBar></div><div style='margin:0px;display:flex;flex-wrap:wrap;width:" +
 							parallelTooltipWidth + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard <span style='color: #888;'>(" +
-							(formatPercent(datum.standard / datum.value)) + ")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorDarkerHTMLcolor'>$" + formatMoney2Decimals(datum.standard) +
+							(formatPercent(datum.standard / datum.value)) + ")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" + formatMoney0Decimals(datum.standard) +
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve <span style='color: #888;'>(" + (formatPercent(datum.reserve / datum.value)) +
-							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(datum.reserve) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;margin-top:8px;'>Under approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;margin-top:8px;'>$" + formatMoney2Decimals(datum.underApproval) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.reserve) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;margin-top:8px;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;margin-top:8px;'>$" + formatMoney0Decimals(datum.underApproval) +
 							"</div></div>");
 
 					createTooltipBar(datum, "pbialpParallelTooltipBar", parallelTooltipWidth, "value", "standard", "reserve");
 
 				} else {
 					tooltip.style("display", "block")
-						.html("<strong><span class='allocationColorDarkerHTMLcolor'>" + thisCbpf +
+						.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + thisCbpf +
 							"</span></strong><br style='line-height:170%;'/>Partner: " + datum.partner +
 							"<br style='line-height:170%;'/>Allocations: $" +
-							formatMoney2Decimals(datum.value));
+							formatMoney0Decimals(datum.value));
 				};
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
@@ -1695,7 +1800,7 @@
 
 				const div1 = containerDiv.append("div")
 					.style("float", "left")
-					.classed("allocationColorDarkerHTMLbc", true)
+					.classed("contributionColorDarkerHTMLbc", true)
 					.style("height", "14px")
 					.style("width", "0px")
 					.style("border-right", scaleDiv(datum[property1]) < 1 ? "0px solid white" : "1px solid white");
@@ -1705,7 +1810,7 @@
 					.style("width", scaleDiv(datum[property1]) + "px");
 
 				const div2 = containerDiv.append("div")
-					.classed("allocationColorHTMLbc", true)
+					.classed("contributionColorHTMLbc", true)
 					.style("margin-left", "0px")
 					.style("height", "14px")
 					.style("width", "0px");
@@ -1715,7 +1820,7 @@
 					.style("margin-left", scaleDiv(datum[property1]) + 1 + "px")
 					.style("width", scaleDiv(datum[property2]) + "px");
 
-				//end of createAllocationsTooltipBar
+				//end of createTooltipBar
 			};
 
 			function createTooltipChartGB(datum) {
@@ -1753,7 +1858,7 @@
 
 				const classScale = d3.scaleOrdinal()
 					.domain(modalities)
-					.range(["allocationColorDarkerFill", "allocationColorFill", "pbialpUnderApprovalClass"]);
+					.range(["contributionColorDarkerFill", "contributionColorFill", "pbialpUnderApprovalClass"]);
 
 				const axisNameScale = d3.scaleOrdinal()
 					.domain(modalities)
@@ -1854,7 +1959,7 @@
 					.attr("transform", "translate(0," + (tooltipSvgHeight - tooltipSvgpadding[2]) + ")")
 					.call(tooltipXAxis);
 
-				//end of createTooltipChart
+				//end of createTooltipChartGB
 			};
 
 			function createTooltipChartDC(datum) {
@@ -1954,6 +2059,28 @@
 						}
 					});
 
+				const slicePercent = tooltipGroups.append("text")
+					.attr("class", "pbialpSlicePercent")
+					.attr("text-anchor", "middle")
+					.attr("y", 4)
+					.text(function(d) {
+						if (!d.values.length) {
+							return "No Value"
+						} else {
+							const total = d3.sum(d.values, function(e) {
+								return e.value;
+							});
+							const thisPartner = d.values.find(function(e) {
+								return e.partner === chartState.selectedPartner;
+							});
+							if (thisPartner) {
+								return formatPercent(thisPartner.value / total);
+							} else {
+								return formatPercent(0);
+							};
+						};
+					});
+
 				const legend = tooltipSvg.selectAll(null)
 					.data(partnerList)
 					.enter()
@@ -1987,7 +2114,7 @@
 					.attr("transform", "translate(0," + (tooltipSvgHeight - tooltipSvgpadding[2]) + ")")
 					.call(tooltipAxis);
 
-				//end of createTooltipChart
+				//end of createTooltipChartDC
 			};
 
 			function recalculateAndResize() {
@@ -2405,10 +2532,52 @@
 					lineHeight = 1.1,
 					y = text.attr("y"),
 					dy = parseFloat(text.attr("dy")),
-					tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", 0)
+					.attr("y", y)
+					.attr("dy", dy + "em");
 				while (word = words.shift()) {
-					tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", (lineNumber++) * lineHeight + dy + "em").text(word);
+					tspan = text.append("tspan")
+						.attr("x", 0)
+						.attr("y", y)
+						.attr("dy", (lineNumber++) * lineHeight + dy + "em")
+						.text(word);
 				};
+			});
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
 			});
 		};
 
