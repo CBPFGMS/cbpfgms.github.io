@@ -457,7 +457,8 @@
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(Total " +
-							(chartState.selectedContribution === "total" ? "Contributions" : chartState.selectedContribution) +
+							(chartState.selectedContribution === "total" ? "Contributions" :
+								chartState.selectedContribution === "pledge" ? "Pledged" : "Paid") +
 							")"
 					});
 
@@ -643,7 +644,11 @@
 						return d === chartState.selectedContribution ? "#444" : "#888"
 					})
 					.text(function(d) {
-						return capitalize(d);
+						if (d === "pledge") {
+							return "Pledged"
+						} else {
+							return capitalize(d);
+						};
 					});
 
 				const leftArrow = buttonPanel.main.append("g")
