@@ -251,12 +251,25 @@
 					.attr("class", "pbialiMainGroup")
 					.style("opacity", 0);
 
+				const clipPath = mainGroup.append("clipPath")
+					.attr("id", function(d) {
+						return "pbialiClipPath" + d.cbpf.replace(/\s+/g, '');
+					})
+					.append("rect")
+					.attr("x", mainPanel.padding[3])
+					.attr("y", mainPanel.padding[0])
+					.attr("height", mainPanel.height - mainPanel.padding[0] - mainPanel.padding[2])
+					.attr("width", 0);
+
 				const path = mainGroup.append("path")
 					.attr("d", function(d) {
 						return lineGeneratorMain(d.values);
 					})
 					.attr("class", "contributionColorStroke")
 					.attr("stroke-width", "1px")
+					.attr("clip-path", function(d) {
+						return "url(#pbialiClipPath" + d.cbpf.replace(/\s+/g, '') + ")"
+					})
 					.style("fill", "none");
 
 				const circles = mainGroup.selectAll(null)
@@ -271,6 +284,10 @@
 					})
 					.attr("cy", function(d) {
 						return yScaleMain(d.total)
+					})
+					.attr("clip-path", function(d) {
+						const thisCbpf = d3.select(this.parentNode).datum().cbpf
+						return "url(#pbialiClipPath" + thisCbpf.replace(/\s+/g, '') + ")"
 					})
 					.attr("class", "contributionColorFill");
 
@@ -727,6 +744,17 @@
 
 				unSelectedGroups.style("opacity", 0);
 
+				selectedGroups.selectAll("clipPath rect")
+					.interrupt();
+
+				selectedGroups.selectAll("clipPath rect")
+					.transition()
+					.duration(duration)
+					.attr("width", mainPanel.width - mainPanel.padding[1] - mainPanel.padding[3]);
+
+				unSelectedGroups.selectAll("clipPath rect")
+					.attr("width", 0);
+
 				const labelsData = chartState.selectedCbpfs.map(function(d) {
 					const thisCountry = data.cbpfs.find(function(e) {
 						return e.cbpf === d;
@@ -747,7 +775,8 @@
 
 				const labelsGroupEnter = labelsGroup.enter()
 					.append("g")
-					.attr("class", "pbialiLabelsGroup");
+					.attr("class", "pbialiLabelsGroup")
+					.style("opacity", 0);
 
 				labelsGroupEnter.attr("transform", function(d) {
 					return "translate(" + (mainPanel.width - mainPanel.padding[1] + labelPadding) + "," +
@@ -775,6 +804,10 @@
 				labelsGroup = labelsGroupEnter.merge(labelsGroup);
 
 				labelsGroup.raise();
+
+				labelsGroup.transition()
+					.duration(duration)
+					.style("opacity", 1);
 
 				collideLabels(labelsGroup.data(), mainPanel.height - mainPanel.padding[2], mainPanel.padding[0]);
 
