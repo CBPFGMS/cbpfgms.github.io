@@ -46,7 +46,7 @@
 			buttonHeight = 58,
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			localVariable = d3.local(),
 			monthsMargin = 2,
 			yMargin = 1.05,
@@ -255,7 +255,7 @@
 					.attr("d", function(d) {
 						return lineGeneratorMain(d.values);
 					})
-					.attr("class", "allocationColorStroke")
+					.attr("class", "contributionColorStroke")
 					.attr("stroke-width", "1px")
 					.style("fill", "none");
 
@@ -272,7 +272,7 @@
 					.attr("cy", function(d) {
 						return yScaleMain(d.total)
 					})
-					.attr("class", "allocationColorFill");
+					.attr("class", "contributionColorFill");
 
 				const rectOverlayCbpfs = mainPanel.main.append("rect")
 					.attr("class", "pbialiRectOverlay")
@@ -350,7 +350,7 @@
 				buttonPaths.each(function(d) {
 					if (d.cbpf === d3.select(this.parentNode).datum().cbpf) {
 						d3.select(this).style("stroke-width", "2px")
-							.attr("class", "allocationColorStroke")
+							.attr("class", "contributionColorStroke")
 							.raise();
 					};
 				});
@@ -618,12 +618,12 @@
 
 					const typeTitle = thisData.length > 1 ? "Allocations" : "Allocation";
 
-					let tooltipHtml = "<span style='margin-bottom:-8px;display:block;'>" + typeTitle + " in <strong>" + mouseYear +
+					let tooltipHtml = "<span style='margin-bottom:-8px;display:block;'>" + typeTitle + " made in <strong>" + mouseYear +
 						"</strong>:</span><br><div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:232px;'>";
 
 					for (let i = 0; i < thisData.length; i++) {
 						tooltipHtml += "<div style='display:flex;flex:0 50%;'>&bull; " +
-							thisData[i].name + ":</div><div style='display:flex;flex:0 50%;justify-content:flex-end;'><span class='allocationColorHTMLcolor'>$" + formatMoney2Decimals(thisData[i].total) +
+							thisData[i].name + ":</div><div style='display:flex;flex:0 50%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(thisData[i].total) +
 							"</span></div>"
 					};
 
@@ -649,7 +649,7 @@
 						.attr("class", "pbialiTooltipCircles")
 						.attr("r", circleRadius + 2)
 						.style("fill", "none")
-						.classed("allocationColorStroke", true)
+						.classed("contributionColorStroke", true)
 						.merge(circles)
 						.attr("cx", function(d) {
 							return xScaleMain(parseTime(d.year))
