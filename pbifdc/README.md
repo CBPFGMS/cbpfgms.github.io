@@ -1,3 +1,4 @@
+
 # GMS BI: CBPF Contributions, force-directed graph
 
 Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
@@ -9,11 +10,18 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">
 
+#### Interactivity:
+
+- The CBPFs and their respective donors can be filtered by region, using the menu at the top left corner in the force-directed graph area. Select `All` to show all donors/CBPFs again.
+- During the map view you can zoom in/out the visualisation. Use the mouse wheel or the touchpad to zoom in/out, click and move to pan.
+- Hovering over the donors, CBPFs or their links changes the legends on the right-hand side. The default legend is also interactive.
+
+
 ## Getting started
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbifdc" data-year="2018" data-showmap="false" data-shownames="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
+```<div id="d3chartcontainerpbifdc" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -23,7 +31,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and 
 
 ## Parameters
 
-There are five parameters:
+There are six parameters:
 
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
@@ -53,6 +61,21 @@ If the value is not an accepted value, it defaults to `"false"`.
 
 This value defines only if the names are visible when the page loads: the user can easily change it by clicking the corresponding button.
 
+**`data-regions`**: defines the selected CBPFs (and all their respective donors) by region, according to [OCHA's Regional Office coverage](https://www.unocha.org/where-we-work/ocha-presence). The value has to be a string. Accepted values:
+
+- `"all"`:  shows all CBPFs (and their respective donors).
+- `"Latin America and the Caribbean"`
+- `"West and Central Africa"`
+- `"Southern and Eastern Africa"`
+- `"Middle East and North Africa"`
+- `"Asia and the Pacific"`
+
+You can specify more than one region. In that case, they should be separated by a comma, without any space. For instance:
+
+`"Latin America and the Caribbean,West and Central Africa"`
+
+If the value is not an accepted one, it will default to `"all"`.
+
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
@@ -72,7 +95,7 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 ## CSS
 
-This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles are listed under `pbifdc` section.
+This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles can be found in [d3chartstylespbifdc.css](https://github.com/CBPFGMS/cbpfgms.github.io/blob/master/css/d3chartstylespbifdc.css) .
 
 ---
 Chart code: `pbifdc`
