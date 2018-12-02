@@ -51,7 +51,7 @@
 			stickHeight = 2,
 			lollipopRadius = 4,
 			formatSIaxes = d3.format("~s"),
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
 			flagPadding = 22,
@@ -93,11 +93,33 @@
 			donorsNumber,
 			cbpfsNumber;
 
+		const geoRegions = {
+			"Latin America and the Caribbean": ["CO", "HT"],
+			"West and Central Africa": ["CF", "CD", "NG"],
+			"Southern and Eastern Africa": ["ET", "SO", "SS", "SD"],
+			"Middle East and North Africa": ["IQ", "JO", "LB", "PS", "SY", "TR", "YE"],
+			"Asia and the Pacific": ["AF", "MM", "PK"],
+			"All": null
+		};
+
 		const containerDiv = d3.select("#d3chartcontainerpbifdc");
 
 		const distancetoTop = containerDiv.node().offsetTop;
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
+
+		const selectedRegionString = containerDiv.node().getAttribute("data-regions");
+
+		let selectedRegion = selectedRegionString.toLowerCase() === "all" ? "All" :
+			selectedRegionString.split(",");
+
+		if (selectedRegion !== "All" && selectedRegion.some(function(d) {
+				return d3.keys(geoRegions).indexOf(d) === -1;
+			})) {
+			selectedRegion = "All"
+		};
+
+		chartState.selectedRegion = selectedRegion;
 
 		const showMapOption = (containerDiv.node().getAttribute("data-showmap") === "true");
 
@@ -166,6 +188,19 @@
 			padding: [10, 6, 12, 6]
 		};
 
+		const geoMenuPanel = {
+			main: svg.append("g")
+				.attr("class", "pbifdcGeoMenuPanel")
+				.attr("transform", "translate(" + (padding[3] + buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsPanel.buttonPadding / 2) +
+					"," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
+			widthCollapsed: 140,
+			widthTotal: 190,
+			heightCollapsed: 20,
+			heightTotal: 166,
+			padding: [42, 4, 4, 24],
+			titlePadding: 6
+		};
+
 		const nodesPanelMapClip = nodesPanel.main.append("clipPath")
 			.attr("id", "pbifdcMapClip")
 			.append("rect")
@@ -180,7 +215,14 @@
 
 		const mapLayer = nodesPanel.main.append("g")
 			.attr("class", "pbifdcMapLayer")
+			.attr("clip-path", "url(#pbifdcMapClip)")
 			.style("opacity", 0);
+
+		const zoomLayer = nodesPanel.main.append("g")
+			.attr("class", "pbifdcZoomLayer")
+			.style("opacity", 0)
+			.attr("cursor", "move")
+			.attr("pointer-events", "none");
 
 		const linksLayer = nodesPanel.main.append("g")
 			.attr("class", "pbifdcLinksLayer")
@@ -193,6 +235,13 @@
 		const nodesLabelLayer = nodesPanel.main.append("g")
 			.attr("class", "pbifdcNodesLabelLayer")
 			.attr("clip-path", "url(#pbifdcMainClip)");
+
+		const zoomRectangle = zoomLayer.append("rect")
+			.attr("width", nodesPanel.width)
+			.attr("height", nodesPanel.height);
+
+		const mapContainer = mapLayer.append("g")
+			.attr("class", "pbifdcMapContainer");
 
 		const mapProjection = d3.geoMercator()
 			.scale((nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]) / (2 * Math.PI))
@@ -312,6 +361,8 @@
 
 			drawLegend(dataObject.nodes, dataObject.links);
 
+			createGeoMenu();
+
 			function createMap(dataMap) {
 
 				dataMap.features.forEach(function(d) {
@@ -326,10 +377,11 @@
 				centroids.CA.x -= 20;
 				centroids.CA.y += 40;
 				centroids.NO.y += 40;
+				centroids.FR.x += 9;
+				centroids.FR.y -= 9;
 
-				const map = mapLayer.append("path")
+				const map = mapContainer.append("path")
 					.attr("d", mapPath(dataMap))
-					.attr("clip-path", "url(#pbifdcMapClip)")
 					.attr("fill", "none")
 					.attr("stroke", "#e9e9f9")
 					.attr("stroke-width", "1px");
@@ -443,7 +495,7 @@
 
 				topPanelSubText.transition(transition)
 					.style("opacity", 1)
-					.text(chartState.selectedYear <= new Date().getFullYear() ? "(total contributions)" : "(pledge values)");
+					.text(chartState.selectedYear <= new Date().getFullYear() ? "(Total Contributions)" : "(Pledged Values)");
 
 				let topPanelDonorsNumber = mainValueGroup.selectAll(".pbifdctopPanelDonorsNumber")
 					.data([donorsNumber]);
@@ -465,10 +517,9 @@
 						};
 					});
 
-				let topPanelDonorsText = mainValueGroup.selectAll(".pbifdctopPanelDonorsText")
-					.data([true]);
-
-				topPanelDonorsText = topPanelDonorsText.enter()
+				const topPanelDonorsText = mainValueGroup.selectAll(".pbifdctopPanelDonorsText")
+					.data([true])
+					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelDonorsText")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.7)
@@ -496,10 +547,9 @@
 						};
 					});
 
-				let topPanelCbpfsText = mainValueGroup.selectAll(".pbifdctopPanelCbpfsText")
-					.data([true]);
-
-				topPanelCbpfsText = topPanelCbpfsText.enter()
+				const topPanelCbpfsText = mainValueGroup.selectAll(".pbifdctopPanelCbpfsText")
+					.data([true])
+					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelCbpfsText")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.7)
@@ -642,16 +692,21 @@
 					.style("stroke", "#aaa")
 					.style("stroke-width", "1px");
 
-				const outerCircle = showMapGroup.append("circle")
-					.attr("r", 6)
-					.attr("cy", -4)
+				const outerRectangle = showMapGroup.append("rect")
+					.attr("width", 14)
+					.attr("height", 14)
+					.attr("rx", 2)
+					.attr("ry", 2)
+					.attr("x", -9)
+					.attr("y", -11)
 					.attr("fill", "white")
 					.attr("stroke", "darkslategray");
 
-				const innerCircle = showMapGroup.append("circle")
-					.attr("r", 4)
-					.attr("cy", -4)
-					.attr("fill", chartState.showMap ? "darkslategray" : "white");
+				const innerCheck = showMapGroup.append("polyline")
+					.style("stroke-width", "2px")
+					.attr("points", "-6,-4 -3,-1 2,-8")
+					.style("fill", "none")
+					.style("stroke", chartState.showMap ? "darkslategray" : "white");
 
 				const showMapText = showMapGroup.append("text")
 					.attr("class", "pbifdcShowMapTextControl")
@@ -684,21 +739,26 @@
 					.style("stroke", "#aaa")
 					.style("stroke-width", "1px");
 
-				const outerCircleShowNames = showNamesGroup.append("circle")
-					.attr("r", 6)
-					.attr("cy", -4)
+				const outerRectangleShowNames = showNamesGroup.append("rect")
+					.attr("width", 14)
+					.attr("height", 14)
+					.attr("rx", 2)
+					.attr("ry", 2)
+					.attr("x", -9)
+					.attr("y", -11)
 					.attr("fill", "white")
 					.attr("stroke", "darkslategray");
 
-				const innerCircleShowNames = showNamesGroup.append("circle")
-					.attr("r", 4)
-					.attr("cy", -4)
-					.attr("fill", chartState.showNames ? "darkslategray" : "white");
+				const innerCheckShowNames = showNamesGroup.append("polyline")
+					.style("stroke-width", "2px")
+					.attr("points", "-6,-4 -3,-1 2,-8")
+					.style("fill", "none")
+					.style("stroke", chartState.showNames ? "darkslategray" : "white");
 
 				const showNamesText = showNamesGroup.append("text")
 					.attr("class", "pbifdcShowMapTextControl")
 					.attr("x", 8)
-					.text("Show names");
+					.text("Show Names");
 
 				const downloadGroup = buttonsPanel.main.append("g")
 					.attr("class", "pbifdcDownloadGroup")
@@ -817,16 +877,14 @@
 
 					chartState.showMap = !chartState.showMap;
 
-					innerCircle.attr("fill", chartState.showMap ? "darkslategray" : "white");
+					innerCheck.style("stroke", chartState.showMap ? "darkslategray" : "white");
 
 					showMapGroupLegend.interrupt()
 						.style("opacity", 0);
 
-					mapLayer.transition()
-						.duration(duration)
-						.style("opacity", function() {
-							return chartState.showMap ? 1 : 0;
-						});
+					mapLayer.style("opacity", function() {
+						return chartState.showMap ? 1 : 0;
+					});
 
 					createNodesPanel(dataObject.nodes, dataObject.links);
 
@@ -848,7 +906,7 @@
 
 					chartState.showNames = !chartState.showNames;
 
-					innerCircleShowNames.attr("fill", chartState.showNames ? "darkslategray" : "white");
+					innerCheckShowNames.style("stroke", chartState.showNames ? "darkslategray" : "white");
 
 					showNamesGroupLegend.interrupt()
 						.style("opacity", 0);
@@ -896,6 +954,15 @@
 
 			function createNodesPanel(dataNodes, dataLinks) {
 
+				let currentTransform;
+
+				if (chartState.showMap) {
+					currentTransform = d3.zoomTransform(nodesPanel.main.node());
+				} else {
+					zoomLayer.attr("pointer-events", "none");
+					nodesPanel.main.on(".zoom", null);
+				};
+
 				const simulationTypes = {
 					geoSimulation: d3.forceSimulation()
 						.force("link", d3.forceLink().id(function(d) {
@@ -914,10 +981,7 @@
 							} else {
 								return centroids.CH.y;
 							}
-						}).strength(1))
-						.force("collide", d3.forceCollide(function(d) {
-							return nodeSizeMapScale(d.total) * collideMarginMap;
-						})),
+						}).strength(1)),
 					naturalSimulation: d3.forceSimulation()
 						.force("link", d3.forceLink().id(function(d) {
 							return d.uniqueId;
@@ -984,6 +1048,13 @@
 							dr = Math.sqrt(dx * dx + dy * dy);
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
 							d.target.x + "," + d.target.y;
+					})
+					.attr("transform", function() {
+						if (!chartState.showMap) {
+							return "translate(0,0) scale(1)";
+						} else {
+							return currentTransform;
+						};
 					});
 
 				links = linksEnter.merge(links);
@@ -994,7 +1065,11 @@
 						return strokeOpacityScale(d.total)
 					})
 					.attr("stroke-width", function(d) {
-						return thisLinkScale(d.total)
+						if (!chartState.showMap) {
+							return thisLinkScale(d.total)
+						} else {
+							return thisLinkScale(d.total) / currentTransform.k;
+						};
 					})
 					.attr("d", function(d) {
 						const sweepFlag = localVariable.get(this);
@@ -1003,6 +1078,13 @@
 							dr = Math.sqrt(dx * dx + dy * dy);
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
 							d.target.x + "," + d.target.y;
+					})
+					.attr("transform", function() {
+						if (!chartState.showMap) {
+							return "translate(0,0) scale(1)";
+						} else {
+							return currentTransform;
+						};
 					});
 
 				let nodeCircle = nodesLayer.selectAll(".pbifdcNodeCircle")
@@ -1020,10 +1102,18 @@
 					.append("circle")
 					.attr("r", 0)
 					.attr("cx", function(d) {
-						return d.x;
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
 					})
 					.attr("cy", function(d) {
-						return d.y;
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
 					})
 					.attr("class", function(d) {
 						return d.category === "Donor" ? "pbifdcNodeCircle contributionColorFill" :
@@ -1034,16 +1124,35 @@
 
 				nodeCircle = nodeCircleEnter.merge(nodeCircle);
 
+				if (chartState.showMap) {
+
+					nodeCircle.sort(function(a, b) {
+						return b.total - a.total;
+					});
+
+				};
+
 				nodeCircle.transition()
 					.duration(duration)
 					.attr("r", function(d) {
 						return thisNodeScale(d.total);
 					})
 					.attr("cx", function(d) {
-						return d.x;
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
 					})
 					.attr("cy", function(d) {
-						return d.y;
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
+					})
+					.on("end", function() {
+						if (chartState.showMap) callZoom();
 					});
 
 				let nodesLabelGroup = nodesLabelLayer.selectAll(".pbifdcNodesLabelGroup")
@@ -1061,13 +1170,24 @@
 					.append("g")
 					.attr("class", "pbifdcNodesLabelGroup")
 					.style("opacity", 0)
-					.style("cursor", "default")
-					.attr("transform", function(d) {
-						return "translate(" + d.x + "," + d.y + ")";
-					});
+					.style("cursor", "default");
 
 				const nodesLabelBack = nodesLabelGroupEnter.append("text")
 					.attr("class", "pbifdcNodesLabelBack")
+					.attr("x", function(d) {
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
+					})
+					.attr("y", function(d) {
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
+					})
 					.attr("dx", function(d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
@@ -1078,7 +1198,11 @@
 					})
 					.append("tspan")
 					.attr("x", function(d) {
-						return thisNodeScale(d.total) + labelPadding;
+						if (!chartState.showMap) {
+							return d.x + thisNodeScale(d.total) + labelPadding;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+						};
 					})
 					.attr("dy", 10)
 					.text(function(d) {
@@ -1087,6 +1211,20 @@
 
 				const nodesLabel = nodesLabelGroupEnter.append("text")
 					.attr("class", "pbifdcNodesLabel")
+					.attr("x", function(d) {
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
+					})
+					.attr("y", function(d) {
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
+					})
 					.attr("dx", function(d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
@@ -1097,7 +1235,11 @@
 					})
 					.append("tspan")
 					.attr("x", function(d) {
-						return thisNodeScale(d.total) + labelPadding;
+						if (!chartState.showMap) {
+							return d.x + thisNodeScale(d.total) + labelPadding;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+						};
 					})
 					.attr("dy", 10)
 					.text(function(d) {
@@ -1108,14 +1250,25 @@
 
 				nodesLabelGroup.transition()
 					.duration(duration)
-					.attr("transform", function(d) {
-						return "translate(" + d.x + "," + d.y + ")";
-					})
 					.style("opacity", 1);
 
 				nodesLabelGroup.select("text.pbifdcNodesLabelBack")
 					.transition()
 					.duration(duration)
+					.attr("x", function(d) {
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
+					})
+					.attr("y", function(d) {
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
+					})
 					.attr("dx", function(d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
@@ -1123,6 +1276,20 @@
 				nodesLabelGroup.select("text.pbifdcNodesLabel")
 					.transition()
 					.duration(duration)
+					.attr("x", function(d) {
+						if (!chartState.showMap) {
+							return d.x;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x;
+						};
+					})
+					.attr("y", function(d) {
+						if (!chartState.showMap) {
+							return d.y;
+						} else {
+							return d.y * currentTransform.k + currentTransform.y;
+						};
+					})
 					.attr("dx", function(d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
@@ -1131,14 +1298,22 @@
 					.transition()
 					.duration(duration)
 					.attr("x", function(d) {
-						return thisNodeScale(d.total) + labelPadding;
+						if (!chartState.showMap) {
+							return d.x + thisNodeScale(d.total) + labelPadding;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+						};
 					});
 
 				nodesLabelGroup.select(".pbifdcNodesLabel tspan")
 					.transition()
 					.duration(duration)
 					.attr("x", function(d) {
-						return thisNodeScale(d.total) + labelPadding;
+						if (!chartState.showMap) {
+							return d.x + thisNodeScale(d.total) + labelPadding;
+						} else {
+							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+						};
 					});
 
 				nodeCircle.on("mouseover", nodeMouseOver)
@@ -1149,6 +1324,75 @@
 
 				links.on("mouseover", linksMouseOver)
 					.on("mouseout", linksMouseOut);
+
+				function callZoom() {
+
+					zoomLayer.attr("pointer-events", "all");
+
+					const zoom = d3.zoom()
+						.scaleExtent([1, 20])
+						.extent([
+							[0, 0],
+							[nodesPanel.width, nodesPanel.height]
+						])
+						.translateExtent([
+							[0, 0],
+							[nodesPanel.width, nodesPanel.height]
+						])
+						.on("zoom", zoomed);
+
+					nodesPanel.main.call(zoom);
+
+					function zoomed() {
+
+						mapContainer.attr("transform", d3.event.transform);
+
+						mapContainer.select("path")
+							.attr("stroke-width", 1 / d3.event.transform.k + "px");
+
+						nodeCircle.attr("cx", function(d) {
+								return d.x * d3.event.transform.k + d3.event.transform.x;
+							})
+							.attr("cy", function(d) {
+								return d.y * d3.event.transform.k + d3.event.transform.y;
+							});
+
+						nodesLabelGroup.select("text.pbifdcNodesLabelBack")
+							.attr("x", function(d) {
+								return d.x * d3.event.transform.k + d3.event.transform.x;
+							})
+							.attr("y", function(d) {
+								return d.y * d3.event.transform.k + d3.event.transform.y;
+							});
+
+						nodesLabelGroup.select("text.pbifdcNodesLabel")
+							.attr("x", function(d) {
+								return d.x * d3.event.transform.k + d3.event.transform.x;
+							})
+							.attr("y", function(d) {
+								return d.y * d3.event.transform.k + d3.event.transform.y;
+							});
+
+						nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
+							.attr("x", function(d) {
+								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
+							});
+
+						nodesLabelGroup.select(".pbifdcNodesLabel tspan")
+							.attr("x", function(d) {
+								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
+							});
+
+						links.attr("transform", d3.event.transform)
+							.attr("stroke-width", function(d) {
+								return thisLinkScale(d.total) / d3.event.transform.k;
+							});
+
+						//end of zoomed
+					};
+
+					//end of callZoom
+				};
 
 				function nodeMouseOver(datum) {
 
@@ -1259,6 +1503,18 @@
 					.attr("y", legendPanel.padding[0] + 16)
 					.text("LEGEND");
 
+				if (dataNodes.length === 0) {
+					legendGroup.append("text")
+						.attr("class", "pbifdcLegendSubTitle")
+						.attr("x", legendPanel.width / 2)
+						.attr("y", legendPanel.padding[0] + 86)
+						.attr("text-anchor", "middle")
+						.text("No data for the current selection")
+						.call(wrapText, 200);
+
+					return;
+				};
+
 				const colorTitle = legendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
@@ -1348,7 +1604,7 @@
 						return i ? legendPanel.padding[0] + 232 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 232;
 					})
 					.text(function(d) {
-						return d.name + " (" + d.category + "): $" + formatMoney2Decimals(d.total);
+						return d.name + " (" + d.category + "): $" + formatMoney0Decimals(d.total);
 					});
 
 				const maxNodeValue = d3.max(dataNodes, function(d) {
@@ -1476,7 +1732,7 @@
 						return legendPanel.padding[0] + 423 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
 					.text(function(d) {
-						return "$" + formatMoney2Decimals(d.total)
+						return "$" + formatMoney0Decimals(d.total)
 					});
 
 				const linkWidthLinks = linkWidthGroup.append("line")
@@ -1636,28 +1892,28 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 122)
-					.text("Pledge amount:");
+					.text("Pledged amount:");
 
 				const totalAmountValue = nodeLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 90)
-					.text("$" + formatMoney2Decimals(datum.total));
+					.text("$" + formatMoney0Decimals(datum.total));
 
 				const totalPaidValue = nodeLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 106)
-					.text("$" + formatMoney2Decimals(datum.paid));
+					.text("$" + formatMoney0Decimals(datum.paid));
 
 				const totalPledgeValue = nodeLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 122)
-					.text("$" + formatMoney2Decimals(datum.pledge));
+					.text("$" + formatMoney0Decimals(datum.pledge));
 
 				const numberOfConnections = nodeLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
@@ -1850,30 +2106,208 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 182)
-					.text("Pledge amount:");
+					.text("Pledged amount:");
 
 				const totalAmountValue = linkLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 150)
-					.text("$" + formatMoney2Decimals(datum.total));
+					.text("$" + formatMoney0Decimals(datum.total));
 
 				const totalPaidValue = linkLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 166)
-					.text("$" + formatMoney2Decimals(datum.paid));
+					.text("$" + formatMoney0Decimals(datum.paid));
 
 				const totalPledgeValue = linkLegendGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 182)
-					.text("$" + formatMoney2Decimals(datum.pledge));
+					.text("$" + formatMoney0Decimals(datum.pledge));
 
 				//end of drawLegendLink
+			};
+
+			function createGeoMenu() {
+
+				const geoMenuContainer = geoMenuPanel.main.append("g")
+
+				const menuRectangle = geoMenuContainer.append("rect")
+					.attr("rx", 2)
+					.attr("ry", 2)
+					.attr("width", geoMenuPanel.widthCollapsed)
+					.attr("height", geoMenuPanel.heightCollapsed)
+					.style("fill", "whitesmoke")
+					.style("stroke-width", 1)
+					.style("opacity", 0.9)
+					.style("stroke", "#aaa");
+
+				const menuRectangleClip = geoMenuContainer.append("clipPath")
+					.attr("id", "pbifdcGeoMenuClip")
+					.append("rect")
+					.attr("width", geoMenuPanel.widthCollapsed)
+					.attr("height", geoMenuPanel.heightCollapsed);
+
+				const geoMenuTitle = geoMenuContainer.append("text")
+					.attr("class", "pbifdcGeoMenuTitle")
+					.attr("x", geoMenuPanel.titlePadding)
+					.attr("y", 15)
+					.text("Select CBPFs by Region:");
+
+				const geoMenuData = d3.keys(geoRegions);
+
+				const geoMenuClipContainer = geoMenuContainer.append("g")
+					.attr("clip-path", "url(#pbifdcGeoMenuClip)");
+
+				const geoMenuGroups = geoMenuClipContainer.selectAll(null)
+					.data(geoMenuData)
+					.enter()
+					.append("g")
+					.attr("class", "pbifdcGeoMenuGroups")
+					.attr("pointer-events", "none")
+					.attr("transform", function(_, i) {
+						return "translate(" + geoMenuPanel.padding[3] + "," + (geoMenuPanel.padding[0] + 22 * i) + ")";
+					});
+
+				const geoMenuText = geoMenuGroups.append("text")
+					.attr("class", "pbifdcGeoMenuText")
+					.attr("x", 0)
+					.text(function(d) {
+						return d;
+					});
+
+				geoMenuGroups.each(function(d) {
+					if (d !== "All") {
+						d3.select(this).append("rect")
+							.attr("width", 14)
+							.attr("height", 14)
+							.attr("rx", 2)
+							.attr("ry", 2)
+							.attr("x", -19)
+							.attr("y", -12)
+							.style("fill", "none")
+							.style("stroke", "darkslategray");
+					} else {
+						d3.select(this).append("circle")
+							.attr("r", 7)
+							.attr("cx", -12)
+							.attr("cy", -4)
+							.style("fill", "none")
+							.style("stroke", "darkslategray");
+					};
+				});
+
+				const geoMenuCheckmarks = geoMenuGroups.filter(":not(:last-child)")
+					.append("polyline")
+					.style("stroke-width", "2px")
+					.attr("points", "-16,-5 -13,-2 -8,-9")
+					.style("fill", "none")
+					.style("stroke", "none");
+
+				const geoMenuInnerCircle = geoMenuGroups.filter(":last-child")
+					.append("circle")
+					.attr("r", 4)
+					.attr("cx", -12)
+					.attr("cy", -4)
+					.style("fill", "none");
+
+				if (chartState.selectedRegion === "All") {
+					geoMenuInnerCircle.style("fill", "darkslategray")
+				} else {
+					geoMenuCheckmarks.filter(function(d) {
+							return chartState.selectedRegion.indexOf(d) > -1
+						})
+						.style("stroke", "darkslategray");
+				};
+
+				geoMenuContainer.on("mouseover", function() {
+
+					menuRectangle.transition()
+						.duration(duration / 2)
+						.attr("height", geoMenuPanel.heightTotal)
+						.attr("width", geoMenuPanel.widthTotal);
+
+					menuRectangleClip.transition()
+						.duration(duration / 2)
+						.attr("height", geoMenuPanel.heightTotal)
+						.attr("width", geoMenuPanel.widthTotal);
+
+					geoMenuTitle.transition()
+						.duration(duration / 2)
+						.attr("x", geoMenuPanel.padding[3]);
+
+					geoMenuGroups.attr("pointer-events", "all");
+
+				}).on("mouseleave", function() {
+
+					menuRectangle.interrupt()
+						.attr("height", geoMenuPanel.heightCollapsed)
+						.attr("width", geoMenuPanel.widthCollapsed);
+
+					menuRectangleClip.interrupt()
+						.attr("height", geoMenuPanel.heightCollapsed)
+						.attr("width", geoMenuPanel.widthCollapsed);
+
+					geoMenuTitle.interrupt()
+						.attr("x", geoMenuPanel.titlePadding);
+
+					geoMenuGroups.attr("pointer-events", "none");
+
+				});
+
+				geoMenuGroups.on("click", function(d) {
+					if (d === "All") {
+						chartState.selectedRegion = "All";
+						geoMenuCheckmarks.style("stroke", "none");
+						geoMenuInnerCircle.style("fill", "darkslategray");
+					} else {
+						if (chartState.selectedRegion === "All") {
+							chartState.selectedRegion = [d];
+						} else {
+							const index = chartState.selectedRegion.indexOf(d);
+							if (index === -1) {
+								chartState.selectedRegion.push(d);
+							} else {
+								if (chartState.selectedRegion.length === 1) {
+									chartState.selectedRegion = "All";
+									geoMenuCheckmarks.style("stroke", "none");
+									geoMenuInnerCircle.style("fill", "darkslategray");
+
+									dataObject = processData(rawData[0]);
+
+									createTopPanel(dataObject.nodes);
+
+									createNodesPanel(dataObject.nodes, dataObject.links);
+
+									drawLegend(dataObject.nodes, dataObject.links);
+
+									return;
+								} else {
+									chartState.selectedRegion.splice(index, 1);
+								};
+							};
+						};
+						geoMenuInnerCircle.style("fill", "none");
+						geoMenuCheckmarks.style("stroke", function(e) {
+							return chartState.selectedRegion.indexOf(e) > -1 ? "darkslategray" : "none";
+						});
+					};
+
+					dataObject = processData(rawData[0]);
+
+					createTopPanel(dataObject.nodes);
+
+					createNodesPanel(dataObject.nodes, dataObject.links);
+
+					drawLegend(dataObject.nodes, dataObject.links);
+
+				});
+
+				//end of createGeoMenu
 			};
 
 			function clickButtonsRects(d) {
@@ -1912,11 +2346,11 @@
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
-					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.total) +
+					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.total) +
 						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(contributionsTotals.paid / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.paid) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercent(contributionsTotals.pledge / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(contributionsTotals.pledge) + "</span></div></div>");
+						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.paid) +
+						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercent(contributionsTotals.pledge / contributionsTotals.total)) +
+						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.pledge) + "</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
@@ -1968,9 +2402,22 @@
 
 		function processData(rawData) {
 
-			const filteredData = rawData.filter(function(d) {
-				return +d.FiscalYear === chartState.selectedYear && d.GMSDonorISO2Code !== "";
-			});
+			let filteredData;
+
+			if (chartState.selectedRegion === "All") {
+				filteredData = rawData.filter(function(d) {
+					return +d.FiscalYear === chartState.selectedYear && d.GMSDonorISO2Code !== "";
+				});
+			} else {
+				const CBPFlist = chartState.selectedRegion.reduce(function(acc, curr) {
+					return acc.concat(geoRegions[curr]);
+				}, []);
+				filteredData = rawData.filter(function(d) {
+					return +d.FiscalYear === chartState.selectedYear &&
+						CBPFlist.indexOf(d.PooledFundISO2Code) > -1 &&
+						d.GMSDonorISO2Code !== "";
+				});
+			};
 
 			filteredData.forEach(function(d) {
 				if (d.GMSDonorName.indexOf("Macedonia") > -1) {
