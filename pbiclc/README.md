@@ -61,7 +61,7 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 ## CSS
 
-This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles are listed under `pbiclc` section.
+This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles can be found in [d3chartstylespbiclc.css](https://github.com/CBPFGMS/cbpfgms.github.io/blob/master/css/d3chartstylespbiclc.css).
 
 ---
 Chart code: `pbiclc`
