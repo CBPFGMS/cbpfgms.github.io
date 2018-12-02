@@ -1509,7 +1509,7 @@
 						.attr("x", legendPanel.width / 2)
 						.attr("y", legendPanel.padding[0] + 86)
 						.attr("text-anchor", "middle")
-						.text("No data for the current selection")
+						.text("No data for the current selection (" + chartState.selectedRegion.join(",") + ")")
 						.call(wrapText, 200);
 
 					return;
