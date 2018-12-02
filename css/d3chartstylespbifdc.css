@@ -146,3 +146,17 @@
 	fill: #aaa;
 	font-size: 12px;
 }
+
+.pbifdcGeoMenuTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #444;
+	pointer-events: none;	
+}
+
+.pbifdcGeoMenuText {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #666;
+	cursor: default;	
+}
