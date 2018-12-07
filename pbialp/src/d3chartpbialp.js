@@ -2365,17 +2365,13 @@
 				};
 			});
 
-			const concatenatedData = clonedData.reduce(function(acc, curr) {
-				return acc.concat(curr);
-			}, []);
-
-			concatenatedData.sort(function(a, b) {
+			clonedData.sort(function(a, b) {
 				return b.total - a.total ||
 					(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
 						a.cbpf.toLowerCase() > b.cbpf.toLowerCase() ? 1 : 0);
 			});
 
-			const header = Object.keys(concatenatedData[0]);
+			const header = Object.keys(clonedData[0]);
 
 			const headerOrder = ["total-UN Agency", "total-Red Cross/Crescent Movement", "total-National NGO", "total-International NGO", "total", "cbpf"];
 
@@ -2387,7 +2383,7 @@
 				return value === null ? '' : value
 			};
 
-			let rows = concatenatedData.map(function(row) {
+			let rows = clonedData.map(function(row) {
 				return header.map(function(fieldName) {
 					return JSON.stringify(row[fieldName], replacer)
 				}).join(',')
