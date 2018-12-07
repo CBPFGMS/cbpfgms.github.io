@@ -1395,9 +1395,15 @@
 				});
 			};
 
-			yScale.domain(data.map(function(d) {
+			const yScaleDomain = data.map(function(d) {
 				return d.cluster;
-			}));
+			});
+
+			yScaleDomain.splice(yScaleDomain.indexOf("Multi-Sector"), 1);
+
+			yScaleDomain.push("Multi-Sector");
+
+			yScale.domain(yScaleDomain);
 
 		};
 
