@@ -70,6 +70,14 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows a force-directed graph will all the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc) for more information.
 
+- **GMS BI: CBPF Overview, lollipop chart**
+
+Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiolc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc)
+
+This charts shows allocations and beneficiaries by cluster, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc) for more information.
+
 ## Chart codes
 
 Each chart and data visualisation is identified by a unique six-letter code. 
@@ -87,3 +95,5 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |GMS BI: CBPF Allocations, lollipop and parallel graph|`pbialp`|
 |GMS BI: CBPF Allocations, line graph|`pbiali`|
 |GMS BI: CBPF Contributions, force-directed graph|`pbifdc`|
+|GMS BI: CBPF Overview, lollipop chart|`pbiolc`|
+
