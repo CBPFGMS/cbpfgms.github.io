@@ -1,0 +1,93 @@
+/*Public BI, Overview, Clusters and Beneficiaries lollipop chart (code: pbiolc)*/
+
+#pbiolctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 13px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 288px;
+}
+
+.pbiolcbuttonsText, .pbiolcbuttonsModalitiesText, .pbiolcbuttonsBeneficiariesText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiolcleftArrowText, .pbiolcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbiolcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbiolcButtonsPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcLabelGroupText {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcAllocationsPanelTitle, .pbiolcBeneficiariesPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+	white-space: pre;
+}
+
+.pbiolcAllocationsPanelSubTitle, .pbiolcBeneficiariesPanelSubTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #666;
+}
+
+.pbiolcAllocationsLabel, .pbiolcBeneficiariesLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcAllocationsLabelPercentage, .pbiolcBeneficiariesLabelPercentage, .pbiolcSortByAllocations, .pbiolcSortByBeneficiaries {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiolcgroupXAxisAllocations text, .pbiolcgroupXAxisBeneficiaries text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiolcgroupXAxisAllocations path, .pbiolcgroupXAxisBeneficiaries path{
+	stroke: none;
+}
+
+.pbiolcgroupXAxisAllocations line, .pbiolcgroupXAxisBeneficiaries line{
+	stroke: #e4e4e4;
+	stroke-dasharray: 2, 2;
+}
