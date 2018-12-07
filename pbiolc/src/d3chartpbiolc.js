@@ -2,9 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
 
-	//const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiolc.css"];
-
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../combinedCSS/d3chartstylespbiolc.css"];
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiolc.css"];
 
 	cssLinks.forEach(function(cssLink) {
 
