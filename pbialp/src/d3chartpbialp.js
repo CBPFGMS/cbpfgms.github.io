@@ -38,7 +38,7 @@
 
 		const width = 1130,
 			parallelPanelHeight = 400,
-			padding = [4, 4, 34, 4],
+			padding = [18, 4, 34, 4],
 			topPanelHeight = 72,
 			buttonPanelHeight = 30,
 			panelHorizontalPadding = 4,
@@ -86,7 +86,6 @@
 			};
 
 		let started = false,
-			firstTime = true,
 			height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
 			yearsArray;
 
@@ -169,8 +168,13 @@
 		const bottomButtonsGroup = svg.append("g")
 			.attr("class", "pbialpBottomButtonsGroup");
 
+		const helpGroup = svg.append("g")
+			.attr("class", "pbialpHelpGroup")
+			.style("cursor", "pointer");
+
 		const annotationPanel = svg.append("g")
-			.attr("class", "pbialpAnnotationPanel");
+			.attr("class", "pbialpAnnotationPanel")
+			.attr("transform", "translate(0," + padding[0] + ")");
 
 		const lollipopPanelClip = lollipopPanel.main.append("clipPath")
 			.attr("id", "pbialpLollipopPanelClip")
@@ -307,7 +311,7 @@
 
 			createBottomButtons();
 
-			if (firstTime) createAnnotationsPanel();
+			createHelpButton();
 
 			function createTopPanel(data) {
 
@@ -1439,6 +1443,7 @@
 					.attr("d", "M0,-5L10,0L0,5");
 
 				const overRectangle = annotationPanel.append("rect")
+					.attr("y", -padding[0])
 					.attr("width", width)
 					.attr("height", height)
 					.style("fill", "white")
@@ -1508,11 +1513,71 @@
 					.attr("d", "M790,320 Q760,320 740,360");
 
 				overRectangle.on("click", function() {
-					firstTime = false;
-					annotationPanel.remove();
+					annotationPanel.selectAll("*").remove();
 				});
 
 				//end of createAnnotationsPanel
+			};
+
+			function createHelpButton() {
+
+				const rightMargin = 42,
+					rectangleWidth = 70,
+					helpVerticalPadding = 5,
+					helpCircleRadius = 8,
+					helpTextMargin = 22;
+
+				const helpRectangle = helpGroup.append("rect")
+					.attr("x", width - rightMargin - rectangleWidth)
+					.attr("height", padding[0])
+					.attr("width", rectangleWidth)
+					.attr("fill", "white");
+
+				const helpCircle = helpGroup.append("circle")
+					.attr("cx", width - rightMargin - helpCircleRadius)
+					.attr("cy", padding[0] / 2)
+					.attr("r", helpCircleRadius)
+					.attr("stroke-width", "2px")
+					.style("stroke", "#888")
+					.style("fill", "white");
+
+				const helpText = helpGroup.append("text")
+					.style("font-family", "Arial")
+					.style("font-size", "12px")
+					.attr("text-anchor", "end")
+					.attr("x", width - rightMargin - helpTextMargin)
+					.attr("y", padding[0] - helpVerticalPadding)
+					.attr("pointer-events", "none")
+					.style("fill", "#888")
+					.text("HELP");
+
+				const helpQuestionMark = helpGroup.append("text")
+					.style("font-family", "Arial")
+					.style("font-size", "12px")
+					.style("font-weight", 700)
+					.attr("text-anchor", "middle")
+					.attr("x", width - rightMargin - helpCircleRadius)
+					.attr("y", padding[0] - helpVerticalPadding)
+					.attr("pointer-events", "none")
+					.style("fill", "#888")
+					.text("?");
+
+				helpGroup.on("mouseover", function() {
+					tooltip.style("display", "block")
+						.html("Click for help")
+						.style("top", d3.event.pageY + 18 + "px")
+						.style("left", d3.event.pageX - 96 + "px");
+				}).on("mousemove", function() {
+					tooltip.style("top", d3.event.pageY + 18 + "px")
+						.style("left", d3.event.pageX - 96 + "px");
+				}).on("mouseout", function() {
+					tooltip.style("display", "none");
+				}).on("click", function() {
+					tooltip.style("display", "none");
+					createAnnotationsPanel();
+				});
+
+				//end of createHelpButton
 			};
 
 			function highlightParallel(data) {
