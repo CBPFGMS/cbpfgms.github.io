@@ -1,4 +1,4 @@
-FiscalYear,GMSDonorName,GMSDonorISO2Code,PooledFundName,PooledFundISO2Code,PaidAmt,PledgeAmt,LPaidAmt,LpledgeAmt,LCurrencyCode
+FiscalYear,GMSDonorName,GMSDonorISO2Code,PooledFundName,PooledFundISO2Code,PaidAmt,PledgeAmt,LPaidAmt,LPledgeAmt,LCurrencyCode
 2014,Australia,AU,Afghanistan,AF,371040,0,291054.9072,0,GBP
 2014,"Korea, Republic of",KR,Afghanistan,AF,6000000,0,4706580,0,GBP
 2014,Norway,NO,Afghanistan,AF,1340450.57,0,1051489.641,0,GBP
