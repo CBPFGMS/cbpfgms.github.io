@@ -12,7 +12,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbicli" data-showfuture="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
+```<div id="d3chartcontainerpbicli" data-localcurrency="false" data-showfuture="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -22,7 +22,14 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and 
 
 ## Parameters
 
-There are three parameters:
+There are four parameters:
+
+**`data-localcurrency`**: defines if the values in the tooltips and in the axes are shown in the local currency or in USD. The value has to be a string. Accepted values:
+
+- `"true"`: values in the local currency.
+- `"false"`: values in USD.
+
+If the value is not an accepted value, it defaults to `"false"`.
 
 **`data-showfuture`**: defines if the contributions for future years are showed when the page loads. The value has to be a string. Accepted values:
 
