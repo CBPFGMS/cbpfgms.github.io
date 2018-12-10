@@ -4,7 +4,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 - Two sets of buttons at the top, allowing the user to hover and click the donor/CBPF (hover highlights, click keeps the highlighted selection) ;
 - Two line graphs, one for the donors and one for the CBPFs;
-- Two control buttons at the bottom, allowing the visualisation of future donations (pledge values) and downloading the corresponding CSV;
+- Two control buttons at the top, allowing the user to select USD or local currency, and two control buttons at the bottom, allowing the visualisation of future donations (pledge values) and downloading the corresponding CSV;
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">
 
