@@ -1706,13 +1706,20 @@
 
 			clonedDataDonors.forEach(function(d) {
 				d.values.forEach(function(e) {
-					e.country = d.donor;
+					e.Country = d.donor;
 					e.type = "donor";
 					e.year = +e.year;
 					e.total = Math.round(e.total * 100) / 100;
 					e.paid = Math.round(e.paid * 100) / 100;
 					e.pledge = Math.round(e.pledge * 100) / 100;
+					e["total (local currency)"] = Math.round(e.localTotal * 100) / 100;
+					e["paid (local currency)"] = Math.round(e.localPaid * 100) / 100;
+					e["pledge (local currency)"] = Math.round(e.localPledge * 100) / 100;
+
 					delete e.donor;
+					delete e.localTotal;
+					delete e.localPaid;
+					delete e.localPledge;
 				});
 			});
 
