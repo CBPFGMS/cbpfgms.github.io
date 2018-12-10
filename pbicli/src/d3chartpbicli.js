@@ -55,9 +55,11 @@
 			currentYear = new Date().getFullYear(),
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			monthsMargin = 2,
 			showFutureGroupPadding = 240,
+			localCurrencyGroupPadding = 88,
+			usdGroupPadding = 140,
 			labelPadding = 10,
 			labelGroupHeight = 14,
 			buttonsGroupHeight = (3 * buttonHeight) + (2 * buttonMargin),
@@ -71,6 +73,10 @@
 			chartState = {
 				selectedDonors: [],
 				selectedCbpfs: []
+			},
+			currencySymbols = {
+				GBP: "\u00A3",
+				EUR: "\u20AC"
 			};
 
 		let started = false,
@@ -86,6 +92,8 @@
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
+
+		chartState.localCurrency = (containerDiv.node().getAttribute("data-localcurrency") === "true");
 
 		if (selectedResponsiveness === false || isInternetExplorer) {
 			containerDiv.style("width", width + "px")
@@ -155,6 +163,12 @@
 		const yScaleCbpfs = d3.scaleLinear()
 			.range([cbpfsLinesPanel.height - cbpfsLinesPanel.padding[2], cbpfsLinesPanel.padding[0]]);
 
+		const yScaleDonorsLocalCurrency = d3.scaleLinear()
+			.range([donorsLinesPanel.height - donorsLinesPanel.padding[2], donorsLinesPanel.padding[0]]);
+
+		const yScaleCbpfsLocalCurrency = d3.scaleLinear()
+			.range([cbpfsLinesPanel.height - cbpfsLinesPanel.padding[2], cbpfsLinesPanel.padding[0]]);
+
 		const lineGeneratorDonors = d3.line()
 			.x(function(d) {
 				return xScaleDonors(parseTime(d.year))
@@ -179,20 +193,24 @@
 			.tickSizeInner(4)
 			.tickSizeOuter(0);
 
-		const yAxisDonors = d3.axisLeft(yScaleDonors)
+		const yAxisDonors = d3.axisLeft(chartState.localCurrency ? yScaleDonorsLocalCurrency : yScaleDonors)
 			.tickSizeInner(2)
 			.tickSizeOuter(0)
 			.ticks(5)
 			.tickFormat(formatSIaxes);
 
-		const yAxisCbpfs = d3.axisLeft(yScaleCbpfs)
+		const yAxisCbpfs = d3.axisLeft(chartState.localCurrency ? yScaleCbpfsLocalCurrency : yScaleCbpfs)
 			.tickSizeInner(2)
 			.tickSizeOuter(0)
 			.ticks(5)
 			.tickFormat(formatSIaxes);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
+		//d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
+
+		d3.csv("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datapbicli.csv")
 			.then(function(rawData) {
+
+				chartState.localCurrencyCode = rawData[0].LCurrencyCode;
 
 				const data = processData(rawData);
 
@@ -242,9 +260,17 @@
 
 			const yScaleDomain = setYDomain(data.donors, data.cbpfs);
 
+			const yScaleDomainLocalCurrency = setYDomainLocalCurrency(data.donors, data.cbpfs);
+
 			yScaleDonors.domain(yScaleDomain);
 
 			yScaleCbpfs.domain(yScaleDomain);
+
+			yScaleDonorsLocalCurrency.domain(yScaleDomainLocalCurrency);
+
+			yScaleCbpfsLocalCurrency.domain(yScaleDomainLocalCurrency);
+
+			saveFlags(data.donors);
 
 			createDonorsButtons();
 
@@ -401,6 +427,66 @@
 						mouseOutButtons(d, "cbpf", this);
 					});
 
+				const localCurrencyGroup = cbpfsButtonsPanel.main.append("g")
+					.attr("class", "pbicliLocalCurrencyGroup")
+					.attr("transform", "translate(" + (cbpfsButtonsPanel.width - cbpfsButtonsPanel.padding[1] - localCurrencyGroupPadding) + "," +
+						(cbpfsButtonsPanel.padding[0] - buttonsTitlePadding) + ")")
+					.style("cursor", "pointer")
+					.attr("pointer-events", "all");
+
+				const localCurrencyouterCircle = localCurrencyGroup.append("circle")
+					.attr("r", 6)
+					.attr("fill", "white")
+					.attr("stroke", "darkslategray");
+
+				const localCurrencyinnerCircle = localCurrencyGroup.append("circle")
+					.attr("r", 4)
+					.attr("fill", chartState.localCurrency ? "darkslategray" : "white");
+
+				const localCurrencyText = localCurrencyGroup.append("text")
+					.attr("class", "pbicliFutureDonationsTextControl")
+					.attr("x", 10)
+					.text("Local Currency")
+					.attr("y", 5);
+
+				const usdGroup = cbpfsButtonsPanel.main.append("g")
+					.attr("class", "pbicliLocalCurrencyGroup")
+					.attr("transform", "translate(" + (cbpfsButtonsPanel.width - cbpfsButtonsPanel.padding[1] - usdGroupPadding) + "," +
+						(cbpfsButtonsPanel.padding[0] - buttonsTitlePadding) + ")")
+					.style("cursor", "pointer")
+					.attr("pointer-events", "all");
+
+				const usdouterCircle = usdGroup.append("circle")
+					.attr("r", 6)
+					.attr("fill", "white")
+					.attr("stroke", "darkslategray");
+
+				const usdinnerCircle = usdGroup.append("circle")
+					.attr("r", 4)
+					.attr("fill", chartState.localCurrency ? "white" : "darkslategray");
+
+				const usdText = usdGroup.append("text")
+					.attr("class", "pbicliFutureDonationsTextControl")
+					.attr("x", 10)
+					.text("USD")
+					.attr("y", 5);
+
+				localCurrencyGroup.on("click", function() {
+					if (chartState.localCurrency) return;
+					chartState.localCurrency = true;
+					localCurrencyinnerCircle.attr("fill", "darkslategray");
+					usdinnerCircle.attr("fill", "white");
+					transitionCurrency();
+				});
+
+				usdGroup.on("click", function() {
+					if (!chartState.localCurrency) return;
+					chartState.localCurrency = false;
+					localCurrencyinnerCircle.attr("fill", "white");
+					usdinnerCircle.attr("fill", "darkslategray");
+					transitionCurrency();
+				});
+
 				//end of createDonorsButtons
 			};
 
@@ -414,7 +500,9 @@
 					.attr("text-anchor", "end")
 					.attr("x", donorsLinesPanel.padding[3] - 2)
 					.attr("y", donorsLinesPanel.padding[0])
-					.text("US$");
+					.text(chartState.localCurrency ? currencySymbols[chartState.localCurrencyCode] ?
+						currencySymbols[chartState.localCurrencyCode] :
+						chartState.localCurrencyCode : "USD");
 
 				const futureDonationsGroup = donorsLinesPanel.main.append("g")
 					.attr("class", "pbicliFutureDonationsGroupDonors")
@@ -543,7 +631,9 @@
 					.attr("text-anchor", "end")
 					.attr("x", cbpfsLinesPanel.padding[3] - 2)
 					.attr("y", cbpfsLinesPanel.padding[0])
-					.text("US$");
+					.text(chartState.localCurrency ? currencySymbols[chartState.localCurrencyCode] ?
+						currencySymbols[chartState.localCurrencyCode] :
+						chartState.localCurrencyCode : "USD");
 
 				const futureDonationsGroup = cbpfsLinesPanel.main.append("g")
 					.attr("class", "pbicliFutureDonationsGroupCbpfs")
@@ -723,9 +813,15 @@
 
 					const yScaleDomain = setYDomain(data.donors, data.cbpfs);
 
+					const yScaleDomainLocalCurrency = setYDomainLocalCurrency(data.donors, data.cbpfs);
+
 					yScaleDonors.domain(yScaleDomain);
 
 					yScaleCbpfs.domain(yScaleDomain);
+
+					yScaleDonorsLocalCurrency.domain(yScaleDomainLocalCurrency);
+
+					yScaleCbpfsLocalCurrency.domain(yScaleDomainLocalCurrency);
 
 					donorsLinesPanel.main.select(".pbicliFutureDonationsGroupDonors")
 						.transition(transition)
@@ -910,6 +1006,11 @@
 
 				const thisData = [];
 
+				const totalKey = chartState.localCurrency ? "localTotal" : "total";
+
+				const currencySymbol = chartState.localCurrency && currencySymbols[chartState.localCurrencyCode] ?
+					currencySymbols[chartState.localCurrencyCode] : "$";
+
 				thisSelectedArray.forEach(function(country) {
 					const thisCountry = data[type + "s"].find(function(e) {
 						return e[type] === country;
@@ -921,6 +1022,7 @@
 						thisData.push({
 							name: country,
 							total: thisYear.total,
+							localTotal: thisYear.localTotal,
 							year: mouseYear
 						})
 					};
@@ -942,7 +1044,7 @@
 					for (let i = 0; i < thisData.length; i++) {
 						tooltipHtml += "<div style='display:flex;flex:0 50%;'>&bull; " +
 							thisData[i].name + ":</div><div style='display:flex;flex:0 50%;justify-content:flex-end;'><span class='" +
-							spanClass + "'>$" + formatMoney2Decimals(thisData[i].total) +
+							spanClass + "'>" + currencySymbol + formatMoney0Decimals(thisData[i][totalKey]) +
 							"</span></div>"
 					};
 
@@ -1119,7 +1221,8 @@
 					return {
 						name: thisCountry.isoCode.toUpperCase(),
 						datum: thisDatum,
-						yPos: yScale(thisDatum.total)
+						yPos: yScale(thisDatum.total),
+						isoCode: thisCountry.isoCode
 					};
 				});
 
@@ -1139,12 +1242,24 @@
 						d.yPos + ")";
 				});
 
-				const labelText = labelsGroupEnter.append("text")
-					.attr("class", "pbicliLabelText")
-					.attr("y", 4)
-					.text(function(d) {
-						return isoAlpha2to3[d.name] ? isoAlpha2to3[d.name] : d.name;
-					});
+				if (type === "donor") {
+					labelsGroupEnter.append("image")
+						.attr("width", flagSize)
+						.attr("height", flagSize)
+						.attr("y", -flagSize / 2)
+						.attr("x", 0)
+						.attr("xlink:href", function(d) {
+							return localStorage.getItem("storedFlag" + d.isoCode) ? localStorage.getItem("storedFlag" + d.isoCode) :
+								flagsDirectory + d.isoCode + ".png";
+						});
+				} else {
+					labelsGroupEnter.append("text")
+						.attr("class", "pbicliLabelText")
+						.attr("y", 4)
+						.text(function(d) {
+							return isoAlpha2to3[d.name] ? isoAlpha2to3[d.name] : d.name;
+						});
+				};
 
 				const labelLine = labelsGroupEnter.append("polyline")
 					.style("stroke-width", "1px")
@@ -1166,10 +1281,6 @@
 				labelsGroup.attr("transform", function(d) {
 					return "translate(" + (thisPanel.width - thisPanel.padding[1] + labelPadding) + "," +
 						d.yPos + ")";
-				});
-
-				labelsGroup.select("text").text(function(d) {
-					return isoAlpha2to3[d.name] ? isoAlpha2to3[d.name] : d.name;
 				});
 
 				labelsGroup.select("polyline")
@@ -1255,9 +1366,8 @@
 							return localVariable.get(this) + 2 * flagPadding;
 						})
 						.attr("xlink:href", function(d) {
-							if (!d.isoCode) d.isoCode = "blank";
-							if (d[countryType] === "UNOCHA") d.isoCode = "un";
-							return flagsDirectory + d.isoCode + ".png";
+							return localStorage.getItem("storedFlag" + d.isoCode) ? localStorage.getItem("storedFlag" + d.isoCode) :
+								flagsDirectory + d.isoCode + ".png";
 						});
 				};
 
@@ -1275,6 +1385,34 @@
 				if (countryType === "donor") maxButtonRows = row;
 
 				//end of createButtonsGroup
+			};
+
+			function transitionCurrency() {
+
+				svg.selectAll(".pbicliYAxisLabel")
+					.text(chartState.localCurrency ? currencySymbols[chartState.localCurrencyCode] ?
+						currencySymbols[chartState.localCurrencyCode] :
+						chartState.localCurrencyCode : "USD");
+
+				if (chartState.localCurrency) {
+					yAxisDonors.scale(yScaleDonorsLocalCurrency);
+					yAxisCbpfs.scale(yScaleCbpfsLocalCurrency);
+				} else {
+					yAxisDonors.scale(yScaleDonors);
+					yAxisCbpfs.scale(yScaleCbpfs);
+				};
+
+				svg.select(".pbicligroupYAxisDonors")
+					.transition()
+					.duration(duration)
+					.call(yAxisDonors);
+
+				svg.select(".pbicligroupYAxisCbpfs")
+					.transition()
+					.duration(duration)
+					.call(yAxisCbpfs);
+
+				//end of transitionCurrency
 			};
 
 			//end of draw
@@ -1319,6 +1457,33 @@
 						return 0;
 					} else {
 						return d.total;
+					};
+				});
+			});
+
+			return [0, Math.max(maxDonors, maxCbpfs) * 1.05];
+
+			//end of setYDomain
+		};
+
+		function setYDomainLocalCurrency(donors, cbpfs) {
+
+			const maxDonors = d3.max(donors, function(donor) {
+				return d3.max(donor.values, function(d) {
+					if (!chartState.futureDonations && +d.year > +currentYear) {
+						return 0;
+					} else {
+						return d.localTotal;
+					};
+				});
+			});
+
+			const maxCbpfs = d3.max(cbpfs, function(cbpf) {
+				return d3.max(cbpf.values, function(d) {
+					if (!chartState.futureDonations && +d.year > +currentYear) {
+						return 0;
+					} else {
+						return d.localTotal;
 					};
 				});
 			});
@@ -1404,12 +1569,18 @@
 						foundValue.paid += +d.PaidAmt;
 						foundValue.pledge += +d.PledgeAmt;
 						foundValue.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundValue.localPaid += +d.LPaidAmt;
+						foundValue.localPledge += +d.LPledgeAmt;
+						foundValue.localTotal += (+d.LPaidAmt) + (+d.LPledgeAmt);
 					} else {
 						foundDonor.values.push({
 							year: d.FiscalYear,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
-							total: (+d.PaidAmt) + (+d.PledgeAmt)
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							localPaid: +d.LPaidAmt,
+							localPledge: +d.LPledgeAmt,
+							localTotal: (+d.LPaidAmt) + (+d.LPledgeAmt)
 						});
 					};
 
@@ -1426,7 +1597,10 @@
 							year: d.FiscalYear,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
-							total: (+d.PaidAmt) + (+d.PledgeAmt)
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							localPaid: +d.LPaidAmt,
+							localPledge: +d.LPledgeAmt,
+							localTotal: (+d.LPaidAmt) + (+d.LPledgeAmt)
 						}]
 					});
 
@@ -1442,12 +1616,18 @@
 						foundValue.paid += +d.PaidAmt;
 						foundValue.pledge += +d.PledgeAmt;
 						foundValue.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundValue.localPaid += +d.LPaidAmt;
+						foundValue.localPledge += +d.LPledgeAmt;
+						foundValue.localTotal += (+d.LPaidAmt) + (+d.LPledgeAmt);
 					} else {
 						foundCbpf.values.push({
 							year: d.FiscalYear,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
-							total: (+d.PaidAmt) + (+d.PledgeAmt)
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							localPaid: +d.LPaidAmt,
+							localPledge: +d.LPledgeAmt,
+							localTotal: (+d.LPaidAmt) + (+d.LPledgeAmt)
 						});
 					};
 
@@ -1464,7 +1644,10 @@
 							year: d.FiscalYear,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
-							total: (+d.PaidAmt) + (+d.PledgeAmt)
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							localPaid: +d.LPaidAmt,
+							localPledge: +d.LPledgeAmt,
+							localTotal: (+d.LPaidAmt) + (+d.LPledgeAmt)
 						}]
 					});
 
@@ -1474,6 +1657,8 @@
 
 			data.donors.forEach(function(donor) {
 				fillZeros(donor.values);
+				if (!donor.isoCode) donor.isoCode = "blank";
+				if (donor.donor === "UNOCHA") donor.isoCode = "un";
 			});
 
 			data.cbpfs.forEach(function(cbpf) {
@@ -1581,6 +1766,56 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
+		};
+
+		function saveFlags(donors) {
+
+			const donorsList = donors.map(function(d) {
+				return d.isoCode;
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
+			donorsList.forEach(function(d) {
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, isoCode) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(isoCode, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(isoCode, base64) {
+				localStorage.setItem("storedFlag" + isoCode, base64);
+			};
+
+			//end of saveFlags
 		};
 
 		function restart() {
