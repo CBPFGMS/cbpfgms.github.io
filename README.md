@@ -58,7 +58,7 @@ This charts shows the CBPF allocations and partner types for selected years. See
 
 Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA GMS.
 
-[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiali.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbialp)
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiali.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiali)
 
 This charts shows the changes for allocations over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiali) for more information.
 
@@ -66,9 +66,17 @@ This charts shows the changes for allocations over the years. See the [chart's p
 
 Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
 
-[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc)
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc)
 
 This charts shows a force-directed graph will all the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc) for more information.
+
+- **GMS BI: CBPF Overview, beneficiaries bar and pictogram chart**
+
+Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiobe.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe)
+
+This charts shows the percentage and proportions of targeted and actual beneficiaries, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe) for more information.
 
 - **GMS BI: CBPF Overview, lollipop chart**
 
@@ -95,5 +103,5 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |GMS BI: CBPF Allocations, lollipop and parallel graph|`pbialp`|
 |GMS BI: CBPF Allocations, line graph|`pbiali`|
 |GMS BI: CBPF Contributions, force-directed graph|`pbifdc`|
+|GMS BI: CBPF Overview, beneficiaries bar and pictogram chart|`pbiobe`|
 |GMS BI: CBPF Overview, lollipop chart|`pbiolc`|
-
