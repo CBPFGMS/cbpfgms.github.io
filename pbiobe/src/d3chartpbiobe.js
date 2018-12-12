@@ -875,7 +875,7 @@
 
 				tooltip.style("display", "block")
 					.html("<strong>" + capitalize(d.beneficiary) + "</strong><br><div style='margin:8px 0px 8px 0px;display:flex;flex-wrap:wrap;align-items:center;width:" + tooltipWidth +
-						"px;'><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " targeted as beneficiary:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
+						"px;'><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " targeted as beneficiaries:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
 						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " actually benefited:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
 						formatComma(d.actual) + "</strong></div></div><div>" + percentageText + "</div>");
 
