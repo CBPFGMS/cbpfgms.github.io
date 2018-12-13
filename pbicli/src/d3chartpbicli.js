@@ -58,8 +58,8 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			monthsMargin = 2,
 			showFutureGroupPadding = 240,
-			localCurrencyGroupPadding = 88,
-			usdGroupPadding = 140,
+			localCurrencyGroupPadding = 128,
+			usdGroupPadding = 180,
 			labelPadding = 10,
 			labelGroupHeight = 14,
 			buttonsGroupHeight = (3 * buttonHeight) + (2 * buttonMargin),
@@ -396,41 +396,10 @@
 						mouseOutButtons(d, "donor", this);
 					});
 
-				//end of createDonorsButtons
-			};
-
-			function createCbpfsButtons() {
-
-				const cbpfTitle = cbpfsButtonsPanel.main.append("text")
-					.attr("class", "pbicliButtonsTitle")
-					.attr("y", cbpfsButtonsPanel.padding[0] - buttonsTitlePadding)
-					.attr("x", cbpfsButtonsPanel.padding[3])
-					.text("CBPFs");
-
-				const cbpfsButtonsContainer = cbpfsButtonsPanel.main.append("g")
-					.attr("class", "pbicliCbpfsButtonsContainer")
-					.attr("transform", "translate(" + cbpfsButtonsPanel.padding[3] + "," +
-						(cbpfsButtonsPanel.padding[0] + buttonsGroupMargin) + ")")
-					.style("cursor", "pointer");
-
-				createButtonsGroups(data.cbpfs, "cbpf", cbpfsButtonsContainer, cbpfsButtonsPanel);
-
-				const cbpfsButtonGroup = cbpfsButtonsPanel.main.selectAll(".pbicliButtonsGroupcbpf");
-
-				cbpfsButtonGroup.on("click", function(d) {
-						clickedButtons(d, "cbpf", this);
-					})
-					.on("mouseover", function(d) {
-						mouseOverButtons(d, "cbpf", this);
-					})
-					.on("mouseout", function(d) {
-						mouseOutButtons(d, "cbpf", this);
-					});
-
-				const localCurrencyGroup = cbpfsButtonsPanel.main.append("g")
+				const localCurrencyGroup = donorsButtonsPanel.main.append("g")
 					.attr("class", "pbicliLocalCurrencyGroup")
-					.attr("transform", "translate(" + (cbpfsButtonsPanel.width - cbpfsButtonsPanel.padding[1] - localCurrencyGroupPadding) + "," +
-						(cbpfsButtonsPanel.padding[0] - buttonsTitlePadding) + ")")
+					.attr("transform", "translate(" + (donorsButtonsPanel.width - donorsButtonsPanel.padding[1] - localCurrencyGroupPadding) + "," +
+						(donorsButtonsPanel.padding[0] - buttonsTitlePadding * 1.5) + ")")
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
@@ -449,10 +418,10 @@
 					.text("Local Currency")
 					.attr("y", 5);
 
-				const usdGroup = cbpfsButtonsPanel.main.append("g")
+				const usdGroup = donorsButtonsPanel.main.append("g")
 					.attr("class", "pbicliLocalCurrencyGroup")
-					.attr("transform", "translate(" + (cbpfsButtonsPanel.width - cbpfsButtonsPanel.padding[1] - usdGroupPadding) + "," +
-						(cbpfsButtonsPanel.padding[0] - buttonsTitlePadding) + ")")
+					.attr("transform", "translate(" + (donorsButtonsPanel.width - donorsButtonsPanel.padding[1] - usdGroupPadding) + "," +
+						(donorsButtonsPanel.padding[0] - buttonsTitlePadding * 1.5) + ")")
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
@@ -486,6 +455,37 @@
 					usdinnerCircle.attr("fill", "darkslategray");
 					transitionCurrency();
 				});
+
+				//end of createDonorsButtons
+			};
+
+			function createCbpfsButtons() {
+
+				const cbpfTitle = cbpfsButtonsPanel.main.append("text")
+					.attr("class", "pbicliButtonsTitle")
+					.attr("y", cbpfsButtonsPanel.padding[0] - buttonsTitlePadding)
+					.attr("x", cbpfsButtonsPanel.padding[3])
+					.text("CBPFs");
+
+				const cbpfsButtonsContainer = cbpfsButtonsPanel.main.append("g")
+					.attr("class", "pbicliCbpfsButtonsContainer")
+					.attr("transform", "translate(" + cbpfsButtonsPanel.padding[3] + "," +
+						(cbpfsButtonsPanel.padding[0] + buttonsGroupMargin) + ")")
+					.style("cursor", "pointer");
+
+				createButtonsGroups(data.cbpfs, "cbpf", cbpfsButtonsContainer, cbpfsButtonsPanel);
+
+				const cbpfsButtonGroup = cbpfsButtonsPanel.main.selectAll(".pbicliButtonsGroupcbpf");
+
+				cbpfsButtonGroup.on("click", function(d) {
+						clickedButtons(d, "cbpf", this);
+					})
+					.on("mouseover", function(d) {
+						mouseOverButtons(d, "cbpf", this);
+					})
+					.on("mouseout", function(d) {
+						mouseOutButtons(d, "cbpf", this);
+					});
 
 				//end of createDonorsButtons
 			};
