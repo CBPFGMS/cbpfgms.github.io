@@ -356,8 +356,6 @@
 
 			function createTopPanel(dataDonors, dataCbpfs) {
 
-				const transition = setTransition(duration);
-
 				contributionType.forEach(function(d) {
 					contributionsTotals[d] = d3.sum(data.dataDonors, function(e) {
 						return e[d]
@@ -382,7 +380,8 @@
 						});
 					});
 
-				topPanelMoneyBag.transition(transition)
+				topPanelMoneyBag.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)");
 
 				const previousValue = d3.select(".pbiclctopPanelMainValue").size() !== 0 ? d3.select(".pbiclctopPanelMainValue").datum() : 0;
@@ -409,7 +408,8 @@
 					.merge(topPanelMainValue)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
 
-				topPanelMainValue.transition(transition)
+				topPanelMainValue.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
@@ -431,7 +431,8 @@
 					.merge(topPanelMainText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9);
 
-				topPanelMainText.transition(transition)
+				topPanelMainText.transition()
+					.duration(duration)
 					.style("opacity", 1)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.text(function(d) {
@@ -452,7 +453,8 @@
 					.merge(topPanelSubText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3);
 
-				topPanelSubText.transition(transition)
+				topPanelSubText.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.style("opacity", 1)
 					.text(function(d) {
@@ -472,7 +474,8 @@
 					.merge(topPanelDonorsNumber)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
 
-				topPanelDonorsNumber.transition(transition)
+				topPanelDonorsNumber.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
@@ -492,7 +495,8 @@
 					.attr("text-anchor", "start")
 					.text("Donors")
 					.merge(topPanelDonorsText)
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[1] + topPanel.mainValueHorPadding);
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbiclctopPanelCbpfsNumber")
@@ -505,7 +509,8 @@
 					.merge(topPanelCbpfsNumber)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
 
-				topPanelCbpfsNumber.transition(transition)
+				topPanelCbpfsNumber.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
@@ -525,7 +530,8 @@
 					.attr("text-anchor", "start")
 					.text("CBPFs")
 					.merge(topPanelCbpfsText)
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[2] + topPanel.mainValueHorPadding);
 
 				const overRectangle = topPanel.main.selectAll(".pbiclctopPanelOverRectangle")
@@ -720,11 +726,11 @@
 
 				leftArrow.on("click", function() {
 					leftArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
-					buttonsGroup.transition(transition)
+					buttonsGroup.transition()
+						.duration(duration)
 						.attr("transform", "translate(" +
 							Math.min(0, (currentTranslate + buttonsNumber * buttonPanel.buttonWidth)) + ",0)")
 						.on("end", function() {
@@ -739,11 +745,11 @@
 
 				rightArrow.on("click", function() {
 					rightArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
-					buttonsGroup.transition(transition)
+					buttonsGroup.transition()
+						.duration(duration)
 						.attr("transform", "translate(" +
 							Math.max(-((yearsArray.length - buttonsNumber) * buttonPanel.buttonWidth),
 								(-(Math.abs(currentTranslate) + buttonsNumber * buttonPanel.buttonWidth))) +
@@ -828,31 +834,31 @@
 
 			function repositionButtonsPanel() {
 
-				const transition = setTransition(duration);
-
 				buttonPanel.main.select(".pbiclcClipPathGroup")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding) + ",0)");
 
 				buttonPanel.main.select(".pbiclcLeftArrowGroup")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",0)");
 
 				buttonPanel.main.select(".pbiclcRightArrowGroup")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding +
 						(buttonsNumber * buttonPanel.buttonWidth)) + ",0)");
 
 				buttonPanel.main.select(".pbiclcbuttonsContributionsGroup")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + (topPanel.moneyBagPadding + donorsPanel.width + panelVerticalPadding) + ",0)")
 
 				//end of repositionButtonsPanel
 			};
 
 			function createDonorsPanel(donorsArray, cbpfRecipient) {
-
-				const transition = setTransition(duration);
 
 				donorsArray.sort(function(a, b) {
 					return b[chartState.selectedContribution] - a[chartState.selectedContribution] ||
@@ -879,7 +885,8 @@
 					.attr("y", donorsPanel.padding[0] - titlePadding)
 					.merge(donorsPanelTitle)
 					.text("Donors" + cbpfName)
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", donorsPanel.padding[3]);
 
 				let donorGroup = donorsPanel.main.selectAll(".pbiclcDonorGroup")
@@ -945,30 +952,35 @@
 
 				donorGroup = donorGroupEnter.merge(donorGroup);
 
-				donorGroup.transition(transition)
+				donorGroup.transition()
+					.duration(duration)
 					.attr("transform", function(d) {
 						return "translate(0," + yScaleDonors(d.donor) + ")";
 					});
 
 				donorGroup.select(".pbiclcDonorStick")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", donorsPanel.padding[3])
 					.attr("width", function(d) {
 						return xScaleDonors(d[chartState.selectedContribution]) - donorsPanel.padding[3];
 					});
 
 				donorGroup.select(".pbiclcDonorLollipop")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("cx", function(d) {
 						return xScaleDonors(d[chartState.selectedContribution]);
 					});
 
 				donorGroup.select(".pbiclcDonorFlag")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", donorsPanel.padding[3] - flagPadding);
 
 				donorGroup.select(".pbiclcDonorPaidIndicator")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0)
 					.attr("transform", function(d) {
 						const thisPadding = xScaleDonors(d.total) - xScaleDonors(d.paid) < lollipopRadius ?
@@ -978,7 +990,8 @@
 					});
 
 				donorGroup.select(".pbiclcDonorLabel")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", function(d) {
 						return xScaleDonors(d[chartState.selectedContribution]) + donorsPanel.labelPadding;
 					})
@@ -1010,11 +1023,13 @@
 
 				xAxisDonors.tickSizeInner(-(lollipopGroupHeight * donorsArray.length));
 
-				groupYAxisDonors.transition(transition)
+				groupYAxisDonors.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + donorsPanel.padding[3] + ",0)")
 					.call(yAxisDonors);
 
-				groupXAxisDonors.transition(transition)
+				groupXAxisDonors.transition()
+					.duration(duration)
 					.call(xAxisDonors);
 
 				groupXAxisDonors.selectAll(".tick")
@@ -1103,8 +1118,6 @@
 
 			function createCbpfsPanel(cbpfsArray, donorCountry) {
 
-				const transition = setTransition(duration);
-
 				cbpfsArray.sort(function(a, b) {
 					return b[chartState.selectedContribution] - a[chartState.selectedContribution] ||
 						(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
@@ -1130,7 +1143,8 @@
 					.attr("y", cbpfsPanel.padding[0] - titlePadding)
 					.merge(cbpfsPanelTitle)
 					.text("CBPFs" + donorName)
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", cbpfsPanel.padding[3]);
 
 				let cbpfGroup = cbpfsPanel.main.selectAll(".pbiclcCbpfGroup")
@@ -1186,26 +1200,30 @@
 
 				cbpfGroup = cbpfGroupEnter.merge(cbpfGroup);
 
-				cbpfGroup.transition(transition)
+				cbpfGroup.transition()
+					.duration(duration)
 					.attr("transform", function(d) {
 						return "translate(0," + yScaleCbpfs(d.cbpf) + ")";
 					});
 
 				cbpfGroup.select(".pbiclcCbpfStick")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", cbpfsPanel.padding[3])
 					.attr("width", function(d) {
 						return xScaleCbpfs(d[chartState.selectedContribution]) - cbpfsPanel.padding[3];
 					});
 
 				cbpfGroup.select(".pbiclcCbpfLollipop")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("cx", function(d) {
 						return xScaleCbpfs(d[chartState.selectedContribution]);
 					});
 
 				cbpfGroup.select(".pbiclcCbpfPaidIndicator")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0)
 					.attr("transform", function(d) {
 						const thisPadding = xScaleCbpfs(d.total) - xScaleCbpfs(d.paid) < lollipopRadius ?
@@ -1215,7 +1233,8 @@
 					});
 
 				cbpfGroup.select(".pbiclcCbpfLabel")
-					.transition(transition)
+					.transition()
+					.duration(duration)
 					.attr("x", function(d) {
 						return xScaleCbpfs(d[chartState.selectedContribution]) + cbpfsPanel.labelPadding;
 					})
@@ -1247,11 +1266,13 @@
 
 				xAxisCbpfs.tickSizeInner(-(lollipopGroupHeight * cbpfsArray.length));
 
-				groupYAxisCbpfs.transition(transition)
+				groupYAxisCbpfs.transition()
+					.duration(duration)
 					.attr("transform", "translate(" + cbpfsPanel.padding[3] + ",0)")
 					.call(yAxisCbpfs);
 
-				groupXAxisCbpfs.transition(transition)
+				groupXAxisCbpfs.transition()
+					.duration(duration)
 					.call(xAxisCbpfs);
 
 				groupXAxisCbpfs.selectAll(".tick")
@@ -1695,10 +1716,6 @@
 
 			groupYAxisCbpfs.attr("transform", "translate(" + cbpfsPanel.padding[3] + ",0)");
 
-		};
-
-		function setTransition(duration) {
-			return d3.transition().duration(duration);
 		};
 
 		function parseTransform(translate) {
