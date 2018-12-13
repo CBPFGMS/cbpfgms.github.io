@@ -315,7 +315,7 @@
 
 			function createTopPanel(data) {
 
-				const transition = setTransition(duration);
+				const transition = setTransition("pbialpTopPanel", duration);
 
 				partnerListWithTotal.forEach(function(d) {
 					partnersTotals[d] = d3.sum(data, function(e) {
@@ -725,7 +725,7 @@
 
 				leftArrow.on("click", function() {
 					leftArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
+					const transition = setTransition("pbialpArrow", duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
@@ -744,7 +744,7 @@
 
 				rightArrow.on("click", function() {
 					rightArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
+					const transition = setTransition("pbialpArrow", duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
@@ -798,7 +798,7 @@
 
 			function createLollipopPanel(cbpfsArray) {
 
-				const transition = setTransition(duration);
+				const transition = setTransition("pbialpLollipop", duration);
 
 				cbpfsArray.sort(function(a, b) {
 					return b[chartState.selectedPartner] - a[chartState.selectedPartner] ||
@@ -1140,7 +1140,7 @@
 					});
 				});
 
-				const transition = setTransition(duration);
+				const transition = setTransition("pbialpParallel", duration);
 
 				const parallelPanelTitle = parallelPanel.main.selectAll(".pbialpParallelPanelTitle")
 					.data([true])
@@ -1582,7 +1582,7 @@
 
 			function highlightParallel(data) {
 
-				const transition = setTransition(duration);
+				const transition = setTransition("pbialpHighlight", duration);
 
 				const selectedData = data.filter(function(d) {
 					return chartState.selectedCbpfs.indexOf(d.cbpf) > -1
@@ -2197,7 +2197,7 @@
 
 			function repositionButtonsPanel() {
 
-				const transition = setTransition(duration);
+				const transition = setTransition("pbialpReposition", duration);
 
 				buttonPanel.main.select(".pbialpClipPathGroup")
 					.transition(transition)
@@ -2301,8 +2301,8 @@
 			groupYAxisLollipop.attr("transform", "translate(" + lollipopPanel.padding[3] + ",0)");
 		};
 
-		function setTransition(duration) {
-			return d3.transition().duration(duration);
+		function setTransition(transitionName, duration) {
+			return d3.transition(transitionName).duration(duration);
 		};
 
 		function parseTransform(translate) {
