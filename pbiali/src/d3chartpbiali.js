@@ -748,6 +748,14 @@
 					.interrupt();
 
 				selectedGroups.selectAll("clipPath rect")
+					.attr("width", function(d) {
+						const current = +d3.select(this).attr("width");
+						if (current === mainPanel.width - mainPanel.padding[1] - mainPanel.padding[3]) {
+							return current;
+						} else {
+							return xScaleMain(parseTime(d.values[0].year));
+						};
+					})
 					.transition()
 					.duration(duration)
 					.attr("width", mainPanel.width - mainPanel.padding[1] - mainPanel.padding[3]);
@@ -873,10 +881,6 @@
 			};
 
 			//end of collideLabels
-		};
-
-		function setTransition(duration) {
-			return d3.transition().duration(duration);
 		};
 
 		function resizeSVG(cbpfs) {
