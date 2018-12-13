@@ -2401,10 +2401,11 @@
 			aggregatedAllocations.forEach(function(cbpf) {
 				cbpf.parallelData = [];
 				partnerList.forEach(function(partner) {
+					const thisPercentage = cbpf.total !== 0 ? cbpf[partner] / cbpf.total : 0;
 					cbpf.parallelData.push({
 						partner: partner,
 						value: cbpf[partner],
-						percentage: cbpf[partner] / cbpf.total,
+						percentage: thisPercentage,
 						total: cbpf.total,
 						standard: cbpf["standard-" + partner],
 						reserve: cbpf["reserve-" + partner],
