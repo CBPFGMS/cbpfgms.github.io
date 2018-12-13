@@ -1684,7 +1684,10 @@
 							year: rangeYear.toString(),
 							paid: 0,
 							pledge: 0,
-							total: 0
+							total: 0,
+							localPaid: 0,
+							localPledge: 0,
+							localTotal: 0
 						});
 					};
 				});
