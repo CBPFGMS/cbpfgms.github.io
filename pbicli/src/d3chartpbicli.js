@@ -801,8 +801,6 @@
 
 					chartState.futureDonations = !chartState.futureDonations;
 
-					const transition = setTransition(duration);
-
 					innerCircle.attr("fill", chartState.futureDonations ? "darkslategray" : "white");
 
 					const timeExtent = setTimeExtent(data.years);
@@ -824,12 +822,14 @@
 					yScaleCbpfsLocalCurrency.domain(yScaleDomainLocalCurrency);
 
 					donorsLinesPanel.main.select(".pbicliFutureDonationsGroupDonors")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear)) + ",0)")
 						.style("opacity", chartState.futureDonations ? 1 : 0);
 
 					cbpfsLinesPanel.main.select(".pbicliFutureDonationsGroupCbpfs")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("transform", "translate(" + xScaleCbpfs(parseTime(currentYear)) + ",0)")
 						.style("opacity", chartState.futureDonations ? 1 : 0);
 
@@ -838,19 +838,22 @@
 					const cbpfsGroups = cbpfsLinesPanel.main.selectAll(".pbicliLineGroup");
 
 					donorsGroups.selectAll("path")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("d", function(d) {
 							return lineGeneratorDonors(d.values)
 						});
 
 					cbpfsGroups.selectAll("path")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("d", function(d) {
 							return lineGeneratorCbpfs(d.values)
 						});
 
 					donorsGroups.selectAll("circle")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("cx", function(d) {
 							return xScaleDonors(parseTime(d.year))
 						})
@@ -859,7 +862,8 @@
 						});
 
 					cbpfsGroups.selectAll("circle")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.attr("cx", function(d) {
 							return xScaleCbpfs(parseTime(d.year))
 						})
@@ -898,19 +902,23 @@
 					redrawLineGraph("cbpf", true);
 
 					donorsLinesPanel.main.select(".pbicligroupXAxisDonors")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.call(xAxisDonors);
 
 					donorsLinesPanel.main.select(".pbicligroupYAxisDonors")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.call(yAxisDonors);
 
 					cbpfsLinesPanel.main.select(".pbicligroupXAxisCbpfs")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.call(xAxisCbpfs);
 
 					cbpfsLinesPanel.main.select(".pbicligroupYAxisCbpfs")
-						.transition(transition)
+						.transition()
+						.duration(duration)
 						.call(yAxisCbpfs);
 
 				});
@@ -1527,10 +1535,6 @@
 			};
 
 			//end of collideLabels
-		};
-
-		function setTransition(duration) {
-			return d3.transition().duration(duration);
 		};
 
 		function processData(rawData) {
