@@ -391,8 +391,6 @@
 
 			function createTopPanel(data) {
 
-				const transition = setTransition(duration);
-
 				const donors = data.filter(function(d) {
 					return d.category === "Donor";
 				});
@@ -450,7 +448,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelMainValue);
 
-				topPanelMainValue.transition(transition)
+				topPanelMainValue.transition()
+					.duration(duration)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousValue, d);
@@ -472,7 +471,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9)
 					.merge(topPanelMainText)
 
-				topPanelMainText.transition(transition)
+				topPanelMainText.transition()
+					.duration(duration)
 					.style("opacity", 1)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
@@ -493,7 +493,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3)
 					.merge(topPanelSubText)
 
-				topPanelSubText.transition(transition)
+				topPanelSubText.transition()
+					.duration(duration)
 					.style("opacity", 1)
 					.text(chartState.selectedYear <= new Date().getFullYear() ? "(Total Contributions)" : "(Pledged Values)");
 
@@ -508,7 +509,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelDonorsNumber);
 
-				topPanelDonorsNumber.transition(transition)
+				topPanelDonorsNumber.transition()
+					.duration(duration)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousDonors, d);
@@ -538,7 +540,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelCbpfsNumber);
 
-				topPanelCbpfsNumber.transition(transition)
+				topPanelCbpfsNumber.transition()
+					.duration(duration)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousCbpfs, d);
@@ -790,11 +793,11 @@
 
 				leftArrow.on("click", function() {
 					leftArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
-					buttonsGroup.transition(transition)
+					buttonsGroup.transition()
+						.duration(duration)
 						.attr("transform", "translate(" +
 							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
 						.on("end", function() {
@@ -809,11 +812,11 @@
 
 				rightArrow.on("click", function() {
 					rightArrow.attr("pointer-events", "none");
-					const transition = setTransition(duration);
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
-					buttonsGroup.transition(transition)
+					buttonsGroup.transition()
+						.duration(duration)
 						.attr("transform", "translate(" +
 							Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
 								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
@@ -2557,10 +2560,6 @@
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			return d3.formatPrefix("." + digits, value)(value);
-		};
-
-		function setTransition(duration) {
-			return d3.transition().duration(duration);
 		};
 
 		function parseTransform(translate) {
