@@ -14,7 +14,7 @@
 	border-radius: 4px;
 	pointer-events: none;
 	cursor: none;
-	min-width: 280px !important;
+	max-width: 280px;
 }
 
 .pbiobebuttonsText, .pbiobebuttonsModalitiesText, .pbiobebuttonsBeneficiariesText {
