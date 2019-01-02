@@ -976,7 +976,7 @@
 					tooltip.html("Year: <strong>" + d.year + "</strong><br>Pooled Fund: <strong>" +
 							d.pooledFundName + "</strong><br style=\"line-height:170%;\"/>Contributions: <strong><span class=\"contributionColorHTMLcolor\">" +
 							formatComma(d.contributions) + " (USD)</span></strong><br>Allocations: <strong><span class=\"allocationColorHTMLcolor\">" +
-							formatComma(d.allocations) + " (USD)</span><strong><br style=\"line-height:170%;\"/>" + donorsTitle + "<br style=\"line-height:170%;\"/>")
+							formatComma(d.allocations) + " (USD)</span></strong><br style=\"line-height:170%;\"/>" + donorsTitle + "<br style=\"line-height:170%;\"/>")
 						.style("display", "block");
 					createTooltipSVG(donors);
 					var tooltipSize = tooltip.node().getBoundingClientRect();
