@@ -363,6 +363,8 @@
 
 			createGeoMenu();
 
+			saveFlags(dataObject.nodes);
+
 			function createMap(dataMap) {
 
 				dataMap.features.forEach(function(d) {
@@ -1320,13 +1322,13 @@
 					});
 
 				nodeCircle.on("mouseover", nodeMouseOver)
-					.on("mouseout", nodeMouseOut);
+					.on("mouseout", nodeLinkMouseOut);
 
 				nodesLabelGroup.on("mouseover", nodeMouseOver)
-					.on("mouseout", nodeMouseOut);
+					.on("mouseout", nodeLinkMouseOut);
 
 				links.on("mouseover", linksMouseOver)
-					.on("mouseout", linksMouseOut);
+					.on("mouseout", nodeLinkMouseOut);
 
 				function callZoom() {
 
@@ -1399,8 +1401,20 @@
 
 				function nodeMouseOver(datum) {
 
+					if (chartState.showMap) {
+						currentTransform = d3.zoomTransform(nodesPanel.main.node());
+					};
+
 					const connections = datum.connections.map(function(d) {
 						return d.uniqueId;
+					});
+
+					const connectedNodes = nodeCircle.filter(function(d) {
+						return connections.indexOf(d.uniqueId) > -1;
+					});
+
+					const connectedLabels = nodesLabelGroup.filter(function(d) {
+						return connections.indexOf(d.uniqueId) > -1;
 					});
 
 					connections.push(datum.uniqueId);
@@ -1418,23 +1432,68 @@
 							strokeOpacityScale(d.total) : 0;
 					});
 
-					drawLegendNode(datum)
+					drawLegendNode(datum);
 
-				};
+					connectedNodes.transition()
+						.duration(duration / 2)
+						.attr("r", function(d) {
+							const thisDatum = datum.connections.find(function(e) {
+								return d.uniqueId === e.uniqueId;
+							});
+							return thisNodeScale(thisDatum.total);
+						});
 
-				function nodeMouseOut() {
+					connectedLabels.select("text.pbifdcNodesLabelBack")
+						.transition()
+						.duration(duration / 2)
+						.attr("dx", function(d) {
+							const thisDatum = datum.connections.find(function(e) {
+								return d.uniqueId === e.uniqueId;
+							});
+							localVariable.set(this.parentNode, thisDatum);
+							return thisNodeScale(thisDatum.total) + labelPadding;
+						});
 
-					nodeCircle.style("opacity", 1);
-					nodesLabelGroup.style("opacity", 1);
-					links.style("opacity", function(d) {
-						return strokeOpacityScale(d.total);
-					});
+					connectedLabels.select("text.pbifdcNodesLabel")
+						.transition()
+						.duration(duration / 2)
+						.attr("dx", function(d) {
+							const thisDatum = localVariable.get(this);
+							return thisNodeScale(thisDatum.total) + labelPadding;
+						});
 
-					drawLegend(dataObject.nodes, dataObject.links);
+					connectedLabels.select(".pbifdcNodesLabelBack tspan")
+						.transition()
+						.duration(duration / 2)
+						.attr("x", function(d) {
+							const thisDatum = localVariable.get(this);
+							if (!chartState.showMap) {
+								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
+							} else {
+								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisDatum.total) + labelPadding;
+							};
+						});
 
+					connectedLabels.select(".pbifdcNodesLabel tspan")
+						.transition()
+						.duration(duration / 2)
+						.attr("x", function(d) {
+							const thisDatum = localVariable.get(this);
+							if (!chartState.showMap) {
+								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
+							} else {
+								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisDatum.total) + labelPadding;
+							};
+						});
+
+					//end of nodeMouseOver
 				};
 
 				function linksMouseOver(datum) {
+
+					if (chartState.showMap) {
+						currentTransform = d3.zoomTransform(nodesPanel.main.node());
+					};
 
 					nodeCircle.style("opacity", function(d) {
 						return d.uniqueId === datum.source.uniqueId || d.uniqueId === datum.target.uniqueId ?
@@ -1452,20 +1511,114 @@
 						return strokeOpacityScale(d.total);
 					});
 
+					const thisValue = datum.source.connections.find(function(d) {
+						return d.uniqueId === datum.target.uniqueId;
+					}).total;
+
+					[datum.source, datum.target].forEach(function(thisDatum) {
+
+						nodeCircle.filter(function(d) {
+								return d.uniqueId === thisDatum.uniqueId;
+							})
+							.transition()
+							.duration(duration / 2)
+							.attr("r", thisNodeScale(thisValue));
+
+						const connectedLabels = nodesLabelGroup.filter(function(d) {
+							return d.uniqueId === thisDatum.uniqueId;
+						});
+
+						connectedLabels.select("text.pbifdcNodesLabelBack")
+							.transition()
+							.duration(duration / 2)
+							.attr("dx", function(d) {
+								return thisNodeScale(thisValue) + labelPadding;
+							});
+
+						connectedLabels.select("text.pbifdcNodesLabel")
+							.transition()
+							.duration(duration / 2)
+							.attr("dx", function(d) {
+								return thisNodeScale(thisValue) + labelPadding;
+							});
+
+						connectedLabels.select(".pbifdcNodesLabelBack tspan")
+							.transition()
+							.duration(duration / 2)
+							.attr("x", function(d) {
+								if (!chartState.showMap) {
+									return d.x + thisNodeScale(thisValue) + labelPadding;
+								} else {
+									return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisValue) + labelPadding;
+								};
+							});
+
+						connectedLabels.select(".pbifdcNodesLabel tspan")
+							.transition()
+							.duration(duration / 2)
+							.attr("x", function(d) {
+								if (!chartState.showMap) {
+									return d.x + thisNodeScale(thisValue) + labelPadding;
+								} else {
+									return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisValue) + labelPadding;
+								};
+							});
+
+					});
+
 					drawLegendLink(datum);
 
+					//end of linksMouseOver
 				};
 
-				function linksMouseOut() {
+				function nodeLinkMouseOut() {
 
-					nodeCircle.style("opacity", 1);
+					nodeCircle.interrupt();
+
+					nodesLabelGroup.selectAll("*").interrupt();
+
+					nodeCircle.style("opacity", 1)
+						.attr("r", function(d) {
+							return thisNodeScale(d.total);
+						});
+
 					nodesLabelGroup.style("opacity", 1);
+
+					nodesLabelGroup.select("text.pbifdcNodesLabelBack")
+						.attr("dx", function(d) {
+							return thisNodeScale(d.total) + labelPadding;
+						});
+
+					nodesLabelGroup.select("text.pbifdcNodesLabel")
+						.attr("dx", function(d) {
+							return thisNodeScale(d.total) + labelPadding;
+						});
+
+					nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
+						.attr("x", function(d) {
+							if (!chartState.showMap) {
+								return d.x + thisNodeScale(d.total) + labelPadding;
+							} else {
+								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+							};
+						});
+
+					nodesLabelGroup.select(".pbifdcNodesLabel tspan")
+						.attr("x", function(d) {
+							if (!chartState.showMap) {
+								return d.x + thisNodeScale(d.total) + labelPadding;
+							} else {
+								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+							};
+						});
+
 					links.style("opacity", function(d) {
 						return strokeOpacityScale(d.total);
 					});
 
 					drawLegend(dataObject.nodes, dataObject.links);
 
+					//end of nodeLinkMouseOut
 				};
 
 				//end of createNodesPanel
@@ -1869,7 +2022,9 @@
 						.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 						.attr("width", flagSize)
 						.attr("height", flagSize)
-						.attr("xlink:href", flagsDirectory + datum.isoCode.toLowerCase() + ".png");
+						.attr("xlink:href", localStorage.getItem("storedFlag" + datum.isoCode.toLowerCase()) ?
+							localStorage.getItem("storedFlag" + datum.isoCode.toLowerCase()) :
+							flagsDirectory + datum.isoCode.toLowerCase() + ".png");
 
 				};
 
@@ -2071,7 +2226,9 @@
 					.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 					.attr("width", flagSize)
 					.attr("height", flagSize)
-					.attr("xlink:href", flagsDirectory + datum.source.isoCode.toLowerCase() + ".png");
+					.attr("xlink:href", localStorage.getItem("storedFlag" + datum.source.isoCode.toLowerCase()) ?
+						localStorage.getItem("storedFlag" + datum.source.isoCode.toLowerCase()) :
+						flagsDirectory + datum.source.isoCode.toLowerCase() + ".png");
 
 				const legendTitleCategoryCbpf = linkLegendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
@@ -2545,6 +2702,58 @@
 			return rows.join('\r\n');
 
 			//end of createCsv
+		};
+
+		function saveFlags(nodes) {
+
+			const donorsList = nodes.filter(function(d) {
+				return d.category === "Donor";
+			}).map(function(d) {
+				return d.isoCode.toLowerCase();
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
+			donorsList.forEach(function(d) {
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, isoCode) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(isoCode, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(isoCode, base64) {
+				localStorage.setItem("storedFlag" + isoCode, base64);
+			};
+
+			//end of saveFlags
 		};
 
 		function validateYear(yearString) {
