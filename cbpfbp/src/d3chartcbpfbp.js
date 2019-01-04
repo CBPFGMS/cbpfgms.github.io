@@ -348,6 +348,8 @@
 
 			started = true;
 
+			saveFlags(dataDonors);
+
 			var maxBarsNumber = Math.max(dataDonors.length, dataCbpfs.length);
 
 			if (maxBarsNumber < 11) {
@@ -804,7 +806,11 @@
 				.attr("y", -3)
 				.attr("x", barsPanel.barsSpace + 8)
 				.attr("xlink:href", function(d) {
-					return d.donor === "Other Donors" ? null : flagsDirectory + d.isoCode + ".png";
+					return d.donor === "Other Donors" ?
+						null :
+						localStorage.getItem("storedFlag" + d.isoCode) ?
+						localStorage.getItem("storedFlag" + d.isoCode) :
+						flagsDirectory + d.isoCode + ".png";
 				})
 				.style("opacity", 0);
 
@@ -1013,7 +1019,9 @@
 						var description = category === "Donors" ? "Total donated" : "Total received";
 
 						if (category === "Donors") {
-							var imageSource = flagsDirectory + d.isoCode + ".png";
+							var imageSource = localStorage.getItem("storedFlag" + d.isoCode) ?
+								localStorage.getItem("storedFlag" + d.isoCode) :
+								flagsDirectory + d.isoCode + ".png";
 						}
 
 						var flag = category === "CBPFs" ? "<br>" : "<img src='" + imageSource + "' height='24' width='24' style='padding:0px;'><br style='line-height:180%;'/>";
@@ -1949,7 +1957,9 @@
 					})[0];
 					var thisIsoCode = thisDonor.isoCode;
 					var thisAmount = thisDonor.totalPaidPlusPledge;
-					var imageSource = flagsDirectory + thisIsoCode + ".png";
+					var imageSource = localStorage.getItem("storedFlag" + thisIsoCode) ?
+						localStorage.getItem("storedFlag" + thisIsoCode) :
+						flagsDirectory + thisIsoCode + ".png";
 					div += "<div style='display:flex;flex:0 50%;white-space:pre;margin-top:0px;margin-bottom:-5px;'><img src='" + imageSource + "' height='24' width='24' style='padding:0px;'>  <span style='margin-top:4px;font-size:12px;'> " + d +
 						"</span><span style='margin-top:4px;color:#666;font-size:10px;font-weight:300;'> (" + formatSIFloat1decimal(thisAmount) + ")</span></div>";
 				});
@@ -2049,6 +2059,56 @@
 			//END CONTROL FUNCTIONS
 
 			//end of draw
+		};
+
+		function saveFlags(donors) {
+
+			const donorsList = donors.map(function(d) {
+				return d.isoCode;
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
+			donorsList.forEach(function(d) {
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, isoCode) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(isoCode, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(isoCode, base64) {
+				localStorage.setItem("storedFlag" + isoCode, base64);
+			};
+
+			//end of saveFlags
 		};
 
 		function restart() {
