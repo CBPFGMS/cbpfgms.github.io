@@ -175,7 +175,8 @@
 			})
 			.y(function(d) {
 				return yScaleDonors(d.total)
-			});
+			})
+			.curve(d3.curveCatmullRom);
 
 		const lineGeneratorCbpfs = d3.line()
 			.x(function(d) {
