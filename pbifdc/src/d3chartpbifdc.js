@@ -4,15 +4,31 @@
 
 	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc.css"];
 
+	const d3URL = "https://d3js.org/d3.v5.min.js";
+
 	cssLinks.forEach(function(cssLink) {
 
-		const externalCSS = document.createElement("link");
-		externalCSS.setAttribute("rel", "stylesheet");
-		externalCSS.setAttribute("type", "text/css");
-		externalCSS.setAttribute("href", cssLink);
-		document.getElementsByTagName("head")[0].appendChild(externalCSS);
+		if (!isStyleLoaded(cssLink)) {
+			const externalCSS = document.createElement("link");
+			externalCSS.setAttribute("rel", "stylesheet");
+			externalCSS.setAttribute("type", "text/css");
+			externalCSS.setAttribute("href", cssLink);
+			document.getElementsByTagName("head")[0].appendChild(externalCSS);
+		};
 
 	});
+
+	if (!isD3Loaded(d3URL)) {
+		if (!isInternetExplorer) {
+			loadScript(d3URL, d3Chart);
+		} else {
+			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
+				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
+					loadScript(d3URL, d3Chart);
+				});
+			});
+		};
+	};
 
 	function loadScript(url, callback) {
 		const head = document.getElementsByTagName('head')[0];
@@ -22,16 +38,22 @@
 		script.onreadystatechange = callback;
 		script.onload = callback;
 		head.appendChild(script);
-	}
+	};
 
-	if (!isInternetExplorer) {
-		loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
-	} else {
-		loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-			loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-				loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
-			});
-		});
+	function isStyleLoaded(url) {
+		const styles = document.getElementsByTagName('link');
+		for (let i = styles.length; i--;) {
+			if (styles[i].href == url) return true;
+		}
+		return false;
+	};
+
+	function isD3Loaded(url) {
+		const scripts = document.getElementsByTagName('script');
+		for (let i = scripts.length; i--;) {
+			if (scripts[i].src == url) return true;
+		}
+		return false;
 	};
 
 	function d3Chart() {
