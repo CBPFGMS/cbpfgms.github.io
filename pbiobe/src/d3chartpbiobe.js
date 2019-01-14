@@ -28,6 +28,8 @@
 				});
 			});
 		};
+	} else {
+		d3Chart();
 	};
 
 	function loadScript(url, callback) {
