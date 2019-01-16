@@ -34,8 +34,8 @@
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == d3URL) d3Script = scripts[i];
 		};
-		d3Script.addEventListener("load", function loadedScript() {
-			d3Script.removeEventListener("load", loadedScript);
+		d3Script.addEventListener("load", function loadedScriptpbialp() {
+			d3Script.removeEventListener("load", loadedScriptpbialp);
 			d3Chart();
 		});
 	};
