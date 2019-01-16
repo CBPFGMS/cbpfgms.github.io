@@ -404,6 +404,17 @@
 
 			};
 
+			if (maxBarsNumber > 10 && (dataDonors.length < 11 || dataCbpfs.length < 11)) {
+				barsDonorsYScale.range([barsPanel.padding[0], dataDonors.length < 11 ?
+					(dataDonors.length * barsHeightUnit) - barsPanel.padding[2] :
+					barsPanel.height - barsPanel.padding[2]
+				]);
+				barsCbpfsYScale.range([barsPanel.padding[0], dataCbpfs.length < 11 ?
+					(dataCbpfs.length * barsHeightUnit) - barsPanel.padding[2] :
+					barsPanel.height - barsPanel.padding[2]
+				]);
+			};
+
 			var top10Donors = dataDonors.slice(0, 10);
 
 			var top10Cbpfs = dataCbpfs.slice(0, 10);
