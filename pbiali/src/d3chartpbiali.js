@@ -28,15 +28,15 @@
 				});
 			});
 		};
+	} else if (typeof d3 !== "undefined") {
+		d3Chart();
 	} else {
 		let d3Script;
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == d3URL) d3Script = scripts[i];
 		};
-		d3Script.addEventListener("load", function() {
-			d3Chart();
-		});
+		d3Script.addEventListener("load", d3Chart);
 	};
 
 	function loadScript(url, callback) {
