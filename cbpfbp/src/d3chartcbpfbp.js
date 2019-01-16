@@ -6,15 +6,40 @@
 
 	var cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescbpfbp.css"];
 
+	var d3URL = "https://d3js.org/d3.v5.min.js";
+
 	cssLinks.forEach(function(cssLink) {
 
-		var externalCSS = document.createElement("link");
-		externalCSS.setAttribute("rel", "stylesheet");
-		externalCSS.setAttribute("type", "text/css");
-		externalCSS.setAttribute("href", cssLink);
-		document.getElementsByTagName("head")[0].appendChild(externalCSS);
+		if (!isStyleLoaded(cssLink)) {
+			var externalCSS = document.createElement("link");
+			externalCSS.setAttribute("rel", "stylesheet");
+			externalCSS.setAttribute("type", "text/css");
+			externalCSS.setAttribute("href", cssLink);
+			document.getElementsByTagName("head")[0].appendChild(externalCSS);
+		};
 
 	});
+
+	if (!isD3Loaded(d3URL)) {
+		if (!isInternetExplorer) {
+			loadScript(d3URL, d3Chart);
+		} else {
+			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
+				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
+					loadScript(d3URL, d3Chart);
+				});
+			});
+		};
+	} else {
+		var d3Script;
+		var allScripts = document.getElementsByTagName('script');
+		for (var i = allScripts.length; i--;) {
+			if (allScripts[i].src == d3URL) d3Script = allScripts[i];
+		};
+		d3Script.addEventListener("load", function() {
+			d3Chart();
+		});
+	};
 
 	function loadScript(url, callback) {
 		var head = document.getElementsByTagName('head')[0];
@@ -24,16 +49,22 @@
 		script.onreadystatechange = callback;
 		script.onload = callback;
 		head.appendChild(script);
-	}
+	};
 
-	if (!isInternetExplorer) {
-		loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
-	} else {
-		loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-			loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-				loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
-			});
-		});
+	function isStyleLoaded(url) {
+		var styles = document.getElementsByTagName('link');
+		for (var i = styles.length; i--;) {
+			if (styles[i].href == url) return true;
+		}
+		return false;
+	};
+
+	function isD3Loaded(url) {
+		var scripts = document.getElementsByTagName('script');
+		for (var i = scripts.length; i--;) {
+			if (scripts[i].src == url) return true;
+		}
+		return false;
 	};
 
 	function d3Chart() {
