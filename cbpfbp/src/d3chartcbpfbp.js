@@ -6,12 +6,12 @@
 
 	var cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescbpfbp.css"];
 
-	var d3URL = "https://d3js.org/d3.v5.min.js";
+	const d3URL = "https://d3js.org/d3.v5.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
-			var externalCSS = document.createElement("link");
+			const externalCSS = document.createElement("link");
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
@@ -31,10 +31,10 @@
 			});
 		};
 	} else {
-		var d3Script;
-		var allScripts = document.getElementsByTagName('script');
-		for (var i = allScripts.length; i--;) {
-			if (allScripts[i].src == d3URL) d3Script = allScripts[i];
+		let d3Script;
+		const scripts = document.getElementsByTagName('script');
+		for (let i = scripts.length; i--;) {
+			if (scripts[i].src == d3URL) d3Script = scripts[i];
 		};
 		d3Script.addEventListener("load", function() {
 			d3Chart();
@@ -42,8 +42,8 @@
 	};
 
 	function loadScript(url, callback) {
-		var head = document.getElementsByTagName('head')[0];
-		var script = document.createElement('script');
+		const head = document.getElementsByTagName('head')[0];
+		const script = document.createElement('script');
 		script.type = 'text/javascript';
 		script.src = url;
 		script.onreadystatechange = callback;
@@ -52,16 +52,16 @@
 	};
 
 	function isStyleLoaded(url) {
-		var styles = document.getElementsByTagName('link');
-		for (var i = styles.length; i--;) {
+		const styles = document.getElementsByTagName('link');
+		for (let i = styles.length; i--;) {
 			if (styles[i].href == url) return true;
 		}
 		return false;
 	};
 
 	function isD3Loaded(url) {
-		var scripts = document.getElementsByTagName('script');
-		for (var i = scripts.length; i--;) {
+		const scripts = document.getElementsByTagName('script');
+		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
 		}
 		return false;
