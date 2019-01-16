@@ -29,7 +29,15 @@
 			});
 		};
 	} else {
-		d3Chart();
+		let d3Script;
+		const scripts = document.getElementsByTagName('script');
+		for (let i = scripts.length; i--;) {
+			if (scripts[i].src == d3URL) d3Script = scripts[i];
+		};
+		d3Script.addEventListener("load", function loadedScript() {
+			d3Script.removeEventListener("load", loadedScript);
+			d3Chart();
+		});
 	};
 
 	function loadScript(url, callback) {
