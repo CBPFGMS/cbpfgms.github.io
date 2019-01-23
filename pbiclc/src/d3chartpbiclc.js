@@ -264,6 +264,15 @@
 
 				chartState.selectedContribution = selectedContribution;
 
+				const allDonors = rawData.map(function(d) {
+					if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
+					return d.GMSDonorISO2Code.toLowerCase();
+				}).filter(function(value, index, self) {
+					return self.indexOf(value) === index;
+				});
+
+				saveFlags(allDonors);
+
 				if (!lazyLoad) {
 					draw(rawData);
 				} else {
@@ -957,7 +966,8 @@
 					.attr("x", donorsPanel.padding[3] - flagPadding)
 					.attr("y", -flagSize / 2 + 1)
 					.attr("xlink:href", function(d) {
-						return flagsDirectory + d.isoCode + ".png";
+						return localStorage.getItem("storedFlag" + d.isoCode) ? localStorage.getItem("storedFlag" + d.isoCode) :
+							flagsDirectory + d.isoCode + ".png";
 					});
 
 				const donorPaidIndicatorEnter = donorGroupEnter.append("path")
@@ -1759,6 +1769,56 @@
 
 			return [matrix.e, matrix.f];
 
+		};
+
+		function saveFlags(donorsList) {
+
+			const unocha = donorsList.indexOf("");
+
+			if (unocha > -1) {
+				donorsList[unocha] = "un";
+			};
+
+			donorsList.forEach(function(d) {
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, isoCode) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(isoCode, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(isoCode, base64) {
+				localStorage.setItem("storedFlag" + isoCode, base64);
+			};
+
+			//end of saveFlags
 		};
 
 		function createProgressWheel() {
