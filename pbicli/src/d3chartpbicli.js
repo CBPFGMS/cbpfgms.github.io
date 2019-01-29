@@ -119,6 +119,8 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
 		if (selectedResponsiveness === false || isInternetExplorer) {
@@ -470,7 +472,7 @@
 
 			createTopLegend();
 
-			createAnnotationsDiv();
+			if (showHelp) createAnnotationsDiv();
 
 			containerDiv.select("#pbicliDonorsDropdown").on("change", function() {
 
@@ -481,8 +483,6 @@
 				};
 
 				if (chartState.showLocal && currencyByCountry[thisIsoCode] !== chartState.selectedLocalCurrency && chartState.selectedLocalCurrency !== null) {
-
-					console.log(chartState)
 					createCurrencyOverDiv2();
 					containerDiv.select("#pbicliDonorsDropdown").select("option")
 						.property("selected", true);
@@ -765,6 +765,41 @@
 
 			});
 
+			function createTitle() {
+
+				borderDiv.style("border-bottom", "1px solid lightgray");
+
+				const title = titleDiv.append("p")
+					.attr("class", "pbicliTitle contributionColorHTMLcolor")
+					.html("Contributions Line Chart");
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbicliHelpButton");
+
+				helpIcon.style("font-size", "0.8vw")
+					.html("HELP ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbicliDownloadButton");
+
+				downloadIcon.style("font-size", "0.8vw")
+					.html(".CSV ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+					if (chartState.controlledBy === null) return;
+					const data = populateData(rawData);
+					downloadData(data, rawData);
+				});
+
+				//end of createTitle
+			};
+
 			function createSelectedDonors() {
 
 				donorsLegendDivBottom.selectAll(".pbicliCheckboxDonorsDiv").remove();
@@ -924,14 +959,15 @@
 					.append("div")
 					.attr("class", "pbicliCheckboxDonorsDiv");
 
-				const checkbox = donorsCheckboxesEnter.append("label")
-					.append("input")
+				const checkbox = donorsCheckboxesEnter.append("label");
+
+				const input = checkbox.append("input")
 					.attr("type", "checkbox")
 					.attr("value", function(d) {
 						return d;
 					});
 
-				const span = donorsCheckboxesEnter.append("span")
+				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
 					.html(function(d) {
 						return iso2Names[d] ? iso2Names[d] : d;
@@ -1041,14 +1077,15 @@
 					.append("div")
 					.attr("class", "pbicliCheckboxCbpfsDiv");
 
-				const checkbox = cbpfsCheckboxesEnter.append("label")
-					.append("input")
+				const checkbox = cbpfsCheckboxesEnter.append("label");
+
+				const input = checkbox.append("input")
 					.attr("type", "checkbox")
 					.attr("value", function(d) {
 						return d;
 					});
 
-				const span = cbpfsCheckboxesEnter.append("span")
+				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
 					.html(function(d) {
 						return iso2Names[d] ? iso2Names[d] : d;
@@ -1181,7 +1218,7 @@
 					})
 					.transition()
 					.duration(duration)
-					.style("stroke-dashoffset", 0);
+					.style("stroke-dashoffset", "0");
 
 				const circlesEnter = donorsGroupEnter.selectAll(null)
 					.data(function(d) {
@@ -1294,7 +1331,7 @@
 					})
 					.transition()
 					.duration(duration)
-					.style("stroke-dashoffset", 0);
+					.style("stroke-dashoffset", "0");
 
 				const circlesEnterLocal = donorsGroupLocalEnter.selectAll(null)
 					.data(function(d) {
@@ -1627,7 +1664,7 @@
 					})
 					.transition()
 					.duration(duration)
-					.style("stroke-dashoffset", 0);
+					.style("stroke-dashoffset", "0");
 
 				const circlesEnter = cbpfsGroupEnter.selectAll(null)
 					.data(function(d) {
@@ -1979,31 +2016,6 @@
 			};
 
 			//end of draw
-		};
-
-		function createTitle() {
-
-			borderDiv.style("border-bottom", "1px solid lightgray");
-
-			const title = titleDiv.append("p")
-				.attr("class", "pbicliTitle contributionColorHTMLcolor")
-				.html("Contributions Line Chart");
-
-			const helpIcon = iconsDiv.append("button")
-				.attr("id", "pbicliHelpButton")
-				.style("font-size", "0.8vw")
-				.html("HELP ")
-				.append("span")
-				.attr("class", "fas fa-info")
-
-			const downloadIcon = iconsDiv.append("button")
-				.attr("id", "pbicliDownloadButton")
-				.style("font-size", "0.8vw")
-				.html(".CSV ")
-				.append("span")
-				.attr("class", "fas fa-download");
-
-			//end of createTitle
 		};
 
 		function createDonorsDropdown(donorsArray) {
@@ -2645,14 +2657,14 @@
 				.attr("class", "pbicliAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", totalWidth / 2)
-				.attr("y", 280)
+				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
 
 			const donorsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
-				.attr("x", 250)
+				.attr("x", 160)
 				.attr("y", 130)
-				.text("Use this menu to select one or more donors. When the donors are selected here, all CBPFs show values corresponding to donations made by those selected donors only.")
+				.text("Use this menu to select one or more donors. When donors are selected here the values of all displayed CBPFs correspond to donations made only by those selected donors.")
 				.call(wrapText2, 200);
 
 			const donorsDropdownPath = helpSVG.append("path")
@@ -2660,13 +2672,27 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M240,140 Q180,140 180,90");
+				.attr("d", "M150,140 Q120,140 120,90");
+
+			const currencyDropdownAnnotation = helpSVG.append("text")
+				.attr("class", "pbicliAnnotationText")
+				.attr("x", 400)
+				.attr("y", 150)
+				.text("Use this menu to select donors by their currencies. This is useful before selecting “local currency” in the radio buttons below.")
+				.call(wrapText2, 200);
+
+			const currencyDropdownPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbicliArrowMarker)")
+				.attr("d", "M470,140 Q470,65 420,65");
 
 			const cbpfsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
 				.attr("x", 650)
 				.attr("y", 130)
-				.text("Use this menu to select one or more CBPFs. When the CBPFs are selected here, all donors show values corresponding to donations made to those selected CBPFs only.")
+				.text("Use this menu to select one or more CBPFs. When CBPFs are selected here the values of all displayed donors correspond to donations made only to those selected CBPFs.")
 				.call(wrapText2, 200);
 
 			const cbpfsDropdownPath = helpSVG.append("path")
@@ -2679,16 +2705,16 @@
 			const radioAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
 				.attr("x", 220)
-				.attr("y", 350)
-				.text("Use these buttons to show the donations in USD or in the donor's local currency. This option is not available when CBPFs are selected, and also depend on the selected donors.")
-				.call(wrapText2, 300);
+				.attr("y", 380)
+				.text("Use these radio buttons to show the donations in USD or in the donor's local currency. This option is not available when CBPFs are selected, and also not available when the selected donors have different local currencies.")
+				.call(wrapText2, 360);
 
 			const radioPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M210,370 Q120,320 90,115");
+				.attr("d", "M210,400 Q80,350 50,115");
 
 			helpSVG.on("click", function() {
 				overDiv.remove();
@@ -2697,10 +2723,116 @@
 			//end of createAnnotationsDiv
 		};
 
-		function createCSV(sourceDataDonors, sourceDataCbpfs) {
+		function downloadData(data, rawData) {
 
+			const csv = createCsv(data, rawData);
 
-			//end of createCSV
+			const fileName = "contributions.csv";
+
+			const blob = new Blob([csv], {
+				type: 'text/csv;charset=utf-8;'
+			});
+
+			if (navigator.msSaveBlob) {
+				navigator.msSaveBlob(blob, filename);
+			} else {
+
+				const link = document.createElement("a");
+
+				if (link.download !== undefined) {
+
+					const url = URL.createObjectURL(blob);
+
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+
+					document.body.appendChild(link);
+
+					link.click();
+
+					document.body.removeChild(link);
+
+				};
+			};
+
+			//end of downloadData
+		};
+
+		function createCsv(sourceData, rawData) {
+
+			const checkedDonorsList = [];
+
+			const checkedCbpfsList = [];
+
+			for (let key in checkedDonors) {
+				if (checkedDonors[key]) checkedDonorsList.push(key);
+			};
+
+			for (let key in checkedCbpfs) {
+				if (checkedCbpfs[key]) checkedCbpfsList.push(key);
+			};
+
+			const selectedDonorsList = chartState.controlledBy === "donor" ?
+				sourceData.donors.map(function(d) {
+					return d.isoCode;
+				}) : checkedDonorsList;
+
+			const selectedCbpfsList = chartState.controlledBy === "cbpf" ?
+				sourceData.cbpfs.map(function(d) {
+					return d.isoCode;
+				}) : checkedCbpfsList;
+
+			const filteredData = rawData.filter(function(row) {
+				return selectedDonorsList.indexOf(row.GMSDonorISO2Code.toLowerCase()) > -1 && selectedCbpfsList.indexOf(row.PooledFundISO2Code.toLowerCase()) > -1;
+			});
+
+			console.log(filteredData);
+
+			filteredData.forEach(function(d) {
+				d["Fiscal year"] = +d.FiscalYear;
+				d.donor = d.GMSDonorName;
+				d.CBPF = d.PooledFundName;
+				d["Paid amount"] = Math.round(+d.PaidAmt * 100) / 100;
+				d["Pledged amount"] = Math.round(+d.PledgeAmt * 100) / 100;
+				d["Paid amount local currency"] = Math.round(+d.PaidAmtLocal * 100) / 100;
+				d["Pledged amount local currency"] = Math.round(+d.PledgeAmtLocal * 100) / 100;
+				d["Exchange rate"] = +d.PaidAmtCurrencyExchangeRate;
+				d["Local currency"] = d.PaidAmtLocalCurrency;
+
+				delete d.FiscalYear;
+				delete d.GMSDonorName;
+				delete d.PooledFundName;
+				delete d.PaidAmt;
+				delete d.PledgeAmt;
+				delete d.PaidAmtLocal;
+				delete d.PledgeAmtLocal;
+				delete d.PaidAmtCurrencyExchangeRate;
+				delete d.PaidAmtLocalCurrency;
+				delete d.PledgeAmtCurrencyExchangeRate;
+				delete d.PledgeAmtLocalCurrency
+				delete d.GMSDonorISO2Code;
+				delete d.PooledFundISO2Code;
+
+			});
+
+			const header = Object.keys(filteredData[0]);
+
+			const replacer = function(key, value) {
+				return value === null ? '' : value
+			};
+
+			let rows = filteredData.map(function(row) {
+				return header.map(function(fieldName) {
+					return JSON.stringify(row[fieldName], replacer)
+				}).join(',')
+			});
+
+			rows.unshift(header.join(','));
+
+			return rows.join('\r\n');
+
+			//end of createCsv
 		};
 
 		function saveFlags(donors) {
