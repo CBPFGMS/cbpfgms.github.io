@@ -121,6 +121,8 @@
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
+		const chartTitle = containerDiv.node().getAttribute("data-title");
+
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
 		if (selectedResponsiveness === false || isInternetExplorer) {
@@ -767,25 +769,23 @@
 
 			function createTitle() {
 
-				borderDiv.style("border-bottom", "1px solid lightgray");
+				borderDiv.style("border-bottom", "1px solid lightgray"); 
 
 				const title = titleDiv.append("p")
 					.attr("class", "pbicliTitle contributionColorHTMLcolor")
-					.html("Contributions Line Chart");
+					.html(chartTitle);
 
 				const helpIcon = iconsDiv.append("button")
 					.attr("id", "pbicliHelpButton");
 
-				helpIcon.style("font-size", "0.8vw")
-					.html("HELP ")
+				helpIcon.html("HELP  ")
 					.append("span")
 					.attr("class", "fas fa-info")
 
 				const downloadIcon = iconsDiv.append("button")
 					.attr("id", "pbicliDownloadButton");
 
-				downloadIcon.style("font-size", "0.8vw")
-					.html(".CSV ")
+				downloadIcon.html(".CSV  ")
 					.append("span")
 					.attr("class", "fas fa-download");
 
