@@ -90,8 +90,34 @@
 }
 
 .pbicliIconsDiv button {
-	color: #666;
+	white-space: pre;
+	font-size: 0.8vw;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 0.2vw 0.6vw 0.2vw 0.6vw;
+	border-radius: 0.4vw;
+	-moz-border-radius: 0.4vw;
+	-webkit-border-radius: 0.4vw;
+	border: 1px solid rgba(0,0,0,0.3);
+	border-bottom-width: 0.2vw;
+	border-right-width: 0.2vw;
+	margin-right: 0.4vw;
+  }
+
+.pbicliIconsDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
 	cursor: pointer;
+}
+
+.pbicliIconsDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbicliIconsDiv button:focus {
+	outline: none;
 }
 
 .pbicliTopSelectionDiv {
@@ -131,7 +157,7 @@
 }
 
 #pbicliDonorsDropdown, #pbicliCurrencyDropdown {
-	width: 8.1vw;
+	width: 9.6vw;
 }
 
 .pbicliFiltersDiv {
