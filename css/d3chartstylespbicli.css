@@ -148,6 +148,7 @@
 	color: #444;
 	margin-top:0;
 	margin-bottom:0;
+	margin-left: 0.8vw;
 }
 
 .pbicliRadioLabel {
@@ -225,6 +226,7 @@
 	font-size: 1vw;
 	color: #666;
 	line-height: 1.2;
+	margin-left: 0.8vw;
 }
 
 .pbicliDonorsTopLegendSubtext, .pbicliCbpfsTopLegendSubtext {
