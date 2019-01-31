@@ -107,12 +107,9 @@
 			pictogramWidth = 12,
 			pictogramHeight = 28;
 
-		let started = false,
-			yearsArray;
+		let yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiobe");
-
-		const distancetoTop = containerDiv.node().offsetTop;
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
@@ -215,36 +212,22 @@
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll", checkPosition);
+				d3.select(window).on("scroll.pbiobe", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
-				const amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(rawData);
-					}
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiobe", null);
+					draw(rawData);
 				};
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				};
-
-				//end of checkPosition
 			};
 
 			//end of d3.csv
 		});
 
 		function draw(rawData) {
-
-			started = true;
 
 			const data = processData(rawData);
 
@@ -1055,14 +1038,6 @@
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
 			return [matrix.e, matrix.f];
-		};
-
-		function restart() {
-			started = false;
-			const all = svg.selectAll(".pbiobeButtonsPanel, .pbiobePercentagePanel, .pbiobePictogramsPanel, .pbiobeBottomGroup")
-				.selectAll("*");
-			all.interrupt();
-			all.remove();
 		};
 
 		function createProgressWheel() {
