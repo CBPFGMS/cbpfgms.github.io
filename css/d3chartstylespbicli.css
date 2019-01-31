@@ -141,11 +141,12 @@
 	margin-left: 1.6vw;
 }
 
-p.pbicliDropdownLabel {
+.pbicliDropdownLabel {
 	font-family: "Roboto", sans-serif;
 	font-size: 1vw;
 	margin-right: 0.2vw;
 	color: #444;
+	margin-top: 0;
 }
 
 .pbicliRadioLabel {
