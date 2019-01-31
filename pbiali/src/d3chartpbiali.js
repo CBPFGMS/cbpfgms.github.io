@@ -78,6 +78,7 @@
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
+			windowHeight = window.innerHeight,
 			localVariable = d3.local(),
 			monthsMargin = 2,
 			yMargin = 1.05,
@@ -96,12 +97,13 @@
 				selectedCbpfs: []
 			};
 
-		let started = false,
-			height = 400;
+		let height = 400;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
+
+		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
 		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
 			containerDiv.node().getAttribute("data-sortbuttons") :
@@ -216,14 +218,25 @@
 
 			const data = processData(rawData);
 
-			draw(data);
+			if (!lazyLoad) {
+				draw(data);
+			} else {
+				d3.select(window).on("scroll.pbiali", checkPosition);
+				checkPosition();
+			};
+
+			function checkPosition() {
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiali", null);
+					draw(data);
+				};
+			};
 
 			//end of d3.csv
 		});
 
 		function draw(data) {
-
-			started = true;
 
 			resizeSVG(data.cbpfs.length);
 
