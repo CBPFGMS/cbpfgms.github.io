@@ -6,7 +6,7 @@
 
 	var cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescbpfbp.css"];
 
-	const d3URL = "https://d3js.org/d3.v5.min.js";
+	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
