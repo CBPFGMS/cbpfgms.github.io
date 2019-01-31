@@ -85,6 +85,7 @@
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
+			windowHeight = window.innerHeight,
 			monthsMargin = 2,
 			showFutureGroupPadding = 240,
 			labelPadding = 10,
@@ -122,6 +123,8 @@
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
 		const chartTitle = containerDiv.node().getAttribute("data-title");
+
+		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
@@ -327,7 +330,20 @@
 
 				saveFlags(list.donorsArray);
 
-				draw(rawData, list);
+				if (!lazyLoad) {
+					draw(rawData, list);
+				} else {
+					d3.select(window).on("scroll.pbicli", checkPosition);
+					checkPosition();
+				};
+
+				function checkPosition() {
+					const containerPosition = containerDiv.node().getBoundingClientRect();
+					if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+						d3.select(window).on("scroll.pbicli", null);
+						draw(rawData, list);
+					};
+				};
 
 				//end of d3.csv
 			});
@@ -769,7 +785,7 @@
 
 			function createTitle() {
 
-				borderDiv.style("border-bottom", "1px solid lightgray"); 
+				borderDiv.style("border-bottom", "1px solid lightgray");
 
 				const title = titleDiv.append("p")
 					.attr("class", "pbicliTitle contributionColorHTMLcolor")
