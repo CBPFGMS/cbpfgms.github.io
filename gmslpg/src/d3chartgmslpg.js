@@ -27,11 +27,11 @@
 	}
 
 	if (!isInternetExplorer) {
-		loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
+		loadScript("https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js", d3Chart);
 	} else {
 		loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 			loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-				loadScript("https://d3js.org/d3.v5.min.js", d3Chart);
+				loadScript("https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js", d3Chart);
 			});
 		});
 	};
