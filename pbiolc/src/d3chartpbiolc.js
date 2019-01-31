@@ -126,12 +126,9 @@
 				sorting: "allocations"
 			};
 
-		let started = false,
-			yearsArray;
+		let yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
-
-		const distancetoTop = containerDiv.node().offsetTop;
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
@@ -285,36 +282,22 @@
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll", checkPosition);
+				d3.select(window).on("scroll.pbiolc", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
-				const amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(rawData);
-					}
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiolc", null); 
+					draw(rawData);
 				};
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				};
-
-				//end of checkPosition
 			};
 
 			//end of d3.csv
 		});
 
 		function draw(rawData) {
-
-			started = true;
 
 			let data = processData(rawData);
 
@@ -1553,14 +1536,6 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
-		};
-
-		function restart() {
-			started = false;
-			const all = svg.selectAll(".pbiolcButtonsPanel, .pbiolcAllocationsPanel, .pbiolcLabelsPanel, .pbiolcBeneficiariesPanel")
-				.selectAll("*:not(.pbiolcgroupXAxisAllocations, .pbiolcgroupXAxisBeneficiaries)");
-			all.interrupt();
-			all.remove();
 		};
 
 		function createProgressWheel() {
