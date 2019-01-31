@@ -116,13 +116,10 @@
 				selectedCbpfs: []
 			};
 
-		let started = false,
-			height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
+		let height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
 			yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbialp");
-
-		const distancetoTop = containerDiv.node().offsetTop;
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -295,36 +292,22 @@
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll", checkPosition);
+				d3.select(window).on("scroll.pbialp", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
-				const amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(rawData);
-					}
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbialp", null);
+					draw(rawData);
 				};
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				};
-
-				//end of checkPosition
 			};
 
 			//end of d3.csv
 		});
 
 		function draw(rawData) {
-
-			started = true;
 
 			let data = processData(rawData);
 
@@ -2503,14 +2486,6 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
-		};
-
-		function restart() {
-			started = false;
-			const all = svg.selectAll(".pbialpTopPanel, .pbialpButtonPanel, .pbialpLollipopPanel, .pbialpParallelPanel")
-				.selectAll("*:not(.pbialpgroupXAxisLollipop, .pbialpgroupXAxisParallel, .pbialpgroupYAxisLollipop)");
-			all.interrupt();
-			all.remove();
 		};
 
 		function createProgressWheel() {
