@@ -119,8 +119,7 @@
 			},
 			centroids = {};
 
-		let started = false,
-			yearsArray,
+		let yearsArray,
 			donorsNumber,
 			cbpfsNumber;
 
@@ -134,8 +133,6 @@
 		};
 
 		const containerDiv = d3.select("#d3chartcontainerpbifdc");
-
-		const distancetoTop = containerDiv.node().offsetTop;
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
@@ -339,36 +336,22 @@
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll", checkPosition);
+				d3.select(window).on("scroll.pbifcd", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
-				const amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(rawData);
-					}
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbifdc", null);
+					draw(rawData);
 				};
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				};
-
-				//end of checkPosition
 			};
 
 			//end of Promise.all
 		});
 
 		function draw(rawData) {
-
-			started = true;
 
 			let dataObject = processData(rawData[0]);
 
@@ -2843,14 +2826,6 @@
 			});
 
 			//end of wrap
-		};
-
-		function restart() {
-			started = false;
-			const all = svg.selectAll(".pbifdcTopPanel, .pbifdcButtonsPanel, .pbifdcMapLayer, .pbifdcNodesLayer, .pbifdcLinksLayer, .pbifdcNodesLabelLayer")
-				.selectAll("*");
-			all.interrupt();
-			all.remove();
 		};
 
 		function createProgressWheel() {
