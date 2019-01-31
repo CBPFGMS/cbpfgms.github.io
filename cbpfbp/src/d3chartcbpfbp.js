@@ -78,7 +78,6 @@
 			panelHorizontalPadding = 6,
 			duration = 1500,
 			shortDuration = 200,
-			started = false,
 			formatMoney2Decimals = d3.format(",.2f"),
 			formatPercent = d3.format(".0%"),
 			formatSI2Decimals = d3.format(".2s"),
@@ -112,8 +111,6 @@
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
-
-		var distancetoTop = containerDiv.node().offsetTop;
 
 		var years = extractYear(containerDiv.node().getAttribute("data-year"));
 
@@ -348,36 +345,22 @@
 			if (!lazyLoad) {
 				draw(aggregatedDonors, aggregatedCbpfs);
 			} else {
-				d3.select(window).on("scroll", checkPosition);
+				d3.select(window).on("scroll.cbpfbp", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
-				var amountScrolled = window.pageYOffset;
-
-				if (amountScrolled > ((distancetoTop - windowHeight) + height / 10) &&
-					amountScrolled < (distancetoTop + height * 0.9)) {
-					if (!started) {
-						draw(aggregatedDonors, aggregatedCbpfs);
-					}
-				}
-
-				if (started) {
-					if (amountScrolled < (distancetoTop - windowHeight) ||
-						amountScrolled > (distancetoTop + height)) {
-						restart();
-					}
-				}
-
-				//end of checkPosition
-			}
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.cbpfbp", null); 
+					draw(aggregatedDonors, aggregatedCbpfs);
+				};
+			};
 
 			//end of d3.csv
 		});
 
 		function draw(dataDonors, dataCbpfs) {
-
-			started = true;
 
 			saveFlags(dataDonors);
 
@@ -2151,14 +2134,6 @@
 			};
 
 			//end of saveFlags
-		};
-
-		function restart() {
-			started = false;
-			var all = svg.selectAll(".cbpfbptopPanel, .cbpfbpbarsPanel, .cbpfbpbeeswarmPanel")
-				.selectAll("*");
-			all.interrupt();
-			all.remove();
 		};
 
 		function extractYear(yearParameter) {
