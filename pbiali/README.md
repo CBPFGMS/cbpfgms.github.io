@@ -12,7 +12,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiali" data-sortbuttons="total" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
+```<div id="d3chartcontainerpbiali" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -28,6 +28,13 @@ There are two parameters:
 - `"alphabetically"`: sorts the buttons alphabetically.
 
 If the value is not an accepted value, it defaults to `"total"`.
+
+**`data-lazyload`**: defines if the animation starts when the SVG is visible. Accepted values:
+
+- `"true"`: the animation starts only when the SVG is visible in the browser window.
+- `"false"`: the animation starts when the page is loaded, regardless if the SVG is visible.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
