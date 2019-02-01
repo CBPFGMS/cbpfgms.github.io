@@ -66,17 +66,17 @@
 .pbicliTopDiv {
 	display: flex;
 	width: 100%;
-	margin-bottom: 0.88vw;
+	margin-bottom: 12px;
 }
 
 .pbicliTitleDiv {
 	display: flex;
 	flex:0 80%;
-	margin-left: 1.5vw;
+	margin-left: 21px;
 }
 
 .pbicliTitle {
-	font-size: 1.8vw;
+	font-size: 26px;
 	font-family: "Arial", sans-serif;
 }
 
@@ -85,23 +85,23 @@
 	flex:0 20%;
 	flex-direction: row-reverse;
 	align-items: center;
-	margin-right: 1vw;
+	margin-right: 14px;
 }
 
 .pbicliIconsDiv button {
 	white-space: pre;
-	font-size: 0.8vw;
+	font-size: 12px;
 	font-weight: 700;
 	color: white;
 	background-color: #418fde;
-	padding: 0.2vw 0.6vw 0.2vw 0.6vw;
-	border-radius: 0.4vw;
-	-moz-border-radius: 0.4vw;
-	-webkit-border-radius: 0.4vw;
+	padding: 3px 8px 3px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
 	border: 1px solid rgba(0,0,0,0.3);
-	border-bottom-width: 0.2vw;
-	border-right-width: 0.2vw;
-	margin-right: 0.4vw;
+	border-bottom-width: 3px;
+	border-right-width: 3px;
+	margin-right: 6px;
   }
 
 .pbicliIconsDiv button:hover {
@@ -122,51 +122,51 @@
 .pbicliTopSelectionDiv {
 	display: flex;
 	width: 100%;
-	margin-top: 0.44vw;
-	margin-bottom: 0.44vw;
+	margin-top: 6px;
+	margin-bottom: 6px;
 }
 
 .pbicliDonorsSelectionDiv {
 	display: flex;
 	flex:0 50%;
 	align-items: center;
-	margin-left: 1.6vw;
+	margin-left: 23px;
 }
 
 .pbicliCbpfsSelectionDiv {
 	display: flex;
 	flex:0 50%;
 	align-items: center;
-	margin-left: 1.6vw;
+	margin-left: 23px;
 }
 
 .pbicliDropdownLabel {
 	font-family: "Roboto", sans-serif;
-	font-size: 1vw;
-	margin-right: 0.2vw;
+	font-size: 14px;
+	margin-right: 3px;
 	color: #444;
 	margin-top:0;
 	margin-bottom:0;
-	margin-left: 0.8vw;
+	margin-left: 12px;
 }
 
 .pbicliRadioLabel {
 	font-family: "Roboto", sans-serif;
-	font-size: 0.8vw;
+	font-size: 12px;
 	color: #444;
-	margin-left: 0.2vw;
-	margin-right: 1vw;
+	margin-left: 3px;
+	margin-right: 14px;
 }
 
 #pbicliDonorsDropdown, #pbicliCurrencyDropdown {
-	width: 9.6vw;
+	width: 138px;
 }
 
 .pbicliFiltersDiv {
 	display: flex;
 	width: 100%;
-	margin-bottom: 0.44vw;
-	margin-left: 2vw;
+	margin-bottom: 6px;
+	margin-left: 28px;
 }
 
 .pbicliBorderDiv {
@@ -181,21 +181,21 @@
 }
 
 .pbicliCheckbox {
-	margin-left: 2vw; 
+	margin-left: 28px; 
 }
 
 .pbicliLegendDiv {
 	display: flex;
 	width: 100%;
-	margin-bottom: 0.44vw;
-	margin-top: 0.44vw;
+	margin-bottom: 6px;
+	margin-top: 6px;
 }
 
 .pbicliDonorsLegendDiv {
 	display: flex;
 	flex:0 50%;
 	align-items: center;
-	margin-left: 1.6vw;
+	margin-left: 23px;
 	flex-direction: column;
 }
 
@@ -203,34 +203,34 @@
 	display: flex;
 	flex:0 50%;
 	align-items: center;
-	margin-left: 1.6vw;
+	margin-left: 23px;
 	flex-direction: column;
 }
 
 .pbicliDonorsLegendDivTop, .pbicliCbpfsLegendDivTop {
 	display: flex;
 	width: 100%;
-	margin-bottom: 0.4vw;
+	margin-bottom: 6px;
 }
 
 .pbicliDonorsLegendDivBottom, .pbicliCbpfsLegendDivBottom {
 	display: flex;
 	width: 98%;
-	margin-left: 0.5vw;
+	margin-left: 7px;
 	flex-wrap: wrap;
 }
 
 .pbicliDonorsTopLegend, .pbicliCbpfsTopLegend {
 	font-family: "Roboto", sans-serif;
-	font-size: 1vw;
+	font-size: 14px;
 	color: #666;
 	line-height: 1.2;
-	margin-left: 0.8vw;
+	margin-left: 12px;
 }
 
 .pbicliDonorsTopLegendSubtext, .pbicliCbpfsTopLegendSubtext {
 	font-family: "Roboto", sans-serif;
-	font-size: 0.7vw;
+	font-size: 10px;
 	color: #666;
 	font-style: italic;
 }
@@ -238,51 +238,51 @@
 .pbicliSelectedDonorsDiv, .pbicliSelectedCbpfsDiv {
 	display: flex;
 	flex-wrap: wrap;
-	border: 0.05vw solid gray;
-	border-radius: 0.33vw;
-	margin-right: 0.22vw;
-	margin-bottom: 0.22vw;
+	border: 1px solid gray;
+	border-radius: 4px;
+	margin-right: 3px;
+	margin-bottom: 3px;
 	align-items: center;
 }
 
 .pbicliSelectedDonorsDivText, .pbicliSelectedCbpfsDivText {
 	font-family: "Roboto", sans-serif;
-	font-size: 0.8vw;
+	font-size: 12px;
 	color: #444;
-	margin-left: 0.4vw;
-	margin-top: 0.11vw;
-	margin-bottom: 0.11vw;
+	margin-left: 6px;
+	margin-top: 2px;
+	margin-bottom: 2px;
 }
 
 .pbicliSelectedDonorsFlagDiv {
 	display: flex;
-	margin-left: 0.2vw;
-	margin-right: 0.2vw;
+	margin-left: 3px;
+	margin-right: 3px;
 }
 
 .pbicliSelectedDonorsCloseDiv, .pbicliSelectedCbpfsCloseDiv {
 	display: flex;
 	cursor: pointer;
-	font-size: 0.8vw;
+	font-size: 12px;
 	align-items: center;
-	padding-left: 0.2vw;
-	padding-right: 0.2vw;
+	padding-left: 3px;
+	padding-right: 3px;
 	height: 100%;
-	border-radius: 0vw 0.3vw 0.3vw 0vw;
+	border-radius: 0px 4px 4px 0px;
 }
 
 .pbicliCheckboxDonorsDiv, .pbicliCheckboxCbpfsDiv {
-	margin-right: 0.4vw;
+	margin-right: 6px;
 }
 
 .pbicliCheckboxText {
 	font-family: "Roboto", sans-serif;
-	font-size: 0.8vw;
+	font-size: 12px;
 	color: #444;
 }
 
 .pbicliSelectedCbpfsCloseDiv {
-	margin-left: 0.2vw;
+	margin-left: 3px;
 }
 
 .pbicliSelectedDonorsCloseDiv:hover, .pbicliSelectedCbpfsCloseDiv:hover {
@@ -291,7 +291,7 @@
 
 .pbicliFooterText {
 	font-family: "Arial", sans-serif;
-	font-size: 0.8vw;
+	font-size: 12px;
 	color: #888;
 	text-align: right;
 	width: 98%;
