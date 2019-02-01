@@ -1939,7 +1939,7 @@
 						const currency = type === "donor" && chartState.showLocal ? " (" + thisData[i].localCurrency + ")" : "";
 						tooltipHtml += "<div style='display:flex;flex:0 60%;'>&bull; " +
 							iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'><span class='" +
-							spanClass + "'>$" + formatMoney0Decimals(thisData[i].total) +
+							spanClass + "'>" + formatMoney0Decimals(thisData[i].total) +
 							"</span></div>"
 					};
 
