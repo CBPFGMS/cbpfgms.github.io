@@ -129,8 +129,7 @@
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
 		if (selectedResponsiveness === false || isInternetExplorer) {
-			containerDiv.style("width", width + "px")
-				.style("height", height + "px");
+			containerDiv.style("width", width + "px");
 		};
 
 		const outerDiv = containerDiv.append("div")
@@ -2897,10 +2896,6 @@
 			};
 
 			//end of saveFlags
-		};
-
-		function calculateVw(width, value) {
-			return ((value * 100) / width) + "vw";
 		};
 
 		function wrapText2(text, width) {
