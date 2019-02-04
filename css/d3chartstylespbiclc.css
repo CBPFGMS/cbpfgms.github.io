@@ -1,5 +1,9 @@
 /*Public BI, Contributions tab, lollipop chart (code: pbiclc)*/
 
+#d3chartcontainerpbiclc {
+	position: relative;
+}
+
 #pbiclctooltipdiv {    
 	position: absolute;
 	text-align: left;
@@ -17,14 +21,48 @@
 	max-width: 300px;
 }
 
+.pbiclcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbiclcTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 16px;
+}
+
+.pbiclcIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.pbiclcFooterDiv {
+	width: 100%;
+}
+
+.pbiclcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.7);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
 .pbiclctopPanelMainValue, .pbiclctopPanelDonorsNumber, .pbiclctopPanelCbpfsNumber {
 	font-family: "Arial", sans-serif;
-	font-size: 60px;
+	font-size: 48px;
 }
 
 .pbiclctopPanelMainText, .pbiclctopPanelSubText {
 	font-family: "Arial", sans-serif;
-	font-size: 20px;
+	font-size: 18px;
 	fill: #888;
 }
 
@@ -104,4 +142,18 @@
 .pbiclcgroupXAxisDonors line, .pbiclcgroupXAxisCbpfs line{
 	stroke: #ddd;
 	stroke-dasharray: 2, 2;
+}
+
+.pbiclcAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbiclcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
 }
