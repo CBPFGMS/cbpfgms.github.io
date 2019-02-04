@@ -2,9 +2,10 @@
 
 Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
 
-- A top banner showing the contributions (paid, pledge and total) the number of donors and the number of CBPFs for the selected year;
-- A control banner allowing the selection of the year and the contribution (paid, pledge or total) and downloading the corresponding CSV;
+- A set of buttons allowing the selection of the year and the contribution (paid, pledge or total);
+- A top banner showing the contributions (paid, pledge and total), the number of donors and the number of CBPFs for the selected year and type of contribution;
 - Two lollipop charts, one for the donors and one for the CBPFs, according to the selected year and contribution type.
+- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiclc.png" width="450">
 
@@ -12,17 +13,26 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiclc" data-year="2018" data-contribution="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiclc/src/d3chartpbiclc.js"></script>```
+```<div id="d3chartcontainerpbiclc" data-title="CBPF Contributions" data-showhelp="true" data-year="2018" data-contribution="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiclc/src/d3chartpbiclc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
-The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) file.
+The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbiclc.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 
-*Important*: The code uses `window.innerHeight`  and `element.offsetTop` to start the animation. Do not copy the snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`  and `element.offsetTop`.
+***Important***: The code uses `window.innerHeight`  and to start the animation when `"data-lazyload"` is set to `true`. If you copy this snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`, set `"data-lazyload"` to `false`.
 
 ## Parameters
 
-There are four parameters:
+There are six parameters:
+
+**`data-title`**: sets the title of the chart.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations no shown. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
@@ -45,7 +55,7 @@ If the value is not an accepted value, it defaults to `"total"`.
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
-- `"false"`: the SVG will be created with a fixed size, which is 1130px width (the height of the SVG varies according to the number of donors/CBPFs in the selected year).
+- `"false"`: the SVG will be created with a fixed size, which is 900px width (the height of the SVG varies according to the number of donors/CBPFs in the selected year).
 
 Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
 
@@ -56,7 +66,7 @@ Note: On Internet Explorer this parameter will default to `"false"`, meaning tha
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
-*Recommended size*: 1130px width (height varies).
+*Recommended size*: 900px width (height varies).
 
 
 ## CSS
