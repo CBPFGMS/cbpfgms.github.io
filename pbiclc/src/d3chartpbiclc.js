@@ -2,7 +2,9 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -13,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous")
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
@@ -67,18 +73,18 @@
 
 	function d3Chart() {
 
-		const width = 1130,
-			padding = [4, 4, 24, 4],
-			topPanelHeight = 72,
+		const width = 900,
+			padding = [4, 10, 4, 10],
+			topPanelHeight = 60,
 			buttonPanelHeight = 30,
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 12,
 			windowHeight = window.innerHeight,
+			currentYear = new Date().getFullYear(),
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
 			lollipopRadius = 4,
 			fadeOpacity = 0.15,
-			excelIconSize = 20,
 			contributionType = ["paid", "pledge", "total"],
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -92,7 +98,6 @@
 			verticalLabelPadding = 4,
 			contributionsTotals = {},
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
@@ -100,7 +105,7 @@
 			],
 			duration = 1000,
 			shortDuration = 500,
-			titlePadding = 20,
+			titlePadding = 24,
 			chartState = {
 				selectedYear: null,
 				selectedContribution: null
@@ -110,6 +115,10 @@
 			yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
+
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const chartTitle = containerDiv.node().getAttribute("data-title");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -125,40 +134,53 @@
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbiclcTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbiclcTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbiclcIconsDiv d3chartIconsDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbiclcFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiclctooltipdiv")
 			.style("display", "none");
-
-		const topPanel = {
-			main: svg.append("g")
-				.attr("class", "pbiclcTopPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
-			width: width - padding[1] - padding[3],
-			height: topPanelHeight,
-			leftPadding: [230, 76, 270],
-			mainValueVerPadding: 14,
-			mainValueHorPadding: 4
-		};
 
 		const buttonPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiclcButtonPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonPanelHeight,
-			padding: [0, 0, 0, 0],
+			padding: [0, 0, 0, 90],
 			buttonWidth: 54,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
 			arrowPadding: 18,
 			buttonContributionsWidth: 70,
-			buttonContributionsPadding: 550
+			buttonContributionsPadding: 590
+		};
+
+		const topPanel = {
+			main: svg.append("g")
+				.attr("class", "pbiclcTopPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonPanel.height + panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: topPanelHeight,
+			moneyBagPadding: 94,
+			leftPadding: [176, 484, 632],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 4
 		};
 
 		const donorsPanel = {
@@ -166,7 +188,7 @@
 				.attr("class", "pbiclcDonorsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [40, 64, 4, 0],
+			padding: [44, 64, 4, 0],
 			labelPadding: 6
 		};
 
@@ -176,7 +198,7 @@
 				.attr("transform", "translate(" + (padding[3] + donorsPanel.width + panelVerticalPadding) + "," +
 					(padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [40, 64, 4, 0],
+			padding: [44, 64, 4, 0],
 			labelPadding: 6
 		};
 
@@ -297,6 +319,10 @@
 				dataCbpfs: dataArray[1]
 			};
 
+			createTitle();
+
+			createFooterDiv();
+
 			recalculateAndResize();
 
 			translateAxes();
@@ -308,6 +334,8 @@
 			createDonorsPanel(data.dataDonors, null);
 
 			createCbpfsPanel(data.dataCbpfs, null);
+
+			if (showHelp) createAnnotationsDiv();
 
 			function clickButtonsRects(d) {
 
@@ -338,8 +366,6 @@
 				recalculateAndResize();
 
 				createTopPanel(data.dataDonors, data.dataCbpfs);
-
-				repositionButtonsPanel();
 
 				createDonorsPanel(data.dataDonors, null);
 
@@ -377,6 +403,66 @@
 				//end of clickButtonsContributionsRects
 			};
 
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "d3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbiclcHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbiclcDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCsv(rawData);
+
+					const fileName = "contributions" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
+
 			function createTopPanel(dataDonors, dataCbpfs) {
 
 				contributionType.forEach(function(d) {
@@ -390,22 +476,17 @@
 				});
 
 				const topPanelMoneyBag = topPanel.main.selectAll(".pbiclctopPanelMoneyBag")
-					.data([true]);
-
-				topPanelMoneyBag.enter()
+					.data([true])
+					.enter()
 					.append("g")
 					.attr("class", "pbiclctopPanelMoneyBag contributionColorFill")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)")
+					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
 					.each(function(_, i, n) {
 						moneyBagdAttribute.forEach(function(d) {
 							d3.select(n[i]).append("path")
 								.attr("d", d);
 						});
 					});
-
-				topPanelMoneyBag.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)");
 
 				const previousValue = d3.select(".pbiclctopPanelMainValue").size() !== 0 ? d3.select(".pbiclctopPanelMainValue").datum() : 0;
 
@@ -429,11 +510,11 @@
 					.attr("class", "pbiclctopPanelMainValue contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding);
 
 				topPanelMainValue.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousValue, d);
@@ -452,12 +533,12 @@
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelMainText)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelMainText.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
@@ -474,11 +555,11 @@
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelSubText)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelSubText.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(Total " +
@@ -495,11 +576,11 @@
 					.attr("class", "pbiclctopPanelDonorsNumber contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelDonorsNumber)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding);
 
 				topPanelDonorsNumber.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousDonors, d);
@@ -508,19 +589,15 @@
 						};
 					});
 
-				let topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
-					.data([true]);
-
-				topPanelDonorsText = topPanelDonorsText.enter()
+				const topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
+					.data([true])
+					.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelDonorsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("Donors")
-					.merge(topPanelDonorsText)
-					.transition()
-					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[1] + topPanel.mainValueHorPadding);
+					.text("Donors");
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbiclctopPanelCbpfsNumber")
 					.data([dataCbpfs.length]);
@@ -530,11 +607,11 @@
 					.attr("class", "pbiclctopPanelCbpfsNumber allocationColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] - topPanel.mainValueHorPadding);
 
 				topPanelCbpfsNumber.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousCbpfs, d);
@@ -543,19 +620,15 @@
 						};
 					});
 
-				let topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
-					.data([true]);
-
-				topPanelCbpfsText = topPanelCbpfsText.enter()
+				const topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
+					.data([true])
+					.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelCbpfsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("CBPFs")
-					.merge(topPanelCbpfsText)
-					.transition()
-					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + donorsPanel.width + topPanel.leftPadding[2] + topPanel.mainValueHorPadding);
+					.text("CBPFs");
 
 				const overRectangle = topPanel.main.selectAll(".pbiclctopPanelOverRectangle")
 					.data([true])
@@ -583,7 +656,7 @@
 
 				const clipPathGroup = buttonPanel.main.append("g")
 					.attr("class", "pbiclcClipPathGroup")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding) + ",0)")
+					.attr("transform", "translate(" + (buttonPanel.padding[3] + buttonPanel.arrowPadding) + ",0)")
 					.attr("clip-path", "url(#pbiclcclip)");
 
 				const buttonsGroup = clipPathGroup.append("g")
@@ -633,7 +706,7 @@
 
 				const buttonsContributionsGroup = buttonPanel.main.append("g")
 					.attr("class", "pbiclcbuttonsContributionsGroup")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + donorsPanel.width + panelVerticalPadding) + ",0)")
+					.attr("transform", "translate(" + (buttonPanel.buttonContributionsPadding) + ",0)")
 					.style("cursor", "pointer");
 
 				const buttonsContributionsRects = buttonsContributionsGroup.selectAll(null)
@@ -683,7 +756,7 @@
 				const leftArrow = buttonPanel.main.append("g")
 					.attr("class", "pbiclcLeftArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",0)");
+					.attr("transform", "translate(" + buttonPanel.padding[3] + ",0)");
 
 				const leftArrowRect = leftArrow.append("rect")
 					.style("fill", "white")
@@ -700,7 +773,7 @@
 				const rightArrow = buttonPanel.main.append("g")
 					.attr("class", "pbiclcRightArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding +
+					.attr("transform", "translate(" + (buttonPanel.padding[3] + buttonPanel.arrowPadding +
 						(buttonsNumber * buttonPanel.buttonWidth)) + ",0)");
 
 				const rightArrowRect = rightArrow.append("rect")
@@ -714,26 +787,6 @@
 					.attr("y", buttonPanel.height - buttonPanel.buttonVerticalPadding * 2.1)
 					.style("fill", "#666")
 					.text("\u25ba");
-
-				const downloadGroup = buttonPanel.main.append("g")
-					.attr("class", "pbiclcDownloadGroup")
-					.attr("transform", "translate(" + (buttonPanel.width - buttonPanel.padding[1] - excelIconSize - 6) + ",0)");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbiclcDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", buttonPanel.height * 0.6);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", (buttonPanel.height - excelIconSize) / 2);
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
@@ -787,41 +840,6 @@
 						})
 				});
 
-				downloadGroup.on("click", function() {
-
-					const csv = createCsv(rawData);
-
-					const fileName = "contributions" + chartState.selectedYear + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
-
 				function checkCurrentTranslate() {
 
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
@@ -853,32 +871,6 @@
 				};
 
 				//end of createButtonPanel
-			};
-
-			function repositionButtonsPanel() {
-
-				buttonPanel.main.select(".pbiclcClipPathGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding) + ",0)");
-
-				buttonPanel.main.select(".pbiclcLeftArrowGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",0)");
-
-				buttonPanel.main.select(".pbiclcRightArrowGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding +
-						(buttonsNumber * buttonPanel.buttonWidth)) + ",0)");
-
-				buttonPanel.main.select(".pbiclcbuttonsContributionsGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + donorsPanel.width + panelVerticalPadding) + ",0)")
-
-				//end of repositionButtonsPanel
 			};
 
 			function createDonorsPanel(donorsArray, cbpfRecipient) {
@@ -1041,7 +1033,6 @@
 
 				setTimeout(function() {
 					donorTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
-						.on("mousemove", mousemoveTooltipRectangle)
 						.on("mouseout", mouseoutTooltipRectangle);
 				}, duration * 1.1);
 
@@ -1073,8 +1064,6 @@
 							return d === datum.donor ? 1 : fadeOpacity;
 						});
 
-					const mouse = d3.mouse(this.parentNode.parentNode);
-
 					tooltip.style("display", "block")
 						.html("Donor: <strong>" + datum.donor + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:262px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
@@ -1082,39 +1071,20 @@
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
-					const tooltipSize = tooltip.node().getBoundingClientRect();
+					const thisBox = this.getBoundingClientRect();
 
-					localVariable.set(this, tooltipSize);
+					const containerBox = containerDiv.node().getBoundingClientRect();
 
-					tooltip.style("top", mouse[1] > Math.max(cbpfsPanel.height, donorsPanel.height) - tooltipSize.height - 22 ?
-							d3.event.pageY - tooltipSize.height - 14 + "px" :
-							d3.event.pageY + 22 + "px")
-						.style("left", mouse[0] - (tooltipSize.width / 2) < donorsPanel.width - tooltipSize.width ?
-							mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageY - (mouse[0] - tooltipSize.width / 2) :
-							d3.event.pageX - (tooltipSize.width) / 2 + "px" :
-							d3.event.pageX - (mouse[0] - (donorsPanel.width - tooltipSize.width)) + "px");
+					const tooltipBox = tooltip.node().getBoundingClientRect();
+
+					const thisOffsetTop = thisBox.top - containerBox.top;
+
+					const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+					tooltip.style("top", thisOffsetTop + 22 + "px")
+						.style("left", thisOffsetLeft + "px");
 
 					createCbpfsPanel(datum.donations, datum.donor);
-
-				};
-
-				function mousemoveTooltipRectangle(datum) {
-
-					if (!localVariable.get(this)) return;
-
-					const mouse = d3.mouse(this.parentNode.parentNode);
-
-					const tooltipSize = localVariable.get(this);
-
-					tooltip.style("top", mouse[1] > Math.max(cbpfsPanel.height, donorsPanel.height) - tooltipSize.height - 22 ?
-							d3.event.pageY - tooltipSize.height - 14 + "px" :
-							d3.event.pageY + 22 + "px")
-						.style("left", mouse[0] - (tooltipSize.width / 2) < donorsPanel.width - tooltipSize.width ?
-							mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageY - (mouse[0] - tooltipSize.width / 2) :
-							d3.event.pageX - (tooltipSize.width) / 2 + "px" :
-							d3.event.pageX - (mouse[0] - (donorsPanel.width - tooltipSize.width)) + "px");
 
 				};
 
@@ -1284,7 +1254,6 @@
 
 				setTimeout(function() {
 					cbpfTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
-						.on("mousemove", mousemoveTooltipRectangle)
 						.on("mouseout", mouseoutTooltipRectangle);
 				}, duration * 1.1);
 
@@ -1316,8 +1285,6 @@
 							return d === datum.cbpf ? 1 : fadeOpacity;
 						});
 
-					const mouse = d3.mouse(this.parentNode.parentNode);
-
 					tooltip.style("display", "block")
 						.html("CBPF: <strong>" + datum.cbpf + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:290px;'><div style='display:flex;flex:0 62%;'>Total contributions:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
 							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
@@ -1325,39 +1292,20 @@
 							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution unpaid <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
-					const tooltipSize = tooltip.node().getBoundingClientRect();
+					const thisBox = this.getBoundingClientRect();
 
-					localVariable.set(this, tooltipSize);
+					const containerBox = containerDiv.node().getBoundingClientRect();
 
-					tooltip.style("top", mouse[1] > Math.max(cbpfsPanel.height, donorsPanel.height) - tooltipSize.height - 22 ?
-							d3.event.pageY - tooltipSize.height - 14 + "px" :
-							d3.event.pageY + 22 + "px")
-						.style("left", mouse[0] - (tooltipSize.width / 2) < cbpfsPanel.width - tooltipSize.width ?
-							mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageY - (mouse[0] - tooltipSize.width / 2) :
-							d3.event.pageX - (tooltipSize.width) / 2 + "px" :
-							d3.event.pageX - (mouse[0] - (cbpfsPanel.width - tooltipSize.width)) + "px");
+					const tooltipBox = tooltip.node().getBoundingClientRect();
+
+					const thisOffsetTop = thisBox.top - containerBox.top;
+
+					const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+					tooltip.style("top", thisOffsetTop + 22 + "px")
+						.style("left", thisOffsetLeft + "px");
 
 					createDonorsPanel(datum.donors, datum.cbpf);
-
-				};
-
-				function mousemoveTooltipRectangle(datum) {
-
-					if (!localVariable.get(this)) return;
-
-					const mouse = d3.mouse(this.parentNode.parentNode);
-
-					const tooltipSize = localVariable.get(this);
-
-					tooltip.style("top", mouse[1] > Math.max(cbpfsPanel.height, donorsPanel.height) - tooltipSize.height - 22 ?
-							d3.event.pageY - tooltipSize.height - 14 + "px" :
-							d3.event.pageY + 22 + "px")
-						.style("left", mouse[0] - (tooltipSize.width / 2) < cbpfsPanel.width - tooltipSize.width ?
-							mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageY - (mouse[0] - tooltipSize.width / 2) :
-							d3.event.pageX - (tooltipSize.width) / 2 + "px" :
-							d3.event.pageX - (mouse[0] - (cbpfsPanel.width - tooltipSize.width)) + "px");
 
 				};
 
@@ -1385,6 +1333,10 @@
 
 			function mouseOverTopPanel() {
 
+				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
@@ -1398,31 +1350,27 @@
 
 				localVariable.set(this, tooltipSize);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffset + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
 			function mouseMoveTopPanel() {
 
+				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				const tooltipSize = localVariable.get(this);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffset + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
@@ -1710,8 +1658,6 @@
 			const labelSize = Math.max(labelSizeDonors + yAxisDonors.tickPadding() + yAxisDonors.tickSizeInner(),
 				labelSizeCbpfs + yAxisCbpfs.tickPadding() + yAxisCbpfs.tickSizeInner());
 
-			topPanel.moneyBagPadding = labelSize;
-
 			donorsPanel.padding[3] = labelSize;
 
 			cbpfsPanel.padding[3] = labelSize;
@@ -1794,6 +1740,141 @@
 			};
 
 			//end of saveFlags
+		};
+
+		function createAnnotationsDiv() {
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", "pbiclcOverDivHelp");
+
+			const totalWidth = overDiv.node().clientWidth;
+
+			const totalHeight = overDiv.node().clientHeight;
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + totalWidth + " " + totalHeight);
+
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbiclcArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
+
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", totalWidth / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const yearsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationText")
+				.attr("x", 300)
+				.attr("y", 16)
+				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
+				.call(wrapText2, 280);
+
+			const yearsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiclcArrowMarker)")
+				.attr("d", "M295,20 Q270,20 270,35");
+
+			const paidPledgeAnnotation = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationText")
+				.attr("x", 340)
+				.attr("y", 150)
+				.text("Use these buttons to filter by “paid” or “pledged” values. “Total” shows both paid and pledged.")
+				.call(wrapText2, 250);
+
+			const paidPledgePath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiclcArrowMarker)")
+				.attr("d", "M570,160 Q690,160 690,90");
+
+			const lollipopsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationText")
+				.attr("x", 270)
+				.attr("y", 390)
+				.text("Hover over the donors or CBPFs to get additional information. Hovering over a donor filters the CBPFs accordingly, as well as hovering over a CBPFs filters the donors accordingly. When “total” is selected, the black triangle indicates the paid amount.")
+				.call(wrapText2, 250);
+
+			const lollipopsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiclcArrowMarker)")
+				.attr("d", "M260,430 Q200,430 200,370");
+
+			const lollipopsPath2 = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiclcArrowMarker)")
+				.attr("d", "M530,430 Q590,430 590,370");
+
+			helpSVG.on("click", function() {
+				overDiv.remove();
+			});
+
+			//end of createAnnotationsDiv
+		};
+
+		function createFooterDiv() {
+
+			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+
+			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText + footerLink + ".");
+
+			//end of createFooterDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
 		};
 
 		function createProgressWheel() {
