@@ -129,7 +129,7 @@ These styles apply to all D3 charts*/
 	font-size: 26px;
 	font-family: "Arial", sans-serif;
 	margin: 0px;
-	fill: #418fde;
+	color: #418fde;
 }
 
 .d3chartIconsDiv button {
