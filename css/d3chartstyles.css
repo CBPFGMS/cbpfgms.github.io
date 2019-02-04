@@ -126,7 +126,7 @@ These styles apply to all D3 charts*/
 
 /*styles for the chart title, footer and help/csv buttons*/
 
-.d3chartTitle {
+#d3chartTitle {
 	font-size: 26px;
 	font-family: "Arial", sans-serif;
 	margin: 0px;
