@@ -1752,7 +1752,7 @@
 			const totalHeight = overDiv.node().clientHeight;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + totalWidth + " " + totalHeight);
+				.attr("viewBox", "0 0 " + width + " " + totalHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
