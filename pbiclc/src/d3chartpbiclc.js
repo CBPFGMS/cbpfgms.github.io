@@ -1747,12 +1747,8 @@
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiclcOverDivHelp");
 
-			const totalWidth = overDiv.node().clientWidth;
-
-			const totalHeight = overDiv.node().clientHeight;
-
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + totalHeight);
+				.attr("viewBox", "0 0 " + width + " " + height);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
@@ -1770,7 +1766,7 @@
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", totalWidth / 2)
+				.attr("x", width / 2)
 				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
 
