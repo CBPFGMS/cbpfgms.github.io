@@ -406,7 +406,7 @@
 			function createTitle() {
 
 				const title = titleDiv.append("p")
-					.attr("id", "d3chartTitle")
+					.attr("id", "pbiclcd3chartTitle")
 					.html(chartTitle);
 
 				const helpIcon = iconsDiv.append("button")
