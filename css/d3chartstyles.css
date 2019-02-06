@@ -126,13 +126,6 @@ These styles apply to all D3 charts*/
 
 /*styles for the chart title, footer and help/csv buttons*/
 
-div[id^="d3chartcontainer"] p[id$="d3chartTitle"] {
-	font-size: 26px;
-	font-family: "Arial", sans-serif;
-	margin: 0px;
-	color: #418fde;
-}
-
 .d3chartIconsDiv button {
 	white-space: pre;
 	font-size: 12px;
