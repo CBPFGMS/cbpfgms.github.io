@@ -2,7 +2,9 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbialp.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbialp.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -13,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous")
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
@@ -67,10 +73,10 @@
 
 	function d3Chart() {
 
-		const width = 1130,
+		const width = 900,
 			parallelPanelHeight = 400,
-			padding = [18, 4, 34, 4],
-			topPanelHeight = 72,
+			padding = [4, 10, 28, 10],
+			topPanelHeight = 60,
 			buttonPanelHeight = 30,
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 8,
@@ -85,10 +91,14 @@
 			paidSymbolSize = 16,
 			percentNumberPadding = 4,
 			circleRadius = 4,
-			showAverageGroupPadding = 180,
+			showAverageGroupPadding = 84,
 			selectedCbpfLabelPadding = 8,
 			lollipopTooltipWidth = 400,
 			parallelTooltipWidth = 280,
+			lollipopWidthFactor = 0.55,
+			lollipopExtraPadding = 4,
+			percentagePadding = 11,
+			currentYear = new Date().getFullYear(),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
 			formatSIaxes = d3.format("~s"),
@@ -97,8 +107,7 @@
 			formatNumberSI = d3.format(".3s"),
 			localVariable = d3.local(),
 			buttonsNumber = 8,
-			excelIconSize = 20,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
+			chartTitleDefault = "Allocations by Organization Type",
 			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -107,7 +116,7 @@
 			],
 			duration = 1000,
 			shortDuration = 500,
-			titlePadding = 20,
+			titlePadding = 26,
 			partnersTotals = {},
 			partnersUnderApproval = {},
 			chartState = {
@@ -117,13 +126,18 @@
 			};
 
 		let height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
-			yearsArray;
+			yearsArray,
+			thisOffsetTopPanel;
 
 		const containerDiv = d3.select("#d3chartcontainerpbialp");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
 		let showAverage = (containerDiv.node().getAttribute("data-showaverage") === "true");
 
@@ -138,13 +152,25 @@
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbialpTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbialpTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbialpIconsDiv d3chartIconsDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbialpFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbialptooltipdiv")
 			.style("display", "none");
 
@@ -154,8 +180,9 @@
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
-			leftPadding: [218, 82, 116],
-			mainValueVerPadding: 14,
+			moneyBagPadding: 50,
+			leftPadding: [180, 468, 110],
+			mainValueVerPadding: 12,
 			mainValueHorPadding: 4
 		};
 
@@ -165,8 +192,8 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonPanelHeight,
-			padding: [0, 0, 0, 0],
-			buttonWidth: 54,
+			padding: [0, 0, 0, 6],
+			buttonWidth: 50,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
 			arrowPadding: 18,
@@ -177,8 +204,8 @@
 			main: svg.append("g")
 				.attr("class", "pbialpLollipopPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
-			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [40, 38, 4, 0],
+			width: (width - padding[1] - padding[3] - panelVerticalPadding) * lollipopWidthFactor,
+			padding: [46, 38, 4, 0],
 			labelPadding: 6
 		};
 
@@ -187,22 +214,14 @@
 				.attr("class", "pbialpParallelPanel")
 				.attr("transform", "translate(" + (padding[3] + lollipopPanel.width + panelVerticalPadding) + "," +
 					(padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
-			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
+			width: (width - padding[1] - padding[3] - panelVerticalPadding) * (1 - lollipopWidthFactor),
 			height: parallelPanelHeight,
-			padding: [40, 54, 44, 0],
+			padding: [46, 40, 44, 0],
 			labelPadding: 6
 		};
 
 		const bottomButtonsGroup = svg.append("g")
 			.attr("class", "pbialpBottomButtonsGroup");
-
-		const helpGroup = svg.append("g")
-			.attr("class", "pbialpHelpGroup")
-			.style("cursor", "pointer");
-
-		const annotationPanel = svg.append("g")
-			.attr("class", "pbialpAnnotationPanel")
-			.attr("transform", "translate(0," + padding[0] + ")");
 
 		const lollipopPanelClip = lollipopPanel.main.append("clipPath")
 			.attr("id", "pbialpLollipopPanelClip")
@@ -311,6 +330,10 @@
 
 			let data = processData(rawData);
 
+			createTitle();
+
+			createFooterDiv();
+
 			recalculateAndResize();
 
 			translateAxes();
@@ -325,7 +348,67 @@
 
 			createBottomButtons();
 
-			createHelpButton();
+			if (showHelp) createAnnotationsDiv();
+
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "pbialpd3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbialpHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbialpDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCSV(data);
+
+					const fileName = "Allocations" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
 
 			function createTopPanel(data) {
 
@@ -346,22 +429,17 @@
 				const valueUnderApproval = partnersUnderApproval[chartState.selectedPartner];
 
 				const topPanelMoneyBag = topPanel.main.selectAll(".pbialptopPanelMoneyBag")
-					.data([true]);
-
-				topPanelMoneyBag.enter()
+					.data([true])
+					.enter()
 					.append("g")
 					.attr("class", "pbialptopPanelMoneyBag contributionColorFill")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)")
+					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
 					.each(function(_, i, n) {
 						moneyBagdAttribute.forEach(function(d) {
 							d3.select(n[i]).append("path")
 								.attr("d", d);
 						});
 					});
-
-				topPanelMoneyBag.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)");
 
 				const previousMainValue = d3.select(".pbialptopPanelMainValue").size() !== 0 ? d3.select(".pbialptopPanelMainValue").datum() : 0;
 
@@ -385,11 +463,11 @@
 					.attr("class", "pbialptopPanelMainValue contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding);
 
 				topPanelMainValue.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousMainValue, d);
@@ -408,12 +486,12 @@
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelMainText)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.8)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelMainText.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
@@ -430,11 +508,11 @@
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelSubText)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelSubText.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(" +
@@ -459,7 +537,8 @@
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalValue contributionColorFill")
 					.attr("text-anchor", "end")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.5)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding / 2)
 					.merge(topPanelUnderApprovalValue);
 
 				const fakeUnderApprovalValue = topPanel.main.append("text")
@@ -476,8 +555,6 @@
 
 				topPanelUnderApprovalValue.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
-						topPanel.leftPadding[1] - topPanel.mainValueHorPadding / 2)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousUnderApprovalValue, d);
@@ -495,13 +572,12 @@
 					.attr("class", "pbialptopPanelUnderApprovalText")
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.5)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
 					.merge(topPanelUnderApprovalText);
 
 				topPanelUnderApprovalText.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
-						topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
 					.style("opacity", 1)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
@@ -519,12 +595,11 @@
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + (topPanel.leftPadding[1] - underApprovalValueTextLength - (topPanel.mainValueHorPadding / 2)))
 					.merge(topPanelUnderApprovalSubText)
 
 				topPanelUnderApprovalSubText.transition()
 					.duration(duration)
-					.attr("x", topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth) +
-						(topPanel.leftPadding[1] - underApprovalValueTextLength - (topPanel.mainValueHorPadding / 2)))
 					.style("opacity", 1)
 					.text(function(d) {
 						return "(" +
@@ -542,11 +617,11 @@
 					.attr("class", "pbialptopPanelCbpfsNumber contributionColorFill")
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding);
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.width - topPanel.leftPadding[2] - topPanel.mainValueHorPadding);
 
 				topPanelCbpfsNumber.transition()
 					.duration(duration)
-					.attr("x", topPanel.width - topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
 					.tween("text", function(d) {
 						const node = this;
 						const i = d3.interpolate(previousCbpfs, d);
@@ -561,7 +636,7 @@
 					.append("text")
 					.attr("class", "pbialptopPanelCbpfsText")
 					.attr("x", topPanel.width - topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("text-anchor", "start")
 					.text("CBPFs");
 
@@ -591,7 +666,7 @@
 
 				const clipPathGroup = buttonPanel.main.append("g")
 					.attr("class", "pbialpClipPathGroup")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding) + ",0)")
+					.attr("transform", "translate(" + (buttonPanel.padding[3] + buttonPanel.arrowPadding) + ",0)")
 					.attr("clip-path", "url(#pbialpClipPathButtons)");
 
 				const buttonsGroup = clipPathGroup.append("g")
@@ -641,7 +716,7 @@
 
 				const buttonsPartnersGroup = buttonPanel.main.append("g")
 					.attr("class", "pbialpbuttonsPartnersGroup")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth)) +
+					.attr("transform", "translate(" + (buttonPanel.padding[3] + (3 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth)) +
 						",0)")
 					.style("cursor", "pointer");
 
@@ -659,7 +734,11 @@
 						return d === chartState.selectedPartner ? "#444" : "#888"
 					})
 					.text(function(d) {
-						if (d !== "total") {
+						if (d === "Red Cross/Crescent Movement") {
+							return "Red Cross/Cres. Mov.";
+						} else if (d === "International NGO") {
+							return "Int. NGO";
+						} else if (d !== "total") {
 							return capitalize(d);
 						} else {
 							return "All partners"
@@ -699,7 +778,7 @@
 				const leftArrow = buttonPanel.main.append("g")
 					.attr("class", "pbialpLeftArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",0)");
+					.attr("transform", "translate(" + buttonPanel.padding[3] + ",0)");
 
 				const leftArrowRect = leftArrow.append("rect")
 					.style("fill", "white")
@@ -716,7 +795,7 @@
 				const rightArrow = buttonPanel.main.append("g")
 					.attr("class", "pbialpRightArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding +
+					.attr("transform", "translate(" + (buttonPanel.padding[3] + buttonPanel.arrowPadding +
 						(buttonsNumber * buttonPanel.buttonWidth)) + ",0)");
 
 				const rightArrowRect = rightArrow.append("rect")
@@ -952,7 +1031,6 @@
 				const cbpfTooltipRectangle = cbpfGroup.select(".pbialpCbpfTooltipRectangle");
 
 				cbpfTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
-					.on("mousemove", mousemoveTooltipRectangle)
 					.on("mouseout", mouseoutTooltipRectangle)
 					.on("click", clickTooltipRectangle);
 
@@ -1002,7 +1080,7 @@
 							return chartState.selectedCbpfs.indexOf(d) > -1 ? 1 : fadeOpacity;
 						});
 
-					highlightParallel(data);
+					highlightParallel(data, datum);
 
 					const thisTotal = chartState.selectedPartner;
 
@@ -1017,8 +1095,6 @@
 					const thisUnderApproval = chartState.selectedPartner === "total" ?
 						"underApproval" :
 						"underApproval-" + chartState.selectedPartner;
-
-					const mouse = d3.mouse(lollipopPanel.main.node());
 
 					const tooltipChartTitle = chartState.selectedPartner === "total" ?
 						"Allocations by Partner Type and Modality:" :
@@ -1054,37 +1130,22 @@
 								"</span></div></div>");
 					};
 
-					const tooltipSize = tooltip.node().getBoundingClientRect();
-
-					localVariable.set(this, tooltipSize);
-
-					tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageX - mouse[0] + "px" :
-							mouse[0] > (lollipopPanel.width - tooltipSize.width / 2) ?
-							d3.event.pageX - (mouse[0] - (lollipopPanel.width - tooltipSize.width)) + "px" :
-							d3.event.pageX - (tooltipSize.width / 2) + "px")
-						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + lollipopGroupHeight ?
-							d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
-							d3.event.pageY + lollipopGroupHeight + "px");
-
-				};
-
-				function mousemoveTooltipRectangle(datum) {
-
-					if (!localVariable.get(this)) return;
-
 					const mouse = d3.mouse(lollipopPanel.main.node());
 
-					const tooltipSize = localVariable.get(this);
+					const thisBox = this.getBoundingClientRect();
 
-					tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-							d3.event.pageX - mouse[0] + "px" :
-							mouse[0] > (lollipopPanel.width - tooltipSize.width / 2) ?
-							d3.event.pageX - (mouse[0] - (lollipopPanel.width - tooltipSize.width)) + "px" :
-							d3.event.pageX - (tooltipSize.width / 2) + "px")
-						.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipSize.height + lollipopGroupHeight ?
-							d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
-							d3.event.pageY + lollipopGroupHeight + "px");
+					const containerBox = containerDiv.node().getBoundingClientRect();
+
+					const tooltipBox = tooltip.node().getBoundingClientRect();
+
+					const thisOffsetTop = thisBox.top - containerBox.top;
+
+					const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+					tooltip.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipBox.height + lollipopGroupHeight ?
+							thisOffsetTop - tooltipBox.height - 4 + "px" :
+							thisOffsetTop + lollipopGroupHeight + 4 + "px")
+						.style("left", thisOffsetLeft + "px");
 
 				};
 
@@ -1144,7 +1205,7 @@
 							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
-					highlightParallel(data);
+					highlightParallel(data, datum);
 
 				};
 
@@ -1172,7 +1233,8 @@
 					.append("text")
 					.attr("class", "pbialpParallelPanelTitle")
 					.attr("y", parallelPanel.padding[0] - titlePadding)
-					.attr("x", parallelPanel.padding[3])
+					.attr("x", parallelPanel.padding[3] + (parallelPanel.width - parallelPanel.padding[3] - parallelPanel.padding[1]) / 2)
+					.attr("text-anchor", "middle")
 					.text("Allocations by Partner Type");
 
 				const percentNumbersGroups = parallelPanel.main.selectAll(".pbialpPercentNumbersGroups")
@@ -1277,7 +1339,7 @@
 					.datum(function(d) {
 						return d
 					})
-					.style("stroke", "darkslategray")
+					.style("stroke", "#6d8383")
 					.style("stroke-width", "1px")
 					.style("stroke-dasharray", "2,2")
 					.style("fill", "none")
@@ -1299,17 +1361,7 @@
 						return xScaleParallel(d.partner);
 					})
 					.attr("cy", yScaleParallel(0))
-					.style("fill", "darkslategray");
-
-				const averageText = cbpfParallelGroupAverageEnter.append("text")
-					.datum(function(d) {
-						return d
-					})
-					.attr("class", "pbialpCbpfParallelText")
-					.attr("text-anchor", "end")
-					.attr("x", xScaleParallel(partnerList[0]) - 6)
-					.attr("y", yScaleParallel(0))
-					.text("Avg");
+					.style("fill", "#6d8383");
 
 				cbpfParallelGroupAverage = cbpfParallelGroupAverageEnter.merge(cbpfParallelGroupAverage);
 
@@ -1340,19 +1392,6 @@
 						return yScaleParallel(d.percentage);
 					});
 
-				cbpfParallelGroupAverage.select("text")
-					.datum(function(d) {
-						return d
-					})
-					.transition()
-					.duration(duration)
-					.attr("y", function(d) {
-						const firstParter = d.find(function(e) {
-							return e.partner === partnerList[0]
-						});
-						return yScaleParallel(firstParter.percentage) + 2
-					});
-
 				groupXAxisParallel.call(xAxisParallel)
 					.selectAll(".tick text")
 					.call(wrapText);
@@ -1369,16 +1408,21 @@
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
-				const outerCircle = showAverageGroup.append("circle")
-					.attr("r", 6)
-					.attr("cy", 2)
+				const outerRectangle = showAverageGroup.append("rect")
+					.attr("width", 12)
+					.attr("height", 12)
+					.attr("rx", 2)
+					.attr("ry", 2)
+					.attr("x", -6)
+					.attr("y", -5)
 					.attr("fill", "white")
 					.attr("stroke", "darkslategray");
 
-				const innerCircle = showAverageGroup.append("circle")
-					.attr("r", 4)
-					.attr("cy", 2)
-					.attr("fill", showAverage ? "darkslategray" : "white");
+				const innerCheck = showAverageGroup.append("polyline")
+					.style("stroke-width", "2px")
+					.attr("points", "-4,1 -1,4 4,-3")
+					.style("fill", "none")
+					.style("stroke", showAverage ? "darkslategray" : "white");
 
 				const showAverageText = showAverageGroup.append("text")
 					.attr("class", "pbialpAverageTextControl")
@@ -1386,79 +1430,34 @@
 					.text("Show Average")
 					.attr("y", 5);
 
-				const downloadGroup = bottomButtonsGroup.append("g")
-					.attr("class", "pbialpDownloadGroup")
-					.attr("transform", "translate(" + (width - padding[1] - excelIconSize - 6) + "," +
-						(height - padding[2] / 2) + ")");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbialpDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", 5);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", (padding[3] - excelIconSize) / 2);
-
 				showAverageGroup.on("click", function() {
 
 					showAverage = !showAverage;
 
-					innerCircle.attr("fill", showAverage ? "darkslategray" : "white");
+					innerCheck.style("stroke", showAverage ? "darkslategray" : "white");
 
 					parallelPanel.main.select(".pbialpCbpfParallelGroupAverage")
 						.style("opacity", showAverage ? 1 : 0);
 
 				});
 
-				downloadGroup.on("click", function() {
-
-					const csv = createCSV(data);
-
-					const fileName = "Allocations" + chartState.selectedYear + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
 
 				//end of createBottomButtons
 			};
 
-			function createAnnotationsPanel() {
+			function createAnnotationsDiv() {
 
-				const arrowMarker = annotationPanel.append("defs")
+				const padding = 6;
+
+				const overDiv = containerDiv.append("div")
+					.attr("class", "pbialpOverDivHelp");
+
+				const totalHeight = overDiv.node().clientHeight;
+
+				const helpSVG = overDiv.append("svg")
+					.attr("viewBox", "0 0 " + width + " " + totalHeight);
+
+				const arrowMarker = helpSVG.append("defs")
 					.append("marker")
 					.attr("id", "pbialpArrowMarker")
 					.attr("viewBox", "0 -5 10 10")
@@ -1471,145 +1470,121 @@
 					.style("fill", "#E56A54")
 					.attr("d", "M0,-5L10,0L0,5");
 
-				const overRectangle = annotationPanel.append("rect")
-					.attr("y", -padding[0])
-					.attr("width", width)
-					.attr("height", height)
-					.style("fill", "white")
-					.style("opacity", 0.8);
-
-				const mainText = annotationPanel.append("text")
+				const mainText = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationMainText contributionColorFill")
 					.attr("text-anchor", "middle")
 					.attr("x", width / 2)
 					.attr("y", 280)
 					.text("CLICK ANYWHERE TO START");
 
-				const yearsButtonsAnnotation = annotationPanel.append("text")
-					.attr("class", "pbialpAnnotationText")
-					.attr("x", 280)
-					.attr("y", 130)
-					.text("Click these buttons to select the year. Click the left and right arrows to show more years.")
-					.call(wrapText2, 200);
+				const yearsButtonsAnnotationRect = helpSVG.append("rect")
+					.attr("x", 120 - padding)
+					.attr("y", 160 - padding - 14)
+					.style("fill", "white")
+					.style("opacity", 0.9);
 
-				const yearsButtonPath = annotationPanel.append("path")
+				const yearsButtonsAnnotation = helpSVG.append("text")
+					.attr("class", "pbialpAnnotationText")
+					.attr("x", 120)
+					.attr("y", 160)
+					.text("Click these buttons to select the year. Click the left and right arrows to reveal more years.")
+					.call(wrapText2, 220);
+
+				const yearsButtonPath = helpSVG.append("path")
 					.style("fill", "none")
 					.style("stroke", "#E56A54")
 					.attr("pointer-events", "none")
 					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M270,140 Q250,140 250,125");
+					.attr("d", "M110,170 Q90,170 90,155");
 
-				const partnersButtonsAnnotation = annotationPanel.append("text")
+				yearsButtonsAnnotationRect.attr("width", yearsButtonsAnnotation.node().getBoundingClientRect().width + padding * 2)
+					.attr("height", yearsButtonsAnnotation.node().getBoundingClientRect().height + padding * 2);
+
+				const partnersButtonsAnnotationRect = helpSVG.append("rect")
+					.attr("x", 480 - padding)
+					.attr("y", 160 - padding - 14)
+					.style("fill", "white")
+					.style("opacity", 0.9);
+
+				const partnersButtonsAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
-					.attr("x", 680)
-					.attr("y", 180)
+					.attr("x", 480)
+					.attr("y", 160)
 					.text("Click these buttons to select the partner type.")
 					.call(wrapText2, 200);
 
-				const partnersButtonPath = annotationPanel.append("path")
+				const partnersButtonPath = helpSVG.append("path")
 					.style("fill", "none")
 					.style("stroke", "#E56A54")
 					.attr("pointer-events", "none")
 					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M880,185 Q920,185 920,130");
+					.attr("d", "M680,170 Q720,170 720,155");
 
-				const lollipopAnnotation = annotationPanel.append("text")
+				partnersButtonsAnnotationRect.attr("width", partnersButtonsAnnotation.node().getBoundingClientRect().width + padding * 2)
+					.attr("height", partnersButtonsAnnotation.node().getBoundingClientRect().height + padding * 2);
+
+				const lollipopAnnotationRect = helpSVG.append("rect")
+					.attr("x", 220 - padding)
+					.attr("y", 340 - padding - 14)
+					.style("fill", "white")
+					.style("opacity", 0.9);
+
+				const lollipopAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
 					.attr("x", 220)
-					.attr("y", 350)
-					.text("Hover over the CBPFs to get the additional info and to highlight the corresponding line on the right-hand side. Clicking a CBPF keeps it selected. You can click more than one CBPF.")
-					.call(wrapText2, 300);
+					.attr("y", 340)
+					.text("Hover over the CBPFs to get the additional info and to highlight the corresponding line on the right-hand side (Allocations by Partner Type). Clicking a CBPF keeps it selected, allowing you to hover over the lines on the right-hand side for more info. You can click more than one CBPF.")
+					.call(wrapText2, 250);
 
-				const lollipopPath = annotationPanel.append("path")
+				const lollipopPath = helpSVG.append("path")
 					.style("fill", "none")
 					.style("stroke", "#E56A54")
 					.attr("pointer-events", "none")
 					.attr("marker-end", "url(#pbialpArrowMarker)")
 					.attr("d", "M210,370 Q180,370 170,340");
 
-				const parallelAnnotation = annotationPanel.append("text")
+				lollipopAnnotationRect.attr("width", lollipopAnnotation.node().getBoundingClientRect().width + padding * 2)
+					.attr("height", lollipopAnnotation.node().getBoundingClientRect().height + padding * 2);
+
+				const parallelAnnotationRect = helpSVG.append("rect")
+					.attr("x", 590 - padding)
+					.attr("y", 340 - padding - 14)
+					.style("fill", "white")
+					.style("opacity", 0.9);
+
+				const parallelAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
-					.attr("x", 800)
-					.attr("y", 300)
+					.attr("x", 590)
+					.attr("y", 340)
 					.text("This area shows the allocations by partner type for all CBPFs. Clicking a CBPF on the right-hand side keeps the respective line highlighted. Hover over the line to get additional info. The dotted line is the average for all CBPFs.")
 					.call(wrapText2, 260);
 
-				const parallelPath = annotationPanel.append("path")
-					.style("fill", "none")
-					.style("stroke", "#E56A54")
-					.attr("pointer-events", "none")
-					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M790,320 Q760,320 740,360");
+				parallelAnnotationRect.attr("width", parallelAnnotation.node().getBoundingClientRect().width + padding * 2)
+					.attr("height", parallelAnnotation.node().getBoundingClientRect().height + padding * 2);
 
-				overRectangle.on("click", function() {
-					annotationPanel.selectAll("*").remove();
+				helpSVG.on("click", function() {
+					overDiv.remove();
 				});
 
-				//end of createAnnotationsPanel
+				//end of createAnnotationsDiv
 			};
 
-			function createHelpButton() {
+			function createFooterDiv() {
 
-				const rightMargin = 42,
-					rectangleWidth = 70,
-					helpVerticalPadding = 5,
-					helpCircleRadius = 8,
-					helpTextMargin = 22;
+				const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
 
-				const helpRectangle = helpGroup.append("rect")
-					.attr("x", width - rightMargin - rectangleWidth)
-					.attr("height", padding[0])
-					.attr("width", rectangleWidth)
-					.attr("fill", "white");
+				const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
 
-				const helpCircle = helpGroup.append("circle")
-					.attr("cx", width - rightMargin - helpCircleRadius)
-					.attr("cy", padding[0] / 2)
-					.attr("r", helpCircleRadius)
-					.attr("stroke-width", "2px")
-					.style("stroke", "#888")
-					.style("fill", "white");
+				footerDiv.append("div")
+					.attr("class", "d3chartFooterText")
+					.html(footerText + footerLink + ".");
 
-				const helpText = helpGroup.append("text")
-					.style("font-family", "Arial")
-					.style("font-size", "12px")
-					.attr("text-anchor", "end")
-					.attr("x", width - rightMargin - helpTextMargin)
-					.attr("y", padding[0] - helpVerticalPadding)
-					.attr("pointer-events", "none")
-					.style("fill", "#888")
-					.text("HELP");
-
-				const helpQuestionMark = helpGroup.append("text")
-					.style("font-family", "Arial")
-					.style("font-size", "12px")
-					.style("font-weight", 700)
-					.attr("text-anchor", "middle")
-					.attr("x", width - rightMargin - helpCircleRadius)
-					.attr("y", padding[0] - helpVerticalPadding)
-					.attr("pointer-events", "none")
-					.style("fill", "#888")
-					.text("?");
-
-				helpGroup.on("mouseover", function() {
-					tooltip.style("display", "block")
-						.html("Click for help")
-						.style("top", d3.event.pageY + 18 + "px")
-						.style("left", d3.event.pageX - 96 + "px");
-				}).on("mousemove", function() {
-					tooltip.style("top", d3.event.pageY + 18 + "px")
-						.style("left", d3.event.pageX - 96 + "px");
-				}).on("mouseout", function() {
-					tooltip.style("display", "none");
-				}).on("click", function() {
-					tooltip.style("display", "none");
-					createAnnotationsPanel();
-				});
-
-				//end of createHelpButton
+				//end of createFooterDiv
 			};
 
-			function highlightParallel(data) {
+			function highlightParallel(data, thisCbpf) {
+
+				const percentagesData = thisCbpf ? thisCbpf.parallelData : [];
 
 				const selectedData = data.filter(function(d) {
 					return chartState.selectedCbpfs.indexOf(d.cbpf) > -1
@@ -1685,6 +1660,43 @@
 							d.yPos + ")";
 					});
 
+				let percentagesGroup = parallelPanel.main.selectAll(".pbialpPercentagesGroup")
+					.data(percentagesData, function(d) {
+						return d.partner;
+					});
+
+				const percentagesGroupExit = percentagesGroup.exit().remove();
+
+				const percentagesGroupEnter = percentagesGroup.enter()
+					.append("g")
+					.attr("class", "pbialpPercentagesGroup");
+
+				const percentagesCircles = percentagesGroupEnter.append("circle")
+					.attr("cx", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("cy", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding - 4;
+					})
+					.style("fill", "white");
+
+				const percentagesText = percentagesGroupEnter.append("text")
+					.attr("class", "pbialpPercentagesText")
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("y", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding;
+					})
+					.attr("text-anchor", "middle")
+					.text(function(d) {
+						return formatPercent(d.percentage);
+					});
+
+				percentagesCircles.attr("r", function() {
+					return Math.min(this.nextSibling.getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
+				});
+
 				//end of highlightParallel
 			};
 
@@ -1728,8 +1740,6 @@
 
 				createTopPanel(data);
 
-				repositionButtonsPanel();
-
 				createLollipopPanel(data);
 
 				createParallelPanel(data);
@@ -1770,6 +1780,10 @@
 
 			function mouseOverTopPanel() {
 
+				thisOffsetTopPanel = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
@@ -1782,31 +1796,25 @@
 
 				localVariable.set(this, tooltipSize);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffsetTopPanel + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
 			function mouseMoveTopPanel() {
 
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				const tooltipSize = localVariable.get(this);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffsetTopPanel + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
@@ -1833,8 +1841,6 @@
 			};
 
 			function mouseOverSelectedCircles(datum) {
-
-				const mouse = d3.mouse(parallelPanel.main.node());
 
 				const thisCbpf = d3.select(this.parentNode).datum().cbpf;
 
@@ -1863,14 +1869,24 @@
 							formatMoney0Decimals(datum.value));
 				};
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
+				const mouse = d3.mouse(parallelPanel.main.node());
 
-				tooltip.style("left", mouse[0] > parallelPanel.width - tooltipSize.width / 2 ?
-						d3.event.pageX - (mouse[0] - (parallelPanel.width - tooltipSize.width)) + "px" :
-						d3.event.pageX - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] > parallelPanel.height - tooltipSize.height ?
-						d3.event.pageY - tooltipSize.height - 16 + "px" :
-						d3.event.pageY + 18 + "px");
+				const thisBox = this.getBoundingClientRect();
+
+				const parallelPanelBox = parallelPanel.main.node().getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top;
+
+				const thisOffsetLeft = parallelPanelBox.left - containerBox.left + (parallelPanelBox.width - tooltipBox.width) / 2;
+
+				tooltip.style("top", mouse[1] > (parallelPanel.height + padding[3]) - tooltipBox.height ?
+						thisOffsetTop - tooltipBox.height - 8 + "px" :
+						thisOffsetTop + 20 + "px")
+					.style("left", thisOffsetLeft + "px");
 
 				//end of mouseOverSelectedCircles
 			};
@@ -2223,33 +2239,6 @@
 				//end of recalculateAndResize
 			};
 
-			function repositionButtonsPanel() {
-
-				buttonPanel.main.select(".pbialpClipPathGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding) + ",0)");
-
-				buttonPanel.main.select(".pbialpLeftArrowGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",0)");
-
-				buttonPanel.main.select(".pbialpRightArrowGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + buttonPanel.arrowPadding +
-						(buttonsNumber * buttonPanel.buttonWidth)) + ",0)");
-
-				buttonPanel.main.select(".pbialpbuttonsPartnersGroup")
-					.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (topPanel.moneyBagPadding + (4 * buttonPanel.arrowPadding) + (buttonsNumber * buttonPanel.buttonWidth)) +
-						",0)")
-
-				//end of repositionButtonsPanel
-			};
-
 			//end of draw
 		};
 
@@ -2317,9 +2306,7 @@
 
 			const labelSize = labelSizeCbpfs + yAxisLollipop.tickPadding() + yAxisLollipop.tickSizeInner();
 
-			topPanel.moneyBagPadding = labelSize;
-
-			lollipopPanel.padding[3] = labelSize;
+			lollipopPanel.padding[3] = labelSize + lollipopExtraPadding;
 
 			xScaleLollipop.range([lollipopPanel.padding[3], lollipopPanel.width - lollipopPanel.padding[1]]);
 
