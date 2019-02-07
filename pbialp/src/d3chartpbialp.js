@@ -1497,8 +1497,8 @@
 					.attr("marker-end", "url(#pbialpArrowMarker)")
 					.attr("d", "M110,170 Q90,170 90,155");
 
-				yearsButtonsAnnotationRect.attr("width", yearsButtonsAnnotation.node().getBoundingClientRect().width + padding * 2)
-					.attr("height", yearsButtonsAnnotation.node().getBoundingClientRect().height + padding * 2);
+				yearsButtonsAnnotationRect.attr("width", yearsButtonsAnnotation.node().getBBox().width + padding * 2)
+					.attr("height", yearsButtonsAnnotation.node().getBBox().height + padding * 2);
 
 				const partnersButtonsAnnotationRect = helpSVG.append("rect")
 					.attr("x", 480 - padding)
@@ -1520,8 +1520,8 @@
 					.attr("marker-end", "url(#pbialpArrowMarker)")
 					.attr("d", "M680,170 Q720,170 720,155");
 
-				partnersButtonsAnnotationRect.attr("width", partnersButtonsAnnotation.node().getBoundingClientRect().width + padding * 2)
-					.attr("height", partnersButtonsAnnotation.node().getBoundingClientRect().height + padding * 2);
+				partnersButtonsAnnotationRect.attr("width", partnersButtonsAnnotation.node().getBBox().width + padding * 2)
+					.attr("height", partnersButtonsAnnotation.node().getBBox().height + padding * 2);
 
 				const lollipopAnnotationRect = helpSVG.append("rect")
 					.attr("x", 220 - padding)
@@ -1543,8 +1543,8 @@
 					.attr("marker-end", "url(#pbialpArrowMarker)")
 					.attr("d", "M210,370 Q180,370 170,340");
 
-				lollipopAnnotationRect.attr("width", lollipopAnnotation.node().getBoundingClientRect().width + padding * 2)
-					.attr("height", lollipopAnnotation.node().getBoundingClientRect().height + padding * 2);
+				lollipopAnnotationRect.attr("width", lollipopAnnotation.node().getBBox().width + padding * 2)
+					.attr("height", lollipopAnnotation.node().getBBox().height + padding * 2);
 
 				const parallelAnnotationRect = helpSVG.append("rect")
 					.attr("x", 590 - padding)
@@ -1559,8 +1559,8 @@
 					.text("This area shows the allocations by partner type for all CBPFs. Clicking a CBPF on the right-hand side keeps the respective line highlighted. Hover over the line to get additional info. The dotted line is the average for all CBPFs.")
 					.call(wrapText2, 260);
 
-				parallelAnnotationRect.attr("width", parallelAnnotation.node().getBoundingClientRect().width + padding * 2)
-					.attr("height", parallelAnnotation.node().getBoundingClientRect().height + padding * 2);
+				parallelAnnotationRect.attr("width", parallelAnnotation.node().getBBox().width + padding * 2)
+					.attr("height", parallelAnnotation.node().getBBox().height + padding * 2);
 
 				helpSVG.on("click", function() {
 					overDiv.remove();
