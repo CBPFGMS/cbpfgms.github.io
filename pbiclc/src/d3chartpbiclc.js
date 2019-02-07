@@ -96,6 +96,7 @@
 			localVariable = d3.local(),
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
+			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
@@ -118,7 +119,7 @@
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
-		const chartTitle = containerDiv.node().getAttribute("data-title");
+		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -1744,6 +1745,8 @@
 
 		function createAnnotationsDiv() {
 
+			const padding = 6;
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiclcOverDivHelp");
 
@@ -1763,12 +1766,29 @@
 				.style("fill", "#E56A54")
 				.attr("d", "M0,-5L10,0L0,5");
 
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
 				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
+
+			const yearsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 300 - padding)
+				.attr("y", 16 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
@@ -1784,6 +1804,15 @@
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
 				.attr("d", "M295,20 Q270,20 270,35");
 
+			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
+
+			const paidPledgeAnnotationRect = helpSVG.append("rect")
+				.attr("x", 340 - padding)
+				.attr("y", 150 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
+
 			const paidPledgeAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
 				.attr("x", 340)
@@ -1797,6 +1826,15 @@
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
 				.attr("d", "M570,160 Q690,160 690,90");
+
+			paidPledgeAnnotationRect.attr("width", paidPledgeAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", paidPledgeAnnotation.node().getBBox().height + padding * 2);
+
+			const lollipopsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 270 - padding)
+				.attr("y", 390 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
 
 			const lollipopsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
@@ -1818,6 +1856,9 @@
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
 				.attr("d", "M530,430 Q590,430 590,370");
+
+			lollipopsAnnotationRect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
 
 			helpSVG.on("click", function() {
 				overDiv.remove();
