@@ -1,4 +1,4 @@
-# GMS BI: CBPF Allocations, lollipop and parallel coordinates chart
+# GMS BI: Allocations by Organization Type, lollipop and parallel coordinates chart
 
 Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-allocations) . The datavis contains several elements:
 
@@ -13,17 +13,26 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbialp" data-year="2018" data-partner="total" data-showaverage="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
+```<div id="d3chartcontainerpbialp" data-title="Allocations by Organization Type" data-year="2018" data-partner="total" data-showaverage="true" data-responsive="true" data-lazyload="true" data-showhelp="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
-The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) file.
+The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbialp.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 
-*Important*: The code uses `window.innerHeight`  and `element.offsetTop` to start the animation. Do not copy the snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`  and `element.offsetTop`.
+***Important***: The code uses `window.innerHeight`  and to start the animation when `"data-lazyload"` is set to `true`. If you copy this snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`, set `"data-lazyload"` to `false`.
 
 ## Parameters
 
-There are five parameters:
+There are seven parameters:
+
+**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocations by Organization Type*.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations no shown. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
@@ -68,7 +77,7 @@ Note: On Internet Explorer this parameter will default to `"false"`, meaning tha
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
-*Recommended size*: 1130px width (height varies).
+*Recommended size*: 900px width.
 
 
 ## CSS
