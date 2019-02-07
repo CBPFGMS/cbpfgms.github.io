@@ -25,7 +25,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 There are six parameters:
 
-**`data-title`**: sets the title of the chart.
+**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *CBPF Contributions*.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
