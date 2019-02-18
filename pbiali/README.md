@@ -1,10 +1,11 @@
-# GMS BI: CBPF Allocations, line graph
+# GMS BI: Allocation Trends
 
 Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-allocations) . The datavis contains several elements:
 
 - A main area for the multi-line graph showing the allocations over the years ;
 - A set of small multiples of multi-line graphs that work as buttons, allowing the user to select one or more CBPFs;
-- Two control buttons at the bottom for sorting the small multiples and a button for downloading a CSV with the data;
+- Two buttons at the top right hand side, for downloading the CSV file and for displaying a description of the chart;
+- Two radio buttons at the bottom for sorting the small multiples.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiali.png" width="450">
 
@@ -12,15 +13,24 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiali" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
+```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-showhelp="true" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
-The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) file.
+The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbiali.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 
 ## Parameters
 
-There are two parameters:
+There are five parameters:
+
+**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocation Trends*.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations no shown. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-sortbuttons`**: defines the criterion for ordering the small multiples. Accepted values:
 
@@ -43,7 +53,7 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
 
-*Recommended size*: 1130px width (height varies).
+*Recommended size*: 900px width.
 
 
 ## CSS
