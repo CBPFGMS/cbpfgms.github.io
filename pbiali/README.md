@@ -1,4 +1,4 @@
-# GMS BI: Allocation Trends
+# GMS BI: Allocation Trends, line graph
 
 Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-allocations) . The datavis contains several elements:
 
