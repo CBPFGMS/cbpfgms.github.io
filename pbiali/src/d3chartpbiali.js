@@ -1,8 +1,10 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiali.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiali.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -13,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous")
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
@@ -67,30 +73,29 @@
 
 	function d3Chart() {
 
-		const width = 1130,
+		const width = 900,
 			mainPanelHeight = 280,
 			padding = [4, 4, 26, 4],
 			panelHorizontalPadding = 12,
 			buttonsPerRow = 10,
 			buttonsVerticalPadding = 8,
 			buttonsHorizontalPadding = 8,
-			buttonHeight = 58,
+			buttonHeight = 48,
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			windowHeight = window.innerHeight,
+			currentYear = new Date().getFullYear(),
 			localVariable = d3.local(),
 			monthsMargin = 2,
 			yMargin = 1.05,
-			mainTitlePadding = 12,
 			circleRadius = 2.5,
-			buttonsOrderGroupPadding = 270,
+			buttonsOrderGroupPadding = 192,
 			duration = 1000,
-			excelIconSize = 20,
 			labelPadding = 12,
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
+			chartTitleDefault = "Allocation Trends",
 			sortButtonsOptions = ["total", "alphabetically"],
 			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv",
 			chartState = {
@@ -105,6 +110,10 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
+		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
+
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
 		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
 			containerDiv.node().getAttribute("data-sortbuttons") :
 			"total";
@@ -114,13 +123,25 @@
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbialiTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbialiTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbialiIconsDiv d3chartIconsDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbialiFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbialitooltipdiv")
 			.style("display", "none");
 
@@ -130,7 +151,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
-			padding: [26, 100, 16, 32]
+			padding: [0, 100, 16, 32]
 		};
 
 		const buttonsPanel = {
@@ -139,7 +160,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + mainPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: 0,
-			padding: [2, 100, 2, 32],
+			padding: [2, 20, 2, 32],
 			buttonsPadding: [14, 4, 4, 4]
 		};
 
@@ -238,6 +259,10 @@
 
 		function draw(data) {
 
+			createTitle();
+
+			createFooterDiv();
+
 			resizeSVG(data.cbpfs.length);
 
 			const timeExtent = setTimeExtent(data.years);
@@ -252,11 +277,75 @@
 
 			yScaleButton.domain(yDomain);
 
+			createAverageLine(data.cbpfs, data.years);
+
 			createMainGraph(data.cbpfs);
 
 			createButtons(data.cbpfs);
 
 			createBottomControls();
+
+			if (showHelp) createAnnotationsDiv();
+
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "pbialid3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbialiHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbialiDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCSV(data.cbpfs);
+
+					const fileName = "CBPFallocations.csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
 
 			function createMainGraph(cbpfs) {
 
@@ -276,12 +365,6 @@
 						return d === 0;
 					})
 					.remove();
-
-				const mainTitle = mainPanel.main.append("text")
-					.attr("x", mainPanel.padding[3])
-					.attr("y", mainPanel.padding[0] - mainTitlePadding)
-					.attr("class", "pbialiMainPanelTitle")
-					.text("Allocations by Year");
 
 				const yAxisLabel = mainPanel.main.append("text")
 					.attr("class", "pbialiYAxisLabel")
@@ -312,7 +395,7 @@
 						return lineGeneratorMain(d.values);
 					})
 					.attr("class", "contributionColorStroke")
-					.attr("stroke-width", "1px")
+					.attr("stroke-width", "2px")
 					.attr("clip-path", function(d) {
 						return "url(#pbialiClipPath" + d.cbpf.replace(/\s+/g, '') + ")"
 					})
@@ -349,6 +432,65 @@
 					.on("mouseout", mouseOutRectOverlay);
 
 				//end of createMainGraph
+			};
+
+			function createAverageLine(cbpfs, years) {
+
+				const averageData = years.map(function(year) {
+					return {
+						year: year,
+						total: cbpfs.reduce(function(acc, curr) {
+							const thisYear = curr.values.find(function(d) {
+								return d.year === year;
+							});
+							const thisValue = thisYear ? thisYear.total : 0;
+							return acc + thisValue;
+						}, 0) / cbpfs.length
+					};
+				});
+
+				const lastAverageDate = averageData[averageData.length - 1];
+
+				const averagePath = mainPanel.main.append("path")
+					.attr("d", lineGeneratorMain(averageData))
+					.attr("stroke-width", "2px")
+					.style("fill", "none")
+					.style("stroke", "#ccc")
+					.attr("pointer-events", "none");
+
+				const averageCircles = mainPanel.main.selectAll(null)
+					.data(averageData)
+					.enter()
+					.append("circle")
+					.attr("r", circleRadius)
+					.attr("cx", function(d) {
+						return xScaleMain(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleMain(d.total)
+					})
+					.attr("fill", "#ccc")
+					.attr("pointer-events", "none");
+
+				const averageLine = mainPanel.main.append("line")
+					.attr("x1", xScaleMain(parseTime(lastAverageDate.year)) + circleRadius * 2)
+					.attr("x2", mainPanel.width - mainPanel.padding[1] + 8)
+					.attr("y1", yScaleMain(lastAverageDate.total))
+					.attr("y2", yScaleMain(lastAverageDate.total))
+					.style("stroke", "#ccc")
+					.attr("stroke-width", "1px")
+					.style("fill", "none")
+					.attr("class", "pbialiAverageLine");
+
+				const averageText = mainPanel.main.append("text")
+					.attr("class", "pbialiAverageText")
+					.attr("pointer-events", "none")
+					.attr("x", mainPanel.width - mainPanel.padding[1] + 10)
+					.attr("y", yScaleMain(lastAverageDate.total) - 2)
+					.text("Overall allocation trend (per CBPF)")
+					.call(wrapText2, 100)
+
+				//end of createAverageLine
 			};
 
 			function createButtons(cbpfs) {
@@ -438,7 +580,7 @@
 					.attr("x", -16)
 					.attr("y", 5)
 					.attr("text-anchor", "end")
-					.text("Sort Buttons by:");
+					.text("Sort by:");
 
 				const orderGroups = buttonsOrderGroup.selectAll(null)
 					.data(sortButtonsOptions)
@@ -470,27 +612,6 @@
 						return i ? "Alphabetically" : "Total Allocations";
 					});
 
-				const downloadGroup = svg.append("g")
-					.attr("class", "pbialiDownloadGroup")
-					.attr("transform", "translate(" + (width - padding[1] - excelIconSize - 6) + "," +
-						(height - padding[2] / 2) + ")");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbialiDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", 5);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", (padding[3] - excelIconSize) / 2);
-
 				orderGroups.on("click", function(d) {
 
 					sortButtons = d;
@@ -519,41 +640,6 @@
 							return "translate(" + (buttonsPanel.padding[3] + ((i % buttonsPerRow) * (buttonWidth + buttonsVerticalPadding))) +
 								"," + (buttonsPanel.padding[0] + (~~(i / buttonsPerRow) * (buttonHeight + buttonsHorizontalPadding))) + ")";
 						});
-
-				});
-
-				downloadGroup.on("click", function() {
-
-					const csv = createCSV(data.cbpfs);
-
-					const fileName = "CBPFallocations.csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
 
 				});
 
@@ -750,11 +836,13 @@
 
 					const tooltipSize = tooltip.node().getBoundingClientRect();
 
+					const mouseDiv = d3.mouse(containerDiv.node());
+
 					tooltip.html(tooltipHtml)
-						.style("top", d3.event.pageY - (tooltipSize.height / 2) + "px")
+						.style("top", mouseDiv[1] - (tooltipSize.height / 2) + "px")
 						.style("left", mouse[0] > mainPanel.width - 16 - tooltipSize.width ?
-							d3.event.pageX - tooltipSize.width - 16 + "px" :
-							d3.event.pageX + 16 + "px");
+							mouseDiv[0] - tooltipSize.width - 16 + "px" :
+							mouseDiv[0] + 16 + "px");
 
 				} else {
 
@@ -775,6 +863,14 @@
 			};
 
 			function highlightPaths() {
+
+				if (chartState.selectedCbpfs.length > 0) {
+					mainPanel.main.selectAll(".pbialiAverageLine, .pbialiAverageText")
+						.style("opacity", 0);
+				} else {
+					mainPanel.main.selectAll(".pbialiAverageLine, .pbialiAverageText")
+						.style("opacity", 1);
+				};
 
 				const pathGroups = d3.selectAll(".pbialiMainGroup");
 
@@ -803,7 +899,9 @@
 						};
 					})
 					.transition()
-					.duration(duration)
+					.duration(function(d) {
+						return d.clicked ? 0 : duration;
+					})
 					.attr("width", mainPanel.width - mainPanel.padding[1] - mainPanel.padding[3]);
 
 				unSelectedGroups.selectAll("clipPath rect")
@@ -1108,6 +1206,169 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
+		};
+
+		function createFooterDiv() {
+
+			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+
+			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText + footerLink + ".");
+
+			//end of createFooterDiv
+		};
+
+		function createAnnotationsDiv() {
+
+			const padding = 6;
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", "pbialiOverDivHelp");
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + width + " " + (height + 50));
+
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbialiArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
+
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 80)
+				.text("CLICK ANYWHERE TO START");
+
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbialiAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 80)
+				.text("CLICK ANYWHERE TO START");
+
+			const buttonsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 120 - padding)
+				.attr("y", 200 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
+
+			const buttonsAnnotation = helpSVG.append("text")
+				.attr("class", "pbialiAnnotationText")
+				.attr("x", 120)
+				.attr("y", 200)
+				.text("Hover over a CBPF button to show its correspondent line in the chart area. Clicking a button keeps the line in the chart area, clicking again removes it. You can click several buttons.")
+				.call(wrapText2, 280);
+
+			const buttonsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbialiArrowMarker)")
+				.attr("d", "M110,230 Q80,230 80,320");
+
+			buttonsAnnotationRect.attr("width", buttonsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", buttonsAnnotation.node().getBBox().height + padding * 2);
+
+			const areaAnnotationRect = helpSVG.append("rect")
+				.attr("x", 630 - padding)
+				.attr("y", 190 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
+
+			const areaAnnotation = helpSVG.append("text")
+				.attr("class", "pbialiAnnotationText")
+				.attr("x", 630)
+				.attr("y", 190)
+				.text("Selected CBPFs will show up in this area. Hover over this area to get detailed values.")
+				.call(wrapText2, 200);
+
+			const areaPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("d", "M 600 300 Q 612 300 608 250 T 620 200 M 600 100 Q 612 100 608 150 T 620 200");
+
+			areaAnnotationRect.attr("width", areaAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", areaAnnotation.node().getBBox().height + padding * 2);
+
+			const sortAnnotationRect = helpSVG.append("rect")
+				.attr("x", 470 - padding)
+				.attr("y", 370 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.9);
+
+			const sortAnnotation = helpSVG.append("text")
+				.attr("class", "pbialiAnnotationText")
+				.attr("x", 470)
+				.attr("y", 370)
+				.text("Sorts the CBPFs buttons alphabetically or by total allocations in each CBPF.")
+				.call(wrapText2, 230);
+
+			const sortPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbialiArrowMarker)")
+				.attr("d", "M640,380 Q730,390 730,438");
+
+			sortAnnotationRect.attr("width", sortAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", sortAnnotation.node().getBBox().height + padding * 2);
+
+			helpSVG.on("click", function() {
+				overDiv.remove();
+			});
+
+			//end of createAnnotationsDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
 		};
 
 		function createProgressWheel() {
