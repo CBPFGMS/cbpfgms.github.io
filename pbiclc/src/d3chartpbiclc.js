@@ -157,10 +157,22 @@
 			.attr("id", "pbiclctooltipdiv")
 			.style("display", "none");
 
+		const topPanel = {
+			main: svg.append("g")
+				.attr("class", "pbiclcTopPanel")
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+			width: width - padding[1] - padding[3],
+			height: topPanelHeight,
+			moneyBagPadding: 94,
+			leftPadding: [176, 484, 632],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 4
+		};
+
 		const buttonPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiclcButtonPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonPanelHeight,
 			padding: [0, 0, 0, 90],
@@ -170,18 +182,6 @@
 			arrowPadding: 18,
 			buttonContributionsWidth: 70,
 			buttonContributionsPadding: 590
-		};
-
-		const topPanel = {
-			main: svg.append("g")
-				.attr("class", "pbiclcTopPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonPanel.height + panelHorizontalPadding) + ")"),
-			width: width - padding[1] - padding[3],
-			height: topPanelHeight,
-			moneyBagPadding: 94,
-			leftPadding: [176, 484, 632],
-			mainValueVerPadding: 12,
-			mainValueHorPadding: 4
 		};
 
 		const donorsPanel = {
@@ -1785,47 +1785,47 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 300 - padding)
-				.attr("y", 16 - padding - 14)
+				.attr("x", 290 - padding)
+				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
-				.style("opacity", 0.9);
+				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 300)
-				.attr("y", 16)
+				.attr("x", 290)
+				.attr("y", 60)
 				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
-				.call(wrapText2, 280);
+				.call(wrapText2, 200);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M295,20 Q270,20 270,35");
+				.attr("d", "M480,70 Q510,70 510,95");
 
 			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
 
 			const paidPledgeAnnotationRect = helpSVG.append("rect")
-				.attr("x", 340 - padding)
-				.attr("y", 150 - padding - 14)
+				.attr("x", 400 - padding)
+				.attr("y", 180 - padding - 14)
 				.style("fill", "white")
-				.style("opacity", 0.9);
+				.style("opacity", 0.95);
 
 			const paidPledgeAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 340)
-				.attr("y", 150)
+				.attr("x", 400)
+				.attr("y", 180)
 				.text("Use these buttons to filter by “paid” or “pledged” values. “Total” shows both paid and pledged.")
-				.call(wrapText2, 250);
+				.call(wrapText2, 220);
 
 			const paidPledgePath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M570,160 Q690,160 690,90");
+				.attr("d", "M600,180 Q690,180 690,150");
 
 			paidPledgeAnnotationRect.attr("width", paidPledgeAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", paidPledgeAnnotation.node().getBBox().height + padding * 2);
@@ -1834,7 +1834,7 @@
 				.attr("x", 270 - padding)
 				.attr("y", 390 - padding - 14)
 				.style("fill", "white")
-				.style("opacity", 0.9);
+				.style("opacity", 0.95);
 
 			const lollipopsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
