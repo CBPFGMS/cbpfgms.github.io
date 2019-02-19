@@ -15,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous")
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
