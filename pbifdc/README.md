@@ -1,19 +1,20 @@
 
-# GMS BI: CBPF Contributions, force-directed graph
+# GMS BI: Contributions flow, force-directed graph
 
 Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
 
 - A top banner showing the contributions (total amount; pledge amount for future years), the number of donors and the number of CBPFs for the selected year;
-- A control banner allowing the selection of the year, the geopositioning (in a map) of the nodes, showing/hiding the nodes' labels and downloading the corresponding CSV;
+- A control panel allowing the selection of the year, the geopositioning (in a map) of the nodes and showing/hiding the nodes' labels;
 - A force-directed graph with all the donors and CBPFs for the selected year. In the force-directed graph each node represents a country, and each link represents the amount donated/received by the donor/CBPF pair.
 - A legend panel, which shows information for the entire selected year, for the country hovered over and for the link hovered over. The legend panel can be hovered as well.
+- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">
 
 #### Interactivity:
 
 - The CBPFs and their respective donors can be filtered by region, using the menu at the top left corner in the force-directed graph area. Select `All` to show all donors/CBPFs again.
-- During the map view you can zoom in/out the visualisation. Use the mouse wheel or the touchpad to zoom in/out, click and move to pan.
+- While in the map view you can zoom in/out the visualisation. Use the mouse wheel or the touchpad to zoom in/out, click and move to pan.
 - Hovering over the donors, CBPFs or their links changes the legends on the right-hand side. The default legend is also interactive.
 
 
@@ -21,17 +22,26 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbifdc" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
+```<div id="d3chartcontainerpbifdc" data-title="Contributions Flow Chart" data-showhelp="true" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
-The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) file.
+The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbifdc.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 
-*Important*: The code uses `window.innerHeight`  and `element.offsetTop` to start the animation. Do not copy the snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`  and `element.offsetTop`.
+***Important***: The code uses `window.innerHeight`  and to start the animation when `"data-lazyload"` is set to `true`. If you copy this snippet inside an iframe or any other element that avoids the correct calculation of `window.innerHeight`, set `"data-lazyload"` to `false`.
 
 ## Parameters
 
-There are six parameters:
+There are eight parameters:
+
+**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Contributions Flow Chart*.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations no shown. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
@@ -79,7 +89,7 @@ If the value is not an accepted one, it will default to `"all"`.
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
-- `"false"`: the SVG will be created with a fixed size, which is 1130px width by 698px height.
+- `"false"`: the SVG will be created with a fixed size, which is 900px wide.
 
 Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
 
@@ -90,7 +100,7 @@ Note: On Internet Explorer this parameter will default to `"false"`, meaning tha
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
-*Recommended size*: 1130px x 698px.
+*Recommended size*: 900px width.
 
 
 ## CSS
