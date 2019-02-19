@@ -66,7 +66,7 @@ Note: On Internet Explorer this parameter will default to `"false"`, meaning tha
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
-*Recommended size*: 900px width (height varies).
+*Recommended size*: 900px (width).
 
 
 ## CSS
