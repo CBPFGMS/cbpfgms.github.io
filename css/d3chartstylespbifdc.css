@@ -1,5 +1,9 @@
 /*Public BI, Force-directed graph Contributions (code: pbifdc)*/
 
+#d3chartcontainerpbifdc {
+	position: relative;
+}
+
 #pbifdctooltipdiv {    
 	position: absolute;
 	text-align: left;
@@ -17,19 +21,64 @@
 	max-width: 270px;
 }
 
+.pbifdcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbifdcTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 31px;
+}
+
+.pbifdcIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 2px;
+}
+
+.pbifdcFooterDiv {
+	width: 100%;
+}
+
+.d3chartFooterText {
+	width: 99.2%;
+}
+
+.pbifdcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbifdcd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
 .pbifdctopPanelMainValue {
 	font-family: "Arial", sans-serif;
-	font-size: 60px;
+	font-size: 48px;
 }
 
 .pbifdctopPanelDonorsNumber, .pbifdctopPanelCbpfsNumber {
 	font-family: "Arial", sans-serif;
-	font-size: 44px;
+	font-size: 48px;
 }
 
 .pbifdctopPanelMainText, .pbifdctopPanelSubText {
 	font-family: "Arial", sans-serif;
-	font-size: 20px;
+	font-size: 16px;
 	fill: #888;
 }
 
@@ -134,7 +183,7 @@
 	stroke-dasharray: 2, 2;
 }
 
-.pbiclcLegendLabel {
+.pbifdcLegendLabel {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
 	fill: #777;
@@ -159,4 +208,18 @@
 	font-size: 11px;
 	fill: #666;
 	cursor: default;	
+}
+
+.pbifdcAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbifdcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
 }
