@@ -62,7 +62,7 @@ Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Inte
 
 This charts shows the changes for allocations over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiali) for more information.
 
-- **GMS BI: CBPF Contributions, force-directed graph**
+- **GMS BI: Contributions Flow Chart, force-directed graph**
 
 Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
 
