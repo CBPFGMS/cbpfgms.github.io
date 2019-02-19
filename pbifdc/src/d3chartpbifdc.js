@@ -1,8 +1,10 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -67,9 +69,9 @@
 
 	function d3Chart() {
 
-		const width = 1130,
+		const width = 900,
 			padding = [4, 6, 4, 6],
-			topPanelHeight = 72,
+			topPanelHeight = 60,
 			nodesPanelHeight = 580,
 			buttonsPanelHeight = 30,
 			panelHorizontalPadding = 4,
@@ -77,16 +79,18 @@
 			nodesPanelWidthFactor = 0.75,
 			legendPanelWidthFactor = 1 - nodesPanelWidthFactor,
 			height = padding[0] + topPanelHeight + buttonsPanelHeight + nodesPanelHeight + (2 * panelHorizontalPadding) + padding[2],
-			buttonsNumber = 12,
-			excelIconSize = 20,
+			buttonsNumber = 10,
 			stickHeight = 2,
 			lollipopRadius = 4,
+			groupLegendPadding = 10,
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
+			chartTitleDefault = "Contributions Flow Chart",
+			currentYear = new Date().getFullYear(),
 			flagPadding = 22,
-			maxNodeSize = 40,
+			maxNodeSize = 35,
 			maxNodeSizeMap = 20,
 			maxLinkWidth = 20,
 			maxLinkWidthMap = 10,
@@ -103,7 +107,6 @@
 			contributionsTotals = {},
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/",
 			flagSize = 24,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
@@ -121,7 +124,9 @@
 
 		let yearsArray,
 			donorsNumber,
-			cbpfsNumber;
+			cbpfsNumber,
+			topPanelRectBoundingRect,
+			containerDivBoundingRect;
 
 		const geoRegions = {
 			"Latin America and the Caribbean": ["CO", "HT"],
@@ -157,18 +162,34 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
+		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
+
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
 		if (selectedResponsiveness === "false" || isInternetExplorer) {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbifdcTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbifdcTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbifdcIconsDiv d3chartIconsDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbifdcFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbifdctooltipdiv")
 			.style("display", "none");
 
@@ -178,10 +199,10 @@
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
-			moneyBagPadding: 35,
-			leftPadding: [230, 564, 698],
-			mainValueVerPadding: 14,
-			mainValueHorPadding: 4
+			moneyBagPadding: 26,
+			leftPadding: [174, 428, 546],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 3
 		};
 
 		const buttonsPanel = {
@@ -190,7 +211,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
-			padding: [0, 0, 0, 35],
+			padding: [0, 0, 0, 6],
 			buttonWidth: 60,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
@@ -203,7 +224,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) * nodesPanelWidthFactor,
 			height: nodesPanelHeight,
-			padding: [10, 16, 10, 16]
+			padding: [8, 16, 8, 16]
 		};
 
 		const legendPanel = {
@@ -302,7 +323,7 @@
 
 		const xAxisLegend = d3.axisTop(xScaleLegend)
 			.tickSizeOuter(0)
-			.ticks(3)
+			.ticks(2)
 			.tickPadding(4)
 			.tickFormat(function(d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
@@ -336,7 +357,7 @@
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll.pbifcd", checkPosition);
+				d3.select(window).on("scroll.pbifdc", checkPosition);
 				checkPosition();
 			};
 
@@ -352,6 +373,10 @@
 		});
 
 		function draw(rawData) {
+
+			createTitle();
+
+			createFooterDiv();
 
 			let dataObject = processData(rawData[0]);
 
@@ -378,6 +403,68 @@
 			createGeoMenu();
 
 			saveFlags(dataObject.nodes);
+
+			if (showHelp) createAnnotationsDiv();
+
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "pbifdcd3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbifdcHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbifdcDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCsv(rawData[0]);
+
+					const fileName = "contributions" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
 
 			function createMap(dataMap) {
 
@@ -431,7 +518,7 @@
 				topPanelMoneyBag.enter()
 					.append("g")
 					.attr("class", "pbifdctopPanelMoneyBag contributionColorFill")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.6)")
+					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
 					.each(function(_, i, n) {
 						moneyBagdAttribute.forEach(function(d) {
 							d3.select(n[i]).append("path")
@@ -540,10 +627,10 @@
 					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelDonorsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.7)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("text-anchor", "start")
 					.text("Donors")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding);
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1]);
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbifdctopPanelCbpfsNumber")
 					.data([cbpfsNumber]);
@@ -571,10 +658,10 @@
 					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelCbpfsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.7)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("text-anchor", "start")
 					.text("CBPFs")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding);
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2]);
 
 				const overRectangle = topPanel.main.selectAll(".pbifdctopPanelOverRectangle")
 					.data([true])
@@ -693,7 +780,7 @@
 					.attr("pointer-events", "all");
 
 				const showMapGroupLegend = buttonsPanel.main.append("g")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
+					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + "," +
 						(buttonsPanel.height * 0.6) + ")")
 					.style("opacity", 0)
 					.attr("pointer-events", "none");
@@ -740,7 +827,7 @@
 					.attr("pointer-events", "all");
 
 				const showNamesGroupLegend = buttonsPanel.main.append("g")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + "," +
+					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + "," +
 						(buttonsPanel.height * 0.6) + ")")
 					.style("opacity", 0)
 					.attr("pointer-events", "none");
@@ -750,7 +837,7 @@
 					.text("Show or hide the name of each node. Hiding the name is useful in the map view")
 					.attr("x", 0)
 					.attr("y", 0)
-					.call(wrapText, 150);
+					.call(wrapText, 140);
 
 				const showNamesGroupLegendLine = showNamesGroupLegend.append("polyline")
 					.attr("points", "76,30 0,30 0,40")
@@ -778,26 +865,6 @@
 					.attr("class", "pbifdcShowMapTextControl")
 					.attr("x", 8)
 					.text("Show Names");
-
-				const downloadGroup = buttonsPanel.main.append("g")
-					.attr("class", "pbifdcDownloadGroup")
-					.attr("transform", "translate(" + (buttonsPanel.width - buttonsPanel.padding[1] - excelIconSize - 6) + ",0)");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbifdcDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", buttonsPanel.height * 0.6);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", (buttonsPanel.height - excelIconSize) / 2);
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
@@ -847,49 +914,14 @@
 						})
 				});
 
-				downloadGroup.on("click", function() {
-
-					const csv = createCsv(rawData[0]);
-
-					const fileName = "contributions" + chartState.selectedYear + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
-
 				showMapGroup.on("mouseover", function() {
 					showMapGroupLegend.transition()
 						.duration(duration)
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + ",-36)")
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + ",-36)")
 						.style("opacity", 1);
 				}).on("mouseout", function() {
 					showMapGroupLegend.interrupt()
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + "," +
 							(buttonsPanel.height * 0.6) + ")")
 						.style("opacity", 0);
 				}).on("click", function() {
@@ -914,11 +946,11 @@
 				showNamesGroup.on("mouseover", function() {
 					showNamesGroupLegend.transition()
 						.duration(duration)
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + ",-36)")
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + ",-36)")
 						.style("opacity", 1);
 				}).on("mouseout", function() {
 					showNamesGroupLegend.interrupt()
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + "," +
+						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + "," +
 							(buttonsPanel.height * 0.6) + ")")
 						.style("opacity", 0);
 				}).on("click", function() {
@@ -1335,14 +1367,25 @@
 						};
 					});
 
-				nodeCircle.on("mouseover", nodeMouseOver)
-					.on("mouseout", nodeLinkMouseOut);
+				nodeCircle.on("mouseover", null)
+					.on("mouseout", null);
 
-				nodesLabelGroup.on("mouseover", nodeMouseOver)
-					.on("mouseout", nodeLinkMouseOut);
+				nodesLabelGroup.on("mouseover", null)
+					.on("mouseout", null);
 
-				links.on("mouseover", linksMouseOver)
-					.on("mouseout", nodeLinkMouseOut);
+				links.on("mouseover", null)
+					.on("mouseout", null);
+
+				d3.timeout(function() {
+					nodeCircle.on("mouseover", nodeMouseOver)
+						.on("mouseout", nodeLinkMouseOut);
+
+					nodesLabelGroup.on("mouseover", nodeMouseOver)
+						.on("mouseout", nodeLinkMouseOut);
+
+					links.on("mouseover", linksMouseOver)
+						.on("mouseout", nodeLinkMouseOut);
+				}, duration * 1.1);
 
 				function callZoom() {
 
@@ -1733,7 +1776,7 @@
 					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 162)
-					.text("The size of each node represents the total amount received (CBPF) or donated (donor). The larger the node the bigger the amount.")
+					.text("The size of each node represents the total amount received (CBPF) or donated (donor).")
 					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
 
 				const sizeRectangle = legendGroup.append("rect")
@@ -1853,7 +1896,7 @@
 					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 340 + (thisNodeScale.range()[1] * 2))
-					.text("The width of each link represents the amount donated from a donor to a CBPF. The wider the link the bigger the amount donated/received.")
+					.text("The width of each link represents the amount donated from a donor to a CBPF.")
 					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
 
 				const linkRectangle = legendGroup.append("rect")
@@ -2165,44 +2208,27 @@
 					.attr("x", xScaleLegend(0))
 					.attr("y", -(stickHeight / 2 - (stickHeight / 4)))
 					.attr("height", stickHeight)
-					.attr("width", 0)
+					.attr("width", function(d) {
+						return xScaleLegend(d.total) - xScaleLegend(0);
+					})
 					.classed(lollipopClass, true);
 
 				const lollipop = lollipopGroups.append("circle")
-					.attr("cx", xScaleLegend(0))
+					.attr("cx", function(d) {
+						return xScaleLegend(d.total);
+					})
 					.attr("cy", (stickHeight / 4))
 					.attr("r", lollipopRadius)
 					.classed(lollipopClass, true);
 
 				const legendLabel = lollipopGroups.append("text")
-					.attr("class", "pbiclcLegendLabel")
-					.attr("x", xScaleLegend(0) + legendLabelPadding)
+					.attr("class", "pbifdcLegendLabel")
 					.attr("y", verticalLabelPadding)
-					.text(formatNumberSI(0));
-
-				lollipopStick.transition()
-					.duration(duration)
-					.attr("width", function(d) {
-						return xScaleLegend(d.total) - xScaleLegend(0);
-					});
-
-				lollipop.transition()
-					.duration(duration)
-					.attr("cx", function(d) {
-						return xScaleLegend(d.total);
-					});
-
-				legendLabel.transition()
-					.duration(duration)
 					.attr("x", function(d) {
 						return xScaleLegend(d.total) + legendLabelPadding;
 					})
-					.tween("text", function(d) {
-						const node = this;
-						const i = d3.interpolate(0, d.total);
-						return function(t) {
-							d3.select(node).text(formatNumberSI(i(t)));
-						};
+					.text(function(d) {
+						return formatNumberSI(d.total);
 					});
 
 				//end of drawLegendNode
@@ -2517,6 +2543,10 @@
 
 			function mouseOverTopPanel() {
 
+				const thisOffset = (topPanelRectBoundingRect = this.getBoundingClientRect()).top - (containerDivBoundingRect = containerDiv.node().getBoundingClientRect()).top;
+
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				tooltip.style("display", "block")
@@ -2530,31 +2560,27 @@
 
 				localVariable.set(this, tooltipSize);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffset + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
 			function mouseMoveTopPanel() {
 
+				const thisOffset = topPanelRectBoundingRect.top - containerDivBoundingRect.top;
+
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouse = d3.mouse(this);
 
 				const tooltipSize = localVariable.get(this);
 
-				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
-						d3.event.pageY - mouse[1] + "px" :
-						mouse[1] > topPanel.height - tooltipSize.height / 2 ?
-						d3.event.pageY - (mouse[1] - (topPanel.height - tooltipSize.height)) + "px" :
-						d3.event.pageY - (tooltipSize.height / 2) + "px")
+				tooltip.style("top", thisOffset + "px")
 					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						d3.event.pageX + 14 + "px" :
-						d3.event.pageX - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 
 			};
 
@@ -2633,13 +2659,22 @@
 					foundDonor.total += (+d.PaidAmt) + (+d.PledgeAmt);
 					foundDonor.paid += +d.PaidAmt;
 					foundDonor.pledge += +d.PledgeAmt;
-					foundDonor.connections.push({
-						uniqueId: "cbpf" + d.PooledFundISO2Code,
-						name: d.PooledFundName,
-						total: (+d.PaidAmt) + (+d.PledgeAmt),
-						paid: +d.PaidAmt,
-						pledge: +d.PledgeAmt,
+					const foundDonorConnection = foundDonor.connections.find(function(e) {
+						return e.uniqueId === "cbpf" + d.PooledFundISO2Code;
 					});
+					if (foundDonorConnection) {
+						foundDonorConnection.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundDonorConnection.paid += +d.PaidAmt;
+						foundDonorConnection.pledge += +d.PledgeAmt;
+					} else {
+						foundDonor.connections.push({
+							uniqueId: "cbpf" + d.PooledFundISO2Code,
+							name: d.PooledFundName,
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							paid: +d.PaidAmt,
+							pledge: +d.PledgeAmt,
+						});
+					};
 				};
 				if (!foundCBPF) {
 					data.nodes.push({
@@ -2663,21 +2698,39 @@
 					foundCBPF.total += (+d.PaidAmt) + (+d.PledgeAmt);
 					foundCBPF.paid += +d.PaidAmt;
 					foundCBPF.pledge += +d.PledgeAmt;
-					foundCBPF.connections.push({
-						uniqueId: "donor" + d.GMSDonorISO2Code,
-						name: d.GMSDonorName,
+					const foundCBPFConnections = foundCBPF.connections.find(function(e) {
+						return e.uniqueId === "donor" + d.GMSDonorISO2Code;
+					});
+					if (foundCBPFConnections) {
+						foundCBPFConnections.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundCBPFConnections.paid += +d.PaidAmt;
+						foundCBPFConnections.pledge += +d.PledgeAmt;
+					} else {
+						foundCBPF.connections.push({
+							uniqueId: "donor" + d.GMSDonorISO2Code,
+							name: d.GMSDonorName,
+							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							paid: +d.PaidAmt,
+							pledge: +d.PledgeAmt,
+						});
+					};
+				};
+				const foundLink = data.links.find(function(e) {
+					return e.source === "donor" + d.GMSDonorISO2Code && e.target === "cbpf" + d.PooledFundISO2Code;
+				});
+				if (foundLink) {
+					foundLink.total += (+d.PaidAmt) + (+d.PledgeAmt);
+					foundLink.paid += +d.PaidAmt;
+					foundLink.pledge += +d.PledgeAmt;
+				} else {
+					data.links.push({
+						source: "donor" + d.GMSDonorISO2Code,
+						target: "cbpf" + d.PooledFundISO2Code,
 						total: (+d.PaidAmt) + (+d.PledgeAmt),
 						paid: +d.PaidAmt,
-						pledge: +d.PledgeAmt,
+						pledge: +d.PledgeAmt
 					});
 				};
-				data.links.push({
-					source: "donor" + d.GMSDonorISO2Code,
-					target: "cbpf" + d.PooledFundISO2Code,
-					total: (+d.PaidAmt) + (+d.PledgeAmt),
-					paid: +d.PaidAmt,
-					pledge: +d.PledgeAmt
-				});
 			});
 
 			return data;
@@ -2768,6 +2821,182 @@
 			};
 
 			//end of saveFlags
+		};
+
+		function createFooterDiv() {
+
+			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+
+			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText + footerLink + ".");
+
+			//end of createFooterDiv
+		};
+
+		function createAnnotationsDiv() {
+
+			const padding = 6;
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", "pbifdcOverDivHelp");
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + width + " " + height);
+
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbifdcArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
+
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const yearsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 290 - padding)
+				.attr("y", 60 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const yearsAnnotation = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationText")
+				.attr("x", 290)
+				.attr("y", 60)
+				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
+				.call(wrapText, 200);
+
+			const yearsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbifdcArrowMarker)")
+				.attr("d", "M480,70 Q510,70 510,95");
+
+			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
+
+			const mapAnnotationRect = helpSVG.append("rect")
+				.attr("x", 400 - padding)
+				.attr("y", 170 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const mapAnnotation = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationText")
+				.attr("x", 400)
+				.attr("y", 170)
+				.text("This checkbox repositions the nodes according to their geographic positions.")
+				.call(wrapText, 220);
+
+			const mapPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbifdcArrowMarker)")
+				.attr("d", "M600,180 Q680,180 680,150");
+
+			mapAnnotationRect.attr("width", mapAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", mapAnnotation.node().getBBox().height + padding * 2);
+
+			const namesAnnotationRect = helpSVG.append("rect")
+				.attr("x", 550 - padding)
+				.attr("y", 60 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const namesAnnotation = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationText")
+				.attr("x", 550)
+				.attr("y", 60)
+				.text("This checkbox shows/hides the nodes labels.")
+				.call(wrapText, 190);
+
+			const namesPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbifdcArrowMarker)")
+				.attr("d", "M740,60 Q760,60 760,100");
+
+			namesAnnotationRect.attr("width", namesAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", namesAnnotation.node().getBBox().height + padding * 2);
+
+			const forceAnnotationRect = helpSVG.append("rect")
+				.attr("x", 310 - padding)
+				.attr("y", 390 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const forceAnnotation = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationText")
+				.attr("x", 310)
+				.attr("y", 390)
+				.text("Hover over the nodes (the countries) and the links (the donations) present in this area to show additional information about the donor, the CBPF or the donation in the Legend area at the right hand side.")
+				.call(wrapText, 350);
+
+			const forcePath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbifdcArrowMarker)")
+				.attr("d", "M300,420 Q290,420 270,440");
+
+			forceAnnotationRect.attr("width", forceAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", forceAnnotation.node().getBBox().height + padding * 2);
+
+			const legendAnnotationRect = helpSVG.append("rect")
+				.attr("x", 280 - padding)
+				.attr("y", 520 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const legendAnnotation = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationText")
+				.attr("x", 280)
+				.attr("y", 520)
+				.text("The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element.")
+				.call(wrapText, 340);
+
+			const legendPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbifdcArrowMarker)")
+				.attr("d", "M620,550 Q640,550 660,530");
+
+			legendAnnotationRect.attr("width", legendAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", legendAnnotation.node().getBBox().height + padding * 2);
+
+			helpSVG.on("click", function() {
+				overDiv.remove();
+			});
+
+			//end of createAnnotationsDiv
 		};
 
 		function validateYear(yearString) {
