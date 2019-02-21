@@ -1,5 +1,5 @@
 
-# GMS BI: Contributions flow, force-directed graph
+# GMS BI: Contributions Flow, force-directed graph
 
 Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
 
@@ -22,7 +22,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbifdc" data-title="Contributions Flow Chart" data-showhelp="true" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
+```<div id="d3chartcontainerpbifdc" data-title="Contributions Flow" data-showhelp="true" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -34,7 +34,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 There are eight parameters:
 
-**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Contributions Flow Chart*.
+**`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Contributions Flow*.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
