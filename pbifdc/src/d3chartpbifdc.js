@@ -91,7 +91,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
-			chartTitleDefault = "Contributions Flow Chart",
+			chartTitleDefault = "Contributions Flow",
 			currentYear = new Date().getFullYear(),
 			flagPadding = 22,
 			maxNodeSize = 35,
