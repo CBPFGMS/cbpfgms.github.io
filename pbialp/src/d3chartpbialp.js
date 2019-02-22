@@ -1363,6 +1363,39 @@
 					.attr("cy", yScaleParallel(0))
 					.style("fill", "#6d8383");
 
+				const percentagesCirclesAverage = cbpfParallelGroupAverageEnter.selectAll(null)
+					.data(function(d) {
+						return d;
+					}, function(d) {
+						return d.partner;
+					})
+					.enter()
+					.append("circle")
+					.attr("class", "pbialpPercentagesCircleAverage pbialpPercentagesAverage")
+					.attr("cx", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("cy", yScaleParallel(0))
+					.style("fill", "white");
+
+				const percentagesTextAverage = cbpfParallelGroupAverageEnter.selectAll(null)
+					.data(function(d) {
+						return d;
+					}, function(d) {
+						return d.partner;
+					})
+					.enter()
+					.append("text")
+					.attr("class", "pbialpPercentagesText pbialpPercentagesAverage")
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("y", yScaleParallel(0))
+					.attr("text-anchor", "middle")
+					.text(function(d) {
+						return formatPercent(d.percentage);
+					});
+
 				cbpfParallelGroupAverage = cbpfParallelGroupAverageEnter.merge(cbpfParallelGroupAverage);
 
 				cbpfParallelGroupAverage.raise();
@@ -1377,7 +1410,7 @@
 						return lineGenerator(d)
 					});
 
-				cbpfParallelGroupAverage.selectAll("circle")
+				cbpfParallelGroupAverage.selectAll(".pbialpParallelCircleAverage")
 					.data(function(d) {
 						return d;
 					}, function(d) {
@@ -1391,6 +1424,43 @@
 					.attr("cy", function(d) {
 						return yScaleParallel(d.percentage);
 					});
+
+				cbpfParallelGroupAverage.selectAll("text")
+					.data(function(d) {
+						return d;
+					}, function(d) {
+						return d.partner;
+					})
+					.text(function(d) {
+						return formatPercent(d.percentage);
+					})
+					.transition()
+					.duration(duration)
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("y", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding;
+					});
+
+				cbpfParallelGroupAverage.selectAll(".pbialpPercentagesCircleAverage")
+					.data(function(d) {
+						return d;
+					}, function(d) {
+						return d.partner;
+					})
+					.transition()
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("cy", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding - 4;
+					})
+					.attr("r", function(_, i) {
+						return Math.min(this.parentNode.childNodes[(9 + i)].getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
+					});
+
 
 				groupXAxisParallel.call(xAxisParallel)
 					.selectAll(".tick text")
@@ -1584,7 +1654,20 @@
 
 			function highlightParallel(data, thisCbpf) {
 
-				const percentagesData = thisCbpf ? thisCbpf.parallelData : [];
+				parallelPanel.main.selectAll(".pbialpPercentagesAverage")
+					.style("opacity", chartState.selectedCbpfs.length === 0 && thisCbpf === undefined ? 1 : 0);
+
+				const lastCbpf = data.find(function(d) {
+					return d.cbpf === chartState.selectedCbpfs[chartState.selectedCbpfs.length - 1]
+				});
+
+				const percentagesData = lastCbpf ? lastCbpf.parallelData : [];
+
+				if (percentagesData.length > 0) {
+					percentagesData.forEach(function(d) {
+						d.uniqueKey = d.partner + (lastCbpf ? lastCbpf.cbpf : "");
+					});
+				};
 
 				const selectedData = data.filter(function(d) {
 					return chartState.selectedCbpfs.indexOf(d.cbpf) > -1
@@ -1662,7 +1745,7 @@
 
 				let percentagesGroup = parallelPanel.main.selectAll(".pbialpPercentagesGroup")
 					.data(percentagesData, function(d) {
-						return d.partner;
+						return d.uniqueKey;
 					});
 
 				const percentagesGroupExit = percentagesGroup.exit().remove();
@@ -1696,6 +1779,30 @@
 				percentagesCircles.attr("r", function() {
 					return Math.min(this.nextSibling.getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
 				});
+
+				percentagesGroup = percentagesGroupEnter.merge(percentagesGroup);
+
+				percentagesGroup.select("text")
+					.transition()
+					.duration(duration)
+					.attr("y", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding;
+					})
+					.text(function(d) {
+						return formatPercent(d.percentage);
+					});
+
+				percentagesGroup.select("circle")
+					.transition()
+					.duration(duration)
+					.attr("cy", function(d) {
+						return yScaleParallel(d.percentage) - percentagePadding - 4;
+					})
+					.attr("r", function() {
+						return Math.min(this.nextSibling.getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
+					});
+
+				percentagesGroup.raise();
 
 				//end of highlightParallel
 			};
