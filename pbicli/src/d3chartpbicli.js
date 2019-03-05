@@ -2648,12 +2648,10 @@
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbicliOverDivHelp");
 
-			const totalWidth = overDiv.node().clientWidth;
-
 			const totalHeight = overDiv.node().clientHeight;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + totalWidth + " " + totalHeight);
+				.attr("viewBox", "0 0 " + width + " " + totalHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
@@ -2671,7 +2669,7 @@
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", totalWidth / 2)
+				.attr("x", width / 2)
 				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
 
@@ -2801,8 +2799,6 @@
 			const filteredData = rawData.filter(function(row) {
 				return selectedDonorsList.indexOf(row.GMSDonorISO2Code.toLowerCase()) > -1 && selectedCbpfsList.indexOf(row.PooledFundISO2Code.toLowerCase()) > -1;
 			});
-
-			console.log(filteredData);
 
 			filteredData.forEach(function(d) {
 				d["Fiscal year"] = +d.FiscalYear;
