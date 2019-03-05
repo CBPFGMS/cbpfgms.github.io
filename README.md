@@ -105,3 +105,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |GMS BI: CBPF Contributions, force-directed graph|`pbifdc`|
 |GMS BI: CBPF Overview, beneficiaries bar and pictogram chart|`pbiobe`|
 |GMS BI: CBPF Overview, lollipop chart|`pbiolc`|
+|GMS BI: Allocations map|`pbimap`|
