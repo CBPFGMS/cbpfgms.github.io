@@ -105,8 +105,8 @@
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
 			csvFormatParameter = "&$format=csv",
-			yearParameter = "&AllocationYear=",
-			initialYear = 2016,
+			yearParameter = "AllocationYear=",
+			initialYear = 2015,
 			yearsArrayString = d3.range(initialYear, currentYear + 1, 1).map(function(d) {
 				return d.toString();
 			}),
@@ -139,8 +139,8 @@
 			tooltipThumbnailPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/pbimaptooltip.png",
 			tooltipThumbnailPathCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/pbimaptooltip.png",
 			partnersProjectSize = 50,
-			apiFiles = ["https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?ShowAllPooledFunds=1",
-				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?ShowAllPooledFunds=1"
+			apiFiles = ["https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?",
+				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?"
 			],
 			cbpfListFile = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			clustersListFile = "https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
