@@ -168,13 +168,17 @@
 			partnersList = {},
 			modalitiesList = {},
 			allocationsTypeList = [],
-			cbpfsInCompleteData = [],
+			cbpfsInCompleteData = {},
 			lowercaseAllocationsTypeList = [],
 			countriesCoordinates = {},
 			completeData = [];
 
 		let initialChartState,
 			timer;
+
+		yearsArrayString.forEach(function(d) {
+			cbpfsInCompleteData[d] = [];
+		});
 
 		const containerDiv = d3.select("#d3chartcontainerpbimap");
 
@@ -660,6 +664,8 @@
 				return a.toLowerCase().localeCompare(b.toLowerCase());
 			})), chartState.selectedCBPF);
 
+			filterCbpfsDropdown();
+
 			const partnersDropdown = dropdownContainer.filter(function(d) {
 				return d === "Partner Type";
 			});
@@ -732,6 +738,8 @@
 							createBreadcrumbDiv();
 						});
 
+					filterCbpfsDropdown();
+
 				});
 
 			cbpfsDropdown.selectAll("li")
@@ -739,6 +747,7 @@
 					if (chartState.selectedCBPF.indexOf(d.toLowerCase()) > -1 && chartState.selectedCBPF.length === 1) return;
 					changeSelected(d, chartState.selectedCBPF);
 					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort()), chartState.selectedCBPF);
+					filterCbpfsDropdown();
 				});
 
 			partnersDropdown.selectAll("li")
@@ -832,6 +841,7 @@
 					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort(function(a, b) {
 						return a.toLowerCase().localeCompare(b.toLowerCase());
 					})), chartState.selectedCBPF);
+					filterCbpfsDropdown();
 					partnersDropdown.call(populateDropdown, ["All"].concat(d3.values(partnersList).sort()), chartState.selectedPartner);
 					clustersDropdown.call(populateDropdown, ["All"].concat(d3.values(clustersList).sort()), chartState.selectedCluster);
 					adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
@@ -862,6 +872,28 @@
 					listDiv.html("");
 				});
 
+			function filterCbpfsDropdown() {
+
+				const allcbpfsWithData = [];
+				chartState.selectedYear.forEach(function(year) {
+					allcbpfsWithData.push.apply(allcbpfsWithData, cbpfsInCompleteData[year + ""]);
+				});
+
+				const cbpfsWithData = allcbpfsWithData.filter(function(value, index, self) {
+					return self.indexOf(value) === index;
+				})
+
+				cbpfsDropdown.selectAll("li")
+					.filter(function(d) {
+						return d !== "All"
+					})
+					.each(function(d) {
+						d3.select(this).style("display", function() {
+							return cbpfsWithData.indexOf(d) === -1 ? "none" : null
+						});
+					});
+			};
+
 			//end of createFilterDivs
 		};
 
@@ -877,19 +909,6 @@
 					d3.select(this).style("opacity", loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu)
 						.style("pointer-events", loadedYears.indexOf(+d) > -1 ? "all" : "none");
 					d3.select(this).select("span:nth-child(2)").html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
-				});
-
-			const cbpfsDropdown = filtersDiv.selectAll(".pbimapDropdownUl")
-				.filter(function(d) {
-					return d === "CBPF";
-				});
-
-			cbpfsDropdown.selectAll("li")
-				.filter(function(d) {
-					return d !== "All"
-				})
-				.each(function(d) {
-					d3.select(this).style("display", cbpfsInCompleteData.indexOf(d) === -1 ? "none" : null);
 				});
 
 			//end of repopulateYearFilter
@@ -1742,8 +1761,8 @@
 					allocationsTypeList.push(thisRow.AllNm);
 				};
 
-				if (cbpfsInCompleteData.indexOf(cbpfsList[thisRow.PFId]) === -1) {
-					cbpfsInCompleteData.push(cbpfsList[thisRow.PFId]);
+				if (cbpfsInCompleteData[thisRow.AYr].indexOf(cbpfsList[thisRow.PFId]) === -1) {
+					cbpfsInCompleteData[thisRow.AYr].push(cbpfsList[thisRow.PFId]);
 				};
 
 				populateColumns(thisRow);
