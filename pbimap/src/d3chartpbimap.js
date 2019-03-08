@@ -86,7 +86,6 @@
 			topSvgPadding = [0, 10, 0, 10],
 			topSvgHorizontalPositions = [0.05, 0.29, 0.54, 0.75],
 			heightTopSvgVerticalPositions = [0.55, 0.85, 0.65],
-			heightBottomSvg = 350,
 			legendSvgWidth = 110,
 			legendSvgHeight = 120,
 			legendSvgPadding = [4, 4, 4, 12],
@@ -98,7 +97,7 @@
 			duration = 1000,
 			tooltipDuration = 250,
 			tooltipMargin = 8,
-			heightProgressSVG = heightLeafletMap + heightTopSvg + heightBottomSvg, //CHANGE THIS
+			heightProgressSVG = heightLeafletMap + heightTopSvg,
 			windowHeight = window.innerHeight,
 			brighterFactor = 0.3,
 			currentYear = new Date().getFullYear(),
@@ -134,6 +133,7 @@
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
+			fadeOpacityMenu = 0.5,
 			partnersLogoPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/projectslogo.png",
 			tooltipThumbnailPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/pbimaptooltip.png",
@@ -302,15 +302,9 @@
 
 		saveImage(tooltipThumbnailPathCors, "tooltipThumbnail");
 
-		//RESTORE THIS!!!!!!!!!!!!
-		// apiFiles.forEach(function(file) {
-		// 	promises.push(d3.csv(file + yearParameter + chartState.selectedYear[0] + csvFormatParameter))
-		// });
-
-		//DELETE THIS!!!!!!!!!!!
-		promises.push(d3.csv("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/ProjectSummary.csv"));
-		promises.push(d3.csv("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/locations.csv"));
-
+		apiFiles.forEach(function(file) {
+			promises.push(d3.csv(file + yearParameter + chartState.selectedYear[0] + csvFormatParameter))
+		});
 
 		promises.push(d3.csv(cbpfListFile));
 		promises.push(d3.csv(clustersListFile));
@@ -335,7 +329,7 @@
 
 			processData(rawData[0], rawData[1]);
 
-			loadedYears.push(chartState.selectedYear);
+			loadedYears.push.apply(loadedYears, chartState.selectedYear);
 
 			getDataAttributes();
 
@@ -354,21 +348,21 @@
 				};
 			};
 
-			//RESTORE THIS!!!!!!!!!!!!!!!!
-			// const remainingYears = yearsArrayString.filter(function(d) {
-			// 	return +d !== chartState.selectedYear;
-			// });
+			const remainingYears = yearsArrayString.filter(function(d) {
+				return chartState.selectedYear.indexOf(+d) === -1;
+			});
 
-			// for (let i = remainingYears.length; i--;) {
-			// 	let remainingPromises = [];
-			// 	apiFiles.forEach(function(file) {
-			// 		remainingPromises.push(d3.csv(file + yearParameter + remainingYears[i] + csvFormatParameter))
-			// 	});
-			// 	Promise.all(remainingPromises).then(function(rawData) {
-			// 		processData(rawData[0], rawData[1]);
-			//		loadedYears.push(+remainingYears[i]);
-			// 	});
-			// };
+			for (let i = remainingYears.length; i--;) {
+				let remainingPromises = [];
+				apiFiles.forEach(function(file) {
+					remainingPromises.push(d3.csv(file + yearParameter + remainingYears[i] + csvFormatParameter))
+				});
+				Promise.all(remainingPromises).then(function(rawData) {
+					processData(rawData[0], rawData[1]);
+					loadedYears.push(+remainingYears[i]);
+					repopulateYearFilter();
+				});
+			};
 
 			//end of Promise.all
 		});
@@ -380,6 +374,8 @@
 			createTitle();
 
 			createFilterDivs(data.map);
+
+			repopulateYearFilter();
 
 			createFooterDiv();
 
@@ -660,7 +656,7 @@
 				return d === "CBPF";
 			});
 
-			cbpfsDropdown.call(populateDropdown, ["All"].concat(cbpfsInCompleteData.sort(function(a, b) {
+			cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort(function(a, b) {
 				return a.toLowerCase().localeCompare(b.toLowerCase());
 			})), chartState.selectedCBPF);
 
@@ -708,17 +704,41 @@
 						return +d
 					}), chartState.selectedYear);
 					const data = filterData();
+					modalitiesDropdown.call(populateDropdown, ["All"].concat(data.allocationsTypeList.sort()), chartState.selectedModality);
+					modalitiesDropdown.selectAll("li")
+						.on("click", function(d) {
+							if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
+							changeSelected(d, chartState.selectedModality);
+						});
+
 					createTopSvg(data.topSvgObject);
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
+
+					const newMaxCombinedLevel = d3.max(data.map, function(d) {
+						return d.maxLevel;
+					}) || 0;
+					chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
+					adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
+					adminLevelDropdown.selectAll("li")
+						.on("click", function(d) {
+							chartState.selectedAdminLevel = d;
+							adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
+							const data = filterData();
+							createTopSvg(data.topSvgObject);
+							createMap(data.map);
+							createLegendSvg(data.map);
+							createBreadcrumbDiv();
+						});
+
 				});
 
 			cbpfsDropdown.selectAll("li")
 				.on("click", function(d) {
 					if (chartState.selectedCBPF.indexOf(d.toLowerCase()) > -1 && chartState.selectedCBPF.length === 1) return;
 					changeSelected(d, chartState.selectedCBPF);
-					cbpfsDropdown.call(populateDropdown, ["All"].concat(cbpfsInCompleteData.sort()), chartState.selectedCBPF);
+					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort()), chartState.selectedCBPF);
 				});
 
 			partnersDropdown.selectAll("li")
@@ -767,6 +787,7 @@
 						thisChartState.splice(index, 1);
 					};
 				};
+
 				const data = filterData();
 				modalitiesDropdown.call(populateDropdown, ["All"].concat(data.allocationsTypeList.sort()), chartState.selectedModality);
 				modalitiesDropdown.selectAll("li")
@@ -781,7 +802,7 @@
 
 				const newMaxCombinedLevel = d3.max(data.map, function(d) {
 					return d.maxLevel;
-				});
+				}) || 0;
 				chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
 				adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 				adminLevelDropdown.selectAll("li")
@@ -808,12 +829,11 @@
 					};
 
 					yearsDropdown.call(populateDropdown, yearsArrayString, chartState.selectedYear);
-					cbpfsDropdown.call(populateDropdown, ["All"].concat(cbpfsInCompleteData.sort(function(a, b) {
+					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort(function(a, b) {
 						return a.toLowerCase().localeCompare(b.toLowerCase());
 					})), chartState.selectedCBPF);
 					partnersDropdown.call(populateDropdown, ["All"].concat(d3.values(partnersList).sort()), chartState.selectedPartner);
 					clustersDropdown.call(populateDropdown, ["All"].concat(d3.values(clustersList).sort()), chartState.selectedCluster);
-					modalitiesDropdown.call(populateDropdown, ["All"].concat(allocationsTypeList.sort()), chartState.selectedModality);
 					adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 
 					modalitiesDropdown.selectAll("li")
@@ -834,6 +854,7 @@
 						});
 
 					const data = filterData();
+					modalitiesDropdown.call(populateDropdown, ["All"].concat(data.allocationsTypeList.sort()), chartState.selectedModality);
 					createTopSvg(data.topSvgObject);
 					createMap(data.map);
 					createLegendSvg(data.map);
@@ -842,6 +863,36 @@
 				});
 
 			//end of createFilterDivs
+		};
+
+		function repopulateYearFilter() {
+
+			const yearsDropdown = filtersDiv.selectAll(".pbimapDropdownUl")
+				.filter(function(d) {
+					return d === "Year";
+				});
+
+			yearsDropdown.selectAll("li")
+				.each(function(d) {
+					d3.select(this).style("opacity", loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu)
+						.style("pointer-events", loadedYears.indexOf(+d) > -1 ? "all" : "none");
+					d3.select(this).select("span:nth-child(2)").html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
+				});
+
+			const cbpfsDropdown = filtersDiv.selectAll(".pbimapDropdownUl")
+				.filter(function(d) {
+					return d === "CBPF";
+				});
+
+			cbpfsDropdown.selectAll("li")
+				.filter(function(d) {
+					return d !== "All"
+				})
+				.each(function(d) {
+					d3.select(this).style("display", cbpfsInCompleteData.indexOf(d) === -1 ? "none" : null);
+				});
+
+			//end of repopulateYearFilter
 		};
 
 		function createMap(data, fromLegend) {
@@ -2465,11 +2516,11 @@
 			},
 			"South Sudan": {
 				sw: {
-					lat: 8.685278,
+					lat: 3.285278,
 					lng: 21.8145046
 				},
 				ne: {
-					lat: 22.224918,
+					lat: 12.224918,
 					lng: 39.0576252
 				}
 			},
