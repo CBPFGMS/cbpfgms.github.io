@@ -5,7 +5,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 - A top banner showing the total allocated, the number of beneficiaries, the number of partners and the number of projects for the selected filters;
 - Two buttons at the top right corner, allowing the user to download the data for the selected filters as CSV and for displaying a description of the chart and its controls;
-- A series of menus allowing the user to select (one or more) the year, CBPF, Partner type, Cluster, Allocation Type and Location Level. A “Reset” button resets all the menus and the map to the initial state;
+- A series of menus allowing the user to select the values (one or more) for the year, CBPF, Partner type, Cluster, Allocation Type and Location Level. A “Reset” button resets all the menus and the map to the initial state;
 - A map with markers depicting allocation values. The markers can be hovered for showing a tooltip with additional information. At the bottom left corner two buttons allow selecting how the markers encode allocations, by size or by color;
 - A breadcrumb below the map helps to visually track the current selection;
 - If selected in the tooltips, a list of the projects will show up below the map area.
