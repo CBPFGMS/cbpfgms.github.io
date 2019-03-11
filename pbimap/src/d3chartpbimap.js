@@ -2163,16 +2163,16 @@
 
 			const yearsAnnotationRect = helpSVG.append("rect")
 				.attr("x", 12 - padding)
-				.attr("y", 30 - padding - 14)
+				.attr("y", 45 - padding - 10)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 12)
-				.attr("y", 30)
-				.text("Use this menu to select one or more years. A greyed-out year means that its data was not downloaded yet (please wait some minutes).")
-				.call(wrapText2, 230);
+				.attr("y", 45)
+				.text("Use this menu to select one or more years. Greyed-out years were not downloaded yet (please wait some time).")
+				.call(wrapText2, 260);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")
@@ -2208,14 +2208,14 @@
 
 			const resetAnnotationRect = helpSVG.append("rect")
 				.attr("x", 750 - padding)
-				.attr("y", 30 - padding - 14)
+				.attr("y", 45 - padding - 10)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const resetAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 750)
-				.attr("y", 30)
+				.attr("y", 45)
 				.text("This button resets all menus (and the map) to the initial values.")
 				.call(wrapText2, 140);
 
@@ -2224,7 +2224,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M858,68 L858,100");
+				.attr("d", "M858,80 L858,100");
 
 			resetAnnotationRect.attr("width", resetAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", resetAnnotation.node().getBBox().height + padding * 2);
