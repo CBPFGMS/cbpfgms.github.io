@@ -110,6 +110,7 @@
 			yearsArrayString = d3.range(initialYear, currentYear + 1, 1).map(function(d) {
 				return d.toString();
 			}),
+			chartTitleDefault = "Allocations map",
 			formatMoney0Decimals = d3.format(",.0f"),
 			zoomSnap = 0.25,
 			zoomDelta = 0.5,
@@ -186,7 +187,7 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const chartTitle = containerDiv.node().getAttribute("data-title");
+		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
