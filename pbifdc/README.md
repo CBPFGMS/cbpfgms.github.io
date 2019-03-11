@@ -39,7 +39,7 @@ There are eight parameters:
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
 - `"true"`: annotations shown when the page loads.
-- `"false"`: annotations no shown. The user can easily show the annotations by clicking the "help" button.
+- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
