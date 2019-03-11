@@ -86,6 +86,14 @@ Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelli
 
 This charts shows allocations and beneficiaries by cluster, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc) for more information.
 
+- **GMS BI: Allocations map**
+
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA GMS.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbimap.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbimap)
+
+This chart shows the geographic location of allocations. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbimap) for more information.
+
 ## Chart codes
 
 Each chart and data visualisation is identified by a unique six-letter code. 
