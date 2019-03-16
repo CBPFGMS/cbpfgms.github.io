@@ -1056,12 +1056,13 @@
 					.attr("class", "pbimapColorMarkers")
 					.attr("d", markerAttribute)
 					.style("pointer-events", "all")
-					.style("fill", function(d) {
-						return colorScale(d.totalAllocation);
-					})
 					.style("stroke", markerStroke);
 
 				colorMarkers = colorMarkersEnter.merge(colorMarkers);
+
+				colorMarkers.style("fill", function(d) {
+					return colorScale(d.totalAllocation);
+				});
 
 				colorMarkers.on("mouseover", function(d) {
 						const self = this;
