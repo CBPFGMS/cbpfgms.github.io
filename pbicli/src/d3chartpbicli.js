@@ -1,6 +1,6 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
@@ -92,7 +92,9 @@
 			labelDistance = 2,
 			labelGroupHeight = 14,
 			fadeOpacity = 0.1,
+			checkboxOpacity = 0.5,
 			defaultYMaxValue = 100000000,
+			chartTitleDefault = "Contribution Trends",
 			currencyLabelPadding = 8,
 			futureTextPadding = 8,
 			duration = 1000,
@@ -105,7 +107,8 @@
 				selectedCbpfs: [],
 				controlledBy: null,
 				showLocal: false,
-				selectedLocalCurrency: null
+				selectedLocalCurrency: null,
+				showTrend: false
 			},
 			currencySymbols = {
 				GBP: "\u00A3",
@@ -122,7 +125,7 @@
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
-		const chartTitle = containerDiv.node().getAttribute("data-title");
+		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
@@ -209,38 +212,6 @@
 			height: height - padding[0] - padding[2],
 			padding: [16, 40, 16, 32]
 		};
-
-		const donorsPanelDefs = donorsLinesPanel.main.append("defs");
-
-		const donorsPanelClipPaths = donorsPanelDefs.append("clipPath")
-			.attr("id", "pbicliDonorsPanelClipPaths")
-			.append("rect")
-			.attr("x", donorsLinesPanel.padding[3])
-			.attr("y", donorsLinesPanel.padding[0])
-			.attr("height", donorsLinesPanel.height - donorsLinesPanel.padding[2] - donorsLinesPanel.padding[0]);
-
-		const donorsPanelClipCircles = donorsPanelDefs.append("clipPath")
-			.attr("id", "pbicliDonorsPanelClipCircles")
-			.append("rect")
-			.attr("x", donorsLinesPanel.padding[3])
-			.attr("y", donorsLinesPanel.padding[0])
-			.attr("height", donorsLinesPanel.height - donorsLinesPanel.padding[2] - donorsLinesPanel.padding[0]);
-
-		const cbpfsPanelDefs = cbpfsLinesPanel.main.append("defs");
-
-		const cbpfsPanelClipPaths = cbpfsPanelDefs.append("clipPath")
-			.attr("id", "pbicliCbpfsPanelClipPaths")
-			.append("rect")
-			.attr("x", cbpfsLinesPanel.padding[3])
-			.attr("y", cbpfsLinesPanel.padding[0])
-			.attr("height", cbpfsLinesPanel.height - cbpfsLinesPanel.padding[2] - cbpfsLinesPanel.padding[0]);
-
-		const cbpfsPanelClipCircles = cbpfsPanelDefs.append("clipPath")
-			.attr("id", "pbicliCbpfsPanelClipCircles")
-			.append("rect")
-			.attr("x", cbpfsLinesPanel.padding[3])
-			.attr("y", cbpfsLinesPanel.padding[0])
-			.attr("height", cbpfsLinesPanel.height - cbpfsLinesPanel.padding[2] - cbpfsLinesPanel.padding[0]);
 
 		const xScaleDonors = d3.scaleTime()
 			.range([donorsLinesPanel.padding[3], donorsLinesPanel.width - donorsLinesPanel.padding[1]]);
@@ -764,9 +735,15 @@
 
 			});
 
-			filtersDiv.select(".pbicliCheckbox input").on("change", function() {
+			filtersDiv.select(".pbicliCheckboxFuture input").on("change", function() {
 
 				chartState.futureDonations = this.checked;
+
+				filtersDiv.select(".pbicliCheckboxTrend input")
+					.property("disabled", !chartState.futureDonations);
+
+				filtersDiv.select(".pbicliCheckboxTrend span")
+					.style("opacity", chartState.futureDonations ? 1 : checkboxOpacity);
 
 				const timeExtent = setTimeExtent(list.yearsArray);
 
@@ -775,6 +752,39 @@
 				xScaleCbpfs.domain(timeExtent);
 
 				const data = populateData(rawData);
+
+				yScaleDonors.domain(setYDomain(data.donors, data.cbpfs));
+
+				yScaleCbpfs.domain(setYDomain(data.donors, data.cbpfs));
+
+				yScaleDonorsLocalCurrency.domain(setYDomainLocalCurrency(data.donors));
+
+				createDonorsLines(data.donors);
+
+				createCbpfsLines(data.cbpfs);
+
+			});
+
+			filtersDiv.select(".pbicliCheckboxTrend input").on("change", function() {
+
+				const transitionRunning = donorsLinesPanel.main.selectAll("path").nodes().some(function(d) {
+					return d3.active(d);
+				});
+
+				if (transitionRunning) {
+					this.checked = !this.checked;
+					return;
+				};
+
+				chartState.showTrend = this.checked;
+
+				const data = populateData(rawData);
+
+				yScaleDonors.domain(setYDomain(data.donors, data.cbpfs));
+
+				yScaleCbpfs.domain(setYDomain(data.donors, data.cbpfs));
+
+				yScaleDonorsLocalCurrency.domain(setYDomainLocalCurrency(data.donors));
 
 				createDonorsLines(data.donors);
 
@@ -1189,20 +1199,42 @@
 					return checkedDonors[d.isoCode];
 				});
 
+				const donorsDataUntilPresent = JSON.parse(JSON.stringify(donorsData));
+
+				donorsDataUntilPresent.forEach(function(d) {
+					d.values = d.values.filter(function(e) {
+						return +e.year <= currentYear;
+					});
+				});
+
+				let donorsDataFuture;
+
+				if (chartState.futureDonations) {
+					donorsDataFuture = JSON.parse(JSON.stringify(donorsData));
+
+					donorsDataFuture.forEach(function(d) {
+						d.values = d.values.filter(function(e) {
+							return +e.year >= currentYear;
+						});
+					});
+
+					donorsDataFuture = donorsDataFuture.filter(function(d) {
+						return d.values.length > 1;
+					});
+				} else {
+					donorsDataFuture = [];
+				};
+
+				const donorsDataTrend = chartState.showTrend && chartState.futureDonations ? donorsData : [];
+
 				const xAxisDonorsRightMargin = xScaleDonors(xScaleDonors.domain()[1]) -
 					xScaleDonors(d3.timeMonth.offset(xScaleDonors.domain()[1], -monthsMargin));
-
-				donorsPanelClipPaths.attr("width", donorsLinesPanel.width - donorsLinesPanel.padding[1] - donorsLinesPanel.padding[3] -
-					xAxisDonorsRightMargin + 1);
-
-				donorsPanelClipCircles.attr("width", donorsLinesPanel.width - donorsLinesPanel.padding[1] - donorsLinesPanel.padding[3] -
-					xAxisDonorsRightMargin + circleRadius);
 
 				futureDonationsGroupDonors.style("opacity", chartState.futureDonations ? 1 : 0)
 					.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear)) + ",0)");
 
 				const donorsGroup = donorsLinesPanel.main.selectAll(".pbicliDonorsGroup")
-					.data(donorsData, function(d) {
+					.data(donorsDataUntilPresent, function(d) {
 						return d.isoCode
 					});
 
@@ -1214,8 +1246,6 @@
 
 				const donorsPath = donorsGroupEnter.append("path")
 					.attr("class", "pbicliDonorsPath")
-					.attr("clip-path", "url(#pbicliDonorsPanelClipPaths)")
-					.style("stroke-dasharray", 0)
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values)
 					})
@@ -1249,7 +1279,6 @@
 					.attr("cy", function(d) {
 						return yScaleDonors(d.total)
 					})
-					.attr("clip-path", "url(#pbicliDonorsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1285,7 +1314,6 @@
 					.attr("cy", function(d) {
 						return yScaleDonors(d.total)
 					})
-					.attr("clip-path", "url(#pbicliDonorsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1305,6 +1333,220 @@
 						return yScaleDonors(d.total)
 					});
 
+				const donorsGroupFuture = donorsLinesPanel.main.selectAll(".pbicliDonorsGroupFuture")
+					.data(donorsDataFuture, function(d) {
+						return d.isoCode
+					});
+
+				const donorsGroupFutureExit = donorsGroupFuture.exit().remove();
+
+				const donorsGroupFutureEnter = donorsGroupFuture.enter()
+					.append("g")
+					.attr("class", "pbicliDonorsGroupFuture");
+
+				const donorsPathFuture = donorsGroupFutureEnter.append("path")
+					.attr("class", "pbicliDonorsPathFuture")
+					.attr("d", function(d) {
+						return lineGeneratorDonors(d.values)
+					})
+					.each(function() {
+						localVariable.set(this, this.getTotalLength())
+					});
+
+				donorsPathFuture.style("stroke-dashoffset", function() {
+						const thisPathLength = localVariable.get(this);
+						return thisPathLength;
+					})
+					.style("stroke-dasharray", function() {
+						const dashString = "3,3";
+						const dashLength = 6;
+						const thisPathLength = localVariable.get(this);
+						const dashNumber = Math.ceil(thisPathLength / dashLength);
+						const dash = d3.range(dashNumber).map(function(d) {
+							return dashString;
+						});
+						return dash + ",0," + thisPathLength;
+					})
+					.transition()
+					.delay(duration)
+					.duration(duration)
+					.style("stroke-dashoffset", "0");
+
+				const circlesFutureEnter = donorsGroupFutureEnter.selectAll(null)
+					.data(function(d) {
+						return d.values;
+					})
+					.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return duration + (i * (duration / n.length));
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				donorsGroupFuture.select("path")
+					.transition()
+					.duration(duration)
+					.attr("d", function(d) {
+						return lineGeneratorDonors(d.values)
+					});
+
+				const updateCirclesFuture = donorsGroupFuture.selectAll("circle")
+					.data(function(d) {
+						return d.values;
+					});
+
+				const updateCirclesFutureExit = updateCirclesFuture.exit().remove();
+
+				const updateCirclesFutureEnter = updateCirclesFuture.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return duration + (i * (duration / n.length));
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				updateCirclesFuture.transition()
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					});
+
+				const donorsGroupTrend = donorsLinesPanel.main.selectAll(".pbicliDonorsGroupTrend")
+					.data(donorsDataTrend, function(d) {
+						return d.isoCode
+					});
+
+				const donorsGroupTrendExit = donorsGroupTrend.exit().remove();
+
+				const donorsGroupTrendEnter = donorsGroupTrend.enter()
+					.append("g")
+					.attr("class", "pbicliDonorsGroupTrend");
+
+				const donorsPathTrend = donorsGroupTrendEnter.append("path")
+					.attr("class", "pbicliDonorsPathTrend")
+					.attr("d", function(d) {
+						return lineGeneratorDonors(d.trendValues)
+					})
+					.each(function() {
+						localVariable.set(this, this.getTotalLength())
+					});
+
+				donorsPathTrend.style("stroke-dashoffset", function() {
+						const thisPathLength = localVariable.get(this);
+						return thisPathLength;
+					})
+					.style("stroke-dasharray", function() {
+						const dashString = "3,3";
+						const dashLength = 6;
+						const thisPathLength = localVariable.get(this);
+						const dashNumber = Math.ceil(thisPathLength / dashLength);
+						const dash = d3.range(dashNumber).map(function(d) {
+							return dashString;
+						});
+						return dash + ",0," + thisPathLength;
+					})
+					.transition()
+					.delay(duration)
+					.duration(duration)
+					.style("stroke-dashoffset", "0");
+
+				const circlesTrendEnter = donorsGroupTrendEnter.selectAll(null)
+					.data(function(d) {
+						return d.trendValues;
+					})
+					.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesTrend")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return duration + (i * (duration / n.length));
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				donorsGroupTrend.select("path")
+					.transition()
+					.duration(duration)
+					.attr("d", function(d) {
+						return lineGeneratorDonors(d.trendValues)
+					})
+					.style("stroke-dasharray", "3,3")
+					.style("stroke-dashoffset", "0");
+
+				const updateCirclesTrend = donorsGroupTrend.selectAll("circle")
+					.data(function(d) {
+						return d.trendValues;
+					});
+
+				const updateCirclesTrendExit = updateCirclesTrend.exit().remove();
+
+				const updateCirclesTrendEnter = updateCirclesTrend.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesTrend")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return duration + (i * (duration / n.length));
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				updateCirclesTrend.transition()
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					});
+
 				const donorsDataLocal = JSON.parse(JSON.stringify(donorsData)).filter(function(d) {
 					return d.localCurrency !== "USD";
 				});
@@ -1313,8 +1555,34 @@
 					d.localData = true;
 				});
 
+				const donorsDataLocalUntilPresent = JSON.parse(JSON.stringify(donorsDataLocal));
+
+				donorsDataLocalUntilPresent.forEach(function(d) {
+					d.values = d.values.filter(function(e) {
+						return +e.year <= currentYear;
+					});
+				});
+
+				let donorsDataLocalFuture;
+
+				if (chartState.futureDonations) {
+					donorsDataLocalFuture = JSON.parse(JSON.stringify(donorsDataLocal));
+
+					donorsDataLocalFuture.forEach(function(d) {
+						d.values = d.values.filter(function(e) {
+							return +e.year >= currentYear;
+						});
+					});
+
+					donorsDataLocalFuture = donorsDataLocalFuture.filter(function(d) {
+						return d.values.length > 1;
+					});
+				} else {
+					donorsDataLocalFuture = [];
+				};
+
 				const donorsGroupLocal = donorsLinesPanel.main.selectAll(".pbicliDonorsGroupLocal")
-					.data(donorsDataLocal, function(d) {
+					.data(donorsDataLocalUntilPresent, function(d) {
 						return d.isoCode
 					});
 
@@ -1327,8 +1595,6 @@
 
 				const donorsPathLocal = donorsGroupLocalEnter.append("path")
 					.attr("class", "pbicliDonorsPathLocal")
-					.attr("clip-path", "url(#pbicliDonorsPanelClipPaths)")
-					.style("stroke-dasharray", 0)
 					.attr("d", function(d) {
 						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values) : lineGeneratorDonors(d.values);
 					})
@@ -1362,7 +1628,6 @@
 					.attr("cy", function(d) {
 						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
 					})
-					.attr("clip-path", "url(#pbicliDonorsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1402,7 +1667,6 @@
 					.attr("cy", function(d) {
 						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
 					})
-					.attr("clip-path", "url(#pbicliDonorsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1414,6 +1678,117 @@
 					.attr("r", circleRadius);
 
 				updateCirclesLocal.transition()
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
+					});
+
+				const donorsGroupLocalFuture = donorsLinesPanel.main.selectAll(".pbicliDonorsGroupLocalFuture")
+					.data(donorsDataLocalFuture, function(d) {
+						return d.isoCode
+					});
+
+				const donorsGroupLocalFutureExit = donorsGroupLocalFuture.exit().remove();
+
+				const donorsGroupLocalFutureEnter = donorsGroupLocalFuture.enter()
+					.append("g")
+					.attr("class", "pbicliDonorsGroupLocalFuture")
+					.style("opacity", chartState.showLocal ? 1 : 0);
+
+				const donorsPathLocalFuture = donorsGroupLocalFutureEnter.append("path")
+					.attr("class", "pbicliDonorsPathLocalFuture")
+					.attr("d", function(d) {
+						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values) : lineGeneratorDonors(d.values);
+					})
+					.each(function() {
+						localVariable.set(this, this.getTotalLength())
+					});
+
+				donorsPathLocalFuture.style("stroke-dasharray", function() {
+						const dashString = "3,3";
+						const dashLength = 6;
+						const thisPathLength = localVariable.get(this);
+						const dashNumber = Math.ceil(thisPathLength / dashLength);
+						const dash = d3.range(dashNumber).map(function(d) {
+							return dashString;
+						});
+						return dash + ",0," + thisPathLength;
+					})
+					.style("stroke-dashoffset", function() {
+						const thisPathLength = localVariable.get(this);
+						return thisPathLength;
+					})
+					.transition()
+					.delay(duration)
+					.duration(duration)
+					.style("stroke-dashoffset", "0");
+
+				const circlesEnterLocalFuture = donorsGroupLocalFutureEnter.selectAll(null)
+					.data(function(d) {
+						return d.values;
+					})
+					.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesLocalFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return i * (duration / n.length);
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				donorsGroupLocalFuture.transition()
+					.duration(duration)
+					.style("opacity", chartState.showLocal ? 1 : 0);
+
+				donorsGroupLocalFuture.select("path")
+					.transition()
+					.duration(duration)
+					.attr("d", function(d) {
+						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values) : lineGeneratorDonors(d.values);
+					});
+
+				const updateCirclesLocalFuture = donorsGroupLocalFuture.selectAll("circle")
+					.data(function(d) {
+						return d.values;
+					});
+
+				const updateCirclesLocalFutureExit = updateCirclesLocalFuture.exit().remove();
+
+				const updateCirclesLocalFutureEnter = updateCirclesLocalFuture.enter()
+					.append("circle")
+					.attr("class", "pbicliDonorsCirclesLocalFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return i * (duration / n.length);
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				updateCirclesLocalFuture.transition()
 					.duration(duration)
 					.attr("cx", function(d) {
 						return xScaleDonors(parseTime(d.year))
@@ -1437,7 +1812,8 @@
 						datum: thisDatum,
 						yPos: yScaleDonors(thisDatum.total),
 						isoCode: d.isoCode,
-						currency: "USD"
+						currency: "USD",
+						trend: false
 					}
 				});
 
@@ -1455,11 +1831,30 @@
 						datum: thisDatum,
 						yPos: yScaleDonorsLocalCurrency(thisDatum.localTotal),
 						isoCode: d.isoCode,
-						currency: d.localCurrency
+						currency: d.localCurrency,
+						trend: false
 					}
 				});
 
+				let labelsDataTrend = {};
+
+				if (chartState.futureDonations && chartState.showTrend) {
+					labelsDataTrend = donorsData.map(function(d) {
+						let thisDatum = d.trendValues[d.trendValues.length - 1];
+						return {
+							name: isoAlpha2to3[d.isoCode.toUpperCase()],
+							datum: thisDatum,
+							yPos: yScaleDonors(thisDatum.total),
+							isoCode: d.isoCode,
+							currency: "USD",
+							trend: true
+						}
+					});
+				};
+
 				if (chartState.showLocal) labelsData = labelsData.concat(labelsDataLocal);
+
+				if (chartState.futureDonations && chartState.showTrend) labelsData = labelsData.concat(labelsDataTrend);
 
 				let labelsGroupDonors = donorsLinesPanel.main.selectAll(".pbicliLabelsGroupDonors")
 					.data(labelsData, function(d) {
@@ -1490,7 +1885,7 @@
 
 				const labelLineDonors = labelsGroupDonorsEnter.append("polyline")
 					.style("stroke-width", "1px")
-					.style("stroke", "#ccc")
+					.style("stroke", "#e2e2e2")
 					.style("fill", "none")
 					.attr("points", function(d) {
 						return (xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
@@ -1514,7 +1909,18 @@
 						});
 				};
 
-				if (!chartState.showLocal) labelsGroupDonors.select("text").remove();
+				if (chartState.futureDonations && chartState.showTrend) {
+					labelsGroupDonors.append("text")
+						.attr("class", "pbicliLabelTextSmall pbicliLabelTrendText")
+						.attr("x", 2 + flagSize)
+						.attr("y", 2)
+						.style("fill", "#666")
+						.text(function(d) {
+							return d.trend ? "(trend)" : "";
+						});
+				};
+
+				if (!chartState.showLocal) labelsGroupDonors.select("text:not(.pbicliLabelTrendText)").remove();
 
 				labelsGroupDonors.raise();
 
@@ -1557,16 +1963,16 @@
 					});
 
 				labelsGroupDonors.on("mouseover", function(d) {
-						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors" :
-							".pbicliDonorsGroup, .pbicliLabelsGroupDonors";
+						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
+							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
 							.style("opacity", function(e) {
 								return d.isoCode === e.isoCode ? 1 : fadeOpacity;
 							});
 					})
 					.on("mouseout", function() {
-						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors" :
-							".pbicliDonorsGroup, .pbicliLabelsGroupDonors";
+						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
+							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
 							.style("opacity", 1);
 					});
@@ -1635,20 +2041,40 @@
 					return checkedCbpfs[d.isoCode];
 				});
 
+				const cbpfsDataUntilPresent = JSON.parse(JSON.stringify(cbpfsData));
+
+				cbpfsDataUntilPresent.forEach(function(d) {
+					d.values = d.values.filter(function(e) {
+						return +e.year <= currentYear;
+					});
+				});
+
+				let cbpfsDataFuture;
+
+				if (chartState.futureDonations) {
+					cbpfsDataFuture = JSON.parse(JSON.stringify(cbpfsData));
+
+					cbpfsDataFuture.forEach(function(d) {
+						d.values = d.values.filter(function(e) {
+							return +e.year >= currentYear;
+						});
+					});
+
+					cbpfsDataFuture = cbpfsDataFuture.filter(function(d) {
+						return d.values.length > 1;
+					});
+				} else {
+					cbpfsDataFuture = [];
+				};
+
 				const xAxisCbpfsRightMargin = xScaleCbpfs(xScaleCbpfs.domain()[1]) -
 					xScaleCbpfs(d3.timeMonth.offset(xScaleCbpfs.domain()[1], -monthsMargin));
-
-				cbpfsPanelClipPaths.attr("width", cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] - cbpfsLinesPanel.padding[3] -
-					xAxisCbpfsRightMargin + 1);
-
-				cbpfsPanelClipCircles.attr("width", cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] - cbpfsLinesPanel.padding[3] -
-					xAxisCbpfsRightMargin + circleRadius);
 
 				futureDonationsGroupCbpfs.style("opacity", chartState.futureDonations ? 1 : 0)
 					.attr("transform", "translate(" + xScaleCbpfs(parseTime(currentYear)) + ",0)");
 
 				const cbpfsGroup = cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup")
-					.data(cbpfsData, function(d) {
+					.data(cbpfsDataUntilPresent, function(d) {
 						return d.isoCode
 					});
 
@@ -1660,8 +2086,6 @@
 
 				const cbpfsPath = cbpfsGroupEnter.append("path")
 					.attr("class", "pbicliCbpfsPath")
-					.attr("clip-path", "url(#pbicliCbpfsPanelClipPaths)")
-					.style("stroke-dasharray", 0)
 					.attr("d", function(d) {
 						return lineGeneratorCbpfs(d.values)
 					})
@@ -1695,7 +2119,6 @@
 					.attr("cy", function(d) {
 						return yScaleCbpfs(d.total)
 					})
-					.attr("clip-path", "url(#pbicliCbpfsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1731,7 +2154,6 @@
 					.attr("cy", function(d) {
 						return yScaleCbpfs(d.total)
 					})
-					.attr("clip-path", "url(#pbicliCbpfsPanelClipCircles)")
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
@@ -1743,6 +2165,112 @@
 					.attr("r", circleRadius);
 
 				updateCircles.transition()
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleCbpfs(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleCbpfs(d.total)
+					});
+
+				const cbpfsGroupFuture = cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroupFuture")
+					.data(cbpfsDataFuture, function(d) {
+						return d.isoCode
+					});
+
+				const cbpfsGroupFutureExit = cbpfsGroupFuture.exit().remove();
+
+				const cbpfsGroupFutureEnter = cbpfsGroupFuture.enter()
+					.append("g")
+					.attr("class", "pbicliCbpfsGroupFuture");
+
+				const cbpfsPathFuture = cbpfsGroupFutureEnter.append("path")
+					.attr("class", "pbicliCbpfsPathFuture")
+					.attr("d", function(d) {
+						return lineGeneratorCbpfs(d.values)
+					})
+					.each(function() {
+						localVariable.set(this, this.getTotalLength())
+					});
+
+				cbpfsPathFuture.style("stroke-dasharray", function() {
+						const dashString = "3,3";
+						const dashLength = 6;
+						const thisPathLength = localVariable.get(this);
+						const dashNumber = Math.ceil(thisPathLength / dashLength);
+						const dash = d3.range(dashNumber).map(function(d) {
+							return dashString;
+						});
+						return dash + ",0," + thisPathLength;
+					})
+					.style("stroke-dashoffset", function() {
+						const thisPathLength = localVariable.get(this);
+						return thisPathLength;
+					})
+					.transition()
+					.delay(duration)
+					.duration(duration)
+					.style("stroke-dashoffset", "0");
+
+				const circlesEnterFuture = cbpfsGroupFutureEnter.selectAll(null)
+					.data(function(d) {
+						return d.values;
+					})
+					.enter()
+					.append("circle")
+					.attr("class", "pbicliCbpfsCirclesFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleCbpfs(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleCbpfs(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return duration + (i * (duration / n.length));
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				cbpfsGroupFuture.select("path")
+					.transition()
+					.duration(duration)
+					.attr("d", function(d) {
+						return lineGeneratorCbpfs(d.values)
+					});
+
+				const updateCirclesFuture = cbpfsGroupFuture.selectAll("circle")
+					.data(function(d) {
+						return d.values;
+					});
+
+				const updateCirclesFutureExit = updateCirclesFuture.exit().remove();
+
+				const updateCirclesFutureEnter = updateCirclesFuture.enter()
+					.append("circle")
+					.attr("class", "pbicliCbpfsCirclesFuture")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleCbpfs(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleCbpfs(d.total)
+					})
+					.each(function(d) {
+						d.donor = d3.select(this.parentNode).datum().donor;
+					})
+					.transition()
+					.delay(function(_, i, n) {
+						return i * (duration / n.length);
+					})
+					.duration(duration / 4)
+					.attr("r", circleRadius);
+
+				updateCirclesFuture.transition()
 					.duration(duration)
 					.attr("cx", function(d) {
 						return xScaleCbpfs(parseTime(d.year))
@@ -1795,7 +2323,7 @@
 
 				const labelLineCbpfs = labelsGroupCbpfsEnter.append("polyline")
 					.style("stroke-width", "1px")
-					.style("stroke", "#ccc")
+					.style("stroke", "#e2e2e2")
 					.style("fill", "none")
 					.attr("points", function(d) {
 						return (xScaleCbpfs(parseTime(d.datum.year)) - (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
@@ -2165,17 +2693,31 @@
 					return d;
 				});
 
-			const checkbox = filtersDiv.append("label")
-				.attr("class", "pbicliCheckbox")
+			const checkboxFuture = filtersDiv.append("label")
+				.attr("class", "pbicliCheckboxFuture")
 				.style("cursor", "pointer");
 
-			checkbox.append("input")
+			checkboxFuture.append("input")
 				.attr("type", "checkbox")
 				.property("checked", chartState.futureDonations);
 
-			checkbox.append("span")
+			checkboxFuture.append("span")
 				.attr("class", "pbicliRadioLabel")
 				.text("Show future (pledged) donations");
+
+			const checkboxTrend = filtersDiv.append("label")
+				.attr("class", "pbicliCheckboxTrend")
+				.style("cursor", "pointer");
+
+			checkboxTrend.append("input")
+				.attr("type", "checkbox")
+				.property("checked", chartState.showTrend)
+				.property("disabled", !chartState.futureDonations);
+
+			checkboxTrend.append("span")
+				.attr("class", "pbicliRadioLabel")
+				.text("Show donations trend")
+				.style("opacity", chartState.futureDonations ? 1 : checkboxOpacity);
 
 			//end of createFilters
 		};
@@ -2441,6 +2983,26 @@
 			});
 
 			data.donors.forEach(function(donor) {
+				if (chartState.showTrend && chartState.futureDonations) {
+					const pastRawData = donor.values.filter(function(e) {
+						return +e.year <= currentYear - 1
+					}).map(function(e) {
+						return [+e.year, e.total];
+					});
+					const trendData = donor.values.filter(function(e) {
+						return +e.year >= currentYear - 1
+					}).map(function(e) {
+						return {
+							year: e.year,
+							total: e.total
+						};
+					});
+					const resultTrend = linearRegression(pastRawData);
+					trendData.forEach(function(d, i) {
+						if (i) d.total = resultTrend.predict(+d.year)[1];
+					});
+					donor.trendValues = trendData;
+				};
 				fillZeros(donor.values);
 			});
 
@@ -2575,9 +3137,19 @@
 				});
 			});
 
+			let maxTrends = 0;
+
+			if (chartState.showTrend && chartState.futureDonations) {
+				maxTrends = d3.max(donors, function(donor) {
+					return d3.max(donor.trendValues, function(d) {
+						return d.total;
+					});
+				});
+			}
+
 			if (maxDonors === undefined && maxCbpfs === undefined) return [0, defaultYMaxValue];
 
-			return [0, Math.max(maxDonors || 0, maxCbpfs || 0) * 1.05];
+			return [0, Math.max(maxDonors || 0, maxTrends, maxCbpfs || 0) * 1.05];
 
 			//end of setYDomain
 		};
@@ -2645,6 +3217,8 @@
 
 		function createAnnotationsDiv() {
 
+			const padding = 6;
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbicliOverDivHelp");
 
@@ -2666,12 +3240,29 @@
 				.style("fill", "#E56A54")
 				.attr("d", "M0,-5L10,0L0,5");
 
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
 				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
+
+			const donorsDropdownAnnotationRect = helpSVG.append("rect")
+				.attr("x", 160 - padding)
+				.attr("y", 130 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
 			const donorsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
@@ -2680,12 +3271,21 @@
 				.text("Use this menu to select one or more donors. When donors are selected here the values of all displayed CBPFs correspond to donations made only by those selected donors.")
 				.call(wrapText2, 200);
 
+			donorsDropdownAnnotationRect.attr("width", donorsDropdownAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", donorsDropdownAnnotation.node().getBBox().height + padding * 2);
+
 			const donorsDropdownPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
 				.attr("d", "M150,140 Q120,140 120,90");
+
+			const currencyDropdownAnnotationRect = helpSVG.append("rect")
+				.attr("x", 400 - padding)
+				.attr("y", 150 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
 			const currencyDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
@@ -2694,12 +3294,21 @@
 				.text("Use this menu to select donors by their currencies. This is useful before selecting “local currency” in the radio buttons below.")
 				.call(wrapText2, 200);
 
+			currencyDropdownAnnotationRect.attr("width", currencyDropdownAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", currencyDropdownAnnotation.node().getBBox().height + padding * 2);
+
 			const currencyDropdownPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
 				.attr("d", "M470,140 Q470,65 420,65");
+
+			const cbpfsDropdownAnnotationRect = helpSVG.append("rect")
+				.attr("x", 650 - padding)
+				.attr("y", 130 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
 			const cbpfsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
@@ -2708,6 +3317,9 @@
 				.text("Use this menu to select one or more CBPFs. When CBPFs are selected here the values of all displayed donors correspond to donations made only to those selected CBPFs.")
 				.call(wrapText2, 200);
 
+			cbpfsDropdownAnnotationRect.attr("width", cbpfsDropdownAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", cbpfsDropdownAnnotation.node().getBBox().height + padding * 2);
+
 			const cbpfsDropdownPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
@@ -2715,12 +3327,21 @@
 				.attr("marker-end", "url(#pbicliArrowMarker)")
 				.attr("d", "M640,140 Q580,140 580,90");
 
+			const radioAnnotationRect = helpSVG.append("rect")
+				.attr("x", 220 - padding)
+				.attr("y", 380 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
 			const radioAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
 				.attr("x", 220)
 				.attr("y", 380)
 				.text("Use these radio buttons to show the donations in USD or in the donor's local currency. This option is not available when CBPFs are selected, and also not available when the selected donors have different local currencies.")
 				.call(wrapText2, 360);
+
+			radioAnnotationRect.attr("width", radioAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", radioAnnotation.node().getBBox().height + padding * 2);
 
 			const radioPath = helpSVG.append("path")
 				.style("fill", "none")
@@ -2995,6 +3616,53 @@
 		};
 
 		//end of d3Chart
+	};
+
+	//Linear regression, from Tom-Alexander/regression-js, Copyright (c) Tom Alexander <me@tomalexander.co.nz>
+
+	function linearRegression(data) {
+		function round(number, precision) {
+			var factor = 10 ** precision;
+			return Math.round(number * factor) / factor;
+		}
+
+		var options = {
+			order: 2,
+			precision: 2,
+			period: null
+		};
+		var sum = [0, 0, 0, 0, 0];
+		var len = 0;
+
+		for (var n = 0; n < data.length; n++) {
+			if (data[n][1] !== null) {
+				len++;
+				sum[0] += data[n][0];
+				sum[1] += data[n][1];
+				sum[2] += data[n][0] * data[n][0];
+				sum[3] += data[n][0] * data[n][1];
+				sum[4] += data[n][1] * data[n][1];
+			}
+		}
+
+		var run = len * sum[2] - sum[0] * sum[0];
+		var rise = len * sum[3] - sum[0] * sum[1];
+		var gradient = run === 0 ? 0 : round(rise / run, options.precision);
+		var intercept = round(sum[1] / len - gradient * sum[0] / len, options.precision);
+
+		var predict = function predict(x) {
+			return [round(x, options.precision), round(gradient * x + intercept, options.precision)];
+		};
+
+		var points = data.map(function(point) {
+			return predict(point[0]);
+		});
+		return {
+			points: points,
+			predict: predict,
+			equation: [gradient, intercept],
+			string: intercept === 0 ? "y = ".concat(gradient, "x") : "y = ".concat(gradient, "x + ").concat(intercept)
+		};
 	};
 
 	//POLYFILLS
