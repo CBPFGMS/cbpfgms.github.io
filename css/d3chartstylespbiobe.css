@@ -15,6 +15,7 @@
 	pointer-events: none;
 	cursor: none;
 	max-width: 280px;
+	z-index: 1500;
 }
 
 .pbiobebuttonsText, .pbiobebuttonsModalitiesText, .pbiobebuttonsBeneficiariesText {
