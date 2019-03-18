@@ -19,6 +19,7 @@
 	pointer-events: none;
 	cursor: none;
 	max-width: 270px;
+	z-index: 1500;
 }
 
 .pbialiTopDiv {
