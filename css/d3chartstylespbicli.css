@@ -180,8 +180,12 @@
 	width: 100%;
 }
 
-.pbicliCheckbox {
-	margin-left: 28px; 
+.pbicliCheckboxFuture {
+	margin-left: 48px; 
+}
+
+.pbicliCheckboxTrend {
+	margin-left: 2px; 
 }
 
 .pbicliLegendDiv {
@@ -372,33 +376,43 @@
 	fill: #666;
 }
 
-.pbicliDonorsPath {
+.pbicliDonorsPath, .pbicliDonorsPathFuture {
 	fill: none;
 	stroke: #418fde;
 	stroke-width: 2px;
 }
 
-.pbicliDonorsCircles {
+.pbicliDonorsPathTrend {
+	fill: none;
+	stroke: darkgray;
+	stroke-width: 2px;
+}
+
+.pbicliDonorsCircles, .pbicliDonorsCirclesFuture {
 	fill: #418fde;
 }
 
-.pbicliDonorsPathLocal {
+.pbicliDonorsCirclesTrend {
+	fill: darkgray;
+}
+
+.pbicliDonorsPathLocal, .pbicliDonorsPathLocalFuture {
 	fill: none;
 	stroke: #E56A54;
 	stroke-width: 2px;
 }
 
-.pbicliDonorsCirclesLocal {
+.pbicliDonorsCirclesLocal, .pbicliDonorsCirclesLocalFuture {
 	fill: #E56A54;
 }
 
-.pbicliCbpfsPath {
+.pbicliCbpfsPath, .pbicliCbpfsPathFuture {
 	fill: none;
 	stroke: #eca154;
 	stroke-width: 2px;
 }
 
-.pbicliCbpfsCircles {
+.pbicliCbpfsCircles, .pbicliCbpfsCirclesFuture {
 	fill: #eca154;
 }
 
