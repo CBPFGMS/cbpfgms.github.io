@@ -19,6 +19,7 @@
 	pointer-events: none;
 	cursor: none;
 	max-width: 300px;
+	z-index: 1500;
 }
 
 .pbiclcTopDiv {
