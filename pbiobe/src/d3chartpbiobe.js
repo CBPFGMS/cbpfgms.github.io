@@ -1,8 +1,10 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiobe.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiobe.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -13,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous")
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
@@ -67,12 +73,13 @@
 
 	function d3Chart() {
 
-		const width = 1130,
-			padding = [4, 4, 32, 4],
+		const width = 900,
+			padding = [4, 8, 38, 8],
 			buttonsPanelHeight = 30,
 			panelHorizontalPadding = 8,
 			panelVerticalPadding = 4,
 			fadeOpacity = 0.15,
+			fadeOpacityCheckbox = 0.5,
 			beneficiariesHeight = 370,
 			buttonsNumber = 16,
 			formatSIaxes = d3.format("~s"),
@@ -82,25 +89,26 @@
 			formatNumberSI = d3.format(".3s"),
 			formatComma = d3.format(","),
 			formatRoundPeople = d3.format(".1s"),
-			titlePadding = 30,
+			titlePadding = 25,
 			percentageVerPadding = 4,
 			percentageHorPadding = 3,
 			percentageHorNegPadding1 = -28,
 			percentageHorNegPadding2 = -36,
 			percentageHorNegPadding3 = -42,
-			percentageBarLimit = 0.925,
+			percentageBarLimit = 0.9,
 			tooltipWidth = 278,
-			localVariable = d3.local(),
-			excelVerticalPadding = 4,
-			excelIconSize = 20,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
+			chartTitleDefault = "Beneficiary Overview",
+			currentYear = new Date().getFullYear(),
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + beneficiariesHeight + padding[2],
 			beneficiariesTypes = ["total", "girls", "boys", "women", "men"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["Actual Beneficiaries", "Targeted Beneficiaries"],
+			legendData = ["Affected Persons", "Targeted Persons"],
+			cbpfsList = {},
 			chartState = {
-				selectedYear: null
+				selectedYear: null,
+				selectedCbpfs: null,
+				cbpfsInData: []
 			},
 			bodyDAttribute = "M 2.954 5.168 C 2.151 5.168 1.463 5.465 0.882 6.038 C 0.299 6.637 0 7.334 0 8.11 L 0 15.286 C 0 15.555 0.092 15.798 0.299 15.995 C 0.491 16.189 0.731 16.277 1.002 16.277 C 1.314 16.277 1.553 16.189 1.745 15.995 C 1.912 15.798 1.999 15.555 1.999 15.286 L 1.999 8.87 L 2.518 8.87 L 2.518 26.634 C 2.518 26.976 2.668 27.292 2.952 27.536 C 3.219 27.805 3.53 27.92 3.889 27.92 C 4.277 27.92 4.59 27.805 4.843 27.536 C 5.112 27.292 5.234 26.976 5.234 26.634 L 5.234 16.337 L 5.815 16.337 L 5.815 26.634 C 5.815 26.976 5.95 27.292 6.202 27.536 C 6.456 27.805 6.785 27.92 7.186 27.92 C 7.528 27.92 7.827 27.805 8.096 27.536 C 8.348 27.292 8.464 26.976 8.464 26.634 L 8.464 8.87 L 9.006 8.87 L 9.006 15.286 C 9.006 15.555 9.091 15.798 9.271 15.995 C 9.484 16.189 9.731 16.277 10.001 16.277 C 10.317 16.277 10.556 16.189 10.735 15.995 C 10.897 15.798 11 15.555 11 15.286 L 11 8.111 C 11 7.337 10.718 6.637 10.135 6.041 C 9.567 5.465 8.886 5.171 8.051 5.171 L 2.954 5.171 L 2.954 5.168 Z",
 			headDAttribute = "M 5.516 4.578 C 6.142 4.578 6.695 4.372 7.139 3.942 C 7.583 3.499 7.81 2.953 7.81 2.294 C 7.81 1.667 7.581 1.129 7.137 0.685 C 6.691 0.228 6.14 0 5.516 0 C 4.858 0 4.305 0.228 3.889 0.685 C 3.445 1.129 3.236 1.667 3.236 2.294 C 3.236 2.955 3.445 3.501 3.889 3.942 C 4.308 4.372 4.861 4.578 5.516 4.578 L 5.516 4.578 Z",
@@ -110,6 +118,12 @@
 		let yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiobe");
+
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
+
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
@@ -122,13 +136,31 @@
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbiobeTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbiobeTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbiobeIconsDiv d3chartIconsDiv");
+
+		const selectTitleDiv = containerDiv.append("div")
+			.attr("class", "pbiobeSelectTitleDiv");
+
+		const selectDiv = containerDiv.append("div")
+			.attr("class", "pbiobeSelectDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbiobeFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiobetooltipdiv")
 			.style("display", "none");
 
@@ -194,12 +226,14 @@
 		const yAxisPercentage = d3.axisLeft(yScalePercentage)
 			.tickFormat(capitalize);
 
-		//STATIC FILE!!!
-		d3.csv("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datapbiobe.csv").then(function(rawData) {
+		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
 
 			removeProgressWheel();
 
 			yearsArray = rawData.map(function(d) {
+				if (!cbpfsList["id" + d.PooledFundId]) {
+					cbpfsList["id" + d.PooledFundId] = d.PooledFundName;
+				};
 				return +d.AllocationYear
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
@@ -208,6 +242,8 @@
 			});
 
 			chartState.selectedYear = validateYear(selectedYearString);
+
+			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
 				draw(rawData);
@@ -231,6 +267,12 @@
 
 			const data = processData(rawData);
 
+			createTitle();
+
+			createCheckboxes(rawData);
+
+			createFooterDiv();
+
 			createAxes();
 
 			createButtonsPanel();
@@ -241,7 +283,152 @@
 
 			createBottomLegend();
 
-			createDownloadGroup();
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "pbiobed3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbiobeHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbiobeDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				selectTitleDiv.html("Select CBPF and Allocation Year:");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCSV(rawData);
+
+					const fileName = "Beneficiaries" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
+
+			function createCheckboxes(data) {
+
+				const checkboxData = d3.keys(cbpfsList);
+
+				checkboxData.push("All CBPFs");
+
+				const checkboxDivs = selectDiv.selectAll(null)
+					.data(checkboxData)
+					.enter()
+					.append("div")
+					.attr("class", "pbiobeCheckboxDiv");
+
+				const checkbox = checkboxDivs.append("label");
+
+				const input = checkbox.append("input")
+					.attr("type", "checkbox")
+					.property("checked", function(d) {
+						return chartState.selectedCbpfs.indexOf(d) > -1;
+					})
+					.attr("value", function(d) {
+						return d;
+					});
+
+				const span = checkbox.append("span")
+					.attr("class", "pbiobeCheckboxText")
+					.html(function(d) {
+						return cbpfsList[d] || d;
+					});
+
+				const allCbpfs = checkboxDivs.filter(function(d) {
+					return d === "All CBPFs";
+				}).select("input");
+
+				const cbpfsCheckboxes = checkboxDivs.filter(function(d) {
+					return d !== "All CBPFs";
+				}).select("input");
+
+				cbpfsCheckboxes.property("disabled", function(d) {
+					return chartState.cbpfsInData.indexOf(d) === -1;
+				});
+
+				allCbpfs.property("checked", function() {
+						return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+					})
+					.property("indeterminate", function() {
+						return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
+					});
+
+				checkbox.select("input").on("change", function() {
+					if (this.value === "All CBPFs") {
+						if (this.checked) {
+							chartState.selectedCbpfs = d3.keys(cbpfsList)
+						} else {
+							chartState.selectedCbpfs.length = 0;
+						};
+						checkbox.select("input")
+							.property("checked", this.checked);
+					} else {
+						if (this.checked) {
+							chartState.selectedCbpfs.push(this.value);
+						} else {
+							const thisIndex = chartState.selectedCbpfs.indexOf(this.value);
+							chartState.selectedCbpfs.splice(thisIndex, 1);
+						};
+						allCbpfs.property("checked", function() {
+								return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+							})
+							.property("indeterminate", function() {
+								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
+							});
+					};
+
+					const data = processData(rawData);
+
+					createPercentagePanel(data);
+
+					createPictogramPanel(data);
+
+					createBottomLegend();
+
+				});
+
+				//end of createCheckboxes
+			};
 
 			function createAxes() {
 
@@ -357,6 +544,8 @@
 					.text("\u25ba");
 
 				if (yearsArray.length > buttonsNumber) {
+
+					clipPathGroup.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding) + ",0)")
 
 					rightArrow.style("opacity", 1)
 						.attr("pointer-events", "all");
@@ -700,6 +889,28 @@
 						return xScalePictograms(d.actual) - xScalePictograms(0);
 					});
 
+				let pictogramRect = pictogramsPanel.main.selectAll(".pbiobePictogramRect")
+					.data(data, function(d) {
+						return d.beneficiary;
+					});
+
+				const pictogramRectExit = pictogramRect.exit()
+					.remove();
+
+				const pictogramRectEnter = pictogramRect.enter()
+					.append("rect")
+					.attr("class", "pbiobePictogramRect")
+					.attr("x", 0)
+					.attr("y", function(d) {
+						return yScalePercentage(d.beneficiary)
+					})
+					.attr("height", yScalePercentage.bandwidth())
+					.attr("width", pictogramsPanel.width)
+					.style("opacity", 0)
+					.attr("pointer-events", "all");
+
+				pictogramRect = pictogramRectEnter.merge(pictogramRect);
+
 				//end of createPictogramPanel
 			};
 
@@ -711,7 +922,7 @@
 					.append("g")
 					.attr("class", "pbiobeLegendGroup")
 					.attr("transform", function(_, i) {
-						return "translate(" + (padding[3] + percentagePanel.padding[3] + 130 * i) + "," + (height - padding[2] / 2) + ")";
+						return "translate(" + (padding[3] + percentagePanel.padding[3] + 130 * i) + "," + (height - padding[2] + 6) + ")";
 					});
 
 				const legendRect = legendGroup.append("rect")
@@ -735,7 +946,7 @@
 					.append("g")
 					.attr("class", "pbiobePictogramLegendGroup")
 					.attr("transform", function() {
-						return "translate(" + (padding[3] + percentagePanel.width + panelVerticalPadding) + "," + (height - padding[2] / 2) + ")";
+						return "translate(" + (padding[3] + percentagePanel.width + panelVerticalPadding) + "," + (height - padding[2] + 8) + ")";
 					});
 
 				const headPath = pictogramLegendGroup.append("path")
@@ -755,10 +966,11 @@
 					.append("text")
 					.attr("class", "pbiobePictogramLegendText")
 					.attr("x", padding[3] + percentagePanel.width + panelVerticalPadding + 12)
-					.attr("y", height - padding[2] / 2 + 8)
+					.attr("y", height - padding[2] + 16)
 					.merge(pictogramLegendText)
 					.text(function(d) {
-						return ": approx. " + calculateRoundNumber((d / ~~(pictogramsPanel.width / pictogramWidth))) + " people";
+						const numberOfPeople = calculateRoundNumber((d / ~~(pictogramsPanel.width / pictogramWidth)));
+						return numberOfPeople ? ": approx. " + numberOfPeople + " people" : ": no people";
 					});
 
 				function calculateRoundNumber(people) {
@@ -769,67 +981,6 @@
 				};
 
 				//end of createBottomLegend
-			};
-
-			function createDownloadGroup() {
-
-				const downloadGroup = bottomGroup.append("g")
-					.attr("class", "pbiobeDownloadGroup")
-					.attr("transform", "translate(" + (width - padding[1] - excelIconSize - 6) +
-						"," + (height - padding[2]) + ")");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbiobeDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", excelIconSize - excelVerticalPadding);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", excelVerticalPadding);
-
-				downloadGroup.on("click", function() {
-
-					const csv = createCSV(rawData);
-
-					const fileName = "Beneficiaries" + chartState.selectedYear + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
-
-				//end of createDownloadGroup
 			};
 
 			function clickButtonsRects(d) {
@@ -854,6 +1005,15 @@
 
 				const data = processData(rawData);
 
+				selectDiv.selectAll(".pbiobeCheckboxDiv")
+					.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.select("input")
+					.property("disabled", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1;
+					});
+
 				createPercentagePanel(data);
 
 				createPictogramPanel(data);
@@ -863,9 +1023,8 @@
 				//end of clickButtonsRects
 			};
 
-			svg.selectAll(".pbiobeBeneficiaryGroup, .pbiobePictogramGroupGray, .pbiobePictogramGroupBlue")
+			svg.selectAll(".pbiobeBeneficiaryGroup, .pbiobePictogramRect")
 				.on("mouseover", mouseOverGroups)
-				.on("mousemove", mouseMoveGroups)
 				.on("mouseout", mouseOutGroups);
 
 			function mouseOverButtonsRects(d) {
@@ -883,8 +1042,6 @@
 						return e.beneficiary === d.beneficiary ? 1 : fadeOpacity;
 					});
 
-				const mouse = d3.mouse(svg.node());
-
 				const percentageText = d.targeted ? "(actual beneficiaries: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
 
 				tooltip.style("display", "block")
@@ -893,37 +1050,22 @@
 						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " actually benefited:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
 						formatComma(d.actual) + "</strong></div></div><div>" + percentageText + "</div>");
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
+				const thisBox = this.getBoundingClientRect();
 
-				localVariable.set(this, tooltipSize);
+				const containerBox = containerDiv.node().getBoundingClientRect();
 
-				tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-						d3.event.pageX - mouse[0] + "px" :
-						mouse[0] > (width - tooltipSize.width / 2) ?
-						d3.event.pageX - (mouse[0] - (width - tooltipSize.width)) + "px" :
-						d3.event.pageX - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] > height - tooltipSize.height + yScalePercentage.bandwidth() ?
-						d3.event.pageY - tooltipSize.height - yScalePercentage.bandwidth() + "px" :
-						d3.event.pageY + yScalePercentage.bandwidth() + "px");
+				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-			};
+				const thisOffsetTop = thisBox.top - containerBox.top;
 
-			function mouseMoveGroups(d) {
-
-				if (!localVariable.get(this)) return;
+				const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
 
 				const mouse = d3.mouse(svg.node());
 
-				const tooltipSize = localVariable.get(this);
-
-				tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-						d3.event.pageX - mouse[0] + "px" :
-						mouse[0] > (width - tooltipSize.width / 2) ?
-						d3.event.pageX - (mouse[0] - (width - tooltipSize.width)) + "px" :
-						d3.event.pageX - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] > height - tooltipSize.height + yScalePercentage.bandwidth() ?
-						d3.event.pageY - tooltipSize.height - yScalePercentage.bandwidth() + "px" :
-						d3.event.pageY + yScalePercentage.bandwidth() + "px");
+				tooltip.style("left", thisOffsetLeft + "px")
+					.style("top", mouse[1] > height - tooltipBox.height - yScalePercentage.bandwidth() ?
+						thisOffsetTop - tooltipBox.height - 6 + "px" :
+						thisOffsetTop + yScalePercentage.bandwidth() + 4 + "px");
 
 			};
 
@@ -936,14 +1078,18 @@
 			//end of draw
 		};
 
-
 		function processData(rawData) {
 
+			chartState.cbpfsInData.length = 0;
+
 			const filteredData = rawData.filter(function(d) {
-				return +d.AllocationYear === chartState.selectedYear;
+				return +d.AllocationYear === chartState.selectedYear && chartState.selectedCbpfs.indexOf("id" + d.PooledFundId) > -1;
 			});
 
 			const aggregatedData = filteredData.reduce(function(acc, curr) {
+				if (chartState.cbpfsInData.indexOf("id" + curr.PooledFundId) === -1) {
+					chartState.cbpfsInData.push("id" + curr.PooledFundId);
+				};
 				return {
 					boysActual: acc.boysActual + (+curr.ActualBoys),
 					boysTargeted: acc.boysTargeted + (+curr.PlannedBoys),
@@ -971,7 +1117,9 @@
 
 			const data = beneficiariesTypes.map(function(d) {
 				const percentage = aggregatedData[d + "Targeted"] !== 0 ?
-					aggregatedData[d + "Actual"] / aggregatedData[d + "Targeted"] : Math.PI;
+					aggregatedData[d + "Actual"] / aggregatedData[d + "Targeted"] :
+					aggregatedData[d + "Actual"] === 0 ?
+					0 : Math.PI;
 				return {
 					beneficiary: d,
 					targeted: aggregatedData[d + "Targeted"],
@@ -1018,9 +1166,230 @@
 			//end of createCSV
 		};
 
+		function createFooterDiv() {
+
+			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+
+			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText + footerLink + ".");
+
+			//end of createFooterDiv
+		};
+
+		function createAnnotationsDiv() {
+
+			const padding = 6;
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", "pbiobeOverDivHelp");
+
+			const overDivSize = overDiv.node().getBoundingClientRect();
+
+			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
+
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbiobeArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
+
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbiobeAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const cbpfsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 320 - padding)
+				.attr("y", 20 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const cbpfsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiobeAnnotationText")
+				.attr("x", 320)
+				.attr("y", 20)
+				.text("Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year.")
+				.call(wrapText2, 350);
+
+			const cbpfsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiobeArrowMarker)")
+				.attr("d", "M660,30 Q700,30 700,65");
+
+			cbpfsAnnotationRect.attr("width", cbpfsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
+
+			const yearAnnotationRect = helpSVG.append("rect")
+				.attr("x", 490 - padding)
+				.attr("y", 136 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const yearAnnotation = helpSVG.append("text")
+				.attr("class", "pbiobeAnnotationText")
+				.attr("x", 490)
+				.attr("y", 136)
+				.text("Use these buttons to select year.")
+				.call(wrapText2, 240);
+
+			const yearPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiobeArrowMarker)")
+				.attr("d", "M486,131 L456,131");
+
+			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
+
+			const percentageAnnotationRect = helpSVG.append("rect")
+				.attr("x", 150 - padding)
+				.attr("y", 356 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const percentageAnnotation = helpSVG.append("text")
+				.attr("class", "pbiobeAnnotationText")
+				.attr("x", 150)
+				.attr("y", 356)
+				.text("The blue bars represent the percentage of affected persons. Actual numbers of affected and targeted persons can be seen at the right-hand side of each bar.")
+				.call(wrapText2, 250);
+
+			const percentagePath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiobeArrowMarker)")
+				.attr("d", "M140,386 Q110,386 110,330");
+
+			percentageAnnotationRect.attr("width", percentageAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", percentageAnnotation.node().getBBox().height + padding * 2);
+
+			const absoluteAnnotationRect = helpSVG.append("rect")
+				.attr("x", 490 - padding)
+				.attr("y", 356 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const absoluteAnnotation = helpSVG.append("text")
+				.attr("class", "pbiobeAnnotationText")
+				.attr("x", 490)
+				.attr("y", 356)
+				.text("The pictograms represent the real proportions of affected and targeted persons, for each category. The number on the bottom indicates how many people (approximately) a single pictogram represents.")
+				.call(wrapText2, 250);
+
+			const absolutePath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiobeArrowMarker)")
+				.attr("d", "M560,445 Q520,470 510,516");
+
+			absoluteAnnotationRect.attr("width", absoluteAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", absoluteAnnotation.node().getBBox().height + padding * 2);
+
+			helpSVG.on("click", function() {
+				overDiv.remove();
+			});
+
+			//end of createAnnotationsDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
+		};
+
 		function validateYear(yearString) {
 			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+				+yearString : currentYear;
+		};
+
+		function populateSelectedCbpfs(cbpfsString) {
+
+			const cbpfs = [];
+
+			const dataArray = cbpfsString.split(",").map(function(d) {
+				return d.trim().toLowerCase();
+			});
+
+			const someInvalidValue = dataArray.some(function(d) {
+				return valuesInLowerCase(d3.values(cbpfsList)).indexOf(d) === -1
+			});
+
+			if (someInvalidValue) return d3.keys(cbpfsList);
+
+			dataArray.forEach(function(d) {
+				for (var key in cbpfsList) {
+					if (cbpfsList[key].toLowerCase() === d) cbpfs.push(key)
+				};
+			});
+
+			return cbpfs;
+
+		};
+
+		function valuesInLowerCase(map) {
+			const values = [];
+			for (let key in map) values.push(map[key].toLowerCase());
+			return values;
 		};
 
 		function capitalize(str) {
