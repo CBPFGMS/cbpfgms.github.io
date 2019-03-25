@@ -270,7 +270,7 @@
 
 			createTitle();
 
-			createCheckboxes(rawData);
+			createCheckboxes();
 
 			createFooterDiv();
 
@@ -348,7 +348,7 @@
 				//end of createTitle
 			};
 
-			function createCheckboxes(data) {
+			function createCheckboxes() {
 
 				const checkboxData = d3.keys(cbpfsList);
 
