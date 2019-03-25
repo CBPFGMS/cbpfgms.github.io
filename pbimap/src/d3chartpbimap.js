@@ -2123,14 +2123,17 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6,
-				helpHeight = 609;
+			const padding = 6;
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbimapOverDivHelp");
 
+			const overDivSize = overDiv.node().getBoundingClientRect();
+
+			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + helpHeight);
+				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
