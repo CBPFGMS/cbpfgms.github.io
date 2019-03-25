@@ -283,6 +283,8 @@
 
 			createBottomLegend();
 
+			if (showHelp) createAnnotationsDiv();
+
 			function createTitle() {
 
 				const title = titleDiv.append("p")
