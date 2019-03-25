@@ -97,6 +97,7 @@
 			percentageHorNegPadding3 = -42,
 			percentageBarLimit = 0.9,
 			tooltipWidth = 278,
+			disabledOpacity = 0.6,
 			chartTitleDefault = "Beneficiary Overview",
 			currentYear = new Date().getFullYear(),
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + beneficiariesHeight + padding[2],
@@ -358,6 +359,13 @@
 					.enter()
 					.append("div")
 					.attr("class", "pbiobeCheckboxDiv");
+
+				checkboxDivs.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.style("opacity", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1 ? disabledOpacity : 1;
+					});
 
 				const checkbox = checkboxDivs.append("label");
 
@@ -1016,6 +1024,14 @@
 						return chartState.cbpfsInData.indexOf(d) === -1;
 					});
 
+				selectDiv.selectAll(".pbiobeCheckboxDiv")
+					.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.style("opacity", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1 ? disabledOpacity : 1;
+					});
+
 				createPercentagePanel(data);
 
 				createPictogramPanel(data);
@@ -1084,14 +1100,17 @@
 
 			chartState.cbpfsInData.length = 0;
 
+			rawData.forEach(function(row) {
+				if (+row.AllocationYear === chartState.selectedYear && chartState.cbpfsInData.indexOf("id" + row.PooledFundId) === -1) {
+					chartState.cbpfsInData.push("id" + row.PooledFundId);
+				};
+			});
+
 			const filteredData = rawData.filter(function(d) {
 				return +d.AllocationYear === chartState.selectedYear && chartState.selectedCbpfs.indexOf("id" + d.PooledFundId) > -1;
 			});
 
 			const aggregatedData = filteredData.reduce(function(acc, curr) {
-				if (chartState.cbpfsInData.indexOf("id" + curr.PooledFundId) === -1) {
-					chartState.cbpfsInData.push("id" + curr.PooledFundId);
-				};
 				return {
 					boysActual: acc.boysActual + (+curr.ActualBoys),
 					boysTargeted: acc.boysTargeted + (+curr.PlannedBoys),
