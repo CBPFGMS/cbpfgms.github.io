@@ -2156,26 +2156,26 @@
 				.style("stroke", "white")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 270)
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 270)
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
 				.attr("x", 12 - padding)
-				.attr("y", 45 - padding - 10)
+				.attr("y", 35 - padding - 10)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 12)
-				.attr("y", 45)
+				.attr("y", 35)
 				.text("Use this menu to select one or more years. Greyed-out years were not downloaded yet (please wait some time).")
 				.call(wrapText2, 260);
 
@@ -2184,7 +2184,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M70,80 L70,100");
+				.attr("d", "M70,70 L70,90");
 
 			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
@@ -2205,22 +2205,24 @@
 			const filtersPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
+				.style("stroke-width", "2px")
 				.attr("pointer-events", "none")
-				.attr("d", "M 790 110 Q 790 90.8 627.5 97.2 T 465 78 M 140 110 Q 140 90.8 302.5 97.2 T 465 78");
+				.attr("d", "M 790 110 Q 790 90.8 627.5 97.2 T 465 78 M 140 110 Q 140 90.8 302.5 97.2 T 465 78")
+				.attr("transform", "translate(10,24) scale(0.8 0.7)");
 
 			filtersAnnotationRect.attr("width", filtersAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", filtersAnnotation.node().getBBox().height + padding * 2);
 
 			const resetAnnotationRect = helpSVG.append("rect")
 				.attr("x", 750 - padding)
-				.attr("y", 45 - padding - 10)
+				.attr("y", 35 - padding - 10)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const resetAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 750)
-				.attr("y", 45)
+				.attr("y", 35)
 				.text("This button resets all menus (and the map) to the initial values.")
 				.call(wrapText2, 140);
 
@@ -2229,21 +2231,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M858,80 L858,100");
+				.attr("d", "M858,70 L858,90");
 
 			resetAnnotationRect.attr("width", resetAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", resetAnnotation.node().getBBox().height + padding * 2);
 
 			const mapAnnotationRect = helpSVG.append("rect")
 				.attr("x", 140 - padding)
-				.attr("y", 190 - padding - 14)
+				.attr("y", 170 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const mapAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 140)
-				.attr("y", 190)
+				.attr("y", 170)
 				.text("In the map area, hover over a marker to get additional information. You can zoom and pan the map.")
 				.call(wrapText2, 180);
 
@@ -2252,14 +2254,14 @@
 
 			const tooltipAnnotationRect = helpSVG.append("rect")
 				.attr("x", 400 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 330 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const tooltipAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 400)
-				.attr("y", 370)
+				.attr("y", 330)
 				.text("When you hover over a marker a tooltip like this shows up. Click “Generate List of Projects” to create a table below the map, with all the projects for that marker.")
 				.call(wrapText2, 220);
 
@@ -2270,7 +2272,7 @@
 				.attr("width", 260)
 				.attr("height", 241)
 				.attr("x", 630)
-				.attr("y", 270)
+				.attr("y", 240)
 				.style("opacity", 0.6);
 
 			const tooltipPath = helpSVG.append("path")
@@ -2278,28 +2280,28 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M500,440 Q500,490 660,490");
+				.attr("d", "M500,410 Q500,460 660,460");
 
 			tooltipAnnotationRect.attr("width", tooltipAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", tooltipAnnotation.node().getBBox().height + padding * 2);
 
 			const legendAnnotationRect = helpSVG.append("rect")
 				.attr("x", 80 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 300 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const legendAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 80)
-				.attr("y", 370)
+				.attr("y", 300)
 				.text("Click here to encode allocations by “size” (larger markers indicate bigger allocations) or by “color” (darker markers indicate bigger allocations).")
 				.call(wrapText2, 220);
 
 			const legendEllipse = helpSVG.append("ellipse")
-				.attr("cx", 58)
-				.attr("cy", 478)
-				.attr("rx", 52)
+				.attr("cx", 48)
+				.attr("cy", 400)
+				.attr("rx", 42)
 				.attr("ry", 18)
 				.style("fill", "none")
 				.style("stroke", "#E56A54");
@@ -2309,21 +2311,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M110,478 Q160,478 160,445");
+				.attr("d", "M90,400 Q130,400 130,380");
 
 			legendAnnotationRect.attr("width", legendAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", legendAnnotation.node().getBBox().height + padding * 2);
 
 			const breadcrumbAnnotationRect = helpSVG.append("rect")
-				.attr("x", 240 - padding)
-				.attr("y", 500 - padding - 14)
+				.attr("x", 200 - padding)
+				.attr("y", 400 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const breadcrumbAnnotation = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationText")
-				.attr("x", 240)
-				.attr("y", 500)
+				.attr("x", 200)
+				.attr("y", 400)
 				.text("This sequence indicates the current selection for all menus.")
 				.call(wrapText2, 180);
 
@@ -2332,7 +2334,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M320,530 L320,555");
+				.attr("d", "M260,430 L260,465");
 
 			breadcrumbAnnotationRect.attr("width", breadcrumbAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", breadcrumbAnnotation.node().getBBox().height + padding * 2);
