@@ -70,7 +70,7 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows a force-directed graph will all the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc) for more information.
 
-- **GMS BI: CBPF Overview, beneficiaries bar and pictogram chart**
+- **GMS BI: Beneficiary Overview, beneficiaries bar and pictogram chart**
 
 Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
 
@@ -78,7 +78,7 @@ Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelli
 
 This charts shows the percentage and proportions of targeted and actual beneficiaries, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe) for more information.
 
-- **GMS BI: CBPF Overview, lollipop chart**
+- **GMS BI: Cluster Overview, lollipop chart**
 
 Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
 
