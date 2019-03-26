@@ -1,8 +1,10 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiolc.css"];
+	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
+
+	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiolc.css", fontAwesomeLink];
 
 	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
@@ -13,6 +15,10 @@
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
+			if (cssLink === fontAwesomeLink) {
+				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
+				externalCSS.setAttribute("crossorigin", "anonymous");
+			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
 
@@ -67,7 +73,7 @@
 
 	function d3Chart() {
 
-		const width = 1130,
+		const width = 900,
 			padding = [4, 4, 4, 4],
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 4,
@@ -95,10 +101,12 @@
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + lollipopPanelsHeight + padding[2],
 			stickHeight = 2,
 			lollipopRadius = 4,
-			lollipopsPanelsRatio = 0.38,
+			lollipopsPanelsRatio = 0.345,
 			buttonsTitleMargin = 4,
 			buttonsNumber = 8,
 			duration = 1000,
+			chartTitleDefault = "Cluster Overview",
+			currentYear = new Date().getFullYear(),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
@@ -107,6 +115,7 @@
 			clusterSymbolsDirectory = "",
 			clusterIconSize = 20,
 			clusterIconPadding = 3,
+			disabledOpacity = 0.6,
 			windowHeight = window.innerHeight,
 			symbolSize = 16,
 			xScaleDomainMargin = 1.1,
@@ -116,21 +125,28 @@
 			tooltipBarWidth = 288,
 			modalities = ["total", "standard", "reserve"],
 			beneficiaries = ["targeted", "actual"],
-			excelIconSize = 20,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
 			clusterIconsPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/",
+			cbpfsList = {},
 			chartState = {
 				selectedYear: null,
 				selectedModality: null,
 				selectedBeneficiary: null,
-				sorting: "allocations"
+				sorting: "allocations",
+				selectedCbpfs: null,
+				cbpfsInData: []
 			};
 
 		let yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
 
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
+
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
+
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
 
 		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality")) > -1 ?
 			containerDiv.node().getAttribute("data-modality") : "total";
@@ -147,13 +163,31 @@
 				.style("height", height + "px");
 		};
 
+		const topDiv = containerDiv.append("div")
+			.attr("class", "pbiolcTopDiv");
+
+		const titleDiv = topDiv.append("div")
+			.attr("class", "pbiolcTitleDiv");
+
+		const iconsDiv = topDiv.append("div")
+			.attr("class", "pbiolcIconsDiv d3chartIconsDiv");
+
+		const selectTitleDiv = containerDiv.append("div")
+			.attr("class", "pbiolcSelectTitleDiv");
+
+		const selectDiv = containerDiv.append("div")
+			.attr("class", "pbiolcSelectDiv");
+
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "pbiolcFooterDiv");
+
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiolctooltipdiv")
 			.style("display", "none");
 
@@ -170,8 +204,7 @@
 			arrowPadding: 18,
 			buttonModalitiesWidth: 68,
 			buttonBeneficiariesWidth: 62,
-			modalitiesPadding: 480,
-			beneficiariesPadding: 800
+			beneficiariesPadding: 750
 		};
 
 		const allocationsPanel = {
@@ -232,7 +265,7 @@
 		const xAxisAllocations = d3.axisTop(xScaleAllocations)
 			.tickSizeOuter(0)
 			.tickSizeInner(-(lollipopGroupHeight * clusters.length))
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
@@ -240,7 +273,7 @@
 		const xAxisBeneficiaries = d3.axisTop(xScaleBeneficiaries)
 			.tickSizeOuter(0)
 			.tickSizeInner(-(lollipopGroupHeight * clusters.length))
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
 				return formatSIaxes(d).replace("G", "B");
 			});
@@ -259,13 +292,14 @@
 			.type(d3.symbolTriangle)
 			.size(symbolSize);
 
-		//STATIC FILE!!
-
-		d3.csv("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datapbiolc.csv").then(function(rawData) {
+		d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
 
 			removeProgressWheel();
 
 			yearsArray = rawData.map(function(d) {
+				if (!cbpfsList["id" + d.PooledFundId]) {
+					cbpfsList["id" + d.PooledFundId] = d.PooledFundName;
+				};
 				return +d.AllocationYear
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
@@ -279,6 +313,10 @@
 
 			chartState.selectedBeneficiary = selectedBeneficiary;
 
+			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
+
+			saveFlags(clusters);
+
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
@@ -289,7 +327,7 @@
 			function checkPosition() {
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.pbiolc", null); 
+					d3.select(window).on("scroll.pbiolc", null);
 					draw(rawData);
 				};
 			};
@@ -305,6 +343,12 @@
 
 			sortData(data);
 
+			createTitle();
+
+			createCheckboxes();
+
+			createFooterDiv();
+
 			createButtonsPanel();
 
 			createLabelsPanel();
@@ -312,6 +356,166 @@
 			createAllocationsPanel();
 
 			createBeneficiariesPanel();
+
+			if (showHelp) createAnnotationsDiv();
+
+			function createTitle() {
+
+				const title = titleDiv.append("p")
+					.attr("id", "pbiolcd3chartTitle")
+					.html(chartTitle);
+
+				const helpIcon = iconsDiv.append("button")
+					.attr("id", "pbiolcHelpButton");
+
+				helpIcon.html("HELP  ")
+					.append("span")
+					.attr("class", "fas fa-info")
+
+				const downloadIcon = iconsDiv.append("button")
+					.attr("id", "pbiolcDownloadButton");
+
+				downloadIcon.html(".CSV  ")
+					.append("span")
+					.attr("class", "fas fa-download");
+
+				selectTitleDiv.html("Select CBPF:");
+
+				helpIcon.on("click", createAnnotationsDiv);
+
+				downloadIcon.on("click", function() {
+
+					const csv = createCSV(data);
+
+					const fileName = "Clusters" + chartState.selectedYear + ".csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+
+				});
+
+				//end of createTitle
+			};
+
+			function createCheckboxes() {
+
+				const checkboxData = d3.keys(cbpfsList);
+
+				checkboxData.push("All CBPFs");
+
+				const checkboxDivs = selectDiv.selectAll(null)
+					.data(checkboxData)
+					.enter()
+					.append("div")
+					.attr("class", "pbiolcCheckboxDiv");
+
+				checkboxDivs.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.style("opacity", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1 ? disabledOpacity : 1;
+					});
+
+				const checkbox = checkboxDivs.append("label");
+
+				const input = checkbox.append("input")
+					.attr("type", "checkbox")
+					.property("checked", function(d) {
+						return chartState.selectedCbpfs.indexOf(d) > -1;
+					})
+					.attr("value", function(d) {
+						return d;
+					});
+
+				const span = checkbox.append("span")
+					.attr("class", "pbiolcCheckboxText")
+					.html(function(d) {
+						return cbpfsList[d] || d;
+					});
+
+				const allCbpfs = checkboxDivs.filter(function(d) {
+					return d === "All CBPFs";
+				}).select("input");
+
+				const cbpfsCheckboxes = checkboxDivs.filter(function(d) {
+					return d !== "All CBPFs";
+				}).select("input");
+
+				cbpfsCheckboxes.property("disabled", function(d) {
+					return chartState.cbpfsInData.indexOf(d) === -1;
+				});
+
+				allCbpfs.property("checked", function() {
+						return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+					})
+					.property("indeterminate", function() {
+						return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
+					});
+
+				checkbox.select("input").on("change", function() {
+					if (this.value === "All CBPFs") {
+						if (this.checked) {
+							chartState.selectedCbpfs = d3.keys(cbpfsList)
+						} else {
+							chartState.selectedCbpfs.length = 0;
+						};
+						checkbox.select("input")
+							.property("checked", this.checked);
+					} else {
+						if (this.checked) {
+							chartState.selectedCbpfs.push(this.value);
+						} else {
+							const thisIndex = chartState.selectedCbpfs.indexOf(this.value);
+							chartState.selectedCbpfs.splice(thisIndex, 1);
+						};
+						allCbpfs.property("checked", function() {
+								return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+							})
+							.property("indeterminate", function() {
+								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
+							});
+					};
+
+					data = processData(rawData);
+
+					setxScaleDomains(data);
+
+					sortData(data);
+
+					createLabelsPanel();
+
+					createAllocationsPanel();
+
+					createBeneficiariesPanel();
+
+				});
+
+				//end of createCheckboxes
+			};
 
 			function createButtonsPanel() {
 
@@ -323,7 +527,6 @@
 
 				const modalitiesTitle = buttonsPanel.main.append("text")
 					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("x", buttonsPanel.modalitiesPadding + 2)
 					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
 					.text("Modality:");
 
@@ -485,7 +688,6 @@
 
 				const buttonsModalitiesGroup = buttonsPanel.main.append("g")
 					.attr("class", "pbiolcbuttonsModalitiesGroup")
-					.attr("transform", "translate(" + buttonsPanel.modalitiesPadding + ",0)")
 					.style("cursor", "pointer");
 
 				const buttonsModalitiesRects = buttonsModalitiesGroup.selectAll(null)
@@ -527,6 +729,17 @@
 					.text(function(d) {
 						return capitalize(d);
 					});
+
+				const buttonsGroupSize = Math.min(buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsGroup.node().getBoundingClientRect().width,
+					buttonsPanel.padding[3] + buttonsNumber * buttonsPanel.buttonWidth + 2 * buttonsPanel.arrowPadding);
+
+				const buttonsModalitiesSize = buttonsModalitiesGroup.node().getBoundingClientRect().width;
+
+				const modalitiesPosition = buttonsGroupSize + (buttonsPanel.beneficiariesPadding - buttonsGroupSize - buttonsModalitiesSize) / 2;
+
+				modalitiesTitle.attr("x", modalitiesPosition + 2);
+
+				buttonsModalitiesGroup.attr("transform", "translate(" + modalitiesPosition + ",0)");
 
 				const buttonsBeneficiariesGroup = buttonsPanel.main.append("g")
 					.attr("class", "pbiolcbuttonsBeneficiariesGroup")
@@ -573,27 +786,6 @@
 						return capitalize(d);
 					});
 
-				const downloadGroup = buttonsPanel.main.append("g")
-					.attr("class", "pbiolcDownloadGroup")
-					.attr("transform", "translate(" + (buttonsPanel.width - buttonsPanel.padding[1] - excelIconSize - 6) +
-						"," + buttonsPanel.padding[0] + ")");
-
-				const downloadText = downloadGroup.append("text")
-					.attr("class", "pbiolcDownloadText")
-					.attr("x", -2)
-					.attr("text-anchor", "end")
-					.style("cursor", "pointer")
-					.text("Save data")
-					.attr("y", excelIconSize - buttonsPanel.buttonVerticalPadding / 2);
-
-				const excelIcon = downloadGroup.append("image")
-					.style("cursor", "pointer")
-					.attr("x", 2)
-					.attr("width", excelIconSize + "px")
-					.attr("height", excelIconSize + "px")
-					.attr("xlink:href", excelIconPath)
-					.attr("y", buttonsPanel.buttonVerticalPadding);
-
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
 					.on("click", clickButtonsRects);
@@ -605,41 +797,6 @@
 				buttonsBeneficiariesRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsBeneficiariesRects)
 					.on("click", clickButtonsBeneficiariesRects);
-
-				downloadGroup.on("click", function() {
-
-					const csv = createCSV(data);
-
-					const fileName = "Clusters" + chartState.selectedYear + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
 
 				function checkCurrentTranslate() {
 
@@ -692,7 +849,7 @@
 					.attr("class", "pbiolcLabelGroupText")
 					.attr("text-anchor", "middle")
 					.attr("y", clusterIconSize / 5)
-					.attr("x", labelsPanel.width / 2)
+					.attr("x", labelsPanel.width / 2 + clusterIconSize / 2)
 					.text(function(d) {
 						return d.cluster;
 					});
@@ -702,11 +859,12 @@
 					.attr("height", clusterIconSize + "px")
 					.attr("x", function() {
 						return (labelsPanel.width - this.previousSibling.getComputedTextLength()) / 2 -
-							clusterIconSize - clusterIconPadding;
+							clusterIconSize / 2 - clusterIconPadding;
 					})
 					.attr("y", -(1 + clusterIconSize / 2))
 					.attr("xlink:href", function(d) {
-						return clusterIconsPath + "cluster" + d.clusterKey.toLowerCase() + ".png";
+						return localStorage.getItem("storedCluster" + d.clusterKey.toLowerCase()) ? localStorage.getItem("storedCluster" + d.clusterKey.toLowerCase()) :
+							clusterIconsPath + "cluster" + d.clusterKey.toLowerCase() + ".png";
 					});
 
 				const labelTooltipRectangleEnter = labelGroupEnter.append("rect")
@@ -728,7 +886,6 @@
 				const labelTooltipRectangle = labelGroup.select(".pbiolcLabelsTooltipRectangle");
 
 				labelTooltipRectangle.on("mouseover", clusterMouseOver)
-					.on("mousemove", clusterMouseMove)
 					.on("mouseout", clusterMouseOut);
 
 				//end of createLabelsPanel
@@ -752,9 +909,8 @@
 
 				allocationsPanel.main.select(".pbiolcAllocationsPanelTitle")
 					.on("mouseover", function() {
-						mouseOverTitles("value of allocations.")
-					}).on("mousemove", mouseMoveTitles)
-					.on("mouseout", mouseOutTooltip);
+						mouseOverTitles("value of allocations.", this)
+					}).on("mouseout", mouseOutTooltip);
 
 				let sortByAllocations = allocationsPanel.main.selectAll(".pbiolcSortByAllocations")
 					.data([true]);
@@ -877,7 +1033,6 @@
 				const allocationsTooltipRectangle = allocationsGroup.select(".pbiolcAllocationsTooltipRectangle");
 
 				allocationsTooltipRectangle.on("mouseover", clusterMouseOver)
-					.on("mousemove", clusterMouseMove)
 					.on("mouseout", clusterMouseOut);
 
 				groupXAxisAllocations.transition()
@@ -910,9 +1065,8 @@
 
 				beneficiariesPanel.main.select(".pbiolcBeneficiariesPanelTitle")
 					.on("mouseover", function() {
-						mouseOverTitles("number of beneficiaries.")
-					}).on("mousemove", mouseMoveTitles)
-					.on("mouseout", mouseOutTooltip);
+						mouseOverTitles("number of beneficiaries.", this)
+					}).on("mouseout", mouseOutTooltip);
 
 				let sortByBeneficiaries = beneficiariesPanel.main.selectAll(".pbiolcSortByBeneficiaries")
 					.data([true]);
@@ -1033,7 +1187,6 @@
 				const beneficiariesTooltipRectangle = beneficiariesGroup.select(".pbiolcBeneficiariesTooltipRectangle");
 
 				beneficiariesTooltipRectangle.on("mouseover", clusterMouseOver)
-					.on("mousemove", clusterMouseMove)
 					.on("mouseout", clusterMouseOut);
 
 				groupXAxisBeneficiaries.transition()
@@ -1071,6 +1224,23 @@
 					});
 
 				data = processData(rawData);
+
+				selectDiv.selectAll(".pbiolcCheckboxDiv")
+					.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.select("input")
+					.property("disabled", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1;
+					});
+
+				selectDiv.selectAll(".pbiolcCheckboxDiv")
+					.filter(function(d) {
+						return d !== "All CBPFs";
+					})
+					.style("opacity", function(d) {
+						return chartState.cbpfsInData.indexOf(d) === -1 ? disabledOpacity : 1;
+					});
 
 				setxScaleDomains(data);
 
@@ -1196,16 +1366,22 @@
 				d3.select(this).style("fill", "white");
 			};
 
-			function mouseOverTitles(type) {
+			function mouseOverTitles(type, self) {
 				tooltip.style("display", "block")
-					.html("<div style='max-width:190px;'>Click here to sort the clusters according to the " + type + "</div>")
-					.style("top", d3.event.pageY - 28 + "px")
-					.style("left", d3.event.pageX + 22 + "px")
-			};
+					.html("<div style='max-width:190px;'>Click here to sort the clusters according to the " + type + "</div>");
 
-			function mouseMoveTitles() {
-				tooltip.style("top", d3.event.pageY - 28 + "px")
-					.style("left", d3.event.pageX + 22 + "px")
+				const thisBox = self.getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top;
+
+				const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+				tooltip.style("left", thisOffsetLeft + "px")
+					.style("top", thisOffsetTop + 26 + "px");
 			};
 
 			function mouseOutTooltip() {
@@ -1218,8 +1394,6 @@
 					.style("opacity", function(e) {
 						return d.cluster === e.cluster ? 1 : fadeOpacity;
 					});
-
-				const mouse = d3.mouse(svg.node());
 
 				tooltip.style("display", "block");
 
@@ -1260,40 +1434,22 @@
 
 				};
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
+				const thisBox = this.getBoundingClientRect();
 
-				localVariable.set(this, tooltipSize);
+				const containerBox = containerDiv.node().getBoundingClientRect();
 
-				tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-						d3.event.pageX - mouse[0] + "px" :
-						mouse[0] > (width - tooltipSize.width / 2) ?
-						d3.event.pageX - (mouse[0] - (width - tooltipSize.width)) + "px" :
-						d3.event.pageX - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] > height - tooltipSize.height + lollipopGroupHeight ?
-						d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
-						d3.event.pageY + lollipopGroupHeight + "px");
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top;
+
+				const thisOffsetLeft = width / 2 - tooltipBox.width / 2;
+
+				tooltip.style("left", thisOffsetLeft + "px")
+					.style("top", (containerBox.bottom - thisBox.bottom) < tooltipBox.height ?
+						thisOffsetTop - tooltipBox.height - 6 + "px" :
+						thisOffsetTop + 28 + "px");
 
 				//end of clusterMouseOver
-			};
-
-			function clusterMouseMove() {
-
-				if (!localVariable.get(this)) return;
-
-				const mouse = d3.mouse(svg.node());
-
-				const tooltipSize = localVariable.get(this);
-
-				tooltip.style("left", mouse[0] < tooltipSize.width / 2 ?
-						d3.event.pageX - mouse[0] + "px" :
-						mouse[0] > (width - tooltipSize.width / 2) ?
-						d3.event.pageX - (mouse[0] - (width - tooltipSize.width)) + "px" :
-						d3.event.pageX - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] > height - tooltipSize.height + lollipopGroupHeight ?
-						d3.event.pageY - tooltipSize.height - lollipopGroupHeight + "px" :
-						d3.event.pageY + lollipopGroupHeight + "px");
-
-				//end of clusteMouseMove
 			};
 
 			function clusterMouseOut() {
@@ -1348,6 +1504,8 @@
 
 		function processData(rawData) {
 
+			chartState.cbpfsInData.length = 0;
+
 			const data = clusters.map(function(d) {
 				return {
 					cluster: d,
@@ -1364,8 +1522,14 @@
 				};
 			});
 
+			rawData.forEach(function(row) {
+				if (+row.AllocationYear === chartState.selectedYear && chartState.cbpfsInData.indexOf("id" + row.PooledFundId) === -1) {
+					chartState.cbpfsInData.push("id" + row.PooledFundId);
+				};
+			});
+
 			const filteredData = rawData.filter(function(d) {
-				return +d.AllocationYear === chartState.selectedYear;
+				return +d.AllocationYear === chartState.selectedYear && chartState.selectedCbpfs.indexOf("id" + d.PooledFundId) > -1;
 			});
 
 			filteredData.forEach(function(d) {
@@ -1375,15 +1539,15 @@
 				});
 
 				if (d.AllocationSourceName === "Standard") {
-					foundCluster.standard += +d.Budgetbycluster;
-					foundCluster.total += +d.Budgetbycluster;
+					foundCluster.standard += +d.BudgetByCluster;
+					foundCluster.total += +d.BudgetByCluster;
 					foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
 					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
 					foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
 					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
 				} else {
-					foundCluster.reserve += +d.Budgetbycluster;
-					foundCluster.total += +d.Budgetbycluster;
+					foundCluster.reserve += +d.BudgetByCluster;
+					foundCluster.total += +d.BudgetByCluster;
 					foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
 					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
 					foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
@@ -1436,6 +1600,36 @@
 		function validateYear(yearString) {
 			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
 				+yearString : new Date().getFullYear()
+		};
+
+		function populateSelectedCbpfs(cbpfsString) {
+
+			const cbpfs = [];
+
+			const dataArray = cbpfsString.split(",").map(function(d) {
+				return d.trim().toLowerCase();
+			});
+
+			const someInvalidValue = dataArray.some(function(d) {
+				return valuesInLowerCase(d3.values(cbpfsList)).indexOf(d) === -1
+			});
+
+			if (someInvalidValue) return d3.keys(cbpfsList);
+
+			dataArray.forEach(function(d) {
+				for (var key in cbpfsList) {
+					if (cbpfsList[key].toLowerCase() === d) cbpfs.push(key)
+				};
+			});
+
+			return cbpfs;
+
+		};
+
+		function valuesInLowerCase(map) {
+			const values = [];
+			for (let key in map) values.push(map[key].toLowerCase());
+			return values;
 		};
 
 		function capitalize(str) {
@@ -1536,6 +1730,319 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
+		};
+
+		function createFooterDiv() {
+
+			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+
+			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText + footerLink + ".");
+
+			//end of createFooterDiv
+		};
+
+		function saveFlags(clustersList) {
+
+			clustersList.forEach(function(d) {
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + ".png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, clusterCode) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(clusterCode, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(clusterCode, base64) {
+				localStorage.setItem("storedCluster" + clusterCode, base64);
+			};
+
+			//end of saveFlags
+		};
+
+		function createAnnotationsDiv() {
+
+			const padding = 6;
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", "pbiolcOverDivHelp");
+
+			const overDivSize = overDiv.node().getBoundingClientRect();
+
+			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
+
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbiolcArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
+
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 320)
+				.text("CLICK ANYWHERE TO START");
+
+			const cbpfsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 300 - padding)
+				.attr("y", 20 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const cbpfsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 300)
+				.attr("y", 20)
+				.text("Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year.")
+				.call(wrapText2, 350);
+
+			const cbpfsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M290,30 Q260,30 260,60");
+
+			cbpfsAnnotationRect.attr("width", cbpfsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
+
+			const yearAnnotationRect = helpSVG.append("rect")
+				.attr("x", 50 - padding)
+				.attr("y", 110 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const yearAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 50)
+				.attr("y", 110)
+				.text("Use these buttons to select year.")
+				.call(wrapText2, 180);
+
+			const yearPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M190,106 Q210,106 210,122");
+
+			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
+
+			const modalityAnnotationRect = helpSVG.append("rect")
+				.attr("x", 400 - padding)
+				.attr("y", 110 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const modalityAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 400)
+				.attr("y", 110)
+				.text("Use these buttons to select modality type.")
+				.call(wrapText2, 180);
+
+			const modalityPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M542,106 Q562,106 562,122");
+
+			modalityAnnotationRect.attr("width", modalityAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
+
+			const beneficiaryAnnotationRect = helpSVG.append("rect")
+				.attr("x", 640 - padding)
+				.attr("y", 110 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const beneficiaryAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 640)
+				.attr("y", 110)
+				.text("Use these buttons to show targeted or actual persons.")
+				.call(wrapText2, 180);
+
+			const beneficiaryPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M822,106 Q842,106 842,122");
+
+			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
+
+			const allocationsSortAnnotationRect = helpSVG.append("rect")
+				.attr("x", 300 - padding)
+				.attr("y", 220 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const allocationsSortAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 300)
+				.attr("y", 220)
+				.text("Click here to sort by allocations.")
+				.call(wrapText2, 180);
+
+			const allocationsSortPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M298,226 Q270,226 270,206");
+
+			allocationsSortAnnotationRect.attr("width", allocationsSortAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", allocationsSortAnnotation.node().getBBox().height + padding * 2);
+
+			const beneficiariesSortAnnotationRect = helpSVG.append("rect")
+				.attr("x", 700 - padding)
+				.attr("y", 220 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const beneficiariesSortAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 700)
+				.attr("y", 220)
+				.text("Click here to sort by beneficiaries.")
+				.call(wrapText2, 180);
+
+			const beneficiariesSortPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiolcArrowMarker)")
+				.attr("d", "M698,226 Q670,226 670,206");
+
+			beneficiariesSortAnnotationRect.attr("width", beneficiariesSortAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", beneficiariesSortAnnotation.node().getBBox().height + padding * 2);
+
+			const allocChartAnnotationRect = helpSVG.append("rect")
+				.attr("x", 120 - padding)
+				.attr("y", 370 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const allocChartAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 120)
+				.attr("y", 370)
+				.text("This area depicts the amount allocated by cluster. The black triangles indicate standard allocations.")
+				.call(wrapText2, 250);
+
+			allocChartAnnotationRect.attr("width", allocChartAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", allocChartAnnotation.node().getBBox().height + padding * 2);
+
+			const benefChartAnnotationRect = helpSVG.append("rect")
+				.attr("x", 580 - padding)
+				.attr("y", 370 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const benefChartAnnotation = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationText")
+				.attr("x", 580)
+				.attr("y", 370)
+				.text("This area depicts the number of beneficiaries (targeted or actual) for each cluster. The black triangles indicate beneficiaries affected by standard allocations.")
+				.call(wrapText2, 250);
+
+			benefChartAnnotationRect.attr("width", benefChartAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", benefChartAnnotation.node().getBBox().height + padding * 2);
+
+			helpSVG.on("click", function() {
+				overDiv.remove();
+			});
+
+			//end of createAnnotationsDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
 		};
 
 		function createProgressWheel() {
