@@ -98,10 +98,11 @@
 			percentageBarLimit = 0.9,
 			tooltipWidth = 278,
 			disabledOpacity = 0.6,
+			localVariable = d3.local(),
 			chartTitleDefault = "Beneficiary Overview",
 			currentYear = new Date().getFullYear(),
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + beneficiariesHeight + padding[2],
-			beneficiariesTypes = ["total", "girls", "boys", "women", "men"],
+			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
 			legendData = ["Affected Persons", "Targeted Persons"],
@@ -111,9 +112,29 @@
 				selectedCbpfs: null,
 				cbpfsInData: []
 			},
-			bodyDAttribute = "M 2.954 5.168 C 2.151 5.168 1.463 5.465 0.882 6.038 C 0.299 6.637 0 7.334 0 8.11 L 0 15.286 C 0 15.555 0.092 15.798 0.299 15.995 C 0.491 16.189 0.731 16.277 1.002 16.277 C 1.314 16.277 1.553 16.189 1.745 15.995 C 1.912 15.798 1.999 15.555 1.999 15.286 L 1.999 8.87 L 2.518 8.87 L 2.518 26.634 C 2.518 26.976 2.668 27.292 2.952 27.536 C 3.219 27.805 3.53 27.92 3.889 27.92 C 4.277 27.92 4.59 27.805 4.843 27.536 C 5.112 27.292 5.234 26.976 5.234 26.634 L 5.234 16.337 L 5.815 16.337 L 5.815 26.634 C 5.815 26.976 5.95 27.292 6.202 27.536 C 6.456 27.805 6.785 27.92 7.186 27.92 C 7.528 27.92 7.827 27.805 8.096 27.536 C 8.348 27.292 8.464 26.976 8.464 26.634 L 8.464 8.87 L 9.006 8.87 L 9.006 15.286 C 9.006 15.555 9.091 15.798 9.271 15.995 C 9.484 16.189 9.731 16.277 10.001 16.277 C 10.317 16.277 10.556 16.189 10.735 15.995 C 10.897 15.798 11 15.555 11 15.286 L 11 8.111 C 11 7.337 10.718 6.637 10.135 6.041 C 9.567 5.465 8.886 5.171 8.051 5.171 L 2.954 5.171 L 2.954 5.168 Z",
-			headDAttribute = "M 5.516 4.578 C 6.142 4.578 6.695 4.372 7.139 3.942 C 7.583 3.499 7.81 2.953 7.81 2.294 C 7.81 1.667 7.581 1.129 7.137 0.685 C 6.691 0.228 6.14 0 5.516 0 C 4.858 0 4.305 0.228 3.889 0.685 C 3.445 1.129 3.236 1.667 3.236 2.294 C 3.236 2.955 3.445 3.501 3.889 3.942 C 4.308 4.372 4.861 4.578 5.516 4.578 L 5.516 4.578 Z",
-			pictogramWidth = 12,
+			pathAttributes = {
+				total: {
+					bodyDAttribute: "M 6.995 18.083 L 6.995 26.833 C 6.995 27.478 6.473 28 5.828 28 C 5.184 28 4.662 27.478 4.662 26.833 L 4.662 8.75 C 3.193 9.578 2.298 11.147 2.333 12.833 C 2.333 13.478 1.811 14 1.167 14 C 0.522 14 0 13.478 0 12.833 C 0 8.959 2.908 6.099 6.995 5.85 L 7 18.083 L 6.995 18.083 L 6.995 18.083 Z  M 8.167 20.417 L 8.167 26.833 C 8.167 27.478 8.689 28 9.333 28 C 9.978 28 10.5 27.478 10.5 26.833 L 10.5 20.417 L 11.667 20.417 C 11.825 20.431 11.982 20.374 12.095 20.262 C 12.208 20.149 12.265 19.992 12.25 19.833 L 9.917 8.75 C 11.647 9.367 12.811 10.996 12.833 12.833 C 12.833 13.478 13.356 14 14 14 C 14.644 14 15.167 13.478 15.167 12.833 C 15.167 8.961 12.255 6.099 8.167 5.85 L 8.167 5.833 L 8.167 20.417 Z",
+					headDAttribute: "M 5.245 2.333 C 5.245 1.046 6.29 0 7.578 0 C 8.866 0 9.912 1.046 9.912 2.333 C 9.912 3.621 8.866 4.667 7.578 4.667 C 6.29 4.667 5.245 3.621 5.245 2.333 Z"
+				},
+				girls: {
+					bodyDAttribute: "M 8 9.185 C 4.766 9.185 2.327 11.486 2.327 14.568 C 2.327 15.038 2.708 15.419 3.178 15.419 C 3.648 15.419 4.029 15.038 4.029 14.568 C 4.021 13.219 4.777 11.981 5.982 11.374 L 4.672 18.186 C 4.652 18.348 4.702 18.51 4.81 18.632 C 4.918 18.754 5.073 18.824 5.235 18.824 L 5.728 18.824 L 5.728 23.649 C 5.728 24.119 6.109 24.5 6.579 24.5 C 7.049 24.5 7.43 24.119 7.43 23.649 L 7.43 18.824 L 8.565 18.824 L 8.565 23.649 C 8.565 24.119 8.947 24.5 9.417 24.5 C 9.887 24.5 10.268 24.119 10.268 23.649 L 10.268 18.824 L 10.76 18.824 C 10.923 18.824 11.078 18.754 11.186 18.632 C 11.294 18.51 11.344 18.348 11.324 18.186 L 10.014 11.371 C 11.221 11.978 11.979 13.217 11.971 14.568 C 11.971 15.038 12.352 15.419 12.822 15.419 C 13.292 15.419 13.673 15.038 13.673 14.568 C 13.673 11.486 11.234 9.185 8 9.185 Z",
+					headDAttribute: "M 5.728 5.77 C 5.728 4.517 6.745 3.5 7.998 3.5 C 9.251 3.5 10.268 4.517 10.268 5.77 C 10.268 7.023 9.251 8.041 7.998 8.041 C 6.745 8.041 5.728 7.023 5.728 5.77 Z"
+				},
+				boys: {
+					bodyDAttribute: "M 8 9.185 C 4.766 9.185 2.327 11.486 2.327 14.568 C 2.327 15.038 2.708 15.419 3.178 15.419 C 3.648 15.419 4.029 15.038 4.029 14.568 C 4.019 13.321 4.666 12.162 5.732 11.515 L 5.732 23.649 C 5.732 24.119 6.113 24.5 6.583 24.5 C 7.053 24.5 7.434 24.119 7.434 23.649 L 7.434 17.689 L 8.569 17.689 L 8.569 23.649 C 8.569 24.119 8.951 24.5 9.421 24.5 C 9.891 24.5 10.272 24.119 10.272 23.649 L 10.272 11.517 C 11.335 12.164 11.981 13.323 11.971 14.568 C 11.971 15.038 12.352 15.419 12.822 15.419 C 13.292 15.419 13.673 15.038 13.673 14.568 C 13.673 11.486 11.234 9.185 8 9.185 Z",
+					headDAttribute: "M 5.732 5.77 C 5.732 4.517 6.749 3.5 8.002 3.5 C 9.255 3.5 10.272 4.517 10.272 5.77 C 10.272 7.023 9.255 8.041 8.002 8.041 C 6.749 8.041 5.732 7.023 5.732 5.77 Z"
+				},
+				women: {
+					bodyDAttribute: "M 7.583 5.833 C 3.185 5.833 0 8.779 0 12.833 C 0 13.478 0.522 14 1.167 14 C 1.811 14 2.333 13.478 2.333 12.833 C 2.333 10.989 3.505 9.348 5.25 8.75 L 2.917 19.833 C 2.902 19.992 2.959 20.149 3.072 20.262 C 3.184 20.374 3.341 20.431 3.5 20.417 L 4.667 20.417 L 4.667 26.833 C 4.667 27.478 5.189 28 5.833 28 C 6.478 28 7 27.478 7 26.833 L 7 20.417 L 8.167 20.417 L 8.167 26.833 C 8.167 27.478 8.689 28 9.333 28 C 9.978 28 10.5 27.478 10.5 26.833 L 10.5 20.417 L 11.667 20.417 C 11.825 20.431 11.982 20.374 12.095 20.262 C 12.208 20.149 12.265 19.992 12.25 19.833 L 9.917 8.75 C 11.647 9.367 12.811 10.996 12.833 12.833 C 12.833 13.478 13.356 14 14 14 C 14.644 14 15.167 13.478 15.167 12.833 C 15.167 8.779 11.976 5.833 7.583 5.833 Z",
+					headDAttribute: "M 5.244 2.333 C 5.244 1.046 6.29 0 7.578 0 C 8.865 0 9.911 1.046 9.911 2.333 C 9.911 3.621 8.865 4.667 7.578 4.667 C 6.29 4.667 5.244 3.621 5.244 2.333 Z"
+				},
+				men: {
+					bodyDAttribute: "M 7.578 5.833 C 3.187 5.833 0 8.777 0 12.833 C 0 13.478 0.522 14 1.167 14 C 1.811 14 2.333 13.478 2.333 12.833 C 2.298 11.147 3.193 9.578 4.662 8.75 L 4.662 26.833 C 4.662 27.478 5.184 28 5.828 28 C 6.473 28 6.995 27.478 6.995 26.833 L 6.995 18.083 L 8.162 18.083 L 8.162 26.833 C 8.162 27.478 8.684 28 9.328 28 C 9.973 28 10.495 27.478 10.495 26.833 L 10.495 8.749 C 11.965 9.577 12.861 11.146 12.826 12.833 C 12.826 13.478 13.348 14 13.993 14 C 14.637 14 15.159 13.478 15.159 12.833 C 15.159 8.777 11.971 5.833 7.578 5.833 Z",
+					headDAttribute: "M 5.245 2.333 C 5.245 1.046 6.29 0 7.578 0 C 8.866 0 9.912 1.046 9.912 2.333 C 9.912 3.621 8.866 4.667 7.578 4.667 C 6.29 4.667 5.245 3.621 5.245 2.333 Z"
+				}
+			},
+			pictogramWidth = 16,
 			pictogramHeight = 28;
 
 		let yearsArray;
@@ -810,6 +831,7 @@
 						return "url(#pbiobeClipPathGray" + d.beneficiary + ")"
 					})
 					.attr("transform", function(d) {
+						localVariable.set(this, d.beneficiary);
 						return "translate(0," + (yScalePictograms(d.beneficiary) - pictogramHeight / 2) + ")";
 					});
 
@@ -831,11 +853,15 @@
 					});
 
 				const headPathGray = pathGroupGray.append("path")
-					.attr("d", headDAttribute)
+					.attr("d", function(d) {
+						return pathAttributes[localVariable.get(this)].headDAttribute;
+					})
 					.style("fill", "#ccc");
 
 				const bodyPathGray = pathGroupGray.append("path")
-					.attr("d", bodyDAttribute)
+					.attr("d", function(d) {
+						return pathAttributes[localVariable.get(this)].bodyDAttribute;
+					})
 					.style("fill", "#ccc");
 
 				pictogramGroupGray = pictogramGroupEnterGray.merge(pictogramGroupGray);
@@ -862,6 +888,7 @@
 						return "url(#pbiobeClipPathBlue" + d.beneficiary + ")"
 					})
 					.attr("transform", function(d) {
+						localVariable.set(this, d.beneficiary);
 						return "translate(0," + (yScalePictograms(d.beneficiary) - pictogramHeight / 2) + ")";
 					});
 
@@ -883,11 +910,15 @@
 					});
 
 				const headPathBlue = pathGroupBlue.append("path")
-					.attr("d", headDAttribute)
+					.attr("d", function(d) {
+						return pathAttributes[localVariable.get(this)].headDAttribute;
+					})
 					.classed("contributionColorFill", true)
 
 				const bodyPathBlue = pathGroupBlue.append("path")
-					.attr("d", bodyDAttribute)
+					.attr("d", function(d) {
+						return pathAttributes[localVariable.get(this)].bodyDAttribute;
+					})
 					.classed("contributionColorFill", true)
 
 				pictogramGroupBlue = pictogramGroupEnterBlue.merge(pictogramGroupBlue);
@@ -960,12 +991,12 @@
 					});
 
 				const headPath = pictogramLegendGroup.append("path")
-					.attr("d", headDAttribute)
+					.attr("d", pathAttributes.total.headDAttribute)
 					.style("fill", "#666")
 					.attr("transform", "translate(0," + (-pictogramHeight / 5) + ") scale(0.7,0.7)");
 
 				const bodyPath = pictogramLegendGroup.append("path")
-					.attr("d", bodyDAttribute)
+					.attr("d", pathAttributes.total.bodyDAttribute)
 					.style("fill", "#666")
 					.attr("transform", "translate(0," + (-pictogramHeight / 5) + ") scale(0.7,0.7)");
 
