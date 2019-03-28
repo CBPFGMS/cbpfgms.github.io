@@ -100,12 +100,12 @@
 			duration = 1000,
 			excelIconSize = 20,
 			checkboxesLimit = 20,
-			excelIconPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/excelicon.png",
+			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			chartState = {
 				selectedDonors: [],
 				selectedCbpfs: [],
-				controlledBy: null,
+				controlledBy: "donor",
 				showLocal: false,
 				selectedLocalCurrency: null,
 				showTrend: false
@@ -150,10 +150,19 @@
 		const topSelectionDiv = outerDiv.append("div")
 			.attr("class", "pbicliTopSelectionDiv");
 
-		const donorsSelectionDiv = topSelectionDiv.append("div")
+		const donorsContainerSelectionDiv = topSelectionDiv.append("div")
+			.attr("class", "pbicliDonorsContainerSelectionDiv");
+
+		const cbpfsContainerSelectionDiv = topSelectionDiv.append("div")
+			.attr("class", "pbicliCbpfsContainerSelectionDiv");
+
+		const donorsSelectionDiv = donorsContainerSelectionDiv.append("div")
 			.attr("class", "pbicliDonorsSelectionDiv");
 
-		const cbpfsSelectionDiv = topSelectionDiv.append("div")
+		const currencySelectionDiv = donorsContainerSelectionDiv.append("div")
+			.attr("class", "pbicliCurrencySelectionDiv");
+
+		const cbpfsSelectionDiv = cbpfsContainerSelectionDiv.append("div")
 			.attr("class", "pbicliCbpfsSelectionDiv");
 
 		const filtersDiv = outerDiv.append("div")
@@ -228,6 +237,12 @@
 		const yScaleDonorsLocalCurrency = d3.scaleLinear()
 			.range([donorsLinesPanel.height - donorsLinesPanel.padding[2], donorsLinesPanel.padding[0]]);
 
+		const scaleColorsDonors = d3.scaleOrdinal()
+			.range(colorsArray);
+
+		const scaleColorsCbpfs = d3.scaleOrdinal()
+			.range(colorsArray);
+
 		const lineGeneratorDonors = d3.line()
 			.x(function(d) {
 				return xScaleDonors(parseTime(d.year))
@@ -297,6 +312,12 @@
 				});
 
 				const list = processList(rawData);
+
+				scaleColorsDonors.domain(list.donorsArray);
+
+				scaleColorsCbpfs.domain(list.cbpfsArray);
+
+				chartState.selectedDonors = list.donorsArray.slice(0, 5);
 
 				saveFlags(list.donorsArray);
 
@@ -459,6 +480,24 @@
 			groupYAxisCbpfs.select(".domain").raise();
 
 			createTopLegend();
+
+			const data = populateData(rawData);
+
+			yScaleDonors.domain(setYDomain(data.donors, data.cbpfs));
+
+			yScaleCbpfs.domain(setYDomain(data.donors, data.cbpfs));
+
+			yScaleDonorsLocalCurrency.domain(setYDomainLocalCurrency(data.donors));
+
+			createTopLegend();
+
+			createSelectedDonors();
+
+			createCbpfCheckboxes(data.cbpfs);
+
+			createDonorsLines(data.donors);
+
+			createCbpfsLines(data.cbpfs);
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -843,7 +882,7 @@
 				const textDiv = selectedDonorsEnter.append("div")
 					.attr("class", "pbicliSelectedDonorsDivText")
 					.html(function(d) {
-						return iso2Names[d]
+						return "<span style='color:" + scaleColorsDonors(d) + ";'>&#9679; </span>" + iso2Names[d]
 					});
 
 				const flagDiv = selectedDonorsEnter.append("div")
@@ -916,7 +955,7 @@
 				const textDiv = selectedCbpfsEnter.append("div")
 					.attr("class", "pbicliSelectedCbpfsDivText")
 					.html(function(d) {
-						return iso2Names[d]
+						return "<span style='color:" + scaleColorsCbpfs(d) + ";'>&#9679; </span>" + iso2Names[d]
 					});
 
 				const closeDiv = selectedCbpfsEnter.append("div")
@@ -995,7 +1034,7 @@
 				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
 					.html(function(d) {
-						return iso2Names[d] ? iso2Names[d] : d;
+						return iso2Names[d] ? "<span style='color:" + scaleColorsDonors(d) + ";'>&#9679; </span>" + iso2Names[d] : d;
 					});
 
 				donorsCheckboxes = donorsCheckboxesEnter.merge(donorsCheckboxes);
@@ -1113,7 +1152,7 @@
 				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
 					.html(function(d) {
-						return iso2Names[d] ? iso2Names[d] : d;
+						return iso2Names[d] ? "<span style='color:" + scaleColorsCbpfs(d) + ";'>&#9679; </span>" + iso2Names[d] : d;
 					});
 
 				cbpfsCheckboxes = cbpfsCheckboxesEnter.merge(cbpfsCheckboxes);
@@ -1246,6 +1285,9 @@
 
 				const donorsPath = donorsGroupEnter.append("path")
 					.attr("class", "pbicliDonorsPath")
+					.style("stroke", function(d) {
+						return scaleColorsDonors(d.isoCode);
+					})
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values)
 					})
@@ -1281,6 +1323,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -1316,6 +1362,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -1346,6 +1396,9 @@
 
 				const donorsPathFuture = donorsGroupFutureEnter.append("path")
 					.attr("class", "pbicliDonorsPathFuture")
+					.style("stroke", function(d) {
+						return scaleColorsDonors(d.isoCode);
+					})
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values)
 					})
@@ -1388,6 +1441,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -1894,33 +1951,32 @@
 							(xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + 5) + ",0"
 					});
 
+				const labelsText = labelsGroupDonorsEnter.append("text")
+					.attr("class", "pbicliLabelTextSmall")
+					.classed("pbicliLabelTrendText", function(d) {
+						return d.trend;
+					})
+					.attr("x", 2 + flagSize)
+					.attr("y", 2)
+					.style("fill", function(d) {
+						return d.currency === "USD" || d.trend ? "#666" : "darkslategray";
+					})
+					.text(function(d) {
+						return d.trend ? "(trend)" : "(" + d.currency + ")";
+					});
+
 				labelsGroupDonors = labelsGroupDonorsEnter.merge(labelsGroupDonors);
 
-				if (chartState.showLocal) {
-					labelsGroupDonors.append("text")
-						.attr("class", "pbicliLabelTextSmall")
-						.attr("x", 2 + flagSize)
-						.attr("y", 2)
-						.style("fill", function(d) {
-							return d.currency === "USD" ? "#666" : "#E56A54";
-						})
-						.text(function(d) {
-							return "(" + d.currency + ")";
-						});
-				};
-
-				if (chartState.futureDonations && chartState.showTrend) {
-					labelsGroupDonors.append("text")
-						.attr("class", "pbicliLabelTextSmall pbicliLabelTrendText")
-						.attr("x", 2 + flagSize)
-						.attr("y", 2)
-						.style("fill", "#666")
-						.text(function(d) {
-							return d.trend ? "(trend)" : "";
-						});
-				};
-
-				if (!chartState.showLocal) labelsGroupDonors.select("text:not(.pbicliLabelTrendText)").remove();
+				labelsGroupDonors.select("text")
+					.style("opacity", function(d) {
+						if (!chartState.showLocal && !d.trend) {
+							return 0;
+						} else if (chartState.showTrend && d.trend) {
+							return 1;
+						} else {
+							return 1;
+						};
+					});
 
 				labelsGroupDonors.raise();
 
@@ -2086,6 +2142,9 @@
 
 				const cbpfsPath = cbpfsGroupEnter.append("path")
 					.attr("class", "pbicliCbpfsPath")
+					.style("stroke", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
+					})
 					.attr("d", function(d) {
 						return lineGeneratorCbpfs(d.values)
 					})
@@ -2121,6 +2180,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -2156,6 +2219,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -2186,6 +2253,9 @@
 
 				const cbpfsPathFuture = cbpfsGroupFutureEnter.append("path")
 					.attr("class", "pbicliCbpfsPathFuture")
+					.style("stroke", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
+					})
 					.attr("d", function(d) {
 						return lineGeneratorCbpfs(d.values)
 					})
@@ -2228,6 +2298,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -2262,6 +2336,10 @@
 					})
 					.each(function(d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
+						d.isoCode = d3.select(this.parentNode).datum().isoCode;
+					})
+					.style("fill", function(d) {
+						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -2367,13 +2445,13 @@
 					});
 
 				labelsGroupCbpfs.on("mouseover", function(d, i) {
-						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs")
+						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
 							.style("opacity", function(e) {
 								return d.isoCode === e.isoCode ? 1 : fadeOpacity;
 							})
 					})
 					.on("mouseout", function() {
-						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs")
+						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
 							.style("opacity", 1);
 					});
 
@@ -2432,6 +2510,8 @@
 
 				const thisData = [];
 
+				const thisColorScale = type === "donor" ? scaleColorsDonors : scaleColorsCbpfs;
+
 				thisOriginalData.forEach(function(country) {
 					const localCurrency = country.localCurrency === undefined ? false : country.localData ? country.localCurrency : "USD";
 					const localData = !!country.localData;
@@ -2465,7 +2545,8 @@
 
 					for (let i = 0; i < thisData.length; i++) {
 						const currency = type === "donor" && chartState.showLocal ? " (" + thisData[i].localCurrency + ")" : "";
-						tooltipHtml += "<div style='display:flex;flex:0 60%;'>&bull; " +
+						const thisColor = type === "donor" && thisData[i].localCurrency !== "USD" ? "darkslategray" : thisColorScale(thisData[i].name)
+						tooltipHtml += "<div style='display:flex;flex:0 60%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
 							iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'><span class='" +
 							spanClass + "'>" + formatMoney0Decimals(thisData[i].total) +
 							"</span></div>"
@@ -2477,9 +2558,27 @@
 						.data([true]);
 
 					const tooltipGroupEnter = tooltipGroup.enter()
-						.append("g")
+						.insert("g", ":first-child")
 						.attr("class", "pbicliTooltipGroup")
 						.attr("pointer-events", "none");
+
+					let lines = tooltipGroup.selectAll(".pbicliTooltipLines")
+						.data([true]);
+
+					lines = lines.enter()
+						.append("line")
+						.attr("class", "pbicliTooltipLines")
+						.style("stroke-width", "1px")
+						.style("stroke", "#ccc")
+						.merge(lines)
+						.attr("x1", function(d) {
+							return xScale(parseTime(mouseYear));
+						})
+						.attr("x2", function(d) {
+							return xScale(parseTime(mouseYear));
+						})
+						.attr("y1", thisPanel.padding[0])
+						.attr("y2", thisPanel.height - thisPanel.padding[2]);
 
 					const circles = tooltipGroup.selectAll(".pbicliTooltipCircles")
 						.data(thisData, function(d) {
@@ -2495,9 +2594,9 @@
 						.style("fill", "none")
 						.style("stroke", function(d) {
 							if (type === "cbpf") {
-								return "#eca154"
+								return scaleColorsCbpfs(d.name);
 							} else {
-								return d.local ? "E56A54" : "418fde"
+								return d.local ? "darkslategray" : scaleColorsDonors(d.name);
 							};
 						})
 						.merge(circles)
@@ -2505,31 +2604,6 @@
 							return xScale(parseTime(d.year))
 						})
 						.attr("cy", function(d) {
-							return d.local ? yScaleDonorsLocalCurrency(d.total) : yScale(d.total);
-						});
-
-					const lines = tooltipGroup.selectAll(".pbicliTooltipLines")
-						.data(thisData, function(d) {
-							return d.name
-						});
-
-					const linesExit = lines.exit().remove();
-
-					const linesEnter = lines.enter()
-						.append("line")
-						.attr("class", "pbicliTooltipLines")
-						.style("stroke-dasharray", "1,1")
-						.style("stroke-width", "1px")
-						.style("stroke", "#222")
-						.merge(lines)
-						.attr("x1", function(d) {
-							return xScale(parseTime(d.year)) - circleRadius - 2;
-						})
-						.attr("x2", thisPanel.padding[3])
-						.attr("y1", function(d) {
-							return d.local ? yScaleDonorsLocalCurrency(d.total) : yScale(d.total);
-						})
-						.attr("y2", function(d) {
 							return d.local ? yScaleDonorsLocalCurrency(d.total) : yScale(d.total);
 						});
 
@@ -2567,7 +2641,7 @@
 
 			const label = donorsSelectionDiv.append("p")
 				.attr("class", "pbicliDropdownLabel")
-				.html("DONOR:");
+				.html("Donor:");
 
 			const select = donorsSelectionDiv.append("select")
 				.attr("id", "pbicliDonorsDropdown");
@@ -2580,7 +2654,7 @@
 					return !i;
 				})
 				.property("selected", function(_, i) {
-					return !i;
+					return i === 1;
 				})
 				.html(function(d, i) {
 					return i < 2 ? d : iso2Names[d];
@@ -2617,11 +2691,11 @@
 
 		function createCurrencyDropdown(dropdownData) {
 
-			const currencyLabel = donorsSelectionDiv.append("p")
+			const currencyLabel = currencySelectionDiv.append("p")
 				.attr("class", "pbicliDropdownLabel")
-				.html("CURRENCY:");
+				.html("Currency:");
 
-			const select = donorsSelectionDiv.append("select")
+			const select = currencySelectionDiv.append("select")
 				.attr("id", "pbicliCurrencyDropdown");
 
 			const options = select.selectAll(null)
@@ -2668,7 +2742,7 @@
 
 		function createFilters() {
 
-			const dataFilters = ["Show USD", "Show local currency"];
+			const dataFilters = ["USD", "Local Currency"];
 
 			const radio = filtersDiv.selectAll(null)
 				.data(dataFilters)
@@ -2703,7 +2777,7 @@
 
 			checkboxFuture.append("span")
 				.attr("class", "pbicliRadioLabel")
-				.text("Show future (pledged) donations");
+				.text("Show future donations");
 
 			const checkboxTrend = filtersDiv.append("label")
 				.attr("class", "pbicliCheckboxTrend")
@@ -3222,10 +3296,12 @@
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbicliOverDivHelp");
 
-			const totalHeight = overDiv.node().clientHeight;
+			const overDivSize = overDiv.node().getBoundingClientRect();
+
+			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + totalHeight);
+				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
@@ -3259,17 +3335,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const donorsDropdownAnnotationRect = helpSVG.append("rect")
-				.attr("x", 160 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("x", 65 - padding)
+				.attr("y", 20 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const donorsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
-				.attr("x", 160)
-				.attr("y", 130)
+				.attr("x", 65)
+				.attr("y", 20)
 				.text("Use this menu to select one or more donors. When donors are selected here the values of all displayed CBPFs correspond to donations made only by those selected donors.")
-				.call(wrapText2, 200);
+				.call(wrapText2, 420);
 
 			donorsDropdownAnnotationRect.attr("width", donorsDropdownAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", donorsDropdownAnnotation.node().getBBox().height + padding * 2);
@@ -3279,7 +3355,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M150,140 Q120,140 120,90");
+				.attr("d", "M60,35 Q45,35 45,54");
 
 			const currencyDropdownAnnotationRect = helpSVG.append("rect")
 				.attr("x", 400 - padding)
@@ -3302,20 +3378,20 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M470,140 Q470,65 420,65");
+				.attr("d", "M470,140 Q470,78 360,78");
 
 			const cbpfsDropdownAnnotationRect = helpSVG.append("rect")
-				.attr("x", 650 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("x", 530 - padding)
+				.attr("y", 20 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const cbpfsDropdownAnnotation = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationText")
-				.attr("x", 650)
-				.attr("y", 130)
-				.text("Use this menu to select one or more CBPFs. When CBPFs are selected here the values of all displayed donors correspond to donations made only to those selected CBPFs.")
-				.call(wrapText2, 200);
+				.attr("x", 530)
+				.attr("y", 20)
+				.text("Use this menu to select one or more CBPFs. When CBPFs are selected the values of all donors correspond to donations made only to those CBPFs.")
+				.call(wrapText2, 360);
 
 			cbpfsDropdownAnnotationRect.attr("width", cbpfsDropdownAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", cbpfsDropdownAnnotation.node().getBBox().height + padding * 2);
@@ -3325,7 +3401,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M640,140 Q580,140 580,90");
+				.attr("d", "M525,35 Q510,35 510,54");
 
 			const radioAnnotationRect = helpSVG.append("rect")
 				.attr("x", 220 - padding)
@@ -3348,7 +3424,61 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M210,400 Q80,350 50,115");
+				.attr("d", "M210,400 Q80,350 80,130");
+
+			const radioEllipse = helpSVG.append("ellipse")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("cx", 80)
+				.attr("cy", 105)
+				.attr("rx", 60)
+				.attr("ry", 10);
+
+			const closeAnnotationRect = helpSVG.append("rect")
+				.attr("x", 220 - padding)
+				.attr("y", 240 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const closeAnnotation = helpSVG.append("text")
+				.attr("class", "pbicliAnnotationText")
+				.attr("x", 220)
+				.attr("y", 240)
+				.text("Click on the “x” to deselect a donor or CBPF. This affects the total value.")
+				.call(wrapText2, 220);
+
+			closeAnnotationRect.attr("width", closeAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", closeAnnotation.node().getBBox().height + padding * 2);
+
+			const closePath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbicliArrowMarker)")
+				.attr("d", "M210,260 Q170,260 170,200");
+
+			const closeCheckAnnotationRect = helpSVG.append("rect")
+				.attr("x", 650 - padding)
+				.attr("y", 240 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const closeCheckAnnotation = helpSVG.append("text")
+				.attr("class", "pbicliAnnotationText")
+				.attr("x", 650)
+				.attr("y", 240)
+				.text("Click on the checkbox to deselect a donor or CBPF. This does not affects the total value.")
+				.call(wrapText2, 220);
+
+			closeCheckAnnotationRect.attr("width", closeCheckAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", closeCheckAnnotation.node().getBBox().height + padding * 2);
+
+			const closeCheckPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbicliArrowMarker)")
+				.attr("d", "M645,255 Q630,255 630,230");
 
 			helpSVG.on("click", function() {
 				overDiv.remove();

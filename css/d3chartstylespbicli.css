@@ -67,13 +67,13 @@
 .pbicliTopDiv {
 	display: flex;
 	width: 100%;
-	margin-bottom: 12px;
+	margin-bottom: 6px;
 }
 
 .pbicliTitleDiv {
 	display: flex;
 	flex:0 80%;
-	margin-left: 21px;
+	margin-left: 23px;
 }
 
 .pbicliTitle {
@@ -127,18 +127,22 @@
 	margin-bottom: 6px;
 }
 
-.pbicliDonorsSelectionDiv {
+.pbicliDonorsContainerSelectionDiv {
 	display: flex;
 	flex:0 50%;
 	align-items: center;
 	margin-left: 23px;
 }
 
-.pbicliCbpfsSelectionDiv {
+.pbicliCbpfsContainerSelectionDiv {
 	display: flex;
 	flex:0 50%;
 	align-items: center;
 	margin-left: 23px;
+}
+
+.pbicliDonorsSelectionDiv {
+	margin-right: 2px;
 }
 
 .pbicliDropdownLabel {
@@ -153,10 +157,10 @@
 
 .pbicliRadioLabel {
 	font-family: "Roboto", sans-serif;
-	font-size: 12px;
+	font-size: 11px;
 	color: #444;
 	margin-left: 3px;
-	margin-right: 14px;
+	margin-right: 12px;
 }
 
 #pbicliDonorsDropdown, #pbicliCurrencyDropdown {
@@ -167,12 +171,20 @@
 	display: flex;
 	width: 100%;
 	margin-bottom: 6px;
-	margin-left: 28px;
+	margin-left: 35px;
+}
+
+#d3chartcontainerpbicli select {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: 1px solid rgba(0,0,0,0.3);
+	margin-left: 12px;
 }
 
 .pbicliBorderDiv {
 	display: flex;
-	width: 98%;
+	width: 92%;
 	margin: auto;
 	max-height: 1px;
 }
@@ -182,11 +194,9 @@
 }
 
 .pbicliCheckboxFuture {
-	margin-left: 48px; 
-}
-
-.pbicliCheckboxTrend {
-	margin-left: 2px; 
+	margin-left: -4px;
+	padding-left: 6px;
+	border-left: 1px solid #ccc; 
 }
 
 .pbicliLegendDiv {
@@ -343,7 +353,7 @@
 }
 
 .pbicligroupYAxisDonorsLocalCurrency line {
-	stroke: #E56A54;
+	stroke: darkslategray;
 	fill: none;
 } 
 
@@ -355,7 +365,7 @@
 .pbicligroupYAxisDonorsLocalCurrency text {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
-	fill: #E56A54;
+	fill: darkslategray;
 	pointer-events: none;
 }
 
@@ -368,7 +378,7 @@
 .pbicliYAxisLabelLocalCurrency {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
-	fill: #E56A54;
+	fill: darkslategray;
 }
 
 .pbicliFutureDonationsText {
@@ -379,7 +389,6 @@
 
 .pbicliDonorsPath, .pbicliDonorsPathFuture {
 	fill: none;
-	stroke: #418fde;
 	stroke-width: 2px;
 }
 
@@ -389,32 +398,23 @@
 	stroke-width: 2px;
 }
 
-.pbicliDonorsCircles, .pbicliDonorsCirclesFuture {
-	fill: #418fde;
-}
-
 .pbicliDonorsCirclesTrend {
 	fill: darkgray;
 }
 
 .pbicliDonorsPathLocal, .pbicliDonorsPathLocalFuture {
 	fill: none;
-	stroke: #E56A54;
+	stroke: darkslategray;
 	stroke-width: 2px;
 }
 
 .pbicliDonorsCirclesLocal, .pbicliDonorsCirclesLocalFuture {
-	fill: #E56A54;
+	fill: darkslategray;
 }
 
 .pbicliCbpfsPath, .pbicliCbpfsPathFuture {
 	fill: none;
-	stroke: #eca154;
 	stroke-width: 2px;
-}
-
-.pbicliCbpfsCircles, .pbicliCbpfsCirclesFuture {
-	fill: #eca154;
 }
 
 .pbicliLabelText {
