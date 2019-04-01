@@ -38,7 +38,7 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc) for more information.
 
-- **GMS BI: CBPF Contributions, line graph**
+- **GMS BI: Contribution Trends, line graph**
 
 Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
 
