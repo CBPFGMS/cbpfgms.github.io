@@ -165,3 +165,10 @@ p#pbiclcd3chartTitle {
 	fill: #222;
 	pointer-events: none;
 }
+
+.pbiclcSvgLegend {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: #666;
+	pointer-events: none;	
+}

@@ -74,7 +74,7 @@
 	function d3Chart() {
 
 		const width = 900,
-			padding = [4, 10, 4, 10],
+			padding = [4, 10, 24, 10],
 			topPanelHeight = 60,
 			buttonPanelHeight = 30,
 			panelHorizontalPadding = 4,
@@ -94,6 +94,9 @@
 			flagSize = 16,
 			paidSymbolSize = 16,
 			localVariable = d3.local(),
+			legendPadding = 6,
+			paidColor = "9063CD",
+			pledgedColor = "E56A54",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
 			chartTitleDefault = "CBPF Contributions",
@@ -189,7 +192,7 @@
 				.attr("class", "pbiclcDonorsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 64, 4, 0],
+			padding: [44, 50, 4, 0],
 			labelPadding: 6
 		};
 
@@ -199,7 +202,7 @@
 				.attr("transform", "translate(" + (padding[3] + donorsPanel.width + panelVerticalPadding) + "," +
 					(padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 64, 4, 0],
+			padding: [44, 50, 4, 0],
 			labelPadding: 6
 		};
 
@@ -328,6 +331,8 @@
 
 			translateAxes();
 
+			createSVGLegend();
+
 			createTopPanel(data.dataDonors, data.dataCbpfs);
 
 			createButtonPanel();
@@ -366,6 +371,8 @@
 
 				recalculateAndResize();
 
+				createSVGLegend();
+
 				createTopPanel(data.dataDonors, data.dataCbpfs);
 
 				createDonorsPanel(data.dataDonors, null);
@@ -402,6 +409,58 @@
 				createCbpfsPanel(data.dataCbpfs, null);
 
 				//end of clickButtonsContributionsRects
+			};
+
+			function createSVGLegend() {
+
+				const legend = svg.selectAll(".pbiclcSvgLegend")
+					.data([true]);
+
+				const legendEnter = legend.enter()
+					.append("text")
+					.attr("class", "pbiclcSvgLegend")
+					.attr("y", height - legendPadding)
+					.attr("x", padding[3] + 2)
+					.text("Figures represent: ")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", "#666")
+					.text("Total ")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.text("(")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", paidColor)
+					.text("Paid")
+					.append("tspan")
+					.style("fill", "#666")
+					.style("font-weight", "normal")
+					.text("/")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", pledgedColor)
+					.text("Pledged")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(")")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(". The arrow (")
+					.append("tspan")
+					.style("fill", paidColor)
+					.text("\u25B2")
+					.append("tspan")
+					.style("fill", "#666")
+					.text(") indicates the paid amount.")
+
+				legend.transition()
+					.duration(duration)
+					.attr("y", height - legendPadding);
+
+				//end of createSVGLegend
 			};
 
 			function createTitle() {
@@ -949,6 +1008,7 @@
 				const donorPaidIndicatorEnter = donorGroupEnter.append("path")
 					.attr("class", "pbiclcDonorPaidIndicator")
 					.attr("d", paidSymbol)
+					.style("fill", paidColor)
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0)
 					.attr("transform", "translate(" + donorsPanel.padding[3] + "," +
 						((Math.sqrt(4 * paidSymbolSize / Math.sqrt(3)) / 2) + stickHeight) + ")");
@@ -1014,15 +1074,35 @@
 					})
 					.tween("text", function(d) {
 						const node = this;
-						const percentPaid = chartState.selectedContribution === "total" ?
-							" (" + formatPercent(d.paid / d.total) + " paid)" : "";
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
-						return function(t) {
-							d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)))
-								.append("tspan")
+
+						function populateLabel(selection) {
+							selection.append("tspan")
 								.attr("class", "pbiclcDonorLabelPercentage")
 								.attr("dy", "-0.5px")
-								.text(percentPaid);
+								.text(" (")
+								.append("tspan")
+								.style("fill", paidColor)
+								.text(d3.formatPrefix(".0", d.paid)(d.paid))
+								.append("tspan")
+								.style("fill", "#aaa")
+								.text("/")
+								.append("tspan")
+								.style("fill", pledgedColor)
+								.text(d3.formatPrefix(".0", d.pledge)(d.pledge))
+								.append("tspan")
+								.style("fill", "#aaa")
+								.text(")");
+						};
+
+						return function(t) {
+							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)));
+							if (chartState.selectedContribution === "total") {
+								thisLabel.call(populateLabel);
+							} else {
+								thisLabel.append("tspan")
+									.text(null);
+							};
 						};
 					});
 
@@ -1067,9 +1147,9 @@
 
 					tooltip.style("display", "block")
 						.html("Donor: <strong>" + datum.donor + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:262px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercentCustom(datum.paid, datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.paid) +
-							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercentCustom(datum.pledge, datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
 					const thisBox = this.getBoundingClientRect();
@@ -1175,6 +1255,7 @@
 				const cbpfPaidIndicatorEnter = cbpfGroupEnter.append("path")
 					.attr("class", "pbiclcCbpfPaidIndicator")
 					.attr("d", paidSymbol)
+					.style("fill", paidColor)
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0)
 					.attr("transform", "translate(" + cbpfsPanel.padding[3] + "," +
 						((Math.sqrt(4 * paidSymbolSize / Math.sqrt(3)) / 2) + stickHeight) + ")");
@@ -1235,15 +1316,35 @@
 					})
 					.tween("text", function(d) {
 						const node = this;
-						const percentPaid = chartState.selectedContribution === "total" ?
-							" (" + formatPercent(d.paid / d.total) + " received)" : "";
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedContribution]);
-						return function(t) {
-							d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)))
-								.append("tspan")
+
+						function populateLabel(selection) {
+							selection.append("tspan")
 								.attr("class", "pbiclcDonorLabelPercentage")
 								.attr("dy", "-0.5px")
-								.text(percentPaid);
+								.text(" (")
+								.append("tspan")
+								.style("fill", paidColor)
+								.text(d3.formatPrefix(".0", d.paid)(d.paid))
+								.append("tspan")
+								.style("fill", "#aaa")
+								.text("/")
+								.append("tspan")
+								.style("fill", pledgedColor)
+								.text(d3.formatPrefix(".0", d.pledge)(d.pledge))
+								.append("tspan")
+								.style("fill", "#aaa")
+								.text(")");
+						};
+
+						return function(t) {
+							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)));
+							if (chartState.selectedContribution === "total") {
+								thisLabel.call(populateLabel);
+							} else {
+								thisLabel.append("tspan")
+									.text(null);
+							};
 						};
 					});
 
@@ -1288,9 +1389,9 @@
 
 					tooltip.style("display", "block")
 						.html("CBPF: <strong>" + datum.cbpf + "</strong><br><br><div style='margin:0px;display:flex;flex-wrap:wrap;width:290px;'><div style='display:flex;flex:0 62%;'>Total contributions:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.total) +
-							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution paid <span style='color: #888;'>(" + (formatPercent(datum.paid / datum.total)) +
+							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution paid <span style='color: #888;'>(" + (formatPercentCustom(datum.paid, datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.paid) +
-							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution unpaid <span style='color: #888;'>(" + (formatPercent(datum.pledge / datum.total)) +
+							"</span></div><div style='display:flex;flex:0 62%;white-space:pre;'>Contribution unpaid <span style='color: #888;'>(" + (formatPercentCustom(datum.pledge, datum.total)) +
 							")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(datum.pledge) + "</span></div></div>");
 
 					const thisBox = this.getBoundingClientRect();
@@ -1342,9 +1443,9 @@
 
 				tooltip.style("display", "block")
 					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(contributionsTotals.paid / contributionsTotals.total)) +
+						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercentCustom(contributionsTotals.paid, contributionsTotals.total)) +
 						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.paid) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercent(contributionsTotals.pledge / contributionsTotals.total)) +
+						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" + (formatPercentCustom(contributionsTotals.pledge, contributionsTotals.total)) +
 						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.pledge) + "</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
@@ -1993,6 +2094,11 @@
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			return d3.formatPrefix("." + digits, value)(value);
+		};
+
+		function formatPercentCustom(dividend, divisor) {
+			const percentage = formatPercent(dividend / divisor);
+			return +(percentage.split("%")[0]) === 0 && (dividend / divisor) !== 0 ? "<1%" : percentage;
 		};
 
 		function reverseFormat(s) {
