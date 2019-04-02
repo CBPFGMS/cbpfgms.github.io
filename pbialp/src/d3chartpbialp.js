@@ -97,7 +97,9 @@
 			parallelTooltipWidth = 280,
 			lollipopWidthFactor = 0.55,
 			lollipopExtraPadding = 4,
-			percentagePadding = 11,
+			percentagePadding = 22,
+			percentagePadding2 = 10,
+			underApprovalColor = "E56A54",
 			currentYear = new Date().getFullYear(),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
@@ -220,6 +222,22 @@
 			labelPadding: 6
 		};
 
+		const defs = svg.append("defs");
+
+		const filter = defs.append("filter")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", 1)
+			.attr("height", 1)
+			.attr("id", "backgroundFilter");
+
+		filter.append("feFlood")
+			.attr("flood-color", "white");
+
+		filter.append("feComposite")
+			.attr("in", "SourceGraphic")
+			.attr("operator", "over");
+
 		const bottomButtonsGroup = svg.append("g")
 			.attr("class", "pbialpBottomButtonsGroup");
 
@@ -334,6 +352,8 @@
 
 			createFooterDiv();
 
+			createLegend();
+
 			recalculateAndResize();
 
 			translateAxes();
@@ -408,6 +428,47 @@
 				});
 
 				//end of createTitle
+			};
+
+			function createLegend() {
+
+				const legendGroup = bottomButtonsGroup.append("g")
+					.attr("class", "pbialpLegendGroup")
+					.attr("transform", "translate(" + (padding[3]) + "," +
+						(height - padding[2] / 2) + ")")
+					.attr("pointer-events", "none");
+
+				const legend = legendGroup.append("text")
+					.attr("class", "pbialpLegendText")
+					.attr("y", 5)
+					.text("Figures represent: ")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", "#666")
+					.text("Total Allocated ")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.text("(")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", underApprovalColor)
+					.text("Under Approval")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(")")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(". The arrow (")
+					.append("tspan")
+					.style("fill", underApprovalColor)
+					.text("\u25B2")
+					.append("tspan")
+					.style("fill", "#666")
+					.text(") indicates the Under Approval amount.")
+
+				//end of createLegend
 			};
 
 			function createTopPanel(data) {
@@ -953,6 +1014,7 @@
 				const cbpfStandardIndicatorEnter = cbpfGroupEnter.append("path")
 					.attr("class", "pbialpCbpfStandardIndicator")
 					.attr("d", paidSymbol)
+					.style("fill", underApprovalColor)
 					.attr("transform", "translate(" + lollipopPanel.padding[3] + "," +
 						((Math.sqrt(4 * paidSymbolSize / Math.sqrt(3)) / 2) + stickHeight) + ")");
 
@@ -998,11 +1060,11 @@
 					.transition()
 					.duration(duration)
 					.attr("transform", function(d) {
-						const thisStandard = chartState.selectedPartner === "total" ? d.standard :
-							d["standard-" + chartState.selectedPartner];
-						const thisPadding = xScaleLollipop(d[chartState.selectedPartner]) - xScaleLollipop(thisStandard) < lollipopRadius ?
+						const thisUnderApproval = chartState.selectedPartner === "total" ? d.underApproval :
+							d["underApproval-" + chartState.selectedPartner];
+						const thisPadding = xScaleLollipop(d[chartState.selectedPartner]) - xScaleLollipop(thisUnderApproval) < lollipopRadius ?
 							lollipopRadius - (stickHeight / 2) : 0;
-						return "translate(" + xScaleLollipop(thisStandard) + "," +
+						return "translate(" + Math.min(xScaleLollipop(thisUnderApproval), xScaleLollipop(d[chartState.selectedPartner])) + "," +
 							((Math.sqrt(4 * paidSymbolSize / Math.sqrt(3)) / 2) + stickHeight + thisPadding) + ")";
 					});
 
@@ -1010,21 +1072,26 @@
 					.transition()
 					.duration(duration)
 					.attr("x", function(d) {
+						console.log(d)
 						return xScaleLollipop(d[chartState.selectedPartner]) + lollipopPanel.labelPadding;
 					})
 					.tween("text", function(d) {
 						const node = this;
-						const thisStandard = chartState.selectedPartner === "total" ? d.standard :
-							d["standard-" + chartState.selectedPartner];
-						const thisPercentage = thisStandard / d[chartState.selectedPartner];
-						const percentStandard = " (" + formatPercent(thisPercentage === thisPercentage ? thisPercentage : 0) + " std)";
+						const thisUnderApproval = chartState.selectedPartner === "total" ? d.underApproval :
+							d["underApproval-" + chartState.selectedPartner];
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedPartner]);
 						return function(t) {
 							d3.select(node).text(formatNumberSI(i(t)))
 								.append("tspan")
 								.attr("class", "pbialpCbpfLabelPercentage")
 								.attr("dy", "-0.5px")
-								.text(percentStandard);
+								.text(" (")
+								.append("tspan")
+								.style("fill", underApprovalColor)
+								.text(d3.formatPrefix(".0", thisUnderApproval)(thisUnderApproval))
+								.append("tspan")
+								.style("fill", "#aaa")
+								.text(")");
 						};
 					});
 
@@ -1363,21 +1430,6 @@
 					.attr("cy", yScaleParallel(0))
 					.style("fill", "#6d8383");
 
-				const percentagesCirclesAverage = cbpfParallelGroupAverageEnter.selectAll(null)
-					.data(function(d) {
-						return d;
-					}, function(d) {
-						return d.partner;
-					})
-					.enter()
-					.append("circle")
-					.attr("class", "pbialpPercentagesCircleAverage pbialpPercentagesAverage")
-					.attr("cx", function(d) {
-						return xScaleParallel(d.partner);
-					})
-					.attr("cy", yScaleParallel(0))
-					.style("fill", "white");
-
 				const percentagesTextAverage = cbpfParallelGroupAverageEnter.selectAll(null)
 					.data(function(d) {
 						return d;
@@ -1387,6 +1439,7 @@
 					.enter()
 					.append("text")
 					.attr("class", "pbialpPercentagesText pbialpPercentagesAverage")
+					.attr("filter", "url(#backgroundFilter)")
 					.attr("x", function(d) {
 						return xScaleParallel(d.partner);
 					})
@@ -1440,27 +1493,8 @@
 						return xScaleParallel(d.partner);
 					})
 					.attr("y", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding;
+						return yScaleParallel(d.percentage) - percentagePadding2;
 					});
-
-				cbpfParallelGroupAverage.selectAll(".pbialpPercentagesCircleAverage")
-					.data(function(d) {
-						return d;
-					}, function(d) {
-						return d.partner;
-					})
-					.transition()
-					.duration(duration)
-					.attr("cx", function(d) {
-						return xScaleParallel(d.partner);
-					})
-					.attr("cy", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding - 4;
-					})
-					.attr("r", function(_, i) {
-						return Math.min(this.parentNode.childNodes[(9 + i)].getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
-					});
-
 
 				groupXAxisParallel.call(xAxisParallel)
 					.selectAll(".tick text")
@@ -1743,66 +1777,46 @@
 							d.yPos + ")";
 					});
 
-				let percentagesGroup = parallelPanel.main.selectAll(".pbialpPercentagesGroup")
+				let percentagesText = parallelPanel.main.selectAll(".pbialpPercentagesTextHighlight")
 					.data(percentagesData, function(d) {
 						return d.uniqueKey;
 					});
 
-				const percentagesGroupExit = percentagesGroup.exit().remove();
+				const percentagesTextExit = percentagesText.exit().remove();
 
-				const percentagesGroupEnter = percentagesGroup.enter()
-					.append("g")
-					.attr("class", "pbialpPercentagesGroup");
-
-				const percentagesCircles = percentagesGroupEnter.append("circle")
-					.attr("cx", function(d) {
-						return xScaleParallel(d.partner);
-					})
-					.attr("cy", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding - 4;
-					})
-					.style("fill", "white");
-
-				const percentagesText = percentagesGroupEnter.append("text")
-					.attr("class", "pbialpPercentagesText")
+				const percentagesTextEnter = percentagesText.enter()
+					.append("text")
+					.attr("class", "pbialpPercentagesTextHighlight")
+					.attr("filter", "url(#backgroundFilter)")
 					.attr("x", function(d) {
 						return xScaleParallel(d.partner);
 					})
 					.attr("y", function(d) {
 						return yScaleParallel(d.percentage) - percentagePadding;
 					})
-					.attr("text-anchor", "middle")
+					.attr("text-anchor", "middle");
+
+				percentagesText = percentagesTextEnter.merge(percentagesText);
+
+				percentagesText.text(function(d) {
+						return formatSIFloat(d.value);
+					})
+					.append("tspan")
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("dy", "1.1em")
 					.text(function(d) {
-						return formatPercent(d.percentage);
+						return "(" + formatPercent(d.percentage) + ")";
 					});
 
-				percentagesCircles.attr("r", function() {
-					return Math.min(this.nextSibling.getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
-				});
-
-				percentagesGroup = percentagesGroupEnter.merge(percentagesGroup);
-
-				percentagesGroup.select("text")
-					.transition()
+				percentagesText.transition()
 					.duration(duration)
 					.attr("y", function(d) {
 						return yScaleParallel(d.percentage) - percentagePadding;
-					})
-					.text(function(d) {
-						return formatPercent(d.percentage);
 					});
 
-				percentagesGroup.select("circle")
-					.transition()
-					.duration(duration)
-					.attr("cy", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding - 4;
-					})
-					.attr("r", function() {
-						return Math.min(this.nextSibling.getBoundingClientRect().width / 1.7, (percentagePadding + 4) - circleRadius);
-					});
-
-				percentagesGroup.raise();
+				percentagesText.raise();
 
 				//end of highlightParallel
 			};

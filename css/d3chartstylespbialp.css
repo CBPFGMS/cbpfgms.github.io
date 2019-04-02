@@ -118,8 +118,15 @@ p#pbialpd3chartTitle {
 
 .pbialpCbpfLabel, .pbialpPercentagesText {
 	font-family: "Roboto", sans-serif;
-	font-size: 10px;
+	font-size: 11px;
 	fill: #666;
+	pointer-events: none;
+}
+
+.pbialpPercentagesTextHighlight {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: #444;
 	pointer-events: none;
 }
 
@@ -184,7 +191,7 @@ p#pbialpd3chartTitle {
 	fill: #f2f2f2;
 }
 
-.pbialpAverageTextControl {
+.pbialpAverageTextControl, .pbialpLegendText {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
 	fill: #666;
