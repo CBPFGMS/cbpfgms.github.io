@@ -99,13 +99,13 @@
 			tooltipWidth = 278,
 			disabledOpacity = 0.6,
 			localVariable = d3.local(),
-			chartTitleDefault = "Beneficiary Overview",
+			chartTitleDefault = "Affected Persons Overview",
 			currentYear = new Date().getFullYear(),
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + beneficiariesHeight + padding[2],
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["Affected Persons", "Targeted Persons"],
+			legendData = ["Actual Affected Persons", "Targeted Affected Persons"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: null,
@@ -473,6 +473,14 @@
 					.attr("transform", "translate(" + percentagePanel.padding[3] + ",0)")
 					.call(yAxisPercentage);
 
+				groupYAxisPercentage.selectAll(".tick")
+					.filter(function(d){
+						return d === "total"
+					})
+					.select("text")
+					.style("font-weight", "bold")
+					.style("fill", "#333");
+
 			};
 
 			function createButtonsPanel() {
@@ -675,7 +683,7 @@
 					.attr("class", "pbiobePercentagePanelTitle")
 					.attr("x", percentagePanel.padding[3])
 					.attr("y", percentagePanel.padding[0] - titlePadding)
-					.text("Beneficiaries, in percentage");
+					.text("Affected Persons, in percentage");
 
 				let beneficiaryGroup = percentagePanel.main.selectAll(".pbiobeBeneficiaryGroup")
 					.data(data, function(d) {
@@ -814,7 +822,7 @@
 					.attr("class", "pbiobePictogramsPanelTitle")
 					.attr("x", pictogramsPanel.padding[3])
 					.attr("y", pictogramsPanel.padding[0] - titlePadding)
-					.text("Beneficiaries, real proportions");
+					.text("Affected Persons, real proportions");
 
 				let pictogramGroupGray = pictogramsPanel.main.selectAll(".pbiobePictogramGroupGray")
 					.data(data, function(d) {
@@ -1091,12 +1099,12 @@
 						return e.beneficiary === d.beneficiary ? 1 : fadeOpacity;
 					});
 
-				const percentageText = d.targeted ? "(actual beneficiaries: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
+				const percentageText = d.targeted ? "(actually affected: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
 
 				tooltip.style("display", "block")
 					.html("<strong>" + capitalize(d.beneficiary) + "</strong><br><div style='margin:8px 0px 8px 0px;display:flex;flex-wrap:wrap;align-items:center;width:" + tooltipWidth +
-						"px;'><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " targeted as beneficiaries:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
-						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " actually benefited:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
+						"px;'><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " targeted:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
+						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " actually affected:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
 						formatComma(d.actual) + "</strong></div></div><div>" + percentageText + "</div>");
 
 				const thisBox = this.getBoundingClientRect();
@@ -1332,7 +1340,7 @@
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 150)
 				.attr("y", 356)
-				.text("The blue bars represent the percentage of affected persons. Actual numbers of affected and targeted persons can be seen at the right-hand side of each bar.")
+				.text("The blue bars represent the percentage of actually affected persons. Real numbers of actually affected and targeted affected persons can be seen at the right-hand side of each bar.")
 				.call(wrapText2, 250);
 
 			const percentagePath = helpSVG.append("path")
@@ -1355,8 +1363,8 @@
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 490)
 				.attr("y", 356)
-				.text("The pictograms represent the real proportions of affected and targeted persons, for each category. The number on the bottom indicates how many people (approximately) a single pictogram represents.")
-				.call(wrapText2, 250);
+				.text("The pictograms represent the real proportions of actually affected and targeted affected persons, for each category. The number on the bottom indicates how many people (approximately) a single pictogram represents.")
+				.call(wrapText2, 290);
 
 			const absolutePath = helpSVG.append("path")
 				.style("fill", "none")
