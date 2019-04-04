@@ -402,6 +402,9 @@
 						return e === chartState.selectedContribution ? "#444" : "#888"
 					});
 
+				d3.select(".pbiclcSvgLegend")
+					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0);
+
 				createTopPanel(data.dataDonors, data.dataCbpfs);
 
 				createDonorsPanel(data.dataDonors, null);
