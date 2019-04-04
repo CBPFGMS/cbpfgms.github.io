@@ -1,10 +1,10 @@
-# GMS BI: Beneficiary Overview, stacked bar and pictogram chart
+# GMS BI: Affected Persons Overview, stacked bar and pictogram chart
 
 Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-overview) . The datavis contains several elements:
 
 - A set of checkboxes for the selection of CBPFs and a set of buttons allowing the selection of the year.
-- A stacked bar chart (100%) showing the percentage of actual beneficiaries relative to targeted beneficiaries for girls, boys, women, men and total.
-- A pictogram chart showing the real number of beneficiaries (targeted and actual) and their proportions for all 5 types (girls, boys, women, men and total).
+- A stacked bar chart (100%) showing the percentage of actual affected persons relative to targeted affected persons for girls, boys, women, men and total.
+- A pictogram chart showing the real number of affected persons (targeted and actual) and their proportions for all 5 types (girls, boys, women, men and total).
 - Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiobe.png" width="450">
@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Bus
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiobe" data-title="Beneficiary Overview" data-showhelp="true" data-cbpf="all" data-year="2018" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiobe/src/d3chartpbiobe.js"></script>```
+```<div id="d3chartcontainerpbiobe" data-title="Affected Persons Overview" data-showhelp="true" data-cbpf="all" data-year="2018" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiobe/src/d3chartpbiobe.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 

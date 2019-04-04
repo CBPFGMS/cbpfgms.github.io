@@ -3,8 +3,8 @@
 Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-overview) . The datavis contains several elements:
 
 - A set of checkboxes for the selection of CBPFs.
-- A set of control buttons allowing the selection of the year, Modality type (total, standard or reserve) and Beneficiary type (targeted or actual).
-- Two lollipop charts, one depicting the allocations by cluster and another one depicting beneficiaries by cluster, (according to the selected year, modality and beneficiary).
+- A set of control buttons allowing the selection of the year, Modality type (total, standard or reserve) and Affected Person type (targeted or actual).
+- Two lollipop charts, one depicting the allocations by cluster and another one depicting affected persons by cluster, (according to the selected year, modality and beneficiary).
 - Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiolc.png" width="450">
@@ -62,10 +62,10 @@ If the value is not a valid one it defaults to `"all"`.
 
 If the value is not an accepted value, it defaults to `"total"`.
 
-**`data-beneficiaries`**: defines the type of beneficiaries depicted by the data visualisation when the page loads. The value has to be a string. Accepted values:
+**`data-beneficiaries`**: defines the type of affected persons depicted by the data visualisation when the page loads. The value has to be a string. Accepted values:
 
-- `"targeted"`: shows targeted beneficiaries.
-- `"actual"`: shows actual beneficiaries.
+- `"targeted"`: shows targeted affected persons.
+- `"actual"`: shows actual affected persons.
 
 If the value is not an accepted value, it defaults to `"targeted"`.
 
