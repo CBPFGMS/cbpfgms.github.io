@@ -1072,7 +1072,6 @@
 					.transition()
 					.duration(duration)
 					.attr("x", function(d) {
-						console.log(d)
 						return xScaleLollipop(d[chartState.selectedPartner]) + lollipopPanel.labelPadding;
 					})
 					.tween("text", function(d) {

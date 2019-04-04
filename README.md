@@ -70,13 +70,13 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows a force-directed graph will all the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc) for more information.
 
-- **GMS BI: Beneficiary Overview, beneficiaries bar and pictogram chart**
+- **GMS BI: Affected Persons Overview, stacked bar and pictogram chart**
 
 Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiobe.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe)
 
-This charts shows the percentage and proportions of targeted and actual beneficiaries, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe) for more information.
+This charts shows the percentage and proportions of targeted and actual affected persons, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe) for more information.
 
 - **GMS BI: Cluster Overview, lollipop chart**
 
@@ -84,7 +84,7 @@ Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelli
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiolc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc)
 
-This charts shows allocations and beneficiaries by cluster, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc) for more information.
+This charts shows allocations and affected persons by cluster, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc) for more information.
 
 - **GMS BI: Allocations map**
 
@@ -107,10 +107,10 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 | GMS Landing Page chart  | `gmslpg`  |
 | CBPF Blog Page chart  | `cbpfbp`  |
 |GMS BI: CBPF Contributions, lollipop chart|`pbiclc`|
-|GMS BI: CBPF Contributions, line graph|`pbicli`|
-|GMS BI: CBPF Allocations, lollipop and parallel graph|`pbialp`|
-|GMS BI: CBPF Allocations, line graph|`pbiali`|
-|GMS BI: CBPF Contributions, force-directed graph|`pbifdc`|
-|GMS BI: CBPF Overview, beneficiaries bar and pictogram chart|`pbiobe`|
-|GMS BI: CBPF Overview, lollipop chart|`pbiolc`|
+|GMS BI: Contribution Trends, line graph|`pbicli`|
+|GMS BI: Allocations by Organization Type, lollipop and parallel coordinates chart|`pbialp`|
+|GMS BI: Allocation Trends, line graph|`pbiali`|
+|GMS BI: Contributions Flow, force-directed graph|`pbifdc`|
+|GMS BI: Affected Persons Overview, stacked bar and pictogram chart|`pbiobe`|
+|GMS BI: Cluster Overview, lollipop chart|`pbiolc`|
 |GMS BI: Allocations map|`pbimap`|
