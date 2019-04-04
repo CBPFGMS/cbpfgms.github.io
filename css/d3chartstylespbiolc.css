@@ -44,6 +44,7 @@
 
 .pbiolcFooterDiv {
 	width: 100%;
+	margin-top: 8px;
 }
 
 .pbiolcOverDivHelp {
@@ -187,4 +188,10 @@ p#pbiolcd3chartTitle {
 	font-size: 15px;
 	fill: #222;
 	pointer-events: none;
+}
+
+.pbiolcLegendText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
 }

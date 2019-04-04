@@ -74,7 +74,7 @@
 	function d3Chart() {
 
 		const width = 900,
-			padding = [4, 4, 4, 4],
+			padding = [4, 4, 40, 4],
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 4,
 			buttonsPanelHeight = 50,
@@ -105,6 +105,7 @@
 			buttonsTitleMargin = 4,
 			buttonsNumber = 8,
 			duration = 1000,
+			legendVerticalPadding = 22,
 			chartTitleDefault = "Cluster Overview",
 			currentYear = new Date().getFullYear(),
 			formatSIaxes = d3.format("~s"),
@@ -234,7 +235,7 @@
 					"," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * lollipopsPanelsRatio,
 			height: lollipopPanelsHeight,
-			padding: [lollipopTitlePadding, 52, 0, 0],
+			padding: [lollipopTitlePadding, 62, 0, 0],
 			labelPadding: 6
 		};
 
@@ -357,6 +358,8 @@
 
 			createBeneficiariesPanel();
 
+			createLegend();
+
 			if (showHelp) createAnnotationsDiv();
 
 			function createTitle() {
@@ -419,6 +422,83 @@
 				});
 
 				//end of createTitle
+			};
+
+			function createLegend() {
+
+				const allocationLegendGroup = svg.append("g")
+					.attr("class", "pbiolcAllocationLegendGroup")
+					.attr("transform", "translate(" + padding[3] +
+						"," + (height - padding[2] + legendVerticalPadding) + ")");
+
+				const beneficiariesLegendGroup = svg.append("g")
+					.attr("class", "pbiolcBeneficiariesLegendGroup")
+					.attr("transform", "translate(" + (padding[3] + allocationsPanel.width + labelsPanel.width + (2 * panelVerticalPadding)) +
+						"," + (height - padding[2] + legendVerticalPadding) + ")");
+
+				const legendAllocation1 = allocationLegendGroup.append("text")
+					.attr("class", "pbiolcLegendText")
+					.attr("x", allocationsPanel.width)
+					.attr("text-anchor", "end")
+					.text("Figures represent: ")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", "#666")
+					.text("total allocated ")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.text("(")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.text("% of standard allocations")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(")");
+
+				const legendAllocation2 = allocationLegendGroup.append("text")
+					.attr("class", "pbiolcLegendText")
+					.attr("x", allocationsPanel.width)
+					.attr("y", 12)
+					.attr("text-anchor", "end")
+					.text("The arrow (")
+					.append("tspan")
+					.style("fill", "black")
+					.text("\u25B2")
+					.append("tspan")
+					.style("fill", "#666")
+					.text(") indicates the standard allocation amount.");
+
+				const legendBeneficiaries1 = beneficiariesLegendGroup.append("text")
+					.attr("class", "pbiolcLegendText")
+					.text("Figures represent: ")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", "#666")
+					.text("targeted ")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.text("(")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.text("actual, % of actual")
+					.append("tspan")
+					.style("font-weight", "normal")
+					.style("fill", "#666")
+					.text(")");
+
+				const legendBeneficiaries2 = beneficiariesLegendGroup.append("text")
+					.attr("class", "pbiolcLegendText")
+					.attr("y", 12)
+					.text("The arrow (")
+					.append("tspan")
+					.style("fill", "black")
+					.text("\u25B2")
+					.append("tspan")
+					.style("fill", "#666")
+					.text(") indicates the number of actual affected persons.");
+
+				//end of createLegend
 			};
 
 			function createCheckboxes() {
@@ -534,7 +614,7 @@
 					.attr("class", "pbiolcButtonsPanelTitle")
 					.attr("x", buttonsPanel.beneficiariesPadding + 2)
 					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Beneficiaries:");
+					.text("Affected Persons:");
 
 				const clipPathButtons = buttonsPanel.main.append("clipPath")
 					.attr("id", "pbiolcclipPathButtons")
@@ -1058,10 +1138,10 @@
 					.attr("class", "pbiolcBeneficiariesPanelTitle")
 					.attr("y", beneficiariesPanel.padding[0] - titleMargin)
 					.attr("x", xScaleBeneficiaries(0))
-					.text("Beneficiaries ")
+					.text("Affected Persons ")
 					.append("tspan")
 					.attr("class", "pbiolcBeneficiariesPanelSubTitle")
-					.text("(people)");
+					.text("(number)");
 
 				beneficiariesPanel.main.select(".pbiolcBeneficiariesPanelTitle")
 					.on("mouseover", function() {
@@ -1155,12 +1235,12 @@
 				beneficiariesGroup.select(".pbiolcBeneficiariesStandardIndicator")
 					.transition()
 					.duration(duration)
-					.style("opacity", chartState.selectedModality === "total" ? 1 : 0)
+					.style("opacity", chartState.selectedBeneficiary === "targeted" ? 1 : 0)
 					.attr("transform", function(d) {
-						const thisPadding = xScaleBeneficiaries(d["total" + chartState.selectedBeneficiary]) -
-							xScaleBeneficiaries(d["standard" + chartState.selectedBeneficiary]) < lollipopRadius ?
+						const thisPadding = xScaleBeneficiaries(d[chartState.selectedModality + "targeted"]) -
+							xScaleBeneficiaries(d[chartState.selectedModality + "actual"]) < lollipopRadius ?
 							lollipopRadius - (stickHeight / 2) : 0;
-						return "translate(" + xScaleBeneficiaries(d["standard" + chartState.selectedBeneficiary]) + "," +
+						return "translate(" + Math.min(xScaleBeneficiaries(d[chartState.selectedModality + "actual"]), xScaleBeneficiaries(d[chartState.selectedModality + "targeted"])) + "," +
 							((Math.sqrt(4 * symbolSize / Math.sqrt(3)) / 2) + stickHeight + thisPadding) + ")";
 					});
 
@@ -1172,15 +1252,17 @@
 					})
 					.tween("text", function(d) {
 						const node = this;
-						const percentStandard = chartState.selectedModality === "total" && d["total" + chartState.selectedBeneficiary] !== 0 ?
-							" (" + formatPercent(d["standard" + chartState.selectedBeneficiary] / d["total" + chartState.selectedBeneficiary]) + " std)" : "";
+						const numberActual = d3.formatPrefix(".0", d[chartState.selectedModality + "actual"])(d[chartState.selectedModality + "actual"]);
+						const percentActual = d[chartState.selectedModality + "actual"] !== 0 ? formatPercent(d[chartState.selectedModality + "actual"] / d[chartState.selectedModality + "targeted"]) : "0%";
+						const actualText = chartState.selectedBeneficiary === "targeted" ?
+							" (" + numberActual + ", " + percentActual + ")" : "";
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedModality + chartState.selectedBeneficiary]);
 						return function(t) {
 							d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedModality + chartState.selectedBeneficiary])(i(t)))
 								.append("tspan")
 								.attr("class", "pbiolcBeneficiariesLabelPercentage")
 								.attr("dy", "-0.5px")
-								.text(percentStandard);
+								.text(actualText);
 						};
 					});
 
@@ -1275,6 +1357,9 @@
 						return e === chartState.selectedModality ? "#666" : "#888"
 					});
 
+				d3.selectAll(".pbiolcAllocationLegendGroup")
+					.style("opacity", chartState.selectedModality === "total" ? 1 : 0);
+
 				sortData(data);
 
 				createLabelsPanel();
@@ -1304,6 +1389,9 @@
 					.style("fill", function(e) {
 						return e === chartState.selectedBeneficiary ? "#666" : "#888"
 					});
+
+				d3.selectAll(".pbiolcBeneficiariesLegendGroup")
+					.style("opacity", chartState.selectedBeneficiary === "targeted" ? 1 : 0);
 
 				if (chartState.sorting === "beneficiaries") {
 					sortData(data);
@@ -1405,7 +1493,7 @@
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" + formatPercent(d.standard / d.total) + "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 						formatMoney0Decimals(d.standard) + "</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" + formatPercent(d.reserve / d.total) +
 						"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(d.reserve) + "</span></div></div><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
-						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>" + capitalize(chartState.selectedBeneficiary) + " Beneficiaries:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>" +
+						"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Affected persons, " + chartState.selectedBeneficiary + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'>" +
 						formatComma(d["total" + chartState.selectedBeneficiary]) + "</div></div><div id='pbiolcBeneficiariesTooltipBar'></div><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" + formatPercent(d["standard" + chartState.selectedBeneficiary] / d["total" + chartState.selectedBeneficiary]) + "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>" +
 						formatComma(d["standard" + chartState.selectedBeneficiary]) + "</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" + formatPercent(d["reserve" + chartState.selectedBeneficiary] / d["total" + chartState.selectedBeneficiary]) +
@@ -1423,7 +1511,7 @@
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" + formatPercent(d.standard / d.total) + "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 						formatMoney0Decimals(d.standard) + "</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" + formatPercent(d.reserve / d.total) +
 						"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(d.reserve) + "</span></div></div><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
-						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>" + capitalize(chartState.selectedBeneficiary) + " Beneficiaries:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>No Beneficiary</div></div>");
+						"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Affected persons, " + chartState.selectedBeneficiary + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'>No affected person</div></div>");
 
 					createTooltipBar(d, "pbiolcAllocationsTooltipBar", tooltipBarWidth, "total", "standard", "reserve");
 
