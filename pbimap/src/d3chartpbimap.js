@@ -2331,7 +2331,7 @@
 
 			const legendEllipse = helpSVG.append("ellipse")
 				.attr("cx", 48)
-				.attr("cy", 400)
+				.attr("cy", 392)
 				.attr("rx", 42)
 				.attr("ry", 18)
 				.style("fill", "none")
@@ -2342,7 +2342,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M90,400 Q130,400 130,380");
+				.attr("d", "M90,392 Q130,392 130,376");
 
 			legendAnnotationRect.attr("width", legendAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", legendAnnotation.node().getBBox().height + padding * 2);
