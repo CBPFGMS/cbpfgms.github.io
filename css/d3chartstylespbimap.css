@@ -515,7 +515,7 @@
 	font-weight: 700;
 }
 
-.pbimapLegendCirclesText, .pbimapLegendColorTexts {
+.pbimapLegendCirclesText, .pbimapLegendColorTexts, .pbimapLegendSubLegendText {
 	font-family: "Arial", sans-serif;
 	font-size: 9px;
 	fill: darkslategray;	

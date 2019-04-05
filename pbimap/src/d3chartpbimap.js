@@ -87,7 +87,7 @@
 			topSvgHorizontalPositions = [0.05, 0.29, 0.54, 0.75],
 			heightTopSvgVerticalPositions = [0.55, 0.85, 0.65],
 			legendSvgWidth = 110,
-			legendSvgHeight = 120,
+			legendSvgHeight = 134,
 			legendSvgPadding = [4, 4, 4, 12],
 			legendTitlePadding = 58,
 			legendSvgVerticalPos = heightLeafletMap - legendSvgHeight,
@@ -121,12 +121,15 @@
 			minCircleRadius = 0.5,
 			maxCircleRadius = 20,
 			circleColor = "#E56A54",
+			circleGlobalColor = "#418FDE",
 			maxMarkerColor = "#CD3A1F",
+			maxMarkerGlobalColor = "#1F69B3",
 			circleStroke = "#555",
 			markerStroke = "#555",
 			markerAttribute = "M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z",
 			noDataTextPosition = heightLeafletMap / 2,
 			colorInterpolator = d3.interpolateRgb("#ccc", maxMarkerColor),
+			colorInterpolatorGlobal = d3.interpolateRgb("#ccc", maxMarkerGlobalColor),
 			tooltipSvgWidth = 270,
 			tooltipSvgHeight = 80,
 			tooltipSvgPadding = [6, 36, 14, 45],
@@ -277,8 +280,11 @@
 			return colorInterpolator(d / 9);
 		});
 
-		const colorScale = d3.scaleQuantile()
-			.range(colorsQuantile);
+		const colorsQuantileGlobal = d3.range(10).map(function(d) {
+			return colorInterpolatorGlobal(d / 9);
+		});
+
+		const colorScale = d3.scaleQuantile();
 
 		const tooltipSvgYScale = d3.scalePoint()
 			.range([tooltipSvgPadding[0], tooltipSvgHeight - tooltipSvgPadding[2]])
@@ -963,7 +969,8 @@
 				return a - b;
 			});
 
-			colorScale.domain(allValues);
+			colorScale.domain(allValues)
+				.range(chartState.selectedAdminLevel ? colorsQuantile : colorsQuantileGlobal);
 
 			const extentLatitude = chartState.selectedAdminLevel === 0 && data.length === 1 ?
 				[countryBoundingBoxes[data[0].locationName].sw.lat, countryBoundingBoxes[data[0].locationName].ne.lat] :
@@ -1009,14 +1016,14 @@
 				const sizeMarkersEnter = sizeMarkers.enter()
 					.append("circle")
 					.attr("class", "pbimapSizeMarkers")
-					.style("fill", circleColor)
 					.style("stroke", circleStroke);
 
 				sizeMarkers = sizeMarkersEnter.merge(sizeMarkers);
 
 				sizeMarkers.attr("r", function(d) {
-					return radiusScale(d.totalAllocation)
-				});
+						return radiusScale(d.totalAllocation)
+					})
+					.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor);
 
 				sizeMarkers.on("mouseover", function(d) {
 						const self = this;
@@ -1192,6 +1199,30 @@
 				.attr("x", legendSvgPadding[3])
 				.attr("y", legendSvgPadding[0] + legendTitlePadding)
 				.text("Legend");
+
+			let legendSubLegend = legendSvg.selectAll(".pbimapLegendSubLegendSquare")
+				.data([true]);
+
+			legendSubLegend.enter()
+				.append("text")
+				.attr("class", "pbimapLegendSubLegendSquare")
+				.attr("x", legendSvgPadding[3])
+				.attr("y", legendSvgPadding[0] + 124)
+				.style("font-size", "12px")
+				.text("\u25A0")
+				.merge(legendSubLegend)
+				.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor);
+
+			let legendSubLegendText = legendSvg.selectAll(".pbimapLegendSubLegendText")
+				.data([true]);
+
+			legendSubLegendText.enter()
+				.append("text")
+				.attr("class", "pbimapLegendSubLegendText")
+				.attr("x", legendSvgPadding[3] + 10)
+				.attr("y", legendSvgPadding[0] + 124)
+				.merge(legendSubLegendText)
+				.text(chartState.selectedAdminLevel ? "Admin Level " + chartState.selectedAdminLevel : "Global Level");
 
 			if (chartState.displayMode === "size") {
 				createSizeLegend();
@@ -1531,7 +1562,7 @@
 					.data(beneficiariesList)
 					.enter()
 					.append("rect")
-					.attr("class", "contributionColorFill")
+					.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor)
 					.attr("x", tooltipSvgPadding[3])
 					.attr("y", function(d) {
 						return tooltipSvgYScale(d) - stickHeight / 4;
@@ -1548,7 +1579,7 @@
 					.data(beneficiariesList)
 					.enter()
 					.append("circle")
-					.attr("class", "contributionColorFill")
+					.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor)
 					.attr("cx", tooltipSvgPadding[3])
 					.attr("cy", function(d) {
 						return tooltipSvgYScale(d);
