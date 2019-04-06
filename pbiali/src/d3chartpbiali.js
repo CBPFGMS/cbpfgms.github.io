@@ -95,6 +95,8 @@
 			labelPadding = 12,
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
+			fadeOpacity = 0.1,
+			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			chartTitleDefault = "Allocation Trends",
 			sortButtonsOptions = ["total", "alphabetically"],
 			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv",
@@ -178,6 +180,9 @@
 
 		const yScaleButton = d3.scaleLinear()
 			.range([buttonHeight - buttonsPanel.buttonsPadding[2], buttonsPanel.buttonsPadding[0]]);
+
+		const scaleColors = d3.scaleOrdinal()
+			.range(colorsArray);
 
 		const lineGeneratorMain = d3.line()
 			.x(function(d) {
@@ -276,6 +281,12 @@
 			yScaleMain.domain(yDomain);
 
 			yScaleButton.domain(yDomain);
+
+			scaleColors.domain(data.cbpfs.sort(function(a, b) {
+				return d3.descending(a.total, b.total);
+			}).map(function(d) {
+				return d.cbpf;
+			}));
 
 			createAverageLine(data.cbpfs, data.years);
 
@@ -380,6 +391,10 @@
 					.attr("class", "pbialiMainGroup")
 					.style("opacity", 0);
 
+				mainGroup.each(function(d) {
+					localVariable.set(this, d.cbpf);
+				});
+
 				const clipPath = mainGroup.append("clipPath")
 					.attr("id", function(d) {
 						return "pbialiClipPath" + d.cbpf.replace(/\s+/g, '');
@@ -394,7 +409,9 @@
 					.attr("d", function(d) {
 						return lineGeneratorMain(d.values);
 					})
-					.attr("class", "contributionColorStroke")
+					.style("stroke", function(d) {
+						return d3.color(scaleColors(d.cbpf)).darker(0.2);
+					})
 					.attr("stroke-width", "2px")
 					.attr("clip-path", function(d) {
 						return "url(#pbialiClipPath" + d.cbpf.replace(/\s+/g, '') + ")"
@@ -418,7 +435,9 @@
 						const thisCbpf = d3.select(this.parentNode).datum().cbpf
 						return "url(#pbialiClipPath" + thisCbpf.replace(/\s+/g, '') + ")"
 					})
-					.attr("class", "contributionColorFill");
+					.style("fill", function() {
+						return d3.color(scaleColors(localVariable.get(this))).darker(0.2);
+					});
 
 				const rectOverlayCbpfs = mainPanel.main.append("rect")
 					.attr("class", "pbialiRectOverlay")
@@ -555,7 +574,9 @@
 				buttonPaths.each(function(d) {
 					if (d.cbpf === d3.select(this.parentNode).datum().cbpf) {
 						d3.select(this).style("stroke-width", "2px")
-							.attr("class", "contributionColorStroke")
+							.style("stroke", function(d) {
+								return d3.color(scaleColors(d.cbpf)).darker(0.4);
+							})
 							.raise();
 					};
 				});
@@ -771,7 +792,8 @@
 						"</strong>:</span><br><div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:232px;'>";
 
 					for (let i = 0; i < thisData.length; i++) {
-						tooltipHtml += "<div style='display:flex;flex:0 50%;'>&bull; " +
+						const thisColor = scaleColors(thisData[i].name);
+						tooltipHtml += "<div style='display:flex;flex:0 50%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
 							thisData[i].name + ":</div><div style='display:flex;flex:0 50%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(thisData[i].total) +
 							"</span></div>"
 					};
@@ -782,9 +804,31 @@
 						.data([true]);
 
 					const tooltipGroupEnter = tooltipGroup.enter()
-						.append("g")
+						.insert("g", ":first-child")
 						.attr("class", "pbialiTooltipGroup")
 						.attr("pointer-events", "none");
+
+					const lines = tooltipGroup.selectAll(".pbialiTooltipLines")
+						.data(thisData, function(d) {
+							return d.name
+						});
+
+					const linesExit = lines.exit().remove();
+
+					const linesEnter = lines.enter()
+						.append("line")
+						.attr("class", "pbialiTooltipLines")
+						.style("stroke-width", "1px")
+						.style("stroke", "#ccc")
+						.merge(lines)
+						.attr("x1", function(d) {
+							return xScaleMain(parseTime(d.year));
+						})
+						.attr("x2", function(d) {
+							return xScaleMain(parseTime(d.year));
+						})
+						.attr("y1", mainPanel.padding[0])
+						.attr("y2", mainPanel.height - mainPanel.padding[2]);
 
 					const circles = tooltipGroup.selectAll(".pbialiTooltipCircles")
 						.data(thisData, function(d) {
@@ -798,37 +842,14 @@
 						.attr("class", "pbialiTooltipCircles")
 						.attr("r", circleRadius + 2)
 						.style("fill", "none")
-						.classed("contributionColorStroke", true)
+						.style("stroke", function(d) {
+							return d3.color(scaleColors(d.name)).darker(0.2);
+						})
 						.merge(circles)
 						.attr("cx", function(d) {
 							return xScaleMain(parseTime(d.year))
 						})
 						.attr("cy", function(d) {
-							return yScaleMain(d.total)
-						});
-
-					const lines = tooltipGroup.selectAll(".pbialiTooltipLines")
-						.data(thisData, function(d) {
-							return d.name
-						});
-
-					const linesExit = lines.exit().remove();
-
-					const linesEnter = lines.enter()
-						.append("line")
-						.attr("class", "pbialiTooltipLines")
-						.style("stroke-dasharray", "4,4")
-						.style("stroke-width", "1px")
-						.style("stroke", "#888")
-						.merge(lines)
-						.attr("x1", function(d) {
-							return xScaleMain(parseTime(d.year)) - circleRadius - 2;
-						})
-						.attr("x2", mainPanel.padding[3])
-						.attr("y1", function(d) {
-							return yScaleMain(d.total)
-						})
-						.attr("y2", function(d) {
 							return yScaleMain(d.total)
 						});
 
@@ -981,6 +1002,15 @@
 							(thisDistance * (2 * Math.abs((yScaleMain(d.datum.total) - d.yPos)) / (maxSize)) - 2 * labelLinePadding) + "," + (yScaleMain(d.datum.total) - d.yPos) + " " +
 							(thisDistance * (2 * Math.abs((yScaleMain(d.datum.total) - d.yPos)) / (maxSize)) - 2 * labelLinePadding) + "," + 0 + " " +
 							-(labelLinePadding) + "," + 0;
+					});
+
+				labelsGroup.on("mouseover", function(d) {
+						selectedGroups.style("opacity", function(e) {
+							return e.cbpf === d.name ? 1 : fadeOpacity;
+						});
+					})
+					.on("mouseout", function() {
+						selectedGroups.style("opacity", 1);
 					});
 
 				mainPanel.main.select(".pbialiRectOverlay").raise();
