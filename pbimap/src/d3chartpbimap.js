@@ -384,7 +384,7 @@
 
 			createTitle();
 
-			createFilterDivs(data.map);
+			createFilterDivs(data);
 
 			repopulateYearFilter();
 
@@ -429,11 +429,17 @@
 
 			downloadIcon.on("click", function() {
 
+				const years = chartState.selectedYear.map(function(d) {
+					return d;
+				}).sort(function(a, b) {
+					return a - b;
+				}).join("-");
+
 				const data = filterData();
 
 				const csv = createCsv(data.map);
 
-				const fileName = "Allocations.csv";
+				const fileName = "Allocations-" + years + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -619,7 +625,7 @@
 
 		function createFilterDivs(data) {
 
-			const maxCombinedLevel = d3.max(data, function(d) {
+			const maxCombinedLevel = d3.max(data.map, function(d) {
 				return d.maxLevel;
 			});
 
@@ -747,6 +753,9 @@
 
 					filterCbpfsDropdown();
 
+					partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
+					clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
+
 				});
 
 			cbpfsDropdown.selectAll("li")
@@ -786,7 +795,12 @@
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
+					partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
+					clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
 				});
+
+			partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
+			clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
 
 			function changeSelected(datum, thisChartState) {
 				if (datum === "All") {
@@ -831,6 +845,9 @@
 						createLegendSvg(data.map);
 						createBreadcrumbDiv();
 					});
+
+				partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
+				clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
 
 			};
 
@@ -899,6 +916,19 @@
 							return cbpfsWithData.indexOf(d) === -1 ? "none" : null
 						});
 					});
+			};
+
+			function filterPartnersAndClusters(selection, data, property) {
+
+				selection.selectAll("li")
+					.filter(function(d) {
+						return d !== "All"
+					})
+					.each(function(d) {
+						d3.select(this).style("opacity", data[property].indexOf(d) === -1 ? fadeOpacityMenu : 1)
+							.style("pointer-events", data[property].indexOf(d) === -1 ? "none" : "all");
+					});
+
 			};
 
 			//end of createFilterDivs
@@ -1639,6 +1669,45 @@
 					listDiv.html("");
 				});
 
+			const listDownloadButton = listButtonDiv.append("button")
+				.html(".CSV  ")
+				.on("click", function() {
+
+					const csv = createCsvProjects(data);
+
+					const fileName = "ProjectsList.csv";
+
+					const blob = new Blob([csv], {
+						type: 'text/csv;charset=utf-8;'
+					});
+
+					if (navigator.msSaveBlob) {
+						navigator.msSaveBlob(blob, filename);
+					} else {
+
+						const link = document.createElement("a");
+
+						if (link.download !== undefined) {
+
+							const url = URL.createObjectURL(blob);
+
+							link.setAttribute("href", url);
+							link.setAttribute("download", fileName);
+							link.style = "visibility:hidden";
+
+							document.body.appendChild(link);
+
+							link.click();
+
+							document.body.removeChild(link);
+
+						};
+					};
+				});
+
+			listDownloadButton.append("span")
+				.attr("class", "fas fa-download contributionColorHTMLcolor");
+
 			const listHeaderContainerDiv = listDiv.append("div")
 				.attr("class", "pbimapListHeaderContainerDiv");
 
@@ -1904,22 +1973,34 @@
 
 			let nestedData;
 
-			const filteredDataForAllocationsTypeList = completeData.filter(function(row) {
-				return filterYear(row.AYr) && filterCBPF(row.cbpfName) && filterPartner(row.partnerType) && filterCluster(row.cluster);
-			});
-
 			const allocationsTypeList = [];
 
 			const lowercaseAllocationsTypeList = [];
 
-			filteredDataForAllocationsTypeList.forEach(function(d) {
-				if (lowercaseAllocationsTypeList.indexOf(d.AllNm.toLowerCase()) === -1) {
-					lowercaseAllocationsTypeList.push(d.AllNm.toLowerCase());
-					allocationsTypeList.push(d.AllNm);
+			const partnersTypeList = [];
+
+			const clustersList = [];
+
+			completeData.forEach(function(row) {
+				if (filterYear(row.AYr) && filterCBPF(row.cbpfName) && filterPartner(row.partnerType) && filterCluster(row.cluster)) {
+					if (lowercaseAllocationsTypeList.indexOf(row.AllNm.toLowerCase()) === -1) {
+						lowercaseAllocationsTypeList.push(row.AllNm.toLowerCase());
+						allocationsTypeList.push(row.AllNm);
+					};
+				};
+
+				if (filterYear(row.AYr) && filterCBPF(row.cbpfName) && filterModality(row.AllNm) && filterCluster(row.cluster)) {
+					if (partnersTypeList.indexOf(row.partnerType) === -1) {
+						partnersTypeList.push(row.partnerType);
+					};
+				};
+
+				if (filterYear(row.AYr) && filterCBPF(row.cbpfName) && filterPartner(row.partnerType) && filterModality(row.AllNm)) {
+					if (clustersList.indexOf(row.cluster) === -1) {
+						clustersList.push(row.cluster);
+					};
 				};
 			});
-
-			filteredDataForAllocationsTypeList.length = 0;
 
 			lowercaseAllocationsTypeList.length = 0;
 
@@ -2059,7 +2140,9 @@
 			return {
 				topSvgObject: topSvgObject,
 				map: nestedData,
-				allocationsTypeList: allocationsTypeList
+				allocationsTypeList: allocationsTypeList,
+				partnersTypeList: partnersTypeList,
+				clustersList: clustersList
 			};
 
 			function filterYear(datum) {
@@ -2416,6 +2499,47 @@
 			return rows.join('\r\n');
 
 			//end of createCsv
+		};
+
+		function createCsvProjects(data) {
+
+			const csvData = [];
+
+			data.forEach(function(d) {
+				let total = 0;
+				beneficiariesList.forEach(function(e) {
+					total += d["AdmLocBenClustAgg" + (chartState.selectedAdminLevel || 1) + e]
+				});
+				total = formatMoney0Decimals(total);
+				csvData.push({
+					CBPF: d.cbpfName,
+					"Project Code": d.PrjCode,
+					"Project Title": d.PrjTitle,
+					Cluster: d.cluster,
+					"Partner Type": d.partnerType,
+					"Allocation Type": d.AllNm,
+					Allocations: Math.floor(d["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)]),
+					"Beneficiaries": total
+				})
+			});
+
+			const header = Object.keys(csvData[0]);
+
+			const replacer = function(key, value) {
+				return value === null ? '' : value
+			};
+
+			let rows = csvData.map(function(row) {
+				return header.map(function(fieldName) {
+					return JSON.stringify(row[fieldName], replacer)
+				}).join(',')
+			});
+
+			rows.unshift(header.join(','));
+
+			return rows.join('\r\n');
+
+			//end of createCsvProjects
 		};
 
 		function valuesInLowerCase(map) {

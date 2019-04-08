@@ -166,7 +166,7 @@
 .pbimapListHeaderContainerDiv {
 	margin-left: 10px;
 	margin-top: 6px;
-	width: 97.3%;
+	width: 97.7%;
 	display: flex;
 	background-color: #D4DADC;
 	border-radius: 4px;
@@ -183,7 +183,7 @@
 
 .pbimapListRowsContainer {
 	margin-left: 10px;
-	width: 97.3%;
+	width: 97.7%;
 	max-height: 400px;
 	overflow-y: auto;
 	border-bottom: 2px solid #D4DADC;
