@@ -92,6 +92,7 @@
 			percentNumberPadding = 4,
 			circleRadius = 4,
 			showAverageGroupPadding = 84,
+			netFundingGroupPadding = 170,
 			selectedCbpfLabelPadding = 8,
 			lollipopTooltipWidth = 400,
 			parallelTooltipWidth = 280,
@@ -110,7 +111,7 @@
 			localVariable = d3.local(),
 			buttonsNumber = 8,
 			chartTitleDefault = "Allocations by Organization Type",
-			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv",
+			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&FundingType=3&$format=csv",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
@@ -124,7 +125,8 @@
 			chartState = {
 				selectedYear: null,
 				selectedPartner: null,
-				selectedCbpfs: []
+				selectedCbpfs: [],
+				netFunding: 1
 			};
 
 		let height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
@@ -579,6 +581,7 @@
 						return "(" +
 							(chartState.selectedPartner === "total" ? "all partners" :
 								chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
+								chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
 								chartState.selectedPartner) +
 							")";
 					});
@@ -666,6 +669,7 @@
 						return "(" +
 							(chartState.selectedPartner === "total" ? "All Partners" :
 								chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
+								chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
 								chartState.selectedPartner) +
 							")";
 					});
@@ -1164,12 +1168,12 @@
 
 					const tooltipChartTitle = chartState.selectedPartner === "total" ?
 						"Allocations by Partner Type and Modality:" :
-						"Allocations for this Partner Type (" + partnersTextScale(chartState.selectedPartner) + ") by Modality, in %:";
+						"Allocations for this Partner Type (" + (chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" : partnersTextScale(chartState.selectedPartner)) + ") by Modality, in %:";
 
 					if (datum[thisTotal]) {
 						tooltip.style("display", "block")
 							.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + datum.cbpf +
-								"</span></strong> (" + (chartState.selectedPartner === "total" ? "All Partners" : chartState.selectedPartner) +
+								"</span></strong> (" + (chartState.selectedPartner === "total" ? "All Partners" : chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" : chartState.selectedPartner) +
 								")<br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 								lollipopTooltipWidth + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" + formatMoney0Decimals(datum[thisTotal]) +
 								"</div></div>Allocation Modalities:<div id=pbialpLollipopTooltipBar></div><div style='margin:0px;display:flex;flex-wrap:wrap;width:" +
@@ -1504,6 +1508,35 @@
 
 			function createBottomButtons() {
 
+				const netFundingGroup = bottomButtonsGroup.append("g")
+					.attr("class", "pbialpNetFundingGroup")
+					.attr("transform", "translate(" + (width - padding[1] - netFundingGroupPadding) + "," +
+						(height - padding[2] / 2) + ")")
+					.style("cursor", "pointer")
+					.attr("pointer-events", "all");
+
+				const netFundingOuterRectangle = netFundingGroup.append("rect")
+					.attr("width", 12)
+					.attr("height", 12)
+					.attr("rx", 2)
+					.attr("ry", 2)
+					.attr("x", -6)
+					.attr("y", -5)
+					.attr("fill", "white")
+					.attr("stroke", "darkslategray");
+
+				const netFundingInnerCheck = netFundingGroup.append("polyline")
+					.style("stroke-width", "2px")
+					.attr("points", "-4,1 -1,4 4,-3")
+					.style("fill", "none")
+					.style("stroke", chartState.netFunding === 2 ? "darkslategray" : "white");
+
+				const netFundingText = netFundingGroup.append("text")
+					.attr("class", "pbialpAverageTextControl")
+					.attr("x", 10)
+					.text("Net Funding")
+					.attr("y", 5);
+
 				const showAverageGroup = bottomButtonsGroup.append("g")
 					.attr("class", "pbialpShowAverageGroup")
 					.attr("transform", "translate(" + (width - padding[1] - showAverageGroupPadding) + "," +
@@ -1532,6 +1565,32 @@
 					.attr("x", 10)
 					.text("Show Average")
 					.attr("y", 5);
+
+				netFundingGroup.on("click", function() {
+
+					chartState.netFunding = 3 - chartState.netFunding;
+
+					netFundingInnerCheck.style("stroke", chartState.netFunding === 2 ? "darkslategray" : "white");
+
+					svg.selectAll(".pbialpbuttonsPartnersText")
+						.filter(function(d) {
+							return d === "National NGO";
+						})
+						.text(chartState.netFunding === 1 ? "National NGO" : "Nat. Partners");
+
+					data = processData(rawData);
+
+					recalculateAndResize();
+
+					createTopPanel(data);
+
+					createLollipopPanel(data);
+
+					createParallelPanel(data);
+
+					highlightParallel(data);
+
+				});
 
 				showAverageGroup.on("click", function() {
 
@@ -1968,7 +2027,7 @@
 
 					tooltip.style("display", "block")
 						.html("<strong><span class='contributionColorDarkerHTMLcolor'>" + thisCbpf +
-							"</span></strong><br style='line-height:170%;'/>Partner: <strong>" + datum.partner +
+							"</span></strong><br style='line-height:170%;'/>Partner: <strong>" + (datum.partner === "National NGO" && chartState.netFunding === 2 ? "National Partners" : datum.partner) +
 							"</strong><br style='line-height:170%;'/><div>Allocations: $" +
 							formatMoney0Decimals(datum.value) + "<br>(" + (~~(datum.percentage * 10000) / 100) +
 							"% of total)</div><br style='line-height:170%;'/>Allocation modalities for this partner:<div id=pbialpParallelTooltipBar></div><div style='margin:0px;display:flex;flex-wrap:wrap;width:" +
@@ -2180,7 +2239,7 @@
 				const tooltipXAxis = d3.axisBottom(xScaleOuter)
 					.tickPadding(0)
 					.tickFormat(function(d) {
-						return partnersTextScale(d)
+						return d === "National NGO" && chartState.netFunding === 2 ? "Nat. Partners" : partnersTextScale(d)
 					});
 
 				const tooltipGX = tooltipSvg.append("g")
@@ -2332,7 +2391,7 @@
 					.attr("class", "pbialpTooltipLegendDonut")
 					.text(function(d) {
 						const bullet = d === chartState.selectedPartner ? " \u2190" : "";
-						return partnersTextScale(d) + bullet;
+						return (d === "National NGO" && chartState.netFunding === 2 ? "Nat. Part." : partnersTextScale(d)) + bullet;
 					});
 
 				const tooltipAxis = d3.axisBottom(xScaleTooltip)
@@ -2457,13 +2516,17 @@
 			const temporarySet = [];
 
 			const filteredData = rawData.filter(function(d) {
-				return +d.AllocationYear === chartState.selectedYear;
+				return +d.AllocationYear === chartState.selectedYear && +d.FundingType === chartState.netFunding;
 			});
 
 			filteredData.forEach(function(row) {
 
-				if (row.OrganizationType === "Others") {
+				if (row.OrganizationType === "Others" || row.OrganizationType === "Red Cross/Red Crescent Society") {
 					row.OrganizationType = "Red Cross/Crescent Movement";
+				};
+
+				if (row.OrganizationType === "National Partners") {
+					row.OrganizationType = "National NGO";
 				};
 
 				if (temporarySet.indexOf(row.PooledFundName) > -1) {
@@ -2714,7 +2777,8 @@
 			text.each(function() {
 				let text = d3.select(this),
 					words = text.text() === "Red Cross/Crescent Movement" ?
-					["Red Cross/", "Crescent Movement"] : text.text().split(" "),
+					["Red Cross/", "Crescent Movement"] : text.text() === "National NGO" && chartState.netFunding === 2 ?
+					["National", "Partners"] : text.text().split(" "),
 					lineNumber = 0,
 					lineHeight = 1.1,
 					y = text.attr("y"),
