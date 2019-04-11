@@ -3,9 +3,10 @@
 Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-allocations) . The datavis contains several elements:
 
 - A top banner showing the value allocated, the value under approval and the number of CBPFs both for the selected partner and the selected year;
-- A control banner allowing the selection of the year and the partner type (International NGO, National NGO, Red Cross/Crescent Movement, UN Agency or All Partners);
+- A set of buttons allowing the selection of the year and the partner type (International NGO, National NGO, Red Cross/Crescent Movement, UN Agency or All Partners);
 - A lollipop chart for the CBPF allocations, according to the selected year and contribution type.
 - A parallel coordinates chart showing the percentage of allocations by partner type for all CBPFs.
+- Two checkboxes, one for displaying Net Funding values and another one for displaying the average percentage of allocations per partner in the parallel coordinates chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbialp.png" width="450">
 
