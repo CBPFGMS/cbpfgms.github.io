@@ -1580,6 +1580,12 @@
 
 					data = processData(rawData);
 
+					data.forEach(function(d) {
+						if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
+							d.clicked = true;
+						};
+					});
+
 					recalculateAndResize();
 
 					createTopPanel(data);
