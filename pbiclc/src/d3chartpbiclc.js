@@ -312,8 +312,6 @@
 				};
 
 				//end of d3.csv
-			}).catch(function(e) {
-				console.log(e);
 			});
 
 		function draw(rawData) {
