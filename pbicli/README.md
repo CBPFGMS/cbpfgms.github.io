@@ -15,7 +15,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-responsive="true" data-showhelp="false"  data-lazyload="true"></div><script type="text/javascript" src="d3chartpbicli.js"></script>```
+```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-responsive="true" data-showhelp="false"  data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
