@@ -311,7 +311,7 @@
 			.domain(listHeader)
 			.range(["PrjCode", "PrjTitle", "cluster", "partnerType", "AllNm", "AdmLocBenClustAgg", "AdmLocClustBdg"]);
 
-		saveImage(tooltipThumbnailPathCors, "tooltipThumbnail");
+		if (!isInternetExplorer) saveImage(tooltipThumbnailPathCors, "tooltipThumbnail");
 
 		apiFiles.forEach(function(file) {
 			promises.push(d3.csv(file + yearParameter + chartState.selectedYear[0] + csvFormatParameter))

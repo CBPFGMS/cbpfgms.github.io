@@ -316,7 +316,7 @@
 
 			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
 
-			saveFlags(clusters);
+			if (!isInternetExplorer) saveFlags(clusters);
 
 			if (!lazyLoad) {
 				draw(rawData);

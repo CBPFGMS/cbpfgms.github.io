@@ -406,7 +406,7 @@
 
 			createGeoMenu();
 
-			saveFlags(dataObject.nodes);
+			if (!isInternetExplorer) saveFlags(dataObject.nodes);
 
 			if (showHelp) createAnnotationsDiv();
 

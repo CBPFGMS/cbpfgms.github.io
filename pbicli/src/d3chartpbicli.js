@@ -319,7 +319,7 @@
 
 				chartState.selectedDonors = list.donorsArray.slice(0, 5);
 
-				saveFlags(list.donorsArray);
+				if (!isInternetExplorer) saveFlags(list.donorsArray);
 
 				if (!lazyLoad) {
 					draw(rawData, list);

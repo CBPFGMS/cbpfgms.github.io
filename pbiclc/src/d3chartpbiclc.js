@@ -1,6 +1,6 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
@@ -294,7 +294,7 @@
 					return self.indexOf(value) === index;
 				});
 
-				saveFlags(allDonors);
+				if (!isInternetExplorer) saveFlags(allDonors);
 
 				if (!lazyLoad) {
 					draw(rawData);
