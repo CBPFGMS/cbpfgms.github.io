@@ -2247,7 +2247,7 @@
 			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 8 " + width + " " + helpSVGHeight);
+				.attr("viewBox", "6 12 " + width + " " + helpSVGHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
