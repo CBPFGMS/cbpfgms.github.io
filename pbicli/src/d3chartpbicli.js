@@ -3752,7 +3752,7 @@
 
 	function linearRegression(data) {
 		function round(number, precision) {
-			var factor = 10 ** precision;
+			var factor = Math.pow(10, precision);
 			return Math.round(number * factor) / factor;
 		}
 
