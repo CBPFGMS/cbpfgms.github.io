@@ -828,12 +828,14 @@
 				createTopSvg(data.topSvgObject);
 				createMap(data.map);
 				createLegendSvg(data.map);
-				createBreadcrumbDiv();
 
 				const newMaxCombinedLevel = d3.max(data.map, function(d) {
 					return d.maxLevel;
 				}) || 0;
 				chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
+
+				createBreadcrumbDiv();
+
 				adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 				adminLevelDropdown.selectAll("li")
 					.on("click", function(d) {
@@ -1400,8 +1402,6 @@
 
 		function createBreadcrumbDiv() {
 
-			const adminLevelText = chartState.selectedAdminLevel < 4 ? "Admin Level " : "Level ";
-
 			const colorArray = JSON.parse(JSON.stringify(filterColorsArray));
 
 			let adminLevel;
@@ -1410,7 +1410,7 @@
 				adminLevel = ["Global Level"]
 			} else {
 				adminLevel = d3.range(1, chartState.selectedAdminLevel + 1).map(function(d) {
-					return adminLevelText + d;
+					return "Admin Level " + d;
 				});
 			};
 
@@ -2247,7 +2247,7 @@
 			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
+				.attr("viewBox", "0 8 " + width + " " + helpSVGHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
