@@ -100,6 +100,7 @@
 			duration = 1000,
 			excelIconSize = 20,
 			checkboxesLimit = 20,
+			checkboxesLimitTrend = 10,
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			chartState = {
@@ -197,6 +198,13 @@
 
 		const footerDiv = containerDiv.append("div")
 			.attr("class", "pbicliFooterDiv");
+
+		const grayFilters = svg.append("filter")
+			.attr("id", "pbicliGrayFilter")
+			.append("feColorMatrix")
+			.attr("in", "SourceGraphic")
+			.attr("type", "saturate")
+			.attr("values", "0");
 
 		createProgressWheel();
 
@@ -1045,9 +1053,12 @@
 
 				donorsCheckboxes.select("input")
 					.property("checked", function(d, i) {
-						if (i > checkboxesLimit) {
-							checkedDonors[d] = false;
-							return false;
+						if (chartState.showTrend && i > checkboxesLimitTrend) {
+							return checkedDonors[d] = false;
+						} else if (!chartState.showTrend && i < checkboxesLimit) {
+							return checkedDonors[d] = true;
+						} else if (i > checkboxesLimit) {
+							return checkedDonors[d] = false;
 						} else {
 							return checkedDonors[d];
 						};
@@ -1164,8 +1175,7 @@
 				cbpfsCheckboxes.select("input")
 					.property("checked", function(d, i) {
 						if (i > checkboxesLimit) {
-							checkedCbpfs[d] = false;
-							return false;
+							return checkedCbpfs[d] = false;
 						} else {
 							return checkedCbpfs[d];
 						};
@@ -1893,19 +1903,21 @@
 					}
 				});
 
-				let labelsDataTrend = {};
+				let labelsDataTrend = [];
 
 				if (chartState.futureDonations && chartState.showTrend) {
-					labelsDataTrend = donorsData.map(function(d) {
-						let thisDatum = d.trendValues[d.trendValues.length - 1];
-						return {
-							name: isoAlpha2to3[d.isoCode.toUpperCase()],
-							datum: thisDatum,
-							yPos: yScaleDonors(thisDatum.total),
-							isoCode: d.isoCode,
-							currency: "USD",
-							trend: true
-						}
+					donorsData.forEach(function(d) {
+						if (d.trendValues.length > 0) {
+							let thisDatum = d.trendValues[d.trendValues.length - 1];
+							labelsDataTrend.push({
+								name: isoAlpha2to3[d.isoCode.toUpperCase()],
+								datum: thisDatum,
+								yPos: yScaleDonors(thisDatum.total),
+								isoCode: d.isoCode,
+								currency: "USD",
+								trend: true
+							});
+						};
 					});
 				};
 
@@ -2022,15 +2034,18 @@
 						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
 							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
-							.style("opacity", function(e) {
-								return d.isoCode === e.isoCode ? 1 : fadeOpacity;
-							});
+							.filter(function(e) {
+								return d.isoCode !== e.isoCode;
+							})
+							.style("opacity", fadeOpacity)
+							.attr("filter", "url(#pbicliGrayFilter)");
 					})
 					.on("mouseout", function() {
 						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
 							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
-							.style("opacity", 1);
+							.style("opacity", 1)
+							.attr("filter", null);
 					});
 
 				groupXAxisDonors.transition()
@@ -2446,13 +2461,16 @@
 
 				labelsGroupCbpfs.on("mouseover", function(d, i) {
 						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
-							.style("opacity", function(e) {
-								return d.isoCode === e.isoCode ? 1 : fadeOpacity;
+							.filter(function(e) {
+								return d.isoCode !== e.isoCode;
 							})
+							.style("opacity", fadeOpacity)
+							.attr("filter", "url(#pbicliGrayFilter)");
 					})
 					.on("mouseout", function() {
 						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
-							.style("opacity", 1);
+							.style("opacity", 1)
+							.attr("filter", null);
 					});
 
 				groupXAxisCbpfs.transition()
@@ -2854,7 +2872,7 @@
 				yearsArray: [],
 				currenciesArray: [],
 				donorsArray: [],
-				cbpfsArray: []
+				cbpfsArray: [],
 			};
 
 			const dataColumns = {
@@ -2869,23 +2887,21 @@
 				cbpfsTotals: {}
 			};
 
-			rawData.forEach(function(row) {
+			const dataKeys = Object.keys(data);
 
-				//REMOVE THIS
-				if (row.GMSDonorISO2Code === "NO") row.PaidAmtLocalCurrency = "NOK";
-				//REMOVE THIS
+			rawData.forEach(function(row) {
 
 				row.GMSDonorISO2Code = row.GMSDonorISO2Code.toLowerCase();
 
 				row.PooledFundISO2Code = row.PooledFundISO2Code.toLowerCase();
 
-				Object.keys(data).forEach(function(key) {
+				dataKeys.forEach(function(key) {
 					if (data[key].indexOf(row[dataColumns[key]].trim()) === -1) {
 						if (row[dataColumns[key]] !== "") data[key].push(row[dataColumns[key]].trim());
 					};
 				});
 
-				if (!currencyByCountry[row.GMSDonorISO2Code]) currencyByCountry[row.GMSDonorISO2Code] = row.PaidAmtLocalCurrency.trim();
+				if (!currencyByCountry[row.GMSDonorISO2Code] || row.PaidAmtLocalCurrency.trim() !== "USD") currencyByCountry[row.GMSDonorISO2Code] = row.PaidAmtLocalCurrency.trim();
 
 				if (!iso2Names[row.GMSDonorISO2Code]) iso2Names[row.GMSDonorISO2Code] = row.GMSDonorName;
 
@@ -2908,6 +2924,8 @@
 				};
 
 			});
+
+			console.log(currencyByCountry);
 
 			iso2Names.mk = "Macedonia";
 

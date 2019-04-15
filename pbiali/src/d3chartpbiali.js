@@ -141,6 +141,13 @@
 		const footerDiv = containerDiv.append("div")
 			.attr("class", "pbialiFooterDiv");
 
+		const grayFilters = svg.append("filter")
+			.attr("id", "pbialiGrayFilter")
+			.append("feColorMatrix")
+			.attr("in", "SourceGraphic")
+			.attr("type", "saturate")
+			.attr("values", "0");
+
 		createProgressWheel();
 
 		const tooltip = containerDiv.append("div")
@@ -471,6 +478,7 @@
 				const lastAverageDate = averageData[averageData.length - 1];
 
 				const averagePath = mainPanel.main.append("path")
+					.attr("class", "pbialiAveragePath")
 					.attr("d", lineGeneratorMain(averageData))
 					.attr("stroke-width", "2px")
 					.style("fill", "none")
@@ -481,6 +489,7 @@
 					.data(averageData)
 					.enter()
 					.append("circle")
+					.attr("class", "pbialiAverageCircles")
 					.attr("r", circleRadius)
 					.attr("cx", function(d) {
 						return xScaleMain(parseTime(d.year))
@@ -888,8 +897,10 @@
 				if (chartState.selectedCbpfs.length > 0) {
 					mainPanel.main.selectAll(".pbialiAverageLine, .pbialiAverageText")
 						.style("opacity", 0);
+					mainPanel.main.selectAll(".pbialiAveragePath, .pbialiAverageCircles")
+						.style("opacity", fadeOpacity);
 				} else {
-					mainPanel.main.selectAll(".pbialiAverageLine, .pbialiAverageText")
+					mainPanel.main.selectAll(".pbialiAverageLine, .pbialiAverageText, .pbialiAveragePath, .pbialiAverageCircles")
 						.style("opacity", 1);
 				};
 
@@ -1005,12 +1016,23 @@
 					});
 
 				labelsGroup.on("mouseover", function(d) {
-						selectedGroups.style("opacity", function(e) {
-							return e.cbpf === d.name ? 1 : fadeOpacity;
-						});
+						labelsGroup.interrupt();
+						selectedGroups.filter(function(e) {
+								return e.cbpf !== d.name;
+							})
+							.style("opacity", fadeOpacity)
+							.attr("filter", "url(#pbialiGrayFilter)");
+						labelsGroup.filter(function(e) {
+								return e.name !== d.name;
+							})
+							.style("opacity", fadeOpacity)
+							.attr("filter", "url(#pbialiGrayFilter)");
 					})
 					.on("mouseout", function() {
-						selectedGroups.style("opacity", 1);
+						selectedGroups.style("opacity", 1)
+							.attr("filter", null);
+						labelsGroup.style("opacity", 1)
+							.attr("filter", null);
 					});
 
 				mainPanel.main.select(".pbialiRectOverlay").raise();
