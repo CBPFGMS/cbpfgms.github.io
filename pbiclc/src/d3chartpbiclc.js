@@ -1717,12 +1717,6 @@
 				.duration(shortDuration)
 				.attr("viewBox", "0 0 " + width + " " + height);
 
-			if (isInternetExplorer) {
-				svg.transition()
-					.duration(shortDuration)
-					.attr("height", height);
-			};
-
 			//end of resizeSvg
 		};
 
