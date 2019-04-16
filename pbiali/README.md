@@ -51,8 +51,6 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
 - `"false"`: the SVG will be created with a fixed size, which is 900px wide (the height of the SVG varies according to the number of CBPFs).
 
-Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
-
 *Recommended size*: 900px (width).
 
 

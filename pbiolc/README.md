@@ -74,8 +74,6 @@ If the value is not an accepted value, it defaults to `"targeted"`.
 - `"true"`: the SVG will stretch to the width of the element containing the code snippet.
 - `"false"`: the SVG will be created with a fixed size, which is 900px wide (the height of the SVG varies according to the number of donors/CBPFs in the selected year).
 
-Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
-
 **`data-lazyload`**: defines if the animation starts when the SVG is visible. Accepted values:
 
 - `"true"`: the animation starts only when the SVG is visible in the browser window.

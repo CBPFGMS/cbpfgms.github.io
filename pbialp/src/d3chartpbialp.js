@@ -1,6 +1,8 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1 ? true : false;
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
+
+	const hasFetch = window.fetch;
 
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
@@ -25,7 +27,7 @@
 	});
 
 	if (!isD3Loaded(d3URL)) {
-		if (!isInternetExplorer) {
+		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
@@ -151,7 +153,7 @@
 			containerDiv.node().getAttribute("data-partner") :
 			"total";
 
-		if (selectedResponsiveness === "false" || isInternetExplorer) {
+		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
@@ -168,6 +170,10 @@
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
+
+		if (isInternetExplorer) {
+			svg.attr("height", height);
+		};
 
 		const footerDiv = containerDiv.append("div")
 			.attr("class", "pbialpFooterDiv");
