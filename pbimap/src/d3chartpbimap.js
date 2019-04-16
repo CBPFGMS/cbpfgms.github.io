@@ -217,7 +217,7 @@
 			.attr("viewBox", "0 0 " + width + " " + heightTopSvg);
 
 		if (isInternetExplorer) {
-			topSvg.attr("height", height);
+			topSvg.attr("height", heightTopSvg);
 		};
 
 		const filtersDiv = containerDiv.append("div")
