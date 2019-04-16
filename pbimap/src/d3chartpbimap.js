@@ -2,6 +2,8 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
+	const hasFetch = window.fetch;
+
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
 	const leafletCSSLink = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css";
@@ -33,7 +35,7 @@
 	});
 
 	if (!isD3Loaded(d3URL)) {
-		if (!isInternetExplorer) {
+		if (hasFetch) {
 			loadScript(leafletURL, function() {
 				loadScript(d3URL, d3Chart);
 			});
@@ -198,7 +200,7 @@
 
 		chartState.selectedYear.push(validateYear(selectedYearString));
 
-		if (selectedResponsiveness === "false" || isInternetExplorer) {
+		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px");
 		};
 
@@ -213,6 +215,10 @@
 
 		const topSvg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + heightTopSvg);
+
+		if (isInternetExplorer) {
+			topSvg.attr("height", height);
+		};
 
 		const filtersDiv = containerDiv.append("div")
 			.attr("class", "pbimapFiltersDiv");

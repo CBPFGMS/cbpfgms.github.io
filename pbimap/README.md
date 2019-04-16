@@ -101,8 +101,6 @@ For more than one cluster the values must be separated with commas. If the value
 - 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
-Note: On Internet Explorer this parameter will default to `"false"`, meaning that the SVG will not be responsive.
-
 **`data-lazyload`**: defines if the animation starts when the SVG is visible. Accepted values:
 
 - `"true"`: the animation starts only when the SVG is visible in the browser window.
