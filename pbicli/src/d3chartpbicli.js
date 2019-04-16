@@ -2,6 +2,8 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
 
+	const hasFetch = window.fetch;
+
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
 	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbicli.css", fontAwesomeLink];
@@ -25,7 +27,7 @@
 	});
 
 	if (!isD3Loaded(d3URL)) {
-		if (!isInternetExplorer) {
+		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
@@ -132,7 +134,7 @@
 
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
-		if (selectedResponsiveness === false || isInternetExplorer) {
+		if (selectedResponsiveness === false) {
 			containerDiv.style("width", width + "px");
 		};
 
@@ -195,6 +197,10 @@
 
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height);
+
+		if (isInternetExplorer) {
+			svg.attr("height", height);
+		};
 
 		const footerDiv = containerDiv.append("div")
 			.attr("class", "pbicliFooterDiv");
