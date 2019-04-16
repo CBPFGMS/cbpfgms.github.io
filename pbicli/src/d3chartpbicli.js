@@ -2931,8 +2931,6 @@
 
 			});
 
-			console.log(currencyByCountry);
-
 			iso2Names.mk = "Macedonia";
 
 			data.yearsArray.sort(function(a, b) {
