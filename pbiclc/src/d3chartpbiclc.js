@@ -97,8 +97,8 @@
 			paidSymbolSize = 16,
 			localVariable = d3.local(),
 			legendPadding = 6,
-			paidColor = "9063CD",
-			pledgedColor = "E56A54",
+			paidColor = "#9063CD",
+			pledgedColor = "#E56A54",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
 			chartTitleDefault = "CBPF Contributions",
@@ -1713,9 +1713,16 @@
 				containerDiv.style("height", height + "px");
 			};
 
-			svg.transition()
-				.duration(shortDuration)
-				.attr("viewBox", "0 0 " + width + " " + height);
+			if (isInternetExplorer) {
+				svg.transition()
+					.duration(shortDuration)
+					.attr("viewBox", "0 0 " + width + " " + height)
+					.attr("height", height);
+			} else {
+				svg.transition()
+					.duration(shortDuration)
+					.attr("viewBox", "0 0 " + width + " " + height);
+			};
 
 			//end of resizeSvg
 		};
