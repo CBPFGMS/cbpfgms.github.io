@@ -1957,8 +1957,8 @@
 				.attr("class", "pbiclcAnnotationText")
 				.attr("x", 270)
 				.attr("y", 390)
-				.text("Hover over the donors or CBPFs to get additional information. Hovering over a donor filters the CBPFs accordingly, as well as hovering over a CBPFs filters the donors accordingly. When “total” is selected, the black triangle indicates the paid amount.")
-				.call(wrapText2, 250);
+				.text("Hover over the donors or CBPFs to get additional information. Hovering over a donor filters the CBPFs accordingly, as well as hovering over a CBPFs filters the donors accordingly. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.")
+				.call(wrapText2, 350);
 
 			const lollipopsPath = helpSVG.append("path")
 				.style("fill", "none")
@@ -1972,7 +1972,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M530,430 Q590,430 590,370");
+				.attr("d", "M630,430 Q690,430 690,370");
 
 			lollipopsAnnotationRect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
