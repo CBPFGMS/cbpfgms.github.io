@@ -87,11 +87,12 @@
 			stickHeight = 2,
 			lollipopRadius = 4,
 			fadeOpacity = 0.15,
+			fadeOpacity2 = 0.2,
 			parallelTickPadding = 20,
 			xScaleLollipopMargin = 1.1,
 			verticalLabelPadding = 4,
 			paidSymbolSize = 16,
-			percentNumberPadding = 4,
+			percentNumberPadding = 8,
 			circleRadius = 4,
 			showAverageGroupPadding = 84,
 			netFundingGroupPadding = 170,
@@ -1862,7 +1863,7 @@
 						return xScaleParallel(d.partner);
 					})
 					.attr("y", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding;
+						return d.percentage > 0.95 ? yScaleParallel(d.percentage) + percentagePadding / 1.2 : yScaleParallel(d.percentage) - percentagePadding;
 					})
 					.attr("text-anchor", "middle");
 
@@ -1883,10 +1884,58 @@
 				percentagesText.transition()
 					.duration(duration)
 					.attr("y", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding;
+						return d.percentage > 0.95 ? yScaleParallel(d.percentage) + percentagePadding / 1.2 : yScaleParallel(d.percentage) - percentagePadding;
 					});
 
 				percentagesText.raise();
+
+				labelsGroup.on("mouseover", function(d) {
+
+					selectedGroups.style("opacity", function(e) {
+						return d.cbpf === e.cbpf ? 1 : fadeOpacity2;
+					});
+
+					let percentagesText = parallelPanel.main.selectAll(".pbialpPercentagesTextHighlight")
+						.data(d.parallelData);
+
+					percentagesText.text(function(d) {
+							return formatSIFloat(d.value);
+						})
+						.attr("y", function(d) {
+							return d.percentage > 0.95 ? yScaleParallel(d.percentage) + percentagePadding / 1.2 : yScaleParallel(d.percentage) - percentagePadding;
+						})
+						.append("tspan")
+						.attr("x", function(d) {
+							return xScaleParallel(d.partner);
+						})
+						.attr("dy", "1.1em")
+						.text(function(d) {
+							return "(" + formatPercent(d.percentage) + ")";
+						});
+
+				}).on("mouseout", function() {
+
+					selectedGroups.style("opacity", 1);
+
+					let percentagesText = parallelPanel.main.selectAll(".pbialpPercentagesTextHighlight")
+						.data(percentagesData);
+
+					percentagesText.text(function(d) {
+							return formatSIFloat(d.value);
+						})
+						.attr("y", function(d) {
+							return d.percentage > 0.95 ? yScaleParallel(d.percentage) + percentagePadding / 1.2 : yScaleParallel(d.percentage) - percentagePadding;
+						})
+						.append("tspan")
+						.attr("x", function(d) {
+							return xScaleParallel(d.partner);
+						})
+						.attr("dy", "1.1em")
+						.text(function(d) {
+							return "(" + formatPercent(d.percentage) + ")";
+						});
+
+				});
 
 				//end of highlightParallel
 			};
