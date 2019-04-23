@@ -568,6 +568,16 @@
 					containerDiv.select("#pbicliCbpfsDropdown").select("option")
 						.property("selected", true);
 
+					containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
+						.property("disabled", function(d, i) {
+							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
+						});
+
+					containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
+						.property("disabled", function(d, i) {
+							return !i || chartState.selectedDonors.indexOf(d) > -1;
+						});
+
 					const data = populateData(rawData);
 
 					yScaleDonors.domain(setYDomain(data.donors, data.cbpfs));
@@ -637,6 +647,16 @@
 
 				containerDiv.select("#pbicliDonorsDropdown").select("option")
 					.property("selected", true);
+
+				containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
+					.property("disabled", function(d, i) {
+						return !i || chartState.selectedDonors.indexOf(d) > -1;
+					});
+
+				containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
+					.property("disabled", function(d, i) {
+						return !i || chartState.selectedCbpfs.indexOf(d) > -1;
+					});
 
 				const data = populateData(rawData);
 
@@ -738,6 +758,11 @@
 
 							containerDiv.select("#pbicliDonorsDropdown").select("option")
 								.property("selected", true);
+
+							containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
+								.property("disabled", function(d, i) {
+									return !i || chartState.selectedDonors.indexOf(d) > -1;
+								});
 
 							const data = populateData(rawData);
 
@@ -930,6 +955,11 @@
 							.property("selected", true);
 					};
 
+					containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
+						.property("disabled", function(d, i) {
+							return !i || chartState.selectedDonors.indexOf(d) > -1;
+						});
+
 					if (!chartState.selectedDonors.length) chartState.selectedLocalCurrency = null;
 
 					const data = populateData(rawData);
@@ -992,6 +1022,11 @@
 						containerDiv.select("#pbicliCbpfsDropdown").select("option")
 							.property("selected", true);
 					};
+
+					containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
+						.property("disabled", function(d, i) {
+							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
+						});
 
 					const data = populateData(rawData);
 
@@ -2674,8 +2709,8 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(_, i) {
-					return !i;
+				.property("disabled", function(d, i) {
+					return !i || chartState.selectedDonors.indexOf(d) > -1;
 				})
 				.property("selected", function(_, i) {
 					return i === 1;
@@ -2700,8 +2735,8 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(_, i) {
-					return !i;
+				.property("disabled", function(d, i) {
+					return !i || chartState.selectedDonors.indexOf(d) > -1;
 				})
 				.property("selected", function(_, i) {
 					return !i;
@@ -2751,8 +2786,8 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(_, i) {
-					return !i;
+				.property("disabled", function(d, i) {
+					return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 				})
 				.property("selected", function(_, i) {
 					return !i;
