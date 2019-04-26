@@ -145,6 +145,8 @@
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
+		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
+
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
 		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
@@ -1234,13 +1236,15 @@
 
 		function createFooterDiv() {
 
-			const footerText = "© OCHA CBPF Section " + currentYear + " | For more information, please visit ";
+			let footerText = "© OCHA CBPF Section " + currentYear;
 
-			const footerLink = "<a href='https://gms.unocha.org/content/cbpf-contributions'>gms.unocha.org/bi</a>";
+			const footerLink = " | For more information, please visit <a href='http://pfbi.unocha.org'>pfbi.unocha.org</a>";
+
+			if (showLink) footerText += footerLink;
 
 			footerDiv.append("div")
 				.attr("class", "d3chartFooterText")
-				.html(footerText + footerLink + ".");
+				.html(footerText);
 
 			//end of createFooterDiv
 		};
