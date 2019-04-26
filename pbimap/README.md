@@ -22,7 +22,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbimap" data-title="Allocations map" data-year="2019" data-cbpf="all" data-partner="all" data-cluster="all" data-adminlevel="all" data-responsive="true" data-lazyload="true" data-showhelp="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbimap/src/d3chartpbimap.js"></script>```
+```<div id="d3chartcontainerpbimap" data-title="Allocations map" data-year="2019" data-cbpf="all" data-partner="all" data-cluster="all" data-adminlevel="all" data-responsive="true" data-lazyload="true" data-showhelp="true" data-showlink="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbimap/src/d3chartpbimap.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -32,7 +32,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are eight parameters:
+There are nine parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocations map*.
 
@@ -40,6 +40,13 @@ There are eight parameters:
 
 - `"true"`: annotations shown when the page loads.
 - `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
