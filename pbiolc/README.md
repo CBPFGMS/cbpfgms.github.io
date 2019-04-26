@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Bus
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiolc" data-title="Cluster Overview" data-showhelp="true" data-cbpf="all" data-year="2018" data-modality="total" data-beneficiaries="targeted" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiolc/src/d3chartpbiolc.js"></script>```
+```<div id="d3chartcontainerpbiolc" data-title="Cluster Overview" data-showhelp="true" data-showlink="true" data-cbpf="all" data-year="2018" data-modality="total" data-beneficiaries="targeted" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiolc/src/d3chartpbiolc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -23,7 +23,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are eight parameters:
+There are nine parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Cluster Overview*.
 
@@ -31,6 +31,13 @@ There are eight parameters:
 
 - `"true"`: annotations shown when the page loads.
 - `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
