@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-showhelp="true" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
+```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-showhelp="true" data-showlink="true" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -21,7 +21,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are five parameters:
+There are six parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocation Trends*.
 
@@ -29,6 +29,13 @@ There are five parameters:
 
 - `"true"`: annotations shown when the page loads.
 - `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
