@@ -1,14 +1,11 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
-
-	const hasFetch = window.fetch;
-
-	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
-
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink];
-
-	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
+		hasFetch = window.fetch,
+		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -159,8 +156,8 @@
 			svg.attr("height", height);
 		};
 
-		const footerDiv = containerDiv.append("div")
-			.attr("class", "pbiclcFooterDiv");
+		const footerDiv = !isPfbiSite ? containerDiv.append("div")
+			.attr("class", "pbiclcFooterDiv") : null;
 
 		createProgressWheel();
 
@@ -333,7 +330,7 @@
 
 			createTitle();
 
-			createFooterDiv();
+			if (!isPfbiSite) createFooterDiv();
 
 			recalculateAndResize();
 

@@ -1,18 +1,13 @@
 (function d3ChartIIFE() {
 
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1;
-
-	const hasFetch = window.fetch;
-
-	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
-
-	const leafletCSSLink = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css";
-
-	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbimap.css", fontAwesomeLink, leafletCSSLink];
-
-	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
-
-	const leafletURL = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js";
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
+		hasFetch = window.fetch,
+		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
+		leafletCSSLink = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css",
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbimap.css", fontAwesomeLink, leafletCSSLink],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		leafletURL = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -232,8 +227,8 @@
 		const breadcrumbDiv = containerDiv.append("div")
 			.attr("class", "pbimapBreadcrumbDiv");
 
-		const footerDiv = containerDiv.append("div")
-			.attr("class", "pbimapFooterDiv");
+		const footerDiv = !isPfbiSite ? containerDiv.append("div")
+			.attr("class", "pbimapFooterDiv") : null;
 
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbimapListContainerDiv");
@@ -396,7 +391,7 @@
 
 			repopulateYearFilter();
 
-			createFooterDiv();
+			if (!isPfbiSite) createFooterDiv();
 
 			createTopSvg(data.topSvgObject);
 
