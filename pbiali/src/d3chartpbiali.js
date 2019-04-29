@@ -4,6 +4,8 @@
 
 	const hasFetch = window.fetch;
 
+	const isPfbiSite = window.location.hostname === "pfbi.unocha.org";
+
 	const fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css";
 
 	const cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiali.css", fontAwesomeLink];
@@ -146,8 +148,8 @@
 			svg.attr("height", height);
 		};
 
-		const footerDiv = containerDiv.append("div")
-			.attr("class", "pbialiFooterDiv");
+		const footerDiv = !isPfbiSite ? containerDiv.append("div")
+			.attr("class", "pbialiFooterDiv") : null;
 
 		const grayFilters = svg.append("filter")
 			.attr("id", "pbialiGrayFilter")
@@ -281,7 +283,7 @@
 
 			createTitle();
 
-			createFooterDiv();
+			if (!isPfbiSite) createFooterDiv();
 
 			resizeSVG(data.cbpfs.length);
 
