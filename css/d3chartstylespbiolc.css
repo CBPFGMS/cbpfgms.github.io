@@ -47,6 +47,14 @@
 	margin-top: 8px;
 }
 
+.pbiolcYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .pbiolcOverDivHelp {
 	position: absolute;
 	width: 100%;

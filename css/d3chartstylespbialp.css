@@ -47,6 +47,14 @@
 	margin-top: 8px;
 }
 
+.pbialpYearsDescriptionDiv {
+	margin-left: 10px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .pbialpOverDivHelp {
 	position: absolute;
 	width: 100%;

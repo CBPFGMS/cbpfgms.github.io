@@ -46,6 +46,14 @@
 	width: 100%;
 }
 
+.pbifdcYearsDescriptionDiv {
+	margin-left: 32px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .d3chartFooterText {
 	width: 99.2%;
 }

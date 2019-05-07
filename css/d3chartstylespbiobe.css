@@ -46,6 +46,14 @@
 	width: 100%;
 }
 
+.pbiobeYearsDescriptionDiv {
+	margin-left: 64px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .pbiobeOverDivHelp {
 	position: absolute;
 	width: 100%;
