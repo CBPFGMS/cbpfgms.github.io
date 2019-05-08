@@ -96,6 +96,7 @@
 			legendPadding = 6,
 			paidColor = "#9063CD",
 			pledgedColor = "#E56A54",
+			unBlue = "#1F69B3",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
 			chartTitleDefault = "CBPF Contributions",
@@ -110,7 +111,7 @@
 			shortDuration = 500,
 			titlePadding = 24,
 			chartState = {
-				selectedYear: null,
+				selectedYear: [],
 				selectedContribution: null
 			};
 
@@ -155,6 +156,9 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		};
+
+		const yearsDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbiclcYearsDescriptionDiv");
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiclcFooterDiv") : null;
@@ -288,7 +292,7 @@
 					return self.indexOf(value) === index;
 				}).sort();
 
-				chartState.selectedYear = validateYear(selectedYearString);
+				chartState.selectedYear.push(validateYear(selectedYearString));
 
 				chartState.selectedContribution = selectedContribution;
 
@@ -350,23 +354,37 @@
 
 			function clickButtonsRects(d) {
 
-				chartState.selectedYear = d;
+				const index = chartState.selectedYear.indexOf(d);
+
+				if (index > -1) {
+					if (chartState.selectedYear.length === 1) {
+						return;
+					} else {
+						chartState.selectedYear.splice(index, 1);
+					}
+				} else {
+					chartState.selectedYear.push(d);
+				};
 
 				d3.selectAll(".pbiclcbuttonsRects")
-					.style("stroke", function(e) {
-						return e === chartState.selectedYear ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(e) {
-						return e === chartState.selectedYear ? "2px" : "1px";
-					})
 					.style("fill", function(e) {
-						return e === chartState.selectedYear ? "whitesmoke" : "white";
+						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
 					});
 
 				d3.selectAll(".pbiclcbuttonsText")
 					.style("fill", function(e) {
-						return e === chartState.selectedYear ? "#444" : "#888"
+						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
+
+				yearsDescriptionDiv.html(function() {
+					if (chartState.selectedYear.length === 1) return null;
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+					return "\u002ASelected years: " + yearsList;
+				});
 
 				const dataArray = processData(rawData);
 
@@ -392,19 +410,13 @@
 				chartState.selectedContribution = d;
 
 				d3.selectAll(".pbiclcbuttonsContributionsRects")
-					.style("stroke", function(e) {
-						return e === chartState.selectedContribution ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(e) {
-						return e === chartState.selectedContribution ? "2px" : "1px";
-					})
 					.style("fill", function(e) {
-						return e === chartState.selectedContribution ? "whitesmoke" : "white";
+						return e === chartState.selectedContribution ? unBlue : "#eaeaea";
 					});
 
 				d3.selectAll(".pbiclcbuttonsContributionsText")
 					.style("fill", function(e) {
-						return e === chartState.selectedContribution ? "#444" : "#888"
+						return e === chartState.selectedContribution ? "white" : "#444";
 					});
 
 				d3.select(".pbiclcSvgLegend")
@@ -497,7 +509,11 @@
 
 					const csv = createCsv(rawData);
 
-					const fileName = "contributions" + chartState.selectedYear + ".csv";
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).join("-");
+
+					const fileName = "contributions" + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -608,10 +624,11 @@
 					.duration(duration)
 					.style("opacity", 1)
 					.text(function(d) {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" received in " + chartState.selectedYear;
+							" received in " + yearsText;
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiclctopPanelSubText")
@@ -746,13 +763,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear ? "whitesmoke" : "white";
-					})
-					.style("stroke", function(d) {
-						return d === chartState.selectedYear ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(d) {
-						return d === chartState.selectedYear ? "2px" : "1px";
+						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -766,7 +777,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear ? "#444" : "#888"
+						return d === chartState.selectedYear[0] ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -791,13 +802,7 @@
 						return i * buttonPanel.buttonContributionsWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedContribution ? "whitesmoke" : "white";
-					})
-					.style("stroke", function(d) {
-						return d === chartState.selectedContribution ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(d) {
-						return d === chartState.selectedContribution ? "2px" : "1px";
+						return d === chartState.selectedContribution ? unBlue : "#eaeaea";
 					});
 
 				const buttonsContributionsText = buttonsContributionsGroup.selectAll(null)
@@ -811,7 +816,7 @@
 						return i * buttonPanel.buttonContributionsWidth + buttonPanel.buttonContributionsWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedContribution ? "#444" : "#888"
+						return d === chartState.selectedContribution ? "white" : "#444";
 					})
 					.text(function(d) {
 						if (d === "pledge") {
@@ -926,11 +931,11 @@
 
 				function repositionButtonsGroup() {
 
-					const firstYearIndex = chartState.selectedYear < yearsArray[5] ?
+					const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
 						0 :
-						chartState.selectedYear > yearsArray[yearsArray.length - 4] ?
+						chartState.selectedYear[0] > yearsArray[yearsArray.length - 4] ?
 						yearsArray.length - 8 :
-						yearsArray.indexOf(chartState.selectedYear) - 4;
+						yearsArray.indexOf(chartState.selectedYear[0]) - 4;
 
 					buttonsGroup.attr("transform", "translate(" +
 						(-(buttonPanel.buttonWidth * firstYearIndex)) +
@@ -1091,20 +1096,20 @@
 								.text(" (")
 								.append("tspan")
 								.style("fill", paidColor)
-								.text(d3.formatPrefix(".0", d.paid)(d.paid))
+								.text(d3.formatPrefix(".0", d.paid)(d.paid).replace("G", "B"))
 								.append("tspan")
 								.style("fill", "#aaa")
 								.text("/")
 								.append("tspan")
 								.style("fill", pledgedColor)
-								.text(d3.formatPrefix(".0", d.pledge)(d.pledge))
+								.text(d3.formatPrefix(".0", d.pledge)(d.pledge).replace("G", "B"))
 								.append("tspan")
 								.style("fill", "#aaa")
 								.text(")");
 						};
 
 						return function(t) {
-							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)));
+							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)).replace("G", "B"));
 							if (chartState.selectedContribution === "total") {
 								thisLabel.call(populateLabel);
 							} else {
@@ -1333,20 +1338,20 @@
 								.text(" (")
 								.append("tspan")
 								.style("fill", paidColor)
-								.text(d3.formatPrefix(".0", d.paid)(d.paid))
+								.text(d3.formatPrefix(".0", d.paid)(d.paid).replace("G", "B"))
 								.append("tspan")
 								.style("fill", "#aaa")
 								.text("/")
 								.append("tspan")
 								.style("fill", pledgedColor)
-								.text(d3.formatPrefix(".0", d.pledge)(d.pledge))
+								.text(d3.formatPrefix(".0", d.pledge)(d.pledge).replace("G", "B"))
 								.append("tspan")
 								.style("fill", "#aaa")
 								.text(")");
 						};
 
 						return function(t) {
-							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)));
+							const thisLabel = d3.select(node).text(d3.formatPrefix(".0", d[chartState.selectedContribution])(i(t)).replace("G", "B"));
 							if (chartState.selectedContribution === "total") {
 								thisLabel.call(populateLabel);
 							} else {
@@ -1489,21 +1494,41 @@
 			};
 
 			function mouseOverButtonsRects(d) {
-				d3.select(this).style("fill", "whitesmoke");
+				d3.select(this).style("fill", unBlue);
+				d3.select(this.parentNode).selectAll("text")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
 			};
 
 			function mouseOutButtonsRects(d) {
-				if (d === chartState.selectedYear) return;
-				d3.select(this).style("fill", "white");
+				if (chartState.selectedYear.indexOf(d) > -1) return;
+				d3.select(this).style("fill", "#eaeaea");
+				d3.selectAll(".pbiclcbuttonsText")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
 			};
 
 			function mouseOverButtonsContributionsRects(d) {
-				d3.select(this).style("fill", "whitesmoke");
+				d3.select(this).style("fill", unBlue);
+				d3.select(this.parentNode).selectAll("text")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
 			};
 
 			function mouseOutButtonsContributionsRects(d) {
 				if (d === chartState.selectedContribution) return;
-				d3.select(this).style("fill", "white");
+				d3.select(this).style("fill", "#eaeaea");
+				d3.selectAll(".pbiclcbuttonsContributionsText")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
 			};
 
 			function recalculateAndResize() {
@@ -1534,7 +1559,7 @@
 				tempSetCbpfs = [];
 
 			const filteredData = rawData.filter(function(d) {
-				return +d.FiscalYear === chartState.selectedYear;
+				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
 			});
 
 			filteredData.forEach(function(d) {
@@ -1665,9 +1690,11 @@
 		function createCsv(rawData) {
 
 			const filteredData = rawData.filter(function(d) {
-				return +d.FiscalYear === chartState.selectedYear;
+				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
 			}).sort(function(a, b) {
-				return b.PaidAmt - a.PaidAmt;
+				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
+					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
+					a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
 			});
 
 			filteredData.forEach(function(d) {
@@ -2128,6 +2155,7 @@
 				P: Math.pow(10, 15),
 				T: Math.pow(10, 12),
 				G: Math.pow(10, 9),
+				B: Math.pow(10, 9),
 				M: Math.pow(10, 6),
 				k: Math.pow(10, 3),
 				h: Math.pow(10, 2),

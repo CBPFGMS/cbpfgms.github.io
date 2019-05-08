@@ -100,7 +100,8 @@
 			lollipopExtraPadding = 4,
 			percentagePadding = 22,
 			percentagePadding2 = 10,
-			underApprovalColor = "E56A54",
+			underApprovalColor = "#E56A54",
+			unBlue = "#1F69B3",
 			currentYear = new Date().getFullYear(),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
@@ -123,7 +124,7 @@
 			partnersTotals = {},
 			partnersUnderApproval = {},
 			chartState = {
-				selectedYear: null,
+				selectedYear: [],
 				selectedPartner: null,
 				selectedCbpfs: [],
 				netFunding: 1
@@ -174,6 +175,9 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		};
+
+		const yearsDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbialpYearsDescriptionDiv");
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbialpFooterDiv") : null;
@@ -332,7 +336,7 @@
 				return self.indexOf(value) === index;
 			}).sort();
 
-			chartState.selectedYear = validateYear(selectedYearString);
+			chartState.selectedYear.push(validateYear(selectedYearString));
 
 			if (!lazyLoad) {
 				draw(rawData);
@@ -402,9 +406,13 @@
 
 				downloadIcon.on("click", function() {
 
-					const csv = createCSV(data);
+					const csv = createCSV(rawData);
 
-					const fileName = "Allocations" + chartState.selectedYear + ".csv";
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).join("-");
+
+					const fileName = "Allocations" + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -562,10 +570,11 @@
 					.duration(duration)
 					.style("opacity", 1)
 					.text(function(d) {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Allocated in " + chartState.selectedYear;
+							" Allocated in " + yearsText;
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbialptopPanelSubText")
@@ -759,13 +768,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear ? "whitesmoke" : "white";
-					})
-					.style("stroke", function(d) {
-						return d === chartState.selectedYear ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(d) {
-						return d === chartState.selectedYear ? "2px" : "1px";
+						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -779,7 +782,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear ? "#444" : "#888"
+						return d === chartState.selectedYear[0] ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -802,7 +805,7 @@
 					.attr("y", buttonPanel.height / 1.6)
 					.attr("x", buttonPanel.buttonPartnersInnerPadding)
 					.style("fill", function(d) {
-						return d === chartState.selectedPartner ? "#444" : "#888"
+						return d === chartState.selectedPartner ? "white" : "#444";
 					})
 					.text(function(d) {
 						if (d === "Red Cross/Crescent Movement") {
@@ -837,13 +840,7 @@
 					.attr("y", buttonPanel.buttonVerticalPadding)
 					.attr("x", 0)
 					.style("fill", function(d) {
-						return d === chartState.selectedPartner ? "whitesmoke" : "white";
-					})
-					.style("stroke", function(d) {
-						return d === chartState.selectedPartner ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(d) {
-						return d === chartState.selectedPartner ? "2px" : "1px";
+						return d === chartState.selectedPartner ? unBlue : "#eaeaea";
 					});
 
 				const leftArrow = buttonPanel.main.append("g")
@@ -951,11 +948,11 @@
 
 				function repositionButtonsGroup() {
 
-					const firstYearIndex = chartState.selectedYear < yearsArray[5] ?
+					const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
 						0 :
-						chartState.selectedYear > yearsArray[yearsArray.length - 4] ?
+						chartState.selectedYear[0] > yearsArray[yearsArray.length - 4] ?
 						yearsArray.length - 8 :
-						yearsArray.indexOf(chartState.selectedYear) - 4;
+						yearsArray.indexOf(chartState.selectedYear[0]) - 4;
 
 					buttonsGroup.attr("transform", "translate(" +
 						(-(buttonPanel.buttonWidth * firstYearIndex)) +
@@ -1090,14 +1087,14 @@
 							d["underApproval-" + chartState.selectedPartner];
 						const i = d3.interpolate(reverseFormat(node.textContent) || 0, d[chartState.selectedPartner]);
 						return function(t) {
-							d3.select(node).text(formatNumberSI(i(t)))
+							d3.select(node).text(formatNumberSI(i(t)).replace("G", "B"))
 								.append("tspan")
 								.attr("class", "pbialpCbpfLabelPercentage")
 								.attr("dy", "-0.5px")
 								.text(" (")
 								.append("tspan")
 								.style("fill", underApprovalColor)
-								.text(d3.formatPrefix(".0", thisUnderApproval)(thisUnderApproval))
+								.text(d3.formatPrefix(".0", thisUnderApproval)(thisUnderApproval).replace("G", "B"))
 								.append("tspan")
 								.style("fill", "#aaa")
 								.text(")");
@@ -1290,18 +1287,28 @@
 
 			function createParallelPanel(cbpfsArray) {
 
-				averageData = [];
+				const averageData = [];
+
+				const totalAllocations = d3.sum(cbpfsArray, function(d) {
+					return d.total;
+				});
 
 				partnerList.forEach(function(d) {
 					averageData.push({
 						partner: d,
-						percentage: d3.mean(cbpfsArray.map(function(e) {
+						percentage: d3.sum(cbpfsArray.map(function(e) {
 							return e.parallelData.find(function(f) {
 								return f.partner === d;
-							}).percentage;
-						}))
+							}).value;
+						})) / totalAllocations
 					});
 				});
+
+				averageData.forEach(function(d) {
+					d.roundPercentage = Math.round(d.percentage * 100);
+				});
+
+				roundToOneHundred(averageData);
 
 				const parallelPanelTitle = parallelPanel.main.selectAll(".pbialpParallelPanelTitle")
 					.data([true])
@@ -1455,7 +1462,7 @@
 					.attr("y", yScaleParallel(0))
 					.attr("text-anchor", "middle")
 					.text(function(d) {
-						return formatPercent(d.percentage);
+						return d.roundPercentage + "%";
 					});
 
 				cbpfParallelGroupAverage = cbpfParallelGroupAverageEnter.merge(cbpfParallelGroupAverage);
@@ -1494,7 +1501,7 @@
 						return d.partner;
 					})
 					.text(function(d) {
-						return formatPercent(d.percentage);
+						return d.roundPercentage + "%";
 					})
 					.transition()
 					.duration(duration)
@@ -1871,7 +1878,7 @@
 				percentagesText = percentagesTextEnter.merge(percentagesText);
 
 				percentagesText.text(function(d) {
-						return formatSIFloat(d.value);
+						return formatSIFloat(d.value).replace("G", "B");
 					})
 					.append("tspan")
 					.attr("x", function(d) {
@@ -1879,7 +1886,7 @@
 					})
 					.attr("dy", "1.1em")
 					.text(function(d) {
-						return "(" + formatPercent(d.percentage) + ")";
+						return "(" + d.roundPercentage + "%)";
 					});
 
 				percentagesText.transition()
@@ -1911,7 +1918,7 @@
 						})
 						.attr("dy", "1.1em")
 						.text(function(d) {
-							return "(" + formatPercent(d.percentage) + ")";
+							return "(" + d.roundPercentage + "%)";
 						});
 
 				}).on("mouseout", function() {
@@ -1933,7 +1940,7 @@
 						})
 						.attr("dy", "1.1em")
 						.text(function(d) {
-							return "(" + formatPercent(d.percentage) + ")";
+							return "(" + d.roundPercentage + "%)";
 						});
 
 				});
@@ -1943,23 +1950,37 @@
 
 			function clickButtonsRects(d) {
 
-				chartState.selectedYear = d;
+				const index = chartState.selectedYear.indexOf(d);
+
+				if (index > -1) {
+					if (chartState.selectedYear.length === 1) {
+						return;
+					} else {
+						chartState.selectedYear.splice(index, 1);
+					}
+				} else {
+					chartState.selectedYear.push(d);
+				};
 
 				d3.selectAll(".pbialpbuttonsRects")
-					.style("stroke", function(e) {
-						return e === chartState.selectedYear ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(e) {
-						return e === chartState.selectedYear ? "2px" : "1px";
-					})
 					.style("fill", function(e) {
-						return e === chartState.selectedYear ? "whitesmoke" : "white";
+						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
 					});
 
 				d3.selectAll(".pbialpbuttonsText")
 					.style("fill", function(e) {
-						return e === chartState.selectedYear ? "#444" : "#888"
+						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
+
+				yearsDescriptionDiv.html(function() {
+					if (chartState.selectedYear.length === 1) return null;
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+					return "\u002ASelected years: " + yearsList;
+				});
 
 				data = processData(rawData);
 
@@ -1995,19 +2016,13 @@
 				chartState.selectedPartner = d;
 
 				d3.selectAll(".pbialpbuttonsPartnersRects")
-					.style("stroke", function(e) {
-						return e === chartState.selectedPartner ? "#444" : "#aaa";
-					})
-					.style("stroke-width", function(e) {
-						return e === chartState.selectedPartner ? "2px" : "1px";
-					})
 					.style("fill", function(e) {
-						return e === chartState.selectedPartner ? "whitesmoke" : "white";
+						return e === chartState.selectedPartner ? unBlue : "#eaeaea";
 					});
 
 				d3.selectAll(".pbialpbuttonsPartnersText")
 					.style("fill", function(e) {
-						return e === chartState.selectedPartner ? "#444" : "#888"
+						return e === chartState.selectedPartner ? "white" : "#444";
 					});
 
 				createTopPanel(data);
@@ -2063,22 +2078,36 @@
 				tooltip.style("display", "none");
 			};
 
-			function mouseOverButtonsRects() {
-				d3.select(this).style("fill", "whitesmoke");
+			function mouseOverButtonsRects(d) {
+				d3.select(this).style("fill", unBlue);
+				d3.select(this.parentNode).selectAll("text")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
 			};
 
 			function mouseOutButtonsRects(d) {
-				if (d === chartState.selectedYear) return;
-				d3.select(this).style("fill", "white");
+				if (chartState.selectedYear.indexOf(d) > -1) return;
+				d3.select(this).style("fill", "#eaeaea");
+				d3.selectAll(".pbialpbuttonsText")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
 			};
 
-			function mouseOverButtonsPartnersRects() {
-				d3.select(this).style("fill", "whitesmoke");
+			function mouseOverButtonsPartnersRects(d) {
+				d3.select(this).style("fill", unBlue);
+				d3.select(this.parentNode).select("text")
+					.style("fill", "white");
 			};
 
 			function mouseOutButtonsPartnersRects(d) {
 				if (d === chartState.selectedPartner) return;
-				d3.select(this).style("fill", "white");
+				d3.select(this).style("fill", "#eaeaea");
+				d3.select(this.parentNode).select("text")
+					.style("fill", "#444");
 			};
 
 			function mouseOverSelectedCircles(datum) {
@@ -2578,7 +2607,7 @@
 			const temporarySet = [];
 
 			const filteredData = rawData.filter(function(d) {
-				return +d.AllocationYear === chartState.selectedYear && +d.FundingType === chartState.netFunding;
+				return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 && +d.FundingType === chartState.netFunding;
 			});
 
 			filteredData.forEach(function(row) {
@@ -2652,12 +2681,14 @@
 						partner: partner,
 						value: cbpf[partner],
 						percentage: thisPercentage,
+						roundPercentage: Math.round(thisPercentage * 100),
 						total: cbpf.total,
 						standard: cbpf["standard-" + partner],
 						reserve: cbpf["reserve-" + partner],
 						underApproval: cbpf["underApproval-" + partner]
 					});
 				});
+				roundToOneHundred(cbpf.parallelData);
 			});
 
 			return aggregatedAllocations;
@@ -2667,7 +2698,7 @@
 
 		function createCSV(sourceData) {
 
-			const clonedData = JSON.parse(JSON.stringify(sourceData));
+			const clonedData = processDataToCSV(sourceData);
 
 			clonedData.forEach(function(d) {
 				d["total-International NGO"] = d["International NGO"];
@@ -2679,8 +2710,6 @@
 				delete d["National NGO"];
 				delete d["Red Cross/Crescent Movement"];
 				delete d["UN Agency"];
-				delete d.clicked;
-				delete d.parallelData;
 
 				for (let key in d) {
 					if (key !== "cbpf") {
@@ -2690,7 +2719,7 @@
 			});
 
 			clonedData.sort(function(a, b) {
-				return b.total - a.total ||
+				return b.year - a.year ||
 					(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
 						a.cbpf.toLowerCase() > b.cbpf.toLowerCase() ? 1 : 0);
 			});
@@ -2718,6 +2747,107 @@
 			return rows.join('\r\n');
 
 			//end of createCSV
+		};
+
+		function processDataToCSV(sourceData) {
+
+			const aggregatedAllocations = [];
+
+			const temporarySet = [];
+
+			const filteredData = sourceData.filter(function(d) {
+				return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 && +d.FundingType === chartState.netFunding;
+			});
+
+			filteredData.forEach(function(row) {
+
+				if (row.OrganizationType === "Others" || row.OrganizationType === "Red Cross/Red Crescent Society") {
+					row.OrganizationType = "Red Cross/Crescent Movement";
+				};
+
+				if (row.OrganizationType === "National Partners") {
+					row.OrganizationType = "National NGO";
+				};
+
+				if (temporarySet.indexOf(row.AllocationYear + row.PooledFundName) > -1) {
+
+					const tempObject = aggregatedAllocations.find(function(d) {
+						return d.cbpf === row.PooledFundName
+					});
+
+					tempObject.total += +row.ApprovedBudget;
+					tempObject.standard += +row.ApprovedStandardBudget;
+					tempObject.reserve += +row.ApprovedReserveBudget;
+					tempObject.underApproval += +row.PipelineBudget;
+					tempObject[row.OrganizationType] += +row.ApprovedBudget;
+					tempObject["underApproval-" + row.OrganizationType] += +row.PipelineBudget;
+					tempObject["reserve-" + row.OrganizationType] += +row.ApprovedReserveBudget;
+					tempObject["standard-" + row.OrganizationType] += +row.ApprovedStandardBudget;
+
+				} else {
+
+					const temporaryOriginalObject = {
+						year: row.AllocationYear,
+						cbpf: row.PooledFundName,
+						total: +row.ApprovedBudget,
+						standard: +row.ApprovedStandardBudget,
+						reserve: +row.ApprovedReserveBudget,
+						underApproval: +row.PipelineBudget,
+						"International NGO": 0,
+						"National NGO": 0,
+						"UN Agency": 0,
+						"Red Cross/Crescent Movement": 0,
+						"underApproval-International NGO": 0,
+						"underApproval-National NGO": 0,
+						"underApproval-UN Agency": 0,
+						"underApproval-Red Cross/Crescent Movement": 0,
+						"reserve-International NGO": 0,
+						"reserve-National NGO": 0,
+						"reserve-UN Agency": 0,
+						"reserve-Red Cross/Crescent Movement": 0,
+						"standard-International NGO": 0,
+						"standard-National NGO": 0,
+						"standard-UN Agency": 0,
+						"standard-Red Cross/Crescent Movement": 0
+					};
+
+					temporaryOriginalObject[row.OrganizationType] += +row.ApprovedBudget;
+					temporaryOriginalObject["underApproval-" + row.OrganizationType] += +row.PipelineBudget;
+					temporaryOriginalObject["reserve-" + row.OrganizationType] += +row.ApprovedReserveBudget;
+					temporaryOriginalObject["standard-" + row.OrganizationType] += +row.ApprovedStandardBudget;
+
+					aggregatedAllocations.push(temporaryOriginalObject);
+
+					temporarySet.push(row.AllocationYear + row.PooledFundName);
+				};
+			});
+
+			return aggregatedAllocations;
+
+			//end of processDataToCSV
+		};
+
+		function roundToOneHundred(dataArray) {
+			let sum = d3.sum(dataArray, function(d) {
+				return d.roundPercentage;
+			});
+			while (sum !== 100) {
+				if (sum > 100) {
+					const intNGOObject = dataArray.find(function(d) {
+						return d.partner === "International NGO";
+					});
+					intNGOObject.roundPercentage -= 1;
+				};
+				if (sum < 100) {
+					const natNGOObject = dataArray.find(function(d) {
+						return d.partner === "National NGO";
+					});
+					natNGOObject.roundPercentage += 1;
+				};
+				sum = d3.sum(dataArray, function(d) {
+					return d.roundPercentage;
+				});
+			};
 		};
 
 		function createProgressWheel() {
@@ -2798,7 +2928,8 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			return d3.formatPrefix("." + digits, value)(value);
+			const result = d3.formatPrefix("." + digits, value)(value);
+			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
 		};
 
 		function reverseFormat(s) {
@@ -2811,6 +2942,7 @@
 				P: Math.pow(10, 15),
 				T: Math.pow(10, 12),
 				G: Math.pow(10, 9),
+				B: Math.pow(10, 9),
 				M: Math.pow(10, 6),
 				k: Math.pow(10, 3),
 				h: Math.pow(10, 2),
