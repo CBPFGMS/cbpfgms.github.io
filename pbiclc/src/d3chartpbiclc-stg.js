@@ -1894,7 +1894,9 @@
 				.attr("class", "pbiclcOverDivHelp");
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + (height + 50));
+				.attr("viewBox", "0 0 " + width + " " + (height + 50))
+				.append("g")
+				.attr("transform", "translate(0,4)");
 
 			const mainTextRect = helpSVG.append("rect")
 				.attr("x", (width / 2) - 185)
