@@ -2004,7 +2004,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "Hover over the donors to get additional information. Hovering over a donor filters the CBPFs accordingly, so only CBPFs that received from that donor are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.";
-					createTooltip(406, 200, text, self);
+					createTooltip(402, 200, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
@@ -2023,7 +2023,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.";
-					createTooltip(174, 200, text, self);
+					createTooltip(170, 200, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
