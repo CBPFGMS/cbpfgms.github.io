@@ -1947,7 +1947,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "Use these buttons to select the year. You can select more than one year, and clicking a selected year deselects it. Click the arrows to reveal more years.";
-					createTooltip(180, 146, text, self);
+					createTooltip(180, 150, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
@@ -1966,7 +1966,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "Use these buttons to select the type of contribution: paid, pledged or total (paid plus pledged).";
-					createTooltip(550, 146, text, self);
+					createTooltip(550, 150, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
@@ -1985,7 +1985,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "This banner shows the total amount of contributions received for the selected year (or years). It also shows the number of donors and CBPFs in that period.";
-					createTooltip(300, 108, text, self);
+					createTooltip(300, 112, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
