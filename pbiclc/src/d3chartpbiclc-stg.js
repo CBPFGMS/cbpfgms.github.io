@@ -1914,9 +1914,9 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const explanationTextRect = helpSVG.append("rect")
-				.attr("x", (width / 2) - 150)
+				.attr("x", (width / 2) - 180)
 				.attr("y", 220)
-				.attr("width", 300)
+				.attr("width", 360)
 				.attr("height", 50)
 				.style("fill", "white");
 
@@ -1929,8 +1929,8 @@
 				.attr("x", width / 2)
 				.attr("y", 240)
 				.attr("pointer-events", "none")
-				.text("Hover over the data visualization to get more information")
-				.call(wrapText2, 300);
+				.text("Hover over the data visualization to get information about its elements")
+				.call(wrapText2, 350);
 
 			const yearsRect = helpSVG.append("rect")
 				.attr("rx", 4)
