@@ -2011,9 +2011,9 @@
 			const cbpfsRect = helpSVG.append("rect")
 				.attr("rx", 4)
 				.attr("ry", 4)
-				.attr("x", 500)
+				.attr("x", 496)
 				.attr("y", 144)
-				.attr("width", 394)
+				.attr("width", 398)
 				.attr("height", 380)
 				.style("stroke", unBlue)
 				.style("stroke-width", "3px")
@@ -2023,7 +2023,7 @@
 				.on("mouseover", function() {
 					const self = this;
 					const text = "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.";
-					createTooltip(170, 200, text, self);
+					createTooltip(166, 200, text, self);
 				})
 				.on("mouseout", removeTooltip);
 
