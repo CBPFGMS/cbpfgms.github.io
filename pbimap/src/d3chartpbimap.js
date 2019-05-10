@@ -4,10 +4,10 @@
 		hasFetch = window.fetch,
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		leafletCSSLink = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css",
+		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbimap.css", fontAwesomeLink, leafletCSSLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
-		leafletURL = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js";
+		leafletURL = "https://cbpfgms.github.io/libraries/leaflet.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -19,10 +19,6 @@
 			if (cssLink === fontAwesomeLink) {
 				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
 				externalCSS.setAttribute("crossorigin", "anonymous")
-			};
-			if (cssLink === leafletCSSLink) {
-				externalCSS.setAttribute("integrity", "sha256-YR4HrDE479EpYZgeTkQfgVJq08+277UXxMLbi/YP69o=");
-				externalCSS.setAttribute("crossorigin", "");
 			};
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
 		};
@@ -52,10 +48,6 @@
 		script.src = url;
 		script.onreadystatechange = callback;
 		script.onload = callback;
-		if (url === leafletURL) {
-			script.setAttribute("integrity", "sha256-6BZRSENq3kxI4YYBDqJ23xg0r1GwTHEpvp3okdaIqBw=");
-			script.setAttribute("crossorigin", "");
-		};
 		head.appendChild(script);
 	};
 
