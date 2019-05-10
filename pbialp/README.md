@@ -14,7 +14,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbialp" data-title="Allocations by Organization Type" data-year="2018" data-partner="total" data-showaverage="true" data-responsive="true" data-lazyload="true" data-showhelp="true" data-showlink="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
+```<div id="d3chartcontainerpbialp" data-title="Allocations by Organization Type" data-year="2018" data-partner="total" data-showaverage="true" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -28,20 +28,6 @@ There are eight parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocations by Organization Type*.
 
-**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
-
-- `"true"`: annotations shown when the page loads.
-- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
-
-- `"true"`: shows the link.
-- `"false"`: doesn't show the link.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
  `"2018"`
@@ -50,7 +36,7 @@ If the provided value is not a valid number the datavis will default to the curr
 
 For the accepted values for the years/periods please refer to the data API.
 
-This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons.
+This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
 
 **`data-partner`**: defines the partner type depicted by the data visualisation when the page loads. The value has to be a string. Accepted values:
 
@@ -68,6 +54,20 @@ This value defines only the selected partner when the page loads: the user can e
 
 - `"true"`: the average line is shown.
 - `"false"`: the average line is not shown.  
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 

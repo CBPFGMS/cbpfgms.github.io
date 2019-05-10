@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-showhelp="true" data-showlink="true" data-sortbuttons="total" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
+```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-sortbuttons="total" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -24,6 +24,13 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 There are six parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocation Trends*.
+
+**`data-sortbuttons`**: defines the criterion for ordering the small multiples. Accepted values:
+
+- `"total"`: sorts the buttons according to the total allocated for the respective CBPF.
+- `"alphabetically"`: sorts the buttons alphabetically.
+
+If the value is not an accepted value, it defaults to `"total"`.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
@@ -38,13 +45,6 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 - `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-sortbuttons`**: defines the criterion for ordering the small multiples. Accepted values:
-
-- `"total"`: sorts the buttons according to the total allocated for the respective CBPF.
-- `"alphabetically"`: sorts the buttons alphabetically.
-
-If the value is not an accepted value, it defaults to `"total"`.
 
 **`data-lazyload`**: defines if the animation starts when the SVG is visible. Accepted values:
 

@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Bus
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiobe" data-title="Affected Persons Overview" data-showhelp="true" data-showlink="true" data-cbpf="all" data-year="2018" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiobe/src/d3chartpbiobe.js"></script>```
+```<div id="d3chartcontainerpbiobe" data-title="Affected Persons Overview" data-cbpf="all" data-year="2018"  data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiobe/src/d3chartpbiobe.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -26,6 +26,28 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 There are seven parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Beneficiary Overview*.
+
+**`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
+
+ `"2019"`
+
+If the provided value is not a valid year the datavis will default to the current year.
+
+For the accepted values please refer to the data API.
+
+This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
+
+**`data-cbpf`**: defines the selected CBPFs when the page loads. For showing all CBPFs, set the value to `"all"`. For individual CBPFs set the value accordingly, such as:
+
+`"Yemen"`.
+
+For more than one CBPF separate the values with commas, such as:
+
+`"Yemen, Sudan, Iraq"`.
+
+For the accepted values, please refer to the data API.
+
+If the value is not a valid one it defaults to `"all"`.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
@@ -40,26 +62,6 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 - `"false"`: doesn't show the link.
 
 If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
-
- `"2019"`
-
-If the provided value is not a valid year the datavis will default to the current year.
-
-For the accepted values please refer to the data API.
-
-**`data-cbpf`**: defines the selected CBPFs when the page loads. For showing all CBPFs, set the value to `"all"`. For individual CBPFs set the value accordingly, such as:
-
-`"Yemen"`.
-
-For more than one CBPF separate the values with commas, such as:
-
-`"Yemen, Sudan, Iraq"`.
-
-For the accepted values, please refer to the data API.
-
-If the value is not a valid one it defaults to `"all"`.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 

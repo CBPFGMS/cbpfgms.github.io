@@ -22,7 +22,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbimap" data-title="Allocations map" data-year="2019" data-cbpf="all" data-partner="all" data-cluster="all" data-adminlevel="all" data-responsive="true" data-lazyload="true" data-showhelp="true" data-showlink="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbimap/src/d3chartpbimap.js"></script>```
+```<div id="d3chartcontainerpbimap" data-title="Allocations map" data-year="2019" data-cbpf="all" data-partner="all" data-cluster="all" data-adminlevel="all" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbimap/src/d3chartpbimap.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -35,20 +35,6 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 There are nine parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocations map*.
-
-**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
-
-- `"true"`: annotations shown when the page loads.
-- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
-
-- `"true"`: shows the link.
-- `"false"`: doesn't show the link.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
@@ -100,6 +86,20 @@ For more than one partner the values must be separated with commas. If the value
 For more than one cluster the values must be separated with commas. If the value is not a valid one it defaults to `"all"`.
 
 **`data-adminlevel`**: defines the selected location level when the page loads. The value must be a number, from `1` to `6`. For showing the global level, set the value to `"all"` or `0`. If the value is not a valid one it defaults to `"all"`.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 

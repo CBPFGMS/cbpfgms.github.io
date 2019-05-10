@@ -22,7 +22,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbifdc" data-title="Contributions Flow" data-showhelp="true" data-showlink="true" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
+```<div id="d3chartcontainerpbifdc" data-title="Contributions Flow" data-year="2018" data-showmap="false" data-shownames="true" data-regions="all" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbifdc/src/d3chartpbifdc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -36,20 +36,6 @@ There are nine parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Contributions Flow*.
 
-**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
-
-- `"true"`: annotations shown when the page loads.
-- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
-
-- `"true"`: shows the link.
-- `"false"`: doesn't show the link.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
  `"2018"`
@@ -58,7 +44,7 @@ If the provided value is not a valid year the datavis will default to the curren
 
 For the accepted values for the years/periods please refer to the data API.
 
-This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons.
+This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
 
 **`data-showmap`**: defines if the nodes in the force-directed graph are freely positioned or if they follow the geographic position of the respective country (in a map) . The value has to be a string. Accepted values:
 
@@ -92,6 +78,20 @@ You can specify more than one region. In that case, they should be separated by 
 `"Latin America and the Caribbean,West and Central Africa"`
 
 If the value is not an accepted one, it will default to `"all"`.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 

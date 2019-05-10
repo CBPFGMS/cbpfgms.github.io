@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Bus
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiolc" data-title="Cluster Overview" data-showhelp="true" data-showlink="true" data-cbpf="all" data-year="2018" data-modality="total" data-beneficiaries="targeted" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiolc/src/d3chartpbiolc.js"></script>```
+```<div id="d3chartcontainerpbiolc" data-title="Cluster Overview" data-cbpf="all" data-year="2018" data-modality="total" data-beneficiaries="targeted" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiolc/src/d3chartpbiolc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -27,20 +27,6 @@ There are nine parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Cluster Overview*.
 
-**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
-
-- `"true"`: annotations shown when the page loads.
-- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
-**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
-
-- `"true"`: shows the link.
-- `"false"`: doesn't show the link.
-
-If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
-
 **`data-year`**: defines the year depicted by the data visualisation when the page loads. The value has to be a string containing the year with century as a decimal number, such as:
 
  `"2019"`
@@ -48,6 +34,8 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 If the provided value is not a valid number the datavis will default to the current year.
 
 For the accepted values for the years please refer to the data API.
+
+This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
 
 **`data-cbpf`**: defines the selected CBPFs when the page loads. For showing all CBPFs, set the value to `"all"`. For individual CBPFs set the value accordingly, such as:
 
@@ -75,6 +63,20 @@ If the value is not an accepted value, it defaults to `"total"`.
 - `"actual"`: shows actual affected persons.
 
 If the value is not an accepted value, it defaults to `"targeted"`.
+
+**`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
+
+- `"true"`: annotations shown when the page loads.
+- `"false"`: annotations not shown when the page loads. The user can easily show the annotations by clicking the "help" button.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
+
+**`data-showlink`**: shows the *"for more information"* link in the footer. Accepted values:
+
+- `"true"`: shows the link.
+- `"false"`: doesn't show the link.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-responsive`**: defines if the SVG stretches to the width of the containing element. Accepted values:
 
