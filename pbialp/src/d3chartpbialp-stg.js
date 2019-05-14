@@ -179,6 +179,9 @@
 		const yearsDescriptionDiv = containerDiv.append("div")
 			.attr("class", "pbialpYearsDescriptionDiv");
 
+		const selectionDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbialpSelectionDescriptionDiv");
+
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbialpFooterDiv") : null;
 
@@ -1278,6 +1281,8 @@
 							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
+					populateSelectedCbpfsDescriptionDiv();
+
 					highlightParallel(data, datum);
 
 				};
@@ -1294,18 +1299,17 @@
 				});
 
 				partnerList.forEach(function(d) {
+					const total = d3.sum(cbpfsArray.map(function(e) {
+						return e.parallelData.find(function(f) {
+							return f.partner === d;
+						}).value;
+					}));
 					averageData.push({
+						total: total,
 						partner: d,
-						percentage: d3.sum(cbpfsArray.map(function(e) {
-							return e.parallelData.find(function(f) {
-								return f.partner === d;
-							}).value;
-						})) / totalAllocations
+						percentage: total / totalAllocations,
+						roundPercentage: Math.round((total / totalAllocations) * 100)
 					});
-				});
-
-				averageData.forEach(function(d) {
-					d.roundPercentage = Math.round(d.percentage * 100);
 				});
 
 				roundToOneHundred(averageData);
@@ -1462,7 +1466,15 @@
 					.attr("y", yScaleParallel(0))
 					.attr("text-anchor", "middle")
 					.text(function(d) {
-						return d.roundPercentage + "%";
+						return formatSIFloat(d.total).replace("G", "B");
+					})
+					.append("tspan")
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("dy", "1.1em")
+					.text(function(d) {
+						return "(" + d.roundPercentage + "%)";
 					});
 
 				cbpfParallelGroupAverage = cbpfParallelGroupAverageEnter.merge(cbpfParallelGroupAverage);
@@ -1501,15 +1513,25 @@
 						return d.partner;
 					})
 					.text(function(d) {
-						return d.roundPercentage + "%";
+						return formatSIFloat(d.total).replace("G", "B");
 					})
+					.append("tspan")
+					.attr("x", function(d) {
+						return xScaleParallel(d.partner);
+					})
+					.attr("dy", "1.1em")
+					.text(function(d) {
+						return "(" + d.roundPercentage + "%)";
+					});
+
+				cbpfParallelGroupAverage.selectAll("text")
 					.transition()
 					.duration(duration)
 					.attr("x", function(d) {
 						return xScaleParallel(d.partner);
 					})
 					.attr("y", function(d) {
-						return yScaleParallel(d.percentage) - percentagePadding2;
+						return d.percentage > 0.95 ? yScaleParallel(d.percentage) + percentagePadding / 1.2 : yScaleParallel(d.percentage) - percentagePadding;
 					});
 
 				groupXAxisParallel.call(xAxisParallel)
@@ -1997,6 +2019,8 @@
 						d.clicked = true;
 					};
 				});
+
+				populateSelectedCbpfsDescriptionDiv();
 
 				recalculateAndResize();
 
@@ -2494,6 +2518,22 @@
 					.call(tooltipAxis);
 
 				//end of createTooltipChartDC
+			};
+
+			function populateSelectedCbpfsDescriptionDiv() {
+
+				selectionDescriptionDiv.html(function() {
+					if (chartState.selectedCbpfs.length === 0) return null;
+					const cbpfsList = chartState.selectedCbpfs.sort(function(a, b) {
+						return a.toLowerCase() < b.toLowerCase() ? -1 :
+							a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedCbpfs.length - 2 ? index > chartState.selectedCbpfs.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+					return "Selected CBPFs: " + cbpfsList;
+				});
+
+				//end of populateSelectedCbpfsDescriptionDiv
 			};
 
 			function recalculateAndResize() {
