@@ -55,6 +55,14 @@
 	width: 98%;
 }
 
+.pbiclcSelectionDescriptionDiv {
+	margin-left: 13px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .pbiclcOverDivHelp {
 	position: absolute;
 	width: 100%;
@@ -104,6 +112,12 @@ p#pbiclcd3chartTitle {
 .pbiclcDonorsPanelTitle, .pbiclcCbpfsPanelTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 16px;
+	fill: #666;
+}
+
+.pbiclcDonorsPanelTitleSpan, .pbiclcCbpfsPanelTitleSpan {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
 	fill: #666;
 }
 
