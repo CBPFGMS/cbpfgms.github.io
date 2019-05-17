@@ -119,9 +119,7 @@
 			};
 
 		let height = 500,
-			yearsArray,
-			timeoutMouseDonors,
-			timeoutMouseCbpfs;
+			yearsArray;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
@@ -352,7 +350,7 @@
 
 			createSVGLegend();
 
-			createTopPanel(data.dataDonors, data.dataCbpfs);
+			createTopPanel();
 
 			createButtonPanel();
 
@@ -364,16 +362,19 @@
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.shiftKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbiclcbuttonsRects")
@@ -434,7 +435,7 @@
 
 				createSVGLegend();
 
-				createTopPanel(data.dataDonors, data.dataCbpfs);
+				createTopPanel();
 
 				createDonorsPanel();
 
@@ -462,7 +463,7 @@
 				d3.select(".pbiclcSvgLegend")
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0);
 
-				createTopPanel(data.dataDonors, data.dataCbpfs);
+				createTopPanel();
 
 				createDonorsPanel();
 
@@ -587,10 +588,28 @@
 				//end of createTitle
 			};
 
-			function createTopPanel(dataDonors, dataCbpfs) {
+			function createTopPanel() {
+
+				const dataDonors = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+					data.dataDonors : chartState.selectedDonors.length ? data.dataDonors.filter(function(d) {
+						return chartState.selectedDonors.indexOf(d.isoCode) > -1;
+					}) : data.dataDonors.reduce(function(acc, curr) {
+						return acc.concat(curr.donations.filter(function(e) {
+							return chartState.selectedCbpfs.indexOf(e.isoCode) > -1;
+						}));
+					}, []);
+
+				const dataCbpfs = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+					data.dataCbpfs : chartState.selectedCbpfs.length ? data.dataCbpfs.filter(function(d) {
+						return chartState.selectedCbpfs.indexOf(d.isoCode) > -1;
+					}) : data.dataCbpfs.reduce(function(acc, curr) {
+						return acc.concat(curr.donors.filter(function(e) {
+							return chartState.selectedDonors.indexOf(e.isoCode) > -1;
+						}));
+					}, []);
 
 				contributionType.forEach(function(d) {
-					contributionsTotals[d] = d3.sum(data.dataDonors, function(e) {
+					contributionsTotals[d] = d3.sum(dataDonors, function(e) {
 						return e[d]
 					});
 				});
@@ -660,6 +679,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
+				const receivedOrDonated = chartState.selectedDonors.length ? " donated in " : " received in ";
+
 				topPanelMainText.transition()
 					.duration(duration)
 					.style("opacity", 1)
@@ -668,7 +689,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" received in " + yearsText;
+							receivedOrDonated + yearsText;
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiclctopPanelSubText")
@@ -714,15 +735,29 @@
 						};
 					});
 
-				const topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
-					.data([true])
-					.enter()
+				let topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
+					.data([true]);
+
+				topPanelDonorsText = topPanelDonorsText.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelDonorsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("Donors");
+					.merge(topPanelDonorsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * (chartState.selectedDonors.length ? 2.5 : 1.9))
+					.text(dataDonors.length > 1 ? "Donors" : "Donor");
+
+				let topPanelDonorsTextSubText = mainValueGroup.selectAll(".pbiclctopPanelDonorsTextSubText")
+					.data([true]);
+
+				topPanelDonorsTextSubText = topPanelDonorsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiclctopPanelDonorsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelDonorsTextSubText)
+					.text(chartState.selectedDonors.length ? "(selected)" : "");
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbiclctopPanelCbpfsNumber")
 					.data([dataCbpfs.length]);
@@ -745,15 +780,29 @@
 						};
 					});
 
-				const topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
-					.data([true])
-					.enter()
+				let topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
+					.data([true]);
+
+				topPanelCbpfsText = topPanelCbpfsText.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelCbpfsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("CBPFs");
+					.merge(topPanelCbpfsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * (chartState.selectedCbpfs.length ? 2.5 : 1.9))
+					.text(dataCbpfs.length > 1 ? "CBPFs" : "CBPF");
+
+				let topPanelCbpfsTextSubText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsTextSubText")
+					.data([true]);
+
+				topPanelCbpfsTextSubText = topPanelCbpfsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiclctopPanelCbpfsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelCbpfsTextSubText)
+					.text(chartState.selectedCbpfs.length ? "(selected)" : "");
 
 				const overRectangle = topPanel.main.selectAll(".pbiclctopPanelOverRectangle")
 					.data([true])
@@ -1346,6 +1395,8 @@
 
 					tooltip.style("display", "none");
 
+					createTopPanel();
+
 					createDonorsPanel();
 
 					createCbpfsPanel();
@@ -1718,6 +1769,8 @@
 					foundDatum.clicked = datum.clicked;
 
 					tooltip.style("display", "none");
+
+					createTopPanel();
 
 					createDonorsPanel();
 

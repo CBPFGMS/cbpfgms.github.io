@@ -97,6 +97,12 @@ p#pbiclcd3chartTitle {
 	fill: #888;
 }
 
+.pbiclctopPanelDonorsTextSubText, .pbiclctopPanelCbpfsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #888;
+}
+
 .pbiclcbuttonsText, .pbiclcbuttonsContributionsText {
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
