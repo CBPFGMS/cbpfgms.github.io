@@ -2549,7 +2549,7 @@
 
 			function clickButtonsRects(d) {
 
-				if (d3.event.shiftKey) {
+				if (d3.event.altKey) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
