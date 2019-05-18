@@ -2955,7 +2955,7 @@
 				.attr("class", "pbifdcAnnotationText")
 				.attr("x", 100)
 				.attr("y", 60)
-				.text("Use these buttons to select the year. You can select more than one year. Press SHIFT when clicking to select just a single year. Click the arrows to reveal more years.")
+				.text("Use these buttons to select the year. You can select more than one year. Press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
 				.call(wrapText, 380);
 
 			const yearsPath = helpSVG.append("path")
