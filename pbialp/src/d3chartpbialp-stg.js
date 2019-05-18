@@ -490,7 +490,17 @@
 				//end of createLegend
 			};
 
-			function createTopPanel(data) {
+			function createTopPanel(unfilteredData) {
+
+				let data;
+
+				if (!chartState.selectedCbpfs.length) {
+					data = unfilteredData;
+				} else {
+					data = unfilteredData.filter(function(d) {
+						return d.clicked;
+					});
+				};
 
 				partnerListWithTotal.forEach(function(d) {
 					partnersTotals[d] = d3.sum(data, function(e) {
@@ -714,14 +724,28 @@
 					});
 
 				let topPanelCbpfsText = mainValueGroup.selectAll(".pbialptopPanelCbpfsText")
-					.data([true])
-					.enter()
+					.data([true]);
+
+				topPanelCbpfsText = topPanelCbpfsText.enter()
 					.append("text")
 					.attr("class", "pbialptopPanelCbpfsText")
 					.attr("x", topPanel.width - topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("text-anchor", "start")
-					.text("CBPFs");
+					.merge(topPanelCbpfsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * (chartState.selectedCbpfs.length ? 2.5 : 1.9))
+					.text(data.length > 1 ? "CBPFs" : "CBPF");
+
+				let topPanelCbpfsTextSubText = mainValueGroup.selectAll(".pbialptopPanelCbpfsTextSubText")
+					.data([true]);
+
+				topPanelCbpfsTextSubText = topPanelCbpfsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbialptopPanelCbpfsTextSubText")
+					.attr("x", topPanel.width - topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.merge(topPanelCbpfsTextSubText)
+					.text(chartState.selectedCbpfs.length ? "(selected)" : "");
 
 				const topPanelOverRectangle = topPanel.main.selectAll(".pbialptopPanelOverRectangle")
 					.data([true])
@@ -1281,6 +1305,8 @@
 							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
+					createTopPanel(data);
+
 					populateSelectedCbpfsDescriptionDiv();
 
 					highlightParallel(data, datum);
@@ -1684,14 +1710,14 @@
 					.attr("x", 120 - padding)
 					.attr("y", 160 - padding - 14)
 					.style("fill", "white")
-					.style("opacity", 0.9);
+					.style("opacity", 0.95);
 
 				const yearsButtonsAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
 					.attr("x", 120)
 					.attr("y", 160)
-					.text("Click these buttons to select the year. Click the left and right arrows to reveal more years.")
-					.call(wrapText2, 220);
+					.text("Use these buttons to select the year. You can select more than one year. Press SHIFT when clicking to select just a single year. Click the arrows to reveal more years.")
+					.call(wrapText2, 330);
 
 				const yearsButtonPath = helpSVG.append("path")
 					.style("fill", "none")
@@ -1707,7 +1733,7 @@
 					.attr("x", 480 - padding)
 					.attr("y", 160 - padding - 14)
 					.style("fill", "white")
-					.style("opacity", 0.9);
+					.style("opacity", 0.95);
 
 				const partnersButtonsAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
@@ -1730,7 +1756,7 @@
 					.attr("x", 220 - padding)
 					.attr("y", 340 - padding - 14)
 					.style("fill", "white")
-					.style("opacity", 0.9);
+					.style("opacity", 0.95);
 
 				const lollipopAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
@@ -1753,7 +1779,7 @@
 					.attr("x", 590 - padding)
 					.attr("y", 340 - padding - 14)
 					.style("fill", "white")
-					.style("opacity", 0.9);
+					.style("opacity", 0.95);
 
 				const parallelAnnotation = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationText")
@@ -1972,16 +1998,19 @@
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.shiftKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbialpbuttonsRects")
@@ -2766,7 +2795,7 @@
 
 			const header = Object.keys(clonedData[0]);
 
-			const headerOrder = ["total-UN Agency", "total-Red Cross/Crescent Movement", "total-National NGO", "total-International NGO", "total", "cbpf"];
+			const headerOrder = ["total-UN Agency", "total-Red Cross/Crescent Movement", "total-National NGO", "total-International NGO", "total", "cbpf", "year"];
 
 			header.sort(function(a, b) {
 				return ((headerOrder.indexOf(b) + 1) - (headerOrder.indexOf(a) + 1)) || (a < b ? -1 : a > b ? 1 : 0);
@@ -2795,9 +2824,17 @@
 
 			const temporarySet = [];
 
-			const filteredData = sourceData.filter(function(d) {
-				return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 && +d.FundingType === chartState.netFunding;
-			});
+			let filteredData;
+
+			if (!chartState.selectedCbpfs.length) {
+				filteredData = sourceData.filter(function(d) {
+					return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 && +d.FundingType === chartState.netFunding;
+				});
+			} else {
+				filteredData = sourceData.filter(function(d) {
+					return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 && +d.FundingType === chartState.netFunding && chartState.selectedCbpfs.indexOf(d.PooledFundName) > -1;
+				});
+			};
 
 			filteredData.forEach(function(row) {
 

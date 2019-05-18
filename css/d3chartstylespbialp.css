@@ -115,6 +115,12 @@ p#pbialpd3chartTitle {
 	fill: #888;
 }
 
+.pbialptopPanelCbpfsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #888;
+}
+
 .pbialpbuttonsText, .pbialpbuttonsPartnersText {
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;

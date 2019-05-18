@@ -2047,7 +2047,13 @@
 		function createCsv(rawData) {
 
 			const filteredData = rawData.filter(function(d) {
-				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				} else if (chartState.selectedDonors.length) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedDonors.indexOf(d.GMSDonorISO2Code.toLowerCase()) > -1;
+				} else {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedCbpfs.indexOf(d.PooledFundISO2Code.toLowerCase()) > -1;
+				};
 			}).sort(function(a, b) {
 				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
 					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
@@ -2315,17 +2321,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 290 - padding)
+				.attr("x", 100 - padding)
 				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 290)
+				.attr("x", 100)
 				.attr("y", 60)
-				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
-				.call(wrapText2, 200);
+				.text("Use these buttons to select the year. You can select more than one year. Press SHIFT when clicking to select just a single year. Click the arrows to reveal more years.")
+				.call(wrapText2, 380);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")

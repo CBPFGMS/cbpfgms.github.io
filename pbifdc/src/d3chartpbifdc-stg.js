@@ -2549,16 +2549,19 @@
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.shiftKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbifdcbuttonsRects")
@@ -2943,17 +2946,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 290 - padding)
+				.attr("x", 100 - padding)
 				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 290)
+				.attr("x", 100)
 				.attr("y", 60)
-				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
-				.call(wrapText, 200);
+				.text("Use these buttons to select the year. You can select more than one year. Press SHIFT when clicking to select just a single year. Click the arrows to reveal more years.")
+				.call(wrapText, 380);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")
