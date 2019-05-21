@@ -83,7 +83,7 @@
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
 			lollipopRadius = 4,
-			fadeOpacity = 0.15,
+			fadeOpacity = 0.3,
 			contributionType = ["paid", "pledge", "total"],
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -101,6 +101,7 @@
 			verticalLabelPadding = 4,
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
+			countryNames = {},
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -112,7 +113,9 @@
 			titlePadding = 24,
 			chartState = {
 				selectedYear: [],
-				selectedContribution: null
+				selectedContribution: null,
+				selectedDonors: [],
+				selectedCbpfs: []
 			};
 
 		let height = 500,
@@ -159,6 +162,9 @@
 
 		const yearsDescriptionDiv = containerDiv.append("div")
 			.attr("class", "pbiclcYearsDescriptionDiv");
+
+		const selectionDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbiclcSelectionDescriptionDiv");
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiclcFooterDiv") : null;
@@ -287,6 +293,8 @@
 				removeProgressWheel();
 
 				yearsArray = rawData.map(function(d) {
+					if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
+					if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
 					return +d.FiscalYear
 				}).filter(function(value, index, self) {
 					return self.indexOf(value) === index;
@@ -342,28 +350,31 @@
 
 			createSVGLegend();
 
-			createTopPanel(data.dataDonors, data.dataCbpfs);
+			createTopPanel();
 
 			createButtonPanel();
 
-			createDonorsPanel(data.dataDonors, null);
+			createDonorsPanel();
 
-			createCbpfsPanel(data.dataCbpfs, null);
+			createCbpfsPanel();
 
 			if (showHelp) createAnnotationsDiv();
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.altKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbiclcbuttonsRects")
@@ -392,15 +403,45 @@
 
 				data.dataCbpfs = dataArray[1];
 
+				const allDonors = data.dataDonors.map(function(d) {
+					return d.isoCode;
+				});
+
+				const allCbpfs = data.dataCbpfs.map(function(d) {
+					return d.isoCode;
+				});
+
+				chartState.selectedDonors = chartState.selectedDonors.filter(function(d) {
+					return allDonors.indexOf(d) > -1;
+				});
+
+				chartState.selectedCbpfs = chartState.selectedCbpfs.filter(function(d) {
+					return allCbpfs.indexOf(d) > -1;
+				});
+
+				data.dataDonors.forEach(function(d) {
+					if (chartState.selectedDonors.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+
+				data.dataCbpfs.forEach(function(d) {
+					if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+
 				recalculateAndResize();
 
 				createSVGLegend();
 
-				createTopPanel(data.dataDonors, data.dataCbpfs);
+				createTopPanel();
 
-				createDonorsPanel(data.dataDonors, null);
+				createDonorsPanel();
 
-				createCbpfsPanel(data.dataCbpfs, null);
+				createCbpfsPanel();
+
+				populateSelectedDescriptionDiv();
 
 				//end of clickButtonsRects
 			};
@@ -422,11 +463,11 @@
 				d3.select(".pbiclcSvgLegend")
 					.style("opacity", chartState.selectedContribution === "total" ? 1 : 0);
 
-				createTopPanel(data.dataDonors, data.dataCbpfs);
+				createTopPanel();
 
-				createDonorsPanel(data.dataDonors, null);
+				createDonorsPanel();
 
-				createCbpfsPanel(data.dataCbpfs, null);
+				createCbpfsPanel();
 
 				//end of clickButtonsContributionsRects
 			};
@@ -547,10 +588,28 @@
 				//end of createTitle
 			};
 
-			function createTopPanel(dataDonors, dataCbpfs) {
+			function createTopPanel() {
+
+				const dataDonors = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+					data.dataDonors : chartState.selectedDonors.length ? data.dataDonors.filter(function(d) {
+						return chartState.selectedDonors.indexOf(d.isoCode) > -1;
+					}) : data.dataDonors.reduce(function(acc, curr) {
+						return acc.concat(curr.donations.filter(function(e) {
+							return chartState.selectedCbpfs.indexOf(e.isoCode) > -1;
+						}));
+					}, []);
+
+				const dataCbpfs = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+					data.dataCbpfs : chartState.selectedCbpfs.length ? data.dataCbpfs.filter(function(d) {
+						return chartState.selectedCbpfs.indexOf(d.isoCode) > -1;
+					}) : data.dataCbpfs.reduce(function(acc, curr) {
+						return acc.concat(curr.donors.filter(function(e) {
+							return chartState.selectedDonors.indexOf(e.isoCode) > -1;
+						}));
+					}, []);
 
 				contributionType.forEach(function(d) {
-					contributionsTotals[d] = d3.sum(data.dataDonors, function(e) {
+					contributionsTotals[d] = d3.sum(dataDonors, function(e) {
 						return e[d]
 					});
 				});
@@ -620,6 +679,8 @@
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
+				const receivedOrDonated = chartState.selectedDonors.length ? " donated in " : " received in ";
+
 				topPanelMainText.transition()
 					.duration(duration)
 					.style("opacity", 1)
@@ -628,7 +689,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" received in " + yearsText;
+							receivedOrDonated + yearsText;
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiclctopPanelSubText")
@@ -674,15 +735,29 @@
 						};
 					});
 
-				const topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
-					.data([true])
-					.enter()
+				let topPanelDonorsText = mainValueGroup.selectAll(".pbiclctopPanelDonorsText")
+					.data([true]);
+
+				topPanelDonorsText = topPanelDonorsText.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelDonorsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("Donors");
+					.merge(topPanelDonorsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * (chartState.selectedDonors.length ? 2.5 : 1.9))
+					.text(dataDonors.length > 1 ? "Donors" : "Donor");
+
+				let topPanelDonorsTextSubText = mainValueGroup.selectAll(".pbiclctopPanelDonorsTextSubText")
+					.data([true]);
+
+				topPanelDonorsTextSubText = topPanelDonorsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiclctopPanelDonorsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelDonorsTextSubText)
+					.text(chartState.selectedDonors.length ? "(selected)" : "");
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbiclctopPanelCbpfsNumber")
 					.data([dataCbpfs.length]);
@@ -705,15 +780,29 @@
 						};
 					});
 
-				const topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
-					.data([true])
-					.enter()
+				let topPanelCbpfsText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsText")
+					.data([true]);
+
+				topPanelCbpfsText = topPanelCbpfsText.enter()
 					.append("text")
 					.attr("class", "pbiclctopPanelCbpfsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.text("CBPFs");
+					.merge(topPanelCbpfsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * (chartState.selectedCbpfs.length ? 2.5 : 1.9))
+					.text(dataCbpfs.length > 1 ? "CBPFs" : "CBPF");
+
+				let topPanelCbpfsTextSubText = mainValueGroup.selectAll(".pbiclctopPanelCbpfsTextSubText")
+					.data([true]);
+
+				topPanelCbpfsTextSubText = topPanelCbpfsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiclctopPanelCbpfsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelCbpfsTextSubText)
+					.text(chartState.selectedCbpfs.length ? "(selected)" : "");
 
 				const overRectangle = topPanel.main.selectAll(".pbiclctopPanelOverRectangle")
 					.data([true])
@@ -946,7 +1035,58 @@
 				//end of createButtonPanel
 			};
 
-			function createDonorsPanel(donorsArray, cbpfRecipient) {
+			function createDonorsPanel() {
+
+				let donorsArray;
+
+				if (chartState.selectedCbpfs.length === 0) {
+					donorsArray = data.dataDonors;
+				} else {
+					const selectedCbpfsData = data.dataCbpfs.filter(function(d) {
+						return chartState.selectedCbpfs.indexOf(d.isoCode) > -1;
+					}).map(function(d) {
+						return d.donors;
+					});
+					const mergedArray = JSON.parse(JSON.stringify(selectedCbpfsData))
+						.reduce(function(acc, curr) {
+							curr.forEach(function(d) {
+								const found = acc.find(function(e) {
+									return e.isoCode === d.isoCode;
+								});
+								if (found) {
+									found.paid += d.paid;
+									found.pledge += d.pledge;
+									found.total += d.total;
+								} else {
+									acc.push(d);
+								};
+							});
+							return acc;
+						});
+					mergedArray.forEach(function(d) {
+						d.clicked = data.dataDonors.find(function(e) {
+							return e.isoCode === d.isoCode;
+						}).clicked;
+					});
+					donorsArray = mergedArray;
+				};
+
+				let cbpfRecipient;
+
+				if (!chartState.selectedCbpfs.length) {
+					cbpfRecipient = null;
+				} else if (chartState.selectedCbpfs.length === 1) {
+					cbpfRecipient = countryNames[chartState.selectedCbpfs[0]]
+				} else if (chartState.selectedCbpfs.length < 4) {
+					cbpfRecipient = chartState.selectedCbpfs.sort(function(a, b) {
+						return a.toLowerCase() < b.toLowerCase() ? -1 :
+							a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedCbpfs.length - 2 ? index > chartState.selectedCbpfs.length - 2 ? isoAlpha2to3[curr.toUpperCase()] : isoAlpha2to3[curr.toUpperCase()] + " and " : isoAlpha2to3[curr.toUpperCase()] + ", ");
+					}, "");
+				} else {
+					cbpfRecipient = "selected CBPFs\u207A";
+				};
 
 				donorsArray.sort(function(a, b) {
 					return b[chartState.selectedContribution] - a[chartState.selectedContribution] ||
@@ -972,10 +1112,20 @@
 					.attr("class", "pbiclcDonorsPanelTitle")
 					.attr("y", donorsPanel.padding[0] - titlePadding)
 					.merge(donorsPanelTitle)
-					.text("Donors" + cbpfName)
-					.transition()
+					.text("Donors");
+
+				donorsPanelTitle.transition()
 					.duration(duration)
 					.attr("x", donorsPanel.padding[3]);
+
+				let donorsPanelTitleSpan = donorsPanelTitle.selectAll(".pbiclcDonorsPanelTitleSpan")
+					.data([true]);
+
+				donorsPanelTitleSpan = donorsPanelTitleSpan.enter()
+					.append("tspan")
+					.attr("class", "pbiclcDonorsPanelTitleSpan")
+					.merge(donorsPanelTitleSpan)
+					.text(cbpfName);
 
 				let donorGroup = donorsPanel.main.selectAll(".pbiclcDonorGroup")
 					.data(donorsArray, function(d) {
@@ -1038,7 +1188,8 @@
 					.attr("height", lollipopGroupHeight)
 					.attr("width", donorsPanel.width)
 					.style("fill", "none")
-					.attr("pointer-events", "all");
+					.attr("pointer-events", "all")
+					.attr("cursor", "pointer");
 
 				donorGroup = donorGroupEnter.merge(donorGroup);
 
@@ -1119,18 +1270,27 @@
 						};
 					});
 
+				donorGroup.selectAll("rect, circle")
+					.classed("contributionColorFill", function(d) {
+						return !d.clicked;
+					})
+					.classed("contributionColorDarkerFill", function(d) {
+						return d.clicked;
+					});
+
 				const donorTooltipRectangle = donorGroup.select(".pbiclcDonorTooltipRectangle");
 
-				donorTooltipRectangle.on("mouseover", null)
-					.on("mousemove", null)
-					.on("mouseout", null);
-
-				setTimeout(function() {
-					donorTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
-						.on("mouseout", mouseoutTooltipRectangle);
-				}, duration * 1.1);
+				donorTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
+					.on("mouseout", mouseoutTooltipRectangle)
+					.on("click", clickTooltipRectangle);
 
 				xAxisDonors.tickSizeInner(-(lollipopGroupHeight * donorsArray.length));
+
+				groupYAxisDonors.selectAll(".tick")
+					.filter(function(d) {
+						return yScaleDonors.domain().indexOf(d) === -1
+					})
+					.remove();
 
 				groupYAxisDonors.transition()
 					.duration(duration)
@@ -1147,15 +1307,24 @@
 					})
 					.remove();
 
+				setGroupOpacity();
+
 				function mouseoverTooltipRectangle(datum) {
 
+					if (!datum.clicked) {
+						chartState.selectedDonors.push(datum.isoCode);
+					};
+
 					donorGroup.style("opacity", function(d) {
-						return d.donor === datum.donor ? 1 : fadeOpacity;
+						return chartState.selectedDonors.indexOf(d.isoCode) > -1 ? 1 : fadeOpacity;
 					});
 
 					groupYAxisDonors.selectAll(".tick")
 						.style("opacity", function(d) {
-							return d === datum.donor ? 1 : fadeOpacity;
+							const isoCode = Object.keys(countryNames).find(function(e) {
+								return countryNames[e] === d;
+							});
+							return chartState.selectedDonors.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
 						});
 
 					tooltip.style("display", "block")
@@ -1178,33 +1347,137 @@
 					tooltip.style("top", thisOffsetTop + 22 + "px")
 						.style("left", thisOffsetLeft + "px");
 
-					createCbpfsPanel(datum.donations, datum.donor);
+					createCbpfsPanel();
 
 				};
 
 				function mouseoutTooltipRectangle(datum) {
 
-					donorGroup.style("opacity", 1);
+					if (!datum.clicked) {
+						const index = chartState.selectedDonors.indexOf(datum.isoCode);
+						if (index > -1) {
+							chartState.selectedDonors.splice(index, 1);
+						};
+					};
 
-					groupYAxisDonors.selectAll(".tick")
-						.style("opacity", 1);
+					setGroupOpacity();
 
 					tooltip.style("display", "none");
 
+					createCbpfsPanel();
+
 				};
 
-				donorGroup.on("mouseout", null);
+				function clickTooltipRectangle(datum) {
 
-				setTimeout(function() {
-					donorGroup.on("mouseout", function() {
-						createCbpfsPanel(data.dataCbpfs, null);
+					chartState.selectedCbpfs.length = 0;
+
+					data.dataCbpfs.forEach(function(d) {
+						d.clicked = false;
 					});
-				}, duration * 1.1);
+
+					datum.clicked = !datum.clicked;
+
+					if (!datum.clicked) {
+						const index = chartState.selectedDonors.indexOf(datum.isoCode);
+						chartState.selectedDonors.splice(index, 1);
+					} else {
+						if (chartState.selectedDonors.indexOf(datum.isoCode) === -1) {
+							chartState.selectedDonors.push(datum.isoCode);
+						}
+					};
+
+					const foundDatum = data.dataDonors.find(function(d) {
+						return d.isoCode === datum.isoCode;
+					});
+
+					foundDatum.clicked = datum.clicked;
+
+					tooltip.style("display", "none");
+
+					createTopPanel();
+
+					createDonorsPanel();
+
+					createCbpfsPanel();
+
+					populateSelectedDescriptionDiv();
+
+				};
+
+				function setGroupOpacity() {
+					if (!chartState.selectedDonors.length) {
+						donorGroup.style("opacity", 1);
+						groupYAxisDonors.selectAll(".tick").style("opacity", 1);
+					} else {
+						donorGroup.style("opacity", function(d) {
+							return chartState.selectedDonors.indexOf(d.isoCode) > -1 ? 1 : fadeOpacity;
+						});
+						groupYAxisDonors.selectAll(".tick")
+							.style("opacity", function(d) {
+								const isoCode = Object.keys(countryNames).find(function(e) {
+									return countryNames[e] === d;
+								});
+								return chartState.selectedDonors.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
+							});
+					};
+				};
 
 				//end of createDonorsPanel
 			};
 
-			function createCbpfsPanel(cbpfsArray, donorCountry) {
+			function createCbpfsPanel() {
+
+				let cbpfsArray;
+
+				if (chartState.selectedDonors.length === 0) {
+					cbpfsArray = data.dataCbpfs;
+				} else {
+					const selectedDonorsData = data.dataDonors.filter(function(d) {
+						return chartState.selectedDonors.indexOf(d.isoCode) > -1;
+					}).map(function(d) {
+						return d.donations;
+					})
+					const mergedArray = JSON.parse(JSON.stringify(selectedDonorsData))
+						.reduce(function(acc, curr) {
+							curr.forEach(function(d) {
+								const found = acc.find(function(e) {
+									return e.isoCode === d.isoCode;
+								});
+								if (found) {
+									found.paid += d.paid;
+									found.pledge += d.pledge;
+									found.total += d.total;
+								} else {
+									acc.push(d);
+								};
+							});
+							return acc;
+						});
+					mergedArray.forEach(function(d) {
+						d.clicked = data.dataCbpfs.find(function(e) {
+							return e.isoCode === d.isoCode;
+						}).clicked;
+					});
+					cbpfsArray = mergedArray;
+				};
+
+				let donorCountry;
+
+				if (!chartState.selectedDonors.length) {
+					donorCountry = null;
+				} else if (chartState.selectedDonors.length === 1) {
+					donorCountry = countryNames[chartState.selectedDonors[0]]
+				} else if (chartState.selectedDonors.length < 4) {
+					donorCountry = chartState.selectedDonors.sort(function(a, b) {
+						return a.toLowerCase() < b.toLowerCase() ? -1 :
+							a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedDonors.length - 2 ? index > chartState.selectedDonors.length - 2 ? isoAlpha2to3[curr.toUpperCase()] : isoAlpha2to3[curr.toUpperCase()] + " and " : isoAlpha2to3[curr.toUpperCase()] + ", ");
+					}, "");
+				} else {
+					donorCountry = "selected CBPFs\u207A";
+				};
 
 				cbpfsArray.sort(function(a, b) {
 					return b[chartState.selectedContribution] - a[chartState.selectedContribution] ||
@@ -1230,10 +1503,20 @@
 					.attr("class", "pbiclcCbpfsPanelTitle")
 					.attr("y", cbpfsPanel.padding[0] - titlePadding)
 					.merge(cbpfsPanelTitle)
-					.text("CBPFs" + donorName)
-					.transition()
+					.text("CBPFs");
+
+				cbpfsPanelTitle.transition()
 					.duration(duration)
 					.attr("x", cbpfsPanel.padding[3]);
+
+				let cbpfsPanelTitleSpan = cbpfsPanelTitle.selectAll(".pbiclcCbpfsPanelTitleSpan")
+					.data([true]);
+
+				cbpfsPanelTitleSpan = cbpfsPanelTitleSpan.enter()
+					.append("tspan")
+					.attr("class", "pbiclcCbpfsPanelTitleSpan")
+					.merge(cbpfsPanelTitleSpan)
+					.text(donorName);
 
 				let cbpfGroup = cbpfsPanel.main.selectAll(".pbiclcCbpfGroup")
 					.data(cbpfsArray, function(d) {
@@ -1285,7 +1568,8 @@
 					.attr("height", lollipopGroupHeight)
 					.attr("width", cbpfsPanel.width)
 					.style("fill", "none")
-					.attr("pointer-events", "all");
+					.attr("pointer-events", "all")
+					.attr("cursor", "pointer");
 
 				cbpfGroup = cbpfGroupEnter.merge(cbpfGroup);
 
@@ -1361,18 +1645,27 @@
 						};
 					});
 
+				cbpfGroup.selectAll("rect, circle")
+					.classed("allocationColorFill", function(d) {
+						return !d.clicked;
+					})
+					.classed("allocationColorDarkerFill", function(d) {
+						return d.clicked;
+					});
+
 				const cbpfTooltipRectangle = cbpfGroup.select(".pbiclcCbpfTooltipRectangle");
 
-				cbpfTooltipRectangle.on("mouseover", null)
-					.on("mousemove", null)
-					.on("mouseout", null);
-
-				setTimeout(function() {
-					cbpfTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
-						.on("mouseout", mouseoutTooltipRectangle);
-				}, duration * 1.1);
+				cbpfTooltipRectangle.on("mouseover", mouseoverTooltipRectangle)
+					.on("mouseout", mouseoutTooltipRectangle)
+					.on("click", clickTooltipRectangle);
 
 				xAxisCbpfs.tickSizeInner(-(lollipopGroupHeight * cbpfsArray.length));
+
+				groupYAxisCbpfs.selectAll(".tick")
+					.filter(function(d) {
+						return yScaleCbpfs.domain().indexOf(d) === -1
+					})
+					.remove();
 
 				groupYAxisCbpfs.transition()
 					.duration(duration)
@@ -1389,15 +1682,24 @@
 					})
 					.remove();
 
+				setGroupOpacity();
+
 				function mouseoverTooltipRectangle(datum) {
 
+					if (!datum.clicked) {
+						chartState.selectedCbpfs.push(datum.isoCode);
+					};
+
 					cbpfGroup.style("opacity", function(d) {
-						return d.cbpf === datum.cbpf ? 1 : fadeOpacity;
+						return chartState.selectedCbpfs.indexOf(d.isoCode) > -1 ? 1 : fadeOpacity;
 					});
 
 					groupYAxisCbpfs.selectAll(".tick")
 						.style("opacity", function(d) {
-							return d === datum.cbpf ? 1 : fadeOpacity;
+							const isoCode = Object.keys(countryNames).find(function(e) {
+								return countryNames[e] === d;
+							});
+							return chartState.selectedCbpfs.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
 						});
 
 					tooltip.style("display", "block")
@@ -1420,28 +1722,81 @@
 					tooltip.style("top", thisOffsetTop + 22 + "px")
 						.style("left", thisOffsetLeft + "px");
 
-					createDonorsPanel(datum.donors, datum.cbpf);
+					createDonorsPanel();
 
 				};
 
 				function mouseoutTooltipRectangle(datum) {
 
-					cbpfGroup.style("opacity", 1);
+					if (!datum.clicked) {
+						const index = chartState.selectedCbpfs.indexOf(datum.isoCode);
+						if (index > -1) {
+							chartState.selectedCbpfs.splice(index, 1);
+						};
+					};
 
-					groupYAxisCbpfs.selectAll(".tick")
-						.style("opacity", 1);
+					setGroupOpacity();
 
 					tooltip.style("display", "none");
 
+					createDonorsPanel();
+
 				};
 
-				cbpfGroup.on("mouseout", null);
+				function clickTooltipRectangle(datum) {
 
-				setTimeout(function() {
-					cbpfGroup.on("mouseout", function() {
-						createDonorsPanel(data.dataDonors, null);
+					chartState.selectedDonors.length = 0;
+
+					data.dataDonors.forEach(function(d) {
+						d.clicked = false;
 					});
-				}, duration * 1.1);
+
+					datum.clicked = !datum.clicked;
+
+					if (!datum.clicked) {
+						const index = chartState.selectedCbpfs.indexOf(datum.isoCode);
+						chartState.selectedCbpfs.splice(index, 1);
+					} else {
+						if (chartState.selectedCbpfs.indexOf(datum.isoCode) === -1) {
+							chartState.selectedCbpfs.push(datum.isoCode);
+						}
+					};
+
+					const foundDatum = data.dataCbpfs.find(function(d) {
+						return d.isoCode === datum.isoCode;
+					});
+
+					foundDatum.clicked = datum.clicked;
+
+					tooltip.style("display", "none");
+
+					createTopPanel();
+
+					createDonorsPanel();
+
+					createCbpfsPanel();
+
+					populateSelectedDescriptionDiv();
+
+				};
+
+				function setGroupOpacity() {
+					if (!chartState.selectedCbpfs.length) {
+						cbpfGroup.style("opacity", 1);
+						groupYAxisCbpfs.selectAll(".tick").style("opacity", 1);
+					} else {
+						cbpfGroup.style("opacity", function(d) {
+							return chartState.selectedCbpfs.indexOf(d.isoCode) > -1 ? 1 : fadeOpacity;
+						});
+						groupYAxisCbpfs.selectAll(".tick")
+							.style("opacity", function(d) {
+								const isoCode = Object.keys(countryNames).find(function(e) {
+									return countryNames[e] === d;
+								});
+								return chartState.selectedCbpfs.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
+							});
+					};
+				};
 
 				//end of createCbpfsPanel
 			};
@@ -1599,6 +1954,7 @@
 				} else {
 
 					aggregatedDonors.push({
+						clicked: false,
 						donor: d.GMSDonorName,
 						isoCode: d.GMSDonorISO2Code.toLowerCase(),
 						donations: [{
@@ -1652,6 +2008,7 @@
 				} else {
 
 					aggregatedCbpfs.push({
+						clicked: false,
 						cbpf: d.PooledFundName,
 						isoCode: d.PooledFundISO2Code.toLowerCase(),
 						donors: [{
@@ -1690,7 +2047,13 @@
 		function createCsv(rawData) {
 
 			const filteredData = rawData.filter(function(d) {
-				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				} else if (chartState.selectedDonors.length) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedDonors.indexOf(d.GMSDonorISO2Code.toLowerCase()) > -1;
+				} else {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedCbpfs.indexOf(d.PooledFundISO2Code.toLowerCase()) > -1;
+				};
 			}).sort(function(a, b) {
 				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
 					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
@@ -1836,6 +2199,36 @@
 
 		};
 
+		function populateSelectedDescriptionDiv() {
+
+			if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
+				selectionDescriptionDiv.html(null);
+				return;
+			};
+
+			const selection = chartState.selectedDonors.length ? "selectedDonors" : "selectedCbpfs";
+
+			const type = chartState.selectedDonors.length ? "donor" : "CBPF";
+
+			selectionDescriptionDiv.html(function() {
+				if (chartState[selection].length === 0) return null;
+				const plural = chartState[selection].length === 1 ? "" : "s";
+				const countryList = chartState[selection].map(function(d) {
+						return countryNames[d];
+					})
+					.sort(function(a, b) {
+						return a.toLowerCase() < b.toLowerCase() ? -1 :
+							a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+					})
+					.reduce(function(acc, curr, index) {
+						return acc + (index >= chartState[selection].length - 2 ? index > chartState[selection].length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+				return "\u207ASelected " + type + plural + ": " + countryList;
+			});
+
+			//end of populateSelectedDescriptionDiv
+		};
+
 		function saveFlags(donorsList) {
 
 			const unocha = donorsList.indexOf("");
@@ -1928,17 +2321,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 290 - padding)
+				.attr("x", 100 - padding)
 				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 290)
+				.attr("x", 100)
 				.attr("y", 60)
-				.text("Use these buttons to select the year. Click the arrows to reveal more years.")
-				.call(wrapText2, 200);
+				.text("Use these buttons to select the year. You can select more than one year. Press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
+				.call(wrapText2, 380);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")
@@ -2001,6 +2394,22 @@
 				.attr("d", "M630,430 Q690,430 690,370");
 
 			lollipopsAnnotationRect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
+
+			const lollipopsAnnotation2Rect = helpSVG.append("rect")
+				.attr("x", 270 - padding)
+				.attr("y", 520 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const lollipopsAnnotation2 = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationText")
+				.attr("x", 270)
+				.attr("y", 520)
+				.text("You can click a donor or a CBPF to select it, allowing the selection of multiple countries. Click again to deselect it.")
+				.call(wrapText2, 350);
+
+			lollipopsAnnotation2Rect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
 
 			helpSVG.on("click", function() {
@@ -2221,6 +2630,256 @@
 	};
 
 	//END OF POLYFILLS
+
+	const isoAlpha2to3 = {
+		AF: 'AFG',
+		AX: 'ALA',
+		AL: 'ALB',
+		DZ: 'DZA',
+		AS: 'ASM',
+		AD: 'AND',
+		AO: 'AGO',
+		AI: 'AIA',
+		AQ: 'ATA',
+		AG: 'ATG',
+		AR: 'ARG',
+		AM: 'ARM',
+		AW: 'ABW',
+		AU: 'AUS',
+		AT: 'AUT',
+		AZ: 'AZE',
+		BS: 'BHS',
+		BH: 'BHR',
+		BD: 'BGD',
+		BB: 'BRB',
+		BY: 'BLR',
+		BE: 'BEL',
+		BZ: 'BLZ',
+		BJ: 'BEN',
+		BM: 'BMU',
+		BT: 'BTN',
+		BO: 'BOL',
+		BA: 'BIH',
+		BW: 'BWA',
+		BV: 'BVT',
+		BR: 'BRA',
+		VG: 'VGB',
+		IO: 'IOT',
+		BN: 'BRN',
+		BG: 'BGR',
+		BF: 'BFA',
+		BI: 'BDI',
+		KH: 'KHM',
+		CM: 'CMR',
+		CA: 'CAN',
+		CV: 'CPV',
+		KY: 'CYM',
+		CF: 'CAF',
+		TD: 'TCD',
+		CL: 'CHL',
+		CN: 'CHN',
+		HK: 'HKG',
+		MO: 'MAC',
+		CX: 'CXR',
+		CC: 'CCK',
+		CO: 'COL',
+		KM: 'COM',
+		CG: 'COG',
+		CD: 'COD',
+		CK: 'COK',
+		CR: 'CRI',
+		CI: 'CIV',
+		HR: 'HRV',
+		CU: 'CUB',
+		CY: 'CYP',
+		CZ: 'CZE',
+		DK: 'DNK',
+		DJ: 'DJI',
+		DM: 'DMA',
+		DO: 'DOM',
+		EC: 'ECU',
+		EG: 'EGY',
+		SV: 'SLV',
+		GQ: 'GNQ',
+		ER: 'ERI',
+		EE: 'EST',
+		ET: 'ETH',
+		FK: 'FLK',
+		FO: 'FRO',
+		FJ: 'FJI',
+		FI: 'FIN',
+		FR: 'FRA',
+		GF: 'GUF',
+		PF: 'PYF',
+		TF: 'ATF',
+		GA: 'GAB',
+		GM: 'GMB',
+		GE: 'GEO',
+		DE: 'DEU',
+		GH: 'GHA',
+		GI: 'GIB',
+		GR: 'GRC',
+		GL: 'GRL',
+		GD: 'GRD',
+		GP: 'GLP',
+		GU: 'GUM',
+		GT: 'GTM',
+		GG: 'GGY',
+		GN: 'GIN',
+		GW: 'GNB',
+		GY: 'GUY',
+		HT: 'HTI',
+		HM: 'HMD',
+		VA: 'VAT',
+		HN: 'HND',
+		HU: 'HUN',
+		IS: 'ISL',
+		IN: 'IND',
+		ID: 'IDN',
+		IR: 'IRN',
+		IQ: 'IRQ',
+		IE: 'IRL',
+		IM: 'IMN',
+		IL: 'ISR',
+		IT: 'ITA',
+		JM: 'JAM',
+		JP: 'JPN',
+		JE: 'JEY',
+		JO: 'JOR',
+		KZ: 'KAZ',
+		KE: 'KEN',
+		KI: 'KIR',
+		KP: 'PRK',
+		KR: 'KOR',
+		KW: 'KWT',
+		KG: 'KGZ',
+		LA: 'LAO',
+		LV: 'LVA',
+		LB: 'LBN',
+		LS: 'LSO',
+		LR: 'LBR',
+		LY: 'LBY',
+		LI: 'LIE',
+		LT: 'LTU',
+		LU: 'LUX',
+		MK: 'MKD',
+		MG: 'MDG',
+		MW: 'MWI',
+		MY: 'MYS',
+		MV: 'MDV',
+		ML: 'MLI',
+		MT: 'MLT',
+		MH: 'MHL',
+		MQ: 'MTQ',
+		MR: 'MRT',
+		MU: 'MUS',
+		YT: 'MYT',
+		MX: 'MEX',
+		FM: 'FSM',
+		MD: 'MDA',
+		MC: 'MCO',
+		MN: 'MNG',
+		ME: 'MNE',
+		MS: 'MSR',
+		MA: 'MAR',
+		MZ: 'MOZ',
+		MM: 'MMR',
+		NA: 'NAM',
+		NR: 'NRU',
+		NP: 'NPL',
+		NL: 'NLD',
+		AN: 'ANT',
+		NC: 'NCL',
+		NZ: 'NZL',
+		NI: 'NIC',
+		NE: 'NER',
+		NG: 'NGA',
+		NU: 'NIU',
+		NF: 'NFK',
+		MP: 'MNP',
+		NO: 'NOR',
+		OM: 'OMN',
+		PK: 'PAK',
+		PW: 'PLW',
+		PS: 'PSE',
+		PA: 'PAN',
+		PG: 'PNG',
+		PY: 'PRY',
+		PE: 'PER',
+		PH: 'PHL',
+		PN: 'PCN',
+		PL: 'POL',
+		PT: 'PRT',
+		PR: 'PRI',
+		QA: 'QAT',
+		RE: 'REU',
+		RO: 'ROU',
+		RU: 'RUS',
+		RW: 'RWA',
+		BL: 'BLM',
+		SH: 'SHN',
+		KN: 'KNA',
+		LC: 'LCA',
+		MF: 'MAF',
+		PM: 'SPM',
+		VC: 'VCT',
+		WS: 'WSM',
+		SM: 'SMR',
+		ST: 'STP',
+		SA: 'SAU',
+		SN: 'SEN',
+		RS: 'SRB',
+		SC: 'SYC',
+		SL: 'SLE',
+		SG: 'SGP',
+		SK: 'SVK',
+		SI: 'SVN',
+		SB: 'SLB',
+		SO: 'SOM',
+		ZA: 'ZAF',
+		GS: 'SGS',
+		SS: 'SSD',
+		ES: 'ESP',
+		LK: 'LKA',
+		SD: 'SDN',
+		SR: 'SUR',
+		SJ: 'SJM',
+		SZ: 'SWZ',
+		SE: 'SWE',
+		CH: 'CHE',
+		SY: 'SYR',
+		TW: 'TWN',
+		TJ: 'TJK',
+		TZ: 'TZA',
+		TH: 'THA',
+		TL: 'TLS',
+		TG: 'TGO',
+		TK: 'TKL',
+		TO: 'TON',
+		TT: 'TTO',
+		TN: 'TUN',
+		TR: 'TUR',
+		TM: 'TKM',
+		TC: 'TCA',
+		TV: 'TUV',
+		UG: 'UGA',
+		UA: 'UKR',
+		AE: 'ARE',
+		GB: 'GBR',
+		US: 'USA',
+		UM: 'UMI',
+		UY: 'URY',
+		UZ: 'UZB',
+		VU: 'VUT',
+		VE: 'VEN',
+		VN: 'VNM',
+		VI: 'VIR',
+		WF: 'WLF',
+		EH: 'ESH',
+		YE: 'YEM',
+		ZM: 'ZMB',
+		ZW: 'ZWE'
+	};
 
 	//end of d3ChartIIFE
 }());
