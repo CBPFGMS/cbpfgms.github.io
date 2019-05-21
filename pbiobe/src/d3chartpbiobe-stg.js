@@ -1360,14 +1360,14 @@
 
 			const cbpfsAnnotationRect = helpSVG.append("rect")
 				.attr("x", 320 - padding)
-				.attr("y", 20 - padding - 14)
+				.attr("y", 40 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const cbpfsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 320)
-				.attr("y", 20)
+				.attr("y", 40)
 				.text("Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year.")
 				.call(wrapText2, 350);
 
@@ -1376,22 +1376,22 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiobeArrowMarker)")
-				.attr("d", "M660,30 Q700,30 700,65");
+				.attr("d", "M660,50 Q700,50 700,85");
 
 			cbpfsAnnotationRect.attr("width", cbpfsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
 
 			const yearAnnotationRect = helpSVG.append("rect")
 				.attr("x", 490 - padding)
-				.attr("y", 136 - padding - 14)
+				.attr("y", 156 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearAnnotation = helpSVG.append("text")
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 490)
-				.attr("y", 136)
-				.text("Use these buttons to select year.")
+				.attr("y", 156)
+				.text("Use these buttons to select year. Press ALT when clicking to select just a single year.")
 				.call(wrapText2, 240);
 
 			const yearPath = helpSVG.append("path")
@@ -1399,7 +1399,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiobeArrowMarker)")
-				.attr("d", "M486,131 L456,131");
+				.attr("d", "M486,151 L456,151");
 
 			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
@@ -1438,14 +1438,14 @@
 				.attr("x", 490)
 				.attr("y", 356)
 				.text("The pictograms represent the real proportions of actually affected and targeted affected persons, for each category. The number on the bottom indicates how many people (approximately) a single pictogram represents.")
-				.call(wrapText2, 290);
+				.call(wrapText2, 300);
 
 			const absolutePath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiobeArrowMarker)")
-				.attr("d", "M560,445 Q520,470 510,516");
+				.attr("d", "M560,465 Q520,490 510,536");
 
 			absoluteAnnotationRect.attr("width", absoluteAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", absoluteAnnotation.node().getBBox().height + padding * 2);

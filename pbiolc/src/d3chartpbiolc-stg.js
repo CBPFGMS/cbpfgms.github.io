@@ -1960,14 +1960,14 @@
 
 			const cbpfsAnnotationRect = helpSVG.append("rect")
 				.attr("x", 300 - padding)
-				.attr("y", 20 - padding - 14)
+				.attr("y", 40 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const cbpfsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 300)
-				.attr("y", 20)
+				.attr("y", 40)
 				.text("Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year.")
 				.call(wrapText2, 350);
 
@@ -1976,44 +1976,44 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M290,30 Q260,30 260,60");
+				.attr("d", "M290,50 Q260,50 260,80");
 
 			cbpfsAnnotationRect.attr("width", cbpfsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
 
 			const yearAnnotationRect = helpSVG.append("rect")
 				.attr("x", 50 - padding)
-				.attr("y", 110 - padding - 14)
+				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 50)
-				.attr("y", 110)
-				.text("Use these buttons to select year.")
-				.call(wrapText2, 180);
+				.attr("x", 20)
+				.attr("y", 130)
+				.text("Use these buttons to select year. Press ALT when clicking to select just a single year")
+				.call(wrapText2, 300);
 
 			const yearPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M190,106 Q210,106 210,122");
+				.attr("d", "M315,126 Q335,126 335,142");
 
 			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
 
 			const modalityAnnotationRect = helpSVG.append("rect")
 				.attr("x", 400 - padding)
-				.attr("y", 110 - padding - 14)
+				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const modalityAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 400)
-				.attr("y", 110)
+				.attr("y", 130)
 				.text("Use these buttons to select modality type.")
 				.call(wrapText2, 180);
 
@@ -2022,21 +2022,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M542,106 Q562,106 562,122");
+				.attr("d", "M542,126 Q562,126 562,142");
 
 			modalityAnnotationRect.attr("width", modalityAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiaryAnnotationRect = helpSVG.append("rect")
 				.attr("x", 640 - padding)
-				.attr("y", 110 - padding - 14)
+				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiaryAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 640)
-				.attr("y", 110)
+				.attr("y", 130)
 				.text("Use these buttons to show targeted or actual persons.")
 				.call(wrapText2, 180);
 
@@ -2045,21 +2045,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M822,106 Q842,106 842,122");
+				.attr("d", "M822,126 Q842,126 842,142");
 
 			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
 
 			const allocationsSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 300 - padding)
-				.attr("y", 220 - padding - 14)
+				.attr("y", 240 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const allocationsSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 300)
-				.attr("y", 220)
+				.attr("y", 240)
 				.text("Click here to sort by allocations.")
 				.call(wrapText2, 180);
 
@@ -2068,21 +2068,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M298,226 Q270,226 270,206");
+				.attr("d", "M298,246 Q270,246 270,226");
 
 			allocationsSortAnnotationRect.attr("width", allocationsSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", allocationsSortAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiariesSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 700 - padding)
-				.attr("y", 220 - padding - 14)
+				.attr("y", 240 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiariesSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 700)
-				.attr("y", 220)
+				.attr("y", 240)
 				.text("Click here to sort by beneficiaries.")
 				.call(wrapText2, 180);
 
@@ -2091,7 +2091,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M698,226 Q670,226 670,206");
+				.attr("d", "M698,246 Q670,246 670,226");
 
 			beneficiariesSortAnnotationRect.attr("width", beneficiariesSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiariesSortAnnotation.node().getBBox().height + padding * 2);
