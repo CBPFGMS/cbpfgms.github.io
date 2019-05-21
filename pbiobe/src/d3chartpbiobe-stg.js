@@ -77,8 +77,7 @@
 			buttonsPanelHeight = 30,
 			panelHorizontalPadding = 8,
 			panelVerticalPadding = 4,
-			fadeOpacity = 0.15,
-			fadeOpacityCheckbox = 0.5,
+			fadeOpacity = 0.3,
 			beneficiariesHeight = 370,
 			buttonsNumber = 16,
 			formatSIaxes = d3.format("~s"),
@@ -1041,16 +1040,19 @@
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.altKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbiobebuttonsRects")

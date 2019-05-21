@@ -121,7 +121,7 @@
 			symbolSize = 16,
 			xScaleDomainMargin = 1.1,
 			verticalLabelPadding = 4,
-			fadeOpacity = 0.1,
+			fadeOpacity = 0.3,
 			localVariable = d3.local(),
 			tooltipBarWidth = 288,
 			modalities = ["total", "standard", "reserve"],
@@ -494,7 +494,7 @@
 					.text("(")
 					.append("tspan")
 					.style("font-weight", "bold")
-					.text("actual, % of actual")
+					.text("actual, actual in %")
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
@@ -1282,16 +1282,19 @@
 
 			function clickButtonsRects(d) {
 
-				const index = chartState.selectedYear.indexOf(d);
-
-				if (index > -1) {
-					if (chartState.selectedYear.length === 1) {
-						return;
-					} else {
-						chartState.selectedYear.splice(index, 1);
-					}
+				if (d3.event.altKey) {
+					chartState.selectedYear = [d];
 				} else {
-					chartState.selectedYear.push(d);
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
 				};
 
 				d3.selectAll(".pbiolcbuttonsRects")
