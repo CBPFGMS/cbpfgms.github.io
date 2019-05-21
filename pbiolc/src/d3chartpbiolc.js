@@ -2045,7 +2045,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M822,126 Q842,126 842,142");
+				.attr("d", "M812,126 Q832,126 832,142");
 
 			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
