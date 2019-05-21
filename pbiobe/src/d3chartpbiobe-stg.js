@@ -1429,14 +1429,14 @@
 
 			const absoluteAnnotationRect = helpSVG.append("rect")
 				.attr("x", 490 - padding)
-				.attr("y", 356 - padding - 14)
+				.attr("y", 366 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const absoluteAnnotation = helpSVG.append("text")
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 490)
-				.attr("y", 356)
+				.attr("y", 366)
 				.text("The pictograms represent the real proportions of actually affected and targeted affected persons, for each category. The number on the bottom indicates how many people (approximately) a single pictogram represents.")
 				.call(wrapText2, 300);
 

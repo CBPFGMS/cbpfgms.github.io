@@ -1982,7 +1982,7 @@
 				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
 
 			const yearAnnotationRect = helpSVG.append("rect")
-				.attr("x", 50 - padding)
+				.attr("x", 20 - padding)
 				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
@@ -2028,17 +2028,17 @@
 				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiaryAnnotationRect = helpSVG.append("rect")
-				.attr("x", 640 - padding)
+				.attr("x", 620 - padding)
 				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiaryAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 640)
+				.attr("x", 620)
 				.attr("y", 130)
 				.text("Use these buttons to show targeted or actual persons.")
-				.call(wrapText2, 180);
+				.call(wrapText2, 200);
 
 			const beneficiaryPath = helpSVG.append("path")
 				.style("fill", "none")
