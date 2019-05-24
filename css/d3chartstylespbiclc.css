@@ -201,3 +201,27 @@ p#pbiclcd3chartTitle {
 	fill: #666;
 	pointer-events: none;	
 }
+
+.pbiclcSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText, .pbiclcSnapshotContent #pbiclcSnapshotPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
