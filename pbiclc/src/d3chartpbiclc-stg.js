@@ -5,7 +5,9 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink],
-		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -23,7 +25,7 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
+	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
@@ -51,6 +53,10 @@
 		script.src = url;
 		script.onreadystatechange = callback;
 		script.onload = callback;
+		if (url === jsPdf) {
+			script.setAttribute("integrity", "sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/");
+			script.setAttribute("crossorigin", "anonymous");
+		};
 		head.appendChild(script);
 	};
 
@@ -62,7 +68,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -286,6 +292,10 @@
 		const paidSymbol = d3.symbol()
 			.type(d3.symbolTriangle)
 			.size(paidSymbolSize);
+
+		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
+
+		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
 			.then(function(rawData) {
@@ -543,6 +553,39 @@
 				downloadIcon.html(".CSV  ")
 					.append("span")
 					.attr("class", "fas fa-download");
+
+				const snapshotDiv = iconsDiv.append("div")
+					.attr("class", "pbiclcSnapshotDiv");
+
+				const snapshotIcon = snapshotDiv.append("button")
+					.attr("id", "pbiclcSnapshotButton");
+
+				snapshotIcon.html("IMAGE ")
+					.append("span")
+					.attr("class", "fas fa-camera");
+
+				const snapshotContent = snapshotDiv.append("div")
+					.attr("class", "pbiclcSnapshotContent");
+
+				const pdfSpan = snapshotContent.append("p")
+					.attr("id", "pbiclcSnapshotPdfText")
+					.html("Download PDF")
+					.on("click", function() {
+						createSnapshot("pdf");
+					})
+
+				const pngSpan = snapshotContent.append("p")
+					.attr("id", "pbiclcSnapshotPngText")
+					.html("Download Image (PNG)")
+					.on("click", function() {
+						createSnapshot("png");
+					})
+
+				snapshotDiv.on("mouseover", function() {
+					snapshotContent.style("display", "block")
+				}).on("mouseout", function() {
+					snapshotContent.style("display", "none")
+				});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
@@ -2466,6 +2509,170 @@
 					}
 				}
 			});
+		};
+
+		function createSnapshot(type) {
+
+			svg.attr("viewBox", null)
+				.attr("width", width)
+				.attr("height", height);
+
+			const listOfStyles = [
+				"font-size",
+				"font-family",
+				"font-weight",
+				"fill",
+				"stroke",
+				"stroke-dasharray",
+				"stroke-width",
+				"opacity",
+				"text-anchor",
+				"text-transform",
+				"shape-rendering",
+				"letter-spacing",
+				"white-space"
+			];
+
+			const imageDiv = containerDiv.node();
+
+			setSvgStyles(svg.node())
+
+			iconsDiv.style("opacity", 0);
+
+			html2canvas(imageDiv).then(function(canvas) {
+				svg.attr("viewBox", "0 0 " + width + " " + height)
+					.attr("width", null)
+					.attr("height", null);
+				iconsDiv.style("opacity", 1);
+				if (type === "png") {
+					downloadSnapshotPng(canvas);
+				} else {
+					downloadSnapshotPdf(canvas);
+				};
+			});
+
+			function setSvgStyles(node) {
+
+				if (!node.style) return;
+
+				let styles = getComputedStyle(node);
+
+				for (let i = 0; i < listOfStyles.length; i++) {
+					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
+				};
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					setSvgStyles(node.childNodes[i]);
+				};
+			};
+
+			//end of createSnapshot
+		};
+
+		function downloadSnapshotPng(source) {
+
+			const fileName = "contributions.png";
+
+			source.toBlob(function(blob) {
+				if (navigator.msSaveBlob) {
+					navigator.msSaveBlob(blob, filename);
+				} else {
+					const link = document.createElement("a");
+					if (link.download !== undefined) {
+						const url = URL.createObjectURL(blob);
+						link.setAttribute("href", url);
+						link.setAttribute("download", fileName);
+						link.style = "visibility:hidden";
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+					};
+				};
+			});
+		};
+
+		function downloadSnapshotPdf(source) {
+
+			const options = {
+				weekday: "long",
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "2-digit",
+				minute: "2-digit"
+			};
+
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+				.then(function(logo) {
+
+					const pdf = new jsPDF();
+
+					pdf.setFillColor(65, 143, 222);
+					pdf.rect(0, 0, 210, 15, "F");
+
+					pdf.addImage(logo, "PNG", 10, 19, 60, 12);
+
+					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", 190, {
+						fontSize: 10
+					});
+
+					const fullDate = new Date().toLocaleDateString("default", options);
+
+					pdf.setTextColor(60);
+					pdf.setFont('helvetica');
+					pdf.setFontType("normal");
+					pdf.setFontSize(10);
+					pdf.text(10, 49, intro);
+
+					pdf.setTextColor(80);
+					pdf.setFontSize(8);
+					pdf.text("Date: " + fullDate, 10, 64);
+
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
+
+					pdf.text(yearsText + yearsList, 10, 68);
+
+					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+						"Selected countries: all" : countriesList();
+
+					pdf.text(selectedCountry, 10, 72);
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 150
+
+					pdf.addImage(source, "PNG", 30, 84, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+
+					pdf.setFillColor(65, 143, 222);
+					pdf.rect(0, 289, 210, 8, "F");
+
+					pdf.save("contributions.pdf");
+
+					function countriesList() {
+						const selection = chartState.selectedDonors.length ? "selectedDonors" : "selectedCbpfs";
+						const type = chartState.selectedDonors.length ? "donor" : "CBPF";
+						const plural = chartState[selection].length === 1 ? "" : "s";
+						const countryList = chartState[selection].map(function(d) {
+								return countryNames[d];
+							})
+							.sort(function(a, b) {
+								return a.toLowerCase() < b.toLowerCase() ? -1 :
+									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= chartState[selection].length - 2 ? index > chartState[selection].length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+						return "Selected " + type + plural + ": " + countryList;
+
+					}
+				});
+
+			//end of downloadSnapshotPdf
 		};
 
 		function createProgressWheel() {
