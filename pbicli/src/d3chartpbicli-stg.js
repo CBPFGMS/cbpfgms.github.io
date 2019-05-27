@@ -3549,7 +3549,7 @@
 
 			const csv = createCsv(data, rawData);
 
-			const fileName = "contributions.csv";
+			const fileName = "Contribution Trends.csv";
 
 			const blob = new Blob([csv], {
 				type: 'text/csv;charset=utf-8;'
@@ -3605,20 +3605,28 @@
 					return d.isoCode;
 				}) : checkedCbpfsList;
 
-			const filteredData = rawData.filter(function(row) {
+			const filteredDataRaw = rawData.filter(function(row) {
 				return selectedDonorsList.indexOf(row.GMSDonorISO2Code.toLowerCase()) > -1 && selectedCbpfsList.indexOf(row.PooledFundISO2Code.toLowerCase()) > -1;
+			}).sort(function(a, b) {
+				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
+					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
+					a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
 			});
 
+			const filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
+
 			filteredData.forEach(function(d) {
-				d["Fiscal year"] = +d.FiscalYear;
-				d.donor = d.GMSDonorName;
-				d.CBPF = d.PooledFundName;
-				d["Paid amount"] = Math.round(+d.PaidAmt * 100) / 100;
-				d["Pledged amount"] = Math.round(+d.PledgeAmt * 100) / 100;
-				d["Paid amount local currency"] = Math.round(+d.PaidAmtLocal * 100) / 100;
-				d["Pledged amount local currency"] = Math.round(+d.PledgeAmtLocal * 100) / 100;
-				d["Exchange rate"] = +d.PaidAmtCurrencyExchangeRate;
-				d["Local currency"] = d.PaidAmtLocalCurrency;
+				d.Year = +d.FiscalYear;
+				d["Donor Name"] = d.GMSDonorName;
+				d["CBPF Name"] = d.PooledFundName;
+				d["Paid Amount"] = Math.round(+d.PaidAmt * 100) / 100;
+				d["Pledged Amount"] = Math.round(+d.PledgeAmt * 100) / 100;
+				d["Total Contributions"] = Math.round(((+d.PledgeAmt) + (+d.PaidAmt)) * 100) / 100;
+				d["Paid Amount (Local Currency)"] = Math.round(+d.PaidAmtLocal * 100) / 100;
+				d["Pledged Amount (Local Currency)"] = Math.round(+d.PledgeAmtLocal * 100) / 100;
+				d["Total Contributions (Local Currency)"] = Math.round(((+d.PledgeAmtLocal) + (+d.PaidAmtLocal)) * 100) / 100;
+				d["Exchange Rate"] = +d.PaidAmtCurrencyExchangeRate;
+				d["Local Currency"] = d.PaidAmtLocalCurrency;
 
 				delete d.FiscalYear;
 				delete d.GMSDonorName;
