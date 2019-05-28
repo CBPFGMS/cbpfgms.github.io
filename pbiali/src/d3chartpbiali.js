@@ -336,7 +336,7 @@
 
 					const csv = createCSV(data.cbpfs);
 
-					const fileName = "CBPFallocations.csv";
+					const fileName = "Allocation Trends.csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -1222,29 +1222,32 @@
 			const clonedData = JSON.parse(JSON.stringify(sourceData));
 
 			clonedData.forEach(function(d) {
+				d.newValues = [];
 				d.values.forEach(function(e) {
-					e.cbpf = d.cbpf;
-					e.year = +e.year;
-					e.total = Math.round(e.total * 100) / 100;
-					e.reserve = Math.round(e.reserve * 100) / 100;
-					e.standard = Math.round(e.standard * 100) / 100;
+					d.newValues.push({
+						"CBPF Name": d.cbpf,
+						Year: +e.year,
+						"Total Allocation": Math.round(e.total * 100) / 100,
+						"Total Reserve Allocation": Math.round(e.reserve * 100) / 100,
+						"Total Standard Allocation": Math.round(e.standard * 100) / 100
+					})
 				});
 			});
 
 			const concatenatedData = clonedData.reduce(function(acc, curr) {
-				return acc.concat(curr.values);
+				return acc.concat(curr.newValues);
 			}, []);
 
 			concatenatedData.sort(function(a, b) {
-				return b.year - a.year ||
-					(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
-						a.cbpf.toLowerCase() > b.cbpf.toLowerCase() ? 1 : 0);
+				return b.Year - a.Year ||
+					(a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
+						a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
 			});
 
 			const header = Object.keys(concatenatedData[0]);
 
 			header.sort(function(a, b) {
-				return a === "year" || b === "year" ? 1 : (a < b ? -1 :
+				return a === "Year" || b === "Year" ? 1 : (a < b ? -1 :
 					a > b ? 1 : 0);
 			});
 

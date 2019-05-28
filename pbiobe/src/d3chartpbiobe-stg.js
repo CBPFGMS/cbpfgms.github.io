@@ -347,7 +347,7 @@
 						return a - b;
 					}).join("-");
 
-					const fileName = "Beneficiaries" + yearsList + ".csv";
+					const fileName = "Affected Persons " + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -1229,8 +1229,8 @@
 		function createCSV(rawData) {
 
 			const csvData = processDataToCsv(rawData).sort(function(a, b) {
-				return (+b.year) - (+a.year) || (a.CBPF.toLowerCase() < b.CBPF.toLowerCase() ? -1 :
-					a.CBPF.toLowerCase() > b.CBPF.toLowerCase() ? 1 : 0);
+				return (+b.Year) - (+a.Year) || (a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
+					a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
 			});
 
 			const header = Object.keys(csvData[0]);
@@ -1262,33 +1262,33 @@
 
 			filteredData.forEach(function(d) {
 				const foundObject = aggregatedData.find(function(e) {
-					return e.year === (+d.AllocationYear) && e.CBPF === d.PooledFundName;
+					return e.Year === (+d.AllocationYear) && e["CBPF Name"] === d.PooledFundName;
 				});
 				if (foundObject) {
-					foundObject["Actual Boys"] += +d.ActualBoys;
-					foundObject["Targeted Boys"] += +d.PlannedBoys;
-					foundObject["Actual Girls"] += +d.ActualGirls;
-					foundObject["Targeted Girls"] += +d.PlannedGirls;
-					foundObject["Actual Men"] += +d.ActualMen;
-					foundObject["Targeted Men"] += +d.PlannedMen;
-					foundObject["Actual Women"] += +d.ActualWomen;
-					foundObject["Targeted Women"] += +d.PlannedWomen;
-					foundObject["Actual Total"] += +d.ActualTotal;
-					foundObject["Targeted Total"] += +d.PlannedTotal;
+					foundObject["Boys (Reached)"] += +d.ActualBoys;
+					foundObject["Boys (Targeted)"] += +d.PlannedBoys;
+					foundObject["Girls (Reached)"] += +d.ActualGirls;
+					foundObject["Girls (Targeted)"] += +d.PlannedGirls;
+					foundObject["Men (Reached)"] += +d.ActualMen;
+					foundObject["Men (Targeted)"] += +d.PlannedMen;
+					foundObject["Women (Reached)"] += +d.ActualWomen;
+					foundObject["Women (Targeted)"] += +d.PlannedWomen;
+					foundObject["Total (Reached)"] += +d.ActualTotal;
+					foundObject["Total (Targeted)"] += +d.PlannedTotal;
 				} else {
 					aggregatedData.push({
-						year: +d.AllocationYear,
-						CBPF: d.PooledFundName,
-						"Actual Boys": +d.ActualBoys,
-						"Targeted Boys": +d.PlannedBoys,
-						"Actual Girls": +d.ActualGirls,
-						"Targeted Girls": +d.PlannedGirls,
-						"Actual Men": +d.ActualMen,
-						"Targeted Men": +d.PlannedMen,
-						"Actual Women": +d.ActualWomen,
-						"Targeted Women": +d.PlannedWomen,
-						"Actual Total": +d.ActualTotal,
-						"Targeted Total": +d.PlannedTotal
+						Year: +d.AllocationYear,
+						"CBPF Name": d.PooledFundName,
+						"Boys (Reached)": +d.ActualBoys,
+						"Boys (Targeted)": +d.PlannedBoys,
+						"Girls (Reached)": +d.ActualGirls,
+						"Girls (Targeted)": +d.PlannedGirls,
+						"Men (Reached)": +d.ActualMen,
+						"Men (Targeted)": +d.PlannedMen,
+						"Women (Reached)": +d.ActualWomen,
+						"Women (Targeted)": +d.PlannedWomen,
+						"Total (Reached)": +d.ActualTotal,
+						"Total (Targeted)": +d.PlannedTotal
 					})
 				};
 			});

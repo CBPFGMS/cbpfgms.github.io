@@ -403,7 +403,7 @@
 						return a - b;
 					}).join("-");
 
-					const fileName = "Clusters" + yearsList + ".csv";
+					const fileName = "Clusters Overview " + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -1795,9 +1795,9 @@
 		function createCSV(sourceData) {
 
 			const csvData = processDataToCsv(sourceData).sort(function(a, b) {
-				return (+b.year) - (+a.year) || (a.CBPF.toLowerCase() < b.CBPF.toLowerCase() ? -1 :
-					a.CBPF.toLowerCase() > b.CBPF.toLowerCase() ? 1 : 0) || (a.cluster.toLowerCase() < b.cluster.toLowerCase() ? -1 :
-					a.cluster.toLowerCase() > b.cluster.toLowerCase() ? 1 : 0);
+				return (+b.Year) - (+a.Year) || (a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
+					a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0) || (a.Cluster.toLowerCase() < b.Cluster.toLowerCase() ? -1 :
+					a.Cluster.toLowerCase() > b.Cluster.toLowerCase() ? 1 : 0);
 			});
 
 			const header = d3.keys(csvData[0]);
@@ -1830,21 +1830,21 @@
 			filteredData.forEach(function(d) {
 
 				const foundCluster = aggregatedData.find(function(e) {
-					return e.year === +d.AllocationYear && e.cluster === d.Cluster && e.CBPF === d.PooledFundName;
+					return e.Year === +d.AllocationYear && e.Cluster === d.Cluster && e["CBPF Name"] === d.PooledFundName;
 				});
 
 				if (foundCluster) {
-					foundCluster.budget += +d.BudgetByCluster;
-					foundCluster["targeted persons"] += ~~(+d.BeneficiariesPlannedTotal);
-					foundCluster["actually affected persons"] += ~~(+d.BeneficiariesActualTotal);
+					foundCluster["Total Allocations"] += +d.BudgetByCluster;
+					foundCluster["Targeted People"] += ~~(+d.BeneficiariesPlannedTotal);
+					foundCluster["Reached People"] += ~~(+d.BeneficiariesActualTotal);
 				} else {
 					aggregatedData.push({
-						year: +d.AllocationYear,
-						CBPF: d.PooledFundName,
-						cluster: d.Cluster,
-						budget: +d.BudgetByCluster,
-						"targeted persons": ~~(+d.BeneficiariesPlannedTotal),
-						"actually affected persons": ~~(+d.BeneficiariesActualTotal)
+						Year: +d.AllocationYear,
+						"CBPF Name": d.PooledFundName,
+						Cluster: d.Cluster,
+						"Total Allocations": +d.BudgetByCluster,
+						"Targeted People": ~~(+d.BeneficiariesPlannedTotal),
+						"Reached People": ~~(+d.BeneficiariesActualTotal)
 					})
 				};
 			});

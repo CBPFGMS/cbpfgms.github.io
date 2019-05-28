@@ -554,7 +554,7 @@
 						return a - b;
 					}).join("-");
 
-					const fileName = "contributions" + yearsList + ".csv";
+					const fileName = "CBPF contributions " + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -2046,7 +2046,7 @@
 
 		function createCsv(rawData) {
 
-			const filteredData = rawData.filter(function(d) {
+			const filteredDataRaw = rawData.filter(function(d) {
 				if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
 					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
 				} else if (chartState.selectedDonors.length) {
@@ -2060,13 +2060,37 @@
 					a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
 			});
 
+			const filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
+
 			filteredData.forEach(function(d) {
-				d.FiscalYear = +d.FiscalYear;
-				d.PaidAmt = +d.PaidAmt;
-				d.PledgeAmt = +d.PledgeAmt;
+				d.Year = +d.FiscalYear;
+				d["Donor Name"] = d.GMSDonorName;
+				d["CBPF Name"] = d.PooledFundName;
+				d["Paid Amount"] = +d.PaidAmt;
+				d["Pledged Amount"] = +d.PledgeAmt;
+				d["Total Contributions"] = (+d.PaidAmt) + (+d.PledgeAmt);
+				d["Local Curency"] = d.PaidAmtLocalCurrency;
+				d["Exchange Rate"] = d.PaidAmtCurrencyExchangeRate;
+				d["Paid Amount (Local Currency)"] = +d.PaidAmtLocal;
+				d["Pledged Amount (Local Currency)"] = +d.PledgeAmtLocal;
+				d["Total Contributions (Local Currency)"] = (+d.PaidAmtLocal) + (+d.PledgeAmtLocal);
+
+				delete d.FiscalYear;
+				delete d.GMSDonorName;
+				delete d.PooledFundName;
+				delete d.PaidAmt;
+				delete d.PledgeAmt;
+				delete d.PaidAmtLocal;
+				delete d.PledgeAmtLocal;
+				delete d.GMSDonorISO2Code;
+				delete d.PooledFundISO2Code;
+				delete d.PledgeAmtLocalCurrency;
+				delete d.PledgeAmtCurrencyExchangeRate;
+				delete d.PaidAmtLocalCurrency;
+				delete d.PaidAmtCurrencyExchangeRate;
 			});
 
-			const header = rawData.columns;
+			const header = d3.keys(filteredData[0]);
 
 			const replacer = function(key, value) {
 				return value === null ? '' : value

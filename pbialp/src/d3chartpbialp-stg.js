@@ -415,7 +415,7 @@
 						return a - b;
 					}).join("-");
 
-					const fileName = "Allocations" + yearsList + ".csv";
+					const fileName = "Allocations by Org Type " + yearsList + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -2770,32 +2770,22 @@
 			const clonedData = processDataToCSV(sourceData);
 
 			clonedData.forEach(function(d) {
-				d["total-International NGO"] = d["International NGO"];
-				d["total-National NGO"] = d["National NGO"];
-				d["total-Red Cross/Crescent Movement"] = d["Red Cross/Crescent Movement"];
-				d["total-UN Agency"] = d["UN Agency"];
-
-				delete d["International NGO"];
-				delete d["National NGO"];
-				delete d["Red Cross/Crescent Movement"];
-				delete d["UN Agency"];
-
 				for (let key in d) {
-					if (key !== "cbpf") {
+					if (key !== "CBPF Name") {
 						d[key] = Math.round(d[key] * 100) / 100;
 					};
 				};
 			});
 
 			clonedData.sort(function(a, b) {
-				return b.year - a.year ||
-					(a.cbpf.toLowerCase() < b.cbpf.toLowerCase() ? -1 :
-						a.cbpf.toLowerCase() > b.cbpf.toLowerCase() ? 1 : 0);
+				return b.Year - a.Year ||
+					(a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
+						a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
 			});
 
 			const header = Object.keys(clonedData[0]);
 
-			const headerOrder = ["total-UN Agency", "total-Red Cross/Crescent Movement", "total-National NGO", "total-International NGO", "total", "cbpf", "year"];
+			const headerOrder = ["Allocation (UN)", "Allocation (Red Cross)", "Allocation (NNGO)", "Allocation (INGO)", "Total Allocation", "CBPF Name", "Year"];
 
 			header.sort(function(a, b) {
 				return ((headerOrder.indexOf(b) + 1) - (headerOrder.indexOf(a) + 1)) || (a < b ? -1 : a > b ? 1 : 0);
@@ -2819,6 +2809,10 @@
 		};
 
 		function processDataToCSV(sourceData) {
+
+			const partnersNamesScale = d3.scaleOrdinal()
+				.domain(partnerList)
+				.range(["INGO", "NNGO", "Red Cross", "UN"]);
 
 			const aggregatedAllocations = [];
 
@@ -2849,49 +2843,49 @@
 				if (temporarySet.indexOf(row.AllocationYear + row.PooledFundName) > -1) {
 
 					const tempObject = aggregatedAllocations.find(function(d) {
-						return d.cbpf === row.PooledFundName
+						return d["CBPF Name"] === row.PooledFundName
 					});
 
-					tempObject.total += +row.ApprovedBudget;
-					tempObject.standard += +row.ApprovedStandardBudget;
-					tempObject.reserve += +row.ApprovedReserveBudget;
-					tempObject.underApproval += +row.PipelineBudget;
-					tempObject[row.OrganizationType] += +row.ApprovedBudget;
-					tempObject["underApproval-" + row.OrganizationType] += +row.PipelineBudget;
-					tempObject["reserve-" + row.OrganizationType] += +row.ApprovedReserveBudget;
-					tempObject["standard-" + row.OrganizationType] += +row.ApprovedStandardBudget;
+					tempObject["Total Allocation"] += +row.ApprovedBudget;
+					tempObject["Total Standard Allocation"] += +row.ApprovedStandardBudget;
+					tempObject["Total Reserve Allocation"] += +row.ApprovedReserveBudget;
+					tempObject["Total Under Approval Allocation"] += +row.PipelineBudget;
+					tempObject["Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedBudget;
+					tempObject["Under Approval Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.PipelineBudget;
+					tempObject["Reserve Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedReserveBudget;
+					tempObject["Standard Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedStandardBudget;
 
 				} else {
 
 					const temporaryOriginalObject = {
-						year: row.AllocationYear,
-						cbpf: row.PooledFundName,
-						total: +row.ApprovedBudget,
-						standard: +row.ApprovedStandardBudget,
-						reserve: +row.ApprovedReserveBudget,
-						underApproval: +row.PipelineBudget,
-						"International NGO": 0,
-						"National NGO": 0,
-						"UN Agency": 0,
-						"Red Cross/Crescent Movement": 0,
-						"underApproval-International NGO": 0,
-						"underApproval-National NGO": 0,
-						"underApproval-UN Agency": 0,
-						"underApproval-Red Cross/Crescent Movement": 0,
-						"reserve-International NGO": 0,
-						"reserve-National NGO": 0,
-						"reserve-UN Agency": 0,
-						"reserve-Red Cross/Crescent Movement": 0,
-						"standard-International NGO": 0,
-						"standard-National NGO": 0,
-						"standard-UN Agency": 0,
-						"standard-Red Cross/Crescent Movement": 0
+						Year: row.AllocationYear,
+						"CBPF Name": row.PooledFundName,
+						"Total Allocation": +row.ApprovedBudget,
+						"Total Standard Allocation": +row.ApprovedStandardBudget,
+						"Total Reserve Allocation": +row.ApprovedReserveBudget,
+						"Total Under Approval Allocation": +row.PipelineBudget,
+						"Allocation (INGO)": 0,
+						"Allocation (NNGO)": 0,
+						"Allocation (UN)": 0,
+						"Allocation (Red Cross)": 0,
+						"Under Approval Allocation (INGO)": 0,
+						"Under Approval Allocation (NNGO)": 0,
+						"Under Approval Allocation (UN)": 0,
+						"Under Approval Allocation (Red)": 0,
+						"Reserve Allocation (INGO)": 0,
+						"Reserve Allocation (NNGO)": 0,
+						"Reserve Allocation (UN)": 0,
+						"Reserve Allocation (Red Cross)": 0,
+						"Standard Allocation (INGO)": 0,
+						"Standard Allocation (NNGO)": 0,
+						"Standard Allocation (UN)": 0,
+						"Standard Allocation (Red Cross)": 0
 					};
 
-					temporaryOriginalObject[row.OrganizationType] += +row.ApprovedBudget;
-					temporaryOriginalObject["underApproval-" + row.OrganizationType] += +row.PipelineBudget;
-					temporaryOriginalObject["reserve-" + row.OrganizationType] += +row.ApprovedReserveBudget;
-					temporaryOriginalObject["standard-" + row.OrganizationType] += +row.ApprovedStandardBudget;
+					temporaryOriginalObject["Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedBudget;
+					temporaryOriginalObject["Under Approval Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.PipelineBudget;
+					temporaryOriginalObject["Reserve Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedReserveBudget;
+					temporaryOriginalObject["Standard Allocation (" + partnersNamesScale(row.OrganizationType) + ")"] += +row.ApprovedStandardBudget;
 
 					aggregatedAllocations.push(temporaryOriginalObject);
 

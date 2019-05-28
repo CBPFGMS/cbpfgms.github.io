@@ -434,7 +434,7 @@
 
 				const csv = createCsv(data.map);
 
-				const fileName = "Allocations-" + years + ".csv";
+				const fileName = "Allocations Overview " + years + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -2464,18 +2464,18 @@
 			data.forEach(function(d) {
 				const country = chartState.selectedAdminLevel ? d.CBPFName : d.locationName;
 				csvData.push({
-					CBPF: country,
+					"CBPF Name": country,
 					Location: d.locationName,
 					Latitude: d.latitude,
 					Longitude: d.longitude,
-					Partners: d.numberOfPartners,
-					Projects: d.numberOfProjects,
-					Allocations: Math.floor(d.totalAllocation * 100) / 100,
-					"Total Beneficiaries": d.beneficiaries,
-					"Beneficiaries - Boys": d.beneficiariesBoys,
-					"Beneficiaries - Girls": d.beneficiariesGirls,
-					"Beneficiaries - Men": d.beneficiariesMen,
-					"Beneficiaries - Women": d.beneficiariesWomen
+					"# of Partners": d.numberOfPartners,
+					"# of Approved Projects": d.numberOfProjects,
+					"Total Allocations": Math.floor(d.totalAllocation * 100) / 100,
+					"Total Targeted People": d.beneficiaries,
+					"Boys (Targeted)": d.beneficiariesBoys,
+					"Girls (Targeted)": d.beneficiariesGirls,
+					"Men (Targeted)": d.beneficiariesMen,
+					"Women (Targeted)": d.beneficiariesWomen
 				})
 			});
 
@@ -2516,7 +2516,7 @@
 					"Partner Type": d.partnerType,
 					"Allocation Type": d.AllNm,
 					Allocations: Math.floor(d["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)]),
-					"Beneficiaries": total
+					"Targeted People": total
 				})
 			});
 
