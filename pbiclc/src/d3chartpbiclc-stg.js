@@ -675,18 +675,52 @@
 					data.dataDonors : chartState.selectedDonors.length ? data.dataDonors.filter(function(d) {
 						return chartState.selectedDonors.indexOf(d.isoCode) > -1;
 					}) : data.dataDonors.reduce(function(acc, curr) {
-						return acc.concat(curr.donations.filter(function(e) {
-							return chartState.selectedCbpfs.indexOf(e.isoCode) > -1;
-						}));
+						curr.donations.forEach(function(d) {
+							if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
+								const found = acc.find(function(e) {
+									return e.donor === curr.donor;
+								});
+								if (found) {
+									found.paid += d.paid;
+									found.pledge += d.pledge;
+									found.total += d.total;
+								} else {
+									acc.push({
+										donor: curr.donor,
+										paid: d.paid,
+										pledge: d.pledge,
+										total: d.total
+									})
+								}
+							};
+						});
+						return acc;
 					}, []);
 
 				const dataCbpfs = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
 					data.dataCbpfs : chartState.selectedCbpfs.length ? data.dataCbpfs.filter(function(d) {
 						return chartState.selectedCbpfs.indexOf(d.isoCode) > -1;
 					}) : data.dataCbpfs.reduce(function(acc, curr) {
-						return acc.concat(curr.donors.filter(function(e) {
-							return chartState.selectedDonors.indexOf(e.isoCode) > -1;
-						}));
+						curr.donors.forEach(function(d) {
+							if (chartState.selectedDonors.indexOf(d.isoCode) > -1) {
+								const found = acc.find(function(e) {
+									return e.cbpf === curr.cbpf;
+								});
+								if (found) {
+									found.paid += d.paid;
+									found.pledge += d.pledge;
+									found.total += d.total;
+								} else {
+									acc.push({
+										cbpf: curr.cbpf,
+										paid: d.paid,
+										pledge: d.pledge,
+										total: d.total
+									})
+								}
+							};
+						});
+						return acc;
 					}, []);
 
 				contributionType.forEach(function(d) {
