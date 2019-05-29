@@ -202,6 +202,10 @@ p#pbiclcd3chartTitle {
 	pointer-events: none;	
 }
 
+#pbiclcSnapshotTooltip {
+	z-index: 1600;
+}
+
 .pbiclcSnapshotContent {
 	position: absolute;
 	min-width: 100px;

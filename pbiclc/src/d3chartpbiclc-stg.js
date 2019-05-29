@@ -125,7 +125,9 @@
 			};
 
 		let height = 500,
-			yearsArray;
+			yearsArray,
+			isSnapshotTooltipVisible = false,
+			currentHoveredRect;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
@@ -177,9 +179,45 @@
 
 		createProgressWheel();
 
+		const snapshotTooltip = containerDiv.append("div")
+			.attr("id", "pbiclcSnapshotTooltip")
+			.attr("class", "pbiclcSnapshotContent")
+			.style("display", "none")
+			.on("mouseleave", function() {
+				isSnapshotTooltipVisible = false;
+				d3.select(currentHoveredRect).dispatch("mouseout");
+				snapshotTooltip.style("display", "none");
+				tooltip.style("display", "none");
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiclcSnapshotPdfText")
+			.html("Download PDF")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("pdf", true);
+			})
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiclcSnapshotPngText")
+			.html("Download Image (PNG)")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("png", true);
+			});
+
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiclctooltipdiv")
 			.style("display", "none");
+
+		containerDiv.on("contextmenu", function() {
+			d3.event.preventDefault();
+			const thisMouse = d3.mouse(this);
+			isSnapshotTooltipVisible = true;
+			snapshotTooltip.style("display", "block")
+				.style("top", thisMouse[1] + "px")
+				.style("left", thisMouse[0] + "px");
+		});
 
 		const topPanel = {
 			main: svg.append("g")
@@ -571,14 +609,14 @@
 					.attr("id", "pbiclcSnapshotPdfText")
 					.html("Download PDF")
 					.on("click", function() {
-						createSnapshot("pdf");
+						createSnapshot("pdf", false);
 					})
 
 				const pngSpan = snapshotContent.append("p")
 					.attr("id", "pbiclcSnapshotPngText")
 					.html("Download Image (PNG)")
 					.on("click", function() {
-						createSnapshot("png");
+						createSnapshot("png", false);
 					})
 
 				snapshotDiv.on("mouseover", function() {
@@ -1354,6 +1392,8 @@
 
 				function mouseoverTooltipRectangle(datum) {
 
+					currentHoveredRect = this;
+
 					if (!datum.clicked) {
 						chartState.selectedDonors.push(datum.isoCode);
 					};
@@ -1395,6 +1435,8 @@
 				};
 
 				function mouseoutTooltipRectangle(datum) {
+
+					if (isSnapshotTooltipVisible) return;
 
 					if (!datum.clicked) {
 						const index = chartState.selectedDonors.indexOf(datum.isoCode);
@@ -1729,6 +1771,8 @@
 
 				function mouseoverTooltipRectangle(datum) {
 
+					currentHoveredRect = this;
+
 					if (!datum.clicked) {
 						chartState.selectedCbpfs.push(datum.isoCode);
 					};
@@ -1770,6 +1814,8 @@
 				};
 
 				function mouseoutTooltipRectangle(datum) {
+
+					if (isSnapshotTooltipVisible) return;
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(datum.isoCode);
@@ -2535,7 +2581,7 @@
 			});
 		};
 
-		function createSnapshot(type) {
+		function createSnapshot(type, fromContextMenu) {
 
 			svg.attr("viewBox", null)
 				.attr("width", width)
@@ -2563,6 +2609,8 @@
 
 			iconsDiv.style("opacity", 0);
 
+			snapshotTooltip.style("display", "none");
+
 			html2canvas(imageDiv).then(function(canvas) {
 				svg.attr("viewBox", "0 0 " + width + " " + height)
 					.attr("width", null)
@@ -2573,6 +2621,7 @@
 				} else {
 					downloadSnapshotPdf(canvas);
 				};
+				if (fromContextMenu) d3.select(currentHoveredRect).dispatch("mouseout");
 			});
 
 			function setSvgStyles(node) {
