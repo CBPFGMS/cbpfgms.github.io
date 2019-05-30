@@ -408,9 +408,9 @@
 
 			if (showHelp) createAnnotationsDiv();
 
-			function clickButtonsRects(d) {
+			function clickButtonsRects(d, singleSelection) {
 
-				if (d3.event.altKey) {
+				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -1067,7 +1067,22 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", clickButtonsRects);
+					.on("click", function(d) {
+						const self = this;
+						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function() {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, false);
+								};
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, true);
+							localVariable.set(this, null);
+						};
+					});
 
 				buttonsContributionsRects.on("mouseover", mouseOverButtonsContributionsRects)
 					.on("mouseout", mouseOutButtonsContributionsRects)
