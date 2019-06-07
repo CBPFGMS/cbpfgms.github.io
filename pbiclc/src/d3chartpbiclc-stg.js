@@ -2482,17 +2482,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 60 - padding)
+				.attr("x", 50 - padding)
 				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 60)
+				.attr("x", 50)
 				.attr("y", 60)
 				.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-				.call(wrapText2, 420);
+				.call(wrapText2, 430);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")
