@@ -103,6 +103,7 @@
 			underApprovalColor = "#E56A54",
 			unBlue = "#1F69B3",
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
 			formatSIaxes = d3.format("~s"),
@@ -411,11 +412,9 @@
 
 					const csv = createCSV(rawData);
 
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).join("-");
+					const currentDate = new Date();
 
-					const fileName = "Allocations by Org Type " + yearsList + ".csv";
+					const fileName = "AllocationsByOrgType" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -907,7 +906,22 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", clickButtonsRects);
+					.on("click", function(d) {
+						const self = this;
+						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function() {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, false);
+								};
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, true);
+							localVariable.set(this, null);
+						};
+					});
 
 				buttonsPartnersRects.on("mouseover", mouseOverButtonsPartnersRects)
 					.on("mouseout", mouseOutButtonsPartnersRects)
@@ -1716,7 +1730,7 @@
 					.attr("class", "pbialpAnnotationText")
 					.attr("x", 120)
 					.attr("y", 160)
-					.text("Use these buttons to select the year. You can select more than one year. Press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
+					.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
 					.call(wrapText2, 330);
 
 				const yearsButtonPath = helpSVG.append("path")
@@ -1996,9 +2010,9 @@
 				//end of highlightParallel
 			};
 
-			function clickButtonsRects(d) {
+			function clickButtonsRects(d, singleSelection) {
 
-				if (d3.event.altKey) {
+				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);

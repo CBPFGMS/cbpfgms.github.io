@@ -81,6 +81,7 @@
 			circleRadius = 2.5,
 			localVariable = d3.local(),
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -3668,7 +3669,9 @@
 
 			const csv = createCsv(data, rawData);
 
-			const fileName = "Contribution Trends.csv";
+			const currentDate = new Date();
+
+			const fileName = "ContributionTrends" + csvDateFormat(currentDate) + ".csv";
 
 			const blob = new Blob([csv], {
 				type: 'text/csv;charset=utf-8;'

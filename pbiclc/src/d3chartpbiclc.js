@@ -80,6 +80,7 @@
 			panelVerticalPadding = 12,
 			windowHeight = window.innerHeight,
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
 			lollipopRadius = 4,
@@ -360,9 +361,9 @@
 
 			if (showHelp) createAnnotationsDiv();
 
-			function clickButtonsRects(d) {
+			function clickButtonsRects(d, singleSelection) {
 
-				if (d3.event.altKey) {
+				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -550,11 +551,9 @@
 
 					const csv = createCsv(rawData);
 
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).join("-");
+					const currentDate = new Date();
 
-					const fileName = "CBPF contributions " + yearsList + ".csv";
+					const fileName = "CBPFcontributions " + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -986,7 +985,22 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", clickButtonsRects);
+					.on("click", function(d) {
+						const self = this;
+						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function() {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, false);
+								};
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, true);
+							localVariable.set(this, null);
+						};
+					});
 
 				buttonsContributionsRects.on("mouseover", mouseOverButtonsContributionsRects)
 					.on("mouseout", mouseOutButtonsContributionsRects)
@@ -2379,17 +2393,17 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 100 - padding)
+				.attr("x", 60 - padding)
 				.attr("y", 60 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 100)
+				.attr("x", 60)
 				.attr("y", 60)
-				.text("Use these buttons to select the year. You can select more than one year. Press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-				.call(wrapText2, 380);
+				.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
+				.call(wrapText2, 420);
 
 			const yearsPath = helpSVG.append("path")
 				.style("fill", "none")

@@ -85,6 +85,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			windowHeight = window.innerHeight,
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			localVariable = d3.local(),
 			monthsMargin = 2,
 			yMargin = 1.05,
@@ -336,7 +337,9 @@
 
 					const csv = createCSV(data.cbpfs);
 
-					const fileName = "Allocation Trends.csv";
+					const currentDate = new Date();
+
+					const fileName = "AllocationTrends" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

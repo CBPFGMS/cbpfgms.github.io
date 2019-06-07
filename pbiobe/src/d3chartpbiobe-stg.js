@@ -100,6 +100,7 @@
 			localVariable = d3.local(),
 			chartTitleDefault = "Affected Persons Overview",
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + beneficiariesHeight + padding[2],
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
@@ -343,11 +344,9 @@
 
 					const csv = createCSV(rawData);
 
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).join("-");
+					const currentDate = new Date();
 
-					const fileName = "Affected Persons " + yearsList + ".csv";
+					const fileName = "AffectedPersons" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -536,6 +535,7 @@
 					.append("text")
 					.attr("text-anchor", "middle")
 					.attr("class", "pbiobebuttonsText")
+					.style("user-select", "none")
 					.attr("y", buttonsPanel.height / 1.6)
 					.attr("x", function(_, i) {
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
@@ -645,7 +645,22 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", clickButtonsRects);
+					.on("click", function(d) {
+						const self = this;
+						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function() {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, false);
+								};
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, true);
+							localVariable.set(this, null);
+						};
+					});
 
 				function checkCurrentTranslate() {
 
@@ -1038,9 +1053,9 @@
 				//end of createBottomLegend
 			};
 
-			function clickButtonsRects(d) {
+			function clickButtonsRects(d, singleSelection) {
 
-				if (d3.event.altKey) {
+				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -1391,7 +1406,7 @@
 				.attr("class", "pbiobeAnnotationText")
 				.attr("x", 490)
 				.attr("y", 156)
-				.text("Use these buttons to select year. Press ALT when clicking to select just a single year.")
+				.text("Use these buttons to select year. Double click or press ALT when clicking to select just a single year.")
 				.call(wrapText2, 240);
 
 			const yearPath = helpSVG.append("path")

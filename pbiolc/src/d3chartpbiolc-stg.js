@@ -108,6 +108,7 @@
 			unBlue = "#1F69B3",
 			chartTitleDefault = "Cluster Overview",
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
@@ -399,11 +400,9 @@
 
 					const csv = createCSV(rawData);
 
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).join("-");
+					const currentDate = new Date();
 
-					const fileName = "Clusters Overview " + yearsList + ".csv";
+					const fileName = "ClustersOverview" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -863,7 +862,22 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", clickButtonsRects);
+					.on("click", function(d) {
+						const self = this;
+						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function() {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, false);
+								};
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, true);
+							localVariable.set(this, null);
+						};
+					});
 
 				buttonsModalitiesRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsModalitiesRects)
@@ -1280,9 +1294,9 @@
 				//end of createBeneficiariesPanel
 			};
 
-			function clickButtonsRects(d) {
+			function clickButtonsRects(d, singleSelection) {
 
-				if (d3.event.altKey) {
+				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -1982,24 +1996,24 @@
 				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
 
 			const yearAnnotationRect = helpSVG.append("rect")
-				.attr("x", 20 - padding)
+				.attr("x", 10 - padding)
 				.attr("y", 130 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 20)
+				.attr("x", 10)
 				.attr("y", 130)
-				.text("Use these buttons to select year. Press ALT when clicking to select just a single year")
-				.call(wrapText2, 300);
+				.text("Use these buttons to select year. Double click or press ALT when clicking to select a single year")
+				.call(wrapText2, 330);
 
 			const yearPath = helpSVG.append("path")
 				.style("fill", "none")
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M315,126 Q335,126 335,142");
+				.attr("d", "M335,126 Q355,126 355,142");
 
 			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);

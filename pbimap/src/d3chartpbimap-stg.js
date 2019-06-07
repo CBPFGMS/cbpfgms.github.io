@@ -90,6 +90,7 @@
 			windowHeight = window.innerHeight,
 			brighterFactor = 0.3,
 			currentYear = new Date().getFullYear(),
+			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			adminLocLevels = 6,
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
@@ -142,7 +143,7 @@
 			promises = [],
 			filterTitles = ["Year", "CBPF", "Partner Type", "Cluster", "Allocation Type", "Location Level"],
 			filterColorsArray = ["#E8F5D6", "#F1E9DA", "#E4D8F3", "#E6E6E6", "#F8D8D3", "#D4E5F7"],
-			listHeader = ["Project Code", "Project Title", "Cluster", "Partner Type", "Allocation Type", "Beneficiaries", "Allocations"],
+			listHeader = ["Project Code", "Project Title", "Cluster", "Partner Type", "Allocation Type", "Targeted People", "Allocations"],
 			listHeadersWidth = ["18%", "28%", "12%", "12%", "12%", "9%", "9%"],
 			listRowsWidth = ["18%", "28.5%", "12%", "12%", "12.5%", "8.5%", "8.5%"],
 			chartState = {
@@ -424,17 +425,13 @@
 
 			downloadIcon.on("click", function() {
 
-				const years = chartState.selectedYear.map(function(d) {
-					return d;
-				}).sort(function(a, b) {
-					return a - b;
-				}).join("-");
-
 				const data = filterData();
 
 				const csv = createCsv(data.map);
 
-				const fileName = "Allocations Overview " + years + ".csv";
+				const currentDate = new Date();
+
+				const fileName = "AllocationsOverview" + csvDateFormat(currentDate) + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -543,7 +540,7 @@
 				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
 				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[1]))
 				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[1]))
-				.text("Beneficiaries targeted");
+				.text("Targeted People");
 
 			const partnersLogo = topSvg.selectAll(".pbimapTopSvgPartnersLogo")
 				.data([true])
@@ -1520,7 +1517,7 @@
 					"</span></div><div style='display:flex;flex:0 54%;'>Number of partners:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor pbimapTooltipTitle2'>" + datum.numberOfPartners +
 					"</span></div><div style='display:flex;flex:0 54%;'>Number of projects:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor pbimapTooltipTitle2'>" + datum.numberOfProjects +
 					"</span></div></div>" + divSpacer + "<span class='pbimapTooltipTitle2'>" + formatMoney0Decimals(datum.beneficiaries) +
-					" Beneficiaries:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Generate List of Projects</button></div>");
+					" Targeted People:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Generate List of Projects</button></div>");
 
 			createTooltipSvg();
 
@@ -1672,7 +1669,9 @@
 
 					const csv = createCsvProjects(data);
 
-					const fileName = "ProjectsList.csv";
+					const currentDate = new Date();
+
+					const fileName = "ProjectsList" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -1749,7 +1748,7 @@
 
 			rowCell.html(function(d) {
 				const parentData = d3.select(this.parentNode.parentNode).datum();
-				if (d === "Beneficiaries") {
+				if (d === "Targeted People") {
 					let total = 0;
 					beneficiariesList.forEach(function(e) {
 						total += parentData["AdmLocBenClustAgg" + (chartState.selectedAdminLevel || 1) + e]
