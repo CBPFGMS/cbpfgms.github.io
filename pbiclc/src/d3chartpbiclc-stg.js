@@ -2695,21 +2695,18 @@
 			const fileName = "contributions.png";
 
 			source.toBlob(function(blob) {
-				if (navigator.msSaveBlob) {
-					navigator.msSaveBlob(blob, filename);
-				} else {
-					const link = document.createElement("a");
-					if (link.download !== undefined) {
-						const url = URL.createObjectURL(blob);
-						link.setAttribute("href", url);
-						link.setAttribute("download", fileName);
-						link.style = "visibility:hidden";
-						document.body.appendChild(link);
-						link.click();
-						document.body.removeChild(link);
-					};
+				const link = document.createElement("a");
+				if (link.download !== undefined) {
+					const url = URL.createObjectURL(blob);
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
 				};
 			});
+
 		};
 
 		function downloadSnapshotPdf(source) {
@@ -2955,6 +2952,31 @@
 
 	Math.log10 = Math.log10 || function(x) {
 		return Math.log(x) * Math.LOG10E;
+	};
+
+	//toBlob
+
+	if (!HTMLCanvasElement.prototype.toBlob) {
+		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			value: function(callback, type, quality) {
+				var dataURL = this.toDataURL(type, quality).split(',')[1];
+				setTimeout(function() {
+
+					var binStr = atob(dataURL),
+						len = binStr.length,
+						arr = new Uint8Array(len);
+
+					for (var i = 0; i < len; i++) {
+						arr[i] = binStr.charCodeAt(i);
+					}
+
+					callback(new Blob([arr], {
+						type: type || 'image/png'
+					}));
+
+				});
+			}
+		});
 	};
 
 	//END OF POLYFILLS
