@@ -96,12 +96,14 @@
 			defaultYMaxValue = 100000000,
 			chartTitleDefault = "Contribution Trends",
 			currencyLabelPadding = 8,
-			futureTextPadding = 8,
+			futureTextPadding = 13,
+			futureTextHorizontalPadding = 10,
 			duration = 1000,
 			excelIconSize = 20,
 			checkboxesLimit = 20,
 			checkboxesLimitTrend = 10,
-			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
+			unBlue = "#418FDE",
+			colorsArray = ["#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D", "#a6cee3", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"],
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			chartState = {
 				selectedDonors: [],
@@ -225,7 +227,7 @@
 
 		createProgressWheel();
 
-		const tooltip = d3.select("body").append("div")
+		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiclitooltipdiv")
 			.style("display", "none");
 
@@ -309,19 +311,25 @@
 			.tickSizeInner(-(donorsLinesPanel.width - donorsLinesPanel.padding[3] - donorsLinesPanel.padding[1]))
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(formatSIaxes);
+			.tickFormat(function(d) {
+				return formatSIaxes(d).replace("G", "B");
+			});
 
 		const yAxisCbpfs = d3.axisLeft(yScaleCbpfs)
 			.tickSizeInner(-(cbpfsLinesPanel.width - cbpfsLinesPanel.padding[3] - cbpfsLinesPanel.padding[1]))
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(formatSIaxes);
+			.tickFormat(function(d) {
+				return formatSIaxes(d).replace("G", "B");
+			});
 
 		const yAxisDonorsLocalCurrency = d3.axisRight(yScaleDonorsLocalCurrency)
 			.tickSizeInner(3)
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(formatSIaxes);
+			.tickFormat(function(d) {
+				return formatSIaxes(d).replace("G", "B");
+			});
 
 		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
 			.then(function(rawData) {
@@ -410,6 +418,52 @@
 				.attr("y", cbpfsLinesPanel.padding[0] - currencyLabelPadding)
 				.text("USD");
 
+			const currentYearGroupDonors = donorsLinesPanel.main.append("g")
+				.attr("class", "pbicliCurrentYearGroupDonors");
+
+			currentYearGroupDonors.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear - 1)) + ",0)");
+
+			const currentYearRectDonors = currentYearGroupDonors.append("rect")
+				.attr("x", 0)
+				.attr("y", donorsLinesPanel.padding[0])
+				.attr("width", xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1)))
+				.attr("height", donorsLinesPanel.height - donorsLinesPanel.padding[2] - donorsLinesPanel.padding[0])
+				.style("fill", "#f2f2f2");
+
+			const currentYearTextDonors = currentYearGroupDonors.append("text")
+				.attr("class", "pbicliFutureDonationsText")
+				.attr("y", 4)
+				.attr("x", (xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1))) / 2)
+				.attr("text-anchor", "middle")
+				.text("Current")
+				.append("tspan")
+				.attr("dy", "0.9em")
+				.attr("x", (xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1))) / 2)
+				.text("year");
+
+			const currentYearGroupCbpfs = cbpfsLinesPanel.main.append("g")
+				.attr("class", "pbicliCurrentYearGroupCbpfs");
+
+			currentYearGroupCbpfs.attr("transform", "translate(" + xScaleCbpfs(parseTime(currentYear - 1)) + ",0)");
+
+			const currentYearRectCbpfs = currentYearGroupCbpfs.append("rect")
+				.attr("x", 0)
+				.attr("y", cbpfsLinesPanel.padding[0])
+				.attr("width", xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1)))
+				.attr("height", cbpfsLinesPanel.height - cbpfsLinesPanel.padding[2] - cbpfsLinesPanel.padding[0])
+				.style("fill", "#f2f2f2");
+
+			const currentYearTextCbpfs = currentYearGroupCbpfs.append("text")
+				.attr("class", "pbicliFutureDonationsText")
+				.attr("y", 4)
+				.attr("x", (xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1))) / 2)
+				.attr("text-anchor", "middle")
+				.text("Current")
+				.append("tspan")
+				.attr("dy", "0.9em")
+				.attr("x", (xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1))) / 2)
+				.text("year");
+
 			const futureDonationsGroupDonors = donorsLinesPanel.main.append("g")
 				.attr("class", "pbicliFutureDonationsGroupDonors")
 				.style("opacity", chartState.futureDonations ? 1 : 0);
@@ -428,7 +482,8 @@
 			const futureDonationsTextDonors = futureDonationsGroupDonors.append("text")
 				.attr("class", "pbicliFutureDonationsText")
 				.attr("y", futureTextPadding)
-				.text("Future Donations");
+				.attr("x", futureTextHorizontalPadding)
+				.text("Future pledges");
 
 			const futureDonationsGroupCbpfs = cbpfsLinesPanel.main.append("g")
 				.attr("class", "pbicliFutureDonationsGroupCbpfs")
@@ -448,7 +503,8 @@
 			const futureDonationsTextCbpfs = futureDonationsGroupCbpfs.append("text")
 				.attr("class", "pbicliFutureDonationsText")
 				.attr("y", futureTextPadding)
-				.text("Future Donations");
+				.attr("x", futureTextHorizontalPadding)
+				.text("Future pledges");
 
 			const groupXAxisDonors = donorsLinesPanel.main.append("g")
 				.attr("class", "pbicligroupXAxisDonors")
@@ -937,7 +993,7 @@
 				const textDiv = selectedDonorsEnter.append("div")
 					.attr("class", "pbicliSelectedDonorsDivText")
 					.html(function(d) {
-						return "<span style='color:" + scaleColorsDonors(d) + ";'>&#9679; </span>" +
+						return "<span style='color:" + (d === "alldonors" ? unBlue : scaleColorsDonors(d)) + ";'>&#9679; </span>" +
 							(d === "alldonors" ? "All Donors&nbsp;" : iso2Names[d])
 					});
 
@@ -1340,8 +1396,23 @@
 				const xAxisDonorsRightMargin = xScaleDonors(xScaleDonors.domain()[1]) -
 					xScaleDonors(d3.timeMonth.offset(xScaleDonors.domain()[1], -monthsMargin));
 
-				futureDonationsGroupDonors.style("opacity", chartState.futureDonations ? 1 : 0)
+				futureDonationsGroupDonors.transition()
+					.duration(duration)
+					.style("opacity", chartState.futureDonations ? 1 : 0)
 					.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear)) + ",0)");
+
+				currentYearGroupDonors.transition()
+					.duration(duration)
+					.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear - 1)) + ",0)");
+
+				currentYearRectDonors.transition()
+					.duration(duration)
+					.attr("width", xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1)));
+
+				currentYearGroupDonors.selectAll("text, tspan")
+					.transition()
+					.duration(duration)
+					.attr("x", (xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1))) / 2);
 
 				const donorsGroup = donorsLinesPanel.main.selectAll(".pbicliDonorsGroup")
 					.data(donorsDataUntilPresent, function(d) {
@@ -1357,7 +1428,7 @@
 				const donorsPath = donorsGroupEnter.append("path")
 					.attr("class", "pbicliDonorsPath")
 					.style("stroke", function(d) {
-						return scaleColorsDonors(d.isoCode);
+						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values)
@@ -1397,7 +1468,7 @@
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
 					.style("fill", function(d) {
-						return scaleColorsDonors(d.isoCode);
+						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -1436,7 +1507,7 @@
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
 					.style("fill", function(d) {
-						return scaleColorsDonors(d.isoCode);
+						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -1468,7 +1539,7 @@
 				const donorsPathFuture = donorsGroupFutureEnter.append("path")
 					.attr("class", "pbicliDonorsPathFuture")
 					.style("stroke", function(d) {
-						return scaleColorsDonors(d.isoCode);
+						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values)
@@ -1515,7 +1586,7 @@
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
 					.style("fill", function(d) {
-						return scaleColorsDonors(d.isoCode);
+						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.transition()
 					.delay(function(_, i, n) {
@@ -2212,8 +2283,23 @@
 				const xAxisCbpfsRightMargin = xScaleCbpfs(xScaleCbpfs.domain()[1]) -
 					xScaleCbpfs(d3.timeMonth.offset(xScaleCbpfs.domain()[1], -monthsMargin));
 
-				futureDonationsGroupCbpfs.style("opacity", chartState.futureDonations ? 1 : 0)
+				futureDonationsGroupCbpfs.transition()
+					.duration(duration)
+					.style("opacity", chartState.futureDonations ? 1 : 0)
 					.attr("transform", "translate(" + xScaleCbpfs(parseTime(currentYear)) + ",0)");
+
+				currentYearGroupCbpfs.transition()
+					.duration(duration)
+					.attr("transform", "translate(" + xScaleCbpfs(parseTime(currentYear - 1)) + ",0)");
+
+				currentYearRectCbpfs.transition()
+					.duration(duration)
+					.attr("width", xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1)));
+
+				currentYearGroupCbpfs.selectAll("text, tspan")
+					.transition()
+					.duration(duration)
+					.attr("x", (xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1))) / 2);
 
 				const cbpfsGroup = cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup")
 					.data(cbpfsDataUntilPresent, function(d) {
@@ -2591,11 +2677,14 @@
 
 				const spanClass = type === "donor" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
 
-				const thisWidth = type === "donor" ? 290 : 250;
-
 				const mouse = d3.mouse(thisPanel.main.node());
 
+				const mouseContainer = d3.mouse(containerDiv.node());
+
 				const mouseYear = d3.timeMonth.offset(xScale.invert(mouse[0]), 6).getFullYear().toString();
+
+				const thisWidth = type === "donor" && chartState.showTrend && chartState.futureDonations && (+mouseYear) >= currentYear ? 350 :
+					type === "donor" ? 260 : 220;
 
 				const thisData = [];
 
@@ -2607,6 +2696,11 @@
 					const thisYear = country.values.find(function(e) {
 						return e.year === mouseYear;
 					});
+					const thisTrendObject = type === "donor" && chartState.showTrend && chartState.futureDonations ?
+						country.trendValues.find(function(e) {
+							return e.year === mouseYear;
+						}) : null;
+					const thisTrend = thisTrendObject && thisTrendObject.total ? thisTrendObject.total : null;
 					if (thisYear && thisYear.total > 0) {
 						thisData.push({
 							name: country.isoCode,
@@ -2614,7 +2708,8 @@
 							year: mouseYear,
 							type: type,
 							local: localData,
-							localCurrency: localCurrency
+							localCurrency: localCurrency,
+							trend: thisTrend
 						})
 					};
 				});
@@ -2629,16 +2724,30 @@
 						type.charAt(0).toUpperCase() + type.slice(1) + "s" :
 						type.charAt(0).toUpperCase() + type.slice(1);
 
-					let tooltipHtml = "<span style='margin-bottom:-8px;display:block;'>" + typeTitle + " in <strong>" + mouseYear +
-						"</strong>:</span><br><div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'>";
+					const trendTitle = thisData.length > 1 ? "(trends)" : "(trend)";
+
+					let tooltipHtml;
+
+					if (chartState.showTrend && chartState.futureDonations && type === "donor" && (+mouseYear) >= currentYear) {
+						tooltipHtml = "<div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'><div style='display:flex;flex:0 75%;'><span>" + typeTitle + " in <strong>" + mouseYear +
+							"</strong>:</span></div><div style='display:flex;flex:0 25%;justify-content: center;'><span style='color: gray;'>" + trendTitle + "</span></div><div style='height:8px;display:flex;flex:0 100%;'></div>";
+					} else {
+						tooltipHtml = "<div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'><div style='display:flex;flex:0 100%;'><span>" + typeTitle + " in <strong>" + mouseYear +
+							"</strong>:</span></div><div style='height:8px;display:flex;flex:0 100%;'></div>";
+					};
 
 					for (let i = 0; i < thisData.length; i++) {
 						const currency = type === "donor" && chartState.showLocal ? " (" + thisData[i].localCurrency + ")" : "";
-						const thisColor = type === "donor" && thisData[i].localCurrency !== "USD" ? "darkslategray" : thisColorScale(thisData[i].name)
-						tooltipHtml += "<div style='display:flex;flex:0 60%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
-							iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'><span class='" +
-							spanClass + "'>" + formatMoney0Decimals(thisData[i].total) +
-							"</span></div>"
+						const thisColor = type === "donor" && thisData[i].localCurrency !== "USD" ? "darkslategray" : thisData[i].name === "alldonors" ? unBlue : thisColorScale(thisData[i].name);
+						if (chartState.showTrend && chartState.futureDonations && type === "donor" && (+mouseYear) >= currentYear) {
+							tooltipHtml += "<div style='display:flex;flex:0 45%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
+								iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 25%;justify-content:flex-end;'><span class='" +
+								spanClass + "'>" + formatMoney0Decimals(thisData[i].total) + "</span></div><div style='display:flex;flex:0 30%;justify-content:flex-end;'><span style='color: gray;'>" + formatMoney0Decimals(thisData[i].trend) + "</span></div>";
+						} else {
+							tooltipHtml += "<div style='display:flex;flex:0 60%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
+								iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'><span class='" +
+								spanClass + "'>" + formatMoney0Decimals(thisData[i].total) + "</span></div>";
+						};
 					};
 
 					tooltipHtml += "</div>";
@@ -2647,7 +2756,7 @@
 						.data([true]);
 
 					const tooltipGroupEnter = tooltipGroup.enter()
-						.insert("g", ":first-child")
+						.insert("g", ":nth-child(4)")
 						.attr("class", "pbicliTooltipGroup")
 						.attr("pointer-events", "none");
 
@@ -2696,15 +2805,38 @@
 							return d.local ? yScaleDonorsLocalCurrency(d.total) : yScale(d.total);
 						});
 
+					const circlesTrend = tooltipGroup.selectAll(".pbicliTooltipCirclesTrend")
+						.data(thisData.filter(function(d) {
+							return d.trend;
+						}), function(d) {
+							return d.name
+						});
+
+					const circlesExitTrend = circlesTrend.exit().remove();
+
+					const circlesEnterTrend = circlesTrend.enter()
+						.append("circle")
+						.attr("class", "pbicliTooltipCirclesTrend")
+						.attr("r", circleRadius + 2)
+						.style("fill", "none")
+						.style("stroke", "darkgray")
+						.merge(circlesTrend)
+						.attr("cx", function(d) {
+							return xScale(parseTime(d.year))
+						})
+						.attr("cy", function(d) {
+							return yScale(d.trend);
+						});
+
 					tooltip.style("display", "block");
 
 					const tooltipSize = tooltip.node().getBoundingClientRect();
 
 					tooltip.html(tooltipHtml)
-						.style("top", d3.event.pageY - (tooltipSize.height / 2) + "px")
+						.style("top", mouseContainer[1] - (tooltipSize.height / 2) + "px")
 						.style("left", mouse[0] > thisPanel.width - 16 - tooltipSize.width && type === "cbpf" ?
-							d3.event.pageX - tooltipSize.width - 16 + "px" :
-							d3.event.pageX + 16 + "px");
+							mouseContainer[0] - tooltipSize.width - 16 + "px" :
+							mouseContainer[0] + 16 + "px");
 
 				} else {
 
@@ -2867,7 +2999,7 @@
 
 			checkboxFuture.append("span")
 				.attr("class", "pbicliRadioLabel")
-				.text("Show future donations");
+				.text("Show future pledges");
 
 			const checkboxTrend = filtersDiv.append("label")
 				.attr("class", "pbicliCheckboxTrend")
@@ -2880,7 +3012,7 @@
 
 			checkboxTrend.append("span")
 				.attr("class", "pbicliRadioLabel")
-				.text("Show donations trend")
+				.text("Show statistical trend")
 				.style("opacity", chartState.futureDonations ? 1 : checkboxOpacity);
 
 			//end of createFilters
@@ -3662,8 +3794,7 @@
 
 		function downloadData(data, rawData) {
 
-			if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length ||
-				chartState.selectedDonors.length === 1 && chartState.selectedDonors[0] === "alldonors") {
+			if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
 				return
 			};
 
@@ -3727,15 +3858,40 @@
 					return d.isoCode;
 				}) : checkedCbpfsList;
 
+			const allDonorsData = [];
+
+			if (selectedDonorsList.indexOf("alldonors") > -1) {
+				rawData.forEach(function(d) {
+					const found = allDonorsData.find(function(e) {
+						return e["CBPF Name"] === d.PooledFundName && e.Year === +d.FiscalYear;
+					});
+					if (found) {
+						found["Paid Amount"] += Math.round(+d.PaidAmt * 100) / 100;
+						found["Pledged Amount"] += Math.round(+d.PledgeAmt * 100) / 100;
+						found["Total Contributions"] += Math.round(((+d.PledgeAmt) + (+d.PaidAmt)) * 100) / 100;
+					} else {
+						allDonorsData.push({
+							Year: +d.FiscalYear,
+							"Donor Name": "All Donors",
+							"CBPF Name": d.PooledFundName,
+							"Paid Amount": Math.round(+d.PaidAmt * 100) / 100,
+							"Pledged Amount": Math.round(+d.PledgeAmt * 100) / 100,
+							"Total Contributions": Math.round(((+d.PledgeAmt) + (+d.PaidAmt)) * 100) / 100,
+							"Paid Amount (Local Currency)": "n/a",
+							"Pledged Amount (Local Currency)": "n/a",
+							"Total Contributions (Local Currency)": "n/a",
+							"Exchange Rate": "n/a",
+							"Local Currency": "n/a"
+						});
+					};
+				});
+			};
+
 			const filteredDataRaw = rawData.filter(function(row) {
 				return selectedDonorsList.indexOf(row.GMSDonorISO2Code.toLowerCase()) > -1 && selectedCbpfsList.indexOf(row.PooledFundISO2Code.toLowerCase()) > -1;
-			}).sort(function(a, b) {
-				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
-					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
-					a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
 			});
 
-			const filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
+			let filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
 
 			filteredData.forEach(function(d) {
 				d.Year = +d.FiscalYear;
@@ -3764,6 +3920,14 @@
 				delete d.GMSDonorISO2Code;
 				delete d.PooledFundISO2Code;
 
+			});
+
+			if (selectedDonorsList.indexOf("alldonors") > -1) filteredData = allDonorsData.concat(filteredData);
+
+			filteredData.sort(function(a, b) {
+				return (+b.Year) - (+a.Year) || (a["Donor Name"].toLowerCase() < b["Donor Name"].toLowerCase() ? -1 :
+					a["Donor Name"].toLowerCase() > b["Donor Name"].toLowerCase() ? 1 : 0) || (a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
+					a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
 			});
 
 			const header = Object.keys(filteredData[0]);
