@@ -103,7 +103,7 @@
 			checkboxesLimit = 20,
 			checkboxesLimitTrend = 10,
 			unBlue = "#418FDE",
-			colorsArray = ["#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D", "#a6cee3", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"],
+			colorsArray = ["#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D", "#a6cee3", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928"],
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			chartState = {
 				selectedDonors: [],
@@ -132,6 +132,8 @@
 				total: 0,
 				values: []
 			};
+
+		let yearsExtent;
 
 		const containerDiv = d3.select("#d3chartcontainerpbicli");
 
@@ -345,6 +347,8 @@
 				});
 
 				const list = processList(rawData);
+
+				yearsExtent = d3.extent(list.yearsArray);
 
 				scaleColorsDonors.domain(list.donorsArray);
 
@@ -2683,8 +2687,10 @@
 
 				const mouseYear = d3.timeMonth.offset(xScale.invert(mouse[0]), 6).getFullYear().toString();
 
-				const thisWidth = type === "donor" && chartState.showTrend && chartState.futureDonations && (+mouseYear) >= currentYear ? 350 :
+				let thisWidth = type === "donor" && chartState.showTrend && chartState.futureDonations && (+mouseYear) >= currentYear ? 350 :
 					type === "donor" ? 260 : 220;
+
+				if (chartState.showLocal && type === "donor") thisWidth += 50;
 
 				const thisData = [];
 
@@ -2696,6 +2702,9 @@
 					const thisYear = country.values.find(function(e) {
 						return e.year === mouseYear;
 					});
+					const thisTrendYear = type === "donor" && chartState.showTrend && chartState.futureDonations ? country.trendValues.find(function(e) {
+						return e.year === mouseYear;
+					}) : null;
 					const thisTrendObject = type === "donor" && chartState.showTrend && chartState.futureDonations ?
 						country.trendValues.find(function(e) {
 							return e.year === mouseYear;
@@ -2710,12 +2719,30 @@
 							local: localData,
 							localCurrency: localCurrency,
 							trend: thisTrend
-						})
+						});
+					} else if (thisTrendYear) {
+						thisData.push({
+							name: country.isoCode,
+							total: "n/a",
+							year: mouseYear,
+							type: type,
+							local: localData,
+							localCurrency: localCurrency,
+							trend: thisTrend
+						});
 					};
 				});
 
 				thisData.sort(function(a, b) {
-					return b.total - a.total;
+					if (+a.total && +b.total) {
+						return b.total - a.total;
+					} else if (+a.total !== +a.total && +b.total === +b.total) {
+						return 1;
+					} else if (+b.total !== +b.total && +a.total === +a.total) {
+						return -1;
+					} else {
+						return b.trend - a.trend;
+					};
 				});
 
 				if (thisData.length) {
@@ -2742,7 +2769,7 @@
 						if (chartState.showTrend && chartState.futureDonations && type === "donor" && (+mouseYear) >= currentYear) {
 							tooltipHtml += "<div style='display:flex;flex:0 45%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
 								iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 25%;justify-content:flex-end;'><span class='" +
-								spanClass + "'>" + formatMoney0Decimals(thisData[i].total) + "</span></div><div style='display:flex;flex:0 30%;justify-content:flex-end;'><span style='color: gray;'>" + formatMoney0Decimals(thisData[i].trend) + "</span></div>";
+								spanClass + "'>" + (thisData[i].total === "n/a" ? thisData[i].total : formatMoney0Decimals(thisData[i].total)) + "</span></div><div style='display:flex;flex:0 30%;justify-content:flex-end;'><span style='color: gray;'>" + formatMoney0Decimals(thisData[i].trend) + "</span></div>";
 						} else {
 							tooltipHtml += "<div style='display:flex;flex:0 60%;'><span style='color:" + thisColor + ";'>&#9679;&nbsp;</span>" +
 								iso2Names[thisData[i].name] + currency + ":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'><span class='" +
@@ -2779,7 +2806,9 @@
 						.attr("y2", thisPanel.height - thisPanel.padding[2]);
 
 					const circles = tooltipGroup.selectAll(".pbicliTooltipCircles")
-						.data(thisData, function(d) {
+						.data(thisData.filter(function(d) {
+							return d.total !== "n/a";
+						}), function(d) {
 							return d.name
 						});
 
@@ -3120,13 +3149,13 @@
 				if (!checkedCbpfs[row.PooledFundISO2Code]) checkedCbpfs[row.PooledFundISO2Code] = true;
 
 				if (totals.donorsTotals[row.GMSDonorISO2Code] === undefined) {
-					totals.donorsTotals[row.GMSDonorISO2Code] = 0;
+					totals.donorsTotals[row.GMSDonorISO2Code] = +row.PaidAmt;
 				} else {
 					totals.donorsTotals[row.GMSDonorISO2Code] += +row.PaidAmt;
 				};
 
 				if (totals.cbpfsTotals[row.PooledFundISO2Code] === undefined) {
-					totals.cbpfsTotals[row.PooledFundISO2Code] = 0;
+					totals.cbpfsTotals[row.PooledFundISO2Code] = +row.PaidAmt;
 				} else {
 					totals.cbpfsTotals[row.PooledFundISO2Code] += +row.PaidAmt;
 				};
@@ -3332,7 +3361,6 @@
 								localTotal: (+row.PaidAmtLocal) + (+row.PledgeAmtLocal)
 							}]
 						});
-
 					};
 				})
 			};
@@ -3352,9 +3380,27 @@
 							total: e.total
 						};
 					});
+					if (!trendData.length) {
+						donor.trendValues = [{
+							year: yearsExtent[1],
+							total: 0
+						}];
+						fillZeros(donor.values);
+						return;
+					};
+					const lastTrendDataYear = trendData[trendData.length - 1].year;
+					if (+lastTrendDataYear < +yearsExtent[1]) {
+						const yearsRange = d3.range(+lastTrendDataYear + 1, +yearsExtent[1] + 1, 1);
+						yearsRange.forEach(function(d) {
+							trendData.push({
+								year: d.toString(),
+								total: 0
+							});
+						});
+					};
 					const resultTrend = linearRegression(pastRawData);
 					trendData.forEach(function(d, i) {
-						if (i) d.total = resultTrend.predict(+d.year)[1];
+						if (i) d.total = Math.max(resultTrend.predict(+d.year)[1], 0);
 					});
 					donor.trendValues = trendData;
 				};
