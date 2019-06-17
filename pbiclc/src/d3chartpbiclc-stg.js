@@ -634,7 +634,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "CBPFcontributions " + csvDateFormat(currentDate) + ".csv";
+					const fileName = "CBPFcontributions_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

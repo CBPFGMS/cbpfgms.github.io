@@ -414,7 +414,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "AllocationsByOrgType" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "AllocationsByOrgType_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

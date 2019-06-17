@@ -431,7 +431,7 @@
 
 				const currentDate = new Date();
 
-				const fileName = "AllocationsOverview" + csvDateFormat(currentDate) + ".csv";
+				const fileName = "AllocationsOverview_" + csvDateFormat(currentDate) + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -1671,7 +1671,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "ProjectsList" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "ProjectsList_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

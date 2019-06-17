@@ -339,7 +339,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "AllocationTrends" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "AllocationTrends_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

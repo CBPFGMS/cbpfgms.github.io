@@ -3550,7 +3550,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "ContributionTrends" + csvDateFormat(currentDate) + ".csv";
+			const fileName = "ContributionTrends_" + csvDateFormat(currentDate) + ".csv";
 
 			const blob = new Blob([csv], {
 				type: 'text/csv;charset=utf-8;'

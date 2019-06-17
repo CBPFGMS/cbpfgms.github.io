@@ -402,7 +402,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "ClustersOverview" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "ClustersOverview_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

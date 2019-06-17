@@ -448,7 +448,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "ContributionsFlow" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "ContributionsFlow_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'

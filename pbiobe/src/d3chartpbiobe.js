@@ -346,7 +346,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "AffectedPersons" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "AffectedPersons_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
