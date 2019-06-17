@@ -3368,7 +3368,7 @@
 			data.donors.forEach(function(donor) {
 				if (chartState.showTrend && chartState.futureDonations) {
 					const pastRawData = donor.values.filter(function(e) {
-						return +e.year <= currentYear - 1
+						return +e.year <= currentYear - 1 && +e.year > 2012;
 					}).map(function(e) {
 						return [+e.year, e.total];
 					});
