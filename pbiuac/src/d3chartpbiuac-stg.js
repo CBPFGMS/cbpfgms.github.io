@@ -4,8 +4,10 @@
 		hasFetch = window.fetch,
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js";
+
+	//CHANGE CSS LINK!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -90,6 +92,7 @@
 			currentYear = currentDate.getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
+			timeFormat = parseDate = d3.timeFormat("%d %b %Y"),
 			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Timeline",
 			panelHorizontalPadding = 12,
@@ -99,6 +102,8 @@
 			rectangleColors = ["#418fde", "#eca154"],
 			todayColor = "#9063CD",
 			todayPadding = 10,
+			offsetStartDefault = 6,
+			offsetEndDefault = 6,
 			formatMoney0Decimals = d3.format(",.0f"),
 			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(0.6), d3.color(rectangleColors[0]).darker(0.6)),
 			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(0.6), d3.color(rectangleColors[1]).darker(0.6)),
@@ -123,7 +128,7 @@
 			maxAllocationValueStandard = Number.NEGATIVE_INFINITY,
 			minAllocationValueReserve = Number.POSITIVE_INFINITY,
 			maxAllocationValueReserve = Number.NEGATIVE_INFINITY,
-			brushDomain = null;
+			overTooltip = false;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
@@ -132,6 +137,18 @@
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
+
+		const offsetStartValue = +(containerDiv.node().getAttribute("data-offsetstart"));
+
+		const offsetEndValue = +(containerDiv.node().getAttribute("data-offsetend"));
+
+		const offsetStart = offsetStartValue === offsetStartValue ? Math.abs(offsetStartValue) : offsetStartDefault;
+
+		const offsetEnd = offsetEndValue === offsetEndValue ? Math.abs(offsetEndValue) : offsetEndDefault;
+
+		const offsetStartDate = d3.timeMonth.offset(currentDate, -offsetStart);
+
+		const offsetEndDate = d3.timeMonth.offset(currentDate, offsetEnd);
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -175,8 +192,8 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			moneyBagPadding: 94,
-			leftPadding: [186, 474, 632],
+			moneyBagPadding: 40,
+			leftPadding: [182, 394, 552, 740],
 			mainValueVerPadding: 10,
 			mainValueHorPadding: 4
 		};
@@ -258,13 +275,12 @@
 			.on("brush", brushed)
 			.on("end", function() {
 				if (d3.event.selection) {
-					brushDomain = [d3.brushSelection(this)[0], d3.brushSelection(this)[1]];
+					return;
 				} else {
 					brushed();
 					brushPanel.main.select(".pbiuacBrushGroup").call(brush.move, xScaleBrush.range());
-					brushDomain = null;
 				}
-			})
+			});
 
 		const zoom = d3.zoom()
 			.scaleExtent([1, Infinity])
@@ -404,6 +420,10 @@
 				return d.timeLine === "ongoing";
 			}).length;
 
+			const pastValue = data.filter(function(d) {
+				return d.timeLine === "past";
+			}).length;
+
 			const topPanelMoneyBag = topPanel.main.selectAll(".pbiuactopPanelMoneyBag")
 				.data([true])
 				.enter()
@@ -422,6 +442,8 @@
 			const previousUpcoming = d3.select(".pbiuactopPanelUpcomingNumber").size() !== 0 ? d3.select(".pbiuactopPanelUpcomingNumber").datum() : 0;
 
 			const previousOngoing = d3.select(".pbiuactopPanelOngoingNumber").size() !== 0 ? d3.select(".pbiuactopPanelOngoingNumber").datum() : 0;
+
+			const previousPast = d3.select(".pbiuactopPanelPastNumber").size() !== 0 ? d3.select(".pbiuactopPanelPastNumber").datum() : 0;
 
 			let mainValueGroup = topPanel.main.selectAll(".pbiuacmainValueGroup")
 				.data([true]);
@@ -583,6 +605,51 @@
 				.merge(topPanelOngoingTextSubText)
 				.text(ongoingValue > 1 ? "Allocations" : "Allocation");
 
+			let topPanelPastNumber = mainValueGroup.selectAll(".pbiuactopPanelPastNumber")
+				.data([pastValue]);
+
+			topPanelPastNumber = topPanelPastNumber.enter()
+				.append("text")
+				.attr("class", "pbiuactopPanelPastNumber contributionColorFill")
+				.attr("text-anchor", "end")
+				.merge(topPanelPastNumber)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[3] - topPanel.mainValueHorPadding);
+
+			topPanelPastNumber.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousPast, d);
+					return function(t) {
+						node.textContent = ~~(i(t));
+					};
+				});
+
+			let topPanelPastText = mainValueGroup.selectAll(".pbiuactopPanelPastText")
+				.data([true]);
+
+			topPanelPastText = topPanelPastText.enter()
+				.append("text")
+				.attr("class", "pbiuactopPanelPastText")
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.merge(topPanelPastText)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3)
+				.text("Closed");
+
+			let topPanelPastTextSubText = mainValueGroup.selectAll(".pbiuactopPanelPastTextSubText")
+				.data([true]);
+
+			topPanelPastTextSubText = topPanelPastTextSubText.enter()
+				.append("text")
+				.attr("class", "pbiuactopPanelPastTextSubText")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.merge(topPanelOngoingTextSubText)
+				.text(pastValue > 1 ? "Allocations" : "Allocation");
+
 			//end of createTopPanel
 		};
 
@@ -685,7 +752,74 @@
 				})
 				.style("stroke", "#666")
 				.style("stroke-width", "1px")
-				.attr("clip-path", "url(#pbiuacclip)");
+				.attr("clip-path", "url(#pbiuacclip)")
+				.on("mouseover", function(d) {
+					mouseOverAllocation(d, this);
+				})
+				.on("mousemove", function(d) {
+					mouseMoveAllocation(d, this);
+				})
+				.on("mouseout", mouseOutAllocation);
+
+			function mouseOverAllocation(datum, element) {
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = element.getBoundingClientRect();
+
+				const mouse = d3.mouse(svg.node());
+
+				const innerTooltip = tooltip.append("div")
+					.attr("id", "pbiuacInnerTooltipDiv");
+
+				innerTooltip.html("<div class='contributionColorHTMLcolor'><b>" + datum.AllocationTitle + "</b></div><div class='pbiuacSpacer'></div>CBPF: <b>" +
+					datum.PooledFundName + "</b><br>Amount: $<b>" + formatMoney0Decimals(datum.TotalUSDPlanned) +
+					"</b><div class='pbiuacSpacer'></div>Start Date: " + timeFormat(datum.PlannedStartDate) + "<br>End Date: " +
+					timeFormat(datum.PlannedEndDate) + "<div class='pbiuacSpacer'></div><div class='pbiuacTooltipButtonDiv' style='height:30px;display:flex;justify-content:center;align-items:center;'><button>Display Details</button></div>");
+
+				tooltip.style("display", "block");
+
+				tooltip.on("mouseenter", function() {
+					overTooltip = true;
+				}).on("mouseleave", function() {
+					overTooltip = false;
+					mouseOutAllocation();
+				});
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
+						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
+					.style("top", thisSize.y - containerSize.y - tooltipSize.height + "px");
+			};
+
+			function mouseMoveAllocation(datum, element) {
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = element.getBoundingClientRect();
+
+				const mouse = d3.mouse(svg.node());
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("display", "block")
+
+				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
+						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
+					.style("top", thisSize.y - containerSize.y - tooltipSize.height + "px");
+			};
+
+			function mouseOutAllocation() {
+				setTimeout(function() {
+					if (!overTooltip) {
+						tooltip.html(null)
+							.style("display", "none");
+					};
+				}, 0);
+			};
 
 			//end of createMainPanel
 		};
@@ -758,7 +892,7 @@
 			const brushGroup = brushPanel.main.append("g")
 				.attr("class", "pbiuacBrushGroup")
 				.call(brush)
-				.call(brush.move, xScaleMain.range());
+				.call(brush.move, [xScaleMain(offsetStartDate), xScaleMain(offsetEndDate)]);
 
 			brushGroup.selectAll(".handle")
 				.attr("fill", "whitesmoke")
@@ -884,19 +1018,24 @@
 
 				const limits = scale.invertExtent(datum);
 
-				tooltip.style("display", "block")
-					.html("This color represents values going from:<br><div style='margin-top:8px;text-align:center;'>$<strong>" + formatMoney0Decimals(limits[0]) + "</strong> to $<strong>" +
-						formatMoney0Decimals(limits[1]) + "</strong></div>");
+				const innerTooltip = tooltip.append("div")
+					.attr("id", "pbiuacInnerTooltipDiv");
+
+				innerTooltip.html("This color represents values going from:<br><div style='margin-top:8px;text-align:center;'>$<strong>" + formatMoney0Decimals(limits[0]) + "</strong> to $<strong>" +
+					formatMoney0Decimals(limits[1]) + "</strong></div>");
+
+				tooltip.style("display", "block");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip.style("left", thisSize.left - containerSize.left - (tooltipSize.width / 2) + (thisSize.width / 2) + "px")
-					.style("top", thisSize.y - containerSize.y - tooltipSize.height - 12 + "px");
+					.style("top", thisSize.y - containerSize.y - tooltipSize.height - 1 + "px");
 
 			};
 
 			function mouseOutLegend() {
-				tooltip.style("display", "none");
+				tooltip.html(null)
+					.style("display", "none");
 			};
 
 			//end of createLegendPanel
@@ -1138,25 +1277,39 @@
 			};
 		};
 
-		function createCsv(rawData) {
+		function createCsv(data) {
 
-			//CHECK d3.csvFormat!!!!!!!!!!
+			const copiedData = JSON.parse(JSON.stringify(data));
 
-			// const header = d3.keys(filteredData[0]);
+			copiedData.forEach(function(d) {
+				d.CBPF = d.PooledFundName;
+				d["Allocation Title"] = d.AllocationTitle;
+				d["Allocation Summary"] = d.AllocationSummary;
+				d.Total = d.TotalUSDPlanned;
+				d["Start Date"] = d.PlannedStartDate;
+				d["End Date"] = d.PlannedEndDate;
 
-			// const replacer = function(key, value) {
-			// 	return value === null ? '' : value
-			// };
+				delete d.AllocationTitle;
+				delete d.AllocationSummary;
+				delete d.TotalUSDPlanned;
+				delete d.PooledFundName;
+				delete d.PlannedStartDate;
+				delete d.PlannedStartDateTimestamp;
+				delete d.PlannedEndDate;
+				delete d.PlannedEndDateTimestamp;
+				delete d.Documents;
+				delete d.PooledFundId;
+				delete d.AllocationYear;
+				delete d.HRPPlans;
+				delete d.timeLine;
+				delete d.allocationType;
+				delete d.row;
 
-			// let rows = filteredData.map(function(row) {
-			// 	return header.map(function(fieldName) {
-			// 		return JSON.stringify(row[fieldName], replacer)
-			// 	}).join(',')
-			// });
+			});
 
-			// rows.unshift(header.join(','));
+			const csv = d3.csvFormat(copiedData);
 
-			// return rows.join('\r\n');
+			return csv;
 
 			//end of createCsv
 		};
@@ -1171,128 +1324,105 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + height);
 
-			// const arrowMarker = helpSVG.append("defs")
-			// 	.append("marker")
-			// 	.attr("id", "pbiuacArrowMarker")
-			// 	.attr("viewBox", "0 -5 10 10")
-			// 	.attr("refX", 0)
-			// 	.attr("refY", 0)
-			// 	.attr("markerWidth", 12)
-			// 	.attr("markerHeight", 12)
-			// 	.attr("orient", "auto")
-			// 	.append("path")
-			// 	.style("fill", "#E56A54")
-			// 	.attr("d", "M0,-5L10,0L0,5");
+			const arrowMarker = helpSVG.append("defs")
+				.append("marker")
+				.attr("id", "pbiuacArrowMarker")
+				.attr("viewBox", "0 -5 10 10")
+				.attr("refX", 0)
+				.attr("refY", 0)
+				.attr("markerWidth", 12)
+				.attr("markerHeight", 12)
+				.attr("orient", "auto")
+				.append("path")
+				.style("fill", "#E56A54")
+				.attr("d", "M0,-5L10,0L0,5");
 
-			// const mainTextWhite = helpSVG.append("text")
-			// 	.attr("font-family", "Roboto")
-			// 	.attr("font-size", "26px")
-			// 	.style("stroke-width", "5px")
-			// 	.attr("font-weight", 700)
-			// 	.style("stroke", "white")
-			// 	.attr("text-anchor", "middle")
-			// 	.attr("x", width / 2)
-			// 	.attr("y", 320)
-			// 	.text("CLICK ANYWHERE TO START");
+			const mainTextWhite = helpSVG.append("text")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "26px")
+				.style("stroke-width", "5px")
+				.attr("font-weight", 700)
+				.style("stroke", "white")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 260)
+				.text("CLICK ANYWHERE TO START");
 
-			// const mainText = helpSVG.append("text")
-			// 	.attr("class", "pbiuacAnnotationMainText contributionColorFill")
-			// 	.attr("text-anchor", "middle")
-			// 	.attr("x", width / 2)
-			// 	.attr("y", 320)
-			// 	.text("CLICK ANYWHERE TO START");
+			const mainText = helpSVG.append("text")
+				.attr("class", "pbiuacAnnotationMainText contributionColorFill")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 260)
+				.text("CLICK ANYWHERE TO START");
 
-			// const yearsAnnotationRect = helpSVG.append("rect")
-			// 	.attr("x", 50 - padding)
-			// 	.attr("y", 60 - padding - 14)
-			// 	.style("fill", "white")
-			// 	.style("opacity", 0.95);
+			const brushAnnotationRect = helpSVG.append("rect")
+				.attr("x", 50 - padding)
+				.attr("y", 130 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
-			// const yearsAnnotation = helpSVG.append("text")
-			// 	.attr("class", "pbiuacAnnotationText")
-			// 	.attr("x", 50)
-			// 	.attr("y", 60)
-			// 	.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-			// 	.call(wrapText2, 430);
+			const brushAnnotation = helpSVG.append("text")
+				.attr("class", "pbiuacAnnotationText")
+				.attr("x", 50)
+				.attr("y", 130)
+				.text("The brush area shows the data for the entire period. Use the two handles to move the selection or click + pan to move the selection. Click outside the selection to select the entire period.")
+				.call(wrapText2, 400);
 
-			// const yearsPath = helpSVG.append("path")
-			// 	.style("fill", "none")
-			// 	.style("stroke", "#E56A54")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("marker-end", "url(#pbiuacArrowMarker)")
-			// 	.attr("d", "M480,70 Q510,70 510,95");
+			const brushPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiuacArrowMarker)")
+				.attr("d", "M440,140 L510,140");
 
-			// yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-			// 	.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
+			brushAnnotationRect.attr("width", brushAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", brushAnnotation.node().getBBox().height + padding * 2);
 
-			// const paidPledgeAnnotationRect = helpSVG.append("rect")
-			// 	.attr("x", 400 - padding)
-			// 	.attr("y", 180 - padding - 14)
-			// 	.style("fill", "white")
-			// 	.style("opacity", 0.95);
+			const mainAreaAnnotationRect = helpSVG.append("rect")
+				.attr("x", 480 - padding)
+				.attr("y", 320 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
-			// const paidPledgeAnnotation = helpSVG.append("text")
-			// 	.attr("class", "pbiuacAnnotationText")
-			// 	.attr("x", 400)
-			// 	.attr("y", 180)
-			// 	.text("Use these buttons to filter by “paid” or “pledged” values. “Total” shows both paid and pledged.")
-			// 	.call(wrapText2, 220);
+			const mainAreaAnnotation = helpSVG.append("text")
+				.attr("class", "pbiuacAnnotationText")
+				.attr("x", 480)
+				.attr("y", 320)
+				.text("This area shows the allocations for the selected period. You can pan left/right or zoom (using the mousewheel or the trackpad) to move this area. Hover over the allocations to get more information, and click on “Display Details” to generate the details (below the chart) for the allocation.")
+				.call(wrapText2, 400);
 
-			// const paidPledgePath = helpSVG.append("path")
-			// 	.style("fill", "none")
-			// 	.style("stroke", "#E56A54")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("marker-end", "url(#pbiuacArrowMarker)")
-			// 	.attr("d", "M600,180 Q690,180 690,150");
+			const mainAreaPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiuacArrowMarker)")
+				.attr("d", "M470,350 L430,350");
 
-			// paidPledgeAnnotationRect.attr("width", paidPledgeAnnotation.node().getBBox().width + padding * 2)
-			// 	.attr("height", paidPledgeAnnotation.node().getBBox().height + padding * 2);
+			mainAreaAnnotationRect.attr("width", mainAreaAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", mainAreaAnnotation.node().getBBox().height + padding * 2);
 
-			// const lollipopsAnnotationRect = helpSVG.append("rect")
-			// 	.attr("x", 270 - padding)
-			// 	.attr("y", 390 - padding - 14)
-			// 	.style("fill", "white")
-			// 	.style("opacity", 0.95);
+			const legendsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 300 - padding)
+				.attr("y", 480 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
-			// const lollipopsAnnotation = helpSVG.append("text")
-			// 	.attr("class", "pbiuacAnnotationText")
-			// 	.attr("x", 270)
-			// 	.attr("y", 390)
-			// 	.text("Hover over the donors or CBPFs to get additional information. Hovering over a donor filters the CBPFs accordingly, as well as hovering over a CBPFs filters the donors accordingly. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.")
-			// 	.call(wrapText2, 350);
+			const legendsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiuacAnnotationText")
+				.attr("x", 300)
+				.attr("y", 480)
+				.text("The legend shows the color encoding according to the allocation amount. Hover over the colors to see the corresponding amount.")
+				.call(wrapText2, 400);
 
-			// const lollipopsPath = helpSVG.append("path")
-			// 	.style("fill", "none")
-			// 	.style("stroke", "#E56A54")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("marker-end", "url(#pbiuacArrowMarker)")
-			// 	.attr("d", "M260,430 Q200,430 200,370");
+			const legendsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbiuacArrowMarker)")
+				.attr("d", "M450,520 L450,550");
 
-			// const lollipopsPath2 = helpSVG.append("path")
-			// 	.style("fill", "none")
-			// 	.style("stroke", "#E56A54")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("marker-end", "url(#pbiuacArrowMarker)")
-			// 	.attr("d", "M630,430 Q690,430 690,370");
-
-			// lollipopsAnnotationRect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
-			// 	.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
-
-			// const lollipopsAnnotation2Rect = helpSVG.append("rect")
-			// 	.attr("x", 270 - padding)
-			// 	.attr("y", 520 - padding - 14)
-			// 	.style("fill", "white")
-			// 	.style("opacity", 0.95);
-
-			// const lollipopsAnnotation2 = helpSVG.append("text")
-			// 	.attr("class", "pbiuacAnnotationText")
-			// 	.attr("x", 270)
-			// 	.attr("y", 520)
-			// 	.text("You can click a donor or a CBPF to select it, allowing the selection of multiple countries. Click again to deselect it.")
-			// 	.call(wrapText2, 350);
-
-			// lollipopsAnnotation2Rect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
-			// 	.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
+			legendsAnnotationRect.attr("width", legendsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", legendsAnnotation.node().getBBox().height + padding * 2);
 
 			helpSVG.on("click", function() {
 				overDiv.remove();
