@@ -4,10 +4,8 @@
 		hasFetch = window.fetch,
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js";
-
-	//CHANGE CSS LINK!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -128,7 +126,8 @@
 			maxAllocationValueStandard = Number.NEGATIVE_INFINITY,
 			minAllocationValueReserve = Number.POSITIVE_INFINITY,
 			maxAllocationValueReserve = Number.NEGATIVE_INFINITY,
-			overTooltip = false;
+			overTooltip = false,
+			completeData;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
@@ -192,10 +191,10 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			moneyBagPadding: 40,
+			moneyBagPadding: 32,
 			leftPadding: [182, 394, 552, 740],
 			mainValueVerPadding: 10,
-			mainValueHorPadding: 4
+			mainValueHorPadding: 2
 		};
 
 		const brushPanel = {
@@ -329,6 +328,8 @@
 
 		function draw(data) {
 
+			completeData = data;
+
 			createTitle(data);
 
 			createTopPanel(data);
@@ -406,7 +407,11 @@
 			//end of createTitle
 		};
 
-		function createTopPanel(data) {
+		function createTopPanel(completeData) {
+
+			const data = completeData.filter(function(d) {
+				return d.PlannedStartDateTimestamp < xScaleMain.domain()[1].getTime() && d.PlannedEndDateTimestamp > xScaleMain.domain()[0].getTime();
+			});
 
 			const mainValue = d3.sum(data, function(d) {
 				return d.TotalUSDPlanned;
@@ -647,7 +652,7 @@
 				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
 				.attr("text-anchor", "start")
-				.merge(topPanelOngoingTextSubText)
+				.merge(topPanelPastTextSubText)
 				.text(pastValue > 1 ? "Allocations" : "Allocation");
 
 			//end of createTopPanel
@@ -767,7 +772,7 @@
 
 				const thisSize = element.getBoundingClientRect();
 
-				const mouse = d3.mouse(svg.node());
+				const mouse = d3.mouse(mainPanel.main.node());
 
 				const innerTooltip = tooltip.append("div")
 					.attr("id", "pbiuacInnerTooltipDiv");
@@ -791,7 +796,8 @@
 				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
 						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
 						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
-					.style("top", thisSize.y - containerSize.y - tooltipSize.height + "px");
+					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
+						thisSize.y - containerSize.y - tooltipSize.height + "px");
 			};
 
 			function mouseMoveAllocation(datum, element) {
@@ -800,16 +806,17 @@
 
 				const thisSize = element.getBoundingClientRect();
 
-				const mouse = d3.mouse(svg.node());
+				const mouse = d3.mouse(mainPanel.main.node());
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip.style("display", "block")
 
-				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
-						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
+				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) ?
+						containerSize.width - tooltipSize.width + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
 						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
-					.style("top", thisSize.y - containerSize.y - tooltipSize.height + "px");
+					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
+						thisSize.y - containerSize.y - tooltipSize.height + "px");
 			};
 
 			function mouseOutAllocation() {
@@ -1057,6 +1064,7 @@
 			mainPanel.main.select(".pbiuacXAxisMainGroup")
 				.call(xAxisMain);
 			rewriteXAxisText();
+			createTopPanel(completeData);
 			mainPanel.main.select(".pbiuacZoomRect").call(zoom.transform, d3.zoomIdentity
 				.scale((mainPanel.width - mainPanel.padding[3] - mainPanel.padding[1]) / (s[1] - s[0]))
 				.translate(-s[0], 0));
@@ -1078,6 +1086,7 @@
 			mainPanel.main.select(".pbiuacXAxisMainGroup")
 				.call(xAxisMain);
 			rewriteXAxisText();
+			createTopPanel(completeData);
 			brushPanel.main.select(".pbiuacBrushGroup").call(brush.move, xScaleMain.range().map(t.invertX, t));
 		};
 
