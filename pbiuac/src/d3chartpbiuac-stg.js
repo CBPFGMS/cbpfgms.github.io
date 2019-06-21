@@ -357,7 +357,7 @@
 
 			const title = titleDiv.append("p")
 				.attr("id", "pbiuacd3chartTitle")
-				.html(chartTitle + (chartYearTitle ? " (since " + chartYearTitle + ")" : ""));
+				.html(chartTitle + " (since " + (chartYearTitle ? chartYearTitle : minDate.getFullYear()) + ")");
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "pbiuacHelpButton");
@@ -1089,8 +1089,6 @@
 		};
 
 		function processData(rawData) {
-
-			console.log(rawData.length)
 
 			rawData.forEach(function(row) {
 
