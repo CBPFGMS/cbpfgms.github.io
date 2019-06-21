@@ -137,3 +137,9 @@ p#pbialid3chartTitle {
 	fill: #222;
 	pointer-events: none;
 }
+
+.pbialiCurrentYearText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
