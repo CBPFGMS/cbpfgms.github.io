@@ -74,7 +74,7 @@
 
 		const width = 900,
 			mainPanelHeight = 280,
-			padding = [4, 4, 26, 4],
+			padding = [12, 4, 26, 4],
 			panelHorizontalPadding = 12,
 			buttonsPerRow = 10,
 			buttonsVerticalPadding = 8,
@@ -300,6 +300,25 @@
 			}).map(function(d) {
 				return d.cbpf;
 			}));
+
+			const currentYearGroup = mainPanel.main.append("g")
+				.attr("class", "pbialiCurrentYearGroup");
+
+			currentYearGroup.attr("transform", "translate(" + xScaleMain(parseTime(currentYear - 1)) + ",0)");
+
+			const currentYearRect = currentYearGroup.append("rect")
+				.attr("x", 0)
+				.attr("y", mainPanel.padding[0])
+				.attr("width", xScaleMain(parseTime(currentYear)) - xScaleMain(parseTime(currentYear - 1)))
+				.attr("height", mainPanel.height - mainPanel.padding[2] - mainPanel.padding[0])
+				.style("fill", "#f4f4f4");
+
+			const currentYearText = currentYearGroup.append("text")
+				.attr("class", "pbialiCurrentYearText")
+				.attr("y", -2)
+				.attr("x", (xScaleMain(parseTime(currentYear)) - xScaleMain(parseTime(currentYear - 1))) / 2)
+				.attr("text-anchor", "middle")
+				.text("Current year");
 
 			createAverageLine(data.cbpfs, data.years);
 
