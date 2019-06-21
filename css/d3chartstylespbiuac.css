@@ -254,14 +254,14 @@ p#pbiuacd3chartTitle {
 	margin-top: 8px;
 }
 
-.pbiuacNameAndYearDiv p, .pbiuacAllocationSource p, .pbiuacAllocationStart p, .pbiuacAllocationEnd p, .pbiuacAllocationHR p {
+.pbiuacNameAndYearDiv p, .pbiuacAllocationSource p, .pbiuacAllocationStart p, .pbiuacAllocationEnd p, .pbiuacAllocationHR p, .pbiuacDocumentsDiv p, .pbiuacDocumentsList p {
 	font-size: 16px;
 	fill: #444;
 	font-family: "Arial", sans-serif;
 	margin-bottom: 0px;
 }
 
-.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR {
+.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR, .pbiuacDocumentsList p {
 	width: 100%;
 }
 
@@ -275,4 +275,12 @@ p#pbiuacd3chartTitle {
 	font-family: "Arial", sans-serif;
 	margin-bottom: 0px;
 }
+
+.pbiuacDocumentsDiv {
+	width: 100%;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+
 

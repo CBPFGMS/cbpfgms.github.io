@@ -91,7 +91,7 @@
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
 			timeFormat = d3.timeFormat("%d %b %Y"),
-			timeFormatList = d3.timeFormat("%d %b %Y, %H:%M:%S %p"),
+			convertToBytes = d3.format(".3s"),
 			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Timeline",
 			panelHorizontalPadding = 12,
@@ -104,8 +104,8 @@
 			offsetStartDefault = 6,
 			offsetEndDefault = 6,
 			formatMoney0Decimals = d3.format(",.0f"),
-			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(0.6), d3.color(rectangleColors[0]).darker(0.6)),
-			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(0.6), d3.color(rectangleColors[1]).darker(0.6)),
+			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(0.9), d3.color(rectangleColors[0]).darker(1)),
+			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(0.9), d3.color(rectangleColors[1]).darker(1)),
 			allocationTypes = ["standard", "reserve"],
 			cbpfsOrdering = ["planned", "ongoing", "past"],
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
@@ -139,6 +139,8 @@
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
+
+		const chartYearTitle = containerDiv.node().getAttribute("data-yeartitle");
 
 		const offsetStartValue = +(containerDiv.node().getAttribute("data-offsetstart"));
 
@@ -178,11 +180,11 @@
 			svg.attr("height", height);
 		};
 
-		const footerDiv = !isPfbiSite ? containerDiv.append("div")
-			.attr("class", "pbiuacFooterDiv") : null;
-
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbiuacListContainerDiv");
+
+		const footerDiv = !isPfbiSite ? containerDiv.append("div")
+			.attr("class", "pbiuacFooterDiv") : null;
 
 		createProgressWheel();
 
@@ -209,7 +211,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [8, 0, 14, 80]
+			padding: [0, 0, 14, 80]
 		};
 
 		const mainPanel = {
@@ -355,7 +357,7 @@
 
 			const title = titleDiv.append("p")
 				.attr("id", "pbiuacd3chartTitle")
-				.html(chartTitle);
+				.html(chartTitle + (chartYearTitle ? " (since " + chartYearTitle + ")" : ""));
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "pbiuacHelpButton");
@@ -837,8 +839,8 @@
 				.attr("transform", "translate(" + xScaleBrush(currentDate) + ",0)");
 
 			const todayLineBrush = todayGroupBrush.append("line")
-				.attr("y1", brushPanel.height - brushPanel.padding[2])
-				.attr("y2", brushPanel.height - brushPanel.padding[2] + 2)
+				.attr("y1", brushPanel.padding[0])
+				.attr("y2", brushPanel.height - brushPanel.padding[2])
 				.style("stroke", todayColor)
 				.style("stroke-width", "1px");
 
@@ -1088,6 +1090,8 @@
 
 		function processData(rawData) {
 
+			console.log(rawData.length)
+
 			rawData.forEach(function(row) {
 
 				const thisAllocationTime = row.PlannedEndDateTimestamp < currentDate.getTime() ? "past" :
@@ -1118,15 +1122,24 @@
 
 			const cbpfsUpcoming = Object.keys(cbpfsAllocationsTime).filter(function(d) {
 				return cbpfsAllocationsTime[d] === "planned";
-			}).sort();
+			}).sort(function(a, b) {
+				return a.toLowerCase() < b.toLowerCase() ? -1 :
+					a.toLowerCase() > b.toLowerCase() ? 1 : 0
+			});
 
 			const cbpfsOngoing = Object.keys(cbpfsAllocationsTime).filter(function(d) {
 				return cbpfsAllocationsTime[d] === "ongoing";
-			}).sort();
+			}).sort(function(a, b) {
+				return a.toLowerCase() < b.toLowerCase() ? -1 :
+					a.toLowerCase() > b.toLowerCase() ? 1 : 0
+			});
 
 			const cbpfsPast = Object.keys(cbpfsAllocationsTime).filter(function(d) {
 				return cbpfsAllocationsTime[d] === "past";
-			}).sort();
+			}).sort(function(a, b) {
+				return a.toLowerCase() < b.toLowerCase() ? -1 :
+					a.toLowerCase() > b.toLowerCase() ? 1 : 0
+			});
 
 			cbpfsList = cbpfsUpcoming.concat(cbpfsOngoing).concat(cbpfsPast);
 
@@ -1232,7 +1245,7 @@
 				])
 
 			brush.extent([
-				[brushPanel.padding[3], 0],
+				[brushPanel.padding[3], brushPanel.padding[0]],
 				[brushPanel.width, brushPanel.height - brushPanel.padding[2]]
 			]);
 
@@ -1275,18 +1288,23 @@
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
 			d.PlannedStartDate = timeParse(d.PlannedStartDate);
 			d.PlannedEndDate = timeParse(d.PlannedEndDate);
-			if (d.PlannedStartDate && d.PlannedEndDate) {
-				d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
-				d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
-				if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d
+			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
+			if (!d.PlannedStartDate) {
+				d.PlannedStartDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)
 			};
+			if (!d.PlannedEndDate) {
+				d.PlannedEndDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedStartDate, 1) : d3.timeDay.offset(d.PlannedStartDate, 15)
+			};
+			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
+			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
+			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d;
 		};
 
 		function generateList(datum) {
 
 			listDiv.html("");
-
-			//const thisColorClass = datum.allocationType === "standard" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
 
 			const thisColorClass = "contributionColorHTMLcolor";
 
@@ -1327,17 +1345,64 @@
 			const allocationStart = listDiv.append("div")
 				.attr("class", "pbiuacAllocationStart")
 				.append("p")
-				.html("<span class='" + thisColorClass + "'>Allocation strategy launch date: </span>" + timeFormatList(datum.PlannedStartDate));
+				.html("<span class='" + thisColorClass + "'>Allocation strategy launch date: </span>" + timeFormat(datum.PlannedStartDate));
 
 			const allocationEnd = listDiv.append("div")
 				.attr("class", "pbiuacAllocationEnd")
 				.append("p")
-				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormatList(datum.PlannedEndDate));
+				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormat(datum.PlannedEndDate));
+
+			const hrList = datum.HRPPlans ? datum.HRPPlans.split("##").join("; ") + "." : "n/a.";
 
 			const allocationHR = listDiv.append("div")
 				.attr("class", "pbiuacAllocationHR")
 				.append("p")
-				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormatList(datum.PlannedEndDate));
+				.html("<span class='" + thisColorClass + "'>Target HRPs: </span>" + hrList);
+
+			const documentsDiv = listDiv.append("div")
+				.attr("class", "pbiuacDocumentsDiv")
+				.append("p")
+				.html("<b>Related Documents:</b>");
+
+			const documentsList = datum.Documents ? datum.Documents.split("|||").map(function(d) {
+				return {
+					documentTitle: d.split("##")[0],
+					size: d.split("##")[1],
+					type: d.split("##")[2],
+					url: d.split("##")[3],
+					documentComment: d.split("##")[4]
+				};
+			}) : null;
+
+			const documentsDivList = listDiv.append("div")
+				.attr("class", "pbiuacDocumentsList");
+
+			if (documentsList) {
+				const list = documentsDivList.append("ol");
+				const rows = list.selectAll(null)
+					.data(documentsList)
+					.enter()
+					.append("li");
+				rows.append("span")
+					.html(function(d) {
+						return d.documentComment + ", ";
+					});
+				rows.append("a")
+					.attr("href", function(d) {
+						return d.url
+					})
+					.attr("target", "_blank")
+					.html(function(d) {
+						return d.documentTitle;
+					});
+				rows.append("span")
+					.html(function(d) {
+						return " (" + convertToBytes(d.size) + "B, " + d.type + ")";
+					});
+			} else {
+				documentsDivList.append("p")
+					.html("Unavailable");
+			};
 
 			//end of generateList
 		};
