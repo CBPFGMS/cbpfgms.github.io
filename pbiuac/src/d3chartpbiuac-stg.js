@@ -4,10 +4,8 @@
 		hasFetch = window.fetch,
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js";
-
-	//CHANGE CSS LINK!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -92,7 +90,8 @@
 			currentYear = currentDate.getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
-			timeFormat = parseDate = d3.timeFormat("%d %b %Y"),
+			timeFormat = d3.timeFormat("%d %b %Y"),
+			timeFormatList = d3.timeFormat("%d %b %Y, %H:%M:%S %p"),
 			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Timeline",
 			panelHorizontalPadding = 12,
@@ -181,6 +180,9 @@
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiuacFooterDiv") : null;
+
+		const listDiv = containerDiv.append("div")
+			.attr("class", "pbiuacListContainerDiv");
 
 		createProgressWheel();
 
@@ -789,6 +791,12 @@
 					"</b><div class='pbiuacSpacer'></div>Start Date: " + timeFormat(datum.PlannedStartDate) + "<br>End Date: " +
 					timeFormat(datum.PlannedEndDate) + "<div class='pbiuacSpacer'></div><div class='pbiuacTooltipButtonDiv' style='height:30px;display:flex;justify-content:center;align-items:center;'><button>Display Details</button></div>");
 
+				tooltip.select("button")
+					.on("click", function() {
+						tooltip.style("display", "none");
+						generateList(datum);
+					});
+
 				tooltip.style("display", "block");
 
 				tooltipSize = tooltip.node().getBoundingClientRect();
@@ -1272,6 +1280,66 @@
 				d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
 				if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d
 			};
+		};
+
+		function generateList(datum) {
+
+			listDiv.html("");
+
+			//const thisColorClass = datum.allocationType === "standard" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
+
+			const thisColorClass = "contributionColorHTMLcolor";
+
+			const listTitleDivContainer = listDiv.append("div")
+				.attr("class", "pbiuacListTitleDivContainer");
+
+			const listTitleDiv = listTitleDivContainer.append("div")
+				.attr("class", "pbiuacListTitleDiv");
+
+			const listButtonDiv = listTitleDivContainer.append("div")
+				.attr("class", "pbiuacListButtonDiv");
+
+			const listTitle = listTitleDiv.append("p")
+				.attr("class", "pbiuacListTitle contributionColorHTMLcolor")
+				.html("Allocation Details");
+
+			const listButton = listButtonDiv.append("button")
+				.html("Remove this list")
+				.on("click", function() {
+					listDiv.html("");
+				});
+
+			const nameAndYearDiv = listDiv.append("div")
+				.attr("class", "pbiuacNameAndYearDiv")
+				.append("p")
+				.html(datum.PooledFundName + ", " + datum.AllocationYear);
+
+			const allocationTitle = listDiv.append("div")
+				.attr("class", "pbiuacAllocationTitle")
+				.append("p")
+				.html(datum.AllocationTitle);
+
+			const allocationSource = listDiv.append("div")
+				.attr("class", "pbiuacAllocationSource")
+				.append("p")
+				.html("(" + datum.AllocationSource + ")");
+
+			const allocationStart = listDiv.append("div")
+				.attr("class", "pbiuacAllocationStart")
+				.append("p")
+				.html("<span class='" + thisColorClass + "'>Allocation strategy launch date: </span>" + timeFormatList(datum.PlannedStartDate));
+
+			const allocationEnd = listDiv.append("div")
+				.attr("class", "pbiuacAllocationEnd")
+				.append("p")
+				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormatList(datum.PlannedEndDate));
+
+			const allocationHR = listDiv.append("div")
+				.attr("class", "pbiuacAllocationHR")
+				.append("p")
+				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormatList(datum.PlannedEndDate));
+
+			//end of generateList
 		};
 
 		function createCsv(data) {

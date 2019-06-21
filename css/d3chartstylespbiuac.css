@@ -180,3 +180,99 @@ p#pbiuacd3chartTitle {
 	width: 100%;
 	height: 8px;
 }
+
+.pbiuacListContainerDiv {
+	width: 100%;
+}
+
+.pbiuacListTitleDivContainer {
+	width: 100%;
+	display: flex;
+}
+
+.pbiuacListTitleDivContainer {
+	margin-top: 10px;
+}
+
+.pbiuacListTitle {
+	font-size: 20px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
+}
+
+.pbiuacListTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 10px;
+	align-content: center;
+}
+
+.pbiuacListTitleDiv p {
+	margin: 0px;
+}
+
+.pbiuacListButtonDiv button, .pbiuacResetDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: darkslategray;
+	background-color: white;
+	padding: 2px 8px 2px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.pbiuacListButtonDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 10px;
+}
+
+.pbiuacListButtonDiv button:hover, .pbiuacResetDiv button:hover {
+	background-color: whitesmoke;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbiuacListButtonDiv button:active, .pbiuacResetDiv button:active {
+	background-color: gainsboro;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbiuacListButtonDiv button:focus, .pbiuacResetDiv button:focus {
+	outline: none;
+}
+
+.pbiuacNameAndYearDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.pbiuacNameAndYearDiv p, .pbiuacAllocationSource p, .pbiuacAllocationStart p, .pbiuacAllocationEnd p, .pbiuacAllocationHR p {
+	font-size: 16px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+	margin-bottom: 0px;
+}
+
+.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR {
+	width: 100%;
+}
+
+.pbiuacAllocationSource {
+	margin-bottom: 8px;
+}
+
+.pbiuacAllocationTitle p {
+	font-size: 18px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+	margin-bottom: 0px;
+}
+
