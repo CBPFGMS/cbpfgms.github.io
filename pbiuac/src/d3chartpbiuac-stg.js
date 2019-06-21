@@ -1383,7 +1383,7 @@
 					.append("li");
 				rows.append("span")
 					.html(function(d) {
-						return d.documentComment + ", ";
+						return d.documentComment ? d.documentComment + ", " : "";
 					});
 				rows.append("a")
 					.attr("href", function(d) {
