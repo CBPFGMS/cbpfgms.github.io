@@ -4,8 +4,10 @@
 		hasFetch = window.fetch,
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js";
+
+	//CHANGE CSS LINK!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -126,8 +128,10 @@
 			maxAllocationValueStandard = Number.NEGATIVE_INFINITY,
 			minAllocationValueReserve = Number.POSITIVE_INFINITY,
 			maxAllocationValueReserve = Number.NEGATIVE_INFINITY,
-			overTooltip = false,
-			completeData;
+			completeData,
+			containerSize,
+			thisSize,
+			tooltipSize;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
@@ -498,7 +502,7 @@
 				.text(function(d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " Allocated";
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in";
 				});
 
 			let topPanelSubText = mainValueGroup.selectAll(".pbiuactopPanelSubText")
@@ -516,9 +520,7 @@
 			topPanelSubText.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text(function(d) {
-					return "(all allocations)"
-				});
+				.text("Allocations");
 
 			let topPanelUpcomingNumber = mainValueGroup.selectAll(".pbiuactopPanelUpcomingNumber")
 				.data([upcomingValue]);
@@ -725,9 +727,9 @@
 				.style("fill", "none")
 				.attr("cursor", "move")
 				.attr("pointer-events", "all")
-				.attr("x", mainPanel.padding[3])
+				.attr("x", mainPanel.padding[3] - 1)
 				.attr("y", mainPanel.padding[0])
-				.attr("width", mainPanel.width - mainPanel.padding[3] - mainPanel.padding[1])
+				.attr("width", mainPanel.width - mainPanel.padding[3] - mainPanel.padding[1] + 2)
 				.attr("height", mainPanel.height)
 				.call(zoom);
 
@@ -763,69 +765,54 @@
 				})
 				.on("mousemove", function(d) {
 					mouseMoveAllocation(d, this);
-				})
-				.on("mouseout", mouseOutAllocation);
+				});
+
+			rectZoom.on("mouseover", mouseOutAllocation);
 
 			function mouseOverAllocation(datum, element) {
 
-				const containerSize = containerDiv.node().getBoundingClientRect();
+				tooltip.html(null);
 
-				const thisSize = element.getBoundingClientRect();
+				containerSize = containerDiv.node().getBoundingClientRect();
+
+				thisSize = element.getBoundingClientRect();
 
 				const mouse = d3.mouse(mainPanel.main.node());
 
 				const innerTooltip = tooltip.append("div")
 					.attr("id", "pbiuacInnerTooltipDiv");
 
-				innerTooltip.html("<div class='contributionColorHTMLcolor'><b>" + datum.AllocationTitle + "</b></div><div class='pbiuacSpacer'></div>CBPF: <b>" +
+				const thisColor = datum.allocationType === "standard" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
+
+				innerTooltip.html("<div class='" + thisColor + "'><b>" + datum.AllocationTitle + "</b></div><div class='pbiuacSpacer'></div>CBPF: <b>" +
 					datum.PooledFundName + "</b><br>Amount: $<b>" + formatMoney0Decimals(datum.TotalUSDPlanned) +
 					"</b><div class='pbiuacSpacer'></div>Start Date: " + timeFormat(datum.PlannedStartDate) + "<br>End Date: " +
 					timeFormat(datum.PlannedEndDate) + "<div class='pbiuacSpacer'></div><div class='pbiuacTooltipButtonDiv' style='height:30px;display:flex;justify-content:center;align-items:center;'><button>Display Details</button></div>");
 
 				tooltip.style("display", "block");
 
-				tooltip.on("mouseenter", function() {
-					overTooltip = true;
-				}).on("mouseleave", function() {
-					overTooltip = false;
-					mouseOutAllocation();
-				});
-
-				const tooltipSize = tooltip.node().getBoundingClientRect();
+				tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
-						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
-						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
+						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] + padding[0] ?
+						mainPanel.padding[3] + padding[0] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
 					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
 						thisSize.y - containerSize.y - tooltipSize.height + "px");
 			};
 
 			function mouseMoveAllocation(datum, element) {
 
-				const containerSize = containerDiv.node().getBoundingClientRect();
-
-				const thisSize = element.getBoundingClientRect();
-
 				const mouse = d3.mouse(mainPanel.main.node());
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
-
-				tooltip.style("display", "block")
-
-				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) ?
-						containerSize.width - tooltipSize.width + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] ?
-						mainPanel.padding[3] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
+				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] + padding[0] ?
+						mainPanel.padding[3] + padding[0] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
 					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
 						thisSize.y - containerSize.y - tooltipSize.height + "px");
 			};
 
 			function mouseOutAllocation() {
-				setTimeout(function() {
-					if (!overTooltip) {
-						tooltip.html(null)
-							.style("display", "none");
-					};
-				}, 0);
+				tooltip.style("display", "none");
 			};
 
 			//end of createMainPanel
@@ -1019,6 +1006,8 @@
 
 			function mouseOverLegend(datum, scale, element) {
 
+				tooltip.html(null);
+
 				const containerSize = containerDiv.node().getBoundingClientRect();
 
 				const thisSize = element.getBoundingClientRect();
@@ -1041,8 +1030,7 @@
 			};
 
 			function mouseOutLegend() {
-				tooltip.html(null)
-					.style("display", "none");
+				tooltip.style("display", "none");
 			};
 
 			//end of createLegendPanel
@@ -1099,7 +1087,7 @@
 
 				row.timeLine = thisAllocationTime;
 
-				row.allocationType = allocationTypes[~~(Math.random() * 2)];
+				row.allocationType = row.AllocationSource.toLowerCase();
 
 				if (cbpfsAllocationsTime[row.PooledFundName] === undefined) {
 					cbpfsAllocationsTime[row.PooledFundName] = thisAllocationTime;
@@ -1288,7 +1276,10 @@
 
 		function createCsv(data) {
 
-			const copiedData = JSON.parse(JSON.stringify(data));
+			const copiedData = JSON.parse(JSON.stringify(data))
+				.filter(function(d) {
+					return d.PlannedStartDateTimestamp < xScaleMain.domain()[1].getTime() && d.PlannedEndDateTimestamp > xScaleMain.domain()[0].getTime();
+				});
 
 			copiedData.forEach(function(d) {
 				d.CBPF = d.PooledFundName;
