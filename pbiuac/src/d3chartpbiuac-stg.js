@@ -183,6 +183,8 @@
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbiuacListContainerDiv");
 
+		listDiv.style("display", "none");
+
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiuacFooterDiv") : null;
 
@@ -1302,7 +1304,8 @@
 
 		function generateList(datum) {
 
-			listDiv.html("");
+			listDiv.html("")
+				.style("display", "block");
 
 			const thisColorClass = "contributionColorHTMLcolor";
 
@@ -1322,7 +1325,8 @@
 			const listButton = listButtonDiv.append("button")
 				.html("Remove this list")
 				.on("click", function() {
-					listDiv.html("");
+					listDiv.html("")
+						.style("display", "none");
 				});
 
 			const nameAndYearDiv = listDiv.append("div")
