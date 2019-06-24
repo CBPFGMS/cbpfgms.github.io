@@ -2756,8 +2756,8 @@
 					let tooltipHtml;
 
 					if (chartState.showTrend && chartState.futureDonations && type === "donor" && (+mouseYear) >= currentYear) {
-						tooltipHtml = "<div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'><div style='display:flex;flex:0 75%;'><span>" + typeTitle + " in <strong>" + mouseYear +
-							"</strong>:</span></div><div style='display:flex;flex:0 25%;justify-content: center;'><span style='color: gray;'>" + trendTitle + "</span></div><div style='height:8px;display:flex;flex:0 100%;'></div>";
+						tooltipHtml = "<div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'><div style='display:flex;flex:0 45%;'><span>" + typeTitle + " in <strong>" + mouseYear +
+							"</strong>:</span></div><div style='display:flex;flex:0 25%;justify-content: flex-end;'><span class='contributionColorHTMLcolor'>(actual)</span></div><div style='display:flex;flex:0 30%;justify-content: flex-end;'><span style='color: gray;'>" + trendTitle + "</span></div><div style='height:8px;display:flex;flex:0 100%;'></div>";
 					} else {
 						tooltipHtml = "<div style='margin:0px;display:flex;flex-wrap:wrap;align-items:flex-end;width:" + thisWidth + "px;'><div style='display:flex;flex:0 100%;'><span>" + typeTitle + " in <strong>" + mouseYear +
 							"</strong>:</span></div><div style='height:8px;display:flex;flex:0 100%;'></div>";
