@@ -1,4 +1,3 @@
-  
 # OCHA Charts
 
 This is the repository for the charts and data visualisations at the OCHA sites. 
@@ -30,7 +29,7 @@ Chart for the Country-based Pooled Funds (CBPF) Page at the OCHA blog (Humanitar
 
 This charts shows the top 10 Donors and the top 10 CBPFs. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/cbpfbp) for more information.
 
-- **GMS BI: CBPF Contributions, lollipop chart**
+- **PFBI: CBPF Contributions, lollipop chart**
 
 Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
 
@@ -38,61 +37,69 @@ Chart for the Country-based Pooled Funds (CBPF) contributions in the Business In
 
 This charts shows the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiclc) for more information.
 
-- **GMS BI: Contribution Trends, line graph**
+- **PFBI: Contribution Trends, line graph**
 
-Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbicli)
 
 This charts shows the changes for Donors and CBPFs over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbicli) for more information.
 
-- **GMS BI: Allocations by Organization Type, lollipop and parallel coordinates chart**
+- **PFBI: Allocations by Organization Type, lollipop and parallel coordinates chart**
 
-Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbialp.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbialp)
 
 This charts shows the CBPF allocations and partner types for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbialp) for more information.
 
-- **GMS BI: Allocation Trends, line graph**
+- **PFBI: Allocation Trends, line graph**
 
-Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiali.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiali)
 
 This charts shows the changes for allocations over the years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiali) for more information.
 
-- **GMS BI: Contributions Flow, force-directed graph**
+- **PFBI: Contributions Flow, force-directed graph**
 
-Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) contributions in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc)
 
 This charts shows a force-directed graph will all the Donors and the CBPFs for selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbifdc) for more information.
 
-- **GMS BI: Affected Persons Overview, stacked bar and pictogram chart**
+- **PFBI: Affected Persons Overview, stacked bar and pictogram chart**
 
-Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiobe.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe)
 
 This charts shows the percentage and proportions of targeted and actual affected persons, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiobe) for more information.
 
-- **GMS BI: Cluster Overview, lollipop chart**
+- **PFBI: Cluster Overview, lollipop chart**
 
-Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) overview in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiolc.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc)
 
 This charts shows allocations and affected persons by cluster, for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiolc) for more information.
 
-- **GMS BI: Allocations map**
+- **PFBI: Allocations map**
 
-Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA GMS.
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA PFBI.
 
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbimap.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbimap)
 
 This chart shows the geographic location of allocations. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbimap) for more information.
+
+- **PFBI: Allocations Timeline**
+
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA PFBI.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiuac.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac)
+
+This chart shows a timeline with the allocations for a selected period. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac) for more information.
 
 ## Chart codes
 
@@ -106,11 +113,12 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 | ------------- | ------------- |
 | GMS Landing Page chart  | `gmslpg`  |
 | CBPF Blog Page chart  | `cbpfbp`  |
-|GMS BI: CBPF Contributions, lollipop chart|`pbiclc`|
-|GMS BI: Contribution Trends, line graph|`pbicli`|
-|GMS BI: Allocations by Organization Type, lollipop and parallel coordinates chart|`pbialp`|
-|GMS BI: Allocation Trends, line graph|`pbiali`|
-|GMS BI: Contributions Flow, force-directed graph|`pbifdc`|
-|GMS BI: Affected Persons Overview, stacked bar and pictogram chart|`pbiobe`|
-|GMS BI: Cluster Overview, lollipop chart|`pbiolc`|
-|GMS BI: Allocations map|`pbimap`|
+|PFBI: CBPF Contributions, lollipop chart|`pbiclc`|
+|PFBI: Contribution Trends, line graph|`pbicli`|
+|PFBI: Allocations by Organization Type, lollipop and parallel coordinates chart|`pbialp`|
+|PFBI: Allocation Trends, line graph|`pbiali`|
+|PFBI: Contributions Flow, force-directed graph|`pbifdc`|
+|PFBI: Affected Persons Overview, stacked bar and pictogram chart|`pbiobe`|
+|PFBI: Cluster Overview, lollipop chart|`pbiolc`|
+|PFBI: Allocations map|`pbimap`|
+|PFBI: Allocations Timeline|`pbiuac`|

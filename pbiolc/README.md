@@ -1,6 +1,6 @@
-# GMS BI: Cluster Overview, lollipop chart
+# PFBI: Cluster Overview, lollipop chart
 
-Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-overview) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A set of checkboxes for the selection of CBPFs.
 - A set of control buttons allowing the selection of the year, Modality type (total, standard or reserve) and Affected Person type (targeted or actual).

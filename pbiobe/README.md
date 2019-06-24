@@ -1,6 +1,6 @@
-# GMS BI: Affected Persons Overview, stacked bar and pictogram chart
+# PFBI: Affected Persons Overview, stacked bar and pictogram chart
 
-Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-overview) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A set of checkboxes for the selection of CBPFs and a set of buttons allowing the selection of the year.
 - A stacked bar chart (100%) showing the percentage of actual affected persons relative to targeted affected persons for girls, boys, women, men and total.

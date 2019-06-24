@@ -1,6 +1,6 @@
-# GMS BI: CBPF Contributions, lollipop chart
+# PFBI: CBPF Contributions, lollipop chart
 
-Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A set of buttons allowing the selection of the year and the contribution (paid, pledge or total);
 - A top banner showing the contributions (paid, pledge and total), the number of donors and the number of CBPFs for the selected year and type of contribution;

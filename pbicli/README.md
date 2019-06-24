@@ -1,6 +1,6 @@
-# GMS BI: CBPF Contribution Trends, line graph
+# PFBI: CBPF Contribution Trends, line graph
 
-Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions). The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A set of dropdown menus to select the donor or the CBPF. If a donor is selected, the donors line chart shows the amount donated by that donor, while the CBPF line chart shows all the CBPFs that received from that donor. If a CBPF is selected, the CBPF line chart shows the amount received by that CBPF, while the donor line chart shows all donors that donated to that CBPF. Multiple selection is allowed. The “Currency” dropdown allows selecting donors by currency;
 - A set of radio buttons for choosing USD or local currency;

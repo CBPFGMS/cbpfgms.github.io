@@ -1,6 +1,6 @@
-# GMS BI: Allocations by Organization Type, lollipop and parallel coordinates chart
+# PFBI: Allocations by Organization Type, lollipop and parallel coordinates chart
 
-Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-allocations) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A top banner showing the value allocated, the value under approval and the number of CBPFs both for the selected partner and the selected year;
 - A set of buttons allowing the selection of the year and the partner type (International NGO, National NGO, Red Cross/Crescent Movement, UN Agency or All Partners);

@@ -1,7 +1,6 @@
+# PFBI: Allocations Map
 
-# GMS BI: Allocations Map
-
-Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A top banner showing the total allocated, the number of beneficiaries, the number of partners and the number of projects for the selected filters;
 - Two buttons at the top right corner, allowing the user to download the data for the selected filters as CSV and for displaying a description of the chart and its controls;

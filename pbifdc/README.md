@@ -1,7 +1,6 @@
+# PFBI: Contributions Flow, force-directed graph
 
-# GMS BI: Contributions Flow, force-directed graph
-
-Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [gms.unocha.org](https://gms.unocha.org/content/cbpf-contributions) . The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) contributions in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org). The datavis contains several elements:
 
 - A top banner showing the contributions (total amount; pledge amount for future years), the number of donors and the number of CBPFs for the selected year;
 - A control panel allowing the selection of the year, the geopositioning (in a map) of the nodes and showing/hiding the nodes' labels;
