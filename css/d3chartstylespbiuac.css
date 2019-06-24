@@ -183,20 +183,15 @@ p#pbiuacd3chartTitle {
 
 .pbiuacListContainerDiv {
 	width: 100%;
-	border: 1px solid #eee;
-	padding: 10px;
-	background-color: #f5f5f5;
-	margin-top: 10px;
-	border-radius: 5px;
-	box-sizing: border-box;
 }
 
 .pbiuacListTitleDivContainer {
 	width: 100%;
 	display: flex;
-	border-bottom:
-	1px dotted #ccc; 
-	margin-top:0;
+}
+
+.pbiuacListTitleDivContainer {
+	margin-top: 10px;
 }
 
 .pbiuacListTitle {
@@ -208,13 +203,12 @@ p#pbiuacd3chartTitle {
 .pbiuacListTitleDiv {
 	display: flex;
 	flex:0 80%;
+	margin-left: 10px;
 	align-content: center;
-	margin-left: 0;
 }
 
 .pbiuacListTitleDiv p {
 	margin: 0px;
-	color: #e27628;
 }
 
 .pbiuacListButtonDiv button, .pbiuacResetDiv button {
@@ -237,8 +231,7 @@ p#pbiuacd3chartTitle {
 	flex:0 20%;
 	flex-direction: row-reverse;
 	align-items: center;
-	margin-right: 0; 
-	margin-bottom: 5px;
+	margin-right: 10px;
 }
 
 .pbiuacListButtonDiv button:hover, .pbiuacResetDiv button:hover {
@@ -261,12 +254,14 @@ p#pbiuacd3chartTitle {
 	margin-top: 8px;
 }
 
-.pbiuacNameAndYearDiv p {
-	font-weight: bold; 
-	color: #2e649b;
+.pbiuacNameAndYearDiv p, .pbiuacAllocationSource p, .pbiuacAllocationStart p, .pbiuacAllocationEnd p, .pbiuacAllocationHR p, .pbiuacDocumentsDiv p, .pbiuacDocumentsList p {
+	font-size: 16px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+	margin-bottom: 0px;
 }
 
-.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR, .pbiuacDocumentsList {
+.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR, .pbiuacDocumentsList p {
 	width: 100%;
 }
 
@@ -275,11 +270,10 @@ p#pbiuacd3chartTitle {
 }
 
 .pbiuacAllocationTitle p {
+	font-size: 18px;
 	fill: #444;
 	font-family: "Arial", sans-serif;
 	margin-bottom: 0px;
-	font-size: 15px; 
-	font-weight: bold;
 }
 
 .pbiuacDocumentsDiv {
@@ -288,30 +282,5 @@ p#pbiuacd3chartTitle {
 	margin-bottom: 12px;
 }
 
-.pbiuacAllocationSource p {
-	font-size: 13px; font-style: italic; color:#2f4f4f;
-}
 
-.pbiuacAllocationStart p {
-	font-size: 13px; font-weight: bold; color: #418fde;
-}
 
-.pbiuacAllocationEnd p  {
-	font-size: 13px; font-weight: bold; color: #418fde;
-}
-
-.pbiuacAllocationHR p  {
-	font-size: 13px; font-weight: bold; color: #418fde;
-}
-
-.pbiuacAllocationStart p span {
-	color: #444; font-weight: normal;
-}
-
-.pbiuacAllocationEnd p span  {
-	color: #444; font-weight: normal;
-}
-
-.pbiuacAllocationHR p span  {
-	color: #444; font-weight: normal;
-}
