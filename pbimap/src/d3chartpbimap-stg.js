@@ -1058,10 +1058,12 @@
 						d3.select(this).style("opacity", 1);
 						mouseOverMarker(d, self);
 					});
-					d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
-						sizeMarkers.style("opacity", 1);
-						mouseOutMarker();
-					});
+					if (chartState.displayMode === "size") {
+						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+							sizeMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+					};
 				} else {
 					sizeMarkers.on("mouseover", function(d) {
 							const self = this;
@@ -1110,16 +1112,32 @@
 					return colorScale(d.totalAllocation);
 				});
 
-				colorMarkers.on("mouseover", function(d) {
+				if (isTouchScreenOnly) {
+					colorMarkers.on("mouseover", function(d) {
+						d3.event.stopPropagation();
 						const self = this;
 						colorMarkers.style("opacity", fadeOpacity);
 						d3.select(this).style("opacity", 1);
 						mouseOverMarker(d, self);
-					})
-					.on("mouseout", function() {
-						colorMarkers.style("opacity", 1);
-						mouseOutMarker();
 					});
+					if (chartState.displayMode === "color") {
+						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+							colorMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+					};
+				} else {
+					colorMarkers.on("mouseover", function(d) {
+							const self = this;
+							colorMarkers.style("opacity", fadeOpacity);
+							d3.select(this).style("opacity", 1);
+							mouseOverMarker(d, self);
+						})
+						.on("mouseout", function() {
+							colorMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+				};
 
 				//end of createColorMap
 			};
