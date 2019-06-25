@@ -2,6 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
@@ -1049,16 +1050,30 @@
 					})
 					.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor);
 
-				sizeMarkers.on("mouseover", function(d) {
+				if (isTouchScreenOnly) {
+					sizeMarkers.on("touchstart", function(d) {
+						d3.event.stopPropagation();
 						const self = this;
 						sizeMarkers.style("opacity", fadeOpacity);
 						d3.select(this).style("opacity", 1);
 						mouseOverMarker(d, self);
-					})
-					.on("mouseout", function() {
+					});
+					d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
 						sizeMarkers.style("opacity", 1);
 						mouseOutMarker();
 					});
+				} else {
+					sizeMarkers.on("mouseover", function(d) {
+							const self = this;
+							sizeMarkers.style("opacity", fadeOpacity);
+							d3.select(this).style("opacity", 1);
+							mouseOverMarker(d, self);
+						})
+						.on("mouseout", function() {
+							sizeMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+				};
 
 				//end of createSizeMap
 			};
