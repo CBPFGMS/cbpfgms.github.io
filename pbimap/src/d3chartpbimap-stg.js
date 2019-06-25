@@ -1113,7 +1113,7 @@
 				});
 
 				if (isTouchScreenOnly) {
-					colorMarkers.on("mouseover", function(d) {
+					colorMarkers.on("touchstart", function(d) {
 						d3.event.stopPropagation();
 						const self = this;
 						colorMarkers.style("opacity", fadeOpacity);
