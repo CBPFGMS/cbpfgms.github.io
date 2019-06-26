@@ -1,0 +1,445 @@
+/*Public BI, Contributions tab, line graph (code: pbicli)*/
+
+#d3chartcontainerpbicli {
+	position: relative;
+}
+
+#pbiclitooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 400px;
+	z-index: 1500;
+}
+
+#pbiclialertdiv {
+	position: absolute;    
+	text-align: center;
+	color: whitesmoke;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 12px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #418fde; 
+	border: 1px solid #fff; 
+	border-radius: 4px;
+	max-width: 200px;
+	z-index: 200;
+	top: 30%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.pbiclialertdivcontainer {
+	display: flex;
+	justify-content: center;
+	margin-top: 18px;
+}
+
+.pbiclialertyesorno {
+	padding: 4px 10px 4px 10px;
+	font-size: 14px;
+	background: #2e649b; 
+	border: 1px solid #eee; 
+	border-radius: 8px;
+	color: white;
+	margin-right: 8px;
+	cursor: pointer;
+}
+
+.pbicliOuterDiv {
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+}
+
+.pbicliTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 6px;
+}
+
+.pbicliTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 23px;
+}
+
+.pbicliTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+}
+
+.pbicliIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 14px;
+}
+
+.pbicliIconsDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 3px 8px 3px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	border-bottom-width: 3px;
+	border-right-width: 3px;
+	margin-right: 6px;
+  }
+
+.pbicliIconsDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbicliIconsDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbicliIconsDiv button:focus {
+	outline: none;
+}
+
+.pbicliTopSelectionDiv {
+	display: flex;
+	width: 100%;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+.pbicliDonorsContainerSelectionDiv {
+	display: flex;
+	flex:0 50%;
+	align-items: center;
+	margin-left: 23px;
+}
+
+.pbicliCbpfsContainerSelectionDiv {
+	display: flex;
+	flex:0 50%;
+	align-items: center;
+	margin-left: 23px;
+}
+
+.pbicliDonorsSelectionDiv {
+	margin-right: 2px;
+}
+
+.pbicliDropdownLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+	margin-right: 3px;
+	color: #444;
+	margin-top:0;
+	margin-bottom:0;
+	margin-left: 12px;
+}
+
+.pbicliRadioLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	color: #444;
+	margin-left: 3px;
+	margin-right: 12px;
+}
+
+#pbicliDonorsDropdown, #pbicliCurrencyDropdown {
+	width: 138px;
+}
+
+.pbicliFiltersDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 6px;
+	margin-left: 35px;
+}
+
+#d3chartcontainerpbicli select {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: 1px solid rgba(0,0,0,0.3);
+	margin-left: 12px;
+}
+
+.pbicliBorderDiv {
+	display: flex;
+	width: 92%;
+	margin: auto;
+	max-height: 1px;
+}
+
+.pbicliFooterDiv {
+	width: 100%;
+}
+
+.pbicliCheckboxFuture {
+	margin-left: -4px;
+	padding-left: 6px;
+	border-left: 1px solid #ccc; 
+}
+
+.pbicliLegendDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 6px;
+	margin-top: 6px;
+}
+
+.pbicliDonorsLegendDiv {
+	display: flex;
+	flex:0 50%;
+	align-items: center;
+	margin-left: 23px;
+	flex-direction: column;
+}
+
+.pbicliCbpfsLegendDiv {
+	display: flex;
+	flex:0 50%;
+	align-items: center;
+	margin-left: 23px;
+	flex-direction: column;
+}
+
+.pbicliDonorsLegendDivTop, .pbicliCbpfsLegendDivTop {
+	display: flex;
+	width: 100%;
+	margin-bottom: 6px;
+}
+
+.pbicliDonorsLegendDivBottom, .pbicliCbpfsLegendDivBottom {
+	display: flex;
+	width: 98%;
+	margin-left: 7px;
+	flex-wrap: wrap;
+}
+
+.pbicliDonorsTopLegend, .pbicliCbpfsTopLegend {
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.2;
+	margin-left: 12px;
+}
+
+.pbicliDonorsTopLegendSubtext, .pbicliCbpfsTopLegendSubtext {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	color: #666;
+	font-style: italic;
+}
+
+.pbicliSelectedDonorsDiv, .pbicliSelectedCbpfsDiv {
+	display: flex;
+	flex-wrap: wrap;
+	border: 1px solid gray;
+	border-radius: 4px;
+	margin-right: 3px;
+	margin-bottom: 3px;
+	align-items: center;
+}
+
+.pbicliSelectedDonorsDivText, .pbicliSelectedCbpfsDivText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	color: #444;
+	margin-left: 6px;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+.pbicliSelectedDonorsFlagDiv {
+	display: flex;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+.pbicliSelectedDonorsCloseDiv, .pbicliSelectedCbpfsCloseDiv {
+	display: flex;
+	cursor: pointer;
+	font-size: 12px;
+	align-items: center;
+	padding-left: 3px;
+	padding-right: 3px;
+	height: 100%;
+	border-radius: 0px 4px 4px 0px;
+}
+
+.pbicliCheckboxDonorsDiv, .pbicliCheckboxCbpfsDiv {
+	margin-right: 6px;
+}
+
+.pbicliCheckboxText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	color: #444;
+}
+
+.pbicliSelectedCbpfsCloseDiv {
+	margin-left: 3px;
+}
+
+.pbicliSelectedDonorsCloseDiv:hover, .pbicliSelectedCbpfsCloseDiv:hover {
+	background-color: lightgray;
+}
+
+.pbicliFooterText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	text-align: right;
+	width: 98%;
+}
+
+.pbicliOverDiv {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.8);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.pbicliOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.pbicligroupXAxisDonors text, .pbicligroupXAxisCbpfs text, .pbicligroupYAxisDonors text, .pbicligroupYAxisCbpfs text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbicligroupXAxisDonors path, .pbicligroupXAxisCbpfs path, .pbicligroupYAxisDonors path, .pbicligroupYAxisCbpfs path{
+	stroke: gray;
+}
+
+.pbicligroupXAxisDonors line, .pbicligroupXAxisCbpfs line {
+	stroke: gray;
+}
+
+.pbicligroupYAxisDonors line, .pbicligroupYAxisCbpfs line{
+	stroke: #e2e2e2;
+	stroke-dasharray: 2, 2;
+}
+
+.pbicligroupYAxisDonorsLocalCurrency line {
+	stroke: darkslategray;
+	fill: none;
+} 
+
+.pbicligroupYAxisDonorsLocalCurrency path {
+	stroke: none;
+	fill: none;
+} 
+
+.pbicligroupYAxisDonorsLocalCurrency text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbicliYAxisLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+}
+
+.pbicliYAxisLabelLocalCurrency {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+}
+
+.pbicliFutureDonationsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbicliDonorsPath, .pbicliDonorsPathFuture {
+	fill: none;
+	stroke-width: 2px;
+}
+
+.pbicliDonorsPathTrend {
+	fill: none;
+	stroke: darkgray;
+	stroke-width: 2px;
+}
+
+.pbicliDonorsCirclesTrend {
+	fill: darkgray;
+}
+
+.pbicliDonorsPathLocal, .pbicliDonorsPathLocalFuture {
+	fill: none;
+	stroke: darkslategray;
+	stroke-width: 2px;
+}
+
+.pbicliDonorsCirclesLocal, .pbicliDonorsCirclesLocalFuture {
+	fill: darkslategray;
+}
+
+.pbicliCbpfsPath, .pbicliCbpfsPathFuture {
+	fill: none;
+	stroke-width: 2px;
+}
+
+.pbicliLabelText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	cursor: default;
+}
+
+.pbicliLabelTextSmall {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	cursor: default;
+}
+
+.pbicliAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbicliAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}

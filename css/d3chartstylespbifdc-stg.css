@@ -1,0 +1,234 @@
+/*Public BI, Force-directed graph Contributions (code: pbifdc)*/
+
+#d3chartcontainerpbifdc {
+	position: relative;
+}
+
+#pbifdctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 270px;
+	z-index: 1500;
+}
+
+.pbifdcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbifdcTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 31px;
+}
+
+.pbifdcIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 2px;
+}
+
+.pbifdcFooterDiv {
+	width: 100%;
+}
+
+.pbifdcYearsDescriptionDiv {
+	margin-left: 32px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.d3chartFooterText {
+	width: 99.2%;
+}
+
+.pbifdcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbifdcd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.pbifdctopPanelMainValue {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbifdctopPanelDonorsNumber, .pbifdctopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbifdctopPanelMainText, .pbifdctopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
+}
+
+.pbifdctopPanelDonorsText, .pbifdctopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
+}
+
+.pbifdcbuttonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbifdcleftArrowText, .pbifdcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbifdcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbifdcShowMapTextControl {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbifdcNodesLabelBack {
+	font-family: "Roboto", sans-serif;
+	fill: white;
+	font-size: 10px;
+	stroke: white;
+	stroke-width: 3px;
+}
+
+.pbifdcNodesLabel {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 10px;
+}
+
+.pbifdcLegendTitle {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 18px;
+}
+
+.pbifdcLegendSubTitle {
+	font-family: "Roboto", sans-serif;
+	fill: #444;
+	font-size: 14px;
+}
+
+.pbifdcLegendTextSmall {
+	font-family: "Roboto", sans-serif;
+	fill: #777;
+	font-size: 12px;
+}
+
+.pbifdcLegendTextSmall2 {
+	font-family: "Roboto", sans-serif;
+	fill: #888;
+	font-size: 12px;
+}
+
+.pbifdcLegendTextSmall3 {
+	font-family: "Roboto", sans-serif;
+	fill: #888;
+	font-size: 10px;
+}
+
+.pbifdcYAxisLegendGroup path {
+	stroke: none;
+}
+
+.pbifdcYAxisLegendGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbifdcXAxisLegendGroup path {
+	stroke: none;
+}
+
+.pbifdcXAxisLegendGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbifdcXAxisLegendGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbifdcLegendLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #777;
+	pointer-events: none;
+}
+
+.pbifdcShowMapGroupLegendText {
+	font-family: "Crimson Text", serif;
+	fill: #aaa;
+	font-size: 12px;
+}
+
+.pbifdcGeoMenuTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #444;
+	pointer-events: none;	
+}
+
+.pbifdcGeoMenuText {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #666;
+	cursor: default;	
+}
+
+.pbifdcAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbifdcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}

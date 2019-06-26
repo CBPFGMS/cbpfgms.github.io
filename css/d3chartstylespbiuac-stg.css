@@ -1,0 +1,286 @@
+/*Public BI, Upcoming Allocations (code: pbiuac)*/
+
+#d3chartcontainerpbiuac {
+	position: relative;
+}
+
+#pbiuactooltipdiv {    
+	position: absolute;
+	padding: 4px;
+	background-color: rgba(0,0,0,0);
+	z-index: 1500;
+}
+
+#pbiuacInnerTooltipDiv {
+	width: 300px;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #777; 
+	border-radius: 4px;
+}
+
+.pbiuacTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbiuacTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 16px;
+}
+
+.pbiuacIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.pbiuacFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.pbiuacOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbiuacd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.pbiuacAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbiuacAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+.pbiuactopPanelMainValue, .pbiuactopPanelUpcomingNumber, .pbiuactopPanelOngoingNumber, .pbiuactopPanelPastNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbiuactopPanelMainText, .pbiuactopPanelSubText, .pbiuactopPanelUpcomingText, .pbiuactopPanelOngoingText, .pbiuactopPanelPastText, .pbiuactopPanelUpcomingTextSubText, .pbiuactopPanelOngoingTextSubText, .pbiuactopPanelPastTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.pbiuacYAxisGroup path {
+	fill: none;
+	stroke: none;
+}
+
+.pbiuacYAxisGroup line {
+	stroke: darkgray;
+}
+
+.pbiuacYAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: #444;
+}
+
+.pbiuacXAxisMainGroup line {
+	stroke-dasharray: 1, 2;
+	opacity: 0.3;
+}
+
+.pbiuacXAxisMainGroup path {
+	fill: none;
+	stroke: none;
+}
+
+.pbiuacXAxisMainGroup text, .pbiuacXAxisBrushGroup text {
+	fill: #888;
+}
+
+.pbiuacXAxisBrushGroup path {
+	stroke: none;
+}
+
+.pbiuacXAxisBrushGroup line {
+	stroke: darkgray;
+}
+
+.pbiuacLegendMainText {
+	font-size: 12px;
+	fill: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.pbiuacLegendMainText2 {
+	font-size: 10px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+}
+
+.pbiuacBrushGroup .selection {
+	stroke: #b1b1b1;
+	fill: #ccc;
+}
+
+.pbiuacTooltipButtonDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 3px 8px 3px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.pbiuacTooltipButtonDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbiuacTooltipButtonDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbiuacTooltipButtonDiv button:focus {
+	outline: none;
+}
+
+.pbiuacSpacer {
+	width: 100%;
+	height: 8px;
+}
+
+.pbiuacListContainerDiv {
+	width: 100%;
+}
+
+.pbiuacListTitleDivContainer {
+	width: 100%;
+	display: flex;
+}
+
+.pbiuacListTitleDivContainer {
+	margin-top: 10px;
+}
+
+.pbiuacListTitle {
+	font-size: 20px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
+}
+
+.pbiuacListTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 10px;
+	align-content: center;
+}
+
+.pbiuacListTitleDiv p {
+	margin: 0px;
+}
+
+.pbiuacListButtonDiv button, .pbiuacResetDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: darkslategray;
+	background-color: white;
+	padding: 2px 8px 2px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.pbiuacListButtonDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 10px;
+}
+
+.pbiuacListButtonDiv button:hover, .pbiuacResetDiv button:hover {
+	background-color: whitesmoke;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbiuacListButtonDiv button:active, .pbiuacResetDiv button:active {
+	background-color: gainsboro;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbiuacListButtonDiv button:focus, .pbiuacResetDiv button:focus {
+	outline: none;
+}
+
+.pbiuacNameAndYearDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.pbiuacNameAndYearDiv p, .pbiuacAllocationSource p, .pbiuacAllocationStart p, .pbiuacAllocationEnd p, .pbiuacAllocationHR p, .pbiuacDocumentsDiv p, .pbiuacDocumentsList p {
+	font-size: 16px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+	margin-bottom: 0px;
+}
+
+.pbiuacAllocationTitle, .pbiuacAllocationSource, .pbiuacAllocationHR, .pbiuacDocumentsList p {
+	width: 100%;
+}
+
+.pbiuacAllocationSource {
+	margin-bottom: 8px;
+}
+
+.pbiuacAllocationTitle p {
+	font-size: 18px;
+	fill: #444;
+	font-family: "Arial", sans-serif;
+	margin-bottom: 0px;
+}
+
+.pbiuacDocumentsDiv {
+	width: 100%;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+
+

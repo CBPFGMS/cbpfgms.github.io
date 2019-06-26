@@ -1,0 +1,205 @@
+/*Public BI, Overview, Clusters and Beneficiaries lollipop chart (code: pbiolc)*/
+
+#d3chartcontainerpbiolc {
+	position: relative;
+}
+
+#pbiolctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 13px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 288px;
+	z-index: 1500;
+}
+
+.pbiolcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbiolcTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 21px;
+}
+
+.pbiolcIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.pbiolcFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.pbiolcYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.pbiolcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbiolcd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.pbiolcSelectTitleDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 8px;
+	margin-top: 8px;
+	margin-left: 23px;
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+}
+
+.pbiolcSelectDiv {
+	display: flex;
+	margin-left: 23px;
+	margin-right: 4px;
+	flex-wrap: wrap;
+}
+
+.pbiolcCheckboxDiv {
+	display: flex;
+	margin-right: 12px;
+	align-items: center;
+}
+
+.pbiolcCheckboxDiv label, .pbiolcCheckboxDiv input {
+	cursor: pointer;
+}
+
+.pbiolcCheckboxText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	color: #666;
+	margin-left: 2px;
+}
+
+
+
+.pbiolcbuttonsText, .pbiolcbuttonsModalitiesText, .pbiolcbuttonsBeneficiariesText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiolcleftArrowText, .pbiolcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbiolcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbiolcButtonsPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcLabelGroupText {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcAllocationsPanelTitle, .pbiolcBeneficiariesPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+	white-space: pre;
+}
+
+.pbiolcAllocationsPanelSubTitle, .pbiolcBeneficiariesPanelSubTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #666;
+}
+
+.pbiolcAllocationsLabel, .pbiolcBeneficiariesLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiolcAllocationsLabelPercentage, .pbiolcBeneficiariesLabelPercentage, .pbiolcSortByAllocations, .pbiolcSortByBeneficiaries {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiolcgroupXAxisAllocations text, .pbiolcgroupXAxisBeneficiaries text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiolcgroupXAxisAllocations path, .pbiolcgroupXAxisBeneficiaries path{
+	stroke: none;
+}
+
+.pbiolcgroupXAxisAllocations line, .pbiolcgroupXAxisBeneficiaries line{
+	stroke: #e4e4e4;
+	stroke-dasharray: 2, 2;
+}
+
+.pbiolcAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbiolcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+.pbiolcLegendText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}

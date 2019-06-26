@@ -1,0 +1,197 @@
+/*Public BI, Overview, Beneficiaries bar and pictogram (code: pbiobe)*/
+
+#d3chartcontainerpbiobe {
+	position: relative;
+}
+
+#pbiobetooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 280px;
+	z-index: 1500;
+}
+
+.pbiobeTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbiobeTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 64px;
+}
+
+.pbiobeIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.pbiobeFooterDiv {
+	width: 100%;
+}
+
+.pbiobeYearsDescriptionDiv {
+	margin-left: 64px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.pbiobeOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbiobed3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.pbiobeSelectTitleDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 8px;
+	margin-top: 8px;
+	margin-left: 64px;
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	color: #666;
+}
+
+.pbiobeSelectDiv {
+	display: flex;
+	margin-left: 64px;
+	margin-right: 4px;
+	flex-wrap: wrap;
+}
+
+.pbiobeCheckboxDiv {
+	display: flex;
+	margin-right: 12px;
+	align-items: center;
+}
+
+.pbiobeCheckboxDiv label, .pbiobeCheckboxDiv input {
+	cursor: pointer;
+}
+
+.pbiobeCheckboxText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	color: #666;
+	margin-left: 2px;
+}
+
+.pbiobebuttonsText, .pbiobebuttonsModalitiesText, .pbiobebuttonsBeneficiariesText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiobeleftArrowText, .pbioberightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbiobePercentagePanelTitle, .pbiobePictogramsPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiobegroupXAxisPercentage text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiobegroupYAxisPercentage text{
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	text-transform: uppercase;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiobegroupXAxisPercentage path, .pbiobegroupYAxisPercentage path, .pbiobegroupYAxisPercentage line{
+	stroke: none;
+}
+
+.pbiobegroupXAxisPercentage line{
+	stroke: #e4e4e4;
+	stroke-dasharray: 2, 2;
+}
+
+.pbiobeBarsPercentage {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	pointer-events: none;
+}
+
+.pbiobeBarsTotalLine1 {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiobeBarsTotalLine2 {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+	fill: #444;
+}
+
+.pbiobeBarsTotalSpan {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	pointer-events: none;
+	fill: #888;
+}
+
+.pbiobeLegendGroup text, .pbiobePictogramLegendText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiobeAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbiobeAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}

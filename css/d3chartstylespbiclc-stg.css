@@ -1,0 +1,231 @@
+/*Public BI, Contributions tab, lollipop chart (code: pbiclc)*/
+
+#d3chartcontainerpbiclc {
+	position: relative;
+}
+
+#pbiclctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 300px;
+	z-index: 1500;
+}
+
+.pbiclcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.pbiclcTitleDiv {
+	display: flex;
+	flex:0 80%;
+	margin-left: 16px;
+}
+
+.pbiclcIconsDiv {
+	display: flex;
+	flex:0 20%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.pbiclcFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.pbiclcYearsDescriptionDiv {
+	margin-left: 12px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.pbiclcSelectionDescriptionDiv {
+	margin-left: 13px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.pbiclcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#pbiclcd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.pbiclctopPanelMainValue, .pbiclctopPanelDonorsNumber, .pbiclctopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbiclctopPanelMainText, .pbiclctopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.pbiclctopPanelDonorsText, .pbiclctopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	fill: #888;
+}
+
+.pbiclctopPanelDonorsTextSubText, .pbiclctopPanelCbpfsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #888;
+}
+
+.pbiclcbuttonsText, .pbiclcbuttonsContributionsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiclcleftArrowText, .pbiclcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbiclcDonorsPanelTitle, .pbiclcCbpfsPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #666;
+}
+
+.pbiclcDonorsPanelTitleSpan, .pbiclcCbpfsPanelTitleSpan {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbiclcDownloadText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbiclcDonorLabel, .pbiclcCbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbiclcDonorLabelPercentage {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonorsFake {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonors text, .pbiclcgroupYAxisCbpfs text {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.pbiclcgroupYAxisDonors path, .pbiclcgroupYAxisDonors line, .pbiclcgroupYAxisCbpfs path, .pbiclcgroupYAxisCbpfs line {
+	stroke: none;
+}
+
+.pbiclcgroupXAxisDonors text, .pbiclcgroupXAxisCbpfs text{
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbiclcgroupXAxisDonors path, .pbiclcgroupXAxisCbpfs path{
+	stroke: none;
+}
+
+.pbiclcgroupXAxisDonors line, .pbiclcgroupXAxisCbpfs line{
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbiclcAnnotationMainText {
+	font-family: "Roboto", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.pbiclcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+.pbiclcSvgLegend {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: #666;
+	pointer-events: none;	
+}
+
+#pbiclcSnapshotTooltip {
+	z-index: 1600;
+}
+
+.pbiclcSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText, .pbiclcSnapshotContent #pbiclcSnapshotPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
