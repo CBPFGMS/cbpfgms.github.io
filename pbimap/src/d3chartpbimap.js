@@ -2,6 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
@@ -637,13 +638,35 @@
 					return d;
 				});
 
-			filterContainerDivs.on("mouseover", function() {
-				d3.select(this).select(".pbimapDropdownContainer")
-					.style("display", "block")
-			}).on("mouseout", function() {
-				d3.select(this).select(".pbimapDropdownContainer")
-					.style("display", "none")
-			});
+			if (isTouchScreenOnly) {
+				filterContainerDivs.on("touchstart", function() {
+					d3.event.stopPropagation();
+					tooltip.style("display", "none");
+					if (chartState.displayMode === "color") {
+						d3MapSvgGroup.selectAll(".pbimapColorMarkers")
+							.style("opacity", 1);
+					} else {
+						d3MapSvgGroup.selectAll(".pbimapSizeMarkers")
+							.style("opacity", 1);
+					};
+					filterContainerDivs.select(".pbimapDropdownContainer")
+						.style("display", "none");
+					d3.select(this).select(".pbimapDropdownContainer")
+						.style("display", "block");
+				});
+				containerDiv.on("touchstart", function() {
+					filterContainerDivs.select(".pbimapDropdownContainer")
+						.style("display", "none");
+				});
+			} else {
+				filterContainerDivs.on("mouseover", function() {
+					d3.select(this).select(".pbimapDropdownContainer")
+						.style("display", "block");
+				}).on("mouseout", function() {
+					d3.select(this).select(".pbimapDropdownContainer")
+						.style("display", "none");
+				});
+			};
 
 			const paddingDiv = filterContainerDivs.append("div")
 				.attr("class", "pbimapDropdownPaddingDiv");
@@ -1049,16 +1072,34 @@
 					})
 					.style("fill", chartState.selectedAdminLevel ? circleColor : circleGlobalColor);
 
-				sizeMarkers.on("mouseover", function(d) {
+				if (isTouchScreenOnly) {
+					sizeMarkers.on("touchstart", function(d) {
+						d3.event.stopPropagation();
+						filtersDiv.selectAll(".pbimapDropdownContainer")
+							.style("display", "none");
 						const self = this;
 						sizeMarkers.style("opacity", fadeOpacity);
 						d3.select(this).style("opacity", 1);
 						mouseOverMarker(d, self);
-					})
-					.on("mouseout", function() {
-						sizeMarkers.style("opacity", 1);
-						mouseOutMarker();
 					});
+					if (chartState.displayMode === "size") {
+						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+							sizeMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+					};
+				} else {
+					sizeMarkers.on("mouseover", function(d) {
+							const self = this;
+							sizeMarkers.style("opacity", fadeOpacity);
+							d3.select(this).style("opacity", 1);
+							mouseOverMarker(d, self);
+						})
+						.on("mouseout", function() {
+							sizeMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+				};
 
 				//end of createSizeMap
 			};
@@ -1095,16 +1136,34 @@
 					return colorScale(d.totalAllocation);
 				});
 
-				colorMarkers.on("mouseover", function(d) {
+				if (isTouchScreenOnly) {
+					colorMarkers.on("touchstart", function(d) {
+						d3.event.stopPropagation();
+						filtersDiv.selectAll(".pbimapDropdownContainer")
+							.style("display", "none");
 						const self = this;
 						colorMarkers.style("opacity", fadeOpacity);
 						d3.select(this).style("opacity", 1);
 						mouseOverMarker(d, self);
-					})
-					.on("mouseout", function() {
-						colorMarkers.style("opacity", 1);
-						mouseOutMarker();
 					});
+					if (chartState.displayMode === "color") {
+						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+							colorMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+					};
+				} else {
+					colorMarkers.on("mouseover", function(d) {
+							const self = this;
+							colorMarkers.style("opacity", fadeOpacity);
+							d3.select(this).style("opacity", 1);
+							mouseOverMarker(d, self);
+						})
+						.on("mouseout", function() {
+							colorMarkers.style("opacity", 1);
+							mouseOutMarker();
+						});
+				};
 
 				//end of createColorMap
 			};
