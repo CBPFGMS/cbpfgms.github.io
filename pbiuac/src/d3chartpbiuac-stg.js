@@ -808,8 +808,8 @@
 				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
 						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] + padding[0] ?
 						mainPanel.padding[3] + padding[0] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
-						thisSize.y - containerSize.y - tooltipSize.height + "px");
+					.style("top", mouse[1] < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 1 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height + "px");
 			};
 
 			function mouseMoveAllocation(datum, element) {
@@ -819,8 +819,8 @@
 				tooltip.style("left", mouse[0] > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
 						containerSize.width - tooltipSize.width - padding[1] + "px" : mouse[0] < tooltipSize.width / 2 + mainPanel.padding[3] + padding[0] ?
 						mainPanel.padding[3] + padding[0] + "px" : mouse[0] - (tooltipSize.width / 2) + "px")
-					.style("top", mouse[1] < tooltipSize.height ? thisSize.y - containerSize.y + thisSize.height + 1 + "px" :
-						thisSize.y - containerSize.y - tooltipSize.height + "px");
+					.style("top", mouse[1] < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 1 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height + "px");
 			};
 
 			function mouseOutAllocation() {
