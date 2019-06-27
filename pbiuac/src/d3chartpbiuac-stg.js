@@ -1354,6 +1354,13 @@
 				.append("p")
 				.html("<span class='" + thisColorClass + "'>Expected completion date of HC approvals: </span>" + timeFormat(datum.PlannedEndDate));
 
+			const thisSummary = datum.AllocationSummary ? datum.AllocationSummary : "n/a";
+
+			const allocationSummary = listDiv.append("div")
+				.attr("class", "pbiuacAllocationEnd")
+				.append("p")
+				.html("<span class='" + thisColorClass + "'>Allocation Summary: </span>" + thisSummary);
+
 			const hrList = datum.HRPPlans ? datum.HRPPlans.split("##").join("; ") + "." : "n/a.";
 
 			const allocationHR = listDiv.append("div")
