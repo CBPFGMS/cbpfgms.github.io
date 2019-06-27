@@ -3400,7 +3400,9 @@
 					};
 					const resultTrend = linearRegression(pastRawData);
 					trendData.forEach(function(d, i) {
-						if (i) d.total = Math.max(resultTrend.predict(+d.year)[1], 0);
+						const thisResult = resultTrend.predict(+d.year)[1];
+						const adjustedResult = thisResult === thisResult ? thisResult : 0;
+						if (i) d.total = Math.max(adjustedResult, 0);
 					});
 					donor.trendValues = trendData;
 				};
