@@ -654,7 +654,7 @@
 					d3.select(this).select(".pbimapDropdownContainer")
 						.style("display", "block");
 				});
-				containerDiv.on("touchstart", function() {
+				d3.select(window).on("touchstart.pbimapFilterContainers", function() {
 					filterContainerDivs.select(".pbimapDropdownContainer")
 						.style("display", "none");
 				});
@@ -745,15 +745,16 @@
 							changeSelected(d, chartState.selectedModality);
 						});
 
+					const newMaxCombinedLevel = d3.max(data.map, function(d) {
+						return d.maxLevel;
+					}) || 0;
+					chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
+
 					createTopSvg(data.topSvgObject);
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 
-					const newMaxCombinedLevel = d3.max(data.map, function(d) {
-						return d.maxLevel;
-					}) || 0;
-					chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
 					adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
@@ -1083,7 +1084,7 @@
 						mouseOverMarker(d, self);
 					});
 					if (chartState.displayMode === "size") {
-						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+						d3.select(window).on("touchstart.pbimapSizeMarkers", function() {
 							sizeMarkers.style("opacity", 1);
 							mouseOutMarker();
 						});
@@ -1147,7 +1148,7 @@
 						mouseOverMarker(d, self);
 					});
 					if (chartState.displayMode === "color") {
-						d3.select("svg.leaflet-zoom-animated").on("touchstart", function() {
+						d3.select(window).on("touchstart.pbimapColorMarkers", function() {
 							colorMarkers.style("opacity", 1);
 							mouseOutMarker();
 						});
