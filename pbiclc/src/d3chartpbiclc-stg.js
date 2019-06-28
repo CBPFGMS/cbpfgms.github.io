@@ -2315,9 +2315,9 @@
 				return d[property]
 			}));
 
-			xScaleDonors.domain([0, ~~(maxXValue * 1.1)]);
+			xScaleDonors.domain([0, Math.floor(maxXValue * 1.1)]);
 
-			xScaleCbpfs.domain([0, ~~(maxXValue * 1.1)]);
+			xScaleCbpfs.domain([0, Math.floor(maxXValue * 1.1)]);
 
 		};
 
