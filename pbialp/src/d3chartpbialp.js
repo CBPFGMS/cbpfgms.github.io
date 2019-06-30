@@ -2651,7 +2651,7 @@
 				return d[property]
 			});
 
-			xScaleLollipop.domain([0, ~~(maxXValue * xScaleLollipopMargin)]);
+			xScaleLollipop.domain([0, Math.floor(maxXValue * xScaleLollipopMargin)]);
 
 		};
 
