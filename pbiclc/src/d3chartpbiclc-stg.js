@@ -178,7 +178,7 @@
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiclcFooterDiv") : null;
 
-		createProgressWheel();
+		createProgressWheel(svg, width, height, "Loading visualisation...");
 
 		const snapshotTooltip = containerDiv.append("div")
 			.attr("id", "pbiclcSnapshotTooltip")
@@ -2631,6 +2631,21 @@
 
 		function createSnapshot(type, fromContextMenu) {
 
+			const downloadingDiv = d3.select("body").append("div")
+				.style("position", "fixed")
+				.attr("id", "pbiclcDownloadingDiv")
+				.style("left", window.innerWidth / 2 - 100 + "px")
+				.style("top", window.innerHeight / 2 - 100 + "px");
+
+			const downloadingDivSvg = downloadingDiv.append("svg")
+				.attr("class", "pbiclcDownloadingDivSvg")
+				.attr("width", 200)
+				.attr("height", 100);
+
+			const downloadingDivText = "Downloading " + type.toUpperCase();
+
+			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+
 			svg.attr("viewBox", null)
 				.attr("width", width)
 				.attr("height", height);
@@ -2653,23 +2668,36 @@
 
 			const imageDiv = containerDiv.node();
 
-			setSvgStyles(svg.node())
+			setSvgStyles(svg.node());
 
-			iconsDiv.style("opacity", 0);
+			if (type === "png") {
+				iconsDiv.style("opacity", 0);
+			} else {
+				topDiv.style("opacity", 0)
+			};
 
 			snapshotTooltip.style("display", "none");
 
 			html2canvas(imageDiv).then(function(canvas) {
+
 				svg.attr("viewBox", "0 0 " + width + " " + height)
 					.attr("width", null)
 					.attr("height", null);
-				iconsDiv.style("opacity", 1);
+
+				if (type === "png") {
+					iconsDiv.style("opacity", 1);
+				} else {
+					topDiv.style("opacity", 1)
+				};
+
 				if (type === "png") {
 					downloadSnapshotPng(canvas);
 				} else {
 					downloadSnapshotPdf(canvas);
 				};
+
 				if (fromContextMenu) d3.select(currentHoveredRect).dispatch("mouseout");
+
 			});
 
 			function setSvgStyles(node) {
@@ -2707,6 +2735,10 @@
 				};
 			});
 
+			removeProgressWheel();
+
+			d3.select("#pbiclcDownloadingDiv").remove();
+
 		};
 
 		function downloadSnapshotPdf(source) {
@@ -2715,9 +2747,14 @@
 				weekday: "long",
 				year: "numeric",
 				month: "long",
-				day: "numeric",
-				hour: "2-digit",
-				minute: "2-digit"
+				day: "numeric"
+			};
+
+			const pdfMargins = {
+				top: 10,
+				bottom: 16,
+				left: 20,
+				right: 30
 			};
 
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
@@ -2725,13 +2762,10 @@
 
 					const pdf = new jsPDF();
 
-					pdf.setFillColor(65, 143, 222);
-					pdf.rect(0, 0, 210, 15, "F");
+					createLetterhead();
 
-					pdf.addImage(logo, "PNG", 10, 19, 60, 12);
-
-					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", 190, {
-						fontSize: 10
+					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 12
 					});
 
 					const fullDate = new Date().toLocaleDateString("default", options);
@@ -2739,12 +2773,18 @@
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
 					pdf.setFontType("normal");
-					pdf.setFontSize(10);
-					pdf.text(10, 49, intro);
+					pdf.setFontSize(12);
+					pdf.text(pdfMargins.left, 48, intro);
 
-					pdf.setTextColor(80);
-					pdf.setFontSize(8);
-					pdf.text("Date: " + fullDate, 10, 64);
+					pdf.setTextColor(65, 143, 222);
+					pdf.setFont('helvetica');
+					pdf.setFontType("bold");
+					pdf.setFontSize(16);
+					pdf.text(chartTitle, pdfMargins.left, 65);
+
+					pdf.setFontSize(12);
+					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div>", pdfMargins.left, 70);
 
 					const yearsList = chartState.selectedYear.sort(function(a, b) {
 						return a - b;
@@ -2754,22 +2794,61 @@
 
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
 
-					pdf.text(yearsText + yearsList, 10, 68);
+					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div>", pdfMargins.left, 76);
+
+					const contributions = chartState.selectedContribution === "total" ? "Total (Paid + Pledged)" : chartState.selectedContribution === "paid" ? "Paid" : "Pledged";
+
+					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Contributions: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						contributions + "</span></div>", pdfMargins.left, 82);
 
 					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
-						"Selected countries: all" : countriesList();
+						"Selected countries-all" : countriesList();
 
-					pdf.text(selectedCountry, 10, 72);
+					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 88);
 
 					const sourceDimentions = containerDiv.node().getBoundingClientRect();
 					const widthInMilimeters = 150
 
-					pdf.addImage(source, "PNG", 30, 84, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+					pdf.addImage(source, "PNG", pdfMargins.left, 96, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
 
-					pdf.setFillColor(65, 143, 222);
-					pdf.rect(0, 289, 210, 8, "F");
+					const currentDate = new Date();
 
-					pdf.save("contributions.pdf");
+					pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
+
+					removeProgressWheel();
+
+					d3.select("#pbiclcDownloadingDiv").remove();
+
+					function createLetterhead() {
+
+						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+
+						pdf.setFillColor(65, 143, 222);
+						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+
+						pdf.setFillColor(255, 255, 255);
+						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+
+						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, 297 - pdfMargins.bottom, 210, 2, "F");
+
+						pdf.setTextColor(60);
+						pdf.setFont("arial");
+						pdf.setFontType("normal");
+						pdf.setFontSize(10);
+						pdf.text(footer, pdfMargins.left, 297 - pdfMargins.bottom + 10);
+
+					};
 
 					function countriesList() {
 						const selection = chartState.selectedDonors.length ? "selectedDonors" : "selectedCbpfs";
@@ -2785,18 +2864,18 @@
 							.reduce(function(acc, curr, index) {
 								return acc + (index >= chartState[selection].length - 2 ? index > chartState[selection].length - 2 ? curr : curr + " and " : curr + ", ");
 							}, "");
-						return "Selected " + type + plural + ": " + countryList;
+						return "Selected " + type + plural + "-" + countryList;
 
-					}
+					};
 				});
 
 			//end of downloadSnapshotPdf
 		};
 
-		function createProgressWheel() {
-			const wheelGroup = svg.append("g")
-				.attr("class", "d3chartwheelGroup")
-				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
+		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
+			const wheelGroup = thissvg.append("g")
+				.attr("class", "pbiclcd3chartwheelGroup")
+				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
@@ -2805,7 +2884,7 @@
 				.style("font-size", "11px")
 				.attr("y", 50)
 				.attr("class", "contributionColorFill")
-				.text("Loading visualisation...");
+				.text(thistext);
 
 			const arc = d3.arc()
 				.outerRadius(25)
@@ -2854,7 +2933,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".d3chartwheelGroup");
+			const wheelGroup = d3.select(".pbiclcd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};

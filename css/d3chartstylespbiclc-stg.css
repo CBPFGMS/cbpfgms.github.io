@@ -4,6 +4,30 @@
 	position: relative;
 }
 
+#pbiclcDownloadingDiv {
+	position: absolute;
+	display: flex;
+	justify-content:center;
+    align-content:center;
+    flex-direction:column;
+    text-align: center;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 190%;
+	font-size: 14px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	font-weight: 700;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
 #pbiclctooltipdiv {    
 	position: absolute;
 	text-align: left;
