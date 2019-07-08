@@ -2758,6 +2758,8 @@
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
 				.then(function(logo) {
 
+					let pdfTextPosition;
+
 					const pdf = new jsPDF();
 
 					createLetterhead();
@@ -2781,8 +2783,6 @@
 					pdf.text(chartTitle, pdfMargins.left, 65);
 
 					pdf.setFontSize(12);
-					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70);
 
 					const yearsList = chartState.selectedYear.sort(function(a, b) {
 						return a - b;
@@ -2792,24 +2792,26 @@
 
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
 
-					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						yearsList + "</span></div>", pdfMargins.left, 76);
-
 					const contributions = chartState.selectedContribution === "total" ? "Total (Paid + Pledged)" : chartState.selectedContribution === "paid" ? "Paid" : "Pledged";
-
-					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Contributions: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						contributions + "</span></div>", pdfMargins.left, 82);
 
 					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
 						"Selected countries-all" : countriesList();
 
-					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 88);
+					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Contributions: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						contributions + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 70, {
+							width: 210 - pdfMargins.left - pdfMargins.right
+						},
+						function(position) {
+							pdfTextPosition = position;
+						});
 
 					const sourceDimentions = containerDiv.node().getBoundingClientRect();
-					const widthInMilimeters = 150
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
 
-					pdf.addImage(source, "PNG", pdfMargins.left, 96, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
 
 					const currentDate = new Date();
 
