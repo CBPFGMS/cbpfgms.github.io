@@ -2716,7 +2716,9 @@
 
 		function downloadSnapshotPng(source) {
 
-			const fileName = "contributions.png";
+			const currentDate = new Date();
+
+			const fileName = "CBPFcontributions_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const link = document.createElement("a");
