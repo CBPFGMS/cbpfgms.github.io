@@ -7,7 +7,7 @@
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -53,10 +53,6 @@
 		script.src = url;
 		script.onreadystatechange = callback;
 		script.onload = callback;
-		if (url === jsPdf) {
-			script.setAttribute("integrity", "sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/");
-			script.setAttribute("crossorigin", "anonymous");
-		};
 		head.appendChild(script);
 	};
 
