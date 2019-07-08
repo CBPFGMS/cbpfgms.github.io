@@ -1945,7 +1945,7 @@
 			function populateUniqueValues(row) {
 				let level = adminLocLevels + 1;
 				while (--level) {
-					row["uniqueValue" + level] = row["AdmLoc" + level] + "," + row["AdmLocCord" + level];
+					row["uniqueValue" + level] = (row["AdmLoc" + level].split(",").join("")) + "," + row["AdmLocCord" + level];
 				};
 			};
 
