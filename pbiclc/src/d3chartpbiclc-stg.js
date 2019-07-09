@@ -182,7 +182,6 @@
 			.style("display", "none")
 			.on("mouseleave", function() {
 				isSnapshotTooltipVisible = false;
-				d3.select(currentHoveredRect).dispatch("mouseout");
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
 			});
@@ -1482,6 +1481,8 @@
 
 					if (isSnapshotTooltipVisible) return;
 
+					currentHoveredRect = null;
+
 					if (!datum.clicked) {
 						const index = chartState.selectedDonors.indexOf(datum.isoCode);
 						if (index > -1) {
@@ -2693,7 +2694,7 @@
 					downloadSnapshotPdf(canvas);
 				};
 
-				if (fromContextMenu) d3.select(currentHoveredRect).dispatch("mouseout");
+				if (fromContextMenu && currentHoveredRect) d3.select(currentHoveredRect).dispatch("mouseout");
 
 			});
 
