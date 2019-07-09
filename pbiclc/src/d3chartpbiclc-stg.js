@@ -1862,6 +1862,8 @@
 
 					if (isSnapshotTooltipVisible) return;
 
+					currentHoveredRect = null;
+
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(datum.isoCode);
 						if (index > -1) {
