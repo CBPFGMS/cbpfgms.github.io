@@ -1978,6 +1978,7 @@
 			};
 
 			function mouseOutTopPanel() {
+				if (isSnapshotTooltipVisible) return;
 				tooltip.style("display", "none");
 			};
 
