@@ -4292,7 +4292,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $6 billion to 27 funds operating in the most severe and complex emergencies around the world. In 2018, donors contributed a record $882 million to CBPFs in 18 countries.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
@@ -4308,7 +4308,7 @@
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
-					pdf.text(chartTitle, pdfMargins.left, 65);
+					pdf.text(chartTitle, pdfMargins.left, 71);
 
 					pdf.setFontSize(12);
 
@@ -4318,7 +4318,7 @@
 						fullDate + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + pdfCountries.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						pdfCountries.split("-")[1] + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Currency : <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						(chartState.selectedLocalCurrency ? chartState.selectedLocalCurrency : "USD") + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Period : <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						yearsExtent[0] + " to " + (chartState.futureDonations ? yearsExtent[1] : currentYear) + "</span></div>", pdfMargins.left, 70, {
+						yearsExtent[0] + " to " + (chartState.futureDonations ? yearsExtent[1] : currentYear) + "</span></div>", pdfMargins.left, 77, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
