@@ -136,7 +136,8 @@
 			};
 
 		let yearsExtent,
-			isSnapshotTooltipVisible = false;
+			isSnapshotTooltipVisible = false,
+			currentHoveredElem;
 
 		const containerDiv = d3.select("#d3chartcontainerpbicli");
 
@@ -2252,6 +2253,7 @@
 					});
 
 				labelsGroupDonors.on("mouseover", function(d) {
+						currentHoveredElem = this;
 						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
 							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
@@ -2262,6 +2264,8 @@
 							.attr("filter", "url(#pbicliGrayFilter)");
 					})
 					.on("mouseout", function() {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
 						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture" :
 							".pbicliDonorsGroup, .pbicliLabelsGroupDonors, .pbicliDonorsGroupTrend, .pbicliDonorsGroupFuture";
 						donorsLinesPanel.main.selectAll(selectedGroups)
@@ -2312,6 +2316,7 @@
 					.attr("pointer-events", "all")
 					.merge(rectOverlayDonors)
 					.on("mousemove", function() {
+						currentHoveredElem = this;
 						if (chartState.showLocal) {
 							mouseMoveRectOverlay("donor", donorsLinesPanel, donorsData.concat(donorsDataLocal), xScaleDonors, yScaleDonors);
 						} else {
@@ -2319,6 +2324,8 @@
 						};
 					})
 					.on("mouseout", function() {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
 						mouseOutRectOverlay(donorsLinesPanel);
 					});
 
@@ -2696,6 +2703,7 @@
 					});
 
 				labelsGroupCbpfs.on("mouseover", function(d, i) {
+						currentHoveredElem = this;
 						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
 							.filter(function(e) {
 								return d.isoCode !== e.isoCode;
@@ -2704,6 +2712,8 @@
 							.attr("filter", "url(#pbicliGrayFilter)");
 					})
 					.on("mouseout", function() {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
 						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs, .pbicliCbpfsGroupFuture")
 							.style("opacity", 1)
 							.attr("filter", null);
@@ -2739,9 +2749,12 @@
 					.attr("pointer-events", "all")
 					.merge(rectOverlayCbpfs)
 					.on("mousemove", function() {
+						currentHoveredElem = this;
 						mouseMoveRectOverlay("cbpf", cbpfsLinesPanel, cbpfsData, xScaleCbpfs, yScaleCbpfs);
 					})
 					.on("mouseout", function() {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
 						mouseOutRectOverlay(cbpfsLinesPanel);
 					});
 
@@ -4221,6 +4234,8 @@
 				} else {
 					downloadSnapshotPdf(canvas);
 				};
+
+				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
 
 			});
 

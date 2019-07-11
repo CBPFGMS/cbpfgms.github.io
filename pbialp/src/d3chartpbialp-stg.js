@@ -198,7 +198,6 @@
 			.style("display", "none")
 			.on("mouseleave", function() {
 				isSnapshotTooltipVisible = false;
-				d3.select(currentHoveredRect).dispatch("mouseout");
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
 			});
