@@ -4,6 +4,19 @@
 	position: relative;
 }
 
+#pbiobeDownloadingDiv {
+	position: absolute;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
 #pbiobetooltipdiv {    
 	position: absolute;
 	text-align: left;
@@ -194,4 +207,32 @@ p#pbiobed3chartTitle {
 	font-size: 15px;
 	fill: #222;
 	pointer-events: none;
+}
+
+#pbiobeSnapshotTooltip {
+	z-index: 1600;
+}
+
+.pbiobeSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.pbiobeSnapshotContent #pbiobeSnapshotPdfText, .pbiobeSnapshotContent #pbiobeSnapshotPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.pbiobeSnapshotContent #pbiobeSnapshotPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotPngText:hover {
+	background-color: #1F69B3;
+	color: white;
 }
