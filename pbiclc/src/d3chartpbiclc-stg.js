@@ -2762,9 +2762,28 @@
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
 				.then(function(logo) {
 
-					let pdfTextPosition;
+					let pdf;
 
-					const pdf = new jsPDF();
+					const point = 2.834646;
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
+					const heightInMilimeters = widthInMilimeters * (sourceDimentions.height / sourceDimentions.width);
+					const maxHeightInMilimeters = 180;
+					let pdfHeight;
+
+					if (heightInMilimeters > maxHeightInMilimeters) {
+						pdfHeight = 297 + heightInMilimeters - maxHeightInMilimeters;
+						pdf = new jsPDF({
+							format: [210 * point, (pdfHeight) * point],
+							unit: "mm"
+						})
+					} else {
+						pdfHeight = 297;
+						pdf = new jsPDF();
+					}
+
+					let pdfTextPosition;
 
 					createLetterhead();
 
@@ -2812,10 +2831,7 @@
 							pdfTextPosition = position;
 						});
 
-					const sourceDimentions = containerDiv.node().getBoundingClientRect();
-					const widthInMilimeters = 210 - pdfMargins.left * 2;
-
-					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
 
@@ -2844,13 +2860,13 @@
 						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
 
 						pdf.setFillColor(236, 161, 84);
-						pdf.rect(0, 297 - pdfMargins.bottom, 210, 2, "F");
+						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");
 
 						pdf.setTextColor(60);
 						pdf.setFont("arial");
 						pdf.setFontType("normal");
 						pdf.setFontSize(10);
-						pdf.text(footer, pdfMargins.left, 297 - pdfMargins.bottom + 10);
+						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
 
 					};
 
