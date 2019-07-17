@@ -3215,8 +3215,7 @@
 
 					const currentDate = new Date();
 
-					//pdf.save("AllocationsOverview_" + csvDateFormat(currentDate) + ".pdf");
-					pdf.output("dataurlnewwindow");
+					pdf.save("AllocationsOverview_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
