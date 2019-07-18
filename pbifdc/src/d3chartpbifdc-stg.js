@@ -3282,6 +3282,11 @@
 
 		function createSnapshot(type, fromContextMenu) {
 
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
+
 			const downloadingDiv = d3.select("body").append("div")
 				.style("position", "fixed")
 				.attr("id", "pbifdcDownloadingDiv")
@@ -3453,9 +3458,9 @@
 
 					const selectedRegions = chartState.selectedRegion === "All" ? "All" : chartState.selectedRegion.join(", ");
 
-					pdf.fromHTML("<div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						yearsList + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + regionsText + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + regionsText + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						selectedRegions + "</span></div>", pdfMargins.left, 77, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},

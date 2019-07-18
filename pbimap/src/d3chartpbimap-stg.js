@@ -2983,6 +2983,11 @@
 
 		function createSnapshot(type, fromContextMenu) {
 
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
+
 			d3.select("pbimapTopSvgPartnersLogo")
 				.attr("xlink:href", localStorage.getItem("storedImagepartnersLogo"));
 
@@ -3038,7 +3043,7 @@
 				.attr("width", width)
 				.attr("height", heightTopSvg);
 
-			containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan")
+			containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
 				.style("opacity", 0);
 
 			if (listDiv.html()) listDiv.style("opacity", 0);
@@ -3051,7 +3056,7 @@
 				useCORS: true
 			}).then(function(canvas) {
 
-				containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan")
+				containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
 					.style("opacity", 1);
 
 				topSvg.attr("viewBox", "0 0 " + width + " " + heightTopSvg)
