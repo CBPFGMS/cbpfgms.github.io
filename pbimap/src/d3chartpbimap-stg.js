@@ -3050,6 +3050,12 @@
 
 			snapshotTooltip.style("display", "none");
 
+			if (isTouchScreenOnly) {
+				window.scrollTo({
+					top: 0
+				});
+			};
+
 			html2canvas(imageDiv, {
 				scrollX: 0,
 				scrollY: -window.scrollY,
