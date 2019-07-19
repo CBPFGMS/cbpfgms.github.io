@@ -2684,6 +2684,11 @@
 
 			snapshotTooltip.style("display", "none");
 
+			svg.selectAll("image")
+				.attr("xlink:href", function(d) {
+					return localStorage.getItem("storedFlag" + d.isoCode);
+				});
+
 			html2canvas(imageDiv).then(function(canvas) {
 
 				svg.attr("width", null)
