@@ -3039,9 +3039,10 @@
 				topDiv.style("opacity", 0)
 			};
 
-			topSvg.attr("viewBox", null)
-				.attr("width", width)
-				.attr("height", heightTopSvg);
+			const svgRealSize = topSvg.node().getBoundingClientRect();
+
+			topSvg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
 
 			containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
 				.style("opacity", 0);
@@ -3065,8 +3066,7 @@
 				containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
 					.style("opacity", 1);
 
-				topSvg.attr("viewBox", "0 0 " + width + " " + heightTopSvg)
-					.attr("width", null)
+				topSvg.attr("width", null)
 					.attr("height", null);
 
 				if (listDiv.html()) listDiv.style("opacity", 1);

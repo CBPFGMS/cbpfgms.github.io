@@ -1721,9 +1721,10 @@
 
 			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
 
-			svg.attr("viewBox", null)
-				.attr("width", width)
-				.attr("height", height);
+			const svgRealSize = svg.node().getBoundingClientRect();
+
+			svg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
 
 			const listOfStyles = [
 				"font-size",
@@ -1755,8 +1756,7 @@
 
 			html2canvas(imageDiv).then(function(canvas) {
 
-				svg.attr("viewBox", "0 0 " + width + " " + height)
-					.attr("width", null)
+				svg.attr("width", null)
 					.attr("height", null);
 
 				if (type === "png") {
