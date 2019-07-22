@@ -238,6 +238,15 @@ p#pbiclcd3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
+.pbiclcSnapshotContent #pbiclcBestVisualizedText {
+	font-size: 10px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+}
+
 .pbiclcSnapshotContent #pbiclcSnapshotPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotPngText:hover {
 	background-color: #1F69B3;
 	color: white;
