@@ -172,7 +172,7 @@ p#pbialid3chartTitle {
 	overflow: hidden;
 }
 
-.pbialiSnapshotContent #pbialiSnapshotPdfText, .pbialiSnapshotContent #pbialiSnapshotPngText {
+.pbialiSnapshotContent #pbialiSnapshotPdfText, .pbialiSnapshotContent #pbialiSnapshotPngText, .pbialiSnapshotContent #pbialiSnapshotTooltipPdfText, .pbialiSnapshotContent #pbialiSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -180,7 +180,17 @@ p#pbialid3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbialiSnapshotContent #pbialiSnapshotPdfText:hover, .pbialiSnapshotContent #pbialiSnapshotPngText:hover {
+.pbialiSnapshotContent #pbialiBestVisualizedText, .pbialiSnapshotContent #pbialiTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbialiSnapshotContent #pbialiSnapshotPdfText:hover, .pbialiSnapshotContent #pbialiSnapshotPngText:hover, .pbialiSnapshotContent #pbialiSnapshotTooltipPdfText:hover, .pbialiSnapshotContent #pbialiSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
