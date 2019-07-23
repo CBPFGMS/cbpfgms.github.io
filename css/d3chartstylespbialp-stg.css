@@ -330,7 +330,7 @@ p#pbialpd3chartTitle {
 	overflow: hidden;
 }
 
-.pbialpSnapshotContent #pbialpSnapshotPdfText, .pbialpSnapshotContent #pbialpSnapshotPngText {
+.pbialpSnapshotContent #pbialpSnapshotPdfText, .pbialpSnapshotContent #pbialpSnapshotPngText, .pbialpSnapshotContent #pbialpSnapshotTooltipPdfText, .pbialpSnapshotContent #pbialpSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -338,7 +338,17 @@ p#pbialpd3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbialpSnapshotContent #pbialpSnapshotPdfText:hover, .pbialpSnapshotContent #pbialpSnapshotPngText:hover {
+.pbialpSnapshotContent #pbialpBestVisualizedText, .pbialpSnapshotContent #pbialpTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbialpSnapshotContent #pbialpSnapshotPdfText:hover, .pbialpSnapshotContent #pbialpSnapshotPngText:hover, .pbialpSnapshotContent #pbialpSnapshotTooltipPdfText:hover, .pbialpSnapshotContent #pbialpSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
