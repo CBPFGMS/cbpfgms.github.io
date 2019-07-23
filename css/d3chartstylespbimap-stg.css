@@ -644,6 +644,7 @@ svg.leaflet-zoom-animated {
 	cursor: pointer;
 	border-radius: 4px;
 	overflow: hidden;
+	z-index: 1900;
 }
 
 .pbimapSnapshotContent #pbimapSnapshotPdfText, .pbimapSnapshotContent #pbimapSnapshotPngText, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText {
