@@ -171,20 +171,30 @@
 			});
 
 		snapshotTooltip.append("p")
-			.attr("id", "pbialiSnapshotPdfText")
+			.attr("id", "pbialiSnapshotTooltipPdfText")
 			.html("Download PDF")
 			.on("click", function() {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("pdf", true);
-			})
+			});
 
 		snapshotTooltip.append("p")
-			.attr("id", "pbialiSnapshotPngText")
+			.attr("id", "pbialiSnapshotTooltipPngText")
 			.html("Download Image (PNG)")
 			.on("click", function() {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("png", true);
 			});
+
+		const browserHasSnapshotIssues = (window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome) || window.navigator.userAgent.indexOf("Edge") > -1;
+
+		if (browserHasSnapshotIssues) {
+			snapshotTooltip.append("p")
+				.attr("id", "pbialiTooltipBestVisualizedText")
+				.html("For best results use Chrome, Firefox, Opera or Edge for MacOS.")
+				.attr("pointer-events", "none")
+				.style("cursor", "default");
+		};
 
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbialitooltipdiv")
@@ -195,8 +205,8 @@
 			const thisMouse = d3.mouse(this);
 			isSnapshotTooltipVisible = true;
 			snapshotTooltip.style("display", "block")
-				.style("top", thisMouse[1] + "px")
-				.style("left", thisMouse[0] + "px");
+				.style("top", thisMouse[1] - 4 + "px")
+				.style("left", thisMouse[0] - 4 + "px");
 		});
 
 		const mainPanel = {
@@ -411,14 +421,22 @@
 					.html("Download PDF")
 					.on("click", function() {
 						createSnapshot("pdf", false);
-					})
+					});
 
 				const pngSpan = snapshotContent.append("p")
 					.attr("id", "pbialiSnapshotPngText")
 					.html("Download Image (PNG)")
 					.on("click", function() {
 						createSnapshot("png", false);
-					})
+					});
+
+				if (browserHasSnapshotIssues) {
+					const bestVisualizedSpan = snapshotContent.append("p")
+						.attr("id", "pbialiBestVisualizedText")
+						.html("For best results use Chrome, Firefox, Opera or Edge for MacOS.")
+						.attr("pointer-events", "none")
+						.style("cursor", "default");
+				};
 
 				snapshotDiv.on("mouseover", function() {
 					snapshotContent.style("display", "block")
@@ -1637,15 +1655,17 @@
 			const fileName = "AllocationTrends_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
+				const url = URL.createObjectURL(blob);
 				const link = document.createElement("a");
 				if (link.download !== undefined) {
-					const url = URL.createObjectURL(blob);
 					link.setAttribute("href", url);
 					link.setAttribute("download", fileName);
 					link.style = "visibility:hidden";
 					document.body.appendChild(link);
 					link.click();
 					document.body.removeChild(link);
+				} else {
+					window.location.href = url;
 				};
 			});
 
