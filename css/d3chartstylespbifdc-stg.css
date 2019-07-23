@@ -261,7 +261,7 @@ p#pbifdcd3chartTitle {
 	overflow: hidden;
 }
 
-.pbifdcSnapshotContent #pbifdcSnapshotPdfText, .pbifdcSnapshotContent #pbifdcSnapshotPngText {
+.pbifdcSnapshotContent #pbifdcSnapshotPdfText, .pbifdcSnapshotContent #pbifdcSnapshotPngText, .pbifdcSnapshotContent #pbifdcSnapshotTooltipPdfText, .pbifdcSnapshotContent #pbifdcSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -269,7 +269,17 @@ p#pbifdcd3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbifdcSnapshotContent #pbifdcSnapshotPdfText:hover, .pbifdcSnapshotContent #pbifdcSnapshotPngText:hover {
+.pbifdcSnapshotContent #pbifdcBestVisualizedText, .pbifdcSnapshotContent #pbifdcTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbifdcSnapshotContent #pbifdcSnapshotPdfText:hover, .pbifdcSnapshotContent #pbifdcSnapshotPngText:hover, .pbifdcSnapshotContent #pbifdcSnapshotTooltipPdfText:hover, .pbifdcSnapshotContent #pbifdcSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
