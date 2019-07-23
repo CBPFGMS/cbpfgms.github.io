@@ -232,7 +232,7 @@ p#pbiolcd3chartTitle {
 	overflow: hidden;
 }
 
-.pbiolcSnapshotContent #pbiolcSnapshotPdfText, .pbiolcSnapshotContent #pbiolcSnapshotPngText {
+.pbiolcSnapshotContent #pbiolcSnapshotPdfText, .pbiolcSnapshotContent #pbiolcSnapshotPngText, .pbiolcSnapshotContent #pbiolcSnapshotTooltipPdfText, .pbiolcSnapshotContent #pbiolcSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -240,7 +240,17 @@ p#pbiolcd3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbiolcSnapshotContent #pbiolcSnapshotPdfText:hover, .pbiolcSnapshotContent #pbiolcSnapshotPngText:hover {
+.pbiolcSnapshotContent #pbiolcBestVisualizedText, .pbiolcSnapshotContent #pbiolcTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbiolcSnapshotContent #pbiolcSnapshotPdfText:hover, .pbiolcSnapshotContent #pbiolcSnapshotPngText:hover, .pbiolcSnapshotContent #pbiolcSnapshotTooltipPdfText:hover, .pbiolcSnapshotContent #pbiolcSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }

@@ -646,7 +646,7 @@ svg.leaflet-zoom-animated {
 	overflow: hidden;
 }
 
-.pbimapSnapshotContent #pbimapSnapshotPdfText, .pbimapSnapshotContent #pbimapSnapshotPngText {
+.pbimapSnapshotContent #pbimapSnapshotPdfText, .pbimapSnapshotContent #pbimapSnapshotPngText, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -654,7 +654,17 @@ svg.leaflet-zoom-animated {
 	font-family: "Arial", sans-serif;
 }
 
-.pbimapSnapshotContent #pbimapSnapshotPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotPngText:hover {
+.pbimapSnapshotContent #pbimapBestVisualizedText, .pbimapSnapshotContent #pbimapTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbimapSnapshotContent #pbimapSnapshotPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotPngText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }

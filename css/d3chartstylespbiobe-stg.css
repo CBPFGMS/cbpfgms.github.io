@@ -224,7 +224,7 @@ p#pbiobed3chartTitle {
 	overflow: hidden;
 }
 
-.pbiobeSnapshotContent #pbiobeSnapshotPdfText, .pbiobeSnapshotContent #pbiobeSnapshotPngText {
+.pbiobeSnapshotContent #pbiobeSnapshotPdfText, .pbiobeSnapshotContent #pbiobeSnapshotPngText, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPdfText, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -232,7 +232,17 @@ p#pbiobed3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbiobeSnapshotContent #pbiobeSnapshotPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotPngText:hover {
+.pbiobeSnapshotContent #pbiobeBestVisualizedText, .pbiobeSnapshotContent #pbiobeTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbiobeSnapshotContent #pbiobeSnapshotPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotPngText:hover, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
