@@ -472,7 +472,7 @@
 	overflow: hidden;
 }
 
-.pbicliSnapshotContent #pbicliSnapshotPdfText, .pbicliSnapshotContent #pbicliSnapshotPngText {
+.pbicliSnapshotContent #pbicliSnapshotPdfText, .pbicliSnapshotContent #pbicliSnapshotPngText, .pbicliSnapshotContent #pbicliSnapshotTooltipPdfText, .pbicliSnapshotContent #pbicliSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -480,7 +480,17 @@
 	font-family: "Arial", sans-serif;
 }
 
-.pbicliSnapshotContent #pbicliSnapshotPdfText:hover, .pbicliSnapshotContent #pbicliSnapshotPngText:hover {
+.pbicliSnapshotContent #pbicliBestVisualizedText, .pbicliSnapshotContent #pbicliTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbicliSnapshotContent #pbicliSnapshotPdfText:hover, .pbicliSnapshotContent #pbicliSnapshotPngText:hover, .pbicliSnapshotContent #pbicliSnapshotTooltipPdfText:hover, .pbicliSnapshotContent #pbicliSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
