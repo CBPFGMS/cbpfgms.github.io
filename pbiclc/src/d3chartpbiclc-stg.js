@@ -202,7 +202,7 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = (window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome) || window.navigator.userAgent.indexOf("Edge") > -1;
+		const browserHasSnapshotIssues = (window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome);
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
