@@ -2856,6 +2856,8 @@
 					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
 						"Selected countries-all" : countriesList();
 
+					console.log("stage-4");
+
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Contributions: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
@@ -2867,11 +2869,13 @@
 							pdfTextPosition = position;
 						});
 
+					console.log("stage-5");
+
 					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
 
-					console.log("stage-4");
+					console.log("stage-6");
 
 					//pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
 					pdf.output("dataurlnewwindow");
