@@ -221,7 +221,7 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = (window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome) || window.navigator.userAgent.indexOf("Edge") > -1;
+		const browserHasSnapshotIssues = window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome;
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
@@ -1779,13 +1779,6 @@
 
 		function downloadSnapshotPdf(source) {
 
-			const options = {
-				weekday: "long",
-				year: "numeric",
-				month: "long",
-				day: "numeric"
-			};
-
 			const pdfMargins = {
 				top: 10,
 				bottom: 16,
@@ -1806,7 +1799,7 @@
 						fontSize: 12
 					});
 
-					const fullDate = new Date().toLocaleDateString("default", options);
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
 
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
