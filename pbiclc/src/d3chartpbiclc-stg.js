@@ -2833,7 +2833,7 @@
 
 					console.log("stage-D");
 
-					const fullDate = new Date().toLocaleDateString("default", options);
+					const fullDate = new Date();
 
 					console.log("stage-E");
 
