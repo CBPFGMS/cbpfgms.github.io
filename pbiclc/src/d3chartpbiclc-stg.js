@@ -2865,7 +2865,8 @@
 
 					const currentDate = new Date();
 
-					pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
+					//pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.output("dataurlnewwindow");
 
 					removeProgressWheel();
 
