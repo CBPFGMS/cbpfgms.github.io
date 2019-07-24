@@ -2709,8 +2709,6 @@
 
 			html2canvas(imageDiv).then(function(canvas) {
 
-				console.log("stage-1");
-
 				svg.attr("width", null)
 					.attr("height", null);
 
@@ -2777,15 +2775,6 @@
 
 		function downloadSnapshotPdf(source) {
 
-			console.log("stage-2");
-
-			const options = {
-				weekday: "long",
-				year: "numeric",
-				month: "long",
-				day: "numeric"
-			};
-
 			const pdfMargins = {
 				top: 10,
 				bottom: 16,
@@ -2795,8 +2784,6 @@
 
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
 				.then(function(logo) {
-
-					console.log("stage-3aaaa");
 
 					let pdf;
 
@@ -2821,21 +2808,13 @@
 
 					let pdfTextPosition;
 
-					console.log("stage-3bbb");
-
 					createLetterhead();
-
-					console.log("stage-3ccc");
 
 					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
-					console.log("stage-D");
-
-					const fullDate = new Date();
-
-					console.log("stage-E");
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
 
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
@@ -2843,15 +2822,11 @@
 					pdf.setFontSize(12);
 					pdf.text(pdfMargins.left, 48, intro);
 
-					console.log("stage-F");
-
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
 					pdf.text(chartTitle, pdfMargins.left, 65);
-
-					console.log("stage-G");
 
 					pdf.setFontSize(12);
 
@@ -2861,16 +2836,12 @@
 						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
 					}, "");
 
-					console.log("stage-H");
-
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
 
 					const contributions = chartState.selectedContribution === "total" ? "Total (Paid + Pledged)" : chartState.selectedContribution === "paid" ? "Paid" : "Pledged";
 
 					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
 						"Selected countries-all" : countriesList();
-
-					console.log("stage-4");
 
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
@@ -2883,16 +2854,11 @@
 							pdfTextPosition = position;
 						});
 
-					console.log("stage-5");
-
 					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
 
-					console.log("stage-6");
-
-					//pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
-					pdf.output("dataurlnewwindow");
+					pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
