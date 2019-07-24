@@ -2796,7 +2796,7 @@
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
 				.then(function(logo) {
 
-					console.log("stage-3");
+					console.log("stage-3aaaa");
 
 					let pdf;
 
@@ -2821,7 +2821,11 @@
 
 					let pdfTextPosition;
 
+					console.log("stage-3bbb");
+
 					createLetterhead();
+
+					console.log("stage-3ccc");
 
 					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
