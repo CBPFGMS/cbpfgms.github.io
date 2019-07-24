@@ -2831,7 +2831,11 @@
 						fontSize: 12
 					});
 
+					console.log("stage-D");
+
 					const fullDate = new Date().toLocaleDateString("default", options);
+
+					console.log("stage-E");
 
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
@@ -2839,11 +2843,15 @@
 					pdf.setFontSize(12);
 					pdf.text(pdfMargins.left, 48, intro);
 
+					console.log("stage-F");
+
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
 					pdf.text(chartTitle, pdfMargins.left, 65);
+
+					console.log("stage-G");
 
 					pdf.setFontSize(12);
 
@@ -2852,6 +2860,8 @@
 					}).reduce(function(acc, curr, index) {
 						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
 					}, "");
+
+					console.log("stage-H");
 
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
 
