@@ -2709,6 +2709,8 @@
 
 			html2canvas(imageDiv).then(function(canvas) {
 
+				console.log("stage-1");
+
 				svg.attr("width", null)
 					.attr("height", null);
 
@@ -2775,6 +2777,8 @@
 
 		function downloadSnapshotPdf(source) {
 
+			console.log("stage-2");
+
 			const options = {
 				weekday: "long",
 				year: "numeric",
@@ -2791,6 +2795,8 @@
 
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
 				.then(function(logo) {
+
+					console.log("stage-3");
 
 					let pdf;
 
@@ -2864,6 +2870,8 @@
 					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
+
+					console.log("stage-4");
 
 					//pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
 					pdf.output("dataurlnewwindow");
