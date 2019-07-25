@@ -207,7 +207,7 @@
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
 				.attr("id", "pbiclcTooltipBestVisualizedText")
-				.html("For best results use Chrome, Firefox, Opera or Edge for MacOS.")
+				.html("For best results use Chrome, Firefox, Opera or Edge.")
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
 		};
@@ -628,7 +628,7 @@
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiclcBestVisualizedText")
-						.html("For best results use Chrome, Firefox, Opera or Edge for MacOS.")
+						.html("For best results use Chrome, Firefox, Opera or Edge.")
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
 				};
