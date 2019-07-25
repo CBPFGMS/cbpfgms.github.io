@@ -287,7 +287,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) * nodesPanelWidthFactor,
 			height: nodesPanelHeight,
-			padding: [8, 16, 8, 16]
+			padding: [8, 28, 8, 16]
 		};
 
 		const legendPanel = {
@@ -1953,9 +1953,9 @@
 						return d.name + " (" + d.category + "): $" + formatMoney0Decimals(d.total);
 					})
 					.each(function(d) {
+						let currentFontSize = parseInt(d3.style(this, "font-size"));
 						while (this.getComputedTextLength() > legendPanel.width - legendPanel.padding[3]) {
-							const currentFontSize = d3.select(this).style("font-size");
-							d3.select(this).style("font-size", (parseInt(currentFontSize)) - 1 + "px");
+							d3.select(this).style("font-size", --currentFontSize);
 						};
 					});
 
@@ -2086,6 +2086,13 @@
 					.text(function(d) {
 						return "$" + formatMoney0Decimals(d.total)
 					});
+
+				linkWidthSubText.each(function() {
+					let elementFontSize = parseInt(d3.style(this.parentNode, "font-size"));
+					while (this.parentNode.getBoundingClientRect().width > (legendPanel.width - legendPanel.padding[3] - legendPanel.padding[1] - 50)) {
+						d3.select(this.parentNode).style("font-size", --elementFontSize);
+					};
+				});
 
 				const linkWidthLinks = linkWidthGroup.append("line")
 					.attr("x1", legendPanel.padding[3])
