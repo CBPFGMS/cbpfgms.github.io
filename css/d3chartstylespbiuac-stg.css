@@ -295,6 +295,12 @@ p#pbiuacd3chartTitle {
 	margin-bottom: 12px;
 }
 
+.pbiuacBrushText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #444;
+}
+
 #pbiuacSnapshotTooltip {
 	z-index: 1600;
 }

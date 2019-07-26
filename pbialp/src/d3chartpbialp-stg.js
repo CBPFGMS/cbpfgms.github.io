@@ -93,8 +93,8 @@
 			paidSymbolSize = 16,
 			percentNumberPadding = 8,
 			circleRadius = 4,
-			showAverageGroupPadding = 84,
-			netFundingGroupPadding = 170,
+			showAverageGroupPadding = 70,
+			netFundingGroupPadding = 156,
 			selectedCbpfLabelPadding = 8,
 			lollipopTooltipWidth = 400,
 			parallelTooltipWidth = 280,
@@ -1743,7 +1743,7 @@
 				const showAverageText = showAverageGroup.append("text")
 					.attr("class", "pbialpAverageTextControl")
 					.attr("x", 10)
-					.text("Show Average")
+					.text("Show Total")
 					.attr("y", 5);
 
 				netFundingGroup.on("click", function() {
