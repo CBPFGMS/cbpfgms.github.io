@@ -106,8 +106,8 @@
 			offsetStartDefault = 6,
 			offsetEndDefault = 6,
 			formatMoney0Decimals = d3.format(",.0f"),
-			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(0.9), d3.color(rectangleColors[0]).darker(1)),
-			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(0.9), d3.color(rectangleColors[1]).darker(1)),
+			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(1.2), d3.color(rectangleColors[0]).darker(1.2)),
+			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(1.2), d3.color(rectangleColors[1]).darker(1.2)),
 			allocationTypes = ["standard", "reserve"],
 			cbpfsOrdering = ["planned", "ongoing", "past"],
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
@@ -120,7 +120,7 @@
 
 		let height = 500,
 			mainPanelHeight = 320,
-			brushPanelHeight = 44,
+			brushPanelHeight = 54,
 			minDate = maxDate = currentDate,
 			cbpfsList,
 			minDateOffset,
@@ -133,7 +133,8 @@
 			containerSize,
 			thisSize,
 			tooltipSize,
-			isSnapshotTooltipVisible = false;
+			isSnapshotTooltipVisible = false,
+			currentHoveredElem;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
@@ -261,7 +262,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [0, 0, 14, 80]
+			padding: [0, 0, 24, 80]
 		};
 
 		const mainPanel = {
@@ -366,9 +367,25 @@
 
 				xScaleBrush.domain([minDateOffset, maxDateOffset]);
 
-				colorScaleStandard.domain([minAllocationValueStandard, maxAllocationValueStandard]);
+				const standardDataArray = data.filter(function(d) {
+					return d.AllocationSource === "Standard";
+				}).map(function(d) {
+					return d.TotalUSDPlanned;
+				}).sort(function(a, b) {
+					return a - b;
+				});
 
-				colorScaleReserve.domain([minAllocationValueReserve, maxAllocationValueReserve]);
+				const reserveDataArray = data.filter(function(d) {
+					return d.AllocationSource === "Reserve";
+				}).map(function(d) {
+					return d.TotalUSDPlanned;
+				}).sort(function(a, b) {
+					return a - b;
+				});
+
+				colorScaleStandard.domain(standardDataArray);
+
+				colorScaleReserve.domain(reserveDataArray);
 
 				if (!lazyLoad) {
 					draw(data);
@@ -1003,6 +1020,30 @@
 				.style("y", (brushPanel.height - brushPanel.padding[2]) * .2)
 				.style("height", (brushPanel.height - brushPanel.padding[2]) * .6);
 
+			const brushText = brushPanel.main.append("text")
+				.attr("text-anchor", "end")
+				.attr("class", "pbiuacBrushText")
+				.attr("x", brushPanel.padding[3] - 26)
+				.attr("y", brushPanel.padding[0] + 21)
+				.text("Select")
+				.append("tspan")
+				.attr("dy", "0.5em")
+				.attr("x", brushPanel.padding[3] - 10)
+				.text("\u2192")
+				.append("tspan")
+				.attr("x", brushPanel.padding[3] - 26)
+				.attr("dy", "0.5em")
+				.text("period");
+
+			const brushPanelLine = brushPanel.main.append("line")
+				.attr("x1", brushPanel.padding[3])
+				.attr("x2", brushPanel.width - brushPanel.padding[1])
+				.attr("y1", brushPanel.height)
+				.attr("y2", brushPanel.height)
+				.style("stroke", "#aaa")
+				.style("stroke-width", "2px")
+				.style("stroke-linecap", "round");
+
 			//end of createBrushPanel
 		};
 
@@ -1056,7 +1097,7 @@
 					return d;
 				})
 				.on("mouseover", function(d) {
-					mouseOverLegend(d, colorScaleStandard, this);
+					mouseOverLegend(d, colorScaleStandard, this, "Standard");
 				})
 				.on("mouseout", mouseOutLegend);
 
@@ -1078,7 +1119,7 @@
 					return d;
 				})
 				.on("mouseover", function(d) {
-					mouseOverLegend(d, colorScaleReserve, this);
+					mouseOverLegend(d, colorScaleReserve, this, "Reserve");
 				})
 				.on("mouseout", mouseOutLegend);
 
@@ -1110,7 +1151,9 @@
 				.attr("text-anchor", "start")
 				.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueReserve));
 
-			function mouseOverLegend(datum, scale, element) {
+			function mouseOverLegend(datum, scale, element, modality) {
+
+				currentHoveredElem = element;
 
 				tooltip.html(null);
 
@@ -1119,6 +1162,11 @@
 				const thisSize = element.getBoundingClientRect();
 
 				const limits = scale.invertExtent(datum);
+
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", function(d) {
+						return d.TotalUSDPlanned >= limits[0] && d.TotalUSDPlanned <= limits[1] && d.AllocationSource === modality ? 1 : 0.1;
+					});
 
 				const innerTooltip = tooltip.append("div")
 					.attr("id", "pbiuacInnerTooltipDiv");
@@ -1137,6 +1185,11 @@
 
 			function mouseOutLegend() {
 				if (isSnapshotTooltipVisible) return;
+
+				currentHoveredElem = null;
+
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", 1);
 				tooltip.style("display", "none");
 			};
 
@@ -1788,6 +1841,8 @@
 				} else {
 					downloadSnapshotPdf(canvas);
 				};
+
+				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
 
 			});
 
