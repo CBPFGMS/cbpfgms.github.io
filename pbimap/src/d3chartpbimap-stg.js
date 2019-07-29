@@ -274,7 +274,7 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome;
+		const browserHasSnapshotIssues = !isTouchScreenOnly && window.safari;
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")

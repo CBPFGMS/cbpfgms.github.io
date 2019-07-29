@@ -2,6 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbialp-stg.css", fontAwesomeLink],
@@ -218,7 +219,7 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = window.navigator.userAgent.indexOf("Safari") > -1 && !window.chrome;
+		const browserHasSnapshotIssues = !isTouchScreenOnly && window.safari;
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
