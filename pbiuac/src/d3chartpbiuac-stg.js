@@ -226,7 +226,7 @@
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
 				.attr("id", "pbiuacTooltipBestVisualizedText")
-				.html("For best results use Chrome, Firefox, Opera or Edge.")
+				.html("For best results use Chrome, Firefox or Opera.")
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
 		};
