@@ -1,0 +1,165 @@
+/******************/
+/*GENERAL STYLES:
+These styles apply to all D3 charts*/
+
+/*styles for 'fill'*/
+
+.contributionColorFill {
+	fill: #418fde;
+}
+
+.allocationColorFill {
+	fill: #eca154;
+}
+
+.contributionColorDarkerFill {
+	fill: #2e649b;
+}
+
+.allocationColorDarkerFill {
+	fill: #a5713b;
+}
+
+.contributionColorBrighterFill {
+	fill: #5dccff;
+}
+
+.allocationColorBrighterFill {
+	fill: #ffe678;
+}
+
+/*styles for 'stroke'*/
+
+.contributionColorStroke {
+	stroke: #418fde;
+}
+
+.allocationColorStroke {
+	stroke: #eca154;
+}
+
+.contributionColorDarkerStroke {
+	stroke: #2e649b;
+}
+
+.allocationColorDarkerStroke {
+	stroke: #a5713b;
+}
+
+.contributionColorBrighterStroke {
+	stroke: #5dccff;
+}
+
+.allocationColorBrighterStroke {
+	stroke: #ffe678;
+}
+
+/*styles for 'HTML color'*/
+
+.contributionColorHTMLcolor {
+	color: #418fde;
+}
+
+.allocationColorHTMLcolor {
+	color: #eca154;
+}
+
+.contributionColorDarkerHTMLcolor {
+	color: #2e649b;
+}
+
+.allocationColorDarkerHTMLcolor {
+	color: #a5713b;
+}
+
+.contributionColorBrighterHTMLcolor {
+	color: #5dccff;
+}
+
+.allocationColorBrighterHTMLcolor {
+	color: #ffe678;
+}
+
+/*styles for 'HTML background-color'*/
+
+.contributionColorHTMLbc {
+	background-color: #418fde;
+}
+
+.allocationColorHTMLbc {
+	background-color: #eca154;
+}
+
+.contributionColorDarkerHTMLbc {
+	background-color: #2e649b;
+}
+
+.allocationColorDarkerHTMLbc {
+	background-color: #a5713b;
+}
+
+.contributionColorBrighterHTMLbc {
+	background-color: #5dccff;
+}
+
+.allocationColorBrighterHTMLbc {
+	background-color: #ffe678;
+}
+
+/*styles for UN partners colors - fill*/
+
+.NationalNGOPartnerColor {
+	fill: #75c0de;
+}
+
+.UNAgencyPartnerColor {
+	fill: #b5dffd;
+}
+
+.OthersPartnerColor {
+	fill: #f02720;
+}
+
+.InternationalNGOPartnerColor {
+	fill: #e9c39b;
+}
+
+/*styles for the chart title, footer and help/csv buttons*/
+
+.d3chartIconsDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 3px 8px 3px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.d3chartIconsDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.d3chartIconsDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.d3chartIconsDiv button:focus {
+	outline: none;
+}
+
+.d3chartFooterText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	text-align: right;
+	width: 98%;
+}
