@@ -95,7 +95,7 @@
 				"Multi-Sector"
 			],
 			numberOfClusters = clusters.length,
-			lollipopGroupHeight = 24,
+			lollipopGroupHeight = 26,
 			lollipopTitlePadding = 50,
 			titleMargin = 24,
 			sortByPadding = 4,
@@ -118,7 +118,7 @@
 			formatNumberSI = d3.format(".3s"),
 			formatComma = d3.format(","),
 			clusterSymbolsDirectory = "",
-			clusterIconSize = 20,
+			clusterIconSize = 26,
 			clusterIconPadding = 3,
 			disabledOpacity = 0.6,
 			windowHeight = window.innerHeight,
@@ -1045,10 +1045,10 @@
 						return (labelsPanel.width - this.previousSibling.getComputedTextLength()) / 2 -
 							clusterIconSize / 2 - clusterIconPadding;
 					})
-					.attr("y", -(1 + clusterIconSize / 2))
+					.attr("y", -(clusterIconSize / 2))
 					.attr("xlink:href", function(d) {
 						return localStorage.getItem("storedCluster" + d.clusterKey.toLowerCase()) ? localStorage.getItem("storedCluster" + d.clusterKey.toLowerCase()) :
-							clusterIconsPath + "cluster" + d.clusterKey.toLowerCase() + ".png";
+							clusterIconsPath + "cluster" + d.clusterKey.toLowerCase() + "60px.png";
 					});
 
 				const labelTooltipRectangleEnter = labelGroupEnter.append("rect")
@@ -1987,7 +1987,7 @@
 		function saveFlags(clustersList) {
 
 			clustersList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + ".png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + "60px.png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, clusterCode) {
