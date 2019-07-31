@@ -2,10 +2,13 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
-		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js";
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac-stg.css", fontAwesomeLink],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js",
+		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -23,7 +26,7 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
+	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
@@ -62,7 +65,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -104,8 +107,8 @@
 			offsetStartDefault = 6,
 			offsetEndDefault = 6,
 			formatMoney0Decimals = d3.format(",.0f"),
-			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(0.9), d3.color(rectangleColors[0]).darker(1)),
-			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(0.9), d3.color(rectangleColors[1]).darker(1)),
+			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(1.2), d3.color(rectangleColors[0]).darker(1.2)),
+			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(1.2), d3.color(rectangleColors[1]).darker(1.2)),
 			allocationTypes = ["standard", "reserve"],
 			cbpfsOrdering = ["planned", "ongoing", "past"],
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
@@ -118,7 +121,7 @@
 
 		let height = 500,
 			mainPanelHeight = 320,
-			brushPanelHeight = 44,
+			brushPanelHeight = 54,
 			minDate = maxDate = currentDate,
 			cbpfsList,
 			minDateOffset,
@@ -130,7 +133,9 @@
 			completeData,
 			containerSize,
 			thisSize,
-			tooltipSize;
+			tooltipSize,
+			isSnapshotTooltipVisible = false,
+			currentHoveredElem;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
@@ -188,11 +193,56 @@
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiuacFooterDiv") : null;
 
-		createProgressWheel();
+		createProgressWheel(svg, width, height, "Loading visualisation...");
+
+		const snapshotTooltip = containerDiv.append("div")
+			.attr("id", "pbiuacSnapshotTooltip")
+			.attr("class", "pbiuacSnapshotContent")
+			.style("display", "none")
+			.on("mouseleave", function() {
+				isSnapshotTooltipVisible = false;
+				snapshotTooltip.style("display", "none");
+				tooltip.style("display", "none");
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiuacSnapshotTooltipPdfText")
+			.html("Download PDF")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("pdf", true);
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiuacSnapshotTooltipPngText")
+			.html("Download Image (PNG)")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("png", true);
+			});
+
+		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
+
+		if (browserHasSnapshotIssues) {
+			snapshotTooltip.append("p")
+				.attr("id", "pbiuacTooltipBestVisualizedText")
+				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+				.attr("pointer-events", "none")
+				.style("cursor", "default");
+		};
 
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiuactooltipdiv")
 			.style("display", "none");
+
+		containerDiv.on("contextmenu", function() {
+			d3.event.preventDefault();
+			const thisMouse = d3.mouse(this);
+			isSnapshotTooltipVisible = true;
+			snapshotTooltip.style("display", "block")
+				.style("top", thisMouse[1] - 4 + "px")
+				.style("left", thisMouse[0] - 4 + "px");
+		});
 
 		const topPanel = {
 			main: svg.append("g")
@@ -213,7 +263,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [0, 0, 14, 80]
+			padding: [0, 0, 24, 80]
 		};
 
 		const mainPanel = {
@@ -295,6 +345,10 @@
 			.scaleExtent([1, Infinity])
 			.on("zoom", zoomed);
 
+		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
+
+		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
+
 		d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row)
 			.then(function(rawData) {
 
@@ -314,9 +368,25 @@
 
 				xScaleBrush.domain([minDateOffset, maxDateOffset]);
 
-				colorScaleStandard.domain([minAllocationValueStandard, maxAllocationValueStandard]);
+				const standardDataArray = data.filter(function(d) {
+					return d.AllocationSource === "Standard";
+				}).map(function(d) {
+					return d.TotalUSDPlanned;
+				}).sort(function(a, b) {
+					return a - b;
+				});
 
-				colorScaleReserve.domain([minAllocationValueReserve, maxAllocationValueReserve]);
+				const reserveDataArray = data.filter(function(d) {
+					return d.AllocationSource === "Reserve";
+				}).map(function(d) {
+					return d.TotalUSDPlanned;
+				}).sort(function(a, b) {
+					return a - b;
+				});
+
+				colorScaleStandard.domain(standardDataArray);
+
+				colorScaleReserve.domain(reserveDataArray);
 
 				if (!lazyLoad) {
 					draw(data);
@@ -374,6 +444,47 @@
 			downloadIcon.html(".CSV  ")
 				.append("span")
 				.attr("class", "fas fa-download");
+
+			const snapshotDiv = iconsDiv.append("div")
+				.attr("class", "pbiuacSnapshotDiv");
+
+			const snapshotIcon = snapshotDiv.append("button")
+				.attr("id", "pbiuacSnapshotButton");
+
+			snapshotIcon.html("IMAGE ")
+				.append("span")
+				.attr("class", "fas fa-camera");
+
+			const snapshotContent = snapshotDiv.append("div")
+				.attr("class", "pbiuacSnapshotContent");
+
+			const pdfSpan = snapshotContent.append("p")
+				.attr("id", "pbiuacSnapshotPdfText")
+				.html("Download PDF")
+				.on("click", function() {
+					createSnapshot("pdf", false);
+				});
+
+			const pngSpan = snapshotContent.append("p")
+				.attr("id", "pbiuacSnapshotPngText")
+				.html("Download Image (PNG)")
+				.on("click", function() {
+					createSnapshot("png", false);
+				});
+
+			if (browserHasSnapshotIssues) {
+				const bestVisualizedSpan = snapshotContent.append("p")
+					.attr("id", "pbiuacBestVisualizedText")
+					.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+					.attr("pointer-events", "none")
+					.style("cursor", "default");
+			};
+
+			snapshotDiv.on("mouseover", function() {
+				snapshotContent.style("display", "block")
+			}).on("mouseout", function() {
+				snapshotContent.style("display", "none")
+			});
 
 			helpIcon.on("click", createAnnotationsDiv);
 
@@ -824,6 +935,7 @@
 			};
 
 			function mouseOutAllocation() {
+				if (isSnapshotTooltipVisible) return;
 				tooltip.style("display", "none");
 			};
 
@@ -909,6 +1021,30 @@
 				.style("y", (brushPanel.height - brushPanel.padding[2]) * .2)
 				.style("height", (brushPanel.height - brushPanel.padding[2]) * .6);
 
+			const brushText = brushPanel.main.append("text")
+				.attr("text-anchor", "end")
+				.attr("class", "pbiuacBrushText")
+				.attr("x", brushPanel.padding[3] - 26)
+				.attr("y", brushPanel.padding[0] + 21)
+				.text("Select")
+				.append("tspan")
+				.attr("dy", "0.5em")
+				.attr("x", brushPanel.padding[3] - 10)
+				.text("\u2192")
+				.append("tspan")
+				.attr("x", brushPanel.padding[3] - 26)
+				.attr("dy", "0.5em")
+				.text("period");
+
+			const brushPanelLine = brushPanel.main.append("line")
+				.attr("x1", brushPanel.padding[3])
+				.attr("x2", brushPanel.width - brushPanel.padding[1])
+				.attr("y1", brushPanel.height)
+				.attr("y2", brushPanel.height)
+				.style("stroke", "#aaa")
+				.style("stroke-width", "2px")
+				.style("stroke-linecap", "round");
+
 			//end of createBrushPanel
 		};
 
@@ -962,7 +1098,7 @@
 					return d;
 				})
 				.on("mouseover", function(d) {
-					mouseOverLegend(d, colorScaleStandard, this);
+					mouseOverLegend(d, colorScaleStandard, this, "Standard");
 				})
 				.on("mouseout", mouseOutLegend);
 
@@ -984,7 +1120,7 @@
 					return d;
 				})
 				.on("mouseover", function(d) {
-					mouseOverLegend(d, colorScaleReserve, this);
+					mouseOverLegend(d, colorScaleReserve, this, "Reserve");
 				})
 				.on("mouseout", mouseOutLegend);
 
@@ -1016,7 +1152,9 @@
 				.attr("text-anchor", "start")
 				.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueReserve));
 
-			function mouseOverLegend(datum, scale, element) {
+			function mouseOverLegend(datum, scale, element, modality) {
+
+				currentHoveredElem = element;
 
 				tooltip.html(null);
 
@@ -1025,6 +1163,11 @@
 				const thisSize = element.getBoundingClientRect();
 
 				const limits = scale.invertExtent(datum);
+
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", function(d) {
+						return d.TotalUSDPlanned >= limits[0] && d.TotalUSDPlanned <= limits[1] && d.AllocationSource === modality ? 1 : 0.1;
+					});
 
 				const innerTooltip = tooltip.append("div")
 					.attr("id", "pbiuacInnerTooltipDiv");
@@ -1042,6 +1185,12 @@
 			};
 
 			function mouseOutLegend() {
+				if (isSnapshotTooltipVisible) return;
+
+				currentHoveredElem = null;
+
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", 1);
 				tooltip.style("display", "none");
 			};
 
@@ -1622,10 +1771,240 @@
 			});
 		};
 
-		function createProgressWheel() {
-			const wheelGroup = svg.append("g")
-				.attr("class", "d3chartwheelGroup")
-				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
+		function createSnapshot(type, fromContextMenu) {
+
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
+
+			const downloadingDiv = d3.select("body").append("div")
+				.style("position", "fixed")
+				.attr("id", "pbiuacDownloadingDiv")
+				.style("left", window.innerWidth / 2 - 100 + "px")
+				.style("top", window.innerHeight / 2 - 100 + "px");
+
+			const downloadingDivSvg = downloadingDiv.append("svg")
+				.attr("class", "pbiuacDownloadingDivSvg")
+				.attr("width", 200)
+				.attr("height", 100);
+
+			const downloadingDivText = "Downloading " + type.toUpperCase();
+
+			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+
+			const svgRealSize = svg.node().getBoundingClientRect();
+
+			svg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
+
+			const listOfStyles = [
+				"font-size",
+				"font-family",
+				"font-weight",
+				"fill",
+				"stroke",
+				"stroke-dasharray",
+				"stroke-width",
+				"opacity",
+				"text-anchor",
+				"text-transform",
+				"shape-rendering",
+				"letter-spacing",
+				"white-space"
+			];
+
+			const imageDiv = containerDiv.node();
+
+			setSvgStyles(svg.node());
+
+			if (type === "png") {
+				iconsDiv.style("opacity", 0);
+			} else {
+				topDiv.style("opacity", 0)
+			};
+
+			snapshotTooltip.style("display", "none");
+
+			html2canvas(imageDiv).then(function(canvas) {
+
+				svg.attr("width", null)
+					.attr("height", null);
+
+				if (type === "png") {
+					iconsDiv.style("opacity", 1);
+				} else {
+					topDiv.style("opacity", 1)
+				};
+
+				if (type === "png") {
+					downloadSnapshotPng(canvas);
+				} else {
+					downloadSnapshotPdf(canvas);
+				};
+
+				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
+
+			});
+
+			function setSvgStyles(node) {
+
+				if (!node.style) return;
+
+				let styles = getComputedStyle(node);
+
+				for (let i = 0; i < listOfStyles.length; i++) {
+					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
+				};
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					setSvgStyles(node.childNodes[i]);
+				};
+			};
+
+			//end of createSnapshot
+		};
+
+		function downloadSnapshotPng(source) {
+
+			const currentDate = new Date();
+
+			const fileName = "AllocationsTimeline_" + csvDateFormat(currentDate) + ".png";
+
+			source.toBlob(function(blob) {
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				if (link.download !== undefined) {
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				} else {
+					window.location.href = url;
+				};
+			});
+
+			removeProgressWheel();
+
+			d3.select("#pbiuacDownloadingDiv").remove();
+
+		};
+
+		function downloadSnapshotPdf(source) {
+
+			const pdfMargins = {
+				top: 10,
+				bottom: 16,
+				left: 20,
+				right: 30
+			};
+
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+				.then(function(logo) {
+
+					let pdf;
+
+					const point = 2.834646;
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
+					const heightInMilimeters = widthInMilimeters * (sourceDimentions.height / sourceDimentions.width);
+					const maxHeightInMilimeters = 190;
+					let pdfHeight;
+
+					if (heightInMilimeters > maxHeightInMilimeters) {
+						pdfHeight = 297 + heightInMilimeters - maxHeightInMilimeters;
+						pdf = new jsPDF({
+							format: [210 * point, (pdfHeight) * point],
+							unit: "mm"
+						})
+					} else {
+						pdfHeight = 297;
+						pdf = new jsPDF();
+					}
+
+					let pdfTextPosition;
+
+					createLetterhead();
+
+					const intro = pdf.splitTextToSize("In 2018, CBPFs allocated more than $836 million to 685 partners in 18 countries to support 1,453 critical humanitarian projects. These projects targeted millions of people with healthcare, food aid, clean water, shelter and other life-saving assistance.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 12
+					});
+
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
+
+					pdf.setTextColor(60);
+					pdf.setFont('helvetica');
+					pdf.setFontType("normal");
+					pdf.setFontSize(12);
+					pdf.text(pdfMargins.left, 48, intro);
+
+					pdf.setTextColor(65, 143, 222);
+					pdf.setFont('helvetica');
+					pdf.setFontType("bold");
+					pdf.setFontSize(16);
+					pdf.text(chartTitle, pdfMargins.left, 71);
+
+					pdf.setFontSize(12);
+
+					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div>", pdfMargins.left, 77, {
+							width: 210 - pdfMargins.left - pdfMargins.right
+						},
+						function(position) {
+							pdfTextPosition = position;
+						});
+
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
+
+					const currentDate = new Date();
+
+					pdf.save("AllocationsTimeline_" + csvDateFormat(currentDate) + ".pdf");
+
+					removeProgressWheel();
+
+					d3.select("#pbiuacDownloadingDiv").remove();
+
+					function createLetterhead() {
+
+						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+
+						pdf.setFillColor(65, 143, 222);
+						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+
+						pdf.setFillColor(255, 255, 255);
+						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+
+						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");
+
+						pdf.setTextColor(60);
+						pdf.setFont("arial");
+						pdf.setFontType("normal");
+						pdf.setFontSize(10);
+						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
+
+					};
+
+				});
+
+			//end of downloadSnapshotPdf
+		};
+
+		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
+			const wheelGroup = thissvg.append("g")
+				.attr("class", "pbiuacd3chartwheelGroup")
+				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
@@ -1634,7 +2013,7 @@
 				.style("font-size", "11px")
 				.attr("y", 50)
 				.attr("class", "contributionColorFill")
-				.text("Loading visualisation...");
+				.text(thistext);
 
 			const arc = d3.arc()
 				.outerRadius(25)
@@ -1683,7 +2062,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".d3chartwheelGroup");
+			const wheelGroup = d3.select(".pbiuacd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};
@@ -1760,6 +2139,31 @@
 			},
 			configurable: true,
 			writable: true
+		});
+	};
+
+	//toBlob
+
+	if (!HTMLCanvasElement.prototype.toBlob) {
+		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			value: function(callback, type, quality) {
+				var dataURL = this.toDataURL(type, quality).split(',')[1];
+				setTimeout(function() {
+
+					var binStr = atob(dataURL),
+						len = binStr.length,
+						arr = new Uint8Array(len);
+
+					for (var i = 0; i < len; i++) {
+						arr[i] = binStr.charCodeAt(i);
+					}
+
+					callback(new Blob([arr], {
+						type: type || 'image/png'
+					}));
+
+				});
+			}
 		});
 	};
 

@@ -6,9 +6,11 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbimap.css", fontAwesomeLink, leafletCSSLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbimap-stg.css", fontAwesomeLink, leafletCSSLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
-		leafletURL = "https://cbpfgms.github.io/libraries/leaflet.js";
+		leafletURL = "https://cbpfgms.github.io/libraries/leaflet.js",
+		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvasrc3.min.js",
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -26,7 +28,7 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
+	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch) {
 			loadScript(leafletURL, function() {
 				loadScript(d3URL, d3Chart);
@@ -60,7 +62,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -133,6 +135,8 @@
 			projectsLogoPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/projectslogo.png",
 			tooltipThumbnailPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/pbimaptooltip.png",
 			tooltipThumbnailPathCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/pbimaptooltip.png",
+			partnersLogoPathCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/partnerslogo.png",
+			projectsLogoPathCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/projectslogo.png",
 			partnersProjectSize = 50,
 			apiFiles = ["https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?",
 				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?"
@@ -169,7 +173,9 @@
 			completeData = [];
 
 		let initialChartState,
-			timer;
+			timer,
+			isSnapshotTooltipVisible = false,
+			currentHoveredElem;
 
 		yearsArrayString.forEach(function(d) {
 			cbpfsInCompleteData[d] = [];
@@ -227,7 +233,7 @@
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbimapListContainerDiv");
 
-		createProgressWheel();
+		createProgressWheel(null, width, heightProgressSVG, "Loading visualisation...");
 
 		const leafletMap = L.map("pbimapContainerDiv", {
 			zoomSnap: zoomSnap,
@@ -242,9 +248,54 @@
 			maxZoom: maxZoomValue
 		}).addTo(leafletMap);
 
+		const snapshotTooltip = containerDiv.append("div")
+			.attr("id", "pbimapSnapshotTooltip")
+			.attr("class", "pbimapSnapshotContent")
+			.style("display", "none")
+			.on("mouseleave", function() {
+				isSnapshotTooltipVisible = false;
+				snapshotTooltip.style("display", "none");
+				tooltip.style("display", "none");
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbimapSnapshotTooltipPdfText")
+			.html("Download PDF")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("pdf", true);
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbimapSnapshotTooltipPngText")
+			.html("Download Image (PNG)")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("png", true);
+			});
+
+		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
+
+		if (browserHasSnapshotIssues) {
+			snapshotTooltip.append("p")
+				.attr("id", "pbimapTooltipBestVisualizedText")
+				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+				.attr("pointer-events", "none")
+				.style("cursor", "default");
+		};
+
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbimaptooltipdiv")
 			.style("display", "none");
+
+		containerDiv.on("contextmenu", function() {
+			d3.event.preventDefault();
+			const thisMouse = d3.mouse(this);
+			isSnapshotTooltipVisible = true;
+			snapshotTooltip.style("display", "block")
+				.style("top", thisMouse[1] - 4 + "px")
+				.style("left", thisMouse[0] - 4 + "px");
+		});
 
 		const svgLayer = L.svg();
 
@@ -310,6 +361,10 @@
 
 		if (!isInternetExplorer) saveImage(tooltipThumbnailPathCors, "tooltipThumbnail");
 
+		if (!isInternetExplorer) saveImage(partnersLogoPathCors, "partnersLogo");
+
+		if (!isInternetExplorer) saveImage(projectsLogoPathCors, "projectsLogo");
+
 		apiFiles.forEach(function(file) {
 			promises.push(d3.csv(file + yearParameter + chartState.selectedYear[0] + csvFormatParameter))
 		});
@@ -318,6 +373,10 @@
 		promises.push(d3.csv(clustersListFile));
 		promises.push(d3.csv(partnersListFile));
 		promises.push(d3.csv(modalitiesListFile));
+
+		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
+
+		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		Promise.all(promises).then(function(rawData) {
 
@@ -421,6 +480,47 @@
 			downloadIcon.html(".CSV  ")
 				.append("span")
 				.attr("class", "fas fa-download");
+
+			const snapshotDiv = iconsDiv.append("div")
+				.attr("class", "pbimapSnapshotDiv");
+
+			const snapshotIcon = snapshotDiv.append("button")
+				.attr("id", "pbimapSnapshotButton");
+
+			snapshotIcon.html("IMAGE ")
+				.append("span")
+				.attr("class", "fas fa-camera");
+
+			const snapshotContent = snapshotDiv.append("div")
+				.attr("class", "pbimapSnapshotContent");
+
+			const pdfSpan = snapshotContent.append("p")
+				.attr("id", "pbimapSnapshotPdfText")
+				.html("Download PDF")
+				.on("click", function() {
+					createSnapshot("pdf", false);
+				});
+
+			const pngSpan = snapshotContent.append("p")
+				.attr("id", "pbimapSnapshotPngText")
+				.html("Download Image (PNG)")
+				.on("click", function() {
+					createSnapshot("png", false);
+				});
+
+			if (browserHasSnapshotIssues) {
+				const bestVisualizedSpan = snapshotContent.append("p")
+					.attr("id", "pbimapBestVisualizedText")
+					.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+					.attr("pointer-events", "none")
+					.style("cursor", "default");
+			};
+
+			snapshotDiv.on("mouseover", function() {
+				snapshotContent.style("display", "block")
+			}).on("mouseout", function() {
+				snapshotContent.style("display", "none")
+			});
 
 			helpIcon.on("click", createAnnotationsDiv);
 
@@ -552,7 +652,9 @@
 				.attr("height", partnersProjectSize + "px")
 				.attr("y", (heightTopSvg - partnersProjectSize) / 2)
 				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[2]))
-				.attr("xlink:href", partnersLogoPath);
+				.attr("xlink:href", localStorage.getItem("storedImagepartnersLogo") ?
+					localStorage.getItem("storedImagepartnersLogo") :
+					partnersLogoPath);
 
 			let topSvgPartners = topSvg.selectAll(".pbimapTopSvgPartners")
 				.data([data.totalPartners]);
@@ -587,7 +689,9 @@
 				.attr("height", partnersProjectSize + "px")
 				.attr("y", (heightTopSvg - partnersProjectSize) / 2)
 				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[3]))
-				.attr("xlink:href", projectsLogoPath);
+				.attr("xlink:href", localStorage.getItem("storedImageprojectsLogo") ?
+					localStorage.getItem("storedImageprojectsLogo") :
+					projectsLogoPath);
 
 			let topSvgProjects = topSvg.selectAll(".pbimapTopSvgProjects")
 				.data([data.totalProjects]);
@@ -1091,12 +1195,15 @@
 					};
 				} else {
 					sizeMarkers.on("mouseover", function(d) {
+							currentHoveredElem = this;
 							const self = this;
 							sizeMarkers.style("opacity", fadeOpacity);
 							d3.select(this).style("opacity", 1);
 							mouseOverMarker(d, self);
 						})
 						.on("mouseout", function() {
+							if (isSnapshotTooltipVisible) return;
+							currentHoveredRect = null;
 							sizeMarkers.style("opacity", 1);
 							mouseOutMarker();
 						});
@@ -1155,12 +1262,15 @@
 					};
 				} else {
 					colorMarkers.on("mouseover", function(d) {
+							currentHoveredElem = this;
 							const self = this;
 							colorMarkers.style("opacity", fadeOpacity);
 							d3.select(this).style("opacity", 1);
 							mouseOverMarker(d, self);
 						})
 						.on("mouseout", function() {
+							if (isSnapshotTooltipVisible) return;
+							currentHoveredRect = null;
 							colorMarkers.style("opacity", 1);
 							mouseOutMarker();
 						});
@@ -2889,17 +2999,322 @@
 			//end of saveImage
 		};
 
-		function createProgressWheel() {
+		function createSnapshot(type, fromContextMenu) {
 
-			const overDiv = containerDiv.append("div")
-				.attr("class", "pbimapOverDiv");
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
 
-			const progressSvg = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + heightProgressSVG);
+			d3.select("pbimapTopSvgPartnersLogo")
+				.attr("xlink:href", localStorage.getItem("storedImagepartnersLogo"));
 
-			const wheelGroup = progressSvg.append("g")
-				.attr("class", "d3chartwheelGroup")
-				.attr("transform", "translate(" + width / 2 + ",200)");
+			d3.select("pbimapTopSvgProjectsLogo")
+				.attr("xlink:href", localStorage.getItem("storedImageprojectsLogo"));
+
+			const downloadingDiv = d3.select("body").append("div")
+				.style("position", "fixed")
+				.attr("id", "pbimapDownloadingDiv")
+				.style("left", window.innerWidth / 2 - 100 + "px")
+				.style("top", window.innerHeight / 2 - 100 + "px");
+
+			const downloadingDivSvg = downloadingDiv.append("svg")
+				.attr("class", "pbimapDownloadingDivSvg")
+				.attr("width", 200)
+				.attr("height", 100);
+
+			const downloadingDivText = "Downloading " + type.toUpperCase();
+
+			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+
+			const listOfStyles = [
+				"font-size",
+				"font-family",
+				"font-weight",
+				"fill",
+				"stroke",
+				"stroke-dasharray",
+				"stroke-width",
+				"opacity",
+				"text-anchor",
+				"text-transform",
+				"shape-rendering",
+				"letter-spacing",
+				"white-space"
+			];
+
+			const imageDiv = containerDiv.node();
+
+			setSvgStyles(topSvg.node());
+
+			setSvgStyles(legendSvg.node());
+
+			if (tooltip.style("display") === "block") setSvgStyles(tooltip.select("svg").node());
+
+			if (type === "png") {
+				iconsDiv.style("opacity", 0);
+			} else {
+				topDiv.style("opacity", 0)
+			};
+
+			const svgRealSize = topSvg.node().getBoundingClientRect();
+
+			topSvg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
+
+			containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
+				.style("opacity", 0);
+
+			if (listDiv.html()) listDiv.style("opacity", 0);
+
+			snapshotTooltip.style("display", "none");
+
+			if (isTouchScreenOnly) {
+				window.scrollTo({
+					top: 0
+				});
+			};
+
+			html2canvas(imageDiv, {
+				scrollX: 0,
+				scrollY: -window.scrollY,
+				useCORS: true
+			}).then(function(canvas) {
+
+				containerDiv.selectAll(".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv")
+					.style("opacity", 1);
+
+				topSvg.attr("width", null)
+					.attr("height", null);
+
+				if (listDiv.html()) listDiv.style("opacity", 1);
+
+				if (type === "png") {
+					iconsDiv.style("opacity", 1);
+				} else {
+					topDiv.style("opacity", 1)
+				};
+
+				if (type === "png") {
+					downloadSnapshotPng(canvas);
+				} else {
+					downloadSnapshotPdf(canvas);
+				};
+
+				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
+
+			});
+
+			function setSvgStyles(node) {
+
+				if (!node.style) return;
+
+				let styles = getComputedStyle(node);
+
+				for (let i = 0; i < listOfStyles.length; i++) {
+					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
+				};
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					setSvgStyles(node.childNodes[i]);
+				};
+			};
+
+			//end of createSnapshot
+		};
+
+		function downloadSnapshotPng(source) {
+
+			const currentDate = new Date();
+
+			const fileName = "AllocationsOverview_" + csvDateFormat(currentDate) + ".png";
+
+			source.toBlob(function(blob) {
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				if (link.download !== undefined) {
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				} else {
+					window.location.href = url;
+				};
+			});
+
+			removeProgressWheel();
+
+			d3.select("#pbimapDownloadingDiv").remove();
+
+		};
+
+		function downloadSnapshotPdf(source) {
+
+			const pdfMargins = {
+				top: 10,
+				bottom: 16,
+				left: 20,
+				right: 30
+			};
+
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+				.then(function(logo) {
+
+					let pdfTextPosition;
+
+					const pdfHeight = 297;
+
+					const pdf = new jsPDF();
+
+					const intro = pdf.splitTextToSize("Funding from CBPFs is directly available to UN agencies, national and international non-governmental organizations (NGOs) and Red Cross/ Red Crescent organizations. In 2018, CBPFs allocated more than $836 million to 685 partners in 18 countries to support 1,453 critical humanitarian projects. These projects targeted millions of people with healthcare, food aid, clean water, shelter and other life-saving assistance.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 12
+					});
+
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
+
+					pdf.setTextColor(60);
+					pdf.setFont('helvetica');
+					pdf.setFontType("normal");
+					pdf.setFontSize(12);
+					pdf.text(pdfMargins.left, 48, intro);
+
+					pdf.setTextColor(65, 143, 222);
+					pdf.setFont('helvetica');
+					pdf.setFontType("bold");
+					pdf.setFontSize(16);
+					pdf.text("Allocations Overview", pdfMargins.left, 88);
+
+					pdf.setFontSize(12);
+
+					const yearsPdfList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const yearsText = chartState.selectedYear.length > 1 ? "Selected Years: " : "Selected Year: ";
+
+					const cbpfsPdfList = chartState.selectedCBPF[0] === "all" ? "All CBPFs" : createPdfList(chartState.selectedCBPF, d3.values(cbpfsList));
+
+					const cbpfsText = chartState.selectedCBPF.length === 1 && chartState.selectedCBPF[0] !== "all" ? "Selected CBPF: " : "Selected CBPFs: ";
+
+					const partnersPdfList = chartState.selectedPartner[0] === "all" ? "All Partners" : createPdfList(chartState.selectedPartner, d3.values(partnersList));
+
+					const partnersText = chartState.selectedPartner.length === 1 && chartState.selectedPartner[0] !== "all" ? "Selected Partner: " : "Selected Partners: ";
+
+					const clusterPdfList = chartState.selectedCluster[0] === "all" ? "All Clusters" : createPdfList(chartState.selectedCluster, d3.values(clustersList));
+
+					const clusterText = chartState.selectedCluster.length === 1 && chartState.selectedCluster[0] !== "all" ? "Selected Cluster: " : "Selected Clusters: ";
+
+					const allocationPdfList = chartState.selectedModality[0] === "all" ? "All Allocations" : createPdfList(chartState.selectedModality, allocationsTypeList);
+
+					const allocationText = chartState.selectedModality.length === 1 && chartState.selectedModality[0] !== "all" ? "Selected Allocation: " : "Selected Allocations: ";
+
+					const locationPdfList = !chartState.selectedAdminLevel ? "Global Level" : "Admin Level " + chartState.selectedAdminLevel;
+
+					const locationText = "Selected Location: ";
+
+					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsPdfList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + cbpfsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						cbpfsPdfList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + partnersText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						partnersPdfList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + clusterText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						clusterPdfList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + allocationText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						allocationPdfList + "</span></div><div style='font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + locationText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						locationPdfList + "</span></div>", pdfMargins.left, 94, {
+							width: 210 - pdfMargins.left - pdfMargins.right
+						},
+						function(position) {
+							pdfTextPosition = position;
+						});
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
+
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+
+					createLetterhead();
+
+					const currentDate = new Date();
+
+					pdf.save("AllocationsOverview_" + csvDateFormat(currentDate) + ".pdf");
+
+					removeProgressWheel();
+
+					d3.select("#pbimapDownloadingDiv").remove();
+
+					function createLetterhead() {
+
+						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+
+						pdf.setFillColor(65, 143, 222);
+						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+
+						pdf.setFillColor(255, 255, 255);
+						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+
+						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");
+
+						pdf.setTextColor(60);
+						pdf.setFont("arial");
+						pdf.setFontType("normal");
+						pdf.setFontSize(10);
+						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
+
+					};
+
+					function createPdfList(arr, list) {
+						return arr.map(function(d) {
+								return list.find(function(e) {
+									return e.toLowerCase() === d;
+								});
+							})
+							.sort(function(a, b) {
+								return a.toLowerCase() < b.toLowerCase() ? -1 :
+									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= arr.length - 2 ? index > arr.length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+					};
+
+				});
+
+			//end of downloadSnapshotPdf
+		};
+
+		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
+
+			let wheelGroup;
+
+			if (thissvg === null) {
+
+				const overDiv = containerDiv.append("div")
+					.attr("class", "pbimapOverDiv");
+
+				const progressSvg = overDiv.append("svg")
+					.attr("viewBox", "0 0 " + thiswidth + " " + thisheight);
+
+				wheelGroup = progressSvg.append("g")
+					.attr("class", "pbimapd3chartwheelGroup")
+					.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
+
+			} else {
+				wheelGroup = thissvg.append("g")
+					.attr("class", "pbiclcd3chartwheelGroup")
+					.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
+			};
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
@@ -2908,7 +3323,7 @@
 				.style("font-size", "11px")
 				.attr("y", 40)
 				.attr("class", "contributionColorFill")
-				.text("Loading visualisation...");
+				.text(thistext);
 
 			const arc = d3.arc()
 				.outerRadius(25)
@@ -2957,7 +3372,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".d3chartwheelGroup");
+			const wheelGroup = d3.select(".pbimapd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 			d3.select(".pbimapOverDiv").remove();
@@ -3031,6 +3446,31 @@
 
 	Math.log10 = Math.log10 || function(x) {
 		return Math.log(x) * Math.LOG10E;
+	};
+
+	//toBlob
+
+	if (!HTMLCanvasElement.prototype.toBlob) {
+		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			value: function(callback, type, quality) {
+				var dataURL = this.toDataURL(type, quality).split(',')[1];
+				setTimeout(function() {
+
+					var binStr = atob(dataURL),
+						len = binStr.length,
+						arr = new Uint8Array(len);
+
+					for (var i = 0; i < len; i++) {
+						arr[i] = binStr.charCodeAt(i);
+					}
+
+					callback(new Blob([arr], {
+						type: type || 'image/png'
+					}));
+
+				});
+			}
+		});
 	};
 
 	//END OF POLYFILLS

@@ -2,10 +2,13 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink],
-		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc-stg.css", fontAwesomeLink],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -23,7 +26,7 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
+	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
@@ -62,7 +65,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -120,7 +123,9 @@
 			};
 
 		let height = 500,
-			yearsArray;
+			yearsArray,
+			isSnapshotTooltipVisible = false,
+			currentHoveredRect;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
@@ -170,11 +175,56 @@
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbiclcFooterDiv") : null;
 
-		createProgressWheel();
+		createProgressWheel(svg, width, height, "Loading visualisation...");
+
+		const snapshotTooltip = containerDiv.append("div")
+			.attr("id", "pbiclcSnapshotTooltip")
+			.attr("class", "pbiclcSnapshotContent")
+			.style("display", "none")
+			.on("mouseleave", function() {
+				isSnapshotTooltipVisible = false;
+				snapshotTooltip.style("display", "none");
+				tooltip.style("display", "none");
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiclcSnapshotTooltipPdfText")
+			.html("Download PDF")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("pdf", true);
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbiclcSnapshotTooltipPngText")
+			.html("Download Image (PNG)")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("png", true);
+			});
+
+		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
+
+		if (browserHasSnapshotIssues) {
+			snapshotTooltip.append("p")
+				.attr("id", "pbiclcTooltipBestVisualizedText")
+				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+				.attr("pointer-events", "none")
+				.style("cursor", "default");
+		};
 
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbiclctooltipdiv")
 			.style("display", "none");
+
+		containerDiv.on("contextmenu", function() {
+			d3.event.preventDefault();
+			const thisMouse = d3.mouse(this);
+			isSnapshotTooltipVisible = true;
+			snapshotTooltip.style("display", "block")
+				.style("top", thisMouse[1] - 4 + "px")
+				.style("left", thisMouse[0] - 4 + "px");
+		});
 
 		const topPanel = {
 			main: svg.append("g")
@@ -287,6 +337,10 @@
 		const paidSymbol = d3.symbol()
 			.type(d3.symbolTriangle)
 			.size(paidSymbolSize);
+
+		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
+
+		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
 			.then(function(rawData) {
@@ -544,6 +598,47 @@
 				downloadIcon.html(".CSV  ")
 					.append("span")
 					.attr("class", "fas fa-download");
+
+				const snapshotDiv = iconsDiv.append("div")
+					.attr("class", "pbiclcSnapshotDiv");
+
+				const snapshotIcon = snapshotDiv.append("button")
+					.attr("id", "pbiclcSnapshotButton");
+
+				snapshotIcon.html("IMAGE ")
+					.append("span")
+					.attr("class", "fas fa-camera");
+
+				const snapshotContent = snapshotDiv.append("div")
+					.attr("class", "pbiclcSnapshotContent");
+
+				const pdfSpan = snapshotContent.append("p")
+					.attr("id", "pbiclcSnapshotPdfText")
+					.html("Download PDF")
+					.on("click", function() {
+						createSnapshot("pdf", false);
+					});
+
+				const pngSpan = snapshotContent.append("p")
+					.attr("id", "pbiclcSnapshotPngText")
+					.html("Download Image (PNG)")
+					.on("click", function() {
+						createSnapshot("png", false);
+					});
+
+				if (browserHasSnapshotIssues) {
+					const bestVisualizedSpan = snapshotContent.append("p")
+						.attr("id", "pbiclcBestVisualizedText")
+						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+						.attr("pointer-events", "none")
+						.style("cursor", "default");
+				};
+
+				snapshotDiv.on("mouseover", function() {
+					snapshotContent.style("display", "block")
+				}).on("mouseout", function() {
+					snapshotContent.style("display", "none")
+				});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
@@ -1359,6 +1454,8 @@
 
 				function mouseoverTooltipRectangle(datum) {
 
+					currentHoveredRect = this;
+
 					if (!datum.clicked) {
 						chartState.selectedDonors.push(datum.isoCode);
 					};
@@ -1400,6 +1497,10 @@
 				};
 
 				function mouseoutTooltipRectangle(datum) {
+
+					if (isSnapshotTooltipVisible) return;
+
+					currentHoveredRect = null;
 
 					if (!datum.clicked) {
 						const index = chartState.selectedDonors.indexOf(datum.isoCode);
@@ -1734,6 +1835,8 @@
 
 				function mouseoverTooltipRectangle(datum) {
 
+					currentHoveredRect = this;
+
 					if (!datum.clicked) {
 						chartState.selectedCbpfs.push(datum.isoCode);
 					};
@@ -1775,6 +1878,10 @@
 				};
 
 				function mouseoutTooltipRectangle(datum) {
+
+					if (isSnapshotTooltipVisible) return;
+
+					currentHoveredRect = null;
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(datum.isoCode);
@@ -1893,6 +2000,7 @@
 			};
 
 			function mouseOutTopPanel() {
+				if (isSnapshotTooltipVisible) return;
 				tooltip.style("display", "none");
 			};
 
@@ -2540,10 +2648,278 @@
 			});
 		};
 
-		function createProgressWheel() {
-			const wheelGroup = svg.append("g")
-				.attr("class", "d3chartwheelGroup")
-				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
+		function createSnapshot(type, fromContextMenu) {
+
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
+
+			const downloadingDiv = d3.select("body").append("div")
+				.style("position", "fixed")
+				.attr("id", "pbiclcDownloadingDiv")
+				.style("left", window.innerWidth / 2 - 100 + "px")
+				.style("top", window.innerHeight / 2 - 100 + "px");
+
+			const downloadingDivSvg = downloadingDiv.append("svg")
+				.attr("class", "pbiclcDownloadingDivSvg")
+				.attr("width", 200)
+				.attr("height", 100);
+
+			const downloadingDivText = "Downloading " + type.toUpperCase();
+
+			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+
+			const svgRealSize = svg.node().getBoundingClientRect();
+
+			svg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
+
+			const listOfStyles = [
+				"font-size",
+				"font-family",
+				"font-weight",
+				"fill",
+				"stroke",
+				"stroke-dasharray",
+				"stroke-width",
+				"opacity",
+				"text-anchor",
+				"text-transform",
+				"shape-rendering",
+				"letter-spacing",
+				"white-space"
+			];
+
+			const imageDiv = containerDiv.node();
+
+			setSvgStyles(svg.node());
+
+			if (type === "png") {
+				iconsDiv.style("opacity", 0);
+			} else {
+				topDiv.style("opacity", 0)
+			};
+
+			snapshotTooltip.style("display", "none");
+
+			svg.selectAll("image")
+				.attr("xlink:href", function(d) {
+					return localStorage.getItem("storedFlag" + d.isoCode);
+				});
+
+			html2canvas(imageDiv).then(function(canvas) {
+
+				svg.attr("width", null)
+					.attr("height", null);
+
+				if (type === "png") {
+					iconsDiv.style("opacity", 1);
+				} else {
+					topDiv.style("opacity", 1)
+				};
+
+				if (type === "png") {
+					downloadSnapshotPng(canvas);
+				} else {
+					downloadSnapshotPdf(canvas);
+				};
+
+				if (fromContextMenu && currentHoveredRect) d3.select(currentHoveredRect).dispatch("mouseout");
+
+			});
+
+			function setSvgStyles(node) {
+
+				if (!node.style) return;
+
+				let styles = getComputedStyle(node);
+
+				for (let i = 0; i < listOfStyles.length; i++) {
+					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
+				};
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					setSvgStyles(node.childNodes[i]);
+				};
+			};
+
+			//end of createSnapshot
+		};
+
+		function downloadSnapshotPng(source) {
+
+			const currentDate = new Date();
+
+			const fileName = "CBPFcontributions_" + csvDateFormat(currentDate) + ".png";
+
+			source.toBlob(function(blob) {
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				if (link.download !== undefined) {
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				} else {
+					window.location.href = url;
+				};
+			});
+
+			removeProgressWheel();
+
+			d3.select("#pbiclcDownloadingDiv").remove();
+
+		};
+
+		function downloadSnapshotPdf(source) {
+
+			const pdfMargins = {
+				top: 10,
+				bottom: 16,
+				left: 20,
+				right: 30
+			};
+
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+				.then(function(logo) {
+
+					let pdf;
+
+					const point = 2.834646;
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
+					const heightInMilimeters = widthInMilimeters * (sourceDimentions.height / sourceDimentions.width);
+					const maxHeightInMilimeters = 180;
+					let pdfHeight;
+
+					if (heightInMilimeters > maxHeightInMilimeters) {
+						pdfHeight = 297 + heightInMilimeters - maxHeightInMilimeters;
+						pdf = new jsPDF({
+							format: [210 * point, (pdfHeight) * point],
+							unit: "mm"
+						})
+					} else {
+						pdfHeight = 297;
+						pdf = new jsPDF();
+					}
+
+					let pdfTextPosition;
+
+					createLetterhead();
+
+					const intro = pdf.splitTextToSize("Since the first CBPF was opened in Angola in 1997, donors have contributed more than $5 billion to 27 funds operating in the most severe and complex emergencies around the world.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 12
+					});
+
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
+
+					pdf.setTextColor(60);
+					pdf.setFont('helvetica');
+					pdf.setFontType("normal");
+					pdf.setFontSize(12);
+					pdf.text(pdfMargins.left, 48, intro);
+
+					pdf.setTextColor(65, 143, 222);
+					pdf.setFont('helvetica');
+					pdf.setFontType("bold");
+					pdf.setFontSize(16);
+					pdf.text(chartTitle, pdfMargins.left, 65);
+
+					pdf.setFontSize(12);
+
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
+
+					const contributions = chartState.selectedContribution === "total" ? "Total (Paid + Pledged)" : chartState.selectedContribution === "paid" ? "Paid" : "Pledged";
+
+					const selectedCountry = !chartState.selectedDonors.length && !chartState.selectedCbpfs.length ?
+						"Selected countries-all" : countriesList();
+
+					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Contributions: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						contributions + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 70, {
+							width: 210 - pdfMargins.left - pdfMargins.right
+						},
+						function(position) {
+							pdfTextPosition = position;
+						});
+
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
+
+					const currentDate = new Date();
+
+					pdf.save("CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf");
+
+					removeProgressWheel();
+
+					d3.select("#pbiclcDownloadingDiv").remove();
+
+					function createLetterhead() {
+
+						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+
+						pdf.setFillColor(65, 143, 222);
+						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+
+						pdf.setFillColor(255, 255, 255);
+						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+
+						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");
+
+						pdf.setTextColor(60);
+						pdf.setFont("arial");
+						pdf.setFontType("normal");
+						pdf.setFontSize(10);
+						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
+
+					};
+
+					function countriesList() {
+						const selection = chartState.selectedDonors.length ? "selectedDonors" : "selectedCbpfs";
+						const type = chartState.selectedDonors.length ? "donor" : "CBPF";
+						const plural = chartState[selection].length === 1 ? "" : "s";
+						const countryList = chartState[selection].map(function(d) {
+								return countryNames[d];
+							})
+							.sort(function(a, b) {
+								return a.toLowerCase() < b.toLowerCase() ? -1 :
+									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= chartState[selection].length - 2 ? index > chartState[selection].length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+						return "Selected " + type + plural + "-" + countryList;
+
+					};
+				});
+
+			//end of downloadSnapshotPdf
+		};
+
+		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
+			const wheelGroup = thissvg.append("g")
+				.attr("class", "pbiclcd3chartwheelGroup")
+				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
@@ -2552,7 +2928,7 @@
 				.style("font-size", "11px")
 				.attr("y", 50)
 				.attr("class", "contributionColorFill")
-				.text("Loading visualisation...");
+				.text(thistext);
 
 			const arc = d3.arc()
 				.outerRadius(25)
@@ -2601,7 +2977,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".d3chartwheelGroup");
+			const wheelGroup = d3.select(".pbiclcd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};
@@ -2699,6 +3075,31 @@
 
 	Math.log10 = Math.log10 || function(x) {
 		return Math.log(x) * Math.LOG10E;
+	};
+
+	//toBlob
+
+	if (!HTMLCanvasElement.prototype.toBlob) {
+		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			value: function(callback, type, quality) {
+				var dataURL = this.toDataURL(type, quality).split(',')[1];
+				setTimeout(function() {
+
+					var binStr = atob(dataURL),
+						len = binStr.length,
+						arr = new Uint8Array(len);
+
+					for (var i = 0; i < len; i++) {
+						arr[i] = binStr.charCodeAt(i);
+					}
+
+					callback(new Blob([arr], {
+						type: type || 'image/png'
+					}));
+
+				});
+			}
+		});
 	};
 
 	//END OF POLYFILLS

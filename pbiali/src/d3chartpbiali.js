@@ -2,10 +2,13 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiali.css", fontAwesomeLink],
-		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiali-stg.css", fontAwesomeLink],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -23,7 +26,7 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
+	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
@@ -62,7 +65,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -104,7 +107,9 @@
 				selectedCbpfs: []
 			};
 
-		let height = 400;
+		let height = 400,
+			isSnapshotTooltipVisible = false,
+			labelGroupHovered;
 
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
@@ -154,11 +159,56 @@
 			.attr("type", "saturate")
 			.attr("values", "0");
 
-		createProgressWheel();
+		createProgressWheel(svg, width, height, "Loading visualisation...");
+
+		const snapshotTooltip = containerDiv.append("div")
+			.attr("id", "pbialiSnapshotTooltip")
+			.attr("class", "pbialiSnapshotContent")
+			.style("display", "none")
+			.on("mouseleave", function() {
+				isSnapshotTooltipVisible = false;
+				snapshotTooltip.style("display", "none");
+				tooltip.style("display", "none");
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbialiSnapshotTooltipPdfText")
+			.html("Download PDF")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("pdf", true);
+			});
+
+		snapshotTooltip.append("p")
+			.attr("id", "pbialiSnapshotTooltipPngText")
+			.html("Download Image (PNG)")
+			.on("click", function() {
+				isSnapshotTooltipVisible = false;
+				createSnapshot("png", true);
+			});
+
+		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
+
+		if (browserHasSnapshotIssues) {
+			snapshotTooltip.append("p")
+				.attr("id", "pbialiTooltipBestVisualizedText")
+				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+				.attr("pointer-events", "none")
+				.style("cursor", "default");
+		};
 
 		const tooltip = containerDiv.append("div")
 			.attr("id", "pbialitooltipdiv")
 			.style("display", "none");
+
+		containerDiv.on("contextmenu", function() {
+			d3.event.preventDefault();
+			const thisMouse = d3.mouse(this);
+			isSnapshotTooltipVisible = true;
+			snapshotTooltip.style("display", "block")
+				.style("top", thisMouse[1] - 4 + "px")
+				.style("left", thisMouse[0] - 4 + "px");
+		});
 
 		const mainPanel = {
 			main: svg.append("g")
@@ -250,6 +300,10 @@
 		feMerge.append("feMergeNode");
 		feMerge.append("feMergeNode")
 			.attr("in", "SourceGraphic");
+
+		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
+
+		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		d3.csv(file).then(function(rawData) {
 
@@ -349,6 +403,47 @@
 				downloadIcon.html(".CSV  ")
 					.append("span")
 					.attr("class", "fas fa-download");
+
+				const snapshotDiv = iconsDiv.append("div")
+					.attr("class", "pbialiSnapshotDiv");
+
+				const snapshotIcon = snapshotDiv.append("button")
+					.attr("id", "pbialiSnapshotButton");
+
+				snapshotIcon.html("IMAGE ")
+					.append("span")
+					.attr("class", "fas fa-camera");
+
+				const snapshotContent = snapshotDiv.append("div")
+					.attr("class", "pbialiSnapshotContent");
+
+				const pdfSpan = snapshotContent.append("p")
+					.attr("id", "pbialiSnapshotPdfText")
+					.html("Download PDF")
+					.on("click", function() {
+						createSnapshot("pdf", false);
+					});
+
+				const pngSpan = snapshotContent.append("p")
+					.attr("id", "pbialiSnapshotPngText")
+					.html("Download Image (PNG)")
+					.on("click", function() {
+						createSnapshot("png", false);
+					});
+
+				if (browserHasSnapshotIssues) {
+					const bestVisualizedSpan = snapshotContent.append("p")
+						.attr("id", "pbialiBestVisualizedText")
+						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+						.attr("pointer-events", "none")
+						.style("cursor", "default");
+				};
+
+				snapshotDiv.on("mouseover", function() {
+					snapshotContent.style("display", "block")
+				}).on("mouseout", function() {
+					snapshotContent.style("display", "none")
+				});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
@@ -913,6 +1008,8 @@
 
 			function mouseOutRectOverlay() {
 
+				if (isSnapshotTooltipVisible) return;
+
 				tooltip.style("display", "none");
 				mainPanel.main.select(".pbialiTooltipGroup").remove();
 
@@ -1043,6 +1140,7 @@
 					});
 
 				labelsGroup.on("mouseover", function(d) {
+						labelGroupHovered = this;
 						labelsGroup.interrupt();
 						selectedGroups.filter(function(e) {
 								return e.cbpf !== d.name;
@@ -1056,6 +1154,8 @@
 							.attr("filter", "url(#pbialiGrayFilter)");
 					})
 					.on("mouseout", function() {
+						if (isSnapshotTooltipVisible) return;
+						labelGroupHovered = null;
 						selectedGroups.style("opacity", 1)
 							.attr("filter", null);
 						labelsGroup.style("opacity", 1)
@@ -1455,10 +1555,242 @@
 			});
 		};
 
-		function createProgressWheel() {
-			const wheelGroup = svg.append("g")
-				.attr("class", "d3chartwheelGroup")
-				.attr("transform", "translate(" + width / 2 + "," + height / 4 + ")");
+		function createSnapshot(type, fromContextMenu) {
+
+			if (isInternetExplorer) {
+				alert("This functionality is not supported by Internet Explorer");
+				return;
+			};
+
+			const downloadingDiv = d3.select("body").append("div")
+				.style("position", "fixed")
+				.attr("id", "pbialiDownloadingDiv")
+				.style("left", window.innerWidth / 2 - 100 + "px")
+				.style("top", window.innerHeight / 2 - 100 + "px");
+
+			const downloadingDivSvg = downloadingDiv.append("svg")
+				.attr("class", "pbialiDownloadingDivSvg")
+				.attr("width", 200)
+				.attr("height", 100);
+
+			const downloadingDivText = "Downloading " + type.toUpperCase();
+
+			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+
+			const svgRealSize = svg.node().getBoundingClientRect();
+
+			svg.attr("width", svgRealSize.width)
+				.attr("height", svgRealSize.height);
+
+			const listOfStyles = [
+				"font-size",
+				"font-family",
+				"font-weight",
+				"fill",
+				"stroke",
+				"stroke-dasharray",
+				"stroke-width",
+				"opacity",
+				"text-anchor",
+				"text-transform",
+				"shape-rendering",
+				"letter-spacing",
+				"white-space"
+			];
+
+			const imageDiv = containerDiv.node();
+
+			setSvgStyles(svg.node());
+
+			if (type === "png") {
+				iconsDiv.style("opacity", 0);
+			} else {
+				topDiv.style("opacity", 0)
+			};
+
+			snapshotTooltip.style("display", "none");
+
+			html2canvas(imageDiv).then(function(canvas) {
+
+				svg.attr("width", null)
+					.attr("height", null);
+
+				if (type === "png") {
+					iconsDiv.style("opacity", 1);
+				} else {
+					topDiv.style("opacity", 1)
+				};
+
+				if (type === "png") {
+					downloadSnapshotPng(canvas);
+				} else {
+					downloadSnapshotPdf(canvas);
+				};
+
+				if (fromContextMenu && labelGroupHovered) d3.select(labelGroupHovered).dispatch("mouseout");
+
+			});
+
+			function setSvgStyles(node) {
+
+				if (!node.style) return;
+
+				let styles = getComputedStyle(node);
+
+				for (let i = 0; i < listOfStyles.length; i++) {
+					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
+				};
+
+				for (let i = 0; i < node.childNodes.length; i++) {
+					setSvgStyles(node.childNodes[i]);
+				};
+			};
+
+			//end of createSnapshot
+		};
+
+		function downloadSnapshotPng(source) {
+
+			const currentDate = new Date();
+
+			const fileName = "AllocationTrends_" + csvDateFormat(currentDate) + ".png";
+
+			source.toBlob(function(blob) {
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				if (link.download !== undefined) {
+					link.setAttribute("href", url);
+					link.setAttribute("download", fileName);
+					link.style = "visibility:hidden";
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				} else {
+					window.location.href = url;
+				};
+			});
+
+			removeProgressWheel();
+
+			d3.select("#pbialiDownloadingDiv").remove();
+
+		};
+
+		function downloadSnapshotPdf(source) {
+
+			const pdfMargins = {
+				top: 10,
+				bottom: 16,
+				left: 20,
+				right: 30
+			};
+
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+				.then(function(logo) {
+
+					let pdfTextPosition;
+
+					const pdf = new jsPDF();
+
+					createLetterhead();
+
+					const intro = pdf.splitTextToSize("In 2018, CBPFs allocated more than $836 million to 685 partners in 18 countries to support 1,453 critical humanitarian projects. These projects targeted millions of people with healthcare, food aid, clean water, shelter and other life-saving assistance.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 12
+					});
+
+					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
+
+					pdf.setTextColor(60);
+					pdf.setFont('helvetica');
+					pdf.setFontType("normal");
+					pdf.setFontSize(12);
+					pdf.text(pdfMargins.left, 48, intro);
+
+					pdf.setTextColor(65, 143, 222);
+					pdf.setFont('helvetica');
+					pdf.setFontType("bold");
+					pdf.setFontSize(16);
+					pdf.text(chartTitle, pdfMargins.left, 71);
+
+					pdf.setFontSize(12);
+
+					const selectedCountry = !chartState.selectedCbpfs.length ?
+						"Selected CBPFs-none" : countriesList();
+
+					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 77, {
+							width: 210 - pdfMargins.left - pdfMargins.right
+						},
+						function(position) {
+							pdfTextPosition = position;
+						});
+
+					const sourceDimentions = containerDiv.node().getBoundingClientRect();
+					const widthInMilimeters = 210 - pdfMargins.left * 2;
+
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+
+					const currentDate = new Date();
+
+					pdf.save("AllocationTrends_" + csvDateFormat(currentDate) + ".pdf");
+
+					removeProgressWheel();
+
+					d3.select("#pbialiDownloadingDiv").remove();
+
+					function createLetterhead() {
+
+						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+
+						pdf.setFillColor(65, 143, 222);
+						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+
+						pdf.setFillColor(255, 255, 255);
+						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+
+						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+
+						pdf.setFillColor(236, 161, 84);
+						pdf.rect(0, 297 - pdfMargins.bottom, 210, 2, "F");
+
+						pdf.setTextColor(60);
+						pdf.setFont("arial");
+						pdf.setFontType("normal");
+						pdf.setFontSize(10);
+						pdf.text(footer, pdfMargins.left, 297 - pdfMargins.bottom + 10);
+
+					};
+
+					function countriesList() {
+						const plural = chartState.selectedCbpfs.length === 1 ? "" : "s";
+						const countryList = chartState.selectedCbpfs.map(function(d) {
+								return d;
+							})
+							.sort(function(a, b) {
+								return a.toLowerCase() < b.toLowerCase() ? -1 :
+									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= chartState.selectedCbpfs.length - 2 ? index > chartState.selectedCbpfs.length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+						return "Selected CBPF" + plural + "-" + countryList;
+					};
+				});
+
+			//end of downloadSnapshotPdf
+		};
+
+		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
+			const wheelGroup = thissvg.append("g")
+				.attr("class", "pbialid3chartwheelGroup")
+				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
@@ -1467,7 +1799,7 @@
 				.style("font-size", "11px")
 				.attr("y", 50)
 				.attr("class", "contributionColorFill")
-				.text("Loading visualisation...");
+				.text(thistext);
 
 			const arc = d3.arc()
 				.outerRadius(25)
@@ -1516,7 +1848,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".d3chartwheelGroup");
+			const wheelGroup = d3.select(".pbialid3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};
@@ -1559,6 +1891,31 @@
 
 	Math.log10 = Math.log10 || function(x) {
 		return Math.log(x) * Math.LOG10E;
+	};
+
+	//toBlob
+
+	if (!HTMLCanvasElement.prototype.toBlob) {
+		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			value: function(callback, type, quality) {
+				var dataURL = this.toDataURL(type, quality).split(',')[1];
+				setTimeout(function() {
+
+					var binStr = atob(dataURL),
+						len = binStr.length,
+						arr = new Uint8Array(len);
+
+					for (var i = 0; i < len; i++) {
+						arr[i] = binStr.charCodeAt(i);
+					}
+
+					callback(new Blob([arr], {
+						type: type || 'image/png'
+					}));
+
+				});
+			}
+		});
 	};
 
 	//END OF POLYFILLS
