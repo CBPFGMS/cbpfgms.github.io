@@ -239,7 +239,7 @@ p#pbiobed3chartTitle {
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 170px;
+	max-width: 184px;
 }
 
 .pbiobeSnapshotContent #pbiobeSnapshotPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotPngText:hover, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPdfText:hover, .pbiobeSnapshotContent #pbiobeSnapshotTooltipPngText:hover {

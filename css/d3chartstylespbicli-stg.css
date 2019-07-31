@@ -487,7 +487,7 @@
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 170px;
+	max-width: 184px;
 }
 
 .pbicliSnapshotContent #pbicliSnapshotPdfText:hover, .pbicliSnapshotContent #pbicliSnapshotPngText:hover, .pbicliSnapshotContent #pbicliSnapshotTooltipPdfText:hover, .pbicliSnapshotContent #pbicliSnapshotTooltipPngText:hover {

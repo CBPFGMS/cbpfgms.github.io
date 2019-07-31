@@ -345,7 +345,7 @@ p#pbialpd3chartTitle {
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 170px;
+	max-width: 184px;
 }
 
 .pbialpSnapshotContent #pbialpSnapshotPdfText:hover, .pbialpSnapshotContent #pbialpSnapshotPngText:hover, .pbialpSnapshotContent #pbialpSnapshotTooltipPdfText:hover, .pbialpSnapshotContent #pbialpSnapshotTooltipPngText:hover {
