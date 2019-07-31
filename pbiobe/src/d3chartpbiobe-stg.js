@@ -222,12 +222,12 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = !isTouchScreenOnly && window.safari;
+		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
 				.attr("id", "pbiobeTooltipBestVisualizedText")
-				.html("For best results use Chrome, Firefox, Opera or Edge.")
+				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
 		};
@@ -420,7 +420,7 @@
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiobeBestVisualizedText")
-						.html("For best results use Chrome, Firefox, Opera or Edge.")
+						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
 				};
