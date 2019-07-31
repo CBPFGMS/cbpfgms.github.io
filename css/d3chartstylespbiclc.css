@@ -4,6 +4,19 @@
 	position: relative;
 }
 
+#pbiclcDownloadingDiv {
+	position: absolute;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
 #pbiclctooltipdiv {    
 	position: absolute;
 	text-align: left;
@@ -217,7 +230,7 @@ p#pbiclcd3chartTitle {
 	overflow: hidden;
 }
 
-.pbiclcSnapshotContent #pbiclcSnapshotPdfText, .pbiclcSnapshotContent #pbiclcSnapshotPngText {
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText, .pbiclcSnapshotContent #pbiclcSnapshotPngText, .pbiclcSnapshotContent #pbiclcSnapshotTooltipPdfText, .pbiclcSnapshotContent #pbiclcSnapshotTooltipPngText {
 	font-size: 14px;
 	padding: 10px;
 	margin: 0px;
@@ -225,7 +238,17 @@ p#pbiclcd3chartTitle {
 	font-family: "Arial", sans-serif;
 }
 
-.pbiclcSnapshotContent #pbiclcSnapshotPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotPngText:hover {
+.pbiclcSnapshotContent #pbiclcBestVisualizedText, .pbiclcSnapshotContent #pbiclcTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	max-width: 170px;
+}
+
+.pbiclcSnapshotContent #pbiclcSnapshotPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotPngText:hover, .pbiclcSnapshotContent #pbiclcSnapshotTooltipPdfText:hover, .pbiclcSnapshotContent #pbiclcSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
 }
