@@ -6,7 +6,7 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbimap-stg.css", fontAwesomeLink, leafletCSSLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbimap.css", fontAwesomeLink, leafletCSSLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		leafletURL = "https://cbpfgms.github.io/libraries/leaflet.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvasrc3.min.js",
