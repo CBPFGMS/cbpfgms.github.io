@@ -187,7 +187,7 @@ p#pbialid3chartTitle {
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 184px;
+	width: 202px;
 }
 
 .pbialiSnapshotContent #pbialiSnapshotPdfText:hover, .pbialiSnapshotContent #pbialiSnapshotPngText:hover, .pbialiSnapshotContent #pbialiSnapshotTooltipPdfText:hover, .pbialiSnapshotContent #pbialiSnapshotTooltipPngText:hover {

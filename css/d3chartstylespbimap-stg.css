@@ -662,7 +662,7 @@ svg.leaflet-zoom-animated {
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 184px;
+	width: 202px;
 }
 
 .pbimapSnapshotContent #pbimapSnapshotPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotPngText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText:hover {

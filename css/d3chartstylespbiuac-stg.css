@@ -331,7 +331,7 @@ p#pbiuacd3chartTitle {
 	color: #222;
 	font-family: "Arial", sans-serif;
 	border-top: 1px solid lightgray;
-	max-width: 184px;
+	width: 202px;
 }
 
 .pbiuacSnapshotContent #pbiuacSnapshotPdfText:hover, .pbiuacSnapshotContent #pbiuacSnapshotPngText:hover, .pbiuacSnapshotContent #pbiuacSnapshotTooltipPdfText:hover, .pbiuacSnapshotContent #pbiuacSnapshotTooltipPngText:hover {
