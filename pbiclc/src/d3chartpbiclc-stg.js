@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -129,8 +127,6 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredRect;
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -141,10 +137,9 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedYearString = queryStringValues.get("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
-		const selectedContribution = contributionType.indexOf(queryStringValues.get("contribution")) > -1 ? queryStringValues.get("contribution") :
-			contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
+		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
