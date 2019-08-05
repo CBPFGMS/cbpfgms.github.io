@@ -152,6 +152,8 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+
 		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
 
 		if (selectedResponsiveness === false) {
@@ -408,7 +410,14 @@
 
 				scaleColorsCbpfs.domain(list.cbpfsArray);
 
-				chartState.selectedDonors.push("alldonors");
+				validateCbpfs(selectedCbpfsString, list.cbpfsArray);
+
+				if (chartState.selectedCbpfs.length) {
+					chartState.selectedDonors = [];
+					chartState.controlledBy = "cbpf";
+				} else {
+					chartState.selectedDonors.push("alldonors");
+				};
 
 				if (!isInternetExplorer) saveFlags(list.donorsArray);
 
@@ -628,9 +637,13 @@
 
 			createTopLegend();
 
-			createSelectedDonors();
-
-			createCbpfCheckboxes(data.cbpfs);
+			if (chartState.selectedCbpfs.length) {
+				createSelectedCbpfs();
+				createDonorsCheckboxes(data.donors);
+			} else {
+				createSelectedDonors();
+				createCbpfCheckboxes(data.cbpfs);
+			};
 
 			createDonorsLines(data.donors);
 
@@ -3012,7 +3025,7 @@
 					return !i || chartState.selectedDonors.indexOf(d) > -1;
 				})
 				.property("selected", function(_, i) {
-					return i === 1;
+					return chartState.selectedCbpfs.length ? i === 0 : i === 1;
 				})
 				.html(function(d, i) {
 					return i < 3 ? d : iso2Names[d];
@@ -3089,8 +3102,8 @@
 				.property("disabled", function(d, i) {
 					return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 				})
-				.property("selected", function(_, i) {
-					return !i;
+				.property("selected", function(d, i) {
+					return chartState.selectedCbpfs.length ? d === chartState.selectedCbpfs[chartState.selectedCbpfs.length - 1] : !i;
 				})
 				.html(function(d, i) {
 					return i < 2 ? d : iso2Names[d];
@@ -3704,6 +3717,20 @@
 			return [0, maxDonors * 1.05];
 
 			//end of setYDomainLocalCurrency
+		};
+
+		function validateCbpfs(cbpfSrting, cbpfsList) {
+			if (!cbpfSrting || cbpfSrting.toLowerCase() === "none") return;
+			const namesArray = cbpfSrting.split(",").map(function(d) {
+				return d.trim().toLowerCase();
+			});
+			const countryCodes = Object.keys(iso2Names);
+			namesArray.forEach(function(d) {
+				const foundCbpf = countryCodes.find(function(e) {
+					return iso2Names[e].toLowerCase() === d && cbpfsList.indexOf(e) > -1;
+				});
+				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+			});
 		};
 
 		function createCurrencyOverDiv() {
