@@ -2998,7 +2998,7 @@
 		};
 
 		function validateCbpfs(cbpfSrting) {
-			if (!cbpfSrting || cbpfSrting.toLowerCase() === "all") return;
+			if (!cbpfSrting || cbpfSrting.toLowerCase() === "none") return;
 			const namesArray = cbpfSrting.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
