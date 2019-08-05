@@ -13,7 +13,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiclc" data-title="CBPF Contributions" data-year="2018" data-contribution="total" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiclc/src/d3chartpbiclc.js"></script>```
+```<div id="d3chartcontainerpbiclc" data-title="CBPF Contributions" data-year="2018" data-contribution="total" data-selectedcbpfs="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiclc/src/d3chartpbiclc.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -23,7 +23,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are seven parameters:
+There are eight parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *CBPF Contributions*.
 
@@ -44,6 +44,22 @@ This value defines only the selected year when the page loads: the user can easi
 - `"pledge"`: shows only the pledged values.
 
 If the value is not an accepted value, it defaults to `"total"`.
+
+**`data-selectedcbpf`**: defines the selected CBPFs when the page loads. For not selecting any CBPF set the value to `"none"`, or just leave it empty:
+
+`""`
+
+For individual CBPFs set the value accordingly, such as:
+
+`"Yemen"`.
+
+For more than one CBPF separate the values with commas, such as:
+
+`"Yemen, Sudan, Iraq"`.
+
+For the accepted values, please refer to the data API.
+
+If the value is not a valid one it defaults to `"none"`. This value defines only the selected CBPFs when the page loads: the CBPFs (and donors) can be easily selected by clicking.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
