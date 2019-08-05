@@ -139,6 +139,8 @@
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+
 		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
 
@@ -359,6 +361,8 @@
 
 				chartState.selectedContribution = selectedContribution;
 
+				validateCbpfs(selectedCbpfsString);
+
 				const allDonors = rawData.map(function(d) {
 					if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
 					return d.GMSDonorISO2Code.toLowerCase();
@@ -394,6 +398,12 @@
 				dataDonors: dataArray[0],
 				dataCbpfs: dataArray[1]
 			};
+
+			data.dataCbpfs.forEach(function(d) {
+				if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
+					d.clicked = true;
+				};
+			});
 
 			createTitle();
 
@@ -2985,6 +2995,20 @@
 		function validateYear(yearString) {
 			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
 				+yearString : new Date().getFullYear()
+		};
+
+		function validateCbpfs(cbpfSrting) {
+			if (!cbpfSrting || cbpfSrting.toLowerCase() === "all") return;
+			const namesArray = cbpfSrting.split(",").map(function(d) {
+				return d.trim().toLowerCase();
+			});
+			const countryCodes = Object.keys(countryNames);
+			namesArray.forEach(function(d) {
+				const foundCbpf = countryCodes.find(function(e) {
+					return countryNames[e].toLowerCase() === d;
+				});
+				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+			});
 		};
 
 		function capitalize(str) {
