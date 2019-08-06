@@ -423,9 +423,7 @@
 		function draw(rawData) {
 
 			let data = processData(rawData);
-
-			console.log(data);
-
+			
 			data.forEach(function(d) {
 				if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
 					d.clicked = true;
