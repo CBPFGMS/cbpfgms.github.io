@@ -127,6 +127,7 @@
 			titlePadding = 26,
 			partnersTotals = {},
 			partnersUnderApproval = {},
+			cbpfsCompleteList = [],
 			chartState = {
 				selectedYear: [],
 				selectedPartner: null,
@@ -155,6 +156,8 @@
 		let showAverage = (containerDiv.node().getAttribute("data-showaverage") === "true");
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
+
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
 
 		chartState.selectedPartner = partnerListWithTotal.indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
 			containerDiv.node().getAttribute("data-partner") :
@@ -389,12 +392,15 @@
 			removeProgressWheel();
 
 			yearsArray = rawData.map(function(d) {
+				if (cbpfsCompleteList.indexOf(d.PooledFundName) === -1) cbpfsCompleteList.push(d.PooledFundName);
 				return +d.AllocationYear;
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
 			}).sort();
 
 			chartState.selectedYear.push(validateYear(selectedYearString));
+
+			validateCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
 				draw(rawData);
@@ -418,6 +424,14 @@
 
 			let data = processData(rawData);
 
+			console.log(data);
+
+			data.forEach(function(d) {
+				if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
+					d.clicked = true;
+				};
+			});
+
 			createTitle();
 
 			if (!isPfbiSite) createFooterDiv();
@@ -437,6 +451,20 @@
 			createParallelPanel(data);
 
 			createBottomButtons();
+
+			if (chartState.selectedCbpfs.length) {
+				lollipopPanel.main.selectAll(".pbialpCbpfGroup").each(function(d) {
+					d3.select(this).select("rect")
+						.style("fill", null)
+						.classed("contributionColorFill", !d.clicked)
+						.classed("contributionColorDarkerFill", d.clicked);
+					d3.select(this).select("circle")
+						.style("fill", null)
+						.classed("contributionColorFill", !d.clicked)
+						.classed("contributionColorDarkerFill", d.clicked);
+				});
+				highlightParallel(data);
+			};
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -3360,6 +3388,16 @@
 		function validateYear(yearString) {
 			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
 				+yearString : new Date().getFullYear()
+		};
+
+		function validateCbpfs(cbpfString) {
+			if (!cbpfString || cbpfString === "none") return;
+			const namesArray = cbpfString.split(",").map(function(d) {
+				return d.trim();
+			});
+			namesArray.forEach(function(d) {
+				if (cbpfsCompleteList.indexOf(d) > -1) chartState.selectedCbpfs.push(d);
+			});
 		};
 
 		function capitalize(str) {
