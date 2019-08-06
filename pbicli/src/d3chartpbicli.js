@@ -3719,9 +3719,9 @@
 			//end of setYDomainLocalCurrency
 		};
 
-		function validateCbpfs(cbpfSrting, cbpfsList) {
-			if (!cbpfSrting || cbpfSrting.toLowerCase() === "none") return;
-			const namesArray = cbpfSrting.split(",").map(function(d) {
+		function validateCbpfs(cbpfString, cbpfsList) {
+			if (!cbpfString || cbpfString.toLowerCase() === "none") return;
+			const namesArray = cbpfString.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(iso2Names);

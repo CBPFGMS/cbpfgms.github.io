@@ -2997,9 +2997,9 @@
 				+yearString : new Date().getFullYear()
 		};
 
-		function validateCbpfs(cbpfSrting) {
-			if (!cbpfSrting || cbpfSrting.toLowerCase() === "none") return;
-			const namesArray = cbpfSrting.split(",").map(function(d) {
+		function validateCbpfs(cbpfString) {
+			if (!cbpfString || cbpfString.toLowerCase() === "none") return;
+			const namesArray = cbpfString.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(countryNames);
