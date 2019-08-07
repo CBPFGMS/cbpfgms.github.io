@@ -109,6 +109,15 @@
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
+			partnersListObject = {
+				"International NGO": "International NGO",
+				"National NGO": "National NGO",
+				"Others": "Red Cross/Crescent Movement",
+				"Red Cross/Crescent Movement": "Red Cross/Crescent Movement",
+				"UN Agency": "UN Agency",
+				"total": "total",
+				"all": "total"
+			},
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
@@ -159,8 +168,8 @@
 
 		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.selectedPartner = partnerListWithTotal.indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
-			containerDiv.node().getAttribute("data-partner") :
+		chartState.selectedPartner = Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
+			partnersListObject[containerDiv.node().getAttribute("data-partner")] :
 			"total";
 
 		if (selectedResponsiveness === "false") {
