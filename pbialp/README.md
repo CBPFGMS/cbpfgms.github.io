@@ -40,10 +40,10 @@ This value defines only the selected year when the page loads: the user can easi
 
 **`data-partner`**: defines the partner type depicted by the data visualisation when the page loads. The value has to be a string. Accepted values:
 
-- `"total"`: shows all partners.
+- `"total"` or `"all"`: shows all partners.
 - `"International NGO"`: shows only the allocations for International NGOs.
 - `"National NGO"`: shows only the allocations for National NGOs.
-- `"Red Cross/Crescent Movement"`: shows only the allocations for Red Cross/Crescent Movement.
+- `"Red Cross/Crescent Movement"` or `"Others"`: shows only the allocations for Red Cross/Crescent Movement.
 - `"UN Agency"`: shows only the allocations for UN Agencies.
 
 If the value is not an accepted value, it defaults to `"total"`.
