@@ -141,7 +141,7 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedCbpfsString = queryStringValues.get("fund") ? queryStringValues.get("fund").replace("|", ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.get("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
 		const selectedYearString = queryStringValues.get("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
