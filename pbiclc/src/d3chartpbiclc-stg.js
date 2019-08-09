@@ -447,6 +447,18 @@
 					};
 				};
 
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", d);
+				} else {
+					queryStringValues.append("year", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
+
 				d3.selectAll(".pbiclcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -519,6 +531,18 @@
 			function clickButtonsContributionsRects(d) {
 
 				chartState.selectedContribution = d;
+
+				if (queryStringValues.has("contribution")) {
+					queryStringValues.set("contribution", d);
+				} else {
+					queryStringValues.append("contribution", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
 
 				d3.selectAll(".pbiclcbuttonsContributionsRects")
 					.style("fill", function(e) {
@@ -1931,6 +1955,22 @@
 							chartState.selectedCbpfs.push(datum.isoCode);
 						}
 					};
+
+					const allFunds = chartState.selectedCbpfs.map(function(d){
+						return countryNames[d];
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
 
 					const foundDatum = data.dataCbpfs.find(function(d) {
 						return d.isoCode === datum.isoCode;
