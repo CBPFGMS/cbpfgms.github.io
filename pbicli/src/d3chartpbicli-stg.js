@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -140,6 +142,8 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbicli");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -152,9 +156,9 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.get("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.futureDonations = (containerDiv.node().getAttribute("data-showfuture") === "true");
+		chartState.futureDonations = queryStringValues.get("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
 
 		if (selectedResponsiveness === false) {
 			containerDiv.style("width", width + "px");
@@ -788,6 +792,22 @@
 					};
 				};
 
+				const allFunds = chartState.selectedCbpfs.map(function(d) {
+					return iso2Names[d];
+				}).join("|");
+
+				if (queryStringValues.has("fund")) {
+					queryStringValues.set("fund", allFunds);
+				} else {
+					queryStringValues.append("fund", allFunds);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
+
 				containerDiv.select("#pbicliDonorsDropdown").select("option")
 					.property("selected", true);
 
@@ -965,6 +985,18 @@
 
 				filtersDiv.select(".pbicliCheckboxTrend span")
 					.style("opacity", chartState.futureDonations ? 1 : checkboxOpacity);
+
+				if (queryStringValues.has("showfuture")) {
+					queryStringValues.set("showfuture", chartState.futureDonations);
+				} else {
+					queryStringValues.append("showfuture", chartState.futureDonations);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
 
 				const timeExtent = setTimeExtent(list.yearsArray);
 
@@ -1215,6 +1247,22 @@
 						.property("disabled", function(d, i) {
 							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 						});
+
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return iso2Names[d];
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
 
 					const data = populateData(rawData);
 
