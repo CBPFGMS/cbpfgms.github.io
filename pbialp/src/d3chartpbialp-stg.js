@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -110,11 +112,11 @@
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
 			partnersListObject = {
-				"International NGO": "International NGO",
-				"National NGO": "National NGO",
-				"Others": "Red Cross/Crescent Movement",
-				"Red Cross/Crescent Movement": "Red Cross/Crescent Movement",
-				"UN Agency": "UN Agency",
+				"international ngo": "International NGO",
+				"national ngo": "National NGO",
+				"others": "Red Cross/Crescent Movement",
+				"red cross/crescent movement": "Red Cross/Crescent Movement",
+				"un agency": "UN Agency",
 				"total": "total",
 				"all": "total"
 			},
@@ -150,6 +152,8 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredRect;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbialp");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -162,14 +166,15 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		let showAverage = (containerDiv.node().getAttribute("data-showaverage") === "true");
+		let showAverage = queryStringValues.has("average") ? queryStringValues.get("average") === "true" : containerDiv.node().getAttribute("data-showaverage") === "true";
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.selectedPartner = Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
-			partnersListObject[containerDiv.node().getAttribute("data-partner")] :
+		chartState.selectedPartner = queryStringValues.has("partner") && Object.keys(partnersListObject).indexOf(queryStringValues.get("partner").toLowerCase()) > -1 ?
+			partnersListObject[queryStringValues.get("partner").toLowerCase()] : Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner").toLowerCase()) > -1 ?
+			partnersListObject[containerDiv.node().getAttribute("data-partner").toLowerCase()] :
 			"total";
 
 		if (selectedResponsiveness === "false") {
@@ -433,10 +438,17 @@
 
 			let data = processData(rawData);
 
+			const allCbpfs = [];
+
 			data.forEach(function(d) {
+				allCbpfs.push(d.cbpf);
 				if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
 					d.clicked = true;
 				};
+			});
+
+			chartState.selectedCbpfs = chartState.selectedCbpfs.filter(function(d) {
+				return allCbpfs.indexOf(d) > -1;
 			});
 
 			createTitle();
@@ -1449,6 +1461,22 @@
 						}
 					};
 
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return d;
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
+
 					cbpfGroup.each(function(d) {
 						d3.select(this).select("rect")
 							.style("fill", null)
@@ -1818,6 +1846,18 @@
 
 					showAverage = !showAverage;
 
+					if (queryStringValues.has("average")) {
+						queryStringValues.set("average", showAverage);
+					} else {
+						queryStringValues.append("average", showAverage);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
+
 					innerCheck.style("stroke", showAverage ? "darkslategray" : "white");
 
 					parallelPanel.main.select(".pbialpCbpfParallelGroupAverage")
@@ -2170,6 +2210,18 @@
 					};
 				};
 
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", d);
+				} else {
+					queryStringValues.append("year", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
+
 				d3.selectAll(".pbialpbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -2234,6 +2286,18 @@
 					.style("fill", function(e) {
 						return e === chartState.selectedPartner ? "white" : "#444";
 					});
+
+				if (queryStringValues.has("partner")) {
+					queryStringValues.set("partner", d);
+				} else {
+					queryStringValues.append("partner", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
 
 				createTopPanel(data);
 
