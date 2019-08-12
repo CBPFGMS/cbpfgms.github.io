@@ -156,9 +156,9 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const selectedCbpfsString = queryStringValues.get("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.futureDonations = queryStringValues.get("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
+		chartState.futureDonations = queryStringValues.has("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
 
 		if (selectedResponsiveness === false) {
 			containerDiv.style("width", width + "px");
