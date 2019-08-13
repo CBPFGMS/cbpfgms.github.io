@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -111,6 +113,8 @@
 			isSnapshotTooltipVisible = false,
 			labelGroupHovered;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -123,9 +127,9 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
-			containerDiv.node().getAttribute("data-sortbuttons") :
-			"total";
+		let sortButtons = queryStringValues.has("sortbuttons") && sortButtonsOptions.indexOf(queryStringValues.get("sortbuttons").toLowerCase()) > -1 ?
+			queryStringValues.get("sortbuttons").toLowerCase() : sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-sortbuttons").toLowerCase() : "total";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -767,6 +771,18 @@
 				orderGroups.on("click", function(d) {
 
 					sortButtons = d;
+
+					if (queryStringValues.has("sortbuttons")) {
+						queryStringValues.set("sortbuttons", sortButtons);
+					} else {
+						queryStringValues.append("sortbuttons", sortButtons);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
 
 					innerCircle.attr("fill", function(d) {
 						return sortButtons === d ? "darkslategray" : "white"
