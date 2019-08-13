@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -147,11 +149,13 @@
 			"All": null
 		};
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbifdc");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
-		const selectedRegionString = containerDiv.node().getAttribute("data-regions");
+		const selectedRegionString = queryStringValues.has("regions") ? queryStringValues.get("regions").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-regions");
 
 		let selectedRegion = selectedRegionString.toLowerCase() === "all" ? "All" :
 			selectedRegionString.split(",");
@@ -164,9 +168,9 @@
 
 		chartState.selectedRegion = selectedRegion;
 
-		const showMapOption = (containerDiv.node().getAttribute("data-showmap") === "true");
+		const showMapOption = queryStringValues.has("showmap") ? queryStringValues.get("showmap") === "true" : containerDiv.node().getAttribute("data-showmap") === "true";
 
-		const showNamesOption = (containerDiv.node().getAttribute("data-shownames") === "true");
+		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -1052,6 +1056,18 @@
 
 					chartState.showMap = !chartState.showMap;
 
+					if (queryStringValues.has("showmap")) {
+						queryStringValues.set("showmap", chartState.showMap);
+					} else {
+						queryStringValues.append("showmap", chartState.showMap);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
+
 					innerCheck.style("stroke", chartState.showMap ? "darkslategray" : "white");
 
 					showMapGroupLegend.interrupt()
@@ -1083,6 +1099,18 @@
 				}).on("click", function() {
 
 					chartState.showNames = !chartState.showNames;
+
+					if (queryStringValues.has("shownames")) {
+						queryStringValues.set("shownames", chartState.showNames);
+					} else {
+						queryStringValues.append("shownames", chartState.showNames);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
 
 					innerCheckShowNames.style("stroke", chartState.showNames ? "darkslategray" : "white");
 
@@ -2687,6 +2715,23 @@
 						});
 					};
 
+					const allRegions = chartState.selectedRegion === "All" ? "All" :
+						chartState.selectedRegion.map(function(d) {
+							return d;
+						}).join("|");
+
+					if (queryStringValues.has("regions")) {
+						queryStringValues.set("regions", allRegions);
+					} else {
+						queryStringValues.append("regions", allRegions);
+					};
+
+					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					window.history.pushState({
+						path: newURL
+					}, "", newURL);
+
 					dataObject = processData(rawData[0]);
 
 					createTopPanel(dataObject.nodes);
@@ -2716,6 +2761,18 @@
 						chartState.selectedYear.push(d);
 					};
 				};
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", d);
+				} else {
+					queryStringValues.append("year", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
 
 				d3.selectAll(".pbifdcbuttonsRects")
 					.style("fill", function(e) {
