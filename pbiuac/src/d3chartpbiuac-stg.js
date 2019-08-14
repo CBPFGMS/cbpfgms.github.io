@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -137,6 +139,8 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -145,11 +149,11 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const chartYearTitle = containerDiv.node().getAttribute("data-yeartitle");
+		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
 
-		const offsetStartValue = +(containerDiv.node().getAttribute("data-offsetstart"));
+		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart"));
 
-		const offsetEndValue = +(containerDiv.node().getAttribute("data-offsetend"));
+		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend"));
 
 		const offsetStart = offsetStartValue === offsetStartValue ? Math.abs(offsetStartValue) : offsetStartDefault;
 
