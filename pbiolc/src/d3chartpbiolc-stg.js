@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -145,6 +147,8 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -153,15 +157,17 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-cbpf");
 
-		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality")) > -1 ?
-			containerDiv.node().getAttribute("data-modality") : "total";
+		const selectedModality = queryStringValues.has("modality") && modalities.indexOf(queryStringValues.get("modality").toLowerCase()) > -1 ? queryStringValues.get("modality").toLowerCase() :
+			modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-modality").toLowerCase() : "total";
 
-		const selectedBeneficiary = beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries")) > -1 ?
-			containerDiv.node().getAttribute("data-beneficiaries") : "targeted";
+		const selectedBeneficiary = queryStringValues.has("persons") && beneficiaries.indexOf(queryStringValues.get("persons").toLowerCase()) > -1 ? queryStringValues.get("persons").toLowerCase() :
+			beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-beneficiaries").toLowerCase() : "targeted";
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -685,6 +691,29 @@
 							.property("indeterminate", function() {
 								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
 							});
+					};
+
+					if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
+						queryStringValues.delete("fund");
+						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+						window.history.pushState({
+							path: newURL
+						}, "", newURL);
+					} else {
+						const allFunds = chartState.selectedCbpfs.map(function(d) {
+							return cbpfsList[d]
+						}).join("|");
+						if (queryStringValues.has("fund")) {
+							queryStringValues.set("fund", allFunds);
+						} else {
+							queryStringValues.append("fund", allFunds);
+						};
+
+						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+						window.history.pushState({
+							path: newURL
+						}, "", newURL);
 					};
 
 					data = processData(rawData);
@@ -1406,6 +1435,18 @@
 					};
 				};
 
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", d);
+				} else {
+					queryStringValues.append("year", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
+
 				d3.selectAll(".pbiolcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -1462,6 +1503,18 @@
 
 				chartState.selectedModality = d;
 
+				if (queryStringValues.has("modality")) {
+					queryStringValues.set("modality", d);
+				} else {
+					queryStringValues.append("modality", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
+
 				d3.selectAll(".pbiolcbuttonsModalitiesRects")
 					.style("fill", function(e) {
 						return e === chartState.selectedModality ? unBlue : "#eaeaea";
@@ -1488,6 +1541,18 @@
 			function clickButtonsBeneficiariesRects(d) {
 
 				chartState.selectedBeneficiary = d;
+
+				if (queryStringValues.has("persons")) {
+					queryStringValues.set("persons", d);
+				} else {
+					queryStringValues.append("persons", d);
+				};
+
+				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+				window.history.pushState({
+					path: newURL
+				}, "", newURL);
 
 				d3.selectAll(".pbiolcbuttonsBeneficiariesRects")
 					.style("fill", function(e) {
