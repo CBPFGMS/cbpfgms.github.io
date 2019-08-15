@@ -168,7 +168,7 @@
 
 		let showAverage = queryStringValues.has("average") ? queryStringValues.get("average") === "true" : containerDiv.node().getAttribute("data-showaverage") === "true";
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
 		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
@@ -412,7 +412,7 @@
 				return self.indexOf(value) === index;
 			}).sort();
 
-			chartState.selectedYear.push(validateYear(selectedYearString));
+			validateYear(selectedYearString);
 
 			validateCbpfs(selectedCbpfsString);
 
@@ -936,7 +936,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -950,7 +950,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -2210,10 +2210,14 @@
 					};
 				};
 
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
 				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", d);
+					queryStringValues.set("year", allYears);
 				} else {
-					queryStringValues.append("year", d);
+					queryStringValues.append("year", allYears);
 				};
 
 				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
@@ -3457,8 +3461,15 @@
 		};
 
 		function validateYear(yearString) {
-			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function validateCbpfs(cbpfString) {
