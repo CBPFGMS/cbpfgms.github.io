@@ -891,7 +891,7 @@
 					if (chartState.selectedCBPF[0] === "all") {
 						queryStringValues.delete("fund");
 						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-						window.history.pushState({
+						window.history.replaceState({
 							path: newURL
 						}, "", newURL);
 					} else {
@@ -919,7 +919,7 @@
 					if (chartState.selectedCluster[0] === "all") {
 						queryStringValues.delete("cluster");
 						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-						window.history.pushState({
+						window.history.replaceState({
 							path: newURL
 						}, "", newURL);
 					} else {
@@ -2780,7 +2780,7 @@
 
 			const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
 
-			window.history.pushState({
+			window.history.replaceState({
 				path: newURL
 			}, "", newURL);
 		};

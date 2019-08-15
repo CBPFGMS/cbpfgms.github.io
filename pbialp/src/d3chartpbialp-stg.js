@@ -1473,7 +1473,7 @@
 
 					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
 
-					window.history.pushState({
+					window.history.replaceState({
 						path: newURL
 					}, "", newURL);
 
@@ -1854,7 +1854,7 @@
 
 					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
 
-					window.history.pushState({
+					window.history.replaceState({
 						path: newURL
 					}, "", newURL);
 
@@ -2218,7 +2218,7 @@
 
 				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
 
-				window.history.pushState({
+				window.history.replaceState({
 					path: newURL
 				}, "", newURL);
 
@@ -2295,7 +2295,7 @@
 
 				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
 
-				window.history.pushState({
+				window.history.replaceState({
 					path: newURL
 				}, "", newURL);
 
