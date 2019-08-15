@@ -430,6 +430,8 @@
 
 			createLegend();
 
+			setYearsDescriptionDiv();
+
 			if (showHelp) createAnnotationsDiv();
 
 			function createTitle() {
@@ -1461,15 +1463,7 @@
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
-				yearsDescriptionDiv.html(function() {
-					if (chartState.selectedYear.length === 1) return null;
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).reduce(function(acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-					}, "");
-					return "\u002ASelected years: " + yearsList;
-				});
+				setYearsDescriptionDiv();
 
 				data = processData(rawData);
 
@@ -1947,6 +1941,18 @@
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
 			return [matrix.e, matrix.f];
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function reverseFormat(s) {
