@@ -1154,6 +1154,16 @@
 				.attr("text-anchor", "start")
 				.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueReserve));
 
+			legendGroups.on("mouseover", function(d) {
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", function(e) {
+						return e.AllocationSource === (d[0].toUpperCase() + d.substring(1)) ? 1 : 0.1;
+					});
+			}).on("mouseout", function() {
+				mainPanel.main.selectAll(".pbiuacAllocationsMain")
+					.style("opacity", 1);
+			});
+
 			function mouseOverLegend(datum, scale, element, modality) {
 
 				currentHoveredElem = element;
