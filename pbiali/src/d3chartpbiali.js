@@ -935,7 +935,7 @@
 						.data([true]);
 
 					const tooltipGroupEnter = tooltipGroup.enter()
-						.insert("g", ":first-child")
+						.insert("g", ":nth-child(3)")
 						.attr("class", "pbialiTooltipGroup")
 						.attr("pointer-events", "none");
 
