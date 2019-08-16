@@ -368,6 +368,8 @@
 				yScaleBrush.domain(cbpfsList)
 					.range(setOrdinalRange(brushPanel, barHeightBrush, outerBarPaddingBrush, innerBarPaddingBrush));
 
+				if (maxDateOffset < offsetEndDate) maxDateOffset = offsetEndDate;
+
 				xScaleMain.domain([minDateOffset, maxDateOffset]);
 
 				xScaleBrush.domain([minDateOffset, maxDateOffset]);
