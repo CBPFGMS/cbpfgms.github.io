@@ -2243,7 +2243,9 @@
 		function saveFlags(clustersList) {
 
 			clustersList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + "60px.png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+				if (!localStorage.getItem("storedCluster" + d.replace(/\W/g, "").toLowerCase())) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + "60px.png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+				}
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, clusterCode) {

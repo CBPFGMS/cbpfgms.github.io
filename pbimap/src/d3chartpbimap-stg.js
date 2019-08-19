@@ -3014,7 +3014,9 @@
 
 		function saveImage(link, filename) {
 
-			getBase64FromImage(link, setLocal, null, filename);
+			if (!localStorage.getItem("storedImage" + filename)) {
+				getBase64FromImage(link, setLocal, null, filename);
+			};
 
 			function getBase64FromImage(url, onSuccess, onError, filename) {
 				const xhr = new XMLHttpRequest();

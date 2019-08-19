@@ -97,7 +97,8 @@
 			formatNumberSI = d3.format(".3s"),
 			chartTitleDefault = "Contributions Flow",
 			unBlue = "#1F69B3",
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			flagPadding = 22,
 			maxNodeSize = 35,
@@ -402,15 +403,32 @@
 			.tickSizeInner(0)
 			.tickSizeOuter(0);
 
-		fileData = d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv");
-
-		fileMap = d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json");
-
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all([fileData, fileMap]).then(function(rawData) {
+		d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
+
+			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - 300000)) {
+				console.log("pbifdc data: from the storage!")
+				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+				csvCallback([apiData, mapData]);
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
+					console.log("pbifdc data: from the API")
+					localStorage.removeItem("pbiclcpbiclipbifdcdata");
+					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+						data: apiData,
+						timestamp: currentDate.getTime()
+					}));
+					csvCallback([apiData, mapData]);
+				});
+			};
+
+		});
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -441,8 +459,8 @@
 				};
 			};
 
-			//end of Promise.all
-		});
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -3084,7 +3102,9 @@
 			});
 
 			donorsList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
+				if (!localStorage.getItem("storedFlag" + d)) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
+				};
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, isoCode) {

@@ -85,7 +85,8 @@
 			flagPadding = 2,
 			circleRadius = 2.5,
 			localVariable = d3.local(),
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			parseTime = d3.timeParse("%Y"),
 			formatSIaxes = d3.format("~s"),
@@ -393,55 +394,71 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
-			.then(function(rawData) {
-
-				removeProgressWheel();
-
-				rawData.sort(function(a, b) {
-					return (+a.FiscalYear) - (+b.FiscalYear);
-				});
-
-				rawData = rawData.filter(function(d) {
-					return d.GMSDonorName !== "" && d.GMSDonorISO2Code !== "";
-				});
-
-				const list = processList(rawData);
-
-				yearsExtent = d3.extent(list.yearsArray);
-
-				scaleColorsDonors.domain(list.donorsArray);
-
-				scaleColorsCbpfs.domain(list.cbpfsArray);
-
-				validateCbpfs(selectedCbpfsString, list.cbpfsArray);
-
-				if (chartState.selectedCbpfs.length) {
-					chartState.selectedDonors = [];
-					chartState.controlledBy = "cbpf";
-				} else {
-					chartState.selectedDonors.push("alldonors");
-				};
-
-				if (!isInternetExplorer) saveFlags(list.donorsArray);
-
-				if (!lazyLoad) {
-					draw(rawData, list);
-				} else {
-					d3.select(window).on("scroll.pbicli", checkPosition);
-					checkPosition();
-				};
-
-				function checkPosition() {
-					const containerPosition = containerDiv.node().getBoundingClientRect();
-					if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-						d3.select(window).on("scroll.pbicli", null);
-						draw(rawData, list);
-					};
-				};
-
-				//end of d3.csv
+		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - 300000)) {
+			console.log("pbicli data: from the storage!")
+			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
+				console.log("pbicli data: from the API")
+				localStorage.removeItem("pbiclcpbiclipbifdcdata");
+				localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+					data: rawData,
+					timestamp: currentDate.getTime()
+				}));
+				csvCallback(rawData);
 			});
+		};
+
+		function csvCallback(rawData) {
+
+			removeProgressWheel();
+
+			rawData.sort(function(a, b) {
+				return (+a.FiscalYear) - (+b.FiscalYear);
+			});
+
+			rawData = rawData.filter(function(d) {
+				return d.GMSDonorName !== "" && d.GMSDonorISO2Code !== "";
+			});
+
+			const list = processList(rawData);
+
+			yearsExtent = d3.extent(list.yearsArray);
+
+			scaleColorsDonors.domain(list.donorsArray);
+
+			scaleColorsCbpfs.domain(list.cbpfsArray);
+
+			validateCbpfs(selectedCbpfsString, list.cbpfsArray);
+
+			if (chartState.selectedCbpfs.length) {
+				chartState.selectedDonors = [];
+				chartState.controlledBy = "cbpf";
+			} else {
+				chartState.selectedDonors.push("alldonors");
+			};
+
+			if (!isInternetExplorer) saveFlags(list.donorsArray);
+
+			if (!lazyLoad) {
+				draw(rawData, list);
+			} else {
+				d3.select(window).on("scroll.pbicli", checkPosition);
+				checkPosition();
+			};
+
+			function checkPosition() {
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbicli", null);
+					draw(rawData, list);
+				};
+			};
+
+			//end of csvCallback
+		};
 
 		function draw(rawData, list) {
 
@@ -4187,7 +4204,9 @@
 			});
 
 			donorsList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				if (!localStorage.getItem("storedFlag" + d)) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				};
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, isoCode) {

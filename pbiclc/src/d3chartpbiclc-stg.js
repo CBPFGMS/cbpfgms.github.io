@@ -84,7 +84,8 @@
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 12,
 			windowHeight = window.innerHeight,
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
@@ -349,51 +350,67 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
-			.then(function(rawData) {
-
-				removeProgressWheel();
-
-				yearsArray = rawData.map(function(d) {
-					if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
-					if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
-					return +d.FiscalYear
-				}).filter(function(value, index, self) {
-					return self.indexOf(value) === index;
-				}).sort();
-
-				validateYear(selectedYearString);
-
-				chartState.selectedContribution = selectedContribution;
-
-				validateCbpfs(selectedCbpfsString);
-
-				const allDonors = rawData.map(function(d) {
-					if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
-					return d.GMSDonorISO2Code.toLowerCase();
-				}).filter(function(value, index, self) {
-					return self.indexOf(value) === index;
-				});
-
-				if (!isInternetExplorer) saveFlags(allDonors);
-
-				if (!lazyLoad) {
-					draw(rawData);
-				} else {
-					d3.select(window).on("scroll.pbiclc", checkPosition);
-					checkPosition();
-				};
-
-				function checkPosition() {
-					const containerPosition = containerDiv.node().getBoundingClientRect();
-					if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-						d3.select(window).on("scroll.pbiclc", null);
-						draw(rawData);
-					};
-				};
-
-				//end of d3.csv
+		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - 300000)) {
+			console.log("pbiclc data: from the storage!")
+			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
+				console.log("pbiclc data: from the API")
+				localStorage.removeItem("pbiclcpbiclipbifdcdata");
+				localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+					data: rawData,
+					timestamp: currentDate.getTime()
+				}));
+				csvCallback(rawData);
 			});
+		};
+
+		function csvCallback(rawData) {
+
+			removeProgressWheel();
+
+			yearsArray = rawData.map(function(d) {
+				if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
+				if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
+				return +d.FiscalYear
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			}).sort();
+
+			validateYear(selectedYearString);
+
+			chartState.selectedContribution = selectedContribution;
+
+			validateCbpfs(selectedCbpfsString);
+
+			const allDonors = rawData.map(function(d) {
+				if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
+				return d.GMSDonorISO2Code.toLowerCase();
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
+			if (!isInternetExplorer) saveFlags(allDonors);
+
+			if (!lazyLoad) {
+				draw(rawData);
+			} else {
+				d3.select(window).on("scroll.pbiclc", checkPosition);
+				checkPosition();
+			};
+
+			function checkPosition() {
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiclc", null);
+					draw(rawData);
+				};
+			};
+
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -2483,7 +2500,9 @@
 			};
 
 			donorsList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				if (!localStorage.getItem("storedFlag" + d)) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				};
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, isoCode) {
