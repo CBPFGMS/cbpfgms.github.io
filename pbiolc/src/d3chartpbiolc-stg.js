@@ -79,9 +79,10 @@
 
 		const width = 900,
 			padding = [4, 4, 40, 4],
+			topPanelHeight = 60,
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 4,
-			buttonsPanelHeight = 50,
+			buttonsPanelHeight = 30,
 			clusters = ["Water Sanitation Hygiene",
 				"Coordination and Support Services",
 				"Emergency Shelter and NFI",
@@ -102,7 +103,7 @@
 			titleMargin = 24,
 			sortByPadding = 4,
 			lollipopPanelsHeight = +lollipopTitlePadding + (numberOfClusters * lollipopGroupHeight),
-			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + lollipopPanelsHeight + padding[2],
+			height = padding[0] + topPanelHeight + buttonsPanelHeight + panelHorizontalPadding + lollipopPanelsHeight + padding[2],
 			stickHeight = 2,
 			lollipopRadius = 4,
 			lollipopsPanelsRatio = 0.345,
@@ -133,6 +134,11 @@
 			modalities = ["total", "standard", "reserve"],
 			beneficiaries = ["targeted", "actual"],
 			clusterIconsPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/",
+			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
+				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
+				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
+				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
+			],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -258,13 +264,26 @@
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
+		const topPanel = {
+			main: svg.append("g")
+				.attr("class", "pbiolcTopPanel")
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+			width: width - padding[1] - padding[3],
+			height: topPanelHeight,
+			padding: [0, 0, 0, 0],
+			moneyBagPadding: 22,
+			leftPadding: [182, 540],
+			mainValueVerPadding: 10,
+			mainValueHorPadding: 2
+		};
+
 		const buttonsPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiolcButtonsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
-			padding: [20, 0, 0, 0],
+			padding: [0, 0, 0, 0],
 			buttonWidth: 52,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
@@ -277,7 +296,7 @@
 		const allocationsPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiolcAllocationsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * lollipopsPanelsRatio,
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 0, 0, 52],
@@ -288,7 +307,7 @@
 			main: svg.append("g")
 				.attr("class", "pbiolcLabelsPanel")
 				.attr("transform", "translate(" + (padding[3] + allocationsPanel.width + panelVerticalPadding) +
-					"," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+					"," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * (1 - (2 * lollipopsPanelsRatio)),
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 0, 0, 0]
@@ -298,7 +317,7 @@
 			main: svg.append("g")
 				.attr("class", "pbiolcBeneficiariesPanel")
 				.attr("transform", "translate(" + (padding[3] + allocationsPanel.width + labelsPanel.width + (2 * panelVerticalPadding)) +
-					"," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+					"," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * lollipopsPanelsRatio,
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 62, 0, 0],
@@ -419,6 +438,8 @@
 			createCheckboxes();
 
 			if (!isPfbiSite) createFooterDiv();
+
+			createTopPanel();
 
 			createButtonsPanel();
 
@@ -724,6 +745,8 @@
 
 					sortData(data);
 
+					createTopPanel()
+
 					createLabelsPanel();
 
 					createAllocationsPanel();
@@ -735,24 +758,170 @@
 				//end of createCheckboxes
 			};
 
+			function createTopPanel() {
+
+				const mainValue = d3.sum(data, function(d) {
+					return d[chartState.selectedModality];
+				});
+
+				const personsValue = d3.sum(data, function(d) {
+					return d[chartState.selectedModality + chartState.selectedBeneficiary];
+				});
+
+				const topPanelMoneyBag = topPanel.main.selectAll(".pbiolctopPanelMoneyBag")
+					.data([true])
+					.enter()
+					.append("g")
+					.attr("class", "pbiolctopPanelMoneyBag contributionColorFill")
+					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
+					.each(function(_, i, n) {
+						moneyBagdAttribute.forEach(function(d) {
+							d3.select(n[i]).append("path")
+								.attr("d", d);
+						});
+					});
+
+				const previousValue = d3.select(".pbiolctopPanelMainValue").size() !== 0 ? d3.select(".pbiolctopPanelMainValue").datum() : 0;
+
+				const previousPersons = d3.select(".pbiolctopPanelPersonsNumber").size() !== 0 ? d3.select(".pbiolctopPanelPersonsNumber").datum() : 0;
+
+				let mainValueGroup = topPanel.main.selectAll(".pbiolcmainValueGroup")
+					.data([true]);
+
+				mainValueGroup = mainValueGroup.enter()
+					.append("g")
+					.attr("class", "pbiolcmainValueGroup")
+					.merge(mainValueGroup);
+
+				let topPanelMainValue = mainValueGroup.selectAll(".pbiolctopPanelMainValue")
+					.data([mainValue]);
+
+				topPanelMainValue = topPanelMainValue.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelMainValue contributionColorFill")
+					.attr("text-anchor", "end")
+					.merge(topPanelMainValue)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding);
+
+				topPanelMainValue.transition()
+					.duration(duration)
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousValue, d);
+						return function(t) {
+							const siString = formatSIFloat(i(t))
+							node.textContent = "$" + siString.substring(0, siString.length - 1);
+						};
+					});
+
+				let topPanelMainText = mainValueGroup.selectAll(".pbiolctopPanelMainText")
+					.data([mainValue]);
+
+				topPanelMainText = topPanelMainText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelMainText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelMainText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
+
+				topPanelMainText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text(function(d) {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						const valueSI = formatSIFloat(d);
+						const unit = valueSI[valueSI.length - 1];
+						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+							" Allocated in " + yearsText;
+					});
+
+				let topPanelSubText = mainValueGroup.selectAll(".pbiolctopPanelSubText")
+					.data([true]);
+
+				topPanelSubText = topPanelSubText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelSubText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelSubText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
+
+				topPanelSubText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text("(" + capitalize(chartState.selectedModality) + " Allocations)");
+
+				let topPanelPersonsNumber = mainValueGroup.selectAll(".pbiolctopPanelPersonsNumber")
+					.data([personsValue]);
+
+				topPanelPersonsNumber = topPanelPersonsNumber.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsNumber contributionColorFill")
+					.attr("text-anchor", "end")
+					.merge(topPanelPersonsNumber)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding);
+
+				topPanelPersonsNumber.transition()
+					.duration(duration)
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousUpcoming, d);
+						return function(t) {
+							node.textContent = ~~(i(t));
+						};
+					})
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousPersons, d);
+						return function(t) {
+							const siString = formatSIFloat(i(t))
+							node.textContent = siString.substring(0, siString.length - 1);
+						};
+					});
+
+				let topPanelPersonsText = mainValueGroup.selectAll(".pbiolctopPanelPersonsText")
+					.data([personsValue]);
+
+				topPanelPersonsText = topPanelPersonsText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelPersonsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+
+				topPanelPersonsText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text(function(d) {
+						const valueSI = formatSIFloat(d);
+						const unit = valueSI[valueSI.length - 1];
+						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+							" Affected Persons";
+					});
+
+				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiolctopPanelPersonsTextSubText")
+					.data([true]);
+
+				topPanelPersonsTextSubText = topPanelPersonsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelPersonsTextSubText)
+					.text("(" + capitalize(chartState.selectedBeneficiary) + ")");
+
+				// 	//end of createTopPanel
+			};
+
 			function createButtonsPanel() {
-
-				const yearsTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("x", buttonsPanel.padding[3] + buttonsPanel.arrowPadding + 2)
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Year:");
-
-				const modalitiesTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Modality:");
-
-				const beneficiariesTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("x", buttonsPanel.beneficiariesPadding + 2)
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Affected Persons:");
 
 				const clipPathButtons = buttonsPanel.main.append("clipPath")
 					.attr("id", "pbiolcclipPathButtons")
@@ -942,8 +1111,6 @@
 				const buttonsModalitiesSize = buttonsModalitiesGroup.node().getBoundingClientRect().width;
 
 				const modalitiesPosition = buttonsGroupSize + (buttonsPanel.beneficiariesPadding - buttonsGroupSize - buttonsModalitiesSize) / 2;
-
-				modalitiesTitle.attr("x", modalitiesPosition + 2);
 
 				buttonsModalitiesGroup.attr("transform", "translate(" + modalitiesPosition + ",0)");
 
@@ -1488,6 +1655,8 @@
 
 				sortData(data);
 
+				createTopPanel()
+
 				createLabelsPanel();
 
 				createAllocationsPanel();
@@ -1527,6 +1696,8 @@
 					.style("opacity", chartState.selectedModality === "total" ? 1 : 0);
 
 				sortData(data);
+
+				createTopPanel()
 
 				createLabelsPanel();
 
@@ -1572,6 +1743,8 @@
 				xScaleBeneficiaries.domain([0, d3.max(data, function(d) {
 					return d["total" + chartState.selectedBeneficiary];
 				}) * xScaleDomainMargin]);
+
+				createTopPanel()
 
 				createLabelsPanel();
 
