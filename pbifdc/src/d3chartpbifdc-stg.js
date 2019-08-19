@@ -77,6 +77,70 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			padding = [4, 6, 4, 6],
 			topPanelHeight = 60,
@@ -3699,68 +3763,6 @@
 		//end of d3Chart
 	};
 
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
 	//force boundaries
 
 	function forceBoundary(x0, y0, x1, y1) {
@@ -3873,8 +3875,6 @@
 
 		return force;
 	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());
