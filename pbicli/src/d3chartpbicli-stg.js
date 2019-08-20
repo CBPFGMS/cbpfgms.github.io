@@ -712,7 +712,7 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.error("D3 chart pbicli, " + error);
+					console.log("D3 chart pbicli, " + error);
 				};
 				csvCallback(rawData);
 			});

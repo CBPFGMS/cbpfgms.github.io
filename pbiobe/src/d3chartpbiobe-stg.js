@@ -389,7 +389,7 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.error("D3 chart pbiobe, " + error);
+					console.log("D3 chart pbiobe, " + error);
 				};
 				csvCallback(rawData);
 			});

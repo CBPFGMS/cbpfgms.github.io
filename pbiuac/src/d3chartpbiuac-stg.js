@@ -424,7 +424,7 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.error("D3 chart pbiuac, " + error);
+					console.log("D3 chart pbiuac, " + error);
 				};
 				csvCallback(rawData);
 			});

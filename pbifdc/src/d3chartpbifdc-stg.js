@@ -476,7 +476,7 @@
 				try {
 					localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
 				} catch (error) {
-					console.error("D3 chart pbifdc map, " + error);
+					console.log("D3 chart pbifdc map, " + error);
 				};
 				getData(mapData);
 			});
@@ -495,7 +495,7 @@
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {
-						console.error("D3 chart pbifdc data, " + error);
+						console.log("D3 chart pbifdc data, " + error);
 					};
 					csvCallback([apiData, mapData]);
 				});
