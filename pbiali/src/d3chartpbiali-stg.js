@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -77,6 +75,64 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			mainPanelHeight = 280,
 			padding = [12, 4, 26, 4],
@@ -89,7 +145,9 @@
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			windowHeight = window.innerHeight,
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			localVariable = d3.local(),
 			monthsMargin = 2,
@@ -113,8 +171,6 @@
 			isSnapshotTooltipVisible = false,
 			labelGroupHovered;
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -127,9 +183,9 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		let sortButtons = queryStringValues.has("sortbuttons") && sortButtonsOptions.indexOf(queryStringValues.get("sortbuttons").toLowerCase()) > -1 ?
-			queryStringValues.get("sortbuttons").toLowerCase() : sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons").toLowerCase()) > -1 ?
-			containerDiv.node().getAttribute("data-sortbuttons").toLowerCase() : "total";
+		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
+			containerDiv.node().getAttribute("data-sortbuttons") :
+			"total";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -309,7 +365,25 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv(file).then(function(rawData) {
+		if (localStorage.getItem("pbialidata") &&
+			JSON.parse(localStorage.getItem("pbialidata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbialidata")).data;
+			csvCallback(rawData);
+		} else {
+			d3.csv(file).then(function(rawData) {
+				try {
+					localStorage.setItem("pbialidata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.error("D3 chart pbiali, " + error);
+				};
+				csvCallback(rawData);
+			});
+		};
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -330,8 +404,8 @@
 				};
 			};
 
-			//end of d3.csv
-		});
+			//end of csvCallback
+		};
 
 		function draw(data) {
 
@@ -771,18 +845,6 @@
 				orderGroups.on("click", function(d) {
 
 					sortButtons = d;
-
-					if (queryStringValues.has("sortbuttons")) {
-						queryStringValues.set("sortbuttons", sortButtons);
-					} else {
-						queryStringValues.append("sortbuttons", sortButtons);
-					};
-
-					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-					window.history.replaceState({
-						path: newURL
-					}, "", newURL);
 
 					innerCircle.attr("fill", function(d) {
 						return sortButtons === d ? "darkslategray" : "white"
@@ -1871,70 +1933,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());

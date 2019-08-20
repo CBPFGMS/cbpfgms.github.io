@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -400,6 +398,7 @@
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
@@ -444,8 +443,6 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredRect;
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -456,12 +453,11 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
-		const selectedContribution = queryStringValues.has("contribution") && contributionType.indexOf(queryStringValues.get("contribution")) > -1 ? queryStringValues.get("contribution") :
-			contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
+		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
@@ -665,18 +661,19 @@
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - 300000)) {
-			console.log("pbiclc data: from the storage!")
+			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
-				console.log("pbiclc data: from the API")
-				localStorage.removeItem("pbiclcpbiclipbifdcdata");
-				localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-					data: rawData,
-					timestamp: currentDate.getTime()
-				}));
+				try {
+					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.error("D3 chart pbiclc, " + error);
+				};
 				csvCallback(rawData);
 			});
 		};
@@ -780,22 +777,6 @@
 					};
 				};
 
-				const allYears = chartState.selectedYear.map(function(d) {
-					return d;
-				}).join("|");
-
-				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", allYears);
-				} else {
-					queryStringValues.append("year", allYears);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
-
 				d3.selectAll(".pbiclcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -860,18 +841,6 @@
 			function clickButtonsContributionsRects(d) {
 
 				chartState.selectedContribution = d;
-
-				if (queryStringValues.has("contribution")) {
-					queryStringValues.set("contribution", d);
-				} else {
-					queryStringValues.append("contribution", d);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
 
 				d3.selectAll(".pbiclcbuttonsContributionsRects")
 					.style("fill", function(e) {
@@ -2284,22 +2253,6 @@
 							chartState.selectedCbpfs.push(datum.isoCode);
 						}
 					};
-
-					const allFunds = chartState.selectedCbpfs.map(function(d) {
-						return countryNames[d];
-					}).join("|");
-
-					if (queryStringValues.has("fund")) {
-						queryStringValues.set("fund", allFunds);
-					} else {
-						queryStringValues.append("fund", allFunds);
-					};
-
-					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-					window.history.replaceState({
-						path: newURL
-					}, "", newURL);
 
 					const foundDatum = data.dataCbpfs.find(function(d) {
 						return d.isoCode === datum.isoCode;

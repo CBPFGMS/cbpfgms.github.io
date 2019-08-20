@@ -32,11 +32,13 @@ There are nine parameters:
 
  `"2018"`
 
-If the provided value is not a valid number the datavis will default to the current year.
+If the provided value is not a valid number the datavis will default to the current year. For the accepted values for the years please refer to the data API.
 
-For the accepted values for the years/periods please refer to the data API.
+Multiple years are allowed. In this case, the values have to be separated by comma, for instance:
 
-This value defines only the selected year when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
+`"2016, 2017, 2018"`
+
+This value defines only the selected year (or years) when the page loads: the user can easily change the selected year by clicking the corresponding buttons. Also, the user can select more than one year.
 
 **`data-partner`**: defines the partner type depicted by the data visualisation when the page loads. The value has to be a string. Accepted values:
 

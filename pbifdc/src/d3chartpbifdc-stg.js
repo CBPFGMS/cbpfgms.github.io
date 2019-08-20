@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -163,6 +161,7 @@
 			unBlue = "#1F69B3",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			flagPadding = 22,
 			maxNodeSize = 35,
@@ -214,13 +213,11 @@
 			"All": null
 		};
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbifdc");
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
-		const selectedRegionString = queryStringValues.has("regions") ? queryStringValues.get("regions").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-regions");
+		const selectedRegionString = containerDiv.node().getAttribute("data-regions");
 
 		let selectedRegion = selectedRegionString.toLowerCase() === "all" ? "All" :
 			selectedRegionString.split(",");
@@ -233,19 +230,19 @@
 
 		chartState.selectedRegion = selectedRegion;
 
-		const showMapOption = queryStringValues.has("showmap") ? queryStringValues.get("showmap") === "true" : containerDiv.node().getAttribute("data-showmap") === "true";
+		const showMapOption = containerDiv.node().getAttribute("data-showmap") === "true";
 
-		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
+		const showNamesOption = containerDiv.node().getAttribute("data-shownames") === "true";
 
-		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
+		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
 
-		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
 
-		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
+		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -471,26 +468,39 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
+		if (localStorage.getItem("pbifdcmap")) {
+			const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
+			getData(mapData);
+		} else {
+			d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
+				try {
+					localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
+				} catch (error) {
+					console.error("D3 chart pbifdc map, " + error);
+				};
+				getData(mapData);
+			});
+		};
 
+		function getData(mapData) {
 			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - 300000)) {
-				console.log("pbifdc data: from the storage!")
+				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
 				csvCallback([apiData, mapData]);
 			} else {
 				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
-					console.log("pbifdc data: from the API")
-					localStorage.removeItem("pbiclcpbiclipbifdcdata");
-					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-						data: apiData,
-						timestamp: currentDate.getTime()
-					}));
+					try {
+						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+							data: apiData,
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.error("D3 chart pbifdc data, " + error);
+					};
 					csvCallback([apiData, mapData]);
 				});
 			};
-
-		});
+		};
 
 		function csvCallback(rawData) {
 
@@ -1140,18 +1150,6 @@
 
 					chartState.showMap = !chartState.showMap;
 
-					if (queryStringValues.has("showmap")) {
-						queryStringValues.set("showmap", chartState.showMap);
-					} else {
-						queryStringValues.append("showmap", chartState.showMap);
-					};
-
-					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-					window.history.replaceState({
-						path: newURL
-					}, "", newURL);
-
 					innerCheck.style("stroke", chartState.showMap ? "darkslategray" : "white");
 
 					showMapGroupLegend.interrupt()
@@ -1183,18 +1181,6 @@
 				}).on("click", function() {
 
 					chartState.showNames = !chartState.showNames;
-
-					if (queryStringValues.has("shownames")) {
-						queryStringValues.set("shownames", chartState.showNames);
-					} else {
-						queryStringValues.append("shownames", chartState.showNames);
-					};
-
-					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-					window.history.replaceState({
-						path: newURL
-					}, "", newURL);
 
 					innerCheckShowNames.style("stroke", chartState.showNames ? "darkslategray" : "white");
 
@@ -2799,23 +2785,6 @@
 						});
 					};
 
-					const allRegions = chartState.selectedRegion === "All" ? "All" :
-						chartState.selectedRegion.map(function(d) {
-							return d;
-						}).join("|");
-
-					if (queryStringValues.has("regions")) {
-						queryStringValues.set("regions", allRegions);
-					} else {
-						queryStringValues.append("regions", allRegions);
-					};
-
-					const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-					window.history.replaceState({
-						path: newURL
-					}, "", newURL);
-
 					dataObject = processData(rawData[0]);
 
 					createTopPanel(dataObject.nodes);
@@ -2845,22 +2814,6 @@
 						chartState.selectedYear.push(d);
 					};
 				};
-
-				const allYears = chartState.selectedYear.map(function(d) {
-					return d;
-				}).join("|");
-
-				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", allYears);
-				} else {
-					queryStringValues.append("year", allYears);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
 
 				d3.selectAll(".pbifdcbuttonsRects")
 					.style("fill", function(e) {
@@ -3630,8 +3583,6 @@
 					}, "");
 
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
-
-					console.log(chartState.selectedRegion)
 
 					const regionsText = chartState.selectedRegion !== "All" && chartState.selectedRegion.length === 1 ? "Selected Region" : "Selected Regions";
 

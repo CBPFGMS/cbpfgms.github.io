@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -77,6 +75,64 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			padding = [4, 16, 4, 4],
 			topPanelHeight = 60,
@@ -93,6 +149,7 @@
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
 			timeFormat = d3.timeFormat("%d %b %Y"),
@@ -139,8 +196,6 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -149,11 +204,11 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
+		const chartYearTitle = containerDiv.node().getAttribute("data-yeartitle");
 
-		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart"));
+		const offsetStartValue = +(containerDiv.node().getAttribute("data-offsetstart"));
 
-		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend"));
+		const offsetEndValue = +(containerDiv.node().getAttribute("data-offsetend"));
 
 		const offsetStart = offsetStartValue === offsetStartValue ? Math.abs(offsetStartValue) : offsetStartDefault;
 
@@ -353,64 +408,85 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row)
-			.then(function(rawData) {
-
-				removeProgressWheel();
-
-				const data = processData(rawData);
-
-				calculateHeightandResize();
-
-				yScaleMain.domain(cbpfsList)
-					.range(setOrdinalRange(mainPanel, barHeight, outerBarPadding, innerBarPadding));
-
-				yScaleBrush.domain(cbpfsList)
-					.range(setOrdinalRange(brushPanel, barHeightBrush, outerBarPaddingBrush, innerBarPaddingBrush));
-
-				if (maxDateOffset < offsetEndDate) maxDateOffset = offsetEndDate;
-
-				xScaleMain.domain([minDateOffset, maxDateOffset]);
-
-				xScaleBrush.domain([minDateOffset, maxDateOffset]);
-
-				const standardDataArray = data.filter(function(d) {
-					return d.AllocationSource === "Standard";
-				}).map(function(d) {
-					return d.TotalUSDPlanned;
-				}).sort(function(a, b) {
-					return a - b;
-				});
-
-				const reserveDataArray = data.filter(function(d) {
-					return d.AllocationSource === "Reserve";
-				}).map(function(d) {
-					return d.TotalUSDPlanned;
-				}).sort(function(a, b) {
-					return a - b;
-				});
-
-				colorScaleStandard.domain(standardDataArray);
-
-				colorScaleReserve.domain(reserveDataArray);
-
-				if (!lazyLoad) {
-					draw(data);
-				} else {
-					d3.select(window).on("scroll.pbiuac", checkPosition);
-					checkPosition();
-				};
-
-				function checkPosition() {
-					const containerPosition = containerDiv.node().getBoundingClientRect();
-					if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-						d3.select(window).on("scroll.pbiuac", null);
-						draw(data);
-					};
-				};
-
-				//end of d3.csv
+		if (localStorage.getItem("pbiuacdata") &&
+			JSON.parse(localStorage.getItem("pbiuacdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbiuacdata")).data;
+			rawData.forEach(function(d) {
+				d.PlannedStartDate = new Date(d.PlannedStartDate);
+				d.PlannedEndDate = new Date(d.PlannedEndDate);
 			});
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
+				try {
+					localStorage.setItem("pbiuacdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.error("D3 chart pbiuac, " + error);
+				};
+				csvCallback(rawData);
+			});
+		};
+
+		function csvCallback(rawData) {
+
+			removeProgressWheel();
+
+			const data = processData(rawData);
+
+			calculateHeightandResize();
+
+			yScaleMain.domain(cbpfsList)
+				.range(setOrdinalRange(mainPanel, barHeight, outerBarPadding, innerBarPadding));
+
+			yScaleBrush.domain(cbpfsList)
+				.range(setOrdinalRange(brushPanel, barHeightBrush, outerBarPaddingBrush, innerBarPaddingBrush));
+
+			if (maxDateOffset < offsetEndDate) maxDateOffset = offsetEndDate;
+
+			xScaleMain.domain([minDateOffset, maxDateOffset]);
+
+			xScaleBrush.domain([minDateOffset, maxDateOffset]);
+
+			const standardDataArray = data.filter(function(d) {
+				return d.AllocationSource === "Standard";
+			}).map(function(d) {
+				return d.TotalUSDPlanned;
+			}).sort(function(a, b) {
+				return a - b;
+			});
+
+			const reserveDataArray = data.filter(function(d) {
+				return d.AllocationSource === "Reserve";
+			}).map(function(d) {
+				return d.TotalUSDPlanned;
+			}).sort(function(a, b) {
+				return a - b;
+			});
+
+			colorScaleStandard.domain(standardDataArray);
+
+			colorScaleReserve.domain(reserveDataArray);
+
+			if (!lazyLoad) {
+				draw(data);
+			} else {
+				d3.select(window).on("scroll.pbiuac", checkPosition);
+				checkPosition();
+			};
+
+			function checkPosition() {
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiuac", null);
+					draw(data);
+				};
+			};
+
+			//end of csvCallback
+		};
 
 		function draw(data) {
 
@@ -2126,64 +2202,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());

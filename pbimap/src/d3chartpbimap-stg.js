@@ -36,10 +36,8 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(leafletURL, function() {
-							loadScript(d3URL, d3Chart);
-						});
+					loadScript(leafletURL, function() {
+						loadScript(d3URL, d3Chart);
 					});
 				});
 			});
@@ -73,6 +71,100 @@
 	};
 
 	function d3Chart() {
+
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Object.assign()
+
+		if (typeof Object.assign != 'function') {
+			Object.defineProperty(Object, "assign", {
+				value: function assign(target, varArgs) {
+					'use strict';
+					if (target == null) {
+						throw new TypeError('Cannot convert undefined or null to object');
+					}
+
+					var to = Object(target);
+
+					for (var index = 1; index < arguments.length; index++) {
+						var nextSource = arguments[index];
+
+						if (nextSource != null) {
+							for (var nextKey in nextSource) {
+								if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+									to[nextKey] = nextSource[nextKey];
+								}
+							}
+						}
+					}
+					return to;
+				},
+				writable: true,
+				configurable: true
+			});
+		}
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
 
 		const width = 900,
 			heightLeafletMap = 420,
@@ -183,8 +275,6 @@
 			cbpfsInCompleteData[d] = [];
 		});
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbimap");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -197,7 +287,7 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
 		chartState.selectedYear.push(validateYear(selectedYearString));
 
@@ -842,7 +932,6 @@
 						const index = chartState.selectedYear.indexOf(+d);
 						chartState.selectedYear.splice(index, 1);
 					};
-					setQueryString("year", d);
 					yearsDropdown.call(populateDropdown, yearsArrayString.map(function(d) {
 						return +d
 					}), chartState.selectedYear);
@@ -868,7 +957,6 @@
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
-							setQueryString("adminlevel", d);
 							adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -888,18 +976,6 @@
 				.on("click", function(d) {
 					if (chartState.selectedCBPF.indexOf(d.toLowerCase()) > -1 && chartState.selectedCBPF.length === 1) return;
 					changeSelected(d, chartState.selectedCBPF);
-					if (chartState.selectedCBPF[0] === "all") {
-						queryStringValues.delete("fund");
-						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-						window.history.replaceState({
-							path: newURL
-						}, "", newURL);
-					} else {
-						const cbpfsListForQuery = d3.values(cbpfsList).filter(function(e) {
-							return chartState.selectedCBPF.indexOf(e.toLowerCase()) > -1;
-						}).join("|");
-						setQueryString("fund", cbpfsListForQuery);
-					};
 					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort()), chartState.selectedCBPF);
 					filterCbpfsDropdown();
 				});
@@ -907,7 +983,6 @@
 			partnersDropdown.selectAll("li")
 				.on("click", function(d) {
 					if (chartState.selectedPartner.indexOf(d.toLowerCase()) > -1 && chartState.selectedPartner.length === 1) return;
-					setQueryString("partner", d);
 					changeSelected(d, chartState.selectedPartner);
 					partnersDropdown.call(populateDropdown, ["All"].concat(d3.values(partnersList).sort()), chartState.selectedPartner);
 				});
@@ -916,18 +991,6 @@
 				.on("click", function(d) {
 					if (chartState.selectedCluster.indexOf(d.toLowerCase()) > -1 && chartState.selectedCluster.length === 1) return;
 					changeSelected(d, chartState.selectedCluster);
-					if (chartState.selectedCluster[0] === "all") {
-						queryStringValues.delete("cluster");
-						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-						window.history.replaceState({
-							path: newURL
-						}, "", newURL);
-					} else {
-						const clustersListForQuery = d3.values(clustersList).filter(function(e) {
-							return chartState.selectedCluster.indexOf(e.toLowerCase()) > -1;
-						}).join("|");
-						setQueryString("cluster", clustersListForQuery);
-					};
 					clustersDropdown.call(populateDropdown, ["All"].concat(d3.values(clustersList).sort()), chartState.selectedCluster);
 				});
 
@@ -940,7 +1003,6 @@
 			adminLevelDropdown.selectAll("li")
 				.on("click", function(d) {
 					chartState.selectedAdminLevel = d;
-					setQueryString("adminlevel", d);
 					adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 					const data = filterData();
 					createTopSvg(data.topSvgObject);
@@ -992,7 +1054,6 @@
 				adminLevelDropdown.selectAll("li")
 					.on("click", function(d) {
 						chartState.selectedAdminLevel = d;
-						setQueryString("adminlevel", d);
 						adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 						const data = filterData();
 						createTopSvg(data.topSvgObject);
@@ -1034,7 +1095,6 @@
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
-							setQueryString("adminlevel", d);
 							adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -2408,14 +2468,9 @@
 
 			dataAttributes.forEach(function(attribute) {
 
-				const queryStringName = attribute === "CBPF" ? "fund" : attribute.toLowerCase();
-
-				const attibuteValues = queryStringValues.has(queryStringName) ? queryStringValues.get(queryStringName).replace(/\|/g, ",").split(",").map(function(d) {
-						return d.trim().toLowerCase();
-					}) :
-					containerDiv.node().getAttribute("data-" + attribute.toLowerCase()).split(",").map(function(d) {
-						return d.trim().toLowerCase();
-					});
+				const attibuteValues = containerDiv.node().getAttribute("data-" + attribute.toLowerCase()).split(",").map(function(d) {
+					return d.trim().toLowerCase();
+				});
 
 				attibuteValues.forEach(function(thisValue) {
 					chartState["selected" + attribute].push(thisValue);
@@ -2429,9 +2484,7 @@
 
 			});
 
-			chartState.selectedAdminLevel = queryStringValues.has("adminlevel") ?
-				~~(queryStringValues.get("adminlevel")) < 7 ? ~~(queryStringValues.get("adminlevel")) : 0 :
-				~~(containerDiv.node().getAttribute("data-adminlevel")) < 7 ? ~~(containerDiv.node().getAttribute("data-adminlevel")) : 0;
+			chartState.selectedAdminLevel = ~~(containerDiv.node().getAttribute("data-adminlevel")) < 7 ? ~~(containerDiv.node().getAttribute("data-adminlevel")) : 0;
 
 			initialChartState = JSON.parse(JSON.stringify(chartState));
 
@@ -2769,20 +2822,6 @@
 				})
 				.join(" ");
 			return capitalized;
-		};
-
-		function setQueryString(fieldName, fieldValue) {
-			if (queryStringValues.has(fieldName)) {
-				queryStringValues.set(fieldName, fieldValue);
-			} else {
-				queryStringValues.append(fieldName, fieldValue);
-			};
-
-			const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-			window.history.replaceState({
-				path: newURL
-			}, "", newURL);
 		};
 
 		const countryBoundingBoxes = {
@@ -3437,100 +3476,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Object.assign()
-
-	if (typeof Object.assign != 'function') {
-		Object.defineProperty(Object, "assign", {
-			value: function assign(target, varArgs) {
-				'use strict';
-				if (target == null) {
-					throw new TypeError('Cannot convert undefined or null to object');
-				}
-
-				var to = Object(target);
-
-				for (var index = 1; index < arguments.length; index++) {
-					var nextSource = arguments[index];
-
-					if (nextSource != null) {
-						for (var nextKey in nextSource) {
-							if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-								to[nextKey] = nextSource[nextKey];
-							}
-						}
-					}
-				}
-				return to;
-			},
-			writable: true,
-			configurable: true
-		});
-	}
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());

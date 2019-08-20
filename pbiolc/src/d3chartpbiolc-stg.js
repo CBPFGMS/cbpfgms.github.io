@@ -32,9 +32,7 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
-						loadScript(d3URL, d3Chart);
-					});
+					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
@@ -77,6 +75,70 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			padding = [4, 4, 40, 4],
 			topPanelHeight = 60,
@@ -113,7 +175,9 @@
 			legendVerticalPadding = 22,
 			unBlue = "#1F69B3",
 			chartTitleDefault = "Cluster Overview",
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -153,8 +217,6 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
-		const queryStringValues = new URLSearchParams(location.search);
-
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -163,16 +225,14 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
-		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-cbpf");
+		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
 
-		const selectedModality = queryStringValues.has("modality") && modalities.indexOf(queryStringValues.get("modality").toLowerCase()) > -1 ? queryStringValues.get("modality").toLowerCase() :
-			modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
+		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
 			containerDiv.node().getAttribute("data-modality").toLowerCase() : "total";
 
-		const selectedBeneficiary = queryStringValues.has("persons") && beneficiaries.indexOf(queryStringValues.get("persons").toLowerCase()) > -1 ? queryStringValues.get("persons").toLowerCase() :
-			beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
+		const selectedBeneficiary = beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
 			containerDiv.node().getAttribute("data-beneficiaries").toLowerCase() : "targeted";
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -382,7 +442,25 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
+		if (localStorage.getItem("pbiolcdata") &&
+			JSON.parse(localStorage.getItem("pbiolcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbiolcdata")).data;
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
+				try {
+					localStorage.setItem("pbiolcdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.error("D3 chart pbiolc, " + error);
+				};
+				csvCallback(rawData);
+			});
+		};
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -422,8 +500,8 @@
 				};
 			};
 
-			//end of d3.csv
-		});
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -714,29 +792,6 @@
 							.property("indeterminate", function() {
 								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
 							});
-					};
-
-					if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
-						queryStringValues.delete("fund");
-						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-						window.history.replaceState({
-							path: newURL
-						}, "", newURL);
-					} else {
-						const allFunds = chartState.selectedCbpfs.map(function(d) {
-							return cbpfsList[d]
-						}).join("|");
-						if (queryStringValues.has("fund")) {
-							queryStringValues.set("fund", allFunds);
-						} else {
-							queryStringValues.append("fund", allFunds);
-						};
-
-						const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-						window.history.replaceState({
-							path: newURL
-						}, "", newURL);
 					};
 
 					data = processData(rawData);
@@ -1604,22 +1659,6 @@
 					};
 				};
 
-				const allYears = chartState.selectedYear.map(function(d) {
-					return d;
-				}).join("|");
-
-				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", allYears);
-				} else {
-					queryStringValues.append("year", allYears);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
-
 				d3.selectAll(".pbiolcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -1670,18 +1709,6 @@
 
 				chartState.selectedModality = d;
 
-				if (queryStringValues.has("modality")) {
-					queryStringValues.set("modality", d);
-				} else {
-					queryStringValues.append("modality", d);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
-
 				d3.selectAll(".pbiolcbuttonsModalitiesRects")
 					.style("fill", function(e) {
 						return e === chartState.selectedModality ? unBlue : "#eaeaea";
@@ -1710,18 +1737,6 @@
 			function clickButtonsBeneficiariesRects(d) {
 
 				chartState.selectedBeneficiary = d;
-
-				if (queryStringValues.has("persons")) {
-					queryStringValues.set("persons", d);
-				} else {
-					queryStringValues.append("persons", d);
-				};
-
-				const newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
-
-				window.history.replaceState({
-					path: newURL
-				}, "", newURL);
 
 				d3.selectAll(".pbiolcbuttonsBeneficiariesRects")
 					.style("fill", function(e) {
@@ -2862,70 +2877,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());
