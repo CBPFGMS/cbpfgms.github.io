@@ -13,14 +13,6 @@ All charts and data visualisations in this repository use a [common CSS](https:/
 
 ## List of charts
 
-- **GMS Landing Page**
-
-Chart for the Grant Management System landing page.
-
-[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/gmslpg.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg)
-
-This chart shows Contributions, Allocations, Partners and Projects for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg) for more information.
-
 - **CBPF Blog Page**
 
 Chart for the Country-based Pooled Funds (CBPF) Page at the OCHA blog (Humanitarian Financing).
@@ -100,6 +92,14 @@ Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Inte
 [<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiuac.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac)
 
 This chart shows a timeline with the allocations for a selected period. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac) for more information.
+
+- **GMS Landing Page**
+
+Chart for the Grant Management System landing page.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/gmslpg.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg)
+
+This chart shows Contributions, Allocations, Partners and Projects for the selected years. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/gmslpg) for more information.
 
 ## Chart codes
 
