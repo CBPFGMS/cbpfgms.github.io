@@ -3473,8 +3473,6 @@
 
 					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
 
-					console.log(chartState.selectedRegion)
-
 					const regionsText = chartState.selectedRegion !== "All" && chartState.selectedRegion.length === 1 ? "Selected Region" : "Selected Regions";
 
 					const selectedRegions = chartState.selectedRegion === "All" ? "All" : chartState.selectedRegion.join(", ");
