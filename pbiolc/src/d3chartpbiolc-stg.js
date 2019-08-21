@@ -165,7 +165,7 @@
 			titleMargin = 24,
 			sortByPadding = 4,
 			lollipopPanelsHeight = +lollipopTitlePadding + (numberOfClusters * lollipopGroupHeight),
-			height = padding[0] + topPanelHeight + buttonsPanelHeight + panelHorizontalPadding + lollipopPanelsHeight + padding[2],
+			height = padding[0] + topPanelHeight + buttonsPanelHeight + (2 * panelHorizontalPadding) + lollipopPanelsHeight + padding[2],
 			stickHeight = 2,
 			lollipopRadius = 4,
 			lollipopsPanelsRatio = 0.345,
@@ -695,7 +695,7 @@
 					.text("(")
 					.append("tspan")
 					.style("font-weight", "bold")
-					.text("actual, actual in %")
+					.text("affected, affected in %")
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
@@ -710,7 +710,7 @@
 					.text("\u25B2")
 					.append("tspan")
 					.style("fill", "#666")
-					.text(") indicates the number of actual affected persons.");
+					.text(") indicates the number of affected persons.");
 
 				//end of createLegend
 			};
@@ -925,13 +925,6 @@
 					.duration(duration)
 					.tween("text", function(d) {
 						const node = this;
-						const i = d3.interpolate(previousUpcoming, d);
-						return function(t) {
-							node.textContent = ~~(i(t));
-						};
-					})
-					.tween("text", function(d) {
-						const node = this;
 						const i = d3.interpolate(previousPersons, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
@@ -958,7 +951,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Affected Persons";
+							" Persons";
 					});
 
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiolctopPanelPersonsTextSubText")
@@ -971,7 +964,7 @@
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
 					.merge(topPanelPersonsTextSubText)
-					.text("(" + capitalize(chartState.selectedBeneficiary) + ")");
+					.text("(" + (chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + ")");
 
 				// 	//end of createTopPanel
 			};
@@ -1205,7 +1198,8 @@
 						return d === chartState.selectedBeneficiary ? "white" : "#444";
 					})
 					.text(function(d) {
-						return capitalize(d);
+						const buttonName = d === "actual" ? "affected" : d;
+						return capitalize(buttonName);
 					});
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
@@ -1487,17 +1481,23 @@
 
 			function createBeneficiariesPanel() {
 
-				const beneficiariesPanelTitle = beneficiariesPanel.main.selectAll(".pbiolcBeneficiariesPanelTitle")
-					.data([true])
-					.enter()
+				let beneficiariesPanelTitle = beneficiariesPanel.main.selectAll(".pbiolcBeneficiariesPanelTitle")
+					.data([true]);
+
+				beneficiariesPanelTitle = beneficiariesPanelTitle.enter()
 					.append("text")
 					.attr("cursor", "pointer")
 					.attr("class", "pbiolcBeneficiariesPanelTitle")
 					.attr("y", beneficiariesPanel.padding[0] - titleMargin)
 					.attr("x", xScaleBeneficiaries(0))
-					.text("Affected Persons ")
+					.merge(beneficiariesPanelTitle)
+					.text((chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + " Persons ");
+
+				let beneficiariesPanelTitleSpan = beneficiariesPanelTitle.selectAll(".pbiolcBeneficiariesPanelSubTitleSpan")
+					.data([true])
+					.enter()
 					.append("tspan")
-					.attr("class", "pbiolcBeneficiariesPanelSubTitle")
+					.attr("class", "pbiolcBeneficiariesPanelSubTitle pbiolcBeneficiariesPanelSubTitleSpan")
 					.text("(number)");
 
 				beneficiariesPanel.main.select(".pbiolcBeneficiariesPanelTitle")
@@ -2336,14 +2336,14 @@
 				.style("stroke", "white")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 350)
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 350)
 				.text("CLICK ANYWHERE TO START");
 
 			const cbpfsAnnotationRect = helpSVG.append("rect")
@@ -2371,14 +2371,14 @@
 
 			const yearAnnotationRect = helpSVG.append("rect")
 				.attr("x", 10 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 10)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to select year. Double click or press ALT when clicking to select a single year")
 				.call(wrapText2, 330);
 
@@ -2387,21 +2387,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M335,126 Q355,126 355,142");
+				.attr("d", "M335,156 Q355,156 355,172");
 
 			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
 
 			const modalityAnnotationRect = helpSVG.append("rect")
 				.attr("x", 400 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const modalityAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 400)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to select modality type.")
 				.call(wrapText2, 180);
 
@@ -2410,21 +2410,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M542,126 Q562,126 562,142");
+				.attr("d", "M542,156 Q562,156 562,172");
 
 			modalityAnnotationRect.attr("width", modalityAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiaryAnnotationRect = helpSVG.append("rect")
 				.attr("x", 620 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiaryAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 620)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to show targeted or actual persons.")
 				.call(wrapText2, 200);
 
@@ -2433,21 +2433,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M812,126 Q832,126 832,142");
+				.attr("d", "M812,156 Q832,156 832,172");
 
 			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
 
 			const allocationsSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 300 - padding)
-				.attr("y", 240 - padding - 14)
+				.attr("y", 270 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const allocationsSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 300)
-				.attr("y", 240)
+				.attr("y", 270)
 				.text("Click here to sort by allocations.")
 				.call(wrapText2, 180);
 
@@ -2456,21 +2456,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M298,246 Q270,246 270,226");
+				.attr("d", "M298,276 Q270,276 270,256");
 
 			allocationsSortAnnotationRect.attr("width", allocationsSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", allocationsSortAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiariesSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 700 - padding)
-				.attr("y", 240 - padding - 14)
+				.attr("y", 270 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiariesSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 700)
-				.attr("y", 240)
+				.attr("y", 270)
 				.text("Click here to sort by beneficiaries.")
 				.call(wrapText2, 180);
 
@@ -2479,21 +2479,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M698,246 Q670,246 670,226");
+				.attr("d", "M698,276 Q670,276 670,256");
 
 			beneficiariesSortAnnotationRect.attr("width", beneficiariesSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiariesSortAnnotation.node().getBBox().height + padding * 2);
 
 			const allocChartAnnotationRect = helpSVG.append("rect")
 				.attr("x", 120 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 400 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const allocChartAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 120)
-				.attr("y", 370)
+				.attr("y", 400)
 				.text("This area depicts the amount allocated by cluster. The black triangles indicate standard allocations.")
 				.call(wrapText2, 250);
 
@@ -2502,14 +2502,14 @@
 
 			const benefChartAnnotationRect = helpSVG.append("rect")
 				.attr("x", 580 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 400 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const benefChartAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 580)
-				.attr("y", 370)
+				.attr("y", 400)
 				.text("This area depicts the number of beneficiaries (targeted or actual) for each cluster. The black triangles indicate beneficiaries affected by standard allocations.")
 				.call(wrapText2, 250);
 
