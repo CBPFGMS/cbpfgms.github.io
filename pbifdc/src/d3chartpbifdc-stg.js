@@ -470,6 +470,7 @@
 
 		if (localStorage.getItem("pbifdcmap")) {
 			const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
+			console.log("pbifdc: map from local storage");
 			getData(mapData);
 		} else {
 			d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
@@ -478,6 +479,7 @@
 				} catch (error) {
 					console.log("D3 chart pbifdc map, " + error);
 				};
+				console.log("pbifdc: map from API");
 				getData(mapData);
 			});
 		};
@@ -486,6 +488,7 @@
 			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+				console.log("pbifdc: data from local storage");
 				csvCallback([apiData, mapData]);
 			} else {
 				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
@@ -497,6 +500,7 @@
 					} catch (error) {
 						console.log("D3 chart pbifdc data, " + error);
 					};
+					console.log("pbifdc: data from API");
 					csvCallback([apiData, mapData]);
 				});
 			};

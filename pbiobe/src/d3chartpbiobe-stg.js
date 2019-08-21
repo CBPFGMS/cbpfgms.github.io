@@ -394,6 +394,7 @@
 		if (localStorage.getItem("pbiobedata") &&
 			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiobedata")).data;
+			console.log("pbiobe: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
@@ -405,6 +406,7 @@
 				} catch (error) {
 					console.log("D3 chart pbiobe, " + error);
 				};
+				console.log("pbiobe: data from API");
 				csvCallback(rawData);
 			});
 		};

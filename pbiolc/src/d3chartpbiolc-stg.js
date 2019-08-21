@@ -445,6 +445,7 @@
 		if (localStorage.getItem("pbiolcdata") &&
 			JSON.parse(localStorage.getItem("pbiolcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiolcdata")).data;
+			console.log("pbiolc: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
@@ -456,6 +457,7 @@
 				} catch (error) {
 					console.log("D3 chart pbiolc, " + error);
 				};
+				console.log("pbiolc: data from API");
 				csvCallback(rawData);
 			});
 		};

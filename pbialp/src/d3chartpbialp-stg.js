@@ -465,6 +465,7 @@
 		if (localStorage.getItem("pbialpdata") &&
 			JSON.parse(localStorage.getItem("pbialpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbialpdata")).data;
+			console.log("pbialp: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
@@ -476,6 +477,7 @@
 				} catch (error) {
 					console.log("D3 chart pbialp, " + error);
 				};
+				console.log("pbialp: data from API");
 				csvCallback(rawData);
 			});
 		};

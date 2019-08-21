@@ -368,6 +368,7 @@
 		if (localStorage.getItem("pbialidata") &&
 			JSON.parse(localStorage.getItem("pbialidata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbialidata")).data;
+			console.log("pbiali: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
@@ -379,6 +380,7 @@
 				} catch (error) {
 					console.log("D3 chart pbiali, " + error);
 				};
+				console.log("pbiali: data from API");
 				csvCallback(rawData);
 			});
 		};

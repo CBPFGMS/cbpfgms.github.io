@@ -415,6 +415,7 @@
 				d.PlannedStartDate = new Date(d.PlannedStartDate);
 				d.PlannedEndDate = new Date(d.PlannedEndDate);
 			});
+			console.log("pbiuac: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
@@ -426,6 +427,7 @@
 				} catch (error) {
 					console.log("D3 chart pbiuac, " + error);
 				};
+				console.log("pbiuac: data from API");
 				csvCallback(rawData);
 			});
 		};

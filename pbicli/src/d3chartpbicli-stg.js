@@ -703,6 +703,7 @@
 		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+			console.log("pbicli: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
@@ -714,6 +715,7 @@
 				} catch (error) {
 					console.log("D3 chart pbicli, " + error);
 				};
+				console.log("pbicli: data from API");
 				csvCallback(rawData);
 			});
 		};
