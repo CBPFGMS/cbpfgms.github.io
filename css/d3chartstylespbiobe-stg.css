@@ -119,6 +119,17 @@ p#pbiobed3chartTitle {
 	margin-left: 2px;
 }
 
+.pbiobetopPanelMainValue, .pbiobetopPanelPersonsActual {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbiobetopPanelMainText, .pbiobetopPanelSubText, .pbiobetopPanelPersonsText, .pbiobetopPanelPersonsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
 .pbiobebuttonsText, .pbiobebuttonsModalitiesText, .pbiobebuttonsBeneficiariesText {
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
