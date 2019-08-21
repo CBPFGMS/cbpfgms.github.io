@@ -75,6 +75,320 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
+		const isoAlpha2to3 = {
+			AF: 'AFG',
+			AX: 'ALA',
+			AL: 'ALB',
+			DZ: 'DZA',
+			AS: 'ASM',
+			AD: 'AND',
+			AO: 'AGO',
+			AI: 'AIA',
+			AQ: 'ATA',
+			AG: 'ATG',
+			AR: 'ARG',
+			AM: 'ARM',
+			AW: 'ABW',
+			AU: 'AUS',
+			AT: 'AUT',
+			AZ: 'AZE',
+			BS: 'BHS',
+			BH: 'BHR',
+			BD: 'BGD',
+			BB: 'BRB',
+			BY: 'BLR',
+			BE: 'BEL',
+			BZ: 'BLZ',
+			BJ: 'BEN',
+			BM: 'BMU',
+			BT: 'BTN',
+			BO: 'BOL',
+			BA: 'BIH',
+			BW: 'BWA',
+			BV: 'BVT',
+			BR: 'BRA',
+			VG: 'VGB',
+			IO: 'IOT',
+			BN: 'BRN',
+			BG: 'BGR',
+			BF: 'BFA',
+			BI: 'BDI',
+			KH: 'KHM',
+			CM: 'CMR',
+			CA: 'CAN',
+			CV: 'CPV',
+			KY: 'CYM',
+			CF: 'CAF',
+			TD: 'TCD',
+			CL: 'CHL',
+			CN: 'CHN',
+			HK: 'HKG',
+			MO: 'MAC',
+			CX: 'CXR',
+			CC: 'CCK',
+			CO: 'COL',
+			KM: 'COM',
+			CG: 'COG',
+			CD: 'COD',
+			CK: 'COK',
+			CR: 'CRI',
+			CI: 'CIV',
+			HR: 'HRV',
+			CU: 'CUB',
+			CY: 'CYP',
+			CZ: 'CZE',
+			DK: 'DNK',
+			DJ: 'DJI',
+			DM: 'DMA',
+			DO: 'DOM',
+			EC: 'ECU',
+			EG: 'EGY',
+			SV: 'SLV',
+			GQ: 'GNQ',
+			ER: 'ERI',
+			EE: 'EST',
+			ET: 'ETH',
+			FK: 'FLK',
+			FO: 'FRO',
+			FJ: 'FJI',
+			FI: 'FIN',
+			FR: 'FRA',
+			GF: 'GUF',
+			PF: 'PYF',
+			TF: 'ATF',
+			GA: 'GAB',
+			GM: 'GMB',
+			GE: 'GEO',
+			DE: 'DEU',
+			GH: 'GHA',
+			GI: 'GIB',
+			GR: 'GRC',
+			GL: 'GRL',
+			GD: 'GRD',
+			GP: 'GLP',
+			GU: 'GUM',
+			GT: 'GTM',
+			GG: 'GGY',
+			GN: 'GIN',
+			GW: 'GNB',
+			GY: 'GUY',
+			HT: 'HTI',
+			HM: 'HMD',
+			VA: 'VAT',
+			HN: 'HND',
+			HU: 'HUN',
+			IS: 'ISL',
+			IN: 'IND',
+			ID: 'IDN',
+			IR: 'IRN',
+			IQ: 'IRQ',
+			IE: 'IRL',
+			IM: 'IMN',
+			IL: 'ISR',
+			IT: 'ITA',
+			JM: 'JAM',
+			JP: 'JPN',
+			JE: 'JEY',
+			JO: 'JOR',
+			KZ: 'KAZ',
+			KE: 'KEN',
+			KI: 'KIR',
+			KP: 'PRK',
+			KR: 'KOR',
+			KW: 'KWT',
+			KG: 'KGZ',
+			LA: 'LAO',
+			LV: 'LVA',
+			LB: 'LBN',
+			LS: 'LSO',
+			LR: 'LBR',
+			LY: 'LBY',
+			LI: 'LIE',
+			LT: 'LTU',
+			LU: 'LUX',
+			MK: 'MKD',
+			MG: 'MDG',
+			MW: 'MWI',
+			MY: 'MYS',
+			MV: 'MDV',
+			ML: 'MLI',
+			MT: 'MLT',
+			MH: 'MHL',
+			MQ: 'MTQ',
+			MR: 'MRT',
+			MU: 'MUS',
+			YT: 'MYT',
+			MX: 'MEX',
+			FM: 'FSM',
+			MD: 'MDA',
+			MC: 'MCO',
+			MN: 'MNG',
+			ME: 'MNE',
+			MS: 'MSR',
+			MA: 'MAR',
+			MZ: 'MOZ',
+			MM: 'MMR',
+			NA: 'NAM',
+			NR: 'NRU',
+			NP: 'NPL',
+			NL: 'NLD',
+			AN: 'ANT',
+			NC: 'NCL',
+			NZ: 'NZL',
+			NI: 'NIC',
+			NE: 'NER',
+			NG: 'NGA',
+			NU: 'NIU',
+			NF: 'NFK',
+			MP: 'MNP',
+			NO: 'NOR',
+			OM: 'OMN',
+			PK: 'PAK',
+			PW: 'PLW',
+			PS: 'PSE',
+			PA: 'PAN',
+			PG: 'PNG',
+			PY: 'PRY',
+			PE: 'PER',
+			PH: 'PHL',
+			PN: 'PCN',
+			PL: 'POL',
+			PT: 'PRT',
+			PR: 'PRI',
+			QA: 'QAT',
+			RE: 'REU',
+			RO: 'ROU',
+			RU: 'RUS',
+			RW: 'RWA',
+			BL: 'BLM',
+			SH: 'SHN',
+			KN: 'KNA',
+			LC: 'LCA',
+			MF: 'MAF',
+			PM: 'SPM',
+			VC: 'VCT',
+			WS: 'WSM',
+			SM: 'SMR',
+			ST: 'STP',
+			SA: 'SAU',
+			SN: 'SEN',
+			RS: 'SRB',
+			SC: 'SYC',
+			SL: 'SLE',
+			SG: 'SGP',
+			SK: 'SVK',
+			SI: 'SVN',
+			SB: 'SLB',
+			SO: 'SOM',
+			ZA: 'ZAF',
+			GS: 'SGS',
+			SS: 'SSD',
+			ES: 'ESP',
+			LK: 'LKA',
+			SD: 'SDN',
+			SR: 'SUR',
+			SJ: 'SJM',
+			SZ: 'SWZ',
+			SE: 'SWE',
+			CH: 'CHE',
+			SY: 'SYR',
+			TW: 'TWN',
+			TJ: 'TJK',
+			TZ: 'TZA',
+			TH: 'THA',
+			TL: 'TLS',
+			TG: 'TGO',
+			TK: 'TKL',
+			TO: 'TON',
+			TT: 'TTO',
+			TN: 'TUN',
+			TR: 'TUR',
+			TM: 'TKM',
+			TC: 'TCA',
+			TV: 'TUV',
+			UG: 'UGA',
+			UA: 'UKR',
+			AE: 'ARE',
+			GB: 'GBR',
+			US: 'USA',
+			UM: 'UMI',
+			UY: 'URY',
+			UZ: 'UZB',
+			VU: 'VUT',
+			VE: 'VEN',
+			VN: 'VNM',
+			VI: 'VIR',
+			WF: 'WLF',
+			EH: 'ESH',
+			YE: 'YEM',
+			ZM: 'ZMB',
+			ZW: 'ZWE'
+		};
+
 		const width = 900,
 			padding = [4, 10, 24, 10],
 			topPanelHeight = 60,
@@ -82,7 +396,9 @@
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 12,
 			windowHeight = window.innerHeight,
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
@@ -137,9 +453,9 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
-
 		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+
+		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
 		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
@@ -344,51 +660,70 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv")
-			.then(function(rawData) {
-
-				removeProgressWheel();
-
-				yearsArray = rawData.map(function(d) {
-					if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
-					if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
-					return +d.FiscalYear
-				}).filter(function(value, index, self) {
-					return self.indexOf(value) === index;
-				}).sort();
-
-				chartState.selectedYear.push(validateYear(selectedYearString));
-
-				chartState.selectedContribution = selectedContribution;
-
-				validateCbpfs(selectedCbpfsString);
-
-				const allDonors = rawData.map(function(d) {
-					if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
-					return d.GMSDonorISO2Code.toLowerCase();
-				}).filter(function(value, index, self) {
-					return self.indexOf(value) === index;
-				});
-
-				if (!isInternetExplorer) saveFlags(allDonors);
-
-				if (!lazyLoad) {
-					draw(rawData);
-				} else {
-					d3.select(window).on("scroll.pbiclc", checkPosition);
-					checkPosition();
+		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+			console.log("pbiclc: data from local storage");
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
+				try {
+					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.log("D3 chart pbiclc, " + error);
 				};
-
-				function checkPosition() {
-					const containerPosition = containerDiv.node().getBoundingClientRect();
-					if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-						d3.select(window).on("scroll.pbiclc", null);
-						draw(rawData);
-					};
-				};
-
-				//end of d3.csv
+				console.log("pbiclc: data from API");
+				csvCallback(rawData);
 			});
+		};
+
+		function csvCallback(rawData) {
+
+			removeProgressWheel();
+
+			yearsArray = rawData.map(function(d) {
+				if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
+				if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
+				return +d.FiscalYear
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			}).sort();
+
+			validateYear(selectedYearString);
+
+			chartState.selectedContribution = selectedContribution;
+
+			validateCbpfs(selectedCbpfsString);
+
+			const allDonors = rawData.map(function(d) {
+				if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
+				return d.GMSDonorISO2Code.toLowerCase();
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
+			if (!isInternetExplorer) saveFlags(allDonors);
+
+			if (!lazyLoad) {
+				draw(rawData);
+			} else {
+				d3.select(window).on("scroll.pbiclc", checkPosition);
+				checkPosition();
+			};
+
+			function checkPosition() {
+				const containerPosition = containerDiv.node().getBoundingClientRect();
+				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+					d3.select(window).on("scroll.pbiclc", null);
+					draw(rawData);
+				};
+			};
+
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -423,6 +758,8 @@
 
 			createCbpfsPanel();
 
+			setYearsDescriptionDiv();
+
 			if (showHelp) createAnnotationsDiv();
 
 			function clickButtonsRects(d, singleSelection) {
@@ -452,15 +789,7 @@
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
-				yearsDescriptionDiv.html(function() {
-					if (chartState.selectedYear.length === 1) return null;
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).reduce(function(acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-					}, "");
-					return "\u002ASelected years: " + yearsList;
-				});
+				setYearsDescriptionDiv();
 
 				const dataArray = processData(rawData);
 
@@ -990,7 +1319,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -1004,7 +1333,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -2419,6 +2748,18 @@
 			//end of populateSelectedDescriptionDiv
 		};
 
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
+		};
+
 		function saveFlags(donorsList) {
 
 			const unocha = donorsList.indexOf("");
@@ -2428,7 +2769,9 @@
 			};
 
 			donorsList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				if (!localStorage.getItem("storedFlag" + d)) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
+				};
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, isoCode) {
@@ -2993,8 +3336,15 @@
 		};
 
 		function validateYear(yearString) {
-			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function validateCbpfs(cbpfString) {
@@ -3062,320 +3412,6 @@
 		};
 
 		//end of d3Chart
-	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
-
-	const isoAlpha2to3 = {
-		AF: 'AFG',
-		AX: 'ALA',
-		AL: 'ALB',
-		DZ: 'DZA',
-		AS: 'ASM',
-		AD: 'AND',
-		AO: 'AGO',
-		AI: 'AIA',
-		AQ: 'ATA',
-		AG: 'ATG',
-		AR: 'ARG',
-		AM: 'ARM',
-		AW: 'ABW',
-		AU: 'AUS',
-		AT: 'AUT',
-		AZ: 'AZE',
-		BS: 'BHS',
-		BH: 'BHR',
-		BD: 'BGD',
-		BB: 'BRB',
-		BY: 'BLR',
-		BE: 'BEL',
-		BZ: 'BLZ',
-		BJ: 'BEN',
-		BM: 'BMU',
-		BT: 'BTN',
-		BO: 'BOL',
-		BA: 'BIH',
-		BW: 'BWA',
-		BV: 'BVT',
-		BR: 'BRA',
-		VG: 'VGB',
-		IO: 'IOT',
-		BN: 'BRN',
-		BG: 'BGR',
-		BF: 'BFA',
-		BI: 'BDI',
-		KH: 'KHM',
-		CM: 'CMR',
-		CA: 'CAN',
-		CV: 'CPV',
-		KY: 'CYM',
-		CF: 'CAF',
-		TD: 'TCD',
-		CL: 'CHL',
-		CN: 'CHN',
-		HK: 'HKG',
-		MO: 'MAC',
-		CX: 'CXR',
-		CC: 'CCK',
-		CO: 'COL',
-		KM: 'COM',
-		CG: 'COG',
-		CD: 'COD',
-		CK: 'COK',
-		CR: 'CRI',
-		CI: 'CIV',
-		HR: 'HRV',
-		CU: 'CUB',
-		CY: 'CYP',
-		CZ: 'CZE',
-		DK: 'DNK',
-		DJ: 'DJI',
-		DM: 'DMA',
-		DO: 'DOM',
-		EC: 'ECU',
-		EG: 'EGY',
-		SV: 'SLV',
-		GQ: 'GNQ',
-		ER: 'ERI',
-		EE: 'EST',
-		ET: 'ETH',
-		FK: 'FLK',
-		FO: 'FRO',
-		FJ: 'FJI',
-		FI: 'FIN',
-		FR: 'FRA',
-		GF: 'GUF',
-		PF: 'PYF',
-		TF: 'ATF',
-		GA: 'GAB',
-		GM: 'GMB',
-		GE: 'GEO',
-		DE: 'DEU',
-		GH: 'GHA',
-		GI: 'GIB',
-		GR: 'GRC',
-		GL: 'GRL',
-		GD: 'GRD',
-		GP: 'GLP',
-		GU: 'GUM',
-		GT: 'GTM',
-		GG: 'GGY',
-		GN: 'GIN',
-		GW: 'GNB',
-		GY: 'GUY',
-		HT: 'HTI',
-		HM: 'HMD',
-		VA: 'VAT',
-		HN: 'HND',
-		HU: 'HUN',
-		IS: 'ISL',
-		IN: 'IND',
-		ID: 'IDN',
-		IR: 'IRN',
-		IQ: 'IRQ',
-		IE: 'IRL',
-		IM: 'IMN',
-		IL: 'ISR',
-		IT: 'ITA',
-		JM: 'JAM',
-		JP: 'JPN',
-		JE: 'JEY',
-		JO: 'JOR',
-		KZ: 'KAZ',
-		KE: 'KEN',
-		KI: 'KIR',
-		KP: 'PRK',
-		KR: 'KOR',
-		KW: 'KWT',
-		KG: 'KGZ',
-		LA: 'LAO',
-		LV: 'LVA',
-		LB: 'LBN',
-		LS: 'LSO',
-		LR: 'LBR',
-		LY: 'LBY',
-		LI: 'LIE',
-		LT: 'LTU',
-		LU: 'LUX',
-		MK: 'MKD',
-		MG: 'MDG',
-		MW: 'MWI',
-		MY: 'MYS',
-		MV: 'MDV',
-		ML: 'MLI',
-		MT: 'MLT',
-		MH: 'MHL',
-		MQ: 'MTQ',
-		MR: 'MRT',
-		MU: 'MUS',
-		YT: 'MYT',
-		MX: 'MEX',
-		FM: 'FSM',
-		MD: 'MDA',
-		MC: 'MCO',
-		MN: 'MNG',
-		ME: 'MNE',
-		MS: 'MSR',
-		MA: 'MAR',
-		MZ: 'MOZ',
-		MM: 'MMR',
-		NA: 'NAM',
-		NR: 'NRU',
-		NP: 'NPL',
-		NL: 'NLD',
-		AN: 'ANT',
-		NC: 'NCL',
-		NZ: 'NZL',
-		NI: 'NIC',
-		NE: 'NER',
-		NG: 'NGA',
-		NU: 'NIU',
-		NF: 'NFK',
-		MP: 'MNP',
-		NO: 'NOR',
-		OM: 'OMN',
-		PK: 'PAK',
-		PW: 'PLW',
-		PS: 'PSE',
-		PA: 'PAN',
-		PG: 'PNG',
-		PY: 'PRY',
-		PE: 'PER',
-		PH: 'PHL',
-		PN: 'PCN',
-		PL: 'POL',
-		PT: 'PRT',
-		PR: 'PRI',
-		QA: 'QAT',
-		RE: 'REU',
-		RO: 'ROU',
-		RU: 'RUS',
-		RW: 'RWA',
-		BL: 'BLM',
-		SH: 'SHN',
-		KN: 'KNA',
-		LC: 'LCA',
-		MF: 'MAF',
-		PM: 'SPM',
-		VC: 'VCT',
-		WS: 'WSM',
-		SM: 'SMR',
-		ST: 'STP',
-		SA: 'SAU',
-		SN: 'SEN',
-		RS: 'SRB',
-		SC: 'SYC',
-		SL: 'SLE',
-		SG: 'SGP',
-		SK: 'SVK',
-		SI: 'SVN',
-		SB: 'SLB',
-		SO: 'SOM',
-		ZA: 'ZAF',
-		GS: 'SGS',
-		SS: 'SSD',
-		ES: 'ESP',
-		LK: 'LKA',
-		SD: 'SDN',
-		SR: 'SUR',
-		SJ: 'SJM',
-		SZ: 'SWZ',
-		SE: 'SWE',
-		CH: 'CHE',
-		SY: 'SYR',
-		TW: 'TWN',
-		TJ: 'TJK',
-		TZ: 'TZA',
-		TH: 'THA',
-		TL: 'TLS',
-		TG: 'TGO',
-		TK: 'TKL',
-		TO: 'TON',
-		TT: 'TTO',
-		TN: 'TUN',
-		TR: 'TUR',
-		TM: 'TKM',
-		TC: 'TCA',
-		TV: 'TUV',
-		UG: 'UGA',
-		UA: 'UKR',
-		AE: 'ARE',
-		GB: 'GBR',
-		US: 'USA',
-		UM: 'UMI',
-		UY: 'URY',
-		UZ: 'UZB',
-		VU: 'VUT',
-		VE: 'VEN',
-		VN: 'VNM',
-		VI: 'VIR',
-		WF: 'WLF',
-		EH: 'ESH',
-		YE: 'YEM',
-		ZM: 'ZMB',
-		ZW: 'ZWE'
 	};
 
 	//end of d3ChartIIFE

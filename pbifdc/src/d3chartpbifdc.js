@@ -75,6 +75,70 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			padding = [4, 6, 4, 6],
 			topPanelHeight = 60,
@@ -95,7 +159,9 @@
 			formatNumberSI = d3.format(".3s"),
 			chartTitleDefault = "Contributions Flow",
 			unBlue = "#1F69B3",
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			flagPadding = 22,
 			maxNodeSize = 35,
@@ -164,19 +230,19 @@
 
 		chartState.selectedRegion = selectedRegion;
 
-		const showMapOption = (containerDiv.node().getAttribute("data-showmap") === "true");
+		const showMapOption = containerDiv.node().getAttribute("data-showmap") === "true";
 
-		const showNamesOption = (containerDiv.node().getAttribute("data-shownames") === "true");
+		const showNamesOption = containerDiv.node().getAttribute("data-shownames") === "true";
 
-		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
+		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
 
-		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
 
-		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
+		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -398,15 +464,49 @@
 			.tickSizeInner(0)
 			.tickSizeOuter(0);
 
-		fileData = d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv");
-
-		fileMap = d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json");
-
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all([fileData, fileMap]).then(function(rawData) {
+		if (localStorage.getItem("pbifdcmap")) {
+			const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
+			console.log("pbifdc: map from local storage");
+			getData(mapData);
+		} else {
+			d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
+				try {
+					localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
+				} catch (error) {
+					console.log("D3 chart pbifdc map, " + error);
+				};
+				console.log("pbifdc: map from API");
+				getData(mapData);
+			});
+		};
+
+		function getData(mapData) {
+			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+				console.log("pbifdc: data from local storage");
+				csvCallback([apiData, mapData]);
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
+					try {
+						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+							data: apiData,
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.log("D3 chart pbifdc data, " + error);
+					};
+					console.log("pbifdc: data from API");
+					csvCallback([apiData, mapData]);
+				});
+			};
+		};
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -416,7 +516,7 @@
 				return self.indexOf(value) === index;
 			}).sort();
 
-			chartState.selectedYear.push(validateYear(selectedYearString));
+			validateYear(selectedYearString);
 
 			chartState.showMap = showMapOption;
 
@@ -437,8 +537,8 @@
 				};
 			};
 
-			//end of Promise.all
-		});
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -469,6 +569,8 @@
 			drawLegend(dataObject.nodes, dataObject.links);
 
 			createGeoMenu();
+
+			setYearsDescriptionDiv();
 
 			if (!isInternetExplorer) saveFlags(dataObject.nodes);
 
@@ -823,7 +925,7 @@
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -837,7 +939,7 @@
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -2727,15 +2829,7 @@
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
-				yearsDescriptionDiv.html(function() {
-					if (chartState.selectedYear.length === 1) return null;
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).reduce(function(acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-					}, "");
-					return "\u002ASelected years: " + yearsList;
-				});
+				setYearsDescriptionDiv();
 
 				dataObject = processData(rawData[0]);
 
@@ -3029,7 +3123,9 @@
 			});
 
 			donorsList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
+				if (!localStorage.getItem("storedFlag" + d)) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
+				};
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, isoCode) {
@@ -3249,8 +3345,15 @@
 		};
 
 		function validateYear(yearString) {
-			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function capitalize(str) {
@@ -3268,6 +3371,18 @@
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
 			return [matrix.e, matrix.f];
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function wrapText(text, width) {
@@ -3603,68 +3718,6 @@
 		//end of d3Chart
 	};
 
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
 	//force boundaries
 
 	function forceBoundary(x0, y0, x1, y1) {
@@ -3777,8 +3830,6 @@
 
 		return force;
 	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());

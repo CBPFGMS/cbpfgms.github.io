@@ -120,7 +120,16 @@ p#pbiolcd3chartTitle {
 	margin-left: 2px;
 }
 
+.pbiolctopPanelMainValue, .pbiolctopPanelPersonsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
 
+.pbiolctopPanelMainText, .pbiolctopPanelSubText, .pbiolctopPanelPersonsText, .pbiolctopPanelPersonsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
 
 .pbiolcbuttonsText, .pbiolcbuttonsModalitiesText, .pbiolcbuttonsBeneficiariesText {
 	font-family: "Roboto", sans-serif;

@@ -75,11 +75,76 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			padding = [4, 4, 40, 4],
+			topPanelHeight = 60,
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 4,
-			buttonsPanelHeight = 50,
+			buttonsPanelHeight = 30,
 			clusters = ["Water Sanitation Hygiene",
 				"Coordination and Support Services",
 				"Emergency Shelter and NFI",
@@ -100,7 +165,7 @@
 			titleMargin = 24,
 			sortByPadding = 4,
 			lollipopPanelsHeight = +lollipopTitlePadding + (numberOfClusters * lollipopGroupHeight),
-			height = padding[0] + buttonsPanelHeight + panelHorizontalPadding + lollipopPanelsHeight + padding[2],
+			height = padding[0] + topPanelHeight + buttonsPanelHeight + (2 * panelHorizontalPadding) + lollipopPanelsHeight + padding[2],
 			stickHeight = 2,
 			lollipopRadius = 4,
 			lollipopsPanelsRatio = 0.345,
@@ -110,7 +175,9 @@
 			legendVerticalPadding = 22,
 			unBlue = "#1F69B3",
 			chartTitleDefault = "Cluster Overview",
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -131,6 +198,11 @@
 			modalities = ["total", "standard", "reserve"],
 			beneficiaries = ["targeted", "actual"],
 			clusterIconsPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/",
+			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
+				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
+				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
+				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
+			],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -157,11 +229,11 @@
 
 		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
 
-		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality")) > -1 ?
-			containerDiv.node().getAttribute("data-modality") : "total";
+		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-modality").toLowerCase() : "total";
 
-		const selectedBeneficiary = beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries")) > -1 ?
-			containerDiv.node().getAttribute("data-beneficiaries") : "targeted";
+		const selectedBeneficiary = beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-beneficiaries").toLowerCase() : "targeted";
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -252,13 +324,26 @@
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
+		const topPanel = {
+			main: svg.append("g")
+				.attr("class", "pbiolcTopPanel")
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+			width: width - padding[1] - padding[3],
+			height: topPanelHeight,
+			padding: [0, 0, 0, 0],
+			moneyBagPadding: 22,
+			leftPadding: [182, 540],
+			mainValueVerPadding: 10,
+			mainValueHorPadding: 2
+		};
+
 		const buttonsPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiolcButtonsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
-			padding: [20, 0, 0, 0],
+			padding: [0, 0, 0, 0],
 			buttonWidth: 52,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
@@ -271,7 +356,7 @@
 		const allocationsPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiolcAllocationsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * lollipopsPanelsRatio,
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 0, 0, 52],
@@ -282,7 +367,7 @@
 			main: svg.append("g")
 				.attr("class", "pbiolcLabelsPanel")
 				.attr("transform", "translate(" + (padding[3] + allocationsPanel.width + panelVerticalPadding) +
-					"," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+					"," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * (1 - (2 * lollipopsPanelsRatio)),
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 0, 0, 0]
@@ -292,7 +377,7 @@
 			main: svg.append("g")
 				.attr("class", "pbiolcBeneficiariesPanel")
 				.attr("transform", "translate(" + (padding[3] + allocationsPanel.width + labelsPanel.width + (2 * panelVerticalPadding)) +
-					"," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+					"," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: (width - padding[1] - padding[3] - (2 * panelVerticalPadding)) * lollipopsPanelsRatio,
 			height: lollipopPanelsHeight,
 			padding: [lollipopTitlePadding, 62, 0, 0],
@@ -357,7 +442,27 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
+		if (localStorage.getItem("pbiolcdata") &&
+			JSON.parse(localStorage.getItem("pbiolcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbiolcdata")).data;
+			console.log("pbiolc: data from local storage");
+			csvCallback(rawData);
+		} else {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
+				try {
+					localStorage.setItem("pbiolcdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.log("D3 chart pbiolc, " + error);
+				};
+				console.log("pbiolc: data from API");
+				csvCallback(rawData);
+			});
+		};
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -372,7 +477,7 @@
 				return a - b;
 			});
 
-			chartState.selectedYear.push(validateYear(selectedYearString));
+			validateYear(selectedYearString);
 
 			chartState.selectedModality = selectedModality;
 
@@ -397,8 +502,8 @@
 				};
 			};
 
-			//end of d3.csv
-		});
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
@@ -414,6 +519,8 @@
 
 			if (!isPfbiSite) createFooterDiv();
 
+			createTopPanel();
+
 			createButtonsPanel();
 
 			createLabelsPanel();
@@ -423,6 +530,8 @@
 			createBeneficiariesPanel();
 
 			createLegend();
+
+			setYearsDescriptionDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -588,7 +697,7 @@
 					.text("(")
 					.append("tspan")
 					.style("font-weight", "bold")
-					.text("actual, actual in %")
+					.text("affected, affected in %")
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
@@ -603,7 +712,7 @@
 					.text("\u25B2")
 					.append("tspan")
 					.style("fill", "#666")
-					.text(") indicates the number of actual affected persons.");
+					.text(") indicates the number of affected persons.");
 
 				//end of createLegend
 			};
@@ -693,6 +802,8 @@
 
 					sortData(data);
 
+					createTopPanel()
+
 					createLabelsPanel();
 
 					createAllocationsPanel();
@@ -704,24 +815,163 @@
 				//end of createCheckboxes
 			};
 
+			function createTopPanel() {
+
+				const mainValue = d3.sum(data, function(d) {
+					return d[chartState.selectedModality];
+				});
+
+				const personsValue = d3.sum(data, function(d) {
+					return d[chartState.selectedModality + chartState.selectedBeneficiary];
+				});
+
+				const topPanelMoneyBag = topPanel.main.selectAll(".pbiolctopPanelMoneyBag")
+					.data([true])
+					.enter()
+					.append("g")
+					.attr("class", "pbiolctopPanelMoneyBag contributionColorFill")
+					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
+					.each(function(_, i, n) {
+						moneyBagdAttribute.forEach(function(d) {
+							d3.select(n[i]).append("path")
+								.attr("d", d);
+						});
+					});
+
+				const previousValue = d3.select(".pbiolctopPanelMainValue").size() !== 0 ? d3.select(".pbiolctopPanelMainValue").datum() : 0;
+
+				const previousPersons = d3.select(".pbiolctopPanelPersonsNumber").size() !== 0 ? d3.select(".pbiolctopPanelPersonsNumber").datum() : 0;
+
+				let mainValueGroup = topPanel.main.selectAll(".pbiolcmainValueGroup")
+					.data([true]);
+
+				mainValueGroup = mainValueGroup.enter()
+					.append("g")
+					.attr("class", "pbiolcmainValueGroup")
+					.merge(mainValueGroup);
+
+				let topPanelMainValue = mainValueGroup.selectAll(".pbiolctopPanelMainValue")
+					.data([mainValue]);
+
+				topPanelMainValue = topPanelMainValue.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelMainValue contributionColorFill")
+					.attr("text-anchor", "end")
+					.merge(topPanelMainValue)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding);
+
+				topPanelMainValue.transition()
+					.duration(duration)
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousValue, d);
+						return function(t) {
+							const siString = formatSIFloat(i(t))
+							node.textContent = "$" + siString.substring(0, siString.length - 1);
+						};
+					});
+
+				let topPanelMainText = mainValueGroup.selectAll(".pbiolctopPanelMainText")
+					.data([mainValue]);
+
+				topPanelMainText = topPanelMainText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelMainText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelMainText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
+
+				topPanelMainText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text(function(d) {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						const valueSI = formatSIFloat(d);
+						const unit = valueSI[valueSI.length - 1];
+						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+							" Allocated in " + yearsText;
+					});
+
+				let topPanelSubText = mainValueGroup.selectAll(".pbiolctopPanelSubText")
+					.data([true]);
+
+				topPanelSubText = topPanelSubText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelSubText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelSubText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
+
+				topPanelSubText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text("(" + capitalize(chartState.selectedModality) + " Allocations)");
+
+				let topPanelPersonsNumber = mainValueGroup.selectAll(".pbiolctopPanelPersonsNumber")
+					.data([personsValue]);
+
+				topPanelPersonsNumber = topPanelPersonsNumber.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsNumber contributionColorFill")
+					.attr("text-anchor", "end")
+					.merge(topPanelPersonsNumber)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding);
+
+				topPanelPersonsNumber.transition()
+					.duration(duration)
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousPersons, d);
+						return function(t) {
+							const siString = formatSIFloat(i(t))
+							node.textContent = siString.substring(0, siString.length - 1);
+						};
+					});
+
+				let topPanelPersonsText = mainValueGroup.selectAll(".pbiolctopPanelPersonsText")
+					.data([personsValue]);
+
+				topPanelPersonsText = topPanelPersonsText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsText")
+					.style("opacity", 0)
+					.attr("text-anchor", "start")
+					.merge(topPanelPersonsText)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+
+				topPanelPersonsText.transition()
+					.duration(duration)
+					.style("opacity", 1)
+					.text(function(d) {
+						const valueSI = formatSIFloat(d);
+						const unit = valueSI[valueSI.length - 1];
+						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+							" Persons";
+					});
+
+				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiolctopPanelPersonsTextSubText")
+					.data([true]);
+
+				topPanelPersonsTextSubText = topPanelPersonsTextSubText.enter()
+					.append("text")
+					.attr("class", "pbiolctopPanelPersonsTextSubText")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+					.attr("text-anchor", "start")
+					.merge(topPanelPersonsTextSubText)
+					.text("(" + (chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + ")");
+
+				// 	//end of createTopPanel
+			};
+
 			function createButtonsPanel() {
-
-				const yearsTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("x", buttonsPanel.padding[3] + buttonsPanel.arrowPadding + 2)
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Year:");
-
-				const modalitiesTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Modality:");
-
-				const beneficiariesTitle = buttonsPanel.main.append("text")
-					.attr("class", "pbiolcButtonsPanelTitle")
-					.attr("x", buttonsPanel.beneficiariesPadding + 2)
-					.attr("y", buttonsPanel.padding[0] - buttonsTitleMargin)
-					.text("Affected Persons:");
 
 				const clipPathButtons = buttonsPanel.main.append("clipPath")
 					.attr("id", "pbiolcclipPathButtons")
@@ -753,7 +1003,7 @@
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -767,7 +1017,7 @@
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -912,8 +1162,6 @@
 
 				const modalitiesPosition = buttonsGroupSize + (buttonsPanel.beneficiariesPadding - buttonsGroupSize - buttonsModalitiesSize) / 2;
 
-				modalitiesTitle.attr("x", modalitiesPosition + 2);
-
 				buttonsModalitiesGroup.attr("transform", "translate(" + modalitiesPosition + ",0)");
 
 				const buttonsBeneficiariesGroup = buttonsPanel.main.append("g")
@@ -952,7 +1200,8 @@
 						return d === chartState.selectedBeneficiary ? "white" : "#444";
 					})
 					.text(function(d) {
-						return capitalize(d);
+						const buttonName = d === "actual" ? "affected" : d;
+						return capitalize(buttonName);
 					});
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
@@ -1234,17 +1483,23 @@
 
 			function createBeneficiariesPanel() {
 
-				const beneficiariesPanelTitle = beneficiariesPanel.main.selectAll(".pbiolcBeneficiariesPanelTitle")
-					.data([true])
-					.enter()
+				let beneficiariesPanelTitle = beneficiariesPanel.main.selectAll(".pbiolcBeneficiariesPanelTitle")
+					.data([true]);
+
+				beneficiariesPanelTitle = beneficiariesPanelTitle.enter()
 					.append("text")
 					.attr("cursor", "pointer")
 					.attr("class", "pbiolcBeneficiariesPanelTitle")
 					.attr("y", beneficiariesPanel.padding[0] - titleMargin)
 					.attr("x", xScaleBeneficiaries(0))
-					.text("Affected Persons ")
+					.merge(beneficiariesPanelTitle)
+					.text((chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + " Persons ");
+
+				let beneficiariesPanelTitleSpan = beneficiariesPanelTitle.selectAll(".pbiolcBeneficiariesPanelSubTitleSpan")
+					.data([true])
+					.enter()
 					.append("tspan")
-					.attr("class", "pbiolcBeneficiariesPanelSubTitle")
+					.attr("class", "pbiolcBeneficiariesPanelSubTitle pbiolcBeneficiariesPanelSubTitleSpan")
 					.text("(number)");
 
 				beneficiariesPanel.main.select(".pbiolcBeneficiariesPanelTitle")
@@ -1416,15 +1671,7 @@
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
-				yearsDescriptionDiv.html(function() {
-					if (chartState.selectedYear.length === 1) return null;
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).reduce(function(acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-					}, "");
-					return "\u002ASelected years: " + yearsList;
-				});
+				setYearsDescriptionDiv();
 
 				data = processData(rawData);
 
@@ -1448,6 +1695,8 @@
 				setxScaleDomains(data);
 
 				sortData(data);
+
+				createTopPanel()
 
 				createLabelsPanel();
 
@@ -1476,6 +1725,8 @@
 					.style("opacity", chartState.selectedModality === "total" ? 1 : 0);
 
 				sortData(data);
+
+				createTopPanel()
 
 				createLabelsPanel();
 
@@ -1509,6 +1760,8 @@
 				xScaleBeneficiaries.domain([0, d3.max(data, function(d) {
 					return d["total" + chartState.selectedBeneficiary];
 				}) * xScaleDomainMargin]);
+
+				createTopPanel()
 
 				createLabelsPanel();
 
@@ -1821,9 +2074,17 @@
 		};
 
 		function validateYear(yearString) {
-			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
+
 
 		function populateSelectedCbpfs(cbpfsString) {
 
@@ -1870,6 +2131,18 @@
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
 			return [matrix.e, matrix.f];
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function reverseFormat(s) {
@@ -1987,7 +2260,9 @@
 		function saveFlags(clustersList) {
 
 			clustersList.forEach(function(d) {
-				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + "60px.png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+				if (!localStorage.getItem("storedCluster" + d.replace(/\W/g, "").toLowerCase())) {
+					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/cluster" + d.replace(/\W/g, "").toLowerCase() + "60px.png", setLocal, null, d.replace(/\W/g, "").toLowerCase());
+				}
 			});
 
 			function getBase64FromImage(url, onSuccess, onError, clusterCode) {
@@ -2063,14 +2338,14 @@
 				.style("stroke", "white")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 350)
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 350)
 				.text("CLICK ANYWHERE TO START");
 
 			const cbpfsAnnotationRect = helpSVG.append("rect")
@@ -2098,14 +2373,14 @@
 
 			const yearAnnotationRect = helpSVG.append("rect")
 				.attr("x", 10 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const yearAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 10)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to select year. Double click or press ALT when clicking to select a single year")
 				.call(wrapText2, 330);
 
@@ -2114,21 +2389,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M335,126 Q355,126 355,142");
+				.attr("d", "M335,156 Q355,156 355,172");
 
 			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
 
 			const modalityAnnotationRect = helpSVG.append("rect")
 				.attr("x", 400 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const modalityAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 400)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to select modality type.")
 				.call(wrapText2, 180);
 
@@ -2137,21 +2412,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M542,126 Q562,126 562,142");
+				.attr("d", "M542,156 Q562,156 562,172");
 
 			modalityAnnotationRect.attr("width", modalityAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiaryAnnotationRect = helpSVG.append("rect")
 				.attr("x", 620 - padding)
-				.attr("y", 130 - padding - 14)
+				.attr("y", 160 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiaryAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 620)
-				.attr("y", 130)
+				.attr("y", 160)
 				.text("Use these buttons to show targeted or actual persons.")
 				.call(wrapText2, 200);
 
@@ -2160,21 +2435,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M812,126 Q832,126 832,142");
+				.attr("d", "M812,156 Q832,156 832,172");
 
 			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
 
 			const allocationsSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 300 - padding)
-				.attr("y", 240 - padding - 14)
+				.attr("y", 270 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const allocationsSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 300)
-				.attr("y", 240)
+				.attr("y", 270)
 				.text("Click here to sort by allocations.")
 				.call(wrapText2, 180);
 
@@ -2183,21 +2458,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M298,246 Q270,246 270,226");
+				.attr("d", "M298,276 Q270,276 270,256");
 
 			allocationsSortAnnotationRect.attr("width", allocationsSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", allocationsSortAnnotation.node().getBBox().height + padding * 2);
 
 			const beneficiariesSortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 700 - padding)
-				.attr("y", 240 - padding - 14)
+				.attr("y", 270 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const beneficiariesSortAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 700)
-				.attr("y", 240)
+				.attr("y", 270)
 				.text("Click here to sort by beneficiaries.")
 				.call(wrapText2, 180);
 
@@ -2206,21 +2481,21 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M698,246 Q670,246 670,226");
+				.attr("d", "M698,276 Q670,276 670,256");
 
 			beneficiariesSortAnnotationRect.attr("width", beneficiariesSortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", beneficiariesSortAnnotation.node().getBBox().height + padding * 2);
 
 			const allocChartAnnotationRect = helpSVG.append("rect")
 				.attr("x", 120 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 400 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const allocChartAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 120)
-				.attr("y", 370)
+				.attr("y", 400)
 				.text("This area depicts the amount allocated by cluster. The black triangles indicate standard allocations.")
 				.call(wrapText2, 250);
 
@@ -2229,14 +2504,14 @@
 
 			const benefChartAnnotationRect = helpSVG.append("rect")
 				.attr("x", 580 - padding)
-				.attr("y", 370 - padding - 14)
+				.attr("y", 400 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const benefChartAnnotation = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationText")
 				.attr("x", 580)
-				.attr("y", 370)
+				.attr("y", 400)
 				.text("This area depicts the number of beneficiaries (targeted or actual) for each cluster. The black triangles indicate beneficiaries affected by standard allocations.")
 				.call(wrapText2, 250);
 
@@ -2604,70 +2879,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());

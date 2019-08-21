@@ -75,6 +75,70 @@
 
 	function d3Chart() {
 
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//END OF POLYFILLS
+
 		const width = 900,
 			parallelPanelHeight = 400,
 			padding = [4, 10, 28, 10],
@@ -105,16 +169,18 @@
 			percentagePadding2 = 10,
 			underApprovalColor = "#E56A54",
 			unBlue = "#1F69B3",
-			currentYear = new Date().getFullYear(),
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			localStorageTime = 600000,
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
 			partnersListObject = {
-				"International NGO": "International NGO",
-				"National NGO": "National NGO",
-				"Others": "Red Cross/Crescent Movement",
-				"Red Cross/Crescent Movement": "Red Cross/Crescent Movement",
-				"UN Agency": "UN Agency",
+				"international ngo": "International NGO",
+				"national ngo": "National NGO",
+				"others": "Red Cross/Crescent Movement",
+				"red cross/crescent movement": "Red Cross/Crescent Movement",
+				"un agency": "UN Agency",
 				"total": "total",
 				"all": "total"
 			},
@@ -162,14 +228,14 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		let showAverage = (containerDiv.node().getAttribute("data-showaverage") === "true");
+		let showAverage = containerDiv.node().getAttribute("data-showaverage") === "true";
 
 		const selectedYearString = containerDiv.node().getAttribute("data-year");
 
 		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.selectedPartner = Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner")) > -1 ?
-			partnersListObject[containerDiv.node().getAttribute("data-partner")] :
+		chartState.selectedPartner = Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner").toLowerCase()) > -1 ?
+			partnersListObject[containerDiv.node().getAttribute("data-partner").toLowerCase()] :
 			"total";
 
 		if (selectedResponsiveness === "false") {
@@ -396,7 +462,27 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		d3.csv(file).then(function(rawData) {
+		if (localStorage.getItem("pbialpdata") &&
+			JSON.parse(localStorage.getItem("pbialpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbialpdata")).data;
+			console.log("pbialp: data from local storage");
+			csvCallback(rawData);
+		} else {
+			d3.csv(file).then(function(rawData) {
+				try {
+					localStorage.setItem("pbialpdata", JSON.stringify({
+						data: rawData,
+						timestamp: currentDate.getTime()
+					}));
+				} catch (error) {
+					console.log("D3 chart pbialp, " + error);
+				};
+				console.log("pbialp: data from API");
+				csvCallback(rawData);
+			});
+		};
+
+		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
@@ -407,7 +493,7 @@
 				return self.indexOf(value) === index;
 			}).sort();
 
-			chartState.selectedYear.push(validateYear(selectedYearString));
+			validateYear(selectedYearString);
 
 			validateCbpfs(selectedCbpfsString);
 
@@ -426,17 +512,24 @@
 				};
 			};
 
-			//end of d3.csv
-		});
+			//end of csvCallback
+		};
 
 		function draw(rawData) {
 
 			let data = processData(rawData);
 
+			const allCbpfs = [];
+
 			data.forEach(function(d) {
+				allCbpfs.push(d.cbpf);
 				if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
 					d.clicked = true;
 				};
+			});
+
+			chartState.selectedCbpfs = chartState.selectedCbpfs.filter(function(d) {
+				return allCbpfs.indexOf(d) > -1;
 			});
 
 			createTitle();
@@ -472,6 +565,8 @@
 				});
 				highlightParallel(data);
 			};
+
+			setYearsDescriptionDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -924,7 +1019,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonPadding / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
 				const buttonsText = buttonsGroup.selectAll(null)
@@ -938,7 +1033,7 @@
 						return i * buttonPanel.buttonWidth + buttonPanel.buttonWidth / 2;
 					})
 					.style("fill", function(d) {
-						return d === chartState.selectedYear[0] ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
 						return d;
@@ -2180,15 +2275,7 @@
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
-				yearsDescriptionDiv.html(function() {
-					if (chartState.selectedYear.length === 1) return null;
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
-						return a - b;
-					}).reduce(function(acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-					}, "");
-					return "\u002ASelected years: " + yearsList;
-				});
+				setYearsDescriptionDiv();
 
 				data = processData(rawData);
 
@@ -2828,6 +2915,18 @@
 
 		};
 
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
+		};
+
 		function processData(rawData) {
 
 			const aggregatedAllocations = [];
@@ -3393,8 +3492,15 @@
 		};
 
 		function validateYear(yearString) {
-			return +yearString === +yearString && yearsArray.indexOf(+yearString) > -1 ?
-				+yearString : new Date().getFullYear()
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function validateCbpfs(cbpfString) {
@@ -3514,70 +3620,6 @@
 
 		//end of d3Chart
 	};
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
-	};
-
-	//toBlob
-
-	if (!HTMLCanvasElement.prototype.toBlob) {
-		Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-			value: function(callback, type, quality) {
-				var dataURL = this.toDataURL(type, quality).split(',')[1];
-				setTimeout(function() {
-
-					var binStr = atob(dataURL),
-						len = binStr.length,
-						arr = new Uint8Array(len);
-
-					for (var i = 0; i < len; i++) {
-						arr[i] = binStr.charCodeAt(i);
-					}
-
-					callback(new Blob([arr], {
-						type: type || 'image/png'
-					}));
-
-				});
-			}
-		});
-	};
-
-	//END OF POLYFILLS
 
 	//end of d3ChartIIFE
 }());
