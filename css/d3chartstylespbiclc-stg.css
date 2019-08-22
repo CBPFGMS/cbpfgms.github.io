@@ -43,13 +43,13 @@
 
 .pbiclcTitleDiv {
 	display: flex;
-	flex:0 80%;
+	flex:0 50%;
 	margin-left: 16px;
 }
 
 .pbiclcIconsDiv {
 	display: flex;
-	flex:0 20%;
+	flex:0 50%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
