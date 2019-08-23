@@ -1054,7 +1054,7 @@
 
 					const shareDivWidth = 460,
 						shareDivHeight = 110,
-						newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+						newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
 
 					const shareDiv = d3.select("body")
 						.append("div")
