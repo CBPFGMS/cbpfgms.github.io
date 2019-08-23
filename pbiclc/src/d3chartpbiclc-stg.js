@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -422,6 +424,7 @@
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
 			countryNames = {},
+			vizNameQueryString = "contributions",
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -441,7 +444,12 @@
 		let height = 500,
 			yearsArray,
 			isSnapshotTooltipVisible = false,
-			currentHoveredRect;
+			currentHoveredRect,
+			queryStringURL;
+
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
 
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
@@ -453,11 +461,12 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
-		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
+		const selectedContribution = queryStringValues.has("contribution") && contributionType.indexOf(queryStringValues.get("contribution")) > -1 ? queryStringValues.get("contribution") :
+			contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
@@ -779,6 +788,16 @@
 					};
 				};
 
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
+				};
+
 				d3.selectAll(".pbiclcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -843,6 +862,12 @@
 			function clickButtonsContributionsRects(d) {
 
 				chartState.selectedContribution = d;
+
+				if (queryStringValues.has("contribution")) {
+					queryStringValues.set("contribution", d);
+				} else {
+					queryStringValues.append("contribution", d);
+				};
 
 				d3.selectAll(".pbiclcbuttonsContributionsRects")
 					.style("fill", function(e) {
@@ -929,7 +954,7 @@
 
 				helpIcon.html("HELP  ")
 					.append("span")
-					.attr("class", "fas fa-info")
+					.attr("class", "fas fa-info");
 
 				const downloadIcon = iconsDiv.append("button")
 					.attr("id", "pbiclcDownloadButton");
@@ -964,6 +989,13 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbiclcShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
@@ -1015,6 +1047,63 @@
 
 						};
 					};
+
+				});
+
+				shareIcon.on("click", function() {
+
+					const shareDivWidth = 460,
+						shareDivHeight = 110,
+						newURL = window.location.origin + window.location.pathname + "?" + queryStringValues.toString();
+
+					const shareDiv = d3.select("body")
+						.append("div")
+						.style("position", "fixed")
+						.attr("id", "d3chartShareDiv")
+						.style("left", window.innerWidth / 2 - (shareDivWidth / 2) + "px")
+						.style("top", window.innerHeight / 2 - shareDivHeight + "px")
+						.style("width", shareDivWidth + "px");
+
+					const shareDivHeader = shareDiv.append("div")
+						.attr("id", "d3chartShareDivHeader");
+
+					const shareDivHeaderText = shareDivHeader.append("div")
+						.attr("id", "d3chartShareDivHeaderText");
+
+					shareDivHeaderText.append("span")
+						.html("Link");
+
+					const shareDivHeaderClose = shareDivHeader.append("div")
+						.attr("id", "d3chartShareDivHeaderClose");
+
+					const closeButton = shareDivHeaderClose.append("span")
+						.attr("class", "fas fa-times");
+
+					const shareDivBody = shareDiv.append("div")
+						.attr("id", "d3chartShareDivBody");
+
+					const shareDivBodyText = shareDivBody.append("div")
+						.attr("id", "d3chartShareDivBodyText");
+
+					shareDivBodyText.append("span")
+						.html("Copy the following link:");
+
+					const shareDivBodyInput = shareDivBody.append("div")
+						.attr("id", "d3chartShareDivBodyInput");
+
+					const shareInput = shareDivBodyInput.append("input")
+						.attr("type", "text")
+						.attr("readonly", true)
+						.attr("spellcheck", "false")
+						.property("value", newURL);
+
+					shareInput.on("click", function() {
+						this.select();
+					});
+
+					shareDivHeaderClose.on("click", function() {
+						shareDiv.remove();
+					});
 
 				});
 
@@ -2254,6 +2343,16 @@
 						if (chartState.selectedCbpfs.indexOf(datum.isoCode) === -1) {
 							chartState.selectedCbpfs.push(datum.isoCode);
 						}
+					};
+
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return countryNames[d];
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
 					};
 
 					const foundDatum = data.dataCbpfs.find(function(d) {

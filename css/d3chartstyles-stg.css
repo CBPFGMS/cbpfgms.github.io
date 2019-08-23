@@ -163,3 +163,62 @@ These styles apply to all D3 charts*/
 	text-align: right;
 	width: 98%;
 }
+
+/*styles for the div created by the "Share" button*/
+
+#d3chartShareDiv {
+	display: flex;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 2px solid #888; 
+	border-radius: 8px;
+	z-index: 2100;
+	flex-direction: column;
+}
+
+#d3chartShareDivHeader {
+	width: 100%;
+	display: flex;
+	height: 30px;
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	font-weight: 700;
+	color: #555;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 18px;
+}
+
+#d3chartShareDivHeaderText {
+
+}
+
+#d3chartShareDivHeaderClose {
+	padding: 0px 4px 0px 4px;
+	cursor: pointer;
+}
+
+#d3chartShareDivBody {
+	width: 100%;
+	display: flex;
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 300;
+	margin-bottom: 12px;
+	align-items: center;
+}
+
+#d3chartShareDivBodyText {
+	flex: 0 20%;
+}
+
+#d3chartShareDivBodyInput {
+	flex: 0 80%;
+}
+
+#d3chartShareDivBodyInput input {
+	width: 98%;
+	height: 24px;
+}
+
+
