@@ -176,7 +176,7 @@ These styles apply to all D3 charts*/
 	color: #222;
 	font-family: "Arial", sans-serif;
 	z-index: 2100;
-	border: 1px solid gray;
+	border: 1px solid lightgray;
 }
 
 #d3chartShareDiv:after {
@@ -198,5 +198,5 @@ These styles apply to all D3 charts*/
 	top: 9px;
 	right: -18px;
 	border: 9px solid transparent;
-	border-left-color: gray;
+	border-left-color: lightgray;
 }
