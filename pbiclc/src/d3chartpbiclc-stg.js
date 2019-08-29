@@ -997,6 +997,10 @@
 					.append("span")
 					.attr("class", "fas fa-share");
 
+				const shareDiv = containerDiv.append("div")
+					.attr("id", "d3chartShareDiv")
+					.style("display", "none");
+
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiclcBestVisualizedText")
@@ -1050,62 +1054,42 @@
 
 				});
 
-				shareIcon.on("click", function() {
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
 
-					const shareDivWidth = 460,
-						shareDivHeight = 110,
-						newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
 
-					const shareDiv = d3.select("body")
-						.append("div")
-						.style("position", "fixed")
-						.attr("id", "d3chartShareDiv")
-						.style("left", window.innerWidth / 2 - (shareDivWidth / 2) + "px")
-						.style("top", window.innerHeight / 2 - shareDivHeight + "px")
-						.style("width", shareDivWidth + "px");
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
 
-					const shareDivHeader = shareDiv.append("div")
-						.attr("id", "d3chartShareDivHeader");
+						shareInput.node().select();
 
-					const shareDivHeaderText = shareDivHeader.append("div")
-						.attr("id", "d3chartShareDivHeaderText");
+						document.execCommand("copy");
 
-					shareDivHeaderText.append("span")
-						.html("Link");
+						shareDiv.html("Copied!");
 
-					const shareDivHeaderClose = shareDivHeader.append("div")
-						.attr("id", "d3chartShareDivHeaderClose");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
 
-					const closeButton = shareDivHeaderClose.append("span")
-						.attr("class", "fas fa-times");
-
-					const shareDivBody = shareDiv.append("div")
-						.attr("id", "d3chartShareDivBody");
-
-					const shareDivBodyText = shareDivBody.append("div")
-						.attr("id", "d3chartShareDivBodyText");
-
-					shareDivBodyText.append("span")
-						.html("Copy the following link:");
-
-					const shareDivBodyInput = shareDivBody.append("div")
-						.attr("id", "d3chartShareDivBodyInput");
-
-					const shareInput = shareDivBodyInput.append("input")
-						.attr("type", "text")
-						.attr("readonly", true)
-						.attr("spellcheck", "false")
-						.property("value", newURL);
-
-					shareInput.on("click", function() {
-						this.select();
 					});
-
-					shareDivHeaderClose.on("click", function() {
-						shareDiv.remove();
-					});
-
-				});
 
 				//end of createTitle
 			};
