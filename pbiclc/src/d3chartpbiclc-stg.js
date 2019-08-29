@@ -461,7 +461,7 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCountriesString = queryStringValues.has("country") ? queryStringValues.get("country").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
 		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
@@ -705,8 +705,6 @@
 
 			chartState.selectedContribution = selectedContribution;
 
-			validateCbpfs(selectedCbpfsString);
-
 			const allDonors = rawData.map(function(d) {
 				if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
 				return d.GMSDonorISO2Code.toLowerCase();
@@ -743,11 +741,31 @@
 				dataCbpfs: dataArray[1]
 			};
 
-			data.dataCbpfs.forEach(function(d) {
-				if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
-					d.clicked = true;
-				};
+			const allDonors = data.dataDonors.map(function(d) {
+				return d.isoCode;
 			});
+
+			const allCbpfs = data.dataCbpfs.map(function(d) {
+				return d.isoCode;
+			});
+
+			validateCountries(selectedCountriesString, allDonors, allCbpfs);
+
+			if (chartState.selectedDonors.length) {
+				data.dataDonors.forEach(function(d) {
+					if (chartState.selectedDonors.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+			};
+
+			if (chartState.selectedCbpfs.length) {
+				data.dataCbpfs.forEach(function(d) {
+					if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+			};
 
 			createTitle();
 
@@ -1948,6 +1966,16 @@
 						}
 					};
 
+					const allCountries = chartState.selectedDonors.map(function(d) {
+						return countryNames[d];
+					}).join("|");
+
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
+					} else {
+						queryStringValues.append("country", allCountries);
+					};
+
 					const foundDatum = data.dataDonors.find(function(d) {
 						return d.isoCode === datum.isoCode;
 					});
@@ -2329,14 +2357,14 @@
 						}
 					};
 
-					const allFunds = chartState.selectedCbpfs.map(function(d) {
+					const allCountries = chartState.selectedCbpfs.map(function(d) {
 						return countryNames[d];
 					}).join("|");
 
-					if (queryStringValues.has("fund")) {
-						queryStringValues.set("fund", allFunds);
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
 					} else {
-						queryStringValues.append("fund", allFunds);
+						queryStringValues.append("country", allCountries);
 					};
 
 					const foundDatum = data.dataCbpfs.find(function(d) {
@@ -3430,18 +3458,26 @@
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
-		function validateCbpfs(cbpfString) {
-			if (!cbpfString || cbpfString.toLowerCase() === "none") return;
-			const namesArray = cbpfString.split(",").map(function(d) {
+		function validateCountries(countriesString, allDonors, allCbpfs) {
+			if (!countriesString || countriesString.toLowerCase() === "none") return;
+			const namesArray = countriesString.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(countryNames);
 			namesArray.forEach(function(d) {
-				const foundCbpf = countryCodes.find(function(e) {
-					return countryNames[e].toLowerCase() === d;
+				const foundDonor = countryCodes.find(function(e) {
+					return countryNames[e].toLowerCase() === d && allDonors.indexOf(e) > -1;
 				});
+				const foundCbpf = countryCodes.find(function(e) {
+					return countryNames[e].toLowerCase() === d && allCbpfs.indexOf(e) > -1;
+				});
+				if (foundDonor) chartState.selectedDonors.push(foundDonor);
 				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
 			});
+			if (chartState.selectedDonors.length && chartState.selectedCbpfs.length) {
+				chartState.selectedDonors.length = 0;
+				chartState.selectedCbpfs.length = 0;
+			};
 		};
 
 		function capitalize(str) {
