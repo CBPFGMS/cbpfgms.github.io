@@ -1044,16 +1044,6 @@
 						};
 					};
 
-					const allFunds = chartState.selectedCbpfs.map(function(d) {
-						return iso2Names[d];
-					}).join("|");
-
-					if (queryStringValues.has("fund")) {
-						queryStringValues.set("fund", allFunds);
-					} else {
-						queryStringValues.append("fund", allFunds);
-					};
-
 					containerDiv.select("#pbicliCbpfsDropdown").select("option")
 						.property("selected", true);
 
@@ -1133,6 +1123,16 @@
 					} else {
 						return
 					};
+				};
+
+				const allFunds = chartState.selectedCbpfs.map(function(d) {
+					return iso2Names[d];
+				}).join("|");
+
+				if (queryStringValues.has("fund")) {
+					queryStringValues.set("fund", allFunds);
+				} else {
+					queryStringValues.append("fund", allFunds);
 				};
 
 				containerDiv.select("#pbicliDonorsDropdown").select("option")
