@@ -302,7 +302,7 @@
 			.attr("class", "pbimapTitleDiv");
 
 		const iconsDiv = topDiv.append("div")
-			.attr("class", "pbimapIconsDiv");
+			.attr("class", "pbimapIconsDiv d3chartIconsDiv");
 
 		const topSvg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + heightTopSvg);
