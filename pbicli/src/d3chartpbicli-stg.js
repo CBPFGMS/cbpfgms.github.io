@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -417,6 +419,7 @@
 			checkboxesLimit = 20,
 			checkboxesLimitTrend = 10,
 			unBlue = "#418FDE",
+			vizNameQueryString = "contribution-trends",
 			colorsArray = ["#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D", "#a6cee3", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928"],
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			chartState = {
@@ -451,6 +454,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbicli");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -463,9 +470,9 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.futureDonations = containerDiv.node().getAttribute("data-showfuture") === "true";
+		chartState.futureDonations = queryStringValues.has("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
 
 		if (selectedResponsiveness === false) {
 			containerDiv.style("width", width + "px");
@@ -703,7 +710,7 @@
 		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
-			console.log("pbicli: data from local storage");
+			console.info("pbicli: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
@@ -713,9 +720,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbicli, " + error);
+					console.info("D3 chart pbicli, " + error);
 				};
-				console.log("pbicli: data from API");
+				console.info("pbicli: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -1037,6 +1044,16 @@
 						};
 					};
 
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return iso2Names[d];
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
+
 					containerDiv.select("#pbicliCbpfsDropdown").select("option")
 						.property("selected", true);
 
@@ -1296,6 +1313,12 @@
 				filtersDiv.select(".pbicliCheckboxTrend span")
 					.style("opacity", chartState.futureDonations ? 1 : checkboxOpacity);
 
+				if (queryStringValues.has("showfuture")) {
+					queryStringValues.set("showfuture", chartState.futureDonations);
+				} else {
+					queryStringValues.append("showfuture", chartState.futureDonations);
+				};
+
 				const timeExtent = setTimeExtent(list.yearsArray);
 
 				xScaleDonors.domain(timeExtent);
@@ -1392,6 +1415,17 @@
 						createSnapshot("png", false);
 					});
 
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbicliShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbicliBestVisualizedText")
@@ -1413,6 +1447,43 @@
 					const data = populateData(rawData);
 					downloadData(data, rawData);
 				});
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
 
 				//end of createTitle
 			};
@@ -1545,6 +1616,16 @@
 						.property("disabled", function(d, i) {
 							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 						});
+
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return iso2Names[d];
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
 
 					const data = populateData(rawData);
 
