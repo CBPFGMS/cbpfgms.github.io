@@ -171,7 +171,7 @@ These styles apply to all D3 charts*/
 	pointer-events: none;
 	border-radius: 4px;
 	font-size: 14px;
-	padding: 10px;
+	padding: 5px 10px 5px 10px;
 	margin: 0px;
 	color: #222;
 	font-family: "Arial", sans-serif;
@@ -184,9 +184,9 @@ These styles apply to all D3 charts*/
 	height: 0;
 	position: absolute;
 	width: 0;
-	top: 10px;
-	right: -15px;
-	border: 8px solid transparent;
+	top: 7px;
+	right: -12px;
+	border: 6px solid transparent;
 	border-left-color: #f9f9f9;
 }
 
@@ -195,8 +195,8 @@ These styles apply to all D3 charts*/
 	height: 0;
 	position: absolute;
 	width: 0;
-	top: 9px;
-	right: -18px;
-	border: 9px solid transparent;
+	top: 6px;
+	right: -15px;
+	border: 7px solid transparent;
 	border-left-color: lightgray;
 }
