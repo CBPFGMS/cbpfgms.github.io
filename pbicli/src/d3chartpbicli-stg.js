@@ -4163,6 +4163,7 @@
 				const foundCbpf = countryCodes.find(function(e) {
 					return iso2Names[e].toLowerCase() === d && cbpfsList.indexOf(e) > -1;
 				});
+				if (d === "all donors") chartState.selectedDonors.push("alldonors");
 				if (foundDonor) chartState.selectedDonors.push(foundDonor);
 				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
 			});
