@@ -672,7 +672,7 @@
 		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
-			console.log("pbiclc: data from local storage");
+			console.info("pbiclc: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
@@ -682,9 +682,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiclc, " + error);
+					console.info("D3 chart pbiclc, " + error);
 				};
-				console.log("pbiclc: data from API");
+				console.info("pbiclc: data from API");
 				csvCallback(rawData);
 			});
 		};
