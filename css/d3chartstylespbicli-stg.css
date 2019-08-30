@@ -102,37 +102,6 @@
 	margin-right: 14px;
 }
 
-.pbicliIconsDiv button {
-	white-space: pre;
-	font-size: 12px;
-	font-weight: 700;
-	color: white;
-	background-color: #418fde;
-	padding: 3px 8px 3px 8px;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border: 1px solid rgba(0,0,0,0.3);
-	border-bottom-width: 3px;
-	border-right-width: 3px;
-	margin-right: 6px;
-  }
-
-.pbicliIconsDiv button:hover {
-	background-color: #2e649b;
-	border-color: rgba(0,0,0,0.6);
-	cursor: pointer;
-}
-
-.pbicliIconsDiv button:active {
-	background-color: #bbb;
-	border-color: rgba(0,0,0,1);
-}
-
-.pbicliIconsDiv button:focus {
-	outline: none;
-}
-
 .pbicliTopSelectionDiv {
 	display: flex;
 	width: 100%;

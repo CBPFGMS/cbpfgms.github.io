@@ -481,7 +481,7 @@
 			.attr("class", "pbicliTitleDiv");
 
 		const iconsDiv = topDiv.append("div")
-			.attr("class", "pbicliIconsDiv");
+			.attr("class", "pbicliIconsDiv d3chartIconsDiv");
 
 		const topSelectionDiv = outerDiv.append("div")
 			.attr("class", "pbicliTopSelectionDiv");
