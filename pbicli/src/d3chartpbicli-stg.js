@@ -470,7 +470,7 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCountriesString = queryStringValues.has("country") ? queryStringValues.get("country").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
 		chartState.futureDonations = queryStringValues.has("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
 
@@ -747,12 +747,12 @@
 
 			scaleColorsCbpfs.domain(list.cbpfsArray);
 
-			validateCbpfs(selectedCbpfsString, list.cbpfsArray);
+			validateCountries(selectedCountriesString, list.donorsArray, list.cbpfsArray);
 
 			if (chartState.selectedCbpfs.length) {
 				chartState.selectedDonors = [];
 				chartState.controlledBy = "cbpf";
-			} else {
+			} else if (!chartState.selectedDonors.length) {
 				chartState.selectedDonors.push("alldonors");
 			};
 
@@ -1044,6 +1044,16 @@
 						};
 					};
 
+					const allCountries = chartState.selectedDonors.map(function(d) {
+						return iso2Names[d];
+					}).join("|");
+
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
+					} else {
+						queryStringValues.append("country", allCountries);
+					};
+
 					containerDiv.select("#pbicliCbpfsDropdown").select("option")
 						.property("selected", true);
 
@@ -1125,14 +1135,14 @@
 					};
 				};
 
-				const allFunds = chartState.selectedCbpfs.map(function(d) {
+				const allCountries = chartState.selectedCbpfs.map(function(d) {
 					return iso2Names[d];
 				}).join("|");
 
-				if (queryStringValues.has("fund")) {
-					queryStringValues.set("fund", allFunds);
+				if (queryStringValues.has("country")) {
+					queryStringValues.set("country", allCountries);
 				} else {
-					queryStringValues.append("fund", allFunds);
+					queryStringValues.append("country", allCountries);
 				};
 
 				containerDiv.select("#pbicliDonorsDropdown").select("option")
@@ -1551,6 +1561,16 @@
 
 					if (!chartState.selectedDonors.length) chartState.selectedLocalCurrency = null;
 
+					const allCountries = chartState.selectedDonors.map(function(d) {
+						return iso2Names[d];
+					}).join("|");
+
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
+					} else {
+						queryStringValues.append("country", allCountries);
+					};
+
 					const data = populateData(rawData);
 
 					yScaleDonors.domain(setYDomain(data.donors, data.cbpfs));
@@ -1617,14 +1637,14 @@
 							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 						});
 
-					const allFunds = chartState.selectedCbpfs.map(function(d) {
+					const allCountries = chartState.selectedCbpfs.map(function(d) {
 						return iso2Names[d];
 					}).join("|");
 
-					if (queryStringValues.has("fund")) {
-						queryStringValues.set("fund", allFunds);
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
 					} else {
-						queryStringValues.append("fund", allFunds);
+						queryStringValues.append("country", allCountries);
 					};
 
 					const data = populateData(rawData);
@@ -4130,18 +4150,26 @@
 			//end of setYDomainLocalCurrency
 		};
 
-		function validateCbpfs(cbpfString, cbpfsList) {
-			if (!cbpfString || cbpfString.toLowerCase() === "none") return;
-			const namesArray = cbpfString.split(",").map(function(d) {
+		function validateCountries(countriesString, donorsList, cbpfsList) {
+			if (!countriesString || countriesString.toLowerCase() === "none") return;
+			const namesArray = countriesString.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(iso2Names);
 			namesArray.forEach(function(d) {
+				const foundDonor = countryCodes.find(function(e) {
+					return iso2Names[e].toLowerCase() === d && donorsList.indexOf(e) > -1;
+				});
 				const foundCbpf = countryCodes.find(function(e) {
 					return iso2Names[e].toLowerCase() === d && cbpfsList.indexOf(e) > -1;
 				});
+				if (foundDonor) chartState.selectedDonors.push(foundDonor);
 				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
 			});
+			if (chartState.selectedDonors.length && chartState.selectedCbpfs.length) {
+				chartState.selectedDonors.length = 0;
+				chartState.selectedCbpfs.length = 0;
+			};
 		};
 
 		function createCurrencyOverDiv() {
