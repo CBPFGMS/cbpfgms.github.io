@@ -3455,8 +3455,8 @@
 				.property("disabled", function(d, i) {
 					return !i || chartState.selectedDonors.indexOf(d) > -1;
 				})
-				.property("selected", function(_, i) {
-					return chartState.selectedCbpfs.length ? i === 0 : i === 1;
+				.property("selected", function(d, i) {
+					return chartState.selectedDonors.length ? d === chartState.selectedDonors[chartState.selectedDonors.length - 1] : !i;
 				})
 				.html(function(d, i) {
 					return i < 3 ? d : iso2Names[d];
