@@ -1015,7 +1015,7 @@
 					.attr("class", "fas fa-share");
 
 				const shareDiv = containerDiv.append("div")
-					.attr("id", "d3chartShareDiv")
+					.attr("class", "d3chartShareDiv")
 					.style("display", "none");
 
 				if (browserHasSnapshotIssues) {
