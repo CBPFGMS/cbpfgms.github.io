@@ -85,7 +85,7 @@
 
 .pbicliTitleDiv {
 	display: flex;
-	flex:0 80%;
+	flex:0 60%;
 	margin-left: 23px;
 }
 
@@ -96,7 +96,7 @@
 
 .pbicliIconsDiv {
 	display: flex;
-	flex:0 20%;
+	flex:0 40%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 14px;
