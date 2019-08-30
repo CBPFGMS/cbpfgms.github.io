@@ -124,7 +124,7 @@ These styles apply to all D3 charts*/
 	fill: #e9c39b;
 }
 
-/*styles for the chart title, footer and help/csv buttons*/
+/*styles for the chart title, footer and help/csv/image/share buttons*/
 
 .d3chartIconsDiv button {
 	white-space: pre;
