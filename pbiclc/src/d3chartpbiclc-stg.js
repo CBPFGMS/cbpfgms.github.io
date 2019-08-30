@@ -444,8 +444,7 @@
 		let height = 500,
 			yearsArray,
 			isSnapshotTooltipVisible = false,
-			currentHoveredRect,
-			queryStringURL;
+			currentHoveredRect;
 
 		const queryStringValues = new URLSearchParams(location.search);
 
