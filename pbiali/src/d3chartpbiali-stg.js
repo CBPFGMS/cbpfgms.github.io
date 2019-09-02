@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -159,6 +161,7 @@
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
 			fadeOpacity = 0.1,
+			vizNameQueryString = "allocation-trends",
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			chartTitleDefault = "Allocation Trends",
 			sortButtonsOptions = ["total", "alphabetically"],
@@ -170,6 +173,10 @@
 		let height = 400,
 			isSnapshotTooltipVisible = false,
 			labelGroupHovered;
+
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
 
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
@@ -183,9 +190,9 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
-			containerDiv.node().getAttribute("data-sortbuttons") :
-			"total";
+		let sortButtons = queryStringValues.has("sortbuttons") && sortButtonsOptions.indexOf(queryStringValues.get("sortbuttons").toLowerCase()) > -1 ?
+			queryStringValues.get("sortbuttons").toLowerCase() : sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-sortbuttons").toLowerCase() : "total";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -368,7 +375,7 @@
 		if (localStorage.getItem("pbialidata") &&
 			JSON.parse(localStorage.getItem("pbialidata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbialidata")).data;
-			console.log("pbiali: data from local storage");
+			console.info("pbiali: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
@@ -378,9 +385,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiali, " + error);
+					console.info("D3 chart pbiali, " + error);
 				};
-				console.log("pbiali: data from API");
+				console.info("pbiali: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -511,6 +518,17 @@
 						createSnapshot("png", false);
 					});
 
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbialiShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbialiBestVisualizedText")
@@ -563,6 +581,43 @@
 					};
 
 				});
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
 
 				//end of createTitle
 			};
@@ -847,6 +902,12 @@
 				orderGroups.on("click", function(d) {
 
 					sortButtons = d;
+
+					if (queryStringValues.has("sortbuttons")) {
+						queryStringValues.set("sortbuttons", sortButtons);
+					} else {
+						queryStringValues.append("sortbuttons", sortButtons);
+					};
 
 					innerCircle.attr("fill", function(d) {
 						return sortButtons === d ? "darkslategray" : "white"
