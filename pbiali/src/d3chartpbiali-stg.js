@@ -190,6 +190,8 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+
 		let sortButtons = queryStringValues.has("sortbuttons") && sortButtonsOptions.indexOf(queryStringValues.get("sortbuttons").toLowerCase()) > -1 ?
 			queryStringValues.get("sortbuttons").toLowerCase() : sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons").toLowerCase()) > -1 ?
 			containerDiv.node().getAttribute("data-sortbuttons").toLowerCase() : "total";
@@ -398,6 +400,10 @@
 
 			const data = processData(rawData);
 
+			validateCbpfs(selectedCbpfsString, data.cbpfs.map(function(d) {
+				return d.cbpf;
+			}));
+
 			if (!lazyLoad) {
 				draw(data);
 			} else {
@@ -468,6 +474,28 @@
 			createButtons(data.cbpfs);
 
 			createBottomControls();
+
+			if (chartState.selectedCbpfs.length) {
+				data.cbpfs.forEach(function(d) {
+					if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
+						d.clicked = true;
+					};
+				});
+				highlightPaths();
+				svg.selectAll(".pbialiButtonGroup")
+					.filter(function(d) {
+						return d.clicked;
+					})
+					.each(function() {
+						d3.select(this).select("rect")
+							.style("stroke", "#666")
+							.style("fill", "#fcfcfc")
+							.style("stroke-width", "2px");
+
+						d3.select(this).select("text")
+							.style("fill", "#222");
+					});
+			};
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -999,6 +1027,16 @@
 					}
 				};
 
+				const allFunds = chartState.selectedCbpfs.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("fund")) {
+					queryStringValues.set("fund", allFunds);
+				} else {
+					queryStringValues.append("fund", allFunds);
+				};
+
 				highlightPaths();
 
 				const thisGroup = d3.select(this);
@@ -1387,6 +1425,16 @@
 				});
 			})) * yMargin];
 
+		};
+
+		function validateCbpfs(cbpfString, cbpfsList) {
+			if (!cbpfString || cbpfString === "none") return;
+			const namesArray = cbpfString.split(",").map(function(d) {
+				return d.trim();
+			});
+			namesArray.forEach(function(d) {
+				if (cbpfsList.indexOf(d) > -1) chartState.selectedCbpfs.push(d);
+			});
 		};
 
 		function processData(rawData) {
