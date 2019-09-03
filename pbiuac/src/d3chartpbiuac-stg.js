@@ -217,9 +217,9 @@
 
 		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend"));
 
-		const offsetStart = offsetStartValue === offsetStartValue ? Math.abs(offsetStartValue) : offsetStartDefault;
+		const offsetStart = offsetStartValue === offsetStartValue ? offsetStartValue : offsetStartDefault;
 
-		const offsetEnd = offsetEndValue === offsetEndValue ? Math.abs(offsetEndValue) : offsetEndDefault;
+		const offsetEnd = offsetEndValue === offsetEndValue ? offsetEndValue : offsetEndDefault;
 
 		const offsetStartDate = d3.timeMonth.offset(currentDate, -offsetStart);
 
@@ -1149,7 +1149,9 @@
 			const brushGroup = brushPanel.main.append("g")
 				.attr("class", "pbiuacBrushGroup")
 				.call(brush)
-				.call(brush.move, [xScaleMain(offsetStartDate), xScaleMain(offsetEndDate)]);
+				.call(brush.move, [Math.max(xScaleBrush.range()[0], xScaleMain(offsetStartDate)),
+					Math.min(xScaleBrush.range()[1], xScaleMain(offsetEndDate))
+				]);
 
 			brushGroup.selectAll(".handle")
 				.attr("fill", "whitesmoke")
