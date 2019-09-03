@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -156,6 +158,7 @@
 			convertToBytes = d3.format(".3s"),
 			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Timeline",
+			vizNameQueryString = "allocations-timeline",
 			panelHorizontalPadding = 12,
 			duration = 1000,
 			axisHighlightColor = "#E56A54",
@@ -196,6 +199,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiuac");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -204,11 +211,11 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const chartYearTitle = containerDiv.node().getAttribute("data-yeartitle");
+		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
 
-		const offsetStartValue = +(containerDiv.node().getAttribute("data-offsetstart"));
+		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart"));
 
-		const offsetEndValue = +(containerDiv.node().getAttribute("data-offsetend"));
+		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend"));
 
 		const offsetStart = offsetStartValue === offsetStartValue ? Math.abs(offsetStartValue) : offsetStartDefault;
 
@@ -415,7 +422,7 @@
 				d.PlannedStartDate = new Date(d.PlannedStartDate);
 				d.PlannedEndDate = new Date(d.PlannedEndDate);
 			});
-			console.log("pbiuac: data from local storage");
+			console.info("pbiuac: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
@@ -425,9 +432,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiuac, " + error);
+					console.info("D3 chart pbiuac, " + error);
 				};
-				console.log("pbiuac: data from API");
+				console.info("pbiuac: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -556,6 +563,17 @@
 					createSnapshot("png", false);
 				});
 
+			const shareIcon = iconsDiv.append("button")
+				.attr("id", "pbiuacShareButton");
+
+			shareIcon.html("SHARE  ")
+				.append("span")
+				.attr("class", "fas fa-share");
+
+			const shareDiv = containerDiv.append("div")
+				.attr("class", "d3chartShareDiv")
+				.style("display", "none");
+
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent.append("p")
 					.attr("id", "pbiuacBestVisualizedText")
@@ -608,6 +626,43 @@
 				};
 
 			});
+
+			shareIcon.on("mouseover", function() {
+					shareDiv.html("Click to copy")
+						.style("display", "block");
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const shareBox = shareDiv.node().getBoundingClientRect();
+					const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+					shareDiv.style("top", thisOffsetTop + "px")
+						.style("left", thisOffsetLeft + "20px");
+				}).on("mouseout", function() {
+					shareDiv.style("display", "none");
+				})
+				.on("click", function() {
+
+					const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+					const shareInput = shareDiv.append("input")
+						.attr("type", "text")
+						.attr("readonly", true)
+						.attr("spellcheck", "false")
+						.property("value", newURL);
+
+					shareInput.node().select();
+
+					document.execCommand("copy");
+
+					shareDiv.html("Copied!");
+
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const shareBox = shareDiv.node().getBoundingClientRect();
+					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+					shareDiv.style("left", thisOffsetLeft + "20px");
+
+				});
 
 			//end of createTitle
 		};
@@ -1295,6 +1350,18 @@
 			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
 			const s = d3.event.selection || xScaleBrush.range();
 			xScaleMain.domain(s.map(xScaleBrush.invert, xScaleBrush));
+			const queryStartDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[0]) * -1;
+			const queryEndDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[1]);
+			if (queryStringValues.has("offsetstart")) {
+				queryStringValues.set("offsetstart", queryStartDate);
+			} else {
+				queryStringValues.append("offsetstart", queryStartDate);
+			};
+			if (queryStringValues.has("offsetend")) {
+				queryStringValues.set("offsetend", queryEndDate);
+			} else {
+				queryStringValues.append("offsetend", queryEndDate);
+			};
 			mainPanel.main.selectAll(".pbiuacAllocationsMain")
 				.attr("x", function(d) {
 					return xScaleMain(d.PlannedStartDate);
@@ -1317,6 +1384,18 @@
 			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
 			const t = d3.event.transform;
 			xScaleMain.domain(t.rescaleX(xScaleBrush).domain());
+			const queryStartDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[0]) * -1;
+			const queryEndDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[1]);
+			if (queryStringValues.has("offsetstart")) {
+				queryStringValues.set("offsetstart", queryStartDate);
+			} else {
+				queryStringValues.append("offsetstart", queryStartDate);
+			};
+			if (queryStringValues.has("offsetend")) {
+				queryStringValues.set("offsetend", queryEndDate);
+			} else {
+				queryStringValues.append("offsetend", queryEndDate);
+			};
 			mainPanel.main.selectAll(".pbiuacAllocationsMain")
 				.attr("x", function(d) {
 					return xScaleMain(d.PlannedStartDate);
