@@ -36,8 +36,10 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(leafletURL, function() {
-						loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(leafletURL, function() {
+							loadScript(d3URL, d3Chart);
+						});
 					});
 				});
 			});
@@ -198,6 +200,7 @@
 				return d.toString();
 			}),
 			chartTitleDefault = "Allocations map",
+			vizNameQueryString = "allocations-overview",
 			formatMoney0Decimals = d3.format(",.0f"),
 			zoomSnap = 0.25,
 			zoomDelta = 0.5,
@@ -275,6 +278,10 @@
 			cbpfsInCompleteData[d] = [];
 		});
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbimap");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -287,7 +294,7 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
 		chartState.selectedYear.push(validateYear(selectedYearString));
 
@@ -602,6 +609,17 @@
 					createSnapshot("png", false);
 				});
 
+			const shareIcon = iconsDiv.append("button")
+				.attr("id", "pbimapShareButton");
+
+			shareIcon.html("SHARE  ")
+				.append("span")
+				.attr("class", "fas fa-share");
+
+			const shareDiv = containerDiv.append("div")
+				.attr("class", "d3chartShareDiv")
+				.style("display", "none");
+
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent.append("p")
 					.attr("id", "pbimapBestVisualizedText")
@@ -656,6 +674,43 @@
 				};
 
 			});
+
+			shareIcon.on("mouseover", function() {
+					shareDiv.html("Click to copy")
+						.style("display", "block");
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const shareBox = shareDiv.node().getBoundingClientRect();
+					const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+					shareDiv.style("top", thisOffsetTop + "px")
+						.style("left", thisOffsetLeft + "20px");
+				}).on("mouseout", function() {
+					shareDiv.style("display", "none");
+				})
+				.on("click", function() {
+
+					const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+					const shareInput = shareDiv.append("input")
+						.attr("type", "text")
+						.attr("readonly", true)
+						.attr("spellcheck", "false")
+						.property("value", newURL);
+
+					shareInput.node().select();
+
+					document.execCommand("copy");
+
+					shareDiv.html("Copied!");
+
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const shareBox = shareDiv.node().getBoundingClientRect();
+					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+					shareDiv.style("left", thisOffsetLeft + "20px");
+
+				});
 
 			//end of createTitle
 		};
@@ -932,6 +987,7 @@
 						const index = chartState.selectedYear.indexOf(+d);
 						chartState.selectedYear.splice(index, 1);
 					};
+					setQueryString("year", d);
 					yearsDropdown.call(populateDropdown, yearsArrayString.map(function(d) {
 						return +d
 					}), chartState.selectedYear);
@@ -957,6 +1013,7 @@
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
+							setQueryString("adminlevel", d);
 							adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -976,6 +1033,14 @@
 				.on("click", function(d) {
 					if (chartState.selectedCBPF.indexOf(d.toLowerCase()) > -1 && chartState.selectedCBPF.length === 1) return;
 					changeSelected(d, chartState.selectedCBPF);
+					if (chartState.selectedCBPF[0] === "all") {
+						queryStringValues.delete("fund");
+					} else {
+						const cbpfsListForQuery = d3.values(cbpfsList).filter(function(e) {
+							return chartState.selectedCBPF.indexOf(e.toLowerCase()) > -1;
+						}).join("|");
+						setQueryString("fund", cbpfsListForQuery);
+					};
 					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort()), chartState.selectedCBPF);
 					filterCbpfsDropdown();
 				});
@@ -984,6 +1049,7 @@
 				.on("click", function(d) {
 					if (chartState.selectedPartner.indexOf(d.toLowerCase()) > -1 && chartState.selectedPartner.length === 1) return;
 					changeSelected(d, chartState.selectedPartner);
+					setQueryString("partner", d);
 					partnersDropdown.call(populateDropdown, ["All"].concat(d3.values(partnersList).sort()), chartState.selectedPartner);
 				});
 
@@ -991,6 +1057,14 @@
 				.on("click", function(d) {
 					if (chartState.selectedCluster.indexOf(d.toLowerCase()) > -1 && chartState.selectedCluster.length === 1) return;
 					changeSelected(d, chartState.selectedCluster);
+					if (chartState.selectedCluster[0] === "all") {
+						queryStringValues.delete("cluster");
+					} else {
+						const clustersListForQuery = d3.values(clustersList).filter(function(e) {
+							return chartState.selectedCluster.indexOf(e.toLowerCase()) > -1;
+						}).join("|");
+						setQueryString("cluster", clustersListForQuery);
+					};
 					clustersDropdown.call(populateDropdown, ["All"].concat(d3.values(clustersList).sort()), chartState.selectedCluster);
 				});
 
@@ -1003,6 +1077,7 @@
 			adminLevelDropdown.selectAll("li")
 				.on("click", function(d) {
 					chartState.selectedAdminLevel = d;
+					setQueryString("adminlevel", d);
 					adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 					const data = filterData();
 					createTopSvg(data.topSvgObject);
@@ -1054,6 +1129,7 @@
 				adminLevelDropdown.selectAll("li")
 					.on("click", function(d) {
 						chartState.selectedAdminLevel = d;
+						setQueryString("adminlevel", d);
 						adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 						const data = filterData();
 						createTopSvg(data.topSvgObject);
@@ -1095,6 +1171,7 @@
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
+							setQueryString("adminlevel", d);
 							adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -2468,9 +2545,14 @@
 
 			dataAttributes.forEach(function(attribute) {
 
-				const attibuteValues = containerDiv.node().getAttribute("data-" + attribute.toLowerCase()).split(",").map(function(d) {
-					return d.trim().toLowerCase();
-				});
+				const queryStringName = attribute === "CBPF" ? "fund" : attribute.toLowerCase();
+
+				const attibuteValues = queryStringValues.has(queryStringName) ? queryStringValues.get(queryStringName).replace(/\|/g, ",").split(",").map(function(d) {
+						return d.trim().toLowerCase();
+					}) :
+					containerDiv.node().getAttribute("data-" + attribute.toLowerCase()).split(",").map(function(d) {
+						return d.trim().toLowerCase();
+					});
 
 				attibuteValues.forEach(function(thisValue) {
 					chartState["selected" + attribute].push(thisValue);
@@ -2484,7 +2566,9 @@
 
 			});
 
-			chartState.selectedAdminLevel = ~~(containerDiv.node().getAttribute("data-adminlevel")) < 7 ? ~~(containerDiv.node().getAttribute("data-adminlevel")) : 0;
+			chartState.selectedAdminLevel = queryStringValues.has("adminlevel") ?
+				~~(queryStringValues.get("adminlevel")) < 7 ? ~~(queryStringValues.get("adminlevel")) : 0 :
+				~~(containerDiv.node().getAttribute("data-adminlevel")) < 7 ? ~~(containerDiv.node().getAttribute("data-adminlevel")) : 0;
 
 			initialChartState = JSON.parse(JSON.stringify(chartState));
 
@@ -2822,6 +2906,14 @@
 				})
 				.join(" ");
 			return capitalized;
+		};
+
+		function setQueryString(fieldName, fieldValue) {
+			if (queryStringValues.has(fieldName)) {
+				queryStringValues.set(fieldName, fieldValue);
+			} else {
+				queryStringValues.append(fieldName, fieldValue);
+			};
 		};
 
 		const countryBoundingBoxes = {
