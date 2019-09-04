@@ -987,7 +987,7 @@
 						const index = chartState.selectedYear.indexOf(+d);
 						chartState.selectedYear.splice(index, 1);
 					};
-					setQueryString("year", d);
+					setQueryString("year", chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : currentYear);
 					yearsDropdown.call(populateDropdown, yearsArrayString.map(function(d) {
 						return +d
 					}), chartState.selectedYear);
