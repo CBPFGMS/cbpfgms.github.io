@@ -166,8 +166,8 @@
 			rectangleColors = ["#418fde", "#eca154"],
 			todayColor = "#9063CD",
 			todayPadding = 10,
-			offsetStartDefault = 6,
-			offsetEndDefault = 6,
+			offsetStartDefault = 182,
+			offsetEndDefault = 182,
 			formatMoney0Decimals = d3.format(",.0f"),
 			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(1.2), d3.color(rectangleColors[0]).darker(1.2)),
 			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(1.2), d3.color(rectangleColors[1]).darker(1.2)),
@@ -213,17 +213,17 @@
 
 		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
 
-		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart"));
+		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart")) * 30;
 
-		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend"));
+		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend")) * 30;
 
 		const offsetStart = offsetStartValue === offsetStartValue ? offsetStartValue : offsetStartDefault;
 
 		const offsetEnd = offsetEndValue === offsetEndValue ? offsetEndValue : offsetEndDefault;
 
-		const offsetStartDate = d3.timeMonth.offset(currentDate, -offsetStart);
+		const offsetStartDate = d3.timeDay.offset(currentDate, -offsetStart);
 
-		const offsetEndDate = d3.timeMonth.offset(currentDate, offsetEnd);
+		const offsetEndDate = d3.timeDay.offset(currentDate, offsetEnd);
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -1352,8 +1352,8 @@
 			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
 			const s = d3.event.selection || xScaleBrush.range();
 			xScaleMain.domain(s.map(xScaleBrush.invert, xScaleBrush));
-			const queryStartDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[0]) * -1;
-			const queryEndDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[1]);
+			const queryStartDate = d3.timeDay.count(currentDate, xScaleMain.domain()[0]) * -1;
+			const queryEndDate = d3.timeDay.count(currentDate, xScaleMain.domain()[1]);
 			if (queryStringValues.has("offsetstart")) {
 				queryStringValues.set("offsetstart", queryStartDate);
 			} else {
@@ -1386,8 +1386,8 @@
 			if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
 			const t = d3.event.transform;
 			xScaleMain.domain(t.rescaleX(xScaleBrush).domain());
-			const queryStartDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[0]) * -1;
-			const queryEndDate = d3.timeMonth.count(currentDate, xScaleMain.domain()[1]);
+			const queryStartDate = d3.timeDay.count(currentDate, xScaleMain.domain()[0]) * -1;
+			const queryEndDate = d3.timeDay.count(currentDate, xScaleMain.domain()[1]);
 			if (queryStringValues.has("offsetstart")) {
 				queryStringValues.set("offsetstart", queryStartDate);
 			} else {
