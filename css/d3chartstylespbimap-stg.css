@@ -263,7 +263,7 @@
 
 .pbimapTitleDiv, .pbimapListTitleDiv {
 	display: flex;
-	flex:0 80%;
+	flex:0 60%;
 	margin-left: 10px;
 }
 
@@ -275,7 +275,7 @@
 
 .pbimapIconsDiv, .pbimapListButtonDiv {
 	display: flex;
-	flex:0 20%;
+	flex:0 40%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 10px;
