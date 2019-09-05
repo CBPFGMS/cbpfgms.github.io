@@ -771,6 +771,10 @@
 					.style("fill", "#666")
 					.text(") indicates the number of affected persons.");
 
+				allocationLegendGroup.style("opacity", chartState.selectedModality === "total" ? 1 : 0);
+
+				beneficiariesLegendGroup.style("opacity", chartState.selectedBeneficiary === "targeted" ? 1 : 0);
+
 				//end of createLegend
 			};
 
@@ -1807,7 +1811,7 @@
 						return e === chartState.selectedModality ? "white" : "#444";
 					});
 
-				d3.selectAll(".pbiolcAllocationLegendGroup")
+				d3.select(".pbiolcAllocationLegendGroup")
 					.style("opacity", chartState.selectedModality === "total" ? 1 : 0);
 
 				sortData(data);
@@ -1842,7 +1846,7 @@
 						return e === chartState.selectedBeneficiary ? "white" : "#444";
 					});
 
-				d3.selectAll(".pbiolcBeneficiariesLegendGroup")
+				d3.select(".pbiolcBeneficiariesLegendGroup")
 					.style("opacity", chartState.selectedBeneficiary === "targeted" ? 1 : 0);
 
 				if (chartState.sorting === "beneficiaries") {
