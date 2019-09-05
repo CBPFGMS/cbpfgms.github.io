@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -195,6 +197,7 @@
 			fadeOpacity = 0.3,
 			localVariable = d3.local(),
 			tooltipBarWidth = 288,
+			vizNameQueryString = "clusters",
 			modalities = ["total", "standard", "reserve"],
 			beneficiaries = ["targeted", "actual"],
 			clusterIconsPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/",
@@ -217,6 +220,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -225,19 +232,21 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-cbpf");
 
-		const selectedModality = modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
+		const selectedModality = queryStringValues.has("modality") && modalities.indexOf(queryStringValues.get("modality").toLowerCase()) > -1 ? queryStringValues.get("modality").toLowerCase() :
+			modalities.indexOf(containerDiv.node().getAttribute("data-modality").toLowerCase()) > -1 ?
 			containerDiv.node().getAttribute("data-modality").toLowerCase() : "total";
 
-		const selectedBeneficiary = beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
+		const selectedBeneficiary = queryStringValues.has("persons") && beneficiaries.indexOf(queryStringValues.get("persons").toLowerCase()) > -1 ? queryStringValues.get("persons").toLowerCase() :
+			beneficiaries.indexOf(containerDiv.node().getAttribute("data-beneficiaries").toLowerCase()) > -1 ?
 			containerDiv.node().getAttribute("data-beneficiaries").toLowerCase() : "targeted";
 
-		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
+		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
 
-		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -445,7 +454,7 @@
 		if (localStorage.getItem("pbiolcdata") &&
 			JSON.parse(localStorage.getItem("pbiolcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiolcdata")).data;
-			console.log("pbiolc: data from local storage");
+			console.info("pbiolc: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
@@ -455,9 +464,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiolc, " + error);
+					console.info("D3 chart pbiolc, " + error);
 				};
-				console.log("pbiolc: data from API");
+				console.info("pbiolc: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -582,6 +591,17 @@
 						createSnapshot("png", false);
 					});
 
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbiolcShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiolcBestVisualizedText")
@@ -636,6 +656,43 @@
 					};
 
 				});
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
 
 				//end of createTitle
 			};
@@ -794,6 +851,19 @@
 							.property("indeterminate", function() {
 								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
 							});
+					};
+
+					if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
+						queryStringValues.delete("fund");
+					} else {
+						const allFunds = chartState.selectedCbpfs.map(function(d) {
+							return cbpfsList[d]
+						}).join("|");
+						if (queryStringValues.has("fund")) {
+							queryStringValues.set("fund", allFunds);
+						} else {
+							queryStringValues.append("fund", allFunds);
+						};
 					};
 
 					data = processData(rawData);
@@ -1661,6 +1731,16 @@
 					};
 				};
 
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
+				};
+
 				d3.selectAll(".pbiolcbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -1711,6 +1791,12 @@
 
 				chartState.selectedModality = d;
 
+				if (queryStringValues.has("modality")) {
+					queryStringValues.set("modality", d);
+				} else {
+					queryStringValues.append("modality", d);
+				};
+
 				d3.selectAll(".pbiolcbuttonsModalitiesRects")
 					.style("fill", function(e) {
 						return e === chartState.selectedModality ? unBlue : "#eaeaea";
@@ -1739,6 +1825,12 @@
 			function clickButtonsBeneficiariesRects(d) {
 
 				chartState.selectedBeneficiary = d;
+
+				if (queryStringValues.has("persons")) {
+					queryStringValues.set("persons", d);
+				} else {
+					queryStringValues.append("persons", d);
+				};
 
 				d3.selectAll(".pbiolcbuttonsBeneficiariesRects")
 					.style("fill", function(e) {
