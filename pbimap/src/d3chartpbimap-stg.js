@@ -298,6 +298,10 @@
 
 		chartState.selectedYear.push(validateYear(selectedYearString));
 
+		const selectedModalityString = queryStringValues.has("modality") ? queryStringValues.get("modality") : null;
+
+		if (selectedModalityString) chartState.selectedModality = selectedModalityString.split("|");
+
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px");
 		};
@@ -1013,7 +1017,11 @@
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
-							setQueryString("adminlevel", d);
+							if (!chartState.selectedAdminLevel) {
+								queryStringValues.delete("adminlevel");
+							} else {
+								setQueryString("adminlevel", d);
+							};
 							adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -1036,10 +1044,7 @@
 					if (chartState.selectedCBPF[0] === "all") {
 						queryStringValues.delete("fund");
 					} else {
-						const cbpfsListForQuery = d3.values(cbpfsList).filter(function(e) {
-							return chartState.selectedCBPF.indexOf(e.toLowerCase()) > -1;
-						}).join("|");
-						setQueryString("fund", cbpfsListForQuery);
+						setQueryString("fund", chartState.selectedCBPF.join("|"));
 					};
 					cbpfsDropdown.call(populateDropdown, ["All"].concat(d3.values(cbpfsList).sort()), chartState.selectedCBPF);
 					filterCbpfsDropdown();
@@ -1049,7 +1054,11 @@
 				.on("click", function(d) {
 					if (chartState.selectedPartner.indexOf(d.toLowerCase()) > -1 && chartState.selectedPartner.length === 1) return;
 					changeSelected(d, chartState.selectedPartner);
-					setQueryString("partner", d);
+					if (chartState.selectedPartner[0] === "all") {
+						queryStringValues.delete("partner");
+					} else {
+						setQueryString("partner", chartState.selectedPartner.join("|"));
+					};
 					partnersDropdown.call(populateDropdown, ["All"].concat(d3.values(partnersList).sort()), chartState.selectedPartner);
 				});
 
@@ -1060,10 +1069,7 @@
 					if (chartState.selectedCluster[0] === "all") {
 						queryStringValues.delete("cluster");
 					} else {
-						const clustersListForQuery = d3.values(clustersList).filter(function(e) {
-							return chartState.selectedCluster.indexOf(e.toLowerCase()) > -1;
-						}).join("|");
-						setQueryString("cluster", clustersListForQuery);
+						setQueryString("cluster", chartState.selectedCluster.join("|"));
 					};
 					clustersDropdown.call(populateDropdown, ["All"].concat(d3.values(clustersList).sort()), chartState.selectedCluster);
 				});
@@ -1072,12 +1078,21 @@
 				.on("click", function(d) {
 					if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
 					changeSelected(d, chartState.selectedModality);
+					if (chartState.selectedModality[0] === "all") {
+						queryStringValues.delete("modality");
+					} else {
+						setQueryString("modality", chartState.selectedModality.join("|"));
+					};
 				});
 
 			adminLevelDropdown.selectAll("li")
 				.on("click", function(d) {
 					chartState.selectedAdminLevel = d;
-					setQueryString("adminlevel", d);
+					if (!chartState.selectedAdminLevel) {
+						queryStringValues.delete("adminlevel");
+					} else {
+						setQueryString("adminlevel", d);
+					};
 					adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 					const data = filterData();
 					createTopSvg(data.topSvgObject);
@@ -1113,6 +1128,11 @@
 					.on("click", function(d) {
 						if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
 						changeSelected(d, chartState.selectedModality);
+						if (chartState.selectedModality[0] === "all") {
+							queryStringValues.delete("modality");
+						} else {
+							setQueryString("modality", chartState.selectedModality.join("|"));
+						};
 					});
 				createTopSvg(data.topSvgObject);
 				createMap(data.map);
@@ -1129,7 +1149,11 @@
 				adminLevelDropdown.selectAll("li")
 					.on("click", function(d) {
 						chartState.selectedAdminLevel = d;
-						setQueryString("adminlevel", d);
+						if (!chartState.selectedAdminLevel) {
+							queryStringValues.delete("adminlevel");
+						} else {
+							setQueryString("adminlevel", d);
+						};
 						adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 						const data = filterData();
 						createTopSvg(data.topSvgObject);
@@ -1166,12 +1190,21 @@
 						.on("click", function(d) {
 							if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
 							changeSelected(d, chartState.selectedModality);
+							if (chartState.selectedModality[0] === "all") {
+								queryStringValues.delete("modality");
+							} else {
+								setQueryString("modality", chartState.selectedModality.join("|"));
+							};
 						});
 
 					adminLevelDropdown.selectAll("li")
 						.on("click", function(d) {
 							chartState.selectedAdminLevel = d;
-							setQueryString("adminlevel", d);
+							if (!chartState.selectedAdminLevel) {
+								queryStringValues.delete("adminlevel");
+							} else {
+								setQueryString("adminlevel", d);
+							};
 							adminLevelDropdown.call(populateDropdown, d3.range(0, maxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
