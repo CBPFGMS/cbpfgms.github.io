@@ -1001,6 +1001,11 @@
 						.on("click", function(d) {
 							if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
 							changeSelected(d, chartState.selectedModality);
+							if (chartState.selectedModality[0] === "all") {
+								queryStringValues.delete("modality");
+							} else {
+								setQueryString("modality", chartState.selectedModality.join("|"));
+							};
 						});
 
 					const newMaxCombinedLevel = d3.max(data.map, function(d) {
