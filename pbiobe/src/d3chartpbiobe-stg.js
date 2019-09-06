@@ -32,7 +32,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -167,6 +169,7 @@
 			disabledOpacity = 0.6,
 			localVariable = d3.local(),
 			chartTitleDefault = "Affected Persons Overview",
+			vizNameQueryString = "affected-persons-trends",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
@@ -211,6 +214,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiobe");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -219,13 +226,13 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-cbpf");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-cbpf");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
-		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
+		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
 
-		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
+		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -394,7 +401,7 @@
 		if (localStorage.getItem("pbiobedata") &&
 			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiobedata")).data;
-			console.log("pbiobe: data from local storage");
+			console.info("pbiobe: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
@@ -404,9 +411,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiobe, " + error);
+					console.info("D3 chart pbiobe, " + error);
 				};
-				console.log("pbiobe: data from API");
+				console.info("pbiobe: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -521,6 +528,17 @@
 						createSnapshot("png", false);
 					});
 
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbiobeShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiobeBestVisualizedText")
@@ -575,6 +593,43 @@
 					};
 
 				});
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
 
 				//end of createTitle
 			};
@@ -656,6 +711,19 @@
 							.property("indeterminate", function() {
 								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
 							});
+					};
+
+					if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
+						queryStringValues.delete("fund");
+					} else {
+						const allFunds = chartState.selectedCbpfs.map(function(d) {
+							return cbpfsList[d]
+						}).join("|");
+						if (queryStringValues.has("fund")) {
+							queryStringValues.set("fund", allFunds);
+						} else {
+							queryStringValues.append("fund", allFunds);
+						};
 					};
 
 					const data = processData(rawData);
@@ -1428,6 +1496,16 @@
 					} else {
 						chartState.selectedYear.push(d);
 					};
+				};
+
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
 				};
 
 				d3.selectAll(".pbiobebuttonsRects")
