@@ -4,6 +4,7 @@
 		hasFetch = window.fetch,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -182,6 +183,7 @@
 			contributionType = ["paid", "pledge", "total"],
 			contributionsTotals = {},
 			vizNameQueryString = "funding-overview",
+			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/",
 			flagSize = 24,
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
@@ -630,16 +632,57 @@
 						createSnapshot("png", false);
 					});
 
-				const shareIcon = iconsDiv.append("button")
-					.attr("id", "pbifdcShareButton");
+				if (!isBookmarkPage) {
 
-				shareIcon.html("SHARE  ")
-					.append("span")
-					.attr("class", "fas fa-share");
+					const shareIcon = iconsDiv.append("button")
+						.attr("id", "pbifdcShareButton");
 
-				const shareDiv = containerDiv.append("div")
-					.attr("class", "d3chartShareDiv")
-					.style("display", "none");
+					shareIcon.html("SHARE  ")
+						.append("span")
+						.attr("class", "fas fa-share");
+
+					const shareDiv = containerDiv.append("div")
+						.attr("class", "d3chartShareDiv")
+						.style("display", "none");
+
+					shareIcon.on("mouseover", function() {
+							shareDiv.html("Click to copy")
+								.style("display", "block");
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("top", thisOffsetTop + "px")
+								.style("left", thisOffsetLeft + "20px");
+						}).on("mouseout", function() {
+							shareDiv.style("display", "none");
+						})
+						.on("click", function() {
+
+							const newURL = bookmarkSite + queryStringValues.toString();
+
+							const shareInput = shareDiv.append("input")
+								.attr("type", "text")
+								.attr("readonly", true)
+								.attr("spellcheck", "false")
+								.property("value", newURL);
+
+							shareInput.node().select();
+
+							document.execCommand("copy");
+
+							shareDiv.html("Copied!");
+
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("left", thisOffsetLeft + "20px");
+
+						});
+
+				};
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
@@ -693,43 +736,6 @@
 					};
 
 				});
-
-				shareIcon.on("mouseover", function() {
-						shareDiv.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					}).on("mouseout", function() {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function() {
-
-						const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
-
-						const shareInput = shareDiv.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-
-					});
 
 				//end of createTitle
 			};

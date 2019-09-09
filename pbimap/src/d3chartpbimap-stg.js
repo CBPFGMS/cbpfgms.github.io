@@ -4,6 +4,7 @@
 		hasFetch = window.fetch,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbimap-stg.css", fontAwesomeLink, leafletCSSLink],
@@ -201,6 +202,7 @@
 			}),
 			chartTitleDefault = "Allocations map",
 			vizNameQueryString = "allocations-overview",
+			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			formatMoney0Decimals = d3.format(",.0f"),
 			zoomSnap = 0.25,
 			zoomDelta = 0.5,
@@ -613,16 +615,57 @@
 					createSnapshot("png", false);
 				});
 
-			const shareIcon = iconsDiv.append("button")
-				.attr("id", "pbimapShareButton");
+			if (!isBookmarkPage) {
 
-			shareIcon.html("SHARE  ")
-				.append("span")
-				.attr("class", "fas fa-share");
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbimapShareButton");
 
-			const shareDiv = containerDiv.append("div")
-				.attr("class", "d3chartShareDiv")
-				.style("display", "none");
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = bookmarkSite + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
+
+			};
 
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent.append("p")
@@ -678,43 +721,6 @@
 				};
 
 			});
-
-			shareIcon.on("mouseover", function() {
-					shareDiv.html("Click to copy")
-						.style("display", "block");
-					const thisBox = this.getBoundingClientRect();
-					const containerBox = containerDiv.node().getBoundingClientRect();
-					const shareBox = shareDiv.node().getBoundingClientRect();
-					const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-					shareDiv.style("top", thisOffsetTop + "px")
-						.style("left", thisOffsetLeft + "20px");
-				}).on("mouseout", function() {
-					shareDiv.style("display", "none");
-				})
-				.on("click", function() {
-
-					const newURL = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?" + queryStringValues.toString();
-
-					const shareInput = shareDiv.append("input")
-						.attr("type", "text")
-						.attr("readonly", true)
-						.attr("spellcheck", "false")
-						.property("value", newURL);
-
-					shareInput.node().select();
-
-					document.execCommand("copy");
-
-					shareDiv.html("Copied!");
-
-					const thisBox = this.getBoundingClientRect();
-					const containerBox = containerDiv.node().getBoundingClientRect();
-					const shareBox = shareDiv.node().getBoundingClientRect();
-					const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-					shareDiv.style("left", thisOffsetLeft + "20px");
-
-				});
 
 			//end of createTitle
 		};
