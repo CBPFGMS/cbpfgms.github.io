@@ -1114,43 +1114,6 @@
 
 				});
 
-				shareIcon.on("mouseover", function() {
-						shareDiv.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					}).on("mouseout", function() {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function() {
-
-						const newURL = bookmarkSite + queryStringValues.toString();
-
-						const shareInput = shareDiv.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-
-					});
-
 				//end of createTitle
 			};
 
