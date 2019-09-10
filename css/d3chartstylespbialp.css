@@ -43,13 +43,13 @@
 
 .pbialpTitleDiv {
 	display: flex;
-	flex:0 80%;
+	flex:0 60%;
 	margin-left: 16px;
 }
 
 .pbialpIconsDiv {
 	display: flex;
-	flex:0 20%;
+	flex:0 40%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;

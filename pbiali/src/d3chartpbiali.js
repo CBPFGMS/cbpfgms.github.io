@@ -4,6 +4,7 @@
 		hasFetch = window.fetch,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiali.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -32,7 +33,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -159,6 +162,8 @@
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
 			fadeOpacity = 0.1,
+			vizNameQueryString = "allocation-trends",
+			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			chartTitleDefault = "Allocation Trends",
 			sortButtonsOptions = ["total", "alphabetically"],
@@ -170,6 +175,10 @@
 		let height = 400,
 			isSnapshotTooltipVisible = false,
 			labelGroupHovered;
+
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
 
 		const containerDiv = d3.select("#d3chartcontainerpbiali");
 
@@ -183,9 +192,11 @@
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
-		let sortButtons = sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons")) > -1 ?
-			containerDiv.node().getAttribute("data-sortbuttons") :
-			"total";
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+
+		let sortButtons = queryStringValues.has("sortbuttons") && sortButtonsOptions.indexOf(queryStringValues.get("sortbuttons").toLowerCase()) > -1 ?
+			queryStringValues.get("sortbuttons").toLowerCase() : sortButtonsOptions.indexOf(containerDiv.node().getAttribute("data-sortbuttons").toLowerCase()) > -1 ?
+			containerDiv.node().getAttribute("data-sortbuttons").toLowerCase() : "total";
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -368,7 +379,7 @@
 		if (localStorage.getItem("pbialidata") &&
 			JSON.parse(localStorage.getItem("pbialidata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbialidata")).data;
-			console.log("pbiali: data from local storage");
+			console.info("pbiali: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
@@ -378,9 +389,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiali, " + error);
+					console.info("D3 chart pbiali, " + error);
 				};
-				console.log("pbiali: data from API");
+				console.info("pbiali: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -390,6 +401,10 @@
 			removeProgressWheel();
 
 			const data = processData(rawData);
+
+			validateCbpfs(selectedCbpfsString, data.cbpfs.map(function(d) {
+				return d.cbpf;
+			}));
 
 			if (!lazyLoad) {
 				draw(data);
@@ -462,6 +477,28 @@
 
 			createBottomControls();
 
+			if (chartState.selectedCbpfs.length) {
+				data.cbpfs.forEach(function(d) {
+					if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
+						d.clicked = true;
+					};
+				});
+				highlightPaths();
+				svg.selectAll(".pbialiButtonGroup")
+					.filter(function(d) {
+						return d.clicked;
+					})
+					.each(function() {
+						d3.select(this).select("rect")
+							.style("stroke", "#666")
+							.style("fill", "#fcfcfc")
+							.style("stroke-width", "2px");
+
+						d3.select(this).select("text")
+							.style("fill", "#222");
+					});
+			};
+
 			if (showHelp) createAnnotationsDiv();
 
 			function createTitle() {
@@ -510,6 +547,58 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				if (!isBookmarkPage) {
+
+					const shareIcon = iconsDiv.append("button")
+						.attr("id", "pbialiShareButton");
+
+					shareIcon.html("SHARE  ")
+						.append("span")
+						.attr("class", "fas fa-share");
+
+					const shareDiv = containerDiv.append("div")
+						.attr("class", "d3chartShareDiv")
+						.style("display", "none");
+
+					shareIcon.on("mouseover", function() {
+							shareDiv.html("Click to copy")
+								.style("display", "block");
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("top", thisOffsetTop + "px")
+								.style("left", thisOffsetLeft + "20px");
+						}).on("mouseout", function() {
+							shareDiv.style("display", "none");
+						})
+						.on("click", function() {
+
+							const newURL = bookmarkSite + queryStringValues.toString();
+
+							const shareInput = shareDiv.append("input")
+								.attr("type", "text")
+								.attr("readonly", true)
+								.attr("spellcheck", "false")
+								.property("value", newURL);
+
+							shareInput.node().select();
+
+							document.execCommand("copy");
+
+							shareDiv.html("Copied!");
+
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("left", thisOffsetLeft + "20px");
+
+						});
+
+				};
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
@@ -848,6 +937,12 @@
 
 					sortButtons = d;
 
+					if (queryStringValues.has("sortbuttons")) {
+						queryStringValues.set("sortbuttons", sortButtons);
+					} else {
+						queryStringValues.append("sortbuttons", sortButtons);
+					};
+
 					innerCircle.attr("fill", function(d) {
 						return sortButtons === d ? "darkslategray" : "white"
 					});
@@ -936,6 +1031,16 @@
 					if (chartState.selectedCbpfs.indexOf(datum.cbpf) === -1) {
 						chartState.selectedCbpfs.push(datum.cbpf);
 					}
+				};
+
+				const allFunds = chartState.selectedCbpfs.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("fund")) {
+					queryStringValues.set("fund", allFunds);
+				} else {
+					queryStringValues.append("fund", allFunds);
 				};
 
 				highlightPaths();
@@ -1326,6 +1431,16 @@
 				});
 			})) * yMargin];
 
+		};
+
+		function validateCbpfs(cbpfString, cbpfsList) {
+			if (!cbpfString || cbpfString === "none") return;
+			const namesArray = cbpfString.split(",").map(function(d) {
+				return d.trim();
+			});
+			namesArray.forEach(function(d) {
+				if (cbpfsList.indexOf(d) > -1) chartState.selectedCbpfs.push(d);
+			});
 		};
 
 		function processData(rawData) {

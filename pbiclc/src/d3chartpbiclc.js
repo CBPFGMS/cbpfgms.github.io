@@ -4,6 +4,7 @@
 		hasFetch = window.fetch,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -32,7 +33,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -422,6 +425,8 @@
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
 			countryNames = {},
+			vizNameQueryString = "contributions",
+			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -443,6 +448,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredRect;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbiclc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
@@ -453,11 +462,12 @@
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCountriesString = queryStringValues.has("country") ? queryStringValues.get("country").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcountry");
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
-		const selectedContribution = contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
+		const selectedContribution = queryStringValues.has("contribution") && contributionType.indexOf(queryStringValues.get("contribution")) > -1 ? queryStringValues.get("contribution") :
+			contributionType.indexOf(containerDiv.node().getAttribute("data-contribution")) > -1 ?
 			containerDiv.node().getAttribute("data-contribution") : "total";
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
@@ -663,7 +673,7 @@
 		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
-			console.log("pbiclc: data from local storage");
+			console.info("pbiclc: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
@@ -673,9 +683,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbiclc, " + error);
+					console.info("D3 chart pbiclc, " + error);
 				};
-				console.log("pbiclc: data from API");
+				console.info("pbiclc: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -695,8 +705,6 @@
 			validateYear(selectedYearString);
 
 			chartState.selectedContribution = selectedContribution;
-
-			validateCbpfs(selectedCbpfsString);
 
 			const allDonors = rawData.map(function(d) {
 				if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
@@ -734,11 +742,31 @@
 				dataCbpfs: dataArray[1]
 			};
 
-			data.dataCbpfs.forEach(function(d) {
-				if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
-					d.clicked = true;
-				};
+			const allDonors = data.dataDonors.map(function(d) {
+				return d.isoCode;
 			});
+
+			const allCbpfs = data.dataCbpfs.map(function(d) {
+				return d.isoCode;
+			});
+
+			validateCountries(selectedCountriesString, allDonors, allCbpfs);
+
+			if (chartState.selectedDonors.length) {
+				data.dataDonors.forEach(function(d) {
+					if (chartState.selectedDonors.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+			};
+
+			if (chartState.selectedCbpfs.length) {
+				data.dataCbpfs.forEach(function(d) {
+					if (chartState.selectedCbpfs.indexOf(d.isoCode) > -1) {
+						d.clicked = true;
+					};
+				});
+			};
 
 			createTitle();
 
@@ -777,6 +805,16 @@
 					} else {
 						chartState.selectedYear.push(d);
 					};
+				};
+
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
 				};
 
 				d3.selectAll(".pbiclcbuttonsRects")
@@ -843,6 +881,12 @@
 			function clickButtonsContributionsRects(d) {
 
 				chartState.selectedContribution = d;
+
+				if (queryStringValues.has("contribution")) {
+					queryStringValues.set("contribution", d);
+				} else {
+					queryStringValues.append("contribution", d);
+				};
 
 				d3.selectAll(".pbiclcbuttonsContributionsRects")
 					.style("fill", function(e) {
@@ -929,7 +973,7 @@
 
 				helpIcon.html("HELP  ")
 					.append("span")
-					.attr("class", "fas fa-info")
+					.attr("class", "fas fa-info");
 
 				const downloadIcon = iconsDiv.append("button")
 					.attr("id", "pbiclcDownloadButton");
@@ -964,6 +1008,58 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				if (!isBookmarkPage) {
+
+					const shareIcon = iconsDiv.append("button")
+						.attr("id", "pbiclcShareButton");
+
+					shareIcon.html("SHARE  ")
+						.append("span")
+						.attr("class", "fas fa-share");
+
+					const shareDiv = containerDiv.append("div")
+						.attr("class", "d3chartShareDiv")
+						.style("display", "none");
+
+					shareIcon.on("mouseover", function() {
+							shareDiv.html("Click to copy")
+								.style("display", "block");
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("top", thisOffsetTop + "px")
+								.style("left", thisOffsetLeft + "20px");
+						}).on("mouseout", function() {
+							shareDiv.style("display", "none");
+						})
+						.on("click", function() {
+
+							const newURL = bookmarkSite + queryStringValues.toString();
+
+							const shareInput = shareDiv.append("input")
+								.attr("type", "text")
+								.attr("readonly", true)
+								.attr("spellcheck", "false")
+								.property("value", newURL);
+
+							shareInput.node().select();
+
+							document.execCommand("copy");
+
+							shareDiv.html("Copied!");
+
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("left", thisOffsetLeft + "20px");
+
+						});
+
+				};
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
@@ -1875,6 +1971,16 @@
 						}
 					};
 
+					const allCountries = chartState.selectedDonors.map(function(d) {
+						return countryNames[d];
+					}).join("|");
+
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
+					} else {
+						queryStringValues.append("country", allCountries);
+					};
+
 					const foundDatum = data.dataDonors.find(function(d) {
 						return d.isoCode === datum.isoCode;
 					});
@@ -2254,6 +2360,16 @@
 						if (chartState.selectedCbpfs.indexOf(datum.isoCode) === -1) {
 							chartState.selectedCbpfs.push(datum.isoCode);
 						}
+					};
+
+					const allCountries = chartState.selectedCbpfs.map(function(d) {
+						return countryNames[d];
+					}).join("|");
+
+					if (queryStringValues.has("country")) {
+						queryStringValues.set("country", allCountries);
+					} else {
+						queryStringValues.append("country", allCountries);
 					};
 
 					const foundDatum = data.dataCbpfs.find(function(d) {
@@ -3347,18 +3463,26 @@
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
-		function validateCbpfs(cbpfString) {
-			if (!cbpfString || cbpfString.toLowerCase() === "none") return;
-			const namesArray = cbpfString.split(",").map(function(d) {
+		function validateCountries(countriesString, allDonors, allCbpfs) {
+			if (!countriesString || countriesString.toLowerCase() === "none") return;
+			const namesArray = countriesString.split(",").map(function(d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(countryNames);
 			namesArray.forEach(function(d) {
-				const foundCbpf = countryCodes.find(function(e) {
-					return countryNames[e].toLowerCase() === d;
+				const foundDonor = countryCodes.find(function(e) {
+					return countryNames[e].toLowerCase() === d && allDonors.indexOf(e) > -1;
 				});
+				const foundCbpf = countryCodes.find(function(e) {
+					return countryNames[e].toLowerCase() === d && allCbpfs.indexOf(e) > -1;
+				});
+				if (foundDonor) chartState.selectedDonors.push(foundDonor);
 				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
 			});
+			if (chartState.selectedDonors.length && chartState.selectedCbpfs.length) {
+				chartState.selectedDonors.length = 0;
+				chartState.selectedCbpfs.length = 0;
+			};
 		};
 
 		function capitalize(str) {

@@ -10,10 +10,10 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 
 Also, at the top right corner, there is a set of buttons:
 
-- Share: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
-- Image: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
-- Csv: downloads the data as a .csv file;
-- Help: shows an annotated layer with tips about how to use and how to understand the chart.
+- **Share**: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
+- **Image**: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
+- **Csv**: downloads the data as a .csv file;
+- **Help**: shows an annotated layer with tips about how to use and how to understand the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbialp.png" width="450">
 

@@ -4,6 +4,7 @@
 		hasFetch = window.fetch,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbialp.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -32,7 +33,9 @@
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript(d3URL, d3Chart);
+					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+						loadScript(d3URL, d3Chart);
+					});
 				});
 			});
 		};
@@ -172,6 +175,8 @@
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
+			vizNameQueryString = "allocations",
+			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),
@@ -216,6 +221,10 @@
 			isSnapshotTooltipVisible = false,
 			currentHoveredRect;
 
+		const queryStringValues = new URLSearchParams(location.search);
+
+		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+
 		const containerDiv = d3.select("#d3chartcontainerpbialp");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -228,13 +237,14 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		let showAverage = containerDiv.node().getAttribute("data-showaverage") === "true";
+		let showAverage = queryStringValues.has("average") ? queryStringValues.get("average") === "true" : containerDiv.node().getAttribute("data-showaverage") === "true";
 
-		const selectedYearString = containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
-		const selectedCbpfsString = containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCbpfsString = queryStringValues.has("fund") ? queryStringValues.get("fund").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
 
-		chartState.selectedPartner = Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner").toLowerCase()) > -1 ?
+		chartState.selectedPartner = queryStringValues.has("partner") && Object.keys(partnersListObject).indexOf(queryStringValues.get("partner").toLowerCase()) > -1 ?
+			partnersListObject[queryStringValues.get("partner").toLowerCase()] : Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner").toLowerCase()) > -1 ?
 			partnersListObject[containerDiv.node().getAttribute("data-partner").toLowerCase()] :
 			"total";
 
@@ -465,7 +475,7 @@
 		if (localStorage.getItem("pbialpdata") &&
 			JSON.parse(localStorage.getItem("pbialpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 			const rawData = JSON.parse(localStorage.getItem("pbialpdata")).data;
-			console.log("pbialp: data from local storage");
+			console.info("pbialp: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
@@ -475,9 +485,9 @@
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.log("D3 chart pbialp, " + error);
+					console.info("D3 chart pbialp, " + error);
 				};
-				console.log("pbialp: data from API");
+				console.info("pbialp: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -616,6 +626,58 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				if (!isBookmarkPage) {
+
+					const shareIcon = iconsDiv.append("button")
+						.attr("id", "pbialpShareButton");
+
+					shareIcon.html("SHARE  ")
+						.append("span")
+						.attr("class", "fas fa-share");
+
+					const shareDiv = containerDiv.append("div")
+						.attr("class", "d3chartShareDiv")
+						.style("display", "none");
+
+					shareIcon.on("mouseover", function() {
+							shareDiv.html("Click to copy")
+								.style("display", "block");
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("top", thisOffsetTop + "px")
+								.style("left", thisOffsetLeft + "20px");
+						}).on("mouseout", function() {
+							shareDiv.style("display", "none");
+						})
+						.on("click", function() {
+
+							const newURL = bookmarkSite + queryStringValues.toString();
+
+							const shareInput = shareDiv.append("input")
+								.attr("type", "text")
+								.attr("readonly", true)
+								.attr("spellcheck", "false")
+								.property("value", newURL);
+
+							shareInput.node().select();
+
+							document.execCommand("copy");
+
+							shareDiv.html("Copied!");
+
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv.node().getBoundingClientRect();
+							const shareBox = shareDiv.node().getBoundingClientRect();
+							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							shareDiv.style("left", thisOffsetLeft + "20px");
+
+						});
+
+				};
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
@@ -1544,6 +1606,16 @@
 						}
 					};
 
+					const allFunds = chartState.selectedCbpfs.map(function(d) {
+						return d;
+					}).join("|");
+
+					if (queryStringValues.has("fund")) {
+						queryStringValues.set("fund", allFunds);
+					} else {
+						queryStringValues.append("fund", allFunds);
+					};
+
 					cbpfGroup.each(function(d) {
 						d3.select(this).select("rect")
 							.style("fill", null)
@@ -1913,6 +1985,12 @@
 
 					showAverage = !showAverage;
 
+					if (queryStringValues.has("average")) {
+						queryStringValues.set("average", showAverage);
+					} else {
+						queryStringValues.append("average", showAverage);
+					};
+
 					innerCheck.style("stroke", showAverage ? "darkslategray" : "white");
 
 					parallelPanel.main.select(".pbialpCbpfParallelGroupAverage")
@@ -2265,6 +2343,16 @@
 					};
 				};
 
+				const allYears = chartState.selectedYear.map(function(d) {
+					return d;
+				}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
+				};
+
 				d3.selectAll(".pbialpbuttonsRects")
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
@@ -2321,6 +2409,12 @@
 					.style("fill", function(e) {
 						return e === chartState.selectedPartner ? "white" : "#444";
 					});
+
+				if (queryStringValues.has("partner")) {
+					queryStringValues.set("partner", d);
+				} else {
+					queryStringValues.append("partner", d);
+				};
 
 				createTopPanel(data);
 
