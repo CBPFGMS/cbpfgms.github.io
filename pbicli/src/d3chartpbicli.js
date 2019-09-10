@@ -384,7 +384,8 @@
 			EH: 'ESH',
 			YE: 'YEM',
 			ZM: 'ZMB',
-			ZW: 'ZWE'
+			ZW: 'ZWE',
+			XX: 'SCB'
 		};
 
 		const width = 900,
