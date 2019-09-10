@@ -331,7 +331,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [0, 0, 24, 80]
+			padding: [0, 0, 24, 102]
 		};
 
 		const mainPanel = {
@@ -340,7 +340,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
-			padding: [0, 0, 14, 80]
+			padding: [0, 0, 14, 102]
 		};
 
 		const legendPanel = {
@@ -349,7 +349,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + mainPanel.height + (3 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: legendPanelHeight,
-			padding: [0, 0, 0, 80]
+			padding: [0, 0, 0, 102]
 		};
 
 		const yScaleMain = d3.scaleOrdinal();

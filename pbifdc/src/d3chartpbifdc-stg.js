@@ -213,7 +213,7 @@
 			"Latin America and the Caribbean": ["CO", "HT"],
 			"West and Central Africa": ["CF", "CD", "NG"],
 			"Southern and Eastern Africa": ["ET", "SO", "SS", "SD"],
-			"Middle East and North Africa": ["IQ", "JO", "LB", "PS", "SY", "TR", "YE"],
+			"Middle East and North Africa": ["IQ", "JO", "LB", "PS", "SY", "XX", "YE"],
 			"Asia and the Pacific": ["AF", "MM", "PK"],
 			"All": null
 		};
@@ -756,6 +756,7 @@
 				centroids.NO.y += 40;
 				centroids.FR.x += 9;
 				centroids.FR.y -= 9;
+				centroids.XX = centroids.TR;
 
 				const map = mapContainer.append("path")
 					.attr("d", mapPath(dataMap))
@@ -1547,7 +1548,9 @@
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
 					.text(function(d) {
-						return d.labelText.split(" ")[0]
+						const labelArray = d.labelText.split(" ");
+						return labelArray.length > 2 ? labelArray[0] + " " + labelArray[1] :
+							labelArray[0];
 					})
 					.append("tspan")
 					.attr("x", function(d) {
@@ -1559,7 +1562,9 @@
 					})
 					.attr("dy", 10)
 					.text(function(d) {
-						return d.labelText.split(" ")[1]
+						const labelArray = d.labelText.split(" ");
+						return labelArray.length > 2 ? labelArray[2] :
+							labelArray[1];
 					});
 
 				const nodesLabel = nodesLabelGroupEnter.append("text")
@@ -1584,7 +1589,9 @@
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
 					.text(function(d) {
-						return d.labelText.split(" ")[0]
+						const labelArray = d.labelText.split(" ");
+						return labelArray.length > 2 ? labelArray[0] + " " + labelArray[1] :
+							labelArray[0];
 					})
 					.append("tspan")
 					.attr("x", function(d) {
@@ -1596,7 +1603,9 @@
 					})
 					.attr("dy", 10)
 					.text(function(d) {
-						return d.labelText.split(" ")[1]
+						const labelArray = d.labelText.split(" ");
+						return labelArray.length > 2 ? labelArray[2] :
+							labelArray[1];
 					});
 
 				nodesLabelGroup = nodesLabelGroupEnter.merge(nodesLabelGroup);

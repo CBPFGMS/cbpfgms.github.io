@@ -587,7 +587,7 @@
 				.attr("class", "pbiclcDonorsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 50, 4, 0],
+			padding: [44, 56, 4, 0],
 			labelPadding: 6
 		};
 
@@ -597,7 +597,7 @@
 				.attr("transform", "translate(" + (padding[3] + donorsPanel.width + panelVerticalPadding) + "," +
 					(padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 50, 4, 0],
+			padding: [44, 56, 4, 0],
 			labelPadding: 6
 		};
 

@@ -287,7 +287,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
-			padding: [0, 100, 16, 32]
+			padding: [0, 132, 16, 32]
 		};
 
 		const buttonsPanel = {
@@ -855,7 +855,7 @@
 					.attr("x", buttonWidth / 2)
 					.attr("y", buttonsPanel.buttonsPadding[0] - 2)
 					.text(function(d) {
-						return d.cbpf;
+						return d.cbpf.toLowerCase() === "syria cross border" ? "Syria Cross" : d.cbpf;
 					})
 					.attr("pointer-events", "none");
 

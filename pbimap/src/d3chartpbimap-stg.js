@@ -3121,7 +3121,7 @@
 					lng: 42.3745687
 				}
 			},
-			"Turkey": {
+			"Syria Cross border": {
 				sw: {
 					lat: 35.8076804,
 					lng: 25.6212891
