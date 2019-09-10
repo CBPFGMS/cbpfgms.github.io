@@ -5,7 +5,13 @@ Data visualisation for the Country-based Pooled Funds (CBPF) overview in the Bus
 - A set of checkboxes for the selection of CBPFs and a set of buttons allowing the selection of the year.
 - A stacked bar chart (100%) showing the percentage of actual affected persons relative to targeted affected persons for girls, boys, women, men and total.
 - A pictogram chart showing the real number of affected persons (targeted and actual) and their proportions for all 5 types (girls, boys, women, men and total).
-- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
+
+Also, at the top right corner, there is a set of buttons:
+
+- Share: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
+- Image: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
+- Csv: downloads the data as a .csv file;
+- Help: shows an annotated layer with tips about how to use and how to understand the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiobe.png" width="450">
 

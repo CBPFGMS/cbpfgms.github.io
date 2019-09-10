@@ -6,7 +6,13 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 - A brush area containing the entire period of the allocations. The user can move the handles on the right and left to change the selected period, as well as click + pan the brushed area;
 - A main area showing the allocations for each CBPF. Hover over the allocation to get more information, and click "Display Details" on the tooltip to generate a list below the chart. The user can pan or zoom this area for changing the selected period;
 - A legend describing the color code for the allocation amount (standard and reserve). Hover over the legend to get the precise amounts;
-- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
+
+Also, at the top right corner, there is a set of buttons:
+
+- Share: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
+- Image: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
+- Csv: downloads the data as a .csv file;
+- Help: shows an annotated layer with tips about how to use and how to understand the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbiuac.png" width="450">
 

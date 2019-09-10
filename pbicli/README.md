@@ -7,7 +7,13 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 - A set of checkboxes for showing future donations and the donation trend (if “future donations” is selected);
 - Depending on the current selection (donor or CBPF), a set of buttons to deselect a country and a set of checkboxes to show/hide a country;
 - Two line graphs, one for the donors and one for the CBPFs;
-- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
+
+Also, at the top right corner, there is a set of buttons:
+
+- Share: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
+- Image: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
+- Csv: downloads the data as a .csv file;
+- Help: shows an annotated layer with tips about how to use and how to understand the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbicli.png" width="450">
 
@@ -15,7 +21,7 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-selectedcbpfs="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
+```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-selectedcountry="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -36,21 +42,21 @@ There are six parameters:
 
 If the value is not an accepted value, it defaults to `"false"`.
 
-**`data-selectedcbpf`**: defines the selected CBPFs when the page loads, and sets the view for those CBPFs (that is, the donor line chart shows all donors that donated to those selected CBPF). For not selecting any CBPF set the value to `"none"`, or just leave it empty:
+**`data-selectedcountry`**: defines the selected country (donor or CBPF) when the page loads, and sets the view for those selected countries (e. g., if the selected country is a CBPF the donor line chart shows all donors that donated to those selected CBPF, and vice versa). For not selecting any country set the value to `"none"`, or just leave it empty:
 
 `""`
 
-For individual CBPFs set the value accordingly, such as:
+For individual countries set the value accordingly, such as:
 
 `"Yemen"`.
 
-For more than one CBPF separate the values with commas, such as:
+For more than one country separate the values with commas, such as:
 
 `"Yemen, Sudan, Iraq"`.
 
-For the accepted values, please refer to the data API.
+In such cases, the list must contain only donors or only CBPFs.
 
-If the value is not a valid one it defaults to `"none"`. This value defines only the selected CBPFs when the page loads: the CBPFs can be easily selected by using the corresponding dropdown menu.
+For the accepted values, please refer to the data API. If the value is not a valid one it defaults to `"none"`. This value defines only the selected country when the page loads: the CBPFs (and donors) can be easily selected by using the corresponding dropdown menu.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 

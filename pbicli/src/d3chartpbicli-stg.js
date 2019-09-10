@@ -472,7 +472,7 @@
 
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
-		const selectedCountriesString = queryStringValues.has("country") ? queryStringValues.get("country").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcbpfs");
+		const selectedCountriesString = queryStringValues.has("country") ? queryStringValues.get("country").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-selectedcountry");
 
 		chartState.futureDonations = queryStringValues.has("showfuture") ? queryStringValues.get("showfuture") === "true" : containerDiv.node().getAttribute("data-showfuture") === "true";
 

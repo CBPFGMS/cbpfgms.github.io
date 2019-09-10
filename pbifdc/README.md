@@ -6,7 +6,13 @@ Data visualisation for the Country-based Pooled Funds (CBPF) contributions in th
 - A control panel allowing the selection of the year, the geopositioning (in a map) of the nodes and showing/hiding the nodes' labels;
 - A force-directed graph with all the donors and CBPFs for the selected year. In the force-directed graph each node represents a country, and each link represents the amount donated/received by the donor/CBPF pair.
 - A legend panel, which shows information for the entire selected year, for the country hovered over and for the link hovered over. The legend panel can be hovered as well.
-- Two buttons at the top right hand side, for downloading the CSV file (according to the selected options) and for displaying a description of the chart.
+
+Also, at the top right corner, there is a set of buttons:
+
+- Share: copies a link with all the current selections to the clipboard. Use that link to go to the Bookmark page;
+- Image: downloads a snapshot of the chart, as a .png file or as a .pdf file. You can also right-click anywhere in the chart to download a snapshot containing the tooltip;
+- Csv: downloads the data as a .csv file;
+- Help: shows an annotated layer with tips about how to use and how to understand the chart.
 
 <img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbifdc.png" width="450">
 
