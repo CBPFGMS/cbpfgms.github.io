@@ -1065,7 +1065,7 @@
 				const playIcon = iconsDiv.append("button")
 					.attr("id", "pbiclcPlayButton");
 
-				playIcon.html("SHARE  ")
+				playIcon.html("PLAY  ")
 					.append("span")
 					.attr("class", "fas fa-play");
 
