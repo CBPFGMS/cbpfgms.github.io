@@ -447,7 +447,8 @@
 		let height = 500,
 			yearsArray,
 			isSnapshotTooltipVisible = false,
-			currentHoveredRect;
+			currentHoveredRect,
+			timer;
 
 		const queryStringValues = new URLSearchParams(location.search);
 
@@ -1061,6 +1062,57 @@
 						});
 
 				};
+
+				const playIcon = iconsDiv.append("button")
+					.datum({
+						clicked: false
+					})
+					.attr("id", "pbiclcPlayButton");
+
+				playIcon.html("PLAY  ")
+					.append("span")
+					.attr("class", "fas fa-play");
+
+				playIcon.on("click", function(d) {
+					d.clicked = !d.clicked;
+
+					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+						.append("span")
+						.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+					if (d.clicked) {
+						chartState.selectedYear.length = 1;
+						loopButtons();
+						timer = d3.interval(loopButtons, 2 * duration);
+					} else {
+						timer.stop();
+					};
+
+					function loopButtons() {
+						const index = yearsArray.indexOf(chartState.selectedYear[0]);
+
+						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+
+						const yearButton = d3.selectAll(".pbiclcbuttonsRects")
+							.filter(function(d) {
+								return d === chartState.selectedYear[0]
+							});
+
+						d3.select(yearButton.node()).dispatch("click");
+						d3.select(yearButton.node()).dispatch("click");
+
+						const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
+							0 :
+							chartState.selectedYear[0] > yearsArray[yearsArray.length - 4] ?
+							yearsArray.length - 8 :
+							yearsArray.indexOf(chartState.selectedYear[0]) - 4;
+
+						svg.select(".pbiclcbuttonsGroup").transition()
+							.attr("transform", "translate(" +
+								(-(buttonPanel.buttonWidth * firstYearIndex)) +
+								",0)");
+					};
+				});
 
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
