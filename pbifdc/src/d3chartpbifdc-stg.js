@@ -1548,23 +1548,18 @@
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
 					.text(function(d) {
-						const labelArray = d.labelText.split(" ");
-						return labelArray.length > 2 ? labelArray[0] + " " + labelArray[1] :
-							labelArray[0];
+						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
+							d.labelText[0];
 					})
-					.append("tspan")
-					.attr("x", function(d) {
-						if (!chartState.showMap) {
-							return d.x + thisNodeScale(d.total) + labelPadding;
-						} else {
-							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+					.each(function(d) {
+						if (d.labelText.length > 1) {
+							d3.select(this).append("tspan")
+								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
+									d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding)
+								.attr("dy", 10)
+								.text(d.labelText.length > 2 ? d.labelText[2] :
+									d.labelText[1]);
 						};
-					})
-					.attr("dy", 10)
-					.text(function(d) {
-						const labelArray = d.labelText.split(" ");
-						return labelArray.length > 2 ? labelArray[2] :
-							labelArray[1];
 					});
 
 				const nodesLabel = nodesLabelGroupEnter.append("text")
@@ -1589,23 +1584,18 @@
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
 					.text(function(d) {
-						const labelArray = d.labelText.split(" ");
-						return labelArray.length > 2 ? labelArray[0] + " " + labelArray[1] :
-							labelArray[0];
+						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
+							d.labelText[0];
 					})
-					.append("tspan")
-					.attr("x", function(d) {
-						if (!chartState.showMap) {
-							return d.x + thisNodeScale(d.total) + labelPadding;
-						} else {
-							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
+					.each(function(d) {
+						if (d.labelText.length > 1) {
+							d3.select(this).append("tspan")
+								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
+									d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding)
+								.attr("dy", 10)
+								.text(d.labelText.length > 2 ? d.labelText[2] :
+									d.labelText[1]);
 						};
-					})
-					.attr("dy", 10)
-					.text(function(d) {
-						const labelArray = d.labelText.split(" ");
-						return labelArray.length > 2 ? labelArray[2] :
-							labelArray[1];
 					});
 
 				nodesLabelGroup = nodesLabelGroupEnter.merge(nodesLabelGroup);
@@ -3061,7 +3051,7 @@
 						uniqueId: "donor" + d.GMSDonorISO2Code,
 						isoCode: d.GMSDonorISO2Code,
 						category: "Donor",
-						labelText: d.GMSDonorName,
+						labelText: d.GMSDonorName.split(" "),
 						total: (+d.PaidAmt) + (+d.PledgeAmt),
 						paid: +d.PaidAmt,
 						pledge: +d.PledgeAmt,
@@ -3100,7 +3090,7 @@
 						uniqueId: "cbpf" + d.PooledFundISO2Code,
 						isoCode: d.PooledFundISO2Code,
 						category: "CBPF",
-						labelText: d.PooledFundName,
+						labelText: d.PooledFundName.split(" "),
 						total: (+d.PaidAmt) + (+d.PledgeAmt),
 						paid: +d.PaidAmt,
 						pledge: +d.PledgeAmt,
