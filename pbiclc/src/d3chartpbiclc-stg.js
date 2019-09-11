@@ -1062,13 +1062,6 @@
 
 				};
 
-				const playIcon = iconsDiv.append("button")
-					.attr("id", "pbiclcPlayButton");
-
-				playIcon.html("PLAY  ")
-					.append("span")
-					.attr("class", "fas fa-play");
-
 				if (browserHasSnapshotIssues) {
 					const bestVisualizedSpan = snapshotContent.append("p")
 						.attr("id", "pbiclcBestVisualizedText")
