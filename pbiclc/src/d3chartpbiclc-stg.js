@@ -1098,8 +1098,8 @@
 								return d === chartState.selectedYear[0]
 							});
 
-						d3.select(yearButton.node()).dispatch("click");
-						d3.select(yearButton.node()).dispatch("click");
+						yearButton.dispatch("click");
+						yearButton.dispatch("click");
 
 						const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
 							0 :
@@ -1107,10 +1107,29 @@
 							yearsArray.length - 8 :
 							yearsArray.indexOf(chartState.selectedYear[0]) - 4;
 
+						const currentTranslate = -(buttonPanel.buttonWidth * firstYearIndex);
+
+						if (currentTranslate === 0) {
+							svg.select(".pbiclcLeftArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbiclcLeftArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbiclcLeftArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbiclcLeftArrowGroup").attr("pointer-events", "all");
+						};
+
+						if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonPanel.buttonWidth)) {
+							svg.select(".pbiclcRightArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbiclcRightArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbiclcRightArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbiclcRightArrowGroup").attr("pointer-events", "all");
+						};
+
 						svg.select(".pbiclcbuttonsGroup").transition()
-							.attr("transform", "translate(" +
-								(-(buttonPanel.buttonWidth * firstYearIndex)) +
-								",0)");
+							.duration(duration)
+							.attrTween("transform", function() {
+								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+							});
 					};
 				});
 
