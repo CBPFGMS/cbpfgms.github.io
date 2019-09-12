@@ -2,6 +2,7 @@
 
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
+		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
@@ -30,9 +31,15 @@
 	});
 
 	if (!isScriptLoaded(d3URL)) {
-		if (hasFetch) {
+		if (hasFetch && hasURLSearchParams) {
 			loadScript(leafletURL, function() {
 				loadScript(d3URL, d3Chart);
+			});
+		} else if (hasFetch && !hasURLSearchParams) {
+			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+				loadScript(leafletURL, function() {
+					loadScript(d3URL, d3Chart);
+				});
 			});
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
