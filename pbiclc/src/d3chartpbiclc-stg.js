@@ -29,7 +29,7 @@
 	});
 
 	if (!isScriptLoaded(d3URL)) {
-		if (hasFetch) {
+		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
 			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
