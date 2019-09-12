@@ -32,13 +32,13 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript("https://unpkg.com/@ungap/url-search-params@0.1.2/min.js", function() {
+			loadScript("https://raw.githubusercontent.com/jerrybendy/url-search-params-polyfill/master/index.js", function() {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
 			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
 				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://unpkg.com/@ungap/url-search-params@0.1.2/min.js", function() {
+					loadScript("https://raw.githubusercontent.com/jerrybendy/url-search-params-polyfill/master/index.js", function() {
 						loadScript(d3URL, d3Chart);
 					});
 				});
