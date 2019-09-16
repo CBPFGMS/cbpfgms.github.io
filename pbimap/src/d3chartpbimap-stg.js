@@ -12,7 +12,10 @@
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		leafletURL = "https://cbpfgms.github.io/libraries/leaflet.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvasrc3.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
+		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
+		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -36,18 +39,34 @@
 				loadScript(d3URL, d3Chart);
 			});
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(URLSearchParamsPolyfill, function() {
 				loadScript(leafletURL, function() {
 					loadScript(d3URL, d3Chart);
 				});
 			});
 		} else {
-			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, function() {
 						loadScript(leafletURL, function() {
 							loadScript(d3URL, d3Chart);
 						});
+					});
+				});
+			});
+		};
+	} else {
+		if (hasFetch && hasURLSearchParams) {
+			loadScript(leafletURL, d3Chart);
+		} else if (hasFetch && !hasURLSearchParams) {
+			loadScript(URLSearchParamsPolyfill, function() {
+				loadScript(leafletURL, d3Chart);
+			});
+		} else {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, function() {
+						loadScript(leafletURL, d3Chart);
 					});
 				});
 			});
