@@ -197,7 +197,7 @@
 			},
 			legendNamesArray = ["HRP Requirements", "HRP Funding", "CBPF Funding"],
 			sortByArray = Object.keys(sortByValues),
-			dataFile = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/datapbihrp.csv",
+			dataFile = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datapbihrp.csv",
 			totalValues = {},
 			chartState = {
 				selectedYear: null,
