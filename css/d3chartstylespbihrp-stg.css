@@ -44,7 +44,7 @@
 .pbihrpTitleDiv {
 	display: flex;
 	flex:0 60%;
-	margin-left: 16px;
+	margin-left: 8px;
 }
 
 .pbihrpIconsDiv {
@@ -75,6 +75,105 @@ p#pbihrpd3chartTitle {
 	font-family: "Arial", sans-serif;
 	margin: 0px;
 	color: #418fde;
+}
+
+.pbihrpbuttonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbihrptopSummaryPanelTitle, .pbihrpbarChartPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #666;
+	pointer-events: none;
+	font-weight: 700;
+}
+
+.pbihrpnonHrpPanelTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #666;
+	pointer-events: none;
+	font-weight: 700;
+}
+
+.pbihrpstackedBarPanelText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbihrplegendText {
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbihrpsortMenuTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.pbihrpsortGroupText {
+	font-family: "Roboto", sans-serif;
+	font-size: 13px;
+	fill: #444;
+}
+
+.pbihrptopSummaryPanelCbpfValue, .pbihrptopSummaryPanelHrpValue, .pbihrpdonutsPanelFundingValue {
+	font-family: "Roboto", sans-serif;
+	font-size: 40px;
+	font-weight: 500;
+}
+
+.pbihrptopSummaryPanelCbpfTopText, .pbihrptopSummaryPanelHrpTopText, .pbihrpdonutsPanelTopText, .pbihrpdonutsPanelDonutsText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbihrptopSummaryPanelCbpfBottomText, .pbihrptopSummaryPanelHrpBottomText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbihrpcbpfTargetLabel, .pbihrpcbpfFundingLabel, .pbihrphrpRequirementsLabel, .pbihrphrpFundingLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbihrpcbpfTargetBarValue, .pbihrpcbpfFundingBarValue, .pbihrphrpRequirementsBarValue, .pbihrphrpFundingBarValue {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #444;
+	font-weight: 500;
+	pointer-events: none;
+}
+
+.pbihrpstackedBarsLabelsSpan {
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbihrpstackedBarsLabels {
+	fill: #444;
+	pointer-events: none;
+}
+
+.pbihrpdonutsPercentage {
+	fill: #444;
+	pointer-events: none;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	font-weight: 500;
 }
 
 .pbihrpAnnotationMainText {
