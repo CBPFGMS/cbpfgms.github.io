@@ -7,13 +7,15 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylesFOOBAR.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
 		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
+
+	//CHANGE CSS LINK!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -154,26 +156,64 @@
 
 		//END OF POLYFILLS
 
-		const width = 900,
-			padding = [0, 0, 0, 0],
+		const width = 1100,
+			padding = [12, 8, 4, 8],
+			panelHorizontalPadding = 4,
+			panelVerticalPadding = 12,
+			buttonsPanelHeight = 36,
+			topSummaryPanelHeight = 80,
+			stackedBarPanelHeight = 94,
+			donutsPanelHeight = 58,
+			barGroupHeight = 50,
+			nonHrpBarHeight = 50,
+			buttonsNumber = 12,
+			sortMenuRectangleOpacity = 0.9,
+			sortMenuVertAlign = -2,
+			duration = 1000,
+			topSummaryBarsHeight = 10,
+			stackedBarHeight = 16,
+			formatPercent = d3.format(".0%"),
+			unBlue = "#1F69B3",
+			targetPercentage = "15%", //CHANGE???
+			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#C7C8CA"], //dark blue, light blue, dark gray, light gray
+			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
+			legendRectangleSize = 16,
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
-			chartTitleDefault = "FOOBAR",
-			vizNameQueryString = "FOOBAR",
+			localVariable = d3.local(),
+			chartTitleDefault = "CBPF versus HRP",
+			vizNameQueryString = "cbpfvshrp",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
-			chartState = {};
+			sortByValues = {
+				cbpffunding: "CBPF Funding",
+				cbpfpercentage: "CBPF Percentage of the Target Achieved",
+				hrpfunding: "HRP Funding",
+				hrprequirements: "HRP Requirements",
+				cbpftarget: "CBPF Target",
+				alphabetically: "Alphabetically"
+			},
+			legendNamesArray = ["HRP Requirements", "HRP Funding", "CBPF Funding"],
+			sortByArray = Object.keys(sortByValues),
+			dataFile = "fakedata.csv",
+			totalValues = {},
+			chartState = {
+				selectedYear: null,
+				sortBy: null,
+			};
 
 		let isSnapshotTooltipVisible = false,
-			currentHoveredRect;
+			height = 600,
+			yearsArray,
+			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
 
 		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
 
-		const containerDiv = d3.select("#d3chartcontainerFOOBAR");
+		const containerDiv = d3.select("#d3chartcontainerpbihrp");
 
 		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
@@ -185,19 +225,27 @@
 
 		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
 
-		if (selectedResponsiveness === false) {
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
+
+		chartState.sortBy = queryStringValues.has("sortby") && sortByArray.indexOf(queryStringValues.get("sortby").replace(" ", "").toLowerCase()) > -1 ? queryStringValues.get("sortby").replace(" ", "").toLowerCase() :
+			sortByArray.indexOf(containerDiv.node().getAttribute("data-sortby").replace(" ", "").toLowerCase()) > -1 ? containerDiv.node().getAttribute("data-sortby").replace(" ", "").toLowerCase() :
+			"cbpffunding";
+
+		if (chartState.sortBy === "cbpftarget") chartState.sortBy = "hrpfunding";
+
+		if (!selectedResponsiveness) {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
 		};
 
 		const topDiv = containerDiv.append("div")
-			.attr("class", "FOOBARTopDiv");
+			.attr("class", "pbihrpTopDiv");
 
 		const titleDiv = topDiv.append("div")
-			.attr("class", "FOOBARTitleDiv");
+			.attr("class", "pbihrpTitleDiv");
 
 		const iconsDiv = topDiv.append("div")
-			.attr("class", "FOOBARIconsDiv d3chartIconsDiv");
+			.attr("class", "pbihrpIconsDiv d3chartIconsDiv");
 
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -208,13 +256,13 @@
 		};
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
-			.attr("class", "FOOBARFooterDiv") : null;
+			.attr("class", "pbihrpFooterDiv") : null;
 
 		createProgressWheel(svg, width, height, "Loading visualisation...");
 
 		const snapshotTooltip = containerDiv.append("div")
-			.attr("id", "FOOBARSnapshotTooltip")
-			.attr("class", "FOOBARSnapshotContent")
+			.attr("id", "pbihrpSnapshotTooltip")
+			.attr("class", "pbihrpSnapshotContent")
 			.style("display", "none")
 			.on("mouseleave", function() {
 				isSnapshotTooltipVisible = false;
@@ -223,7 +271,7 @@
 			});
 
 		snapshotTooltip.append("p")
-			.attr("id", "FOOBARSnapshotTooltipPdfText")
+			.attr("id", "pbihrpSnapshotTooltipPdfText")
 			.html("Download PDF")
 			.on("click", function() {
 				isSnapshotTooltipVisible = false;
@@ -231,7 +279,7 @@
 			});
 
 		snapshotTooltip.append("p")
-			.attr("id", "FOOBARSnapshotTooltipPngText")
+			.attr("id", "pbihrpSnapshotTooltipPngText")
 			.html("Download Image (PNG)")
 			.on("click", function() {
 				isSnapshotTooltipVisible = false;
@@ -242,14 +290,14 @@
 
 		if (browserHasSnapshotIssues) {
 			snapshotTooltip.append("p")
-				.attr("id", "FOOBARTooltipBestVisualizedText")
+				.attr("id", "pbihrpTooltipBestVisualizedText")
 				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
 		};
 
 		const tooltip = containerDiv.append("div")
-			.attr("id", "FOOBARtooltipdiv")
+			.attr("id", "pbihrptooltipdiv")
 			.style("display", "none");
 
 		containerDiv.on("contextmenu", function() {
@@ -261,36 +309,153 @@
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
-		const fooPanel = {
+		const buttonsPanel = {
 			main: svg.append("g")
-				.attr("class", "FOOBARTopPanel")
+				.attr("class", "pbihrpbuttonsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
-			height: topPanelHeight
+			height: buttonsPanelHeight,
+			padding: [0, 0, 6, 0],
+			buttonWidth: 54,
+			buttonPadding: 4,
+			buttonVerticalPadding: 4,
+			arrowPadding: 18
 		};
 
+		const topSummaryPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrptopSummaryPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + panelVerticalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: topSummaryPanelHeight,
+			titlePadding: 30,
+			padding: [0, 0, 0, 0]
+		};
 
+		const topSummaryPanelCbpf = {
+			main: topSummaryPanel.main.append("g")
+				.attr("class", "pbihrptopSummaryPanelCbpf")
+				.attr("transform", "translate(0," + topSummaryPanel.titlePadding + ")"),
+			width: topSummaryPanel.width / 2 - panelVerticalPadding / 2,
+			height: topSummaryPanel.height - topSummaryPanel.padding[0] - topSummaryPanel.padding[2] - topSummaryPanel.titlePadding,
+			padding: [0, 40, 0, 314],
+			valuePadding: 148,
+			valueVerPadding: 11
+		};
+
+		const topSummaryPanelHrp = {
+			main: topSummaryPanel.main.append("g")
+				.attr("class", "pbihrptopSummaryPanelHrp")
+				.attr("transform", "translate(" + (topSummaryPanel.width / 2 + panelVerticalPadding / 2) + "," + topSummaryPanel.titlePadding + ")"),
+			width: topSummaryPanel.width / 2 - panelVerticalPadding / 2,
+			height: topSummaryPanel.height - topSummaryPanel.padding[0] - topSummaryPanel.padding[2] - topSummaryPanel.titlePadding,
+			padding: [0, 40, 0, 314],
+			valuePadding: 148,
+			valueVerPadding: 11
+		};
+
+		const stackedBarPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrpstackedBarPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + 2 * panelVerticalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: stackedBarPanelHeight,
+			padding: [20, 2, 26, 0],
+			barHeight: 20,
+			labelPadding: 10,
+			labelHorPadding: 8
+		};
+
+		const donutsPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrpdonutsPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + 3 * panelVerticalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: donutsPanelHeight,
+			padding: [8, 274, 0, 420],
+			valuePadding: 148,
+			valueVerPadding: 11
+		};
+
+		const barChartPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrpbarChartPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			padding: [70, 0, 0, 10],
+			get titlePadding() {
+				return this.padding[0] * 0.4;
+			},
+			get legendPadding() {
+				return this.padding[0] * 0.5;
+			}
+		};
+
+		const nonHrpPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrpnonHrpPanel"),
+			width: width - padding[1] - padding[3],
+			padding: [24, 0, 0, 0]
+		};
+
+		const sortMenuPanel = {
+			main: svg.append("g")
+				.attr("class", "pbihrpsortMenuPanel")
+				.attr("transform", "translate(" + (padding[3] + barChartPanel.width / 2) + "," +
+					(padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.legendPadding + 6 * panelVerticalPadding) + ")"),
+			width: 258,
+			height: 102,
+			padding: [0, 0, 0, 4],
+			titlePadding: 48,
+			itemPadding: 16,
+			groupHeight: 20,
+			circleSize: 6,
+			innerCircleSize: 3
+		};
+
+		const arcGenerator = d3.arc()
+			.outerRadius((donutsPanel.height - donutsPanel.padding[0] - donutsPanel.padding[2]) / 2 - 5)
+			.innerRadius((donutsPanel.height - donutsPanel.padding[0] - donutsPanel.padding[2]) / 2 - 10);
+
+		const donutGenerator = d3.pie()
+			.value(function(d) {
+				return d.value;
+			})
+			.sort(null);
+
+		const donutsPanelScale = d3.scalePoint()
+			.range([donutsPanel.padding[3], donutsPanel.width - donutsPanel.padding[1]]);
+
+		const legendColorsScale = d3.scaleOrdinal()
+			.domain(variablesArray)
+			.range(colorsArray);
+
+		const topSummaryScale = d3.scaleLinear()
+			.range([topSummaryPanelCbpf.padding[3], topSummaryPanelCbpf.width - topSummaryPanelCbpf.padding[1]]);
+
+		const stackedBarScale = d3.scaleLinear()
+			.range([stackedBarPanel.padding[3], stackedBarPanel.width - stackedBarPanel.padding[1]]);
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("FOOBARdata") &&
-			JSON.parse(localStorage.getItem("FOOBARdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("FOOBARdata")).data;
-			console.info("FOOBAR: data from local storage");
+		if (localStorage.getItem("pbihrpdata") &&
+			JSON.parse(localStorage.getItem("pbihrpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = JSON.parse(localStorage.getItem("pbihrpdata")).data;
+			console.info("pbihrp: data from local storage");
 			csvCallback(rawData);
 		} else {
-			d3.csv("URL").then(function(rawData) {
+			d3.csv(dataFile).then(function(rawData) {
 				try {
-					localStorage.setItem("FOOBARdata", JSON.stringify({
+					localStorage.setItem("pbihrpdata", JSON.stringify({
 						data: rawData,
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
-					console.info("D3 chart FOOBAR, " + error);
+					console.info("D3 chart pbihrp, " + error);
 				};
-				console.info("FOOBAR: data from API");
+				console.info("pbihrp: data from API");
 				csvCallback(rawData);
 			});
 		};
@@ -299,192 +464,1625 @@
 
 			removeProgressWheel();
 
+			const completeData = processData(rawData)
 
+			yearsArray = completeData.map(function(d) {
+				return d.year;
+			}).sort(function(a, b) {
+				return a - b;
+			});
+
+			validateYear(selectedYearString);
 
 			if (!lazyLoad) {
-				draw(rawData);
+				draw(completeData);
 			} else {
-				d3.select(window).on("scroll.FOOBAR", checkPosition);
+				d3.select(window).on("scroll.pbihrp", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.FOOBAR", null);
-					draw(rawData);
+					d3.select(window).on("scroll.pbihrp", null);
+					draw(completeData);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData) {
+		function draw(completeData) {
 
-			createTitle();
+			const data = completeData.find(function(d) {
+				return d.year === chartState.selectedYear;
+			});
+
+			resizeSVGHeight(data)
+
+			createTitle(completeData);
+
+			createButtonsPanel(yearsArray, completeData);
+
+			createTopSummaryPanel(data.totalData, data.hrpYear);
+
+			createStackedBarPanel(data.totalData);
+
+			createDonutsPanel(data.totalData, data.hrpYear);
+
+			createBarChartPanel(data);
+
+			createNonHrpPanel(data);
+
+			createSortMenu(completeData);
 
 			if (!isPfbiSite) createFooterDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
-			function createTitle() {
-
-				const title = titleDiv.append("p")
-					.attr("id", "FOOBARd3chartTitle")
-					.html(chartTitle);
-
-				const helpIcon = iconsDiv.append("button")
-					.attr("id", "FOOBARHelpButton");
-
-				helpIcon.html("HELP  ")
-					.append("span")
-					.attr("class", "fas fa-info")
-
-				const downloadIcon = iconsDiv.append("button")
-					.attr("id", "FOOBARDownloadButton");
-
-				downloadIcon.html(".CSV  ")
-					.append("span")
-					.attr("class", "fas fa-download");
-
-				const snapshotDiv = iconsDiv.append("div")
-					.attr("class", "FOOBARSnapshotDiv");
-
-				const snapshotIcon = snapshotDiv.append("button")
-					.attr("id", "FOOBARSnapshotButton");
-
-				snapshotIcon.html("IMAGE ")
-					.append("span")
-					.attr("class", "fas fa-camera");
-
-				const snapshotContent = snapshotDiv.append("div")
-					.attr("class", "FOOBARSnapshotContent");
-
-				const pdfSpan = snapshotContent.append("p")
-					.attr("id", "FOOBARSnapshotPdfText")
-					.html("Download PDF")
-					.on("click", function() {
-						createSnapshot("pdf", false);
-					});
-
-				const pngSpan = snapshotContent.append("p")
-					.attr("id", "FOOBARSnapshotPngText")
-					.html("Download Image (PNG)")
-					.on("click", function() {
-						createSnapshot("png", false);
-					});
-
-				if (!isBookmarkPage) {
-
-					const shareIcon = iconsDiv.append("button")
-						.attr("id", "FOOBARShareButton");
-
-					shareIcon.html("SHARE  ")
-						.append("span")
-						.attr("class", "fas fa-share");
-
-					const shareDiv = containerDiv.append("div")
-						.attr("class", "d3chartShareDiv")
-						.style("display", "none");
-
-					shareIcon.on("mouseover", function() {
-							shareDiv.html("Click to copy")
-								.style("display", "block");
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("top", thisOffsetTop + "px")
-								.style("left", thisOffsetLeft + "20px");
-						}).on("mouseout", function() {
-							shareDiv.style("display", "none");
-						})
-						.on("click", function() {
-
-							const newURL = bookmarkSite + queryStringValues.toString();
-
-							const shareInput = shareDiv.append("input")
-								.attr("type", "text")
-								.attr("readonly", true)
-								.attr("spellcheck", "false")
-								.property("value", newURL);
-
-							shareInput.node().select();
-
-							document.execCommand("copy");
-
-							shareDiv.html("Copied!");
-
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("left", thisOffsetLeft + "20px");
-
-						});
-
-				};
-
-				if (browserHasSnapshotIssues) {
-					const bestVisualizedSpan = snapshotContent.append("p")
-						.attr("id", "FOOBARBestVisualizedText")
-						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
-						.attr("pointer-events", "none")
-						.style("cursor", "default");
-				};
-
-				snapshotDiv.on("mouseover", function() {
-					snapshotContent.style("display", "block")
-				}).on("mouseout", function() {
-					snapshotContent.style("display", "none")
-				});
-
-				helpIcon.on("click", createAnnotationsDiv);
-
-				downloadIcon.on("click", function() {
-
-					const csv = createCsv(rawData); //CHANGE
-
-					const currentDate = new Date();
-
-					const fileName = "FOOBAR_" + csvDateFormat(currentDate) + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
-				});
-
-				//end of createTitle
-			};
-
 			//end of draw
 		};
 
+		function resizeSVGHeight(data) {
+
+			const barsHeight = data.hrpData.length * barGroupHeight;
+
+			const nonHrpBarsHeight = data.nonHrpData.length * nonHrpBarHeight;
+
+			barChartPanel.height = barChartPanel.padding[0] + barsHeight + barChartPanel.padding[2];
+
+			nonHrpPanel.height = nonHrpPanel.padding[0] + nonHrpBarHeight + nonHrpPanel.padding[2];
+
+			nonHrpPanel.main
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.height + 7 * panelVerticalPadding) + ")");
+
+			height = padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.height + nonHrpPanel.height + 7 * panelVerticalPadding + padding[2];
+
+			if (!selectedResponsiveness) {
+				containerDiv.style("width", width + "px")
+					.style("height", height + "px");
+			};
+
+			if (isInternetExplorer) {
+				svg.attr("viewBox", "0 0 " + width + " " + height)
+					.attr("height", height);
+			} else {
+				svg.attr("viewBox", "0 0 " + width + " " + height);
+			};
+
+			//end of resizeSVGHeight
+		};
+
+		function createTitle(completeData) {
+
+			const title = titleDiv.append("p")
+				.attr("id", "pbihrpd3chartTitle")
+				.html(chartTitle);
+
+			const helpIcon = iconsDiv.append("button")
+				.attr("id", "pbihrpHelpButton");
+
+			helpIcon.html("HELP  ")
+				.append("span")
+				.attr("class", "fas fa-info")
+
+			const downloadIcon = iconsDiv.append("button")
+				.attr("id", "pbihrpDownloadButton");
+
+			downloadIcon.html(".CSV  ")
+				.append("span")
+				.attr("class", "fas fa-download");
+
+			const snapshotDiv = iconsDiv.append("div")
+				.attr("class", "pbihrpSnapshotDiv");
+
+			const snapshotIcon = snapshotDiv.append("button")
+				.attr("id", "pbihrpSnapshotButton");
+
+			snapshotIcon.html("IMAGE ")
+				.append("span")
+				.attr("class", "fas fa-camera");
+
+			const snapshotContent = snapshotDiv.append("div")
+				.attr("class", "pbihrpSnapshotContent");
+
+			const pdfSpan = snapshotContent.append("p")
+				.attr("id", "pbihrpSnapshotPdfText")
+				.html("Download PDF")
+				.on("click", function() {
+					createSnapshot("pdf", false);
+				});
+
+			const pngSpan = snapshotContent.append("p")
+				.attr("id", "pbihrpSnapshotPngText")
+				.html("Download Image (PNG)")
+				.on("click", function() {
+					createSnapshot("png", false);
+				});
+
+			if (!isBookmarkPage) {
+
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbihrpShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = bookmarkSite + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
+
+			};
+
+			if (browserHasSnapshotIssues) {
+				const bestVisualizedSpan = snapshotContent.append("p")
+					.attr("id", "pbihrpBestVisualizedText")
+					.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+					.attr("pointer-events", "none")
+					.style("cursor", "default");
+			};
+
+			snapshotDiv.on("mouseover", function() {
+				snapshotContent.style("display", "block")
+			}).on("mouseout", function() {
+				snapshotContent.style("display", "none")
+			});
+
+			helpIcon.on("click", createAnnotationsDiv);
+
+			downloadIcon.on("click", function() {
+
+				const data = completeData.find(function(d) {
+					return d.year === chartState.selectedYear;
+				});
+
+				const csv = createCsv(data);
+
+				const currentDate = new Date();
+
+				const fileName = "CBPFvsHRP_" + csvDateFormat(currentDate) + ".csv";
+
+				const blob = new Blob([csv], {
+					type: 'text/csv;charset=utf-8;'
+				});
+
+				if (navigator.msSaveBlob) {
+					navigator.msSaveBlob(blob, filename);
+				} else {
+
+					const link = document.createElement("a");
+
+					if (link.download !== undefined) {
+
+						const url = URL.createObjectURL(blob);
+
+						link.setAttribute("href", url);
+						link.setAttribute("download", fileName);
+						link.style = "visibility:hidden";
+
+						document.body.appendChild(link);
+
+						link.click();
+
+						document.body.removeChild(link);
+
+					};
+				};
+
+			});
+
+			//end of createTitle
+		};
+
+		function createButtonsPanel(yearsData, completeData) {
+
+			const clipPathButtons = buttonsPanel.main.append("clipPath")
+				.attr("id", "pbihrpclipPathButtons")
+				.append("rect")
+				.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
+				.attr("height", (buttonsPanel.height - buttonsPanel.padding[2]));
+
+			const clipPathGroup = buttonsPanel.main.append("g")
+				.attr("class", "pbihrpClipPathGroup")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3]) + ",0)")
+				.attr("clip-path", "url(#pbihrpclipPathButtons)");
+
+			const buttonsGroup = clipPathGroup.append("g")
+				.attr("class", "pbihrpbuttonsGroup")
+				.attr("transform", "translate(0,0)")
+				.style("cursor", "pointer");
+
+			const buttonsRects = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("rect")
+				.attr("rx", "2px")
+				.attr("ry", "2px")
+				.attr("class", "pbihrpbuttonsRects")
+				.attr("width", buttonsPanel.buttonWidth - buttonsPanel.buttonPadding)
+				.attr("height", (buttonsPanel.height - buttonsPanel.padding[2]) - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear === d ? unBlue : "#eaeaea";
+				});
+
+			const buttonsText = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("text")
+				.attr("text-anchor", "middle")
+				.attr("class", "pbihrpbuttonsText")
+				.style("user-select", "none")
+				.attr("y", (buttonsPanel.height - buttonsPanel.padding[2]) / 1.6)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear === d ? "white" : "#444";
+				})
+				.text(function(d) {
+					return d;
+				});
+
+			const leftArrow = buttonsPanel.main.append("g")
+				.attr("class", "pbihrpLeftArrowGroup")
+				.style("cursor", "pointer")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.attr("transform", "translate(" + buttonsPanel.padding[3] + ",0)");
+
+			const leftArrowRect = leftArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", (buttonsPanel.height - buttonsPanel.padding[2]) - buttonsPanel.padding[0] - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding);
+
+			const leftArrowText = leftArrow.append("text")
+				.attr("class", "pbihrpleftArrowText")
+				.attr("x", 0)
+				.attr("y", (buttonsPanel.height - buttonsPanel.padding[2]) - buttonsPanel.buttonVerticalPadding * 2.4)
+				.style("fill", "#666")
+				.text("\u25c4");
+
+			const rightArrow = buttonsPanel.main.append("g")
+				.attr("class", "pbihrpRightArrowGroup")
+				.style("cursor", "pointer")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding +
+					(buttonsNumber * buttonsPanel.buttonWidth)) + ",0)");
+
+			const rightArrowRect = rightArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", (buttonsPanel.height - buttonsPanel.padding[2]) - buttonsPanel.padding[0] - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding);
+
+			const rightArrowText = rightArrow.append("text")
+				.attr("class", "pbihrprightArrowText")
+				.attr("x", -1)
+				.attr("y", (buttonsPanel.height - buttonsPanel.padding[2]) - buttonsPanel.buttonVerticalPadding * 2.4)
+				.style("fill", "#666")
+				.text("\u25ba");
+
+			if (yearsArray.length > buttonsNumber) {
+
+				clipPathGroup.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding) + ",0)")
+
+				rightArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				leftArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				repositionButtonsGroup();
+
+				checkCurrentTranslate();
+
+				leftArrow.on("click", function() {
+					leftArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
+						.on("end", function() {
+							const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+							if (currentTranslate === 0) {
+								leftArrow.select("text").style("fill", "#ccc")
+							} else {
+								leftArrow.attr("pointer-events", "all");
+							}
+						})
+				});
+
+				rightArrow.on("click", function() {
+					rightArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
+								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
+							",0)")
+						.on("end", function() {
+							const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+							if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+								rightArrow.select("text").style("fill", "#ccc")
+							} else {
+								rightArrow.attr("pointer-events", "all");
+							}
+						})
+				});
+			};
+
+			buttonsRects.on("mouseover", mouseOverButtonsRects)
+				.on("mouseout", mouseOutButtonsRects)
+				.on("click", function(d) {
+					chartState.selectedYear = d;
+
+					if (queryStringValues.has("year")) {
+						queryStringValues.set("year", d);
+					} else {
+						queryStringValues.append("year", d);
+					};
+
+					buttonsRects.style("fill", function(e) {
+						return chartState.selectedYear === e ? unBlue : "#eaeaea";
+					});
+
+					buttonsText.style("fill", function(e) {
+						return chartState.selectedYear === e ? "white" : "#444";
+					});
+
+					const data = completeData.find(function(d) {
+						return d.year === chartState.selectedYear;
+					});
+
+					resizeSVGHeight(data)
+
+					createTopSummaryPanel(data.totalData, data.hrpYear);
+
+					createStackedBarPanel(data.totalData);
+
+					createDonutsPanel(data.totalData, data.hrpYear);
+
+					createBarChartPanel(data);
+
+					createNonHrpPanel(data);
+				});
+
+			function mouseOverButtonsRects(d) {
+				d3.select(this).style("fill", unBlue);
+				buttonsGroup.selectAll("text")
+					.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
+			};
+
+			function mouseOutButtonsRects(d) {
+				if (chartState.selectedYear === d) return;
+				d3.select(this).style("fill", "#eaeaea");
+				buttonsText.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
+			};
+
+			function checkCurrentTranslate() {
+
+				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+				if (currentTranslate === 0) {
+					leftArrow.select("text").style("fill", "#ccc")
+					leftArrow.attr("pointer-events", "none");
+				};
+
+				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					rightArrow.select("text").style("fill", "#ccc")
+					rightArrow.attr("pointer-events", "none");
+				};
+
+			};
+
+			function repositionButtonsGroup() {
+
+				const firstYearIndex = chartState.selectedYear < yearsArray[buttonsNumber / 2] ?
+					0 :
+					chartState.selectedYear > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+					yearsArray.length - buttonsNumber :
+					yearsArray.indexOf(chartState.selectedYear) - (buttonsNumber / 2);
+
+				buttonsGroup.attr("transform", "translate(" +
+					(-(buttonsPanel.buttonWidth * firstYearIndex)) +
+					",0)");
+
+			};
+
+			//end of createButtonsPanel
+		};
+
+		function createTopSummaryPanel(data, hrpYear) {
+
+			// //test
+			// topSummaryPanel.main.append("rect")
+			// 	.attr("width", topSummaryPanel.width)
+			// 	.attr("height", topSummaryPanel.height)
+			// 	.style("opacity", 0.05);
+
+			// topSummaryPanelCbpf.main.append("rect")
+			// 	.attr("width", topSummaryPanelCbpf.width)
+			// 	.attr("height", topSummaryPanelCbpf.height)
+			// 	.style("opacity", 0.1);
+
+			// topSummaryPanelHrp.main.append("rect")
+			// 	.attr("width", topSummaryPanelHrp.width)
+			// 	.attr("height", topSummaryPanelHrp.height)
+			// 	.style("opacity", 0.1);
+			// //test
+
+			const maximumTotalValue = d3.max(d3.values(data));
+
+			topSummaryScale.domain([0, maximumTotalValue]);
+
+			const topSummaryPanelTitle = topSummaryPanel.main.selectAll(".pbihrptopSummaryPanelTitle")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelTitle")
+				.attr("x", 0)
+				.attr("y", topSummaryPanel.titlePadding - 10)
+				.text("Summary of the data");
+
+			const topSummaryPanelLine = topSummaryPanel.main.selectAll(".pbihrptopSummaryPanelLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrptopSummaryPanelLine")
+				.attr("x1", 0)
+				.attr("x2", topSummaryPanel.width)
+				.attr("y1", topSummaryPanel.titlePadding - 3)
+				.attr("y2", topSummaryPanel.titlePadding - 3)
+				.style("stroke-width", "1px")
+				.style("stroke", "#ccc");
+
+			const topSummaryPanelMiddleLine = topSummaryPanel.main.selectAll(".pbihrptopSummaryPanelMiddleLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrptopSummaryPanelMiddleLine")
+				.attr("x1", topSummaryPanel.width / 2)
+				.attr("x2", topSummaryPanel.width / 2)
+				.attr("y1", topSummaryPanel.titlePadding + 8)
+				.attr("y2", topSummaryPanel.height - 8)
+				.style("stroke-width", "1px")
+				.style("stroke", "#ccc");
+
+			const previousCbpfValue = d3.select(".pbihrptopSummaryPanelCbpfValue").size() !== 0 ? d3.select(".pbihrptopSummaryPanelCbpfValue").datum() : 0;
+
+			const previousHrpValue = d3.select(".pbihrptopSummaryPanelHrpValue").size() !== 0 ? d3.select(".pbihrptopSummaryPanelHrpValue").datum() : 0;
+
+			let topSummaryPanelCbpfValue = topSummaryPanelCbpf.main.selectAll(".pbihrptopSummaryPanelCbpfValue")
+				.data([data.cbpftarget]);
+
+			topSummaryPanelCbpfValue = topSummaryPanelCbpfValue.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelCbpfValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.merge(topSummaryPanelCbpfValue)
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding)
+				.attr("x", topSummaryPanelCbpf.valuePadding);
+
+			topSummaryPanelCbpfValue.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousCbpfValue, d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			let topSummaryPanelCbpfTopText = topSummaryPanelCbpf.main.selectAll(".pbihrptopSummaryPanelCbpfTopText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelCbpfTopText")
+				.attr("x", topSummaryPanelCbpf.valuePadding + 3)
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 2.6)
+				.text("CBPF Target");
+
+			let topSummaryPanelCbpfBottomText = topSummaryPanelCbpf.main.selectAll(".pbihrptopSummaryPanelCbpfBottomText")
+				.data([data.hrpfunding]);
+
+			topSummaryPanelCbpfBottomText = topSummaryPanelCbpfBottomText.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelCbpfBottomText")
+				.attr("x", topSummaryPanelCbpf.valuePadding + 3)
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 1.1)
+				.merge(topSummaryPanelCbpfBottomText)
+				.text(function(d) {
+					return "(" + targetPercentage + " of " + formatSIFloat(d) + ")";
+				});
+
+			let topSummaryPanelHrpValue = topSummaryPanelHrp.main.selectAll(".pbihrptopSummaryPanelHrpValue")
+				.data([data.hrpfunding]);
+
+			topSummaryPanelHrpValue = topSummaryPanelHrpValue.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelHrpValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.merge(topSummaryPanelHrpValue)
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding)
+				.attr("x", topSummaryPanelHrp.valuePadding);
+
+			topSummaryPanelHrpValue.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousHrpValue, d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			let topSummaryPanelHrpTopText = topSummaryPanelHrp.main.selectAll(".pbihrptopSummaryPanelHrpTopText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelHrpTopText")
+				.attr("x", topSummaryPanelHrp.valuePadding + 3)
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 2.6)
+				.text("HRP Funding");
+
+			let topSummaryPanelHrpBottomText = topSummaryPanelHrp.main.selectAll(".pbihrptopSummaryPanelHrpBottomText")
+				.data([data.hrpfunding]);
+
+			topSummaryPanelHrpBottomText = topSummaryPanelHrpBottomText.enter()
+				.append("text")
+				.attr("class", "pbihrptopSummaryPanelHrpBottomText")
+				.attr("x", topSummaryPanelHrp.valuePadding + 3)
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 1.1)
+				.merge(topSummaryPanelHrpBottomText)
+				.text(function(d) {
+					return "(for " + hrpYear + ")";
+				});
+
+			const cbpfTargetLabel = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfTargetLabel")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpcbpfTargetLabel")
+				.attr("x", topSummaryPanelCbpf.padding[3] - 4)
+				.attr("text-anchor", "end")
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 2.7)
+				.text("Target");
+
+			const cbpfFundingLabel = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfFundingLabel")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpcbpfFundingLabel")
+				.attr("x", topSummaryPanelCbpf.padding[3] - 4)
+				.attr("text-anchor", "end")
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 1.3)
+				.text("Funding");
+
+			const hrpRequirementsLabel = topSummaryPanelHrp.main.selectAll(".pbihrphrpRequirementsLabel")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrphrpRequirementsLabel")
+				.attr("x", topSummaryPanelHrp.padding[3] - 4)
+				.attr("text-anchor", "end")
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 2.7)
+				.text("Requirements");
+
+			const hrpFundingLabel = topSummaryPanelHrp.main.selectAll(".pbihrphrpFundingLabel")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrphrpFundingLabel")
+				.attr("x", topSummaryPanelHrp.padding[3] - 4)
+				.attr("text-anchor", "end")
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 1.3)
+				.text("Funding");
+
+			let cbpfTargetBar = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfTargetBar")
+				.data([data.cbpftarget]);
+
+			cbpfTargetBar = cbpfTargetBar.enter()
+				.append("rect")
+				.attr("class", "pbihrpcbpfTargetBar")
+				.attr("x", topSummaryPanelCbpf.padding[3])
+				.attr("y", topSummaryPanelCbpf.height * 0.35 - topSummaryBarsHeight / 2)
+				.attr("width", 0)
+				.attr("height", topSummaryBarsHeight)
+				.style("fill", colorsArray[1])
+				.merge(cbpfTargetBar);
+
+			cbpfTargetBar.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return topSummaryScale(d) - topSummaryPanelCbpf.padding[3];
+				});
+
+			let cbpfFundingBar = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfFundingBar")
+				.data([data.cbpffunding]);
+
+			cbpfFundingBar = cbpfFundingBar.enter()
+				.append("rect")
+				.attr("class", "pbihrpcbpfFundingBar")
+				.attr("x", topSummaryPanelCbpf.padding[3])
+				.attr("y", topSummaryPanelCbpf.height * 0.65 - topSummaryBarsHeight / 2)
+				.attr("width", 0)
+				.attr("height", topSummaryBarsHeight)
+				.style("fill", colorsArray[0])
+				.merge(cbpfFundingBar);
+
+			cbpfFundingBar.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return topSummaryScale(d) - topSummaryPanelCbpf.padding[3];
+				});
+
+			let hrpRequirementsBar = topSummaryPanelHrp.main.selectAll(".pbihrphrpRequirementsBar")
+				.data([data.hrprequirements]);
+
+			hrpRequirementsBar = hrpRequirementsBar.enter()
+				.append("rect")
+				.attr("class", "pbihrphrpRequirementsBar")
+				.attr("x", topSummaryPanelHrp.padding[3])
+				.attr("y", topSummaryPanelHrp.height * 0.35 - topSummaryBarsHeight / 2)
+				.attr("width", 0)
+				.attr("height", topSummaryBarsHeight)
+				.style("fill", colorsArray[3])
+				.merge(hrpRequirementsBar);
+
+			hrpRequirementsBar.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return topSummaryScale(d) - topSummaryPanelHrp.padding[3];
+				});
+
+			let hrpFundingBar = topSummaryPanelHrp.main.selectAll(".pbihrphrpFundingBar")
+				.data([data.hrpfunding]);
+
+			hrpFundingBar = hrpFundingBar.enter()
+				.append("rect")
+				.attr("class", "pbihrphrpFundingBar")
+				.attr("x", topSummaryPanelHrp.padding[3])
+				.attr("y", topSummaryPanelHrp.height * 0.65 - topSummaryBarsHeight / 2)
+				.attr("width", 0)
+				.attr("height", topSummaryBarsHeight)
+				.style("fill", colorsArray[2])
+				.merge(hrpFundingBar);
+
+			hrpFundingBar.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return topSummaryScale(d) - topSummaryPanelHrp.padding[3];
+				});
+
+			const cbpfTargetBarTick = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfTargetBarTick")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrpcbpfTargetBarTick")
+				.attr("x1", topSummaryPanelCbpf.padding[3] - 3)
+				.attr("x2", topSummaryPanelCbpf.padding[3])
+				.attr("y1", topSummaryPanelCbpf.height * 0.35)
+				.attr("y2", topSummaryPanelCbpf.height * 0.35)
+				.style("stroke", "#888")
+				.style("stroke-width", "1px");
+
+			const cbpfFundingBarTick = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfFundingBarTick")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrpcbpfFundingBarTick")
+				.attr("x1", topSummaryPanelCbpf.padding[3] - 3)
+				.attr("x2", topSummaryPanelCbpf.padding[3])
+				.attr("y1", topSummaryPanelCbpf.height * 0.65)
+				.attr("y2", topSummaryPanelCbpf.height * 0.65)
+				.style("stroke", "#888")
+				.style("stroke-width", "1px");
+
+			const hrpRequirementsBarTick = topSummaryPanelHrp.main.selectAll(".pbihrphrpRequirementsBarTick")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrphrpRequirementsBarTick")
+				.attr("x1", topSummaryPanelHrp.padding[3] - 3)
+				.attr("x2", topSummaryPanelHrp.padding[3])
+				.attr("y1", topSummaryPanelHrp.height * 0.35)
+				.attr("y2", topSummaryPanelHrp.height * 0.35)
+				.style("stroke", "#888")
+				.style("stroke-width", "1px");
+
+			const hrpFundingBarTick = topSummaryPanelHrp.main.selectAll(".pbihrphrpFundingBarTick")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrphrpFundingBarTick")
+				.attr("x1", topSummaryPanelHrp.padding[3] - 3)
+				.attr("x2", topSummaryPanelHrp.padding[3])
+				.attr("y1", topSummaryPanelHrp.height * 0.65)
+				.attr("y2", topSummaryPanelHrp.height * 0.65)
+				.style("stroke", "#888")
+				.style("stroke-width", "1px");
+
+			let cbpfTargetBarValue = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfTargetBarValue")
+				.data([data.cbpftarget]);
+
+			cbpfTargetBarValue = cbpfTargetBarValue.enter()
+				.append("text")
+				.attr("class", "pbihrpcbpfTargetBarValue")
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 2.7)
+				.attr("x", topSummaryScale(0) + 2)
+				.text(formatSIFloat(0))
+				.merge(cbpfTargetBarValue);
+
+			cbpfTargetBarValue.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return topSummaryScale(d) + 2;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.slice(1)), d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			let cbpfFundingBarValue = topSummaryPanelCbpf.main.selectAll(".pbihrpcbpfFundingBarValue")
+				.data([data.cbpffunding]);
+
+			cbpfFundingBarValue = cbpfFundingBarValue.enter()
+				.append("text")
+				.attr("class", "pbihrpcbpfFundingBarValue")
+				.attr("y", topSummaryPanelCbpf.height - topSummaryPanelCbpf.valueVerPadding * 1.3)
+				.attr("x", topSummaryScale(0) + 2)
+				.text(formatSIFloat(0))
+				.merge(cbpfFundingBarValue);
+
+			cbpfFundingBarValue.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return topSummaryScale(d) + 2;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.slice(1)), d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			let hrpRequirementsBarValue = topSummaryPanelHrp.main.selectAll(".pbihrphrpRequirementsBarValue")
+				.data([data.hrprequirements]);
+
+			hrpRequirementsBarValue = hrpRequirementsBarValue.enter()
+				.append("text")
+				.attr("class", "pbihrphrpRequirementsBarValue")
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 2.7)
+				.attr("x", topSummaryScale(0) + 2)
+				.text(formatSIFloat(0))
+				.merge(hrpRequirementsBarValue);
+
+			hrpRequirementsBarValue.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return topSummaryScale(d) + 2;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.slice(1)), d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			let hrpFundingBarValue = topSummaryPanelHrp.main.selectAll(".pbihrphrpFundingBarValue")
+				.data([data.hrpfunding]);
+
+			hrpFundingBarValue = hrpFundingBarValue.enter()
+				.append("text")
+				.attr("class", "pbihrphrpFundingBarValue")
+				.attr("y", topSummaryPanelHrp.height - topSummaryPanelHrp.valueVerPadding * 1.3)
+				.attr("x", topSummaryScale(0) + 2)
+				.text(formatSIFloat(0))
+				.merge(hrpFundingBarValue);
+
+			hrpFundingBarValue.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return topSummaryScale(d) + 2;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.slice(1)), d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			//end of createTopSummaryPanel
+		};
+
+		function createStackedBarPanel(data) {
+
+			//test
+			// stackedBarPanel.main.append("rect")
+			// 	.attr("width", stackedBarPanel.width)
+			// 	.attr("height", stackedBarPanel.height)
+			// 	.style("opacity", 0.1);
+			//test
+
+			const stackedBarPanelText = stackedBarPanel.main.selectAll(".pbihrpstackedBarPanelText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpstackedBarPanelText")
+				.attr("x", 0)
+				.attr("y", stackedBarPanel.padding[0] - 5)
+				.text("CBPF and HRP values, to scale:");
+
+			const stackedData = d3.entries(data).sort(function(a, b) {
+				return b.value - a.value;
+			});
+
+			stackedBarScale.domain([0, stackedData[0].value]);
+
+			let stackedBarsGroup = stackedBarPanel.main.selectAll(".pbihrpstackedBarsGroup")
+				.data(stackedData);
+
+			const stackedBarsGroupEnter = stackedBarsGroup.enter()
+				.append("g")
+				.attr("class", "pbihrpstackedBarsGroup");
+
+			const stackedBarsEnter = stackedBarsGroupEnter.append("rect")
+				.attr("y", function(_, i) {
+					return stackedBarPanel.padding[0] + i * (stackedBarHeight / 2);
+				})
+				.attr("x", stackedBarScale(0))
+				.attr("height", stackedBarHeight)
+				.style("fill", function(d) {
+					return legendColorsScale(d.key);
+				})
+				.style("stroke", "white")
+				.style("stroke-width", "1px");
+
+			const stackedBarsLabels = stackedBarsGroupEnter.append("text")
+				.attr("class", "pbihrpstackedBarsLabels")
+				.attr("x", stackedBarScale(0))
+				.attr("y", stackedBarPanel.height - stackedBarPanel.padding[2] + stackedBarPanel.labelPadding)
+				.attr("font-family", "Roboto")
+				.attr("font-size", "12px")
+				.attr("font-weight", 500)
+				.text(formatSIFloat(0));
+
+			const stackedBarsLabelsSpan = stackedBarsGroupEnter.append("text")
+				.attr("class", "pbihrpstackedBarsLabelsSpan")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "12px")
+				.attr("font-weight", 400)
+				.attr("x", stackedBarScale(0))
+				.attr("y", stackedBarPanel.height - stackedBarPanel.padding[2] + stackedBarPanel.labelPadding * 2.3)
+				.text(function(d) {
+					return sortByValues[d.key];
+				});
+
+			const stackedBarsPolyline = stackedBarsGroupEnter.append("polyline")
+				.style("fill", "none")
+				.style("stroke", "#ccc")
+				.style("stroke-width", "1px")
+				.attr("points", function(d, i) {
+					return stackedBarScale(0) + "," + (stackedBarPanel.padding[0] + (i * stackedBarHeight / 2) + stackedBarHeight) + " " +
+						stackedBarScale(0) + "," + (stackedBarPanel.height - stackedBarPanel.padding[2] - 4) + " " +
+						stackedBarScale(0) + "," + (stackedBarPanel.height - stackedBarPanel.padding[2] - 4) + " " +
+						stackedBarScale(0) + "," + (stackedBarPanel.height - stackedBarPanel.padding[2]) + " ";
+				});
+
+			stackedBarsLabelsSpan.each(function(_, i, n) {
+				if (!i) {
+					d3.select(this.parentNode).selectAll("text, tspan")
+						.attr("text-anchor", "end");
+				};
+				localVariable.set(this.parentNode, this.getBoundingClientRect().width);
+			});
+
+			stackedBarsGroup = stackedBarsGroupEnter.merge(stackedBarsGroup);
+
+			let labelsPositions = [];
+
+			stackedBarsGroup.each(function(d) {
+				const thisWidth = localVariable.get(this);
+				labelsPositions.unshift({
+					key: d.key,
+					position: stackedBarScale(d.value),
+					width: thisWidth
+				});
+			});
+
+			labelsPositions.forEach(function(d, i, arr) {
+				if (i && i < arr.length - 1) {
+					if (d.position < arr[i - 1].position) d.position = arr[i - 1].position;
+					while (d.position < arr[i - 1].position + arr[i - 1].width + stackedBarPanel.labelHorPadding) {
+						++d.position;
+					};
+				};
+			});
+
+			for (let i = labelsPositions.length - 1; i--;) {
+				if (labelsPositions[i].position > labelsPositions[i + 1].position) labelsPositions[i].position = labelsPositions[i + 1].position;
+				if (i === labelsPositions.length - 2) {
+					while (labelsPositions[i].position + labelsPositions[i].width + stackedBarPanel.labelHorPadding > labelsPositions[i + 1].position - labelsPositions[i + 1].width) {
+						--labelsPositions[i].position;
+					};
+				} else {
+					while (labelsPositions[i].position + labelsPositions[i].width + stackedBarPanel.labelHorPadding > labelsPositions[i + 1].position) {
+						--labelsPositions[i].position;
+					};
+				};
+			};
+
+			stackedBarsGroup.select("rect")
+				.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return stackedBarScale(d.value) - stackedBarPanel.padding[3]
+				});
+
+			stackedBarsGroup.select("text.pbihrpstackedBarsLabels")
+				.transition()
+				.duration(duration)
+				.attr("x", function(d, i, n) {
+					return labelsPositions.find(function(e) {
+						return e.key === d.key;
+					}).position;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.slice(1)), d.value);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			stackedBarsGroup.select("text.pbihrpstackedBarsLabelsSpan")
+				.transition()
+				.duration(duration)
+				.attr("x", function(d, i, n) {
+					return labelsPositions.find(function(e) {
+						return e.key === d.key;
+					}).position;
+				});
+
+			stackedBarsGroup.select("polyline")
+				.transition()
+				.duration(duration)
+				.attr("points", function(d, i) {
+					const lastPoint = labelsPositions.find(function(e) {
+						return e.key === d.key;
+					}).position;
+					return stackedBarScale(d.value) + "," + (stackedBarPanel.padding[0] + (i * stackedBarHeight / 2) + stackedBarHeight) + " " +
+						stackedBarScale(d.value) + "," + (stackedBarPanel.height - stackedBarPanel.padding[2] - 4) + " " +
+						lastPoint + "," + (stackedBarPanel.height - stackedBarPanel.padding[2] - 4) + " " +
+						lastPoint + "," + (stackedBarPanel.height - stackedBarPanel.padding[2]) + " ";
+				});
+
+			//end of createStackedBarPanel
+		};
+
+		function createDonutsPanel(data, hrpYear) {
+
+			//test
+			// donutsPanel.main.append("rect")
+			// 	.attr("width", donutsPanel.width)
+			// 	.attr("height", donutsPanel.height)
+			// 	.style("opacity", 0.1);
+			//test
+
+			const previousFundingValue = d3.select(".pbihrpdonutsPanelFundingValue").size() !== 0 ? d3.select(".pbihrpdonutsPanelFundingValue").datum() : 0;
+
+			let donutsPanelFundingValue = donutsPanel.main.selectAll(".pbihrpdonutsPanelFundingValue")
+				.data([data.cbpffunding]);
+
+			donutsPanelFundingValue = donutsPanelFundingValue.enter()
+				.append("text")
+				.attr("class", "pbihrpdonutsPanelFundingValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.merge(donutsPanelFundingValue)
+				.attr("y", donutsPanel.height - donutsPanel.valueVerPadding)
+				.attr("x", donutsPanel.valuePadding);
+
+			donutsPanelFundingValue.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousFundingValue, d);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const donutsPanelTopText = donutsPanel.main.selectAll(".pbihrpdonutsPanelTopText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpdonutsPanelTopText")
+				.attr("x", donutsPanel.valuePadding + 3)
+				.attr("y", donutsPanel.height - donutsPanel.valueVerPadding * 2.6)
+				.text("Is the CBPF current")
+				.append("tspan")
+				.attr("x", donutsPanel.valuePadding + 3)
+				.attr("y", donutsPanel.height - donutsPanel.valueVerPadding * 1.1)
+				.text("funding. It corresponds to...");
+
+			const donutsPanelArrow = donutsPanel.main.selectAll(".pbihrpdonutsPanelArrow")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("font-size", "40px")
+				.attr("fill", "#888")
+				.attr("font-family", "Arial")
+				.attr("class", "pbihrpdonutsPanelArrow")
+				.attr("y", donutsPanel.height / 1.3)
+				.attr("x", donutsPanel.valuePadding + 190)
+				.text("\u2192");
+
+			const donutsKeys = ["cbpftarget", "hrpfunding", "hrprequirements"];
+
+			donutsPanelScale.domain(donutsKeys);
+
+			const pieData = donutsKeys.map(function(d) {
+				const values = [{
+					key: "cbpffunding",
+					value: data.cbpffunding
+				}, {
+					key: d,
+					value: data[d] - data.cbpffunding
+				}];
+				return {
+					key: d,
+					percent: data.cbpffunding / data[d],
+					values: values
+				};
+			});
+
+			let donutsGroup = donutsPanel.main.selectAll(".pbihrpdonutsGroup")
+				.data(pieData);
+
+			const donutsGroupEnter = donutsGroup.enter()
+				.append("g")
+				.attr("class", "pbihrpdonutsGroup")
+				.attr("transform", function(d) {
+					return "translate(" + donutsPanelScale(d.key) + "," + ((donutsPanel.padding[0] + donutsPanel.height) / 2) + ")";
+				});
+
+			const donutsPathsEnter = donutsGroupEnter.selectAll(".pbihrpdonutsPathsEnter")
+				.data(function(d) {
+					return donutGenerator(d.values.map(function(e) {
+						if (e.key === "cbpffunding") {
+							return {
+								key: "cbpffunding",
+								value: 0
+							};
+						} else {
+							return e;
+						}
+					}))
+				}, function(d) {
+					return d.data.key;
+				})
+				.enter()
+				.append("path")
+				.attr("class", "pbihrpdonutsPathsEnter")
+				.style("fill", function(d) {
+					return d.data.key === "cbpffunding" ? colorsArray[0] : colorsArray[colorsArray.length - 1];
+				})
+				.attr("d", arcGenerator)
+				.each(function(d) {
+					localVariable.set(this, d);
+				});
+
+			const donutsPercentage = donutsGroupEnter.append("text")
+				.attr("class", "pbihrpdonutsPercentage")
+				.attr("text-anchor", "middle")
+				.attr("y", 4)
+				.attr("x", 0)
+				.text(formatPercent(0));
+
+			const donutsPanelDonutsText = donutsGroupEnter.selectAll(".pbihrpdonutsPanelDonutsText")
+				.data(function(d) {
+					return [d]
+				})
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpdonutsPanelDonutsText")
+				.attr("x", donutsPanel.height / 2)
+				.attr("y", -3)
+				.text(function(d) {
+					if (d.key === "cbpftarget") {
+						return "of the current CBPF";
+					} else if (d.key === "hrpfunding") {
+						return "of the HRP Funding";
+					} else {
+						return "of the HRP Requirements"
+					};
+				})
+				.append("tspan")
+				.attr("x", donutsPanel.height / 2)
+				.attr("y", 12)
+				.text(function(d) {
+					if (d.key === "cbpftarget") {
+						return "Target";
+					} else {
+						return "for " + hrpYear;
+					};
+				});
+
+			donutsGroup = donutsGroupEnter.merge(donutsGroup);
+
+			donutsGroup.select("text.pbihrpdonutsPercentage")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const thisValue = +(node.textContent.match(/\d+/)[0]);
+					const i = d3.interpolate(thisValue / 100, d.percent);
+					return function(t) {
+						if (i(t) > 1) {
+							d3.select(node).style("font-size", 10);
+						} else {
+							d3.select(node).style("font-size", 12);
+						};
+						node.textContent = i(t) > 1 ? ">100%" : formatPercent(i(t));
+					};
+				});
+
+			donutsGroup.select(".pbihrpdonutsPanelDonutsText tspan")
+				.text(function(d) {
+					if (d.key === "cbpftarget") {
+						return "Target";
+					} else {
+						return "for " + hrpYear;
+					};
+				});
+
+			const donutsPaths = donutsGroup.selectAll(".pbihrpdonutsPathsEnter")
+				.data(function(d) {
+					return donutGenerator(d.values)
+				}, function(d) {
+					return d.data.key;
+				})
+				.transition()
+				.duration(duration)
+				.attrTween("d", function(d) {
+					const i = d3.interpolate(localVariable.get(this), d);
+					localVariable.set(this, i(0));
+					return function(t) {
+						return arcGenerator(i(t));
+					};
+				});
+
+
+			//console.log(pieData);
+
+
+			//end of createDonutsPanel
+		};
+
+		function createBarChartPanel(data) {
+
+			//test
+			// barChartPanel.main.append("rect")
+			// 	.attr("width", barChartPanel.width)
+			// 	.attr("height", barChartPanel.height)
+			// 	.style("opacity", 0.05);
+			//test
+
+			const barChartPanelTitle = barChartPanel.main.selectAll(".pbihrpbarChartPanelTitle")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpbarChartPanelTitle")
+				.attr("x", 0)
+				.attr("y", barChartPanel.titlePadding - 7)
+				.text("CBPF Target by Country");
+
+			const barChartPanelLine = barChartPanel.main.selectAll(".pbihrpbarChartPanelLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrpbarChartPanelLine")
+				.attr("x1", 0)
+				.attr("x2", barChartPanel.width)
+				.attr("y1", barChartPanel.titlePadding)
+				.attr("y2", barChartPanel.titlePadding)
+				.style("stroke-width", "1px")
+				.style("stroke", "#ccc");
+
+			const legendGroup = barChartPanel.main.selectAll(".pbihrplegendGroup")
+				.data(variablesArray.filter(function(_, i) {
+					return i !== 1;
+				}))
+				.enter()
+				.append("g")
+				.attr("class", "pbihrplegendGroup")
+				.attr("transform", "translate(0," + barChartPanel.legendPadding + ")");
+
+			const legendRectangle = legendGroup.append("rect")
+				.attr("width", legendRectangleSize)
+				.attr("height", legendRectangleSize)
+				.style("fill", function(d) {
+					return legendColorsScale(d)
+				});
+
+			const legendText = legendGroup.append("text")
+				.attr("y", legendRectangleSize - 3)
+				.attr("x", legendRectangleSize + 3)
+				.attr("class", "pbihrplegendText")
+				.style("font-family", "Roboto")
+				.style("font-size", "13px")
+				.text(function(d) {
+					return sortByValues[d.toLowerCase()];
+				});
+
+			if (legendGroup.size()) {
+				let counter = 0;
+				legendGroup.each(function(_, i, nodes) {
+					if (i) {
+						d3.select(this)
+							.attr("transform", "translate(" + (counter += this.previousSibling.getBoundingClientRect().width + 26) + "," + barChartPanel.legendPadding + ")");
+					};
+				});
+			};
+
+			//end of createBarChartPanel
+		};
+
+		function createNonHrpPanel(data) {
+
+			//test
+			// nonHrpPanel.main.append("rect")
+			// 	.attr("width", nonHrpPanel.width)
+			// 	.attr("height", nonHrpPanel.height)
+			// 	.style("opacity", 0.05);
+			//test
+
+			const nonHrpPanelTitle = nonHrpPanel.main.selectAll(".pbihrpnonHrpPanelTitle")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpnonHrpPanelTitle")
+				.attr("x", 0)
+				.attr("y", nonHrpPanel.padding[0] - 7)
+				.text("Non-HRP CBPFs:");
+
+			//end of createNonHrpPanel
+		};
+
+		function createSortMenu(completeData) {
+
+			const sortMenuTitle = sortMenuPanel.main.append("text")
+				.attr("class", "pbihrpsortMenuTitle contributionColorDarkerFill")
+				.attr("x", 0)
+				.attr("y", legendRectangleSize - 3)
+				.text("Sort by:");
+
+			const menuRectangle = sortMenuPanel.main.append("rect")
+				.attr("rx", 2)
+				.attr("ry", 2)
+				.attr("x", sortMenuPanel.titlePadding)
+				.attr("y", -2)
+				.attr("width", sortMenuPanel.width)
+				.attr("height", sortMenuPanel.groupHeight)
+				.style("fill", "whitesmoke")
+				.style("stroke-width", 1)
+				.style("opacity", 0)
+				.style("stroke", "#aaa")
+				.attr("pointer-events", "none");
+
+			const menuRectangleClip = sortMenuPanel.main.append("clipPath")
+				.attr("id", "pbihrpsortMenuClip")
+				.append("rect")
+				.attr("x", sortMenuPanel.titlePadding + 1)
+				.attr("y", -2)
+				.attr("width", sortMenuPanel.width)
+				.attr("height", sortMenuPanel.groupHeight);
+
+			let currentTranslate = calculateTranslate();
+
+			const sortMenuContainerClipGroup = sortMenuPanel.main.append("g")
+				.attr("clip-path", "url(#pbihrpsortMenuClip)");
+
+			const sortMenuContainer = sortMenuContainerClipGroup.append("g")
+				.attr("transform", "translate(" + (sortMenuPanel.titlePadding - sortMenuPanel.circleSize * 2 - sortMenuPanel.padding[3]) + "," + currentTranslate + ")");
+
+			const menuRectangleBackground = sortMenuContainer.append("rect")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("width", sortMenuPanel.width)
+				.attr("height", sortMenuPanel.height)
+				.style("fill", "none")
+				.attr("pointer-events", "all");
+
+			const sortGroups = sortMenuContainer.selectAll(null)
+				.data(sortByArray.filter(function(d) {
+					return d !== "cbpftarget"
+				}))
+				.enter()
+				.append("g")
+				.attr("transform", function(_, i) {
+					return "translate(" + sortMenuPanel.padding[3] + "," + (sortMenuPanel.groupHeight * i) + ")";
+				})
+				.attr("cursor", "pointer")
+				.attr("pointer-events", "all");
+
+			const sortGroupsText = sortGroups.append("text")
+				.attr("class", "pbihrpsortGroupText")
+				.attr("x", sortMenuPanel.itemPadding)
+				.attr("y", sortMenuPanel.groupHeight / 1.35)
+				.text(function(d) {
+					return d === "hrpfunding" ? sortByValues[d] + "/CBPF target" : sortByValues[d];
+				});
+
+			const sortGroupsOuterCircle = sortGroups.append("circle")
+				.attr("class", "pbihrpsortGroupsOuterCircle")
+				.attr("r", sortMenuPanel.circleSize)
+				.attr("cx", sortMenuPanel.circleSize)
+				.attr("cy", sortMenuPanel.groupHeight / 2)
+				.style("fill", "none")
+				.style("stroke", "darkslategray");
+
+			const sortGroupsInnerCircle = sortGroups.append("circle")
+				.attr("class", "pbihrpsortGroupsInnerCircle")
+				.attr("r", sortMenuPanel.innerCircleSize)
+				.attr("cx", sortMenuPanel.circleSize)
+				.attr("cy", sortMenuPanel.groupHeight / 2)
+				.style("stroke", "none")
+				.style("fill", function(d) {
+					return chartState.sortBy === d ? "darkslategray" : "none";
+				});
+
+			sortMenuPanel.main.on("mouseover", function() {
+
+				currentHoveredElement = this;
+
+				sortMenuContainer.transition()
+					.duration(duration)
+					.attr("transform", "translate(" + sortMenuPanel.titlePadding + "," + sortMenuVertAlign + ")");
+
+				menuRectangle.transition()
+					.duration(duration)
+					.style("opacity", sortMenuRectangleOpacity)
+					.attr("height", sortMenuPanel.height);
+
+				menuRectangleClip.transition()
+					.duration(duration)
+					.attr("height", sortMenuPanel.height);
+
+			}).on("mouseleave", function() {
+
+				if (isSnapshotTooltipVisible) return;
+				currentHoveredElem = null;
+
+				currentTranslate = calculateTranslate();
+
+				sortMenuContainer.transition()
+					.duration(duration)
+					.attr("transform", "translate(" + (sortMenuPanel.titlePadding - sortMenuPanel.circleSize * 2 - sortMenuPanel.padding[3]) + "," + currentTranslate + ")");
+
+				menuRectangle.transition()
+					.duration(duration)
+					.style("opacity", 0)
+					.attr("height", sortMenuPanel.groupHeight);
+
+				menuRectangleClip.transition()
+					.duration(duration)
+					.attr("height", sortMenuPanel.groupHeight);
+
+			});
+
+			sortGroups.on("click", function(d) {
+				chartState.sortBy = d;
+
+				if (queryStringValues.has("sortby")) {
+					queryStringValues.set("sortby", d);
+				} else {
+					queryStringValues.append("sortby", d);
+				};
+
+				sortGroupsInnerCircle.style("fill", function(d) {
+					return chartState.sortBy === d ? "darkslategray" : "none";
+				});
+				d3.select(currentHoveredElement).dispatch("mouseleave");
+			});
+
+			function calculateTranslate() {
+				const index = sortByArray.indexOf(chartState.sortBy);
+				return index ? -sortMenuPanel.groupHeight * index + sortMenuVertAlign : sortMenuVertAlign;
+			};
+
+			//end of createSortMenu
+		};
+
+		function processData(rawData) {
+
+			const completeData = [];
+
+			rawData.forEach(function(row) {
+				if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
+
+					//REMOVE
+					row.PFFunded = row.PFFunded * (Math.random() / 10);
+					row.PFHRPTarget = row.PFHRPTarget * (Math.random() / 10);
+					row.HRPClstFunded = row.HRPClstFunded * (Math.random() / 10);
+					row.HRPClstReq = row.HRPClstReq * (Math.random() / 10);
+
+					const thisValues = {
+						cbpfName: row.PFName,
+						cbpfId: row.PFId,
+						cbpffunding: +row.PFFunded,
+						cbpftarget: +row.PFHRPTarget,
+						cbpfpercentage: (+row.PFFunded) / (+row.PFHRPTarget),
+						hrpfunding: +row.HRPClstFunded,
+						hrprequirements: +row.HRPClstReq
+					};
+					const foundYear = completeData.find(function(d) {
+						return d.year === +row.TargYr
+					});
+					if (foundYear) {
+						if (row.ClstNm === "xxx") {
+							foundYear.totalData.cbpffunding += +row.PFFunded;
+							foundYear.totalData.cbpftarget += +row.PFHRPTarget;
+							foundYear.totalData.hrpfunding += +row.HRPClstFunded;
+							foundYear.totalData.hrprequirements += +row.HRPClstReq;
+							foundYear.hrpData.push(thisValues);
+						} else {
+							foundYear.nonHrpData.push(thisValues);
+						};
+					} else {
+						if (row.ClstNm === "xxx") {
+							completeData.push({
+								year: +row.TargYr,
+								hrpYear: +row.HRPYr,
+								totalData: {
+									cbpffunding: +row.PFFunded,
+									cbpftarget: +row.PFHRPTarget,
+									hrpfunding: +row.HRPClstFunded,
+									hrprequirements: +row.HRPClstReq
+								},
+								hrpData: [thisValues],
+								nonHrpData: []
+							});
+						} else {
+							completeData.push({
+								year: +row.TargYr,
+								hrpYear: +row.HRPYr,
+								totalData: {
+									cbpffunding: +row.PFFunded,
+									cbpftarget: +row.PFHRPTarget,
+									hrpfunding: +row.HRPClstFunded,
+									hrprequirements: +row.HRPClstReq
+								},
+								hrpData: [],
+								nonHrpData: [thisValues]
+							});
+						};
+					}
+				};
+			});
+
+			return completeData;
+
+			//end of processData
+		};
+
+		function validateYear(yearString) {
+			chartState.selectedYear = yearsArray.indexOf(+yearString) > -1 ? +yearString : currentYear;
+		};
+
+		function parseTransform(translate) {
+			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			group.setAttributeNS(null, "transform", translate);
+			const matrix = group.transform.baseVal.consolidate().matrix;
+			return [matrix.e, matrix.f];
+		};
+
+		function formatSIFloat(value) {
+			const length = (~~Math.log10(value) + 1) % 3;
+			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
+			let siString = d3.formatPrefix("." + digits, value)(value);
+			if (siString[siString.length - 1] === "G") {
+				siString = siString.slice(0, -1) + "B";
+			};
+			return siString;
+		};
+
+		function reverseFormat(s) {
+			if (+s === 0) return 0;
+			let returnValue;
+			const transformation = {
+				Y: Math.pow(10, 24),
+				Z: Math.pow(10, 21),
+				E: Math.pow(10, 18),
+				P: Math.pow(10, 15),
+				T: Math.pow(10, 12),
+				G: Math.pow(10, 9),
+				B: Math.pow(10, 9),
+				M: Math.pow(10, 6),
+				k: Math.pow(10, 3),
+				h: Math.pow(10, 2),
+				da: Math.pow(10, 1),
+				d: Math.pow(10, -1),
+				c: Math.pow(10, -2),
+				m: Math.pow(10, -3),
+				μ: Math.pow(10, -6),
+				n: Math.pow(10, -9),
+				p: Math.pow(10, -12),
+				f: Math.pow(10, -15),
+				a: Math.pow(10, -18),
+				z: Math.pow(10, -21),
+				y: Math.pow(10, -24)
+			};
+			Object.keys(transformation).some(function(k) {
+				if (s.indexOf(k) > 0) {
+					returnValue = parseFloat(s.split(k)[0]) * transformation[k];
+					return true;
+				}
+			});
+			return returnValue;
+		};
 
 		function createCsv(datahere) {
 
@@ -498,14 +2096,14 @@
 			const padding = 6;
 
 			const overDiv = containerDiv.append("div")
-				.attr("class", "FOOBAROverDivHelp");
+				.attr("class", "pbihrpOverDivHelp");
 
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + height);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
-				.attr("id", "FOOBARArrowMarker")
+				.attr("id", "pbihrpArrowMarker")
 				.attr("viewBox", "0 -5 10 10")
 				.attr("refX", 0)
 				.attr("refY", 0)
@@ -528,7 +2126,7 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
-				.attr("class", "FOOBARAnnotationMainText contributionColorFill")
+				.attr("class", "pbihrpAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
 				.attr("y", 320)
@@ -567,12 +2165,12 @@
 
 			const downloadingDiv = d3.select("body").append("div")
 				.style("position", "fixed")
-				.attr("id", "FOOBARDownloadingDiv")
+				.attr("id", "pbihrpDownloadingDiv")
 				.style("left", window.innerWidth / 2 - 100 + "px")
 				.style("top", window.innerHeight / 2 - 100 + "px");
 
 			const downloadingDivSvg = downloadingDiv.append("svg")
-				.attr("class", "FOOBARDownloadingDivSvg")
+				.attr("class", "pbihrpDownloadingDivSvg")
 				.attr("width", 200)
 				.attr("height", 100);
 
@@ -630,7 +2228,7 @@
 					downloadSnapshotPdf(canvas);
 				};
 
-				if (fromContextMenu && currentHoveredRect) d3.select(currentHoveredRect).dispatch("mouseout");
+				if (fromContextMenu && currentHoveredElement) d3.select(currentHoveredElement).dispatch("mouseout");
 
 			});
 
@@ -656,7 +2254,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "FOOBAR_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "CBPFvsHRP_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -675,7 +2273,7 @@
 
 			removeProgressWheel();
 
-			d3.select("#FOOBARDownloadingDiv").remove();
+			d3.select("#pbihrpDownloadingDiv").remove();
 
 		};
 
@@ -748,11 +2346,11 @@
 
 					const currentDate = new Date();
 
-					pdf.save("FOOBAR_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("CBPFvsHRP_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
-					d3.select("#FOOBARDownloadingDiv").remove();
+					d3.select("#pbihrpDownloadingDiv").remove();
 
 					function createLetterhead() {
 
@@ -790,7 +2388,7 @@
 
 		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
 			const wheelGroup = thissvg.append("g")
-				.attr("class", "FOOBARd3chartwheelGroup")
+				.attr("class", "pbihrpd3chartwheelGroup")
 				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
@@ -849,7 +2447,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".FOOBARd3chartwheelGroup");
+			const wheelGroup = d3.select(".pbihrpd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};

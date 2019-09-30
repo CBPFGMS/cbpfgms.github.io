@@ -122,3 +122,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |PFBI: Cluster Overview, lollipop chart|`pbiolc`|
 |PFBI: Allocations map|`pbimap`|
 |PFBI: Allocations Timeline|`pbiuac`|
+|PFBI: CBPF versus HRP|`pbihrp`|
