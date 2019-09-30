@@ -1,0 +1,321 @@
+PFISO3,TargYr,PFName,PFId,HRPId,HRPNm,HRPYr,HRPClstReq,HRPClstFunded,HRPBenReq,HRPBenReached,ClstNm,ClsCd,PFHRPTarget,PFFunded
+AFG,2019,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2018,16793206,3862437.38,,,Education,E,579365.607,133254.0896
+CAF,2019,CAR,17,,CAR Humanitarian Reponse Plan,2018,3657983,621857.11,,,Education,E,93278.5665,15857.35631
+COD,2019,DRC,24,,DRC Humanitarian Reponse Plan,2018,16935584,4064540.16,,,Education,E,609681.024,146323.4458
+SDN,2019,Sudan,15,,Sudan Humanitarian Reponse Plan,2018,15148223,2272233.45,,,Education,E,340835.0175,51125.25263
+SOM,2019,Somalia,21,,Somalia Humanitarian Reponse Plan,2018,47961048,10071820.08,,,Education,E,1510773.012,317262.3325
+SSD,2019,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2018,33794332,6420923.08,,,Education,E,963138.462,182996.3078
+COL,2019,Colombia,52,,Colombia Humanitarian Reponse Plan,2018,107022,55651.44,,,Education,E,8347.716,4340.81232
+ETH,2019,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2018,296728821,157266275.1,,,Education,E,23589941.27,12502668.87
+HTI,2019,Haiti,54,,Haiti Humanitarian Reponse Plan,2018,1370761,740210.94,,,Education,E,111031.641,59957.08614
+MMR,2019,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2018,67643318,39909557.62,,,Education,E,5986433.643,3531995.849
+PAK,2019,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2018,2447841,1468704.6,,,Education,E,220305.69,132183.414
+YEM,2019,Yemen,64,,Yemen Humanitarian Reponse Plan,2018,23161381,14823283.84,,,Education,E,2223492.576,1423035.249
+PSE,2019,oPt,67,,Palestian Humanitarian Reponse Plan,2018,23161381,15518125.27,,,Education,E,2327718.791,1559571.59
+SYR,2019,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2018,296728821,207710174.7,,,Education,E,31156526.21,21809568.34
+LBN,2019,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2018,1370761,973240.31,,,Education,E,145986.0465,103650.093
+JOR,2019,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2018,67643318,49379622.14,,,Education,E,7406943.321,5407068.624
+TUR,2019,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2018,2447841,1517661.42,,,Education,E,227649.213,141142.5121
+IRQ,2019,Iraq,72,,Iraq Humanitarian Reponse Plan,2018,22438700,16155864,,,Education,E,2423379.6,1744833.312
+NGA,2019,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2018,59469400,44602050,,,Education,E,6690307.5,5017730.625
+UKR,2019,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2018,1508040,1221512.4,,,Education,E,183226.86,148413.7566
+AFG,2019,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2018,16793206,3862437.38,,,Health,H,579365.607,133254.0896
+CAF,2019,CAR,17,,CAR Humanitarian Reponse Plan,2018,3657983,621857.11,,,Health,H,93278.5665,15857.35631
+COD,2019,DRC,24,,DRC Humanitarian Reponse Plan,2018,16935584,4064540.16,,,Health,H,609681.024,146323.4458
+SDN,2019,Sudan,15,,Sudan Humanitarian Reponse Plan,2018,15148223,2272233.45,,,Health,H,340835.0175,51125.25263
+SOM,2019,Somalia,21,,Somalia Humanitarian Reponse Plan,2018,47961048,10071820.08,,,Health,H,1510773.012,317262.3325
+SSD,2019,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2018,33794332,6420923.08,,,Health,H,963138.462,182996.3078
+COL,2019,Colombia,52,,Colombia Humanitarian Reponse Plan,2018,107022,55651.44,,,Health,H,8347.716,4340.81232
+ETH,2019,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2018,296728821,157266275.1,,,Health,H,23589941.27,12502668.87
+HTI,2019,Haiti,54,,Haiti Humanitarian Reponse Plan,2018,1370761,740210.94,,,Health,H,111031.641,59957.08614
+MMR,2019,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2018,67643318,39909557.62,,,Health,H,5986433.643,3531995.849
+PAK,2019,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2018,2447841,1468704.6,,,Health,H,220305.69,132183.414
+YEM,2019,Yemen,64,,Yemen Humanitarian Reponse Plan,2018,23161381,14823283.84,,,Health,H,2223492.576,1423035.249
+PSE,2019,oPt,67,,Palestian Humanitarian Reponse Plan,2018,23161381,15518125.27,,,Health,H,2327718.791,1559571.59
+SYR,2019,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2018,296728821,207710174.7,,,Health,H,31156526.21,21809568.34
+LBN,2019,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2018,1370761,973240.31,,,Health,H,145986.0465,103650.093
+JOR,2019,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2018,67643318,49379622.14,,,Health,H,7406943.321,5407068.624
+TUR,2019,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2018,2447841,1517661.42,,,Health,H,227649.213,141142.5121
+IRQ,2019,Iraq,72,,Iraq Humanitarian Reponse Plan,2018,22438700,16155864,,,Health,H,2423379.6,1744833.312
+NGA,2019,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2018,59469400,44602050,,,Health,H,6690307.5,5017730.625
+UKR,2019,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2018,1508040,1221512.4,,,Health,H,183226.86,148413.7566
+AFG,2019,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2018,16793206,3862437.38,,,Protection,P,579365.607,133254.0896
+CAF,2019,CAR,17,,CAR Humanitarian Reponse Plan,2018,3657983,621857.11,,,Protection,P,93278.5665,15857.35631
+COD,2019,DRC,24,,DRC Humanitarian Reponse Plan,2018,16935584,4064540.16,,,Protection,P,609681.024,146323.4458
+SDN,2019,Sudan,15,,Sudan Humanitarian Reponse Plan,2018,15148223,2272233.45,,,Protection,P,340835.0175,51125.25263
+SOM,2019,Somalia,21,,Somalia Humanitarian Reponse Plan,2018,47961048,10071820.08,,,Protection,P,1510773.012,317262.3325
+SSD,2019,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2018,33794332,6420923.08,,,Protection,P,963138.462,182996.3078
+COL,2019,Colombia,52,,Colombia Humanitarian Reponse Plan,2018,107022,55651.44,,,Protection,P,8347.716,4340.81232
+ETH,2019,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2018,296728821,157266275.1,,,Protection,P,23589941.27,12502668.87
+HTI,2019,Haiti,54,,Haiti Humanitarian Reponse Plan,2018,1370761,740210.94,,,Protection,P,111031.641,59957.08614
+MMR,2019,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2018,67643318,39909557.62,,,Protection,P,5986433.643,3531995.849
+PAK,2019,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2018,2447841,1468704.6,,,Protection,P,220305.69,132183.414
+YEM,2019,Yemen,64,,Yemen Humanitarian Reponse Plan,2018,23161381,14823283.84,,,Protection,P,2223492.576,1423035.249
+PSE,2019,oPt,67,,Palestian Humanitarian Reponse Plan,2018,23161381,15518125.27,,,Protection,P,2327718.791,1559571.59
+SYR,2019,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2018,296728821,207710174.7,,,Protection,P,31156526.21,21809568.34
+LBN,2019,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2018,1370761,973240.31,,,Protection,P,145986.0465,103650.093
+JOR,2019,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2018,67643318,49379622.14,,,Protection,P,7406943.321,5407068.624
+TUR,2019,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2018,2447841,1517661.42,,,Protection,P,227649.213,141142.5121
+IRQ,2019,Iraq,72,,Iraq Humanitarian Reponse Plan,2018,22438700,16155864,,,Protection,P,2423379.6,1744833.312
+NGA,2019,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2018,59469400,44602050,,,Protection,P,6690307.5,5017730.625
+UKR,2019,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2018,1508040,1221512.4,,,Protection,P,183226.86,148413.7566
+AFG,2019,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2018,16793206,3862437.38,,,xxx,X,579365.607,133254.0896
+CAF,2019,CAR,17,,CAR Humanitarian Reponse Plan,2018,3657983,621857.11,,,xxx,X,93278.5665,15857.35631
+COD,2019,DRC,24,,DRC Humanitarian Reponse Plan,2018,16935584,4064540.16,,,xxx,X,609681.024,146323.4458
+SDN,2019,Sudan,15,,Sudan Humanitarian Reponse Plan,2018,15148223,2272233.45,,,xxx,X,340835.0175,51125.25263
+SOM,2019,Somalia,21,,Somalia Humanitarian Reponse Plan,2018,47961048,10071820.08,,,xxx,X,1510773.012,317262.3325
+SSD,2019,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2018,33794332,6420923.08,,,xxx,X,963138.462,182996.3078
+COL,2019,Colombia,52,,Colombia Humanitarian Reponse Plan,2018,107022,55651.44,,,xxx,X,8347.716,4340.81232
+ETH,2019,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2018,296728821,157266275.1,,,xxx,X,23589941.27,12502668.87
+HTI,2019,Haiti,54,,Haiti Humanitarian Reponse Plan,2018,1370761,740210.94,,,xxx,X,111031.641,59957.08614
+MMR,2019,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2018,67643318,39909557.62,,,xxx,X,5986433.643,3531995.849
+PAK,2019,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2018,2447841,1468704.6,,,xxx,X,220305.69,132183.414
+YEM,2019,Yemen,64,,Yemen Humanitarian Reponse Plan,2018,23161381,14823283.84,,,xxx,X,2223492.576,1423035.249
+PSE,2019,oPt,67,,Palestian Humanitarian Reponse Plan,2018,23161381,15518125.27,,,xxx,X,2327718.791,1559571.59
+SYR,2019,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2018,296728821,207710174.7,,,xxx,X,31156526.21,21809568.34
+LBN,2019,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2018,1370761,973240.31,,,yyy,Y,145986.0465,103650.093
+JOR,2019,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2018,67643318,49379622.14,,,xxx,X,7406943.321,5407068.624
+TUR,2019,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2018,2447841,1517661.42,,,xxx,X,227649.213,141142.5121
+IRQ,2019,Iraq,72,,Iraq Humanitarian Reponse Plan,2018,22438700,16155864,,,xxx,X,2423379.6,1744833.312
+NGA,2019,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2018,59469400,44602050,,,xxx,X,6690307.5,5017730.625
+UKR,2019,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2018,1508040,1221512.4,,,xxx,X,183226.86,148413.7566
+AFG,2018,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2017,16793206,3862437.38,,,Education,E,579365.607,133254.0896
+CAF,2018,CAR,17,,CAR Humanitarian Reponse Plan,2017,3657983,621857.11,,,Education,E,93278.5665,15857.35631
+COD,2018,DRC,24,,DRC Humanitarian Reponse Plan,2017,16935584,4064540.16,,,Education,E,609681.024,146323.4458
+SDN,2018,Sudan,15,,Sudan Humanitarian Reponse Plan,2017,15148223,2272233.45,,,Education,E,340835.0175,51125.25263
+SOM,2018,Somalia,21,,Somalia Humanitarian Reponse Plan,2017,47961048,10071820.08,,,Education,E,1510773.012,317262.3325
+SSD,2018,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2017,33794332,6420923.08,,,Education,E,963138.462,182996.3078
+COL,2018,Colombia,52,,Colombia Humanitarian Reponse Plan,2017,107022,55651.44,,,Education,E,8347.716,4340.81232
+ETH,2018,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2017,296728821,157266275.1,,,Education,E,23589941.27,12502668.87
+HTI,2018,Haiti,54,,Haiti Humanitarian Reponse Plan,2017,1370761,740210.94,,,Education,E,111031.641,59957.08614
+MMR,2018,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2017,67643318,39909557.62,,,Education,E,5986433.643,3531995.849
+PAK,2018,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2017,2447841,1468704.6,,,Education,E,220305.69,132183.414
+YEM,2018,Yemen,64,,Yemen Humanitarian Reponse Plan,2017,23161381,14823283.84,,,Education,E,2223492.576,1423035.249
+PSE,2018,oPt,67,,Palestian Humanitarian Reponse Plan,2017,23161381,15518125.27,,,Education,E,2327718.791,1559571.59
+SYR,2018,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2017,296728821,207710174.7,,,Education,E,31156526.21,21809568.34
+LBN,2018,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2017,1370761,973240.31,,,Education,E,145986.0465,103650.093
+JOR,2018,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2017,67643318,49379622.14,,,Education,E,7406943.321,5407068.624
+TUR,2018,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2017,2447841,1517661.42,,,Education,E,227649.213,141142.5121
+IRQ,2018,Iraq,72,,Iraq Humanitarian Reponse Plan,2017,22438700,16155864,,,Education,E,2423379.6,1744833.312
+NGA,2018,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2017,59469400,44602050,,,Education,E,6690307.5,5017730.625
+UKR,2018,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2017,1508040,1221512.4,,,Education,E,183226.86,148413.7566
+AFG,2018,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2017,16793206,3862437.38,,,Health,H,579365.607,133254.0896
+CAF,2018,CAR,17,,CAR Humanitarian Reponse Plan,2017,3657983,621857.11,,,Health,H,93278.5665,15857.35631
+COD,2018,DRC,24,,DRC Humanitarian Reponse Plan,2017,16935584,4064540.16,,,Health,H,609681.024,146323.4458
+SDN,2018,Sudan,15,,Sudan Humanitarian Reponse Plan,2017,15148223,2272233.45,,,Health,H,340835.0175,51125.25263
+SOM,2018,Somalia,21,,Somalia Humanitarian Reponse Plan,2017,47961048,10071820.08,,,Health,H,1510773.012,317262.3325
+SSD,2018,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2017,33794332,6420923.08,,,Health,H,963138.462,182996.3078
+COL,2018,Colombia,52,,Colombia Humanitarian Reponse Plan,2017,107022,55651.44,,,Health,H,8347.716,4340.81232
+ETH,2018,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2017,296728821,157266275.1,,,Health,H,23589941.27,12502668.87
+HTI,2018,Haiti,54,,Haiti Humanitarian Reponse Plan,2017,1370761,740210.94,,,Health,H,111031.641,59957.08614
+MMR,2018,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2017,67643318,39909557.62,,,Health,H,5986433.643,3531995.849
+PAK,2018,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2017,2447841,1468704.6,,,Health,H,220305.69,132183.414
+YEM,2018,Yemen,64,,Yemen Humanitarian Reponse Plan,2017,23161381,14823283.84,,,Health,H,2223492.576,1423035.249
+PSE,2018,oPt,67,,Palestian Humanitarian Reponse Plan,2017,23161381,15518125.27,,,Health,H,2327718.791,1559571.59
+SYR,2018,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2017,296728821,207710174.7,,,Health,H,31156526.21,21809568.34
+LBN,2018,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2017,1370761,973240.31,,,Health,H,145986.0465,103650.093
+JOR,2018,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2017,67643318,49379622.14,,,Health,H,7406943.321,5407068.624
+TUR,2018,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2017,2447841,1517661.42,,,Health,H,227649.213,141142.5121
+IRQ,2018,Iraq,72,,Iraq Humanitarian Reponse Plan,2017,22438700,16155864,,,Health,H,2423379.6,1744833.312
+NGA,2018,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2017,59469400,44602050,,,Health,H,6690307.5,5017730.625
+UKR,2018,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2017,1508040,1221512.4,,,Health,H,183226.86,148413.7566
+AFG,2018,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2017,16793206,3862437.38,,,Protection,P,579365.607,133254.0896
+CAF,2018,CAR,17,,CAR Humanitarian Reponse Plan,2017,3657983,621857.11,,,Protection,P,93278.5665,15857.35631
+COD,2018,DRC,24,,DRC Humanitarian Reponse Plan,2017,16935584,4064540.16,,,Protection,P,609681.024,146323.4458
+SDN,2018,Sudan,15,,Sudan Humanitarian Reponse Plan,2017,15148223,2272233.45,,,Protection,P,340835.0175,51125.25263
+SOM,2018,Somalia,21,,Somalia Humanitarian Reponse Plan,2017,47961048,10071820.08,,,Protection,P,1510773.012,317262.3325
+SSD,2018,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2017,33794332,6420923.08,,,Protection,P,963138.462,182996.3078
+COL,2018,Colombia,52,,Colombia Humanitarian Reponse Plan,2017,107022,55651.44,,,Protection,P,8347.716,4340.81232
+ETH,2018,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2017,296728821,157266275.1,,,Protection,P,23589941.27,12502668.87
+HTI,2018,Haiti,54,,Haiti Humanitarian Reponse Plan,2017,1370761,740210.94,,,Protection,P,111031.641,59957.08614
+MMR,2018,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2017,67643318,39909557.62,,,Protection,P,5986433.643,3531995.849
+PAK,2018,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2017,2447841,1468704.6,,,Protection,P,220305.69,132183.414
+YEM,2018,Yemen,64,,Yemen Humanitarian Reponse Plan,2017,23161381,14823283.84,,,Protection,P,2223492.576,1423035.249
+PSE,2018,oPt,67,,Palestian Humanitarian Reponse Plan,2017,23161381,15518125.27,,,Protection,P,2327718.791,1559571.59
+SYR,2018,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2017,296728821,207710174.7,,,Protection,P,31156526.21,21809568.34
+LBN,2018,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2017,1370761,973240.31,,,Protection,P,145986.0465,103650.093
+JOR,2018,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2017,67643318,49379622.14,,,Protection,P,7406943.321,5407068.624
+TUR,2018,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2017,2447841,1517661.42,,,Protection,P,227649.213,141142.5121
+IRQ,2018,Iraq,72,,Iraq Humanitarian Reponse Plan,2017,22438700,16155864,,,Protection,P,2423379.6,1744833.312
+NGA,2018,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2017,59469400,44602050,,,Protection,P,6690307.5,5017730.625
+UKR,2018,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2017,1508040,1221512.4,,,Protection,P,183226.86,148413.7566
+AFG,2018,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2017,13434564.8,3089949.904,,,xxx,X,463492.4856,106603.2717
+CAF,2018,CAR,17,,CAR Humanitarian Reponse Plan,2017,2926386.4,497485.688,,,xxx,X,74622.8532,12685.88504
+COD,2018,DRC,24,,DRC Humanitarian Reponse Plan,2017,13548467.2,3251632.128,,,xxx,X,487744.8192,117058.7566
+SDN,2018,Sudan,15,,Sudan Humanitarian Reponse Plan,2017,12118578.4,1817786.76,,,xxx,X,272668.014,40900.2021
+SOM,2018,Somalia,21,,Somalia Humanitarian Reponse Plan,2017,38368838.4,8057456.064,,,xxx,X,1208618.41,253809.866
+SSD,2018,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2017,27035465.6,5136738.464,,,xxx,X,770510.7696,146397.0462
+COL,2018,Colombia,52,,Colombia Humanitarian Reponse Plan,2017,85617.6,44521.152,,,xxx,X,6678.1728,3472.649856
+ETH,2018,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2017,237383056.8,125813020.1,,,xxx,X,18871953.02,10002135.1
+HTI,2018,Haiti,54,,Haiti Humanitarian Reponse Plan,2017,1096608.8,592168.752,,,xxx,X,88825.3128,47965.66891
+MMR,2018,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2017,54114654.4,31927646.1,,,xxx,X,4789146.914,2825596.679
+PAK,2018,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2017,1958272.8,1174963.68,,,xxx,X,176244.552,105746.7312
+YEM,2018,Yemen,64,,Yemen Humanitarian Reponse Plan,2017,18529104.8,11858627.07,,,xxx,X,1778794.061,1138428.199
+PSE,2018,oPt,67,,Palestian Humanitarian Reponse Plan,2017,18529104.8,12414500.22,,,xxx,X,1862175.032,1247657.272
+SYR,2018,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2017,237383056.8,166168139.8,,,xxx,X,24925220.96,17447654.67
+LBN,2018,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2017,1096608.8,778592.248,,,yyy,Y,116788.8372,82920.07441
+JOR,2018,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2017,54114654.4,39503697.71,,,xxx,X,5925554.657,4325654.899
+TUR,2018,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2017,1958272.8,1214129.136,,,xxx,X,182119.3704,112914.0096
+IRQ,2018,Iraq,72,,Iraq Humanitarian Reponse Plan,2017,17950960,12924691.2,,,xxx,X,1938703.68,1395866.65
+NGA,2018,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2017,47575520,35681640,,,xxx,X,5352246,4014184.5
+UKR,2018,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2017,1206432,977209.92,,,xxx,X,146581.488,118731.0053
+AFG,2017,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2016,16793206,3862437.38,,,Education,E,579365.607,133254.0896
+CAF,2017,CAR,17,,CAR Humanitarian Reponse Plan,2016,3657983,621857.11,,,Education,E,93278.5665,15857.35631
+COD,2017,DRC,24,,DRC Humanitarian Reponse Plan,2016,16935584,4064540.16,,,Education,E,609681.024,146323.4458
+SDN,2017,Sudan,15,,Sudan Humanitarian Reponse Plan,2016,15148223,2272233.45,,,Education,E,340835.0175,51125.25263
+SOM,2017,Somalia,21,,Somalia Humanitarian Reponse Plan,2016,47961048,10071820.08,,,Education,E,1510773.012,317262.3325
+SSD,2017,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2016,33794332,6420923.08,,,Education,E,963138.462,182996.3078
+COL,2017,Colombia,52,,Colombia Humanitarian Reponse Plan,2016,107022,55651.44,,,Education,E,8347.716,4340.81232
+ETH,2017,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2016,296728821,157266275.1,,,Education,E,23589941.27,12502668.87
+HTI,2017,Haiti,54,,Haiti Humanitarian Reponse Plan,2016,1370761,740210.94,,,Education,E,111031.641,59957.08614
+MMR,2017,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2016,67643318,39909557.62,,,Education,E,5986433.643,3531995.849
+PAK,2017,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2016,2447841,1468704.6,,,Education,E,220305.69,132183.414
+YEM,2017,Yemen,64,,Yemen Humanitarian Reponse Plan,2016,23161381,14823283.84,,,Education,E,2223492.576,1423035.249
+PSE,2017,oPt,67,,Palestian Humanitarian Reponse Plan,2016,23161381,15518125.27,,,Education,E,2327718.791,1559571.59
+SYR,2017,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2016,296728821,207710174.7,,,Education,E,31156526.21,21809568.34
+LBN,2017,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2016,1370761,973240.31,,,Education,E,145986.0465,103650.093
+JOR,2017,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2016,67643318,49379622.14,,,Education,E,7406943.321,5407068.624
+TUR,2017,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2016,2447841,1517661.42,,,Education,E,227649.213,141142.5121
+IRQ,2017,Iraq,72,,Iraq Humanitarian Reponse Plan,2016,22438700,16155864,,,Education,E,2423379.6,1744833.312
+NGA,2017,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2016,59469400,44602050,,,Education,E,6690307.5,5017730.625
+UKR,2017,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2016,1508040,1221512.4,,,Education,E,183226.86,148413.7566
+AFG,2017,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2016,16793206,3862437.38,,,Health,H,579365.607,133254.0896
+CAF,2017,CAR,17,,CAR Humanitarian Reponse Plan,2016,3657983,621857.11,,,Health,H,93278.5665,15857.35631
+COD,2017,DRC,24,,DRC Humanitarian Reponse Plan,2016,16935584,4064540.16,,,Health,H,609681.024,146323.4458
+SDN,2017,Sudan,15,,Sudan Humanitarian Reponse Plan,2016,15148223,2272233.45,,,Health,H,340835.0175,51125.25263
+SOM,2017,Somalia,21,,Somalia Humanitarian Reponse Plan,2016,47961048,10071820.08,,,Health,H,1510773.012,317262.3325
+SSD,2017,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2016,33794332,6420923.08,,,Health,H,963138.462,182996.3078
+COL,2017,Colombia,52,,Colombia Humanitarian Reponse Plan,2016,107022,55651.44,,,Health,H,8347.716,4340.81232
+ETH,2017,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2016,296728821,157266275.1,,,Health,H,23589941.27,12502668.87
+HTI,2017,Haiti,54,,Haiti Humanitarian Reponse Plan,2016,1370761,740210.94,,,Health,H,111031.641,59957.08614
+MMR,2017,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2016,67643318,39909557.62,,,Health,H,5986433.643,3531995.849
+PAK,2017,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2016,2447841,1468704.6,,,Health,H,220305.69,132183.414
+YEM,2017,Yemen,64,,Yemen Humanitarian Reponse Plan,2016,23161381,14823283.84,,,Health,H,2223492.576,1423035.249
+PSE,2017,oPt,67,,Palestian Humanitarian Reponse Plan,2016,23161381,15518125.27,,,Health,H,2327718.791,1559571.59
+SYR,2017,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2016,296728821,207710174.7,,,Health,H,31156526.21,21809568.34
+LBN,2017,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2016,1370761,973240.31,,,Health,H,145986.0465,103650.093
+JOR,2017,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2016,67643318,49379622.14,,,Health,H,7406943.321,5407068.624
+TUR,2017,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2016,2447841,1517661.42,,,Health,H,227649.213,141142.5121
+IRQ,2017,Iraq,72,,Iraq Humanitarian Reponse Plan,2016,22438700,16155864,,,Health,H,2423379.6,1744833.312
+NGA,2017,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2016,59469400,44602050,,,Health,H,6690307.5,5017730.625
+UKR,2017,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2016,1508040,1221512.4,,,Health,H,183226.86,148413.7566
+AFG,2017,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2016,16793206,3862437.38,,,Protection,P,579365.607,133254.0896
+CAF,2017,CAR,17,,CAR Humanitarian Reponse Plan,2016,3657983,621857.11,,,Protection,P,93278.5665,15857.35631
+COD,2017,DRC,24,,DRC Humanitarian Reponse Plan,2016,16935584,4064540.16,,,Protection,P,609681.024,146323.4458
+SDN,2017,Sudan,15,,Sudan Humanitarian Reponse Plan,2016,15148223,2272233.45,,,Protection,P,340835.0175,51125.25263
+SOM,2017,Somalia,21,,Somalia Humanitarian Reponse Plan,2016,47961048,10071820.08,,,Protection,P,1510773.012,317262.3325
+SSD,2017,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2016,33794332,6420923.08,,,Protection,P,963138.462,182996.3078
+COL,2017,Colombia,52,,Colombia Humanitarian Reponse Plan,2016,107022,55651.44,,,Protection,P,8347.716,4340.81232
+ETH,2017,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2016,296728821,157266275.1,,,Protection,P,23589941.27,12502668.87
+HTI,2017,Haiti,54,,Haiti Humanitarian Reponse Plan,2016,1370761,740210.94,,,Protection,P,111031.641,59957.08614
+MMR,2017,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2016,67643318,39909557.62,,,Protection,P,5986433.643,3531995.849
+PAK,2017,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2016,2447841,1468704.6,,,Protection,P,220305.69,132183.414
+YEM,2017,Yemen,64,,Yemen Humanitarian Reponse Plan,2016,23161381,14823283.84,,,Protection,P,2223492.576,1423035.249
+PSE,2017,oPt,67,,Palestian Humanitarian Reponse Plan,2016,23161381,15518125.27,,,Protection,P,2327718.791,1559571.59
+SYR,2017,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2016,296728821,207710174.7,,,Protection,P,31156526.21,21809568.34
+LBN,2017,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2016,1370761,973240.31,,,Protection,P,145986.0465,103650.093
+JOR,2017,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2016,67643318,49379622.14,,,Protection,P,7406943.321,5407068.624
+TUR,2017,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2016,2447841,1517661.42,,,Protection,P,227649.213,141142.5121
+IRQ,2017,Iraq,72,,Iraq Humanitarian Reponse Plan,2016,22438700,16155864,,,Protection,P,2423379.6,1744833.312
+NGA,2017,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2016,59469400,44602050,,,Protection,P,6690307.5,5017730.625
+UKR,2017,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2016,1508040,1221512.4,,,Protection,P,183226.86,148413.7566
+AFG,2017,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2016,11755244.2,2703706.166,,,xxx,X,405555.9249,93277.86273
+CAF,2017,CAR,17,,CAR Humanitarian Reponse Plan,2016,2560588.1,435299.977,,,xxx,X,65294.99655,11100.14941
+COD,2017,DRC,24,,DRC Humanitarian Reponse Plan,2016,11854908.8,2845178.112,,,xxx,X,426776.7168,102426.412
+SDN,2017,Sudan,15,,Sudan Humanitarian Reponse Plan,2016,10603756.1,1590563.415,,,xxx,X,238584.5123,35787.67684
+SOM,2017,Somalia,21,,Somalia Humanitarian Reponse Plan,2016,33572733.6,7050274.056,,,xxx,X,1057541.108,222083.6328
+SSD,2017,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2016,23656032.4,4494646.156,,,xxx,X,674196.9234,128097.4154
+COL,2017,Colombia,52,,Colombia Humanitarian Reponse Plan,2016,74915.4,38956.008,,,xxx,X,5843.4012,3038.568624
+ETH,2017,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2016,207710174.7,110086392.6,,,xxx,X,16512958.89,8751868.211
+HTI,2017,Haiti,54,,Haiti Humanitarian Reponse Plan,2016,959532.7,518147.658,,,xxx,X,77722.1487,41969.9603
+MMR,2017,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2016,47350322.6,27936690.33,,,xxx,X,4190503.55,2472397.095
+PAK,2017,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2016,1713488.7,1028093.22,,,xxx,X,154213.983,92528.3898
+YEM,2017,Yemen,64,,Yemen Humanitarian Reponse Plan,2016,16212966.7,10376298.69,,,xxx,X,1556444.803,996124.674
+PSE,2017,oPt,67,,Palestian Humanitarian Reponse Plan,2016,16212966.7,10862687.69,,,xxx,X,1629403.153,1091700.113
+SYR,2017,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2016,207710174.7,145397122.3,,,xxx,X,21809568.34,15266697.84
+LBN,2017,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2016,959532.7,681268.217,,,yyy,Y,102190.2326,72555.06511
+JOR,2017,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2016,47350322.6,34565735.5,,,xxx,X,5184860.325,3784948.037
+TUR,2017,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2016,1713488.7,1062362.994,,,xxx,X,159354.4491,98799.75844
+IRQ,2017,Iraq,72,,Iraq Humanitarian Reponse Plan,2016,15707090,11309104.8,,,xxx,X,1696365.72,1221383.318
+NGA,2017,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2016,41628580,31221435,,,xxx,X,4683215.25,3512411.438
+UKR,2017,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2016,1055628,855058.68,,,xxx,X,128258.802,103889.6296
+AFG,2016,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2015,16793206,3862437.38,,,Education,E,579365.607,133254.0896
+CAF,2016,CAR,17,,CAR Humanitarian Reponse Plan,2015,3657983,621857.11,,,Education,E,93278.5665,15857.35631
+COD,2016,DRC,24,,DRC Humanitarian Reponse Plan,2015,16935584,4064540.16,,,Education,E,609681.024,146323.4458
+SDN,2016,Sudan,15,,Sudan Humanitarian Reponse Plan,2015,15148223,2272233.45,,,Education,E,340835.0175,51125.25263
+SOM,2016,Somalia,21,,Somalia Humanitarian Reponse Plan,2015,47961048,10071820.08,,,Education,E,1510773.012,317262.3325
+SSD,2016,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2015,33794332,6420923.08,,,Education,E,963138.462,182996.3078
+COL,2016,Colombia,52,,Colombia Humanitarian Reponse Plan,2015,107022,55651.44,,,Education,E,8347.716,4340.81232
+ETH,2016,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2015,296728821,157266275.1,,,Education,E,23589941.27,12502668.87
+HTI,2016,Haiti,54,,Haiti Humanitarian Reponse Plan,2015,1370761,740210.94,,,Education,E,111031.641,59957.08614
+MMR,2016,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2015,67643318,39909557.62,,,Education,E,5986433.643,3531995.849
+PAK,2016,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2015,2447841,1468704.6,,,Education,E,220305.69,132183.414
+YEM,2016,Yemen,64,,Yemen Humanitarian Reponse Plan,2015,23161381,14823283.84,,,Education,E,2223492.576,1423035.249
+PSE,2016,oPt,67,,Palestian Humanitarian Reponse Plan,2015,23161381,15518125.27,,,Education,E,2327718.791,1559571.59
+SYR,2016,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2015,296728821,207710174.7,,,Education,E,31156526.21,21809568.34
+LBN,2016,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2015,1370761,973240.31,,,Education,E,145986.0465,103650.093
+JOR,2016,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2015,67643318,49379622.14,,,Education,E,7406943.321,5407068.624
+TUR,2016,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2015,2447841,1517661.42,,,Education,E,227649.213,141142.5121
+IRQ,2016,Iraq,72,,Iraq Humanitarian Reponse Plan,2015,22438700,16155864,,,Education,E,2423379.6,1744833.312
+NGA,2016,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2015,59469400,44602050,,,Education,E,6690307.5,5017730.625
+UKR,2016,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2015,1508040,1221512.4,,,Education,E,183226.86,148413.7566
+AFG,2016,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2015,16793206,3862437.38,,,Health,H,579365.607,133254.0896
+CAF,2016,CAR,17,,CAR Humanitarian Reponse Plan,2015,3657983,621857.11,,,Health,H,93278.5665,15857.35631
+COD,2016,DRC,24,,DRC Humanitarian Reponse Plan,2015,16935584,4064540.16,,,Health,H,609681.024,146323.4458
+SDN,2016,Sudan,15,,Sudan Humanitarian Reponse Plan,2015,15148223,2272233.45,,,Health,H,340835.0175,51125.25263
+SOM,2016,Somalia,21,,Somalia Humanitarian Reponse Plan,2015,47961048,10071820.08,,,Health,H,1510773.012,317262.3325
+SSD,2016,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2015,33794332,6420923.08,,,Health,H,963138.462,182996.3078
+COL,2016,Colombia,52,,Colombia Humanitarian Reponse Plan,2015,107022,55651.44,,,Health,H,8347.716,4340.81232
+ETH,2016,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2015,296728821,157266275.1,,,Health,H,23589941.27,12502668.87
+HTI,2016,Haiti,54,,Haiti Humanitarian Reponse Plan,2015,1370761,740210.94,,,Health,H,111031.641,59957.08614
+MMR,2016,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2015,67643318,39909557.62,,,Health,H,5986433.643,3531995.849
+PAK,2016,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2015,2447841,1468704.6,,,Health,H,220305.69,132183.414
+YEM,2016,Yemen,64,,Yemen Humanitarian Reponse Plan,2015,23161381,14823283.84,,,Health,H,2223492.576,1423035.249
+PSE,2016,oPt,67,,Palestian Humanitarian Reponse Plan,2015,23161381,15518125.27,,,Health,H,2327718.791,1559571.59
+SYR,2016,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2015,296728821,207710174.7,,,Health,H,31156526.21,21809568.34
+LBN,2016,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2015,1370761,973240.31,,,Health,H,145986.0465,103650.093
+JOR,2016,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2015,67643318,49379622.14,,,Health,H,7406943.321,5407068.624
+TUR,2016,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2015,2447841,1517661.42,,,Health,H,227649.213,141142.5121
+IRQ,2016,Iraq,72,,Iraq Humanitarian Reponse Plan,2015,22438700,16155864,,,Health,H,2423379.6,1744833.312
+NGA,2016,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2015,59469400,44602050,,,Health,H,6690307.5,5017730.625
+UKR,2016,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2015,1508040,1221512.4,,,Health,H,183226.86,148413.7566
+AFG,2016,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2015,16793206,3862437.38,,,Protection,P,579365.607,133254.0896
+CAF,2016,CAR,17,,CAR Humanitarian Reponse Plan,2015,3657983,621857.11,,,Protection,P,93278.5665,15857.35631
+COD,2016,DRC,24,,DRC Humanitarian Reponse Plan,2015,16935584,4064540.16,,,Protection,P,609681.024,146323.4458
+SDN,2016,Sudan,15,,Sudan Humanitarian Reponse Plan,2015,15148223,2272233.45,,,Protection,P,340835.0175,51125.25263
+SOM,2016,Somalia,21,,Somalia Humanitarian Reponse Plan,2015,47961048,10071820.08,,,Protection,P,1510773.012,317262.3325
+SSD,2016,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2015,33794332,6420923.08,,,Protection,P,963138.462,182996.3078
+COL,2016,Colombia,52,,Colombia Humanitarian Reponse Plan,2015,107022,55651.44,,,Protection,P,8347.716,4340.81232
+ETH,2016,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2015,296728821,157266275.1,,,Protection,P,23589941.27,12502668.87
+HTI,2016,Haiti,54,,Haiti Humanitarian Reponse Plan,2015,1370761,740210.94,,,Protection,P,111031.641,59957.08614
+MMR,2016,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2015,67643318,39909557.62,,,Protection,P,5986433.643,3531995.849
+PAK,2016,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2015,2447841,1468704.6,,,Protection,P,220305.69,132183.414
+YEM,2016,Yemen,64,,Yemen Humanitarian Reponse Plan,2015,23161381,14823283.84,,,Protection,P,2223492.576,1423035.249
+PSE,2016,oPt,67,,Palestian Humanitarian Reponse Plan,2015,23161381,15518125.27,,,Protection,P,2327718.791,1559571.59
+SYR,2016,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2015,296728821,207710174.7,,,Protection,P,31156526.21,21809568.34
+LBN,2016,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2015,1370761,973240.31,,,Protection,P,145986.0465,103650.093
+JOR,2016,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2015,67643318,49379622.14,,,Protection,P,7406943.321,5407068.624
+TUR,2016,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2015,2447841,1517661.42,,,Protection,P,227649.213,141142.5121
+IRQ,2016,Iraq,72,,Iraq Humanitarian Reponse Plan,2015,22438700,16155864,,,Protection,P,2423379.6,1744833.312
+NGA,2016,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2015,59469400,44602050,,,Protection,P,6690307.5,5017730.625
+UKR,2016,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2015,1508040,1221512.4,,,Protection,P,183226.86,148413.7566
+AFG,2016,Afghanistan,23,,Afghanistan Humanitarian Reponse Plan,2015,10075923.6,2317462.428,,,xxx,X,347619.3642,79952.45376
+CAF,2016,CAR,17,,CAR Humanitarian Reponse Plan,2015,2194789.8,373114.266,,,xxx,X,55967.1399,9514.413786
+COD,2016,DRC,24,,DRC Humanitarian Reponse Plan,2015,10161350.4,2438724.096,,,xxx,X,365808.6144,87794.06748
+SDN,2016,Sudan,15,,Sudan Humanitarian Reponse Plan,2015,9088933.8,1363340.07,,,xxx,X,204501.0105,30675.15158
+SOM,2016,Somalia,21,,Somalia Humanitarian Reponse Plan,2015,28776628.8,6043092.048,,,xxx,X,906463.8072,190357.3995
+SSD,2016,South Sudan,19,,South Sudan Humanitarian Reponse Plan,2015,20276599.2,3852553.848,,,xxx,X,577883.0772,109797.7847
+COL,2016,Colombia,52,,Colombia Humanitarian Reponse Plan,2015,64213.2,33390.864,,,xxx,X,5008.6296,2604.487392
+ETH,2016,Ethiopia,53,,Ethiopia Humanitarian Reponse Plan,2015,178037292.6,94359765.06,,,xxx,X,14153964.76,7501601.322
+HTI,2016,Haiti,54,,Haiti Humanitarian Reponse Plan,2015,822456.6,444126.564,,,xxx,X,66618.9846,35974.25168
+MMR,2016,Myanmar,59,,Myanmar Humanitarian Reponse Plan,2015,40585990.8,23945734.57,,,xxx,X,3591860.186,2119197.509
+PAK,2016,Pakistan,60,,Pakistan Humanitarian Reponse Plan,2015,1468704.6,881222.76,,,xxx,X,132183.414,79310.0484
+YEM,2016,Yemen,64,,Yemen Humanitarian Reponse Plan,2015,13896828.6,8893970.304,,,xxx,X,1334095.546,853821.1494
+PSE,2016,oPt,67,,Palestian Humanitarian Reponse Plan,2015,13896828.6,9310875.162,,,xxx,X,1396631.275,935742.954
+SYR,2016,Syria Cross border,70,,Syria Humanitarian Reponse Plan,2015,178037292.6,124626104.8,,,xxx,X,18693915.73,13085741
+LBN,2016,Lebanon,71,,Syria (3 RP) Humanitarian Reponse Plan,2015,822456.6,583944.186,,,yyy,Y,87591.6279,62190.0558
+JOR,2016,Jordan,73,,Syria (3 RP) Humanitarian Reponse Plan,2015,40585990.8,29627773.28,,,xxx,X,4444165.993,3244241.174
+TUR,2016,Syria,62,,Syria (3 RP) Humanitarian Reponse Plan,2015,1468704.6,910596.852,,,xxx,X,136589.5278,84685.50726
+IRQ,2016,Iraq,72,,Iraq Humanitarian Reponse Plan,2015,13463220,9693518.4,,,xxx,X,1454027.76,1046899.987
+NGA,2016,Nigeria,75,,Nigeria Humanitarian Reponse Plan,2015,35681640,26761230,,,xxx,X,4014184.5,3010638.375
+UKR,2016,Ukraine,81,,Ukraine Humanitarian Reponse Plan,2015,904824,732907.44,,,xxx,X,109936.116,89048.25396
