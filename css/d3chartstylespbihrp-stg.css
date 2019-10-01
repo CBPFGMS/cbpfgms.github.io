@@ -168,11 +168,38 @@ p#pbihrpd3chartTitle {
 	pointer-events: none;
 }
 
-.pbihrpdonutsPercentage {
+.pbihrpdonutsPercentage, .pbihrpbarChartDonutsPercentage {
 	fill: #444;
 	pointer-events: none;
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
+	font-weight: 500;
+}
+
+.pbihrplegendDonutText {
+	fill: #444;
+	pointer-events: none;
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 500;
+}
+
+.pbihrpgroupYAxisBarChartMain line {
+	stroke: #aaa;
+}
+
+.pbihrpgroupYAxisBarChartInner line {
+	stroke: #666;
+}
+
+.pbihrpgroupYAxisBarChartInner text {
+	fill: #666;
+}
+
+.pbihrpgroupYAxisBarChartMain text {
+	font-size: 14px;
+	font-family: "Roboto", sans-serif;
+	fill: #666;
 	font-weight: 500;
 }
 

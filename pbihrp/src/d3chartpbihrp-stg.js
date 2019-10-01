@@ -177,6 +177,7 @@
 			targetPercentage = "15%", //CHANGE???
 			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#C7C8CA"], //dark blue, light blue, dark gray, light gray
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
+			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			legendRectangleSize = 16,
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
@@ -361,7 +362,6 @@
 			width: width - padding[1] - padding[3],
 			height: stackedBarPanelHeight,
 			padding: [20, 2, 26, 0],
-			barHeight: 20,
 			labelPadding: 10,
 			labelHorPadding: 8
 		};
@@ -382,7 +382,11 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 0, 0, 10],
+			padding: [70, 4, 0, 192],
+			get mainAxisPadding() {
+				return this.padding[3] - 100;
+			},
+			donutPadding: 30,
 			get titlePadding() {
 				return this.padding[0] * 0.4;
 			},
@@ -401,7 +405,7 @@
 		const sortMenuPanel = {
 			main: svg.append("g")
 				.attr("class", "pbihrpsortMenuPanel")
-				.attr("transform", "translate(" + (padding[3] + barChartPanel.width / 2) + "," +
+				.attr("transform", "translate(" + (barChartPanel.width - 300) + "," +
 					(padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.legendPadding + 6 * panelVerticalPadding) + ")"),
 			width: 258,
 			height: 102,
@@ -435,6 +439,25 @@
 
 		const stackedBarScale = d3.scaleLinear()
 			.range([stackedBarPanel.padding[3], stackedBarPanel.width - stackedBarPanel.padding[1]]);
+
+		const yScaleBarChartMain = d3.scaleBand();
+
+		const yScaleBarChartInner = d3.scaleBand()
+			.domain(yScaleBarChartInnerDomain)
+			.range([0, barGroupHeight])
+			.paddingOuter(0.75)
+			.paddingInner(0.2);
+
+		console.log(yScaleBarChartInner.bandwidth());
+
+		const yAxisBarChartMain = d3.axisLeft(yScaleBarChartMain);
+
+		const yAxisBarChartInner = d3.axisLeft(yScaleBarChartInner)
+			.tickSize(4);
+
+		const groupYAxisBarChartMain = barChartPanel.main.append("g")
+			.attr("class", "pbihrpgroupYAxisBarChartMain")
+			.attr("transform", "translate(" + barChartPanel.mainAxisPadding + ",0)");
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
@@ -1672,7 +1695,7 @@
 
 			donutsGroup = donutsGroupEnter.merge(donutsGroup);
 
-			donutsGroup.select("text.pbihrpdonutsPercentage")
+			donutsGroup.select(".pbihrpdonutsPercentage")
 				.transition()
 				.duration(duration)
 				.tween("text", function(d) {
@@ -1680,12 +1703,7 @@
 					const thisValue = +(node.textContent.match(/\d+/)[0]);
 					const i = d3.interpolate(thisValue / 100, d.percent);
 					return function(t) {
-						if (i(t) > 1) {
-							d3.select(node).style("font-size", 10);
-						} else {
-							d3.select(node).style("font-size", 12);
-						};
-						node.textContent = i(t) > 1 ? ">100%" : formatPercent(i(t));
+						node.textContent = formatPercent(i(t));
 					};
 				});
 
@@ -1713,10 +1731,6 @@
 						return arcGenerator(i(t));
 					};
 				});
-
-
-			//console.log(pieData);
-
 
 			//end of createDonutsPanel
 		};
@@ -1785,6 +1799,173 @@
 							.attr("transform", "translate(" + (counter += this.previousSibling.getBoundingClientRect().width + 26) + "," + barChartPanel.legendPadding + ")");
 					};
 				});
+
+				counter += legendGroup.nodes()[legendGroup.nodes().length - 1].getBoundingClientRect().width + 34;
+
+				const legendRadius = 8,
+					legendData = [{
+						value: 0.7
+					}, {
+						value: 0.3
+					}],
+					legendArc = d3.arc().outerRadius(legendRadius + 1).innerRadius(legendRadius - 2);
+				const legendDonutGroup = barChartPanel.main.append("g")
+					.attr("transform", "translate(" + counter + "," + (barChartPanel.legendPadding + 8) + ")");
+				const legendPie = legendDonutGroup.selectAll(null)
+					.data(donutGenerator(legendData))
+					.enter()
+					.append("path")
+					.attr("d", legendArc)
+					.style("fill", function(_, i) {
+						return i ? colorsArray[3] : colorsArray[0];
+					});
+
+				const legendDonutText = legendDonutGroup.append("text")
+					.attr("class", "pbihrplegendDonutText")
+					.attr("text-anchor", "middle")
+					.attr("y", 4)
+					.text("%");
+
+				const legendDonutTextDescription = legendDonutGroup.append("text")
+					.attr("y", 5)
+					.attr("x", legendRadius + 3)
+					.attr("class", "pbihrplegendText")
+					.style("font-family", "Roboto")
+					.style("font-size", "13px")
+					.text("CBPF Funding as Percentage of the Target");
+
+			};
+
+			data.hrpData.sort(function(a, b) {
+				if (chartState.sortBy === "alphabetically") {
+					return a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
+						a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0;
+				} else {
+					return b[chartState.sortBy] - a[chartState.sortBy];
+				};
+			});
+
+			const cbpfNames = data.hrpData.map(function(d) {
+				return d.cbpfName;
+			});
+
+			yScaleBarChartMain.domain(cbpfNames)
+				.range([barChartPanel.padding[0], barChartPanel.height - barChartPanel.padding[2]]);
+
+			let barChartGroup = barChartPanel.main.selectAll(".pbihrpbarChartGroup")
+				.data(data.hrpData, function(d) {
+					return d.cbpfId;
+				});
+
+			const barChartGroupExit = barChartGroup.exit()
+				.remove();
+
+			const barChartGroupEnter = barChartGroup.enter()
+				.append("g")
+				.attr("class", "pbihrpbarChartGroup")
+				.attr("transform", function(d) {
+					return "translate(0," + yScaleBarChartMain(d.cbpfName) + ")";
+				});
+
+			const barChartDonutsGroupEnter = barChartGroupEnter.append("g")
+				.attr("transform", "translate(" + (barChartPanel.mainAxisPadding + barChartPanel.donutPadding) + "," + (barGroupHeight / 2) + ")");
+
+			const barChartDonutsPathsEnter = barChartDonutsGroupEnter.selectAll(".pbihrpbarChartDonutsPaths")
+				.data(donutGenerator([{
+					value: 0
+				}, {
+					value: 1
+				}]))
+				.enter()
+				.append("path")
+				.attr("class", "pbihrpbarChartDonutsPaths")
+				.attr("d", arcGenerator)
+				.style("fill", function(_, i) {
+					return i ? colorsArray[3] : colorsArray[0]
+				})
+				.each(function(d) {
+					localVariable.set(this, d);
+				});
+
+			const barChartDonutsPercentageEnter = barChartDonutsGroupEnter.append("text")
+				.attr("class", "pbihrpbarChartDonutsPercentage")
+				.attr("text-anchor", "middle")
+				.attr("y", 4)
+				.attr("x", 0)
+				.text(formatPercent(0));
+
+			const groupYAxisBarChartInner = barChartGroupEnter.append("g")
+				.attr("class", "pbihrpgroupYAxisBarChartInner")
+				.attr("transform", "translate(" + barChartPanel.padding[3] + ",0)")
+				.call(yAxisBarChartInner)
+				.select(".domain")
+				.remove();
+
+			barChartGroup = barChartGroupEnter.merge(barChartGroup);
+
+			barChartGroup.transition()
+				.duration(duration)
+				.attr("transform", function(d) {
+					return "translate(0," + yScaleBarChartMain(d.cbpfName) + ")";
+				});
+
+			barChartGroup.selectAll(".pbihrpbarChartDonutsPaths")
+				.data(function(d) {
+					return donutGenerator([{
+						value: d.cbpfpercentage
+					}, {
+						value: d.cbpfpercentage > 1 ? 0 : 1 - d.cbpfpercentage
+					}])
+				})
+				.transition()
+				.duration(duration)
+				.attrTween("d", function(d) {
+					const i = d3.interpolate(localVariable.get(this), d);
+					localVariable.set(this, i(0));
+					return function(t) {
+						return arcGenerator(i(t));
+					};
+				});
+
+			barChartGroup.select(".pbihrpbarChartDonutsPercentage")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const thisValue = +(node.textContent.match(/\d+/)[0]);
+					const i = d3.interpolate(thisValue / 100, d.cbpfpercentage);
+					return function(t) {
+						node.textContent = formatPercent(i(t));
+					};
+				});
+
+
+
+			groupYAxisBarChartMain.transition()
+				.duration(duration)
+				.call(customAxis);
+
+			function customAxis(group) {
+				const sel = group.selection ? group.selection() : group;
+				group.call(yAxisBarChartMain);
+				sel.select(".domain").remove();
+				sel.selectAll(".tick text")
+					.filter(function(d) {
+						return d === "Syria Cross border";
+					})
+					.text("Syria Cross")
+					.attr("x", -9)
+					.attr("dy", "-0.4em")
+					.append("tspan")
+					.attr("dy", "1.2em")
+					.attr("x", -9)
+					.text("border");
+				if (sel !== group) group.selectAll(".tick text")
+					.filter(function(d) {
+						return d === "Syria Cross border";
+					})
+					.attrTween("x", null)
+					.tween("text", null);
 			};
 
 			//end of createBarChartPanel
@@ -1793,10 +1974,10 @@
 		function createNonHrpPanel(data) {
 
 			//test
-			// nonHrpPanel.main.append("rect")
-			// 	.attr("width", nonHrpPanel.width)
-			// 	.attr("height", nonHrpPanel.height)
-			// 	.style("opacity", 0.05);
+			nonHrpPanel.main.append("rect")
+				.attr("width", nonHrpPanel.width)
+				.attr("height", nonHrpPanel.height)
+				.style("opacity", 0.05);
 			//test
 
 			const nonHrpPanelTitle = nonHrpPanel.main.selectAll(".pbihrpnonHrpPanelTitle")
@@ -1840,6 +2021,10 @@
 				.attr("width", sortMenuPanel.width)
 				.attr("height", sortMenuPanel.groupHeight);
 
+			const sortByArrayFiltered = sortByArray.filter(function(d) {
+				return d !== "cbpftarget"
+			});
+
 			let currentTranslate = calculateTranslate();
 
 			const sortMenuContainerClipGroup = sortMenuPanel.main.append("g")
@@ -1857,9 +2042,7 @@
 				.attr("pointer-events", "all");
 
 			const sortGroups = sortMenuContainer.selectAll(null)
-				.data(sortByArray.filter(function(d) {
-					return d !== "cbpftarget"
-				}))
+				.data(sortByArrayFiltered)
 				.enter()
 				.append("g")
 				.attr("transform", function(_, i) {
@@ -1946,10 +2129,18 @@
 					return chartState.sortBy === d ? "darkslategray" : "none";
 				});
 				d3.select(currentHoveredElement).dispatch("mouseleave");
+
+				const data = completeData.find(function(d) {
+					return d.year === chartState.selectedYear;
+				});
+
+				createBarChartPanel(data);
+
+				createNonHrpPanel(data);
 			});
 
 			function calculateTranslate() {
-				const index = sortByArray.indexOf(chartState.sortBy);
+				const index = sortByArrayFiltered.indexOf(chartState.sortBy);
 				return index ? -sortMenuPanel.groupHeight * index + sortMenuVertAlign : sortMenuVertAlign;
 			};
 
@@ -1964,10 +2155,10 @@
 				if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
 
 					//REMOVE
-					row.PFFunded = row.PFFunded * (Math.random() / 10);
-					row.PFHRPTarget = row.PFHRPTarget * (Math.random() / 10);
-					row.HRPClstFunded = row.HRPClstFunded * (Math.random() / 10);
-					row.HRPClstReq = row.HRPClstReq * (Math.random() / 10);
+					row.PFFunded = +row.PFFunded * (1 - Math.random() / 5);
+					row.PFHRPTarget = +row.PFHRPTarget * (1 - Math.random() / 5);
+					row.HRPClstFunded = +row.HRPClstFunded * (1 - Math.random() / 5);
+					row.HRPClstReq = +row.HRPClstReq * (1 - Math.random() / 5);
 
 					const thisValues = {
 						cbpfName: row.PFName,
