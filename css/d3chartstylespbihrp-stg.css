@@ -150,11 +150,18 @@ p#pbihrpd3chartTitle {
 	pointer-events: none;
 }
 
-.pbihrpcbpfTargetBarValue, .pbihrpcbpfFundingBarValue, .pbihrphrpRequirementsBarValue, .pbihrphrpFundingBarValue {
+.pbihrpcbpfTargetBarValue, .pbihrpcbpfFundingBarValue, .pbihrphrpRequirementsBarValue, .pbihrphrpFundingBarValue, .pbihrpbarChartPercentageTextSpan {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
 	fill: #444;
 	font-weight: 500;
+	pointer-events: none;
+}
+
+.pbihrpbarChartPercentageText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #444;
 	pointer-events: none;
 }
 
@@ -166,6 +173,24 @@ p#pbihrpd3chartTitle {
 .pbihrpstackedBarsLabels {
 	fill: #444;
 	pointer-events: none;
+}
+
+.pbihrpbarChartsLabels, .pbihrpbarChartsLabelsNonHrp {
+	fill: #444;
+	pointer-events: none;
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 500;
+}
+
+.pbihrpbarChartsLabelsBack {
+	fill: white;
+	pointer-events: none;
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 500;
+	stroke: white;
+	stroke-width: 4px;
 }
 
 .pbihrpdonutsPercentage, .pbihrpbarChartDonutsPercentage {
@@ -184,19 +209,19 @@ p#pbihrpd3chartTitle {
 	font-weight: 500;
 }
 
-.pbihrpgroupYAxisBarChartMain line {
+.pbihrpgroupYAxisBarChartMain line , .pbihrpgroupYAxisBarChartNonHrp line{
 	stroke: #aaa;
 }
 
-.pbihrpgroupYAxisBarChartInner line {
+.pbihrpgroupYAxisBarChartInner line, .pbihrpgroupYAxisBarChartNonHrpInner line {
 	stroke: #666;
 }
 
-.pbihrpgroupYAxisBarChartInner text {
+.pbihrpgroupYAxisBarChartInner text, .pbihrpgroupYAxisBarChartNonHrpInner text {
 	fill: #666;
 }
 
-.pbihrpgroupYAxisBarChartMain text {
+.pbihrpgroupYAxisBarChartMain text, .pbihrpgroupYAxisBarChartNonHrp text {
 	font-size: 14px;
 	font-family: "Roboto", sans-serif;
 	fill: #666;

@@ -5,7 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -165,16 +165,19 @@
 			stackedBarPanelHeight = 94,
 			donutsPanelHeight = 58,
 			barGroupHeight = 50,
-			nonHrpBarHeight = 50,
+			nonHrpBarHeight = 24,
 			buttonsNumber = 12,
-			sortMenuRectangleOpacity = 0.9,
+			sortMenuRectangleOpacity = 0.85,
 			sortMenuVertAlign = -2,
 			duration = 1000,
 			topSummaryBarsHeight = 10,
 			stackedBarHeight = 16,
+			barChartLabelPadding = 3,
+			barChartLabelVertPadding = 10,
+			barChartPercentageLabelPadding = 6,
+			barChartPercentageLabelVertPadding = 8,
 			formatPercent = d3.format(".0%"),
 			unBlue = "#1F69B3",
-			targetPercentage = "15%", //CHANGE???
 			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#C7C8CA"], //dark blue, light blue, dark gray, light gray
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
@@ -186,7 +189,7 @@
 			localVariable = d3.local(),
 			chartTitleDefault = "CBPF versus HRP",
 			vizNameQueryString = "cbpfvshrp",
-			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			sortByValues = {
 				cbpffunding: "CBPF Funding",
@@ -198,7 +201,7 @@
 			},
 			legendNamesArray = ["HRP Requirements", "HRP Funding", "CBPF Funding"],
 			sortByArray = Object.keys(sortByValues),
-			dataFile = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datapbihrp.csv",
+			dataFile = "https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary?PoolfundCodeAbbrv=&$format=csv",
 			totalValues = {},
 			chartState = {
 				selectedYear: null,
@@ -208,6 +211,8 @@
 		let isSnapshotTooltipVisible = false,
 			height = 600,
 			yearsArray,
+			targetPercentage = "15%", //CHANGE???
+			activeSortMenu = false,
 			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -382,7 +387,7 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 4, 0, 192],
+			padding: [70, 32, 0, 192],
 			get mainAxisPadding() {
 				return this.padding[3] - 100;
 			},
@@ -399,7 +404,10 @@
 			main: svg.append("g")
 				.attr("class", "pbihrpnonHrpPanel"),
 			width: width - padding[1] - padding[3],
-			padding: [24, 0, 0, 0]
+			padding: [24, 32, 0, 192],
+			get mainAxisPadding() {
+				return this.padding[3] - 48;
+			}
 		};
 
 		const sortMenuPanel = {
@@ -430,7 +438,7 @@
 		const donutsPanelScale = d3.scalePoint()
 			.range([donutsPanel.padding[3], donutsPanel.width - donutsPanel.padding[1]]);
 
-		const legendColorsScale = d3.scaleOrdinal()
+		const colorsScale = d3.scaleOrdinal()
 			.domain(variablesArray)
 			.range(colorsArray);
 
@@ -448,16 +456,46 @@
 			.paddingOuter(0.75)
 			.paddingInner(0.2);
 
-		console.log(yScaleBarChartInner.bandwidth());
+		const xScaleBarChart = d3.scaleLinear()
+			.range([barChartPanel.padding[3], barChartPanel.width - barChartPanel.padding[1]]);
+
+		const yScaleBarChartNonHrp = d3.scaleBand();
+
+		const yScaleBarChartNonHrpInner = d3.scaleBand()
+			.domain([yScaleBarChartInnerDomain[1]])
+			.range([0, nonHrpBarHeight])
+			.paddingOuter(0.5);
+
+		const xScaleBarChartNonHrp = d3.scaleLinear()
+			.range([nonHrpPanel.padding[3], nonHrpPanel.width - nonHrpPanel.padding[1]]);
 
 		const yAxisBarChartMain = d3.axisLeft(yScaleBarChartMain);
 
 		const yAxisBarChartInner = d3.axisLeft(yScaleBarChartInner)
 			.tickSize(4);
 
+		const yAxisBarChartNonHrp = d3.axisLeft(yScaleBarChartNonHrp)
+			.tickSize(0);
+
+		const yAxisBarChartNonHrpInner = d3.axisLeft(yScaleBarChartNonHrpInner)
+			.tickSize(4);
+
 		const groupYAxisBarChartMain = barChartPanel.main.append("g")
 			.attr("class", "pbihrpgroupYAxisBarChartMain")
 			.attr("transform", "translate(" + barChartPanel.mainAxisPadding + ",0)");
+
+		const arrowheadMarker = svg.append("defs")
+			.append("marker")
+			.attr("id", "pbihrparrowHead")
+			.attr("viewBox", "0 -5 10 10")
+			.attr("refX", 0)
+			.attr("refY", 0)
+			.attr("markerWidth", 10)
+			.attr("markerHeight", 10)
+			.attr("orient", "auto")
+			.append("path")
+			.style("fill", "#222")
+			.attr("d", "M0,-5L5,0L0,5");
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
@@ -554,7 +592,7 @@
 
 			barChartPanel.height = barChartPanel.padding[0] + barsHeight + barChartPanel.padding[2];
 
-			nonHrpPanel.height = nonHrpPanel.padding[0] + nonHrpBarHeight + nonHrpPanel.padding[2];
+			nonHrpPanel.height = nonHrpBarsHeight ? nonHrpPanel.padding[0] + nonHrpBarsHeight + nonHrpPanel.padding[2] : 0;
 
 			nonHrpPanel.main
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.height + 7 * panelVerticalPadding) + ")");
@@ -973,23 +1011,6 @@
 
 		function createTopSummaryPanel(data, hrpYear) {
 
-			// //test
-			// topSummaryPanel.main.append("rect")
-			// 	.attr("width", topSummaryPanel.width)
-			// 	.attr("height", topSummaryPanel.height)
-			// 	.style("opacity", 0.05);
-
-			// topSummaryPanelCbpf.main.append("rect")
-			// 	.attr("width", topSummaryPanelCbpf.width)
-			// 	.attr("height", topSummaryPanelCbpf.height)
-			// 	.style("opacity", 0.1);
-
-			// topSummaryPanelHrp.main.append("rect")
-			// 	.attr("width", topSummaryPanelHrp.width)
-			// 	.attr("height", topSummaryPanelHrp.height)
-			// 	.style("opacity", 0.1);
-			// //test
-
 			const maximumTotalValue = d3.max(d3.values(data));
 
 			topSummaryScale.domain([0, maximumTotalValue]);
@@ -1012,8 +1033,8 @@
 				.attr("x2", topSummaryPanel.width)
 				.attr("y1", topSummaryPanel.titlePadding - 3)
 				.attr("y2", topSummaryPanel.titlePadding - 3)
-				.style("stroke-width", "1px")
-				.style("stroke", "#ccc");
+				.style("stroke-width", "2px")
+				.style("stroke", colorsArray[0]);
 
 			const topSummaryPanelMiddleLine = topSummaryPanel.main.selectAll(".pbihrptopSummaryPanelMiddleLine")
 				.data([true])
@@ -1382,13 +1403,6 @@
 
 		function createStackedBarPanel(data) {
 
-			//test
-			// stackedBarPanel.main.append("rect")
-			// 	.attr("width", stackedBarPanel.width)
-			// 	.attr("height", stackedBarPanel.height)
-			// 	.style("opacity", 0.1);
-			//test
-
 			const stackedBarPanelText = stackedBarPanel.main.selectAll(".pbihrpstackedBarPanelText")
 				.data([true])
 				.enter()
@@ -1405,7 +1419,9 @@
 			stackedBarScale.domain([0, stackedData[0].value]);
 
 			let stackedBarsGroup = stackedBarPanel.main.selectAll(".pbihrpstackedBarsGroup")
-				.data(stackedData);
+				.data(stackedData, function(d) {
+					return d.key;
+				});
 
 			const stackedBarsGroupEnter = stackedBarsGroup.enter()
 				.append("g")
@@ -1418,7 +1434,7 @@
 				.attr("x", stackedBarScale(0))
 				.attr("height", stackedBarHeight)
 				.style("fill", function(d) {
-					return legendColorsScale(d.key);
+					return colorsScale(d.key);
 				})
 				.style("stroke", "white")
 				.style("stroke-width", "1px");
@@ -1500,6 +1516,9 @@
 			stackedBarsGroup.select("rect")
 				.transition()
 				.duration(duration)
+				.attr("y", function(_, i) {
+					return stackedBarPanel.padding[0] + i * (stackedBarHeight / 2);
+				})
 				.attr("width", function(d) {
 					return stackedBarScale(d.value) - stackedBarPanel.padding[3]
 				});
@@ -1546,13 +1565,6 @@
 		};
 
 		function createDonutsPanel(data, hrpYear) {
-
-			//test
-			// donutsPanel.main.append("rect")
-			// 	.attr("width", donutsPanel.width)
-			// 	.attr("height", donutsPanel.height)
-			// 	.style("opacity", 0.1);
-			//test
 
 			const previousFundingValue = d3.select(".pbihrpdonutsPanelFundingValue").size() !== 0 ? d3.select(".pbihrpdonutsPanelFundingValue").datum() : 0;
 
@@ -1631,7 +1643,7 @@
 					return "translate(" + donutsPanelScale(d.key) + "," + ((donutsPanel.padding[0] + donutsPanel.height) / 2) + ")";
 				});
 
-			const donutsPathsEnter = donutsGroupEnter.selectAll(".pbihrpdonutsPathsEnter")
+			const donutsPathsEnter = donutsGroupEnter.selectAll(null)
 				.data(function(d) {
 					return donutGenerator(d.values.map(function(e) {
 						if (e.key === "cbpffunding") {
@@ -1648,7 +1660,7 @@
 				})
 				.enter()
 				.append("path")
-				.attr("class", "pbihrpdonutsPathsEnter")
+				.attr("class", "pbihrpdonutsPaths")
 				.style("fill", function(d) {
 					return d.data.key === "cbpffunding" ? colorsArray[0] : colorsArray[colorsArray.length - 1];
 				})
@@ -1664,7 +1676,7 @@
 				.attr("x", 0)
 				.text(formatPercent(0));
 
-			const donutsPanelDonutsText = donutsGroupEnter.selectAll(".pbihrpdonutsPanelDonutsText")
+			const donutsPanelDonutsText = donutsGroupEnter.selectAll(null)
 				.data(function(d) {
 					return [d]
 				})
@@ -1716,7 +1728,7 @@
 					};
 				});
 
-			const donutsPaths = donutsGroup.selectAll(".pbihrpdonutsPathsEnter")
+			const donutsPaths = donutsGroup.selectAll(".pbihrpdonutsPaths")
 				.data(function(d) {
 					return donutGenerator(d.values)
 				}, function(d) {
@@ -1737,13 +1749,6 @@
 
 		function createBarChartPanel(data) {
 
-			//test
-			// barChartPanel.main.append("rect")
-			// 	.attr("width", barChartPanel.width)
-			// 	.attr("height", barChartPanel.height)
-			// 	.style("opacity", 0.05);
-			//test
-
 			const barChartPanelTitle = barChartPanel.main.selectAll(".pbihrpbarChartPanelTitle")
 				.data([true])
 				.enter()
@@ -1762,8 +1767,8 @@
 				.attr("x2", barChartPanel.width)
 				.attr("y1", barChartPanel.titlePadding)
 				.attr("y2", barChartPanel.titlePadding)
-				.style("stroke-width", "1px")
-				.style("stroke", "#ccc");
+				.style("stroke-width", "2px")
+				.style("stroke", colorsArray[0]);
 
 			const legendGroup = barChartPanel.main.selectAll(".pbihrplegendGroup")
 				.data(variablesArray.filter(function(_, i) {
@@ -1778,7 +1783,7 @@
 				.attr("width", legendRectangleSize)
 				.attr("height", legendRectangleSize)
 				.style("fill", function(d) {
-					return legendColorsScale(d)
+					return colorsScale(d)
 				});
 
 			const legendText = legendGroup.append("text")
@@ -1841,7 +1846,9 @@
 					return a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
 						a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0;
 				} else {
-					return b[chartState.sortBy] - a[chartState.sortBy];
+					return b[chartState.sortBy] - a[chartState.sortBy] ||
+						(a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
+							a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0);
 				};
 			});
 
@@ -1851,6 +1858,10 @@
 
 			yScaleBarChartMain.domain(cbpfNames)
 				.range([barChartPanel.padding[0], barChartPanel.height - barChartPanel.padding[2]]);
+
+			xScaleBarChart.domain([0, d3.max(data.hrpData, function(d) {
+				return Math.max(d.cbpffunding, d.hrpfunding, d.hrprequirements);
+			})]);
 
 			let barChartGroup = barChartPanel.main.selectAll(".pbihrpbarChartGroup")
 				.data(data.hrpData, function(d) {
@@ -1870,7 +1881,7 @@
 			const barChartDonutsGroupEnter = barChartGroupEnter.append("g")
 				.attr("transform", "translate(" + (barChartPanel.mainAxisPadding + barChartPanel.donutPadding) + "," + (barGroupHeight / 2) + ")");
 
-			const barChartDonutsPathsEnter = barChartDonutsGroupEnter.selectAll(".pbihrpbarChartDonutsPaths")
+			const barChartDonutsPathsEnter = barChartDonutsGroupEnter.selectAll(null)
 				.data(donutGenerator([{
 					value: 0
 				}, {
@@ -1900,6 +1911,89 @@
 				.call(yAxisBarChartInner)
 				.select(".domain")
 				.remove();
+
+			const barChartBarsEnter = barChartGroupEnter.selectAll(null)
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: 0
+					}, {
+						key: "hrpfunding",
+						value: 0
+					}, {
+						key: "hrprequirements",
+						value: 0
+					}];
+				}, function(d) {
+					return d.key;
+				})
+				.enter()
+				.append("rect")
+				.attr("class", "pbihrpbarChartBars")
+				.style("fill", function(d) {
+					return colorsScale(d.key);
+				})
+				.attr("width", 0)
+				.attr("height", yScaleBarChartInner.bandwidth())
+				.attr("x", barChartPanel.padding[3])
+				.attr("y", function(d) {
+					return d.key === "cbpffunding" ? yScaleBarChartInner("CBPF") : yScaleBarChartInner("HRP")
+				});
+
+			const barChartLineEnter = barChartGroupEnter.append("line")
+				.attr("class", "pbihrpbarChartLine")
+				.attr("x1", xScaleBarChart(0))
+				.attr("x2", xScaleBarChart(0))
+				.attr("y1", yScaleBarChartInner.paddingOuter() * yScaleBarChartInner.step() / 4)
+				.attr("y2", yScaleBarChartMain.bandwidth() - (yScaleBarChartInner.paddingOuter() * yScaleBarChartInner.step()) / 1.5)
+				.style("stroke", "#222")
+				.attr("stroke-dasharray", "2, 2")
+				.attr("stroke-width", "1px")
+				.attr("marker-start", "url(#pbihrparrowHead)");
+
+			const barChartPercentageText = barChartGroupEnter.append("text")
+				.attr("class", "pbihrpbarChartPercentageText")
+				.attr("y", barChartPercentageLabelVertPadding)
+				.attr("x", xScaleBarChart(0) + barChartPercentageLabelPadding)
+				.text(targetPercentage);
+
+			const barChartLabelsBackEnter = barChartGroupEnter.selectAll(null)
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: 0
+					}];
+				})
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpbarChartsLabelsBack")
+				.attr("x", barChartPanel.padding[3] + barChartLabelPadding)
+				.attr("y", yScaleBarChartInner("CBPF") + barChartLabelVertPadding)
+				.text(formatSIFloat(0));
+
+			const barChartLabelsEnter = barChartGroupEnter.selectAll(null)
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: 0
+					}, {
+						key: "hrpfunding",
+						value: 0
+					}, {
+						key: "hrprequirements",
+						value: 0
+					}];
+				}, function(d) {
+					return d.key;
+				})
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpbarChartsLabels")
+				.attr("x", barChartPanel.padding[3] + barChartLabelPadding)
+				.attr("y", function(d) {
+					return (d.key === "cbpffunding" ? yScaleBarChartInner("CBPF") : yScaleBarChartInner("HRP")) + barChartLabelVertPadding;
+				})
+				.text(formatSIFloat(0));
 
 			barChartGroup = barChartGroupEnter.merge(barChartGroup);
 
@@ -1939,7 +2033,129 @@
 					};
 				});
 
+			barChartGroup.selectAll(".pbihrpbarChartBars")
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: d.cbpffunding
+					}, {
+						key: "hrpfunding",
+						value: d.hrpfunding
+					}, {
+						key: "hrprequirements",
+						value: d.hrprequirements
+					}];
+				}, function(d) {
+					return d.key;
+				})
+				.sort(function(a, b) {
+					return b.value - a.value;
+				})
+				.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return xScaleBarChart(d.value) - barChartPanel.padding[3];
+				});
 
+			barChartGroup.select(".pbihrpbarChartLine")
+				.transition()
+				.duration(duration)
+				.attr("x1", function(d) {
+					return xScaleBarChart(d.cbpftarget);
+				})
+				.attr("x2", function(d) {
+					return xScaleBarChart(d.cbpftarget);
+				});
+
+			barChartGroup.select(".pbihrpbarChartPercentageText")
+				.text(function(d) {
+					return targetPercentage + " of " + formatSIFloat(d.hrpfunding) + " target: ";
+				})
+				.append("tspan")
+				.attr("class", "pbihrpbarChartPercentageTextSpan")
+				.text(function(d) {
+					return formatSIFloat(d.cbpftarget)
+				});
+
+			barChartGroup.select(".pbihrpbarChartPercentageText")
+				.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return xScaleBarChart(d.cbpftarget) + barChartPercentageLabelPadding;
+				});
+
+			barChartGroup.selectAll(".pbihrpbarChartsLabels")
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: d.cbpffunding
+					}, {
+						key: "hrpfunding",
+						value: d.hrpfunding
+					}, {
+						key: "hrprequirements",
+						value: d.hrprequirements
+					}];
+				}, function(d) {
+					return d.key;
+				})
+				.each(function(d, _, n) {
+					if (d.key === "hrpfunding") {
+						const requirementsDatum = d3.select(this.nextSibling).datum();
+						const dummyText = barChartGroup.append("text")
+							.style("opacity", 0)
+							.style("font-family", "Roboto")
+							.style("font-size", 10)
+							.style("font-weight", 500)
+							.text(formatSIFloat(d.value));
+						const size = dummyText.node().getBoundingClientRect().width;
+						const move = Math.abs(xScaleBarChart(d.value) - xScaleBarChart(requirementsDatum.value)) < size + 1.5 * barChartLabelPadding;
+						localVariable.set(this, {
+							size: size,
+							move: move
+						});
+						dummyText.remove();
+					};
+				})
+				.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					if (d.key === "hrprequirements" && localVariable.get(this.previousSibling).move) {
+						return xScaleBarChart(d.value) + (2.5 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
+					} else if (d.key === "hrpfunding" && localVariable.get(this).move) {
+						return xScaleBarChart(d3.select(this.nextSibling).datum().value) + barChartLabelPadding;
+					} else {
+						return xScaleBarChart(d.value) + barChartLabelPadding;
+					};
+				})
+				.tween("text", function(d) {
+					const separator = d.key === "hrpfunding" && localVariable.get(this).move ? "/" : "";
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.replace("/", "")), d.value);
+					return function(t) {
+						node.textContent = formatSIFloat(i(t)) + separator;
+					};
+				});
+
+			barChartGroup.selectAll(".pbihrpbarChartsLabelsBack")
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: d.cbpffunding
+					}];
+				})
+				.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return xScaleBarChart(d.value) + barChartLabelPadding;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent), d.value);
+					return function(t) {
+						node.textContent = formatSIFloat(i(t));
+					};
+				});
 
 			groupYAxisBarChartMain.transition()
 				.duration(duration)
@@ -1973,12 +2189,10 @@
 
 		function createNonHrpPanel(data) {
 
-			//test
-			nonHrpPanel.main.append("rect")
-				.attr("width", nonHrpPanel.width)
-				.attr("height", nonHrpPanel.height)
-				.style("opacity", 0.05);
-			//test
+			if (!data.nonHrpData.length) {
+				nonHrpPanel.main.selectAll("*").remove();
+				return;
+			};
 
 			const nonHrpPanelTitle = nonHrpPanel.main.selectAll(".pbihrpnonHrpPanelTitle")
 				.data([true])
@@ -1988,6 +2202,149 @@
 				.attr("x", 0)
 				.attr("y", nonHrpPanel.padding[0] - 7)
 				.text("Non-HRP CBPFs:");
+
+			const nonHrpPanelLine = nonHrpPanel.main.selectAll(".pbihrpnonHrpPanelLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", "pbihrpnonHrpPanelLine")
+				.attr("x1", 0)
+				.attr("x2", nonHrpPanel.width)
+				.attr("y1", nonHrpPanel.padding[0] - 2)
+				.attr("y2", nonHrpPanel.padding[0] - 2)
+				.style("opacity", 0.5)
+				.style("stroke-width", "1px")
+				.style("stroke", colorsArray[0]);
+
+			data.nonHrpData.sort(function(a, b) {
+				if (chartState.sortBy === "alphabetically") {
+					return a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
+						a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0;
+				} else {
+					return b.cbpffunding - a.cbpffunding ||
+						(a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
+							a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0);
+				};
+			});
+
+			const nonHrpCbpfNames = data.nonHrpData.map(function(d) {
+				return d.cbpfName;
+			});
+
+			yScaleBarChartNonHrp.domain(nonHrpCbpfNames)
+				.range([nonHrpPanel.padding[0], nonHrpPanel.height - nonHrpPanel.padding[2]]);
+
+			xScaleBarChartNonHrp.domain(xScaleBarChart.domain());
+
+			const groupYAxisBarChartNonHrp = nonHrpPanel.main.selectAll(".pbihrpgroupYAxisBarChartNonHrp")
+				.data([true])
+				.enter()
+				.append("g")
+				.attr("class", "pbihrpgroupYAxisBarChartNonHrp")
+				.attr("transform", "translate(" + nonHrpPanel.mainAxisPadding + ",0)");
+
+			nonHrpPanel.main.select(".pbihrpgroupYAxisBarChartNonHrp")
+				.transition()
+				.duration(duration)
+				.call(yAxisBarChartNonHrp)
+				.selection()
+				.select(".domain")
+				.remove();
+
+			let barChartGroupNonHrp = nonHrpPanel.main.selectAll(".pbihrpbarChartGroupNonHrp")
+				.data(data.nonHrpData, function(d) {
+					return d.cbpfId;
+				});
+
+			const barChartGroupNonHrpExit = barChartGroupNonHrp.exit()
+				.remove();
+
+			const barChartGroupNonHrpEnter = barChartGroupNonHrp.enter()
+				.append("g")
+				.attr("class", "pbihrpbarChartGroupNonHrp")
+				.attr("transform", function(d) {
+					return "translate(0," + yScaleBarChartNonHrp(d.cbpfName) + ")";
+				});
+
+			const groupYAxisBarChartNonHrpInner = barChartGroupNonHrpEnter.append("g")
+				.attr("class", "pbihrpgroupYAxisBarChartNonHrpInner")
+				.attr("transform", "translate(" + nonHrpPanel.padding[3] + ",0)")
+				.call(yAxisBarChartNonHrpInner)
+				.select(".domain")
+				.remove();
+
+			const barChartBarsNonHrpEnter = barChartGroupNonHrpEnter.selectAll(null)
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: 0
+					}];
+				})
+				.enter()
+				.append("rect")
+				.attr("class", "pbihrpbarChartBarsNonHrp")
+				.style("fill", function(d) {
+					return colorsScale(d.key);
+				})
+				.attr("width", 0)
+				.attr("height", yScaleBarChartNonHrpInner.bandwidth())
+				.attr("x", nonHrpPanel.padding[3])
+				.attr("y", yScaleBarChartNonHrpInner("CBPF"));
+
+			const barChartLabelsNonHrpEnter = barChartGroupNonHrpEnter.selectAll(null)
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: 0
+					}];
+				})
+				.enter()
+				.append("text")
+				.attr("class", "pbihrpbarChartsLabelsNonHrp")
+				.attr("x", nonHrpPanel.padding[3] + barChartLabelPadding)
+				.attr("y", yScaleBarChartNonHrpInner("CBPF") + barChartLabelVertPadding)
+				.text(formatSIFloat(0));
+
+			barChartGroupNonHrp = barChartGroupNonHrpEnter.merge(barChartGroupNonHrp);
+
+			barChartGroupNonHrp.transition()
+				.duration(duration)
+				.attr("transform", function(d) {
+					return "translate(0," + yScaleBarChartNonHrp(d.cbpfName) + ")";
+				});
+
+			barChartGroupNonHrp.selectAll(".pbihrpbarChartBarsNonHrp")
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: d.cbpffunding
+					}];
+				})
+				.transition()
+				.duration(duration)
+				.attr("width", function(d) {
+					return xScaleBarChartNonHrp(d.value) - nonHrpPanel.padding[3];
+				});
+
+			barChartGroupNonHrp.selectAll(".pbihrpbarChartsLabelsNonHrp")
+				.data(function(d) {
+					return [{
+						key: "cbpffunding",
+						value: d.cbpffunding
+					}];
+				})
+				.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return xScaleBarChartNonHrp(d.value) + barChartLabelPadding;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent), d.value);
+					return function(t) {
+						node.textContent = formatSIFloat(i(t));
+					};
+				});
 
 			//end of createNonHrpPanel
 		};
@@ -2079,11 +2436,19 @@
 
 			sortMenuPanel.main.on("mouseover", function() {
 
+				if (activeSortMenu) return;
+
 				currentHoveredElement = this;
 
 				sortMenuContainer.transition()
 					.duration(duration)
-					.attr("transform", "translate(" + sortMenuPanel.titlePadding + "," + sortMenuVertAlign + ")");
+					.attr("transform", "translate(" + sortMenuPanel.titlePadding + "," + sortMenuVertAlign + ")")
+					.on("start", function() {
+						activeSortMenu = true;
+					})
+					.on("end", function() {
+						activeSortMenu = false;
+					});
 
 				menuRectangle.transition()
 					.duration(duration)
@@ -2098,6 +2463,8 @@
 
 				if (isSnapshotTooltipVisible) return;
 				currentHoveredElem = null;
+
+				activeSortMenu = false;
 
 				currentTranslate = calculateTranslate();
 
@@ -2154,18 +2521,12 @@
 			rawData.forEach(function(row) {
 				if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
 
-					//REMOVE
-					row.PFFunded = +row.PFFunded * (1 - Math.random() / 5);
-					row.PFHRPTarget = +row.PFHRPTarget * (1 - Math.random() / 5);
-					row.HRPClstFunded = +row.HRPClstFunded * (1 - Math.random() / 5);
-					row.HRPClstReq = +row.HRPClstReq * (1 - Math.random() / 5);
-
 					const thisValues = {
-						cbpfName: row.PFName,
+						cbpfName: row.PFNm,
 						cbpfId: row.PFId,
 						cbpffunding: +row.PFFunded,
 						cbpftarget: +row.PFHRPTarget,
-						cbpfpercentage: (+row.PFFunded) / (+row.PFHRPTarget),
+						cbpfpercentage: +row.PFHRPTarget === 0 ? 0 : (+row.PFFunded) / (+row.PFHRPTarget),
 						hrpfunding: +row.HRPClstFunded,
 						hrprequirements: +row.HRPClstReq
 					};
