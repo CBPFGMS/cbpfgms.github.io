@@ -158,7 +158,7 @@
 
 		const width = 1100,
 			padding = [12, 8, 4, 8],
-			panelHorizontalPadding = 4,
+			panelHorizontalPadding = 6,
 			panelVerticalPadding = 12,
 			buttonsPanelHeight = 36,
 			topSummaryPanelHeight = 80,
@@ -187,7 +187,7 @@
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
 			localVariable = d3.local(),
-			chartTitleDefault = "CBPF versus HRP",
+			chartTitleDefault = "CBPF Target vs HRP",
 			vizNameQueryString = "cbpfvshrp",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
@@ -342,7 +342,7 @@
 			main: topSummaryPanel.main.append("g")
 				.attr("class", "pbihrptopSummaryPanelCbpf")
 				.attr("transform", "translate(0," + topSummaryPanel.titlePadding + ")"),
-			width: topSummaryPanel.width / 2 - panelVerticalPadding / 2,
+			width: topSummaryPanel.width / 2 - panelHorizontalPadding,
 			height: topSummaryPanel.height - topSummaryPanel.padding[0] - topSummaryPanel.padding[2] - topSummaryPanel.titlePadding,
 			padding: [0, 40, 0, 314],
 			valuePadding: 148,
@@ -353,7 +353,7 @@
 			main: topSummaryPanel.main.append("g")
 				.attr("class", "pbihrptopSummaryPanelHrp")
 				.attr("transform", "translate(" + (topSummaryPanel.width / 2 + panelVerticalPadding / 2) + "," + topSummaryPanel.titlePadding + ")"),
-			width: topSummaryPanel.width / 2 - panelVerticalPadding / 2,
+			width: topSummaryPanel.width / 2 - panelHorizontalPadding,
 			height: topSummaryPanel.height - topSummaryPanel.padding[0] - topSummaryPanel.padding[2] - topSummaryPanel.titlePadding,
 			padding: [0, 40, 0, 314],
 			valuePadding: 148,
@@ -1397,6 +1397,70 @@
 						node.textContent = "$" + formatSIFloat(i(t));
 					};
 				});
+
+			const overlayRectangle = topSummaryPanel.main.selectAll(".pbihrpoverlayRectangle")
+				.data([true])
+				.enter()
+				.append("rect")
+				.attr("class", "pbihrpoverlayRectangle")
+				.attr("width", topSummaryPanel.width)
+				.attr("height", topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 2 * panelVerticalPadding)
+				.style("opacity", 0);
+
+			// overlayRectangle.on("mouseover", mouseOverTopPanel)
+			// 	.on("mousemove", mouseMoveTopPanel)
+			// 	.on("mouseout", mouseOutTopPanel);
+
+			// function mouseOverTopPanel() {
+
+			// 	currentHoveredElement = this;
+
+			// 	const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+			// 	const mouseContainer = d3.mouse(containerDiv.node());
+
+			// 	const mouse = d3.mouse(this);
+
+			// 	tooltip.style("display", "block");
+
+			// 	tooltip.html("Foo Bar Baz");
+
+			// 	const tooltipSize = tooltip.node().getBoundingClientRect();
+
+			// 	localVariable.set(this, tooltipSize);
+
+			// 	tooltip.style("top", thisOffset + "px")
+			// 		.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
+			// 			mouseContainer[0] + 14 + "px" :
+			// 			mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
+
+			// };
+
+			// function mouseMoveTopPanel() {
+
+			// 	const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+			// 	const mouseContainer = d3.mouse(containerDiv.node());
+
+			// 	const mouse = d3.mouse(this);
+
+			// 	const tooltipSize = localVariable.get(this);
+
+			// 	tooltip.style("top", thisOffset + "px")
+			// 		.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
+			// 			mouseContainer[0] + 14 + "px" :
+			// 			mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
+
+			// };
+
+			// function mouseOutTopPanel() {
+
+			// 	if (isSnapshotTooltipVisible) return;
+			// 	currentHoveredRect = null;
+
+			// 	tooltip.style("display", "none");
+
+			// };
 
 			//end of createTopSummaryPanel
 		};
@@ -2462,7 +2526,7 @@
 			}).on("mouseleave", function() {
 
 				if (isSnapshotTooltipVisible) return;
-				currentHoveredElem = null;
+				currentHoveredElement = null;
 
 				activeSortMenu = false;
 
@@ -2636,9 +2700,35 @@
 			return returnValue;
 		};
 
-		function createCsv(datahere) {
+		function createCsv(data) {
 
-			const csv = d3.csvFormat(changedDataHere);
+			const csvData = data.hrpData.map(function(d) {
+				return {
+					"CBPF Name": d.cbpfName,
+					"CBPF Funding": d.cbpffunding,
+					"CBPF Target": d.cbpftarget,
+					"CBPF Funding as % of Target": ~~(10000 * d.cbpfpercentage) / 100,
+					"HRP Funding": d.hrpfunding,
+					"HRP Requirements": d.hrprequirements,
+					"Has HRP?": "yes"
+				}
+			});
+
+			const csvNonHrpData = data.nonHrpData.map(function(d) {
+				return {
+					"CBPF Name": d.cbpfName,
+					"CBPF Funding": d.cbpffunding,
+					"CBPF Target": "n/a",
+					"CBPF Funding as % of Target": "n/a",
+					"HRP Funding": d.hrpfunding,
+					"HRP Requirements": d.hrprequirements,
+					"Has HRP?": "no"
+				}
+			});
+
+			csvData.push.apply(csvData, csvNonHrpData);
+
+			const csv = d3.csvFormat(csvData);
 
 			return csv;
 		};
@@ -2674,17 +2764,84 @@
 				.style("stroke", "white")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 280)
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbihrpAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
+				.attr("y", 280)
 				.text("CLICK ANYWHERE TO START");
 
+			const yearsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 360 - padding)
+				.attr("y", 68 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
+			const yearsAnnotation = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationText")
+				.attr("x", 360)
+				.attr("y", 68)
+				.text("Use these buttons to select the year. You can select only one year at a time.")
+				.call(wrapText2, 280);
+
+			const yearsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbihrpArrowMarker)")
+				.attr("d", "M356,70 L160,70");
+
+			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
+
+			const sortAnnotationRect = helpSVG.append("rect")
+				.attr("x", 800 - padding)
+				.attr("y", 280 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const sortAnnotation = helpSVG.append("text")
+				.attr("class", "pbihrpAnnotationText")
+				.attr("x", 800)
+				.attr("y", 280)
+				.text("Hover over this area to open a menu which you can use to sort the Funds according to several variables.")
+				.call(wrapText2, 220);
+
+			const sortPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbihrpArrowMarker)")
+				.attr("d", "M900,325 Q1050,380 940,430");
+
+			sortAnnotationRect.attr("width", sortAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", sortAnnotation.node().getBBox().height + padding * 2);
+
+			const barsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 100 - padding)
+				.attr("y", 340 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const barsAnnotation = helpSVG.append("text")
+				.attr("class", "pbihrpAnnotationText")
+				.attr("x", 100)
+				.attr("y", 340)
+				.text("Hover over the bars to get detailed figures for each Fund.")
+				.call(wrapText2, 220);
+
+			const barsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbihrpArrowMarker)")
+				.attr("d", "M120,365 Q120,420 200,460");
+
+			barsAnnotationRect.attr("width", barsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", barsAnnotation.node().getBBox().height + padding * 2);
 
 			helpSVG.on("click", function() {
 				overDiv.remove();
@@ -2706,6 +2863,40 @@
 				.html(footerText);
 
 			//end of createFooterDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
 		};
 
 		function createSnapshot(type, fromContextMenu) {
@@ -2866,8 +3057,8 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("TEXT HERE.", (210 - pdfMargins.left - pdfMargins.right), {
-						fontSize: 12
+					const intro = pdf.splitTextToSize("The Humanitarian Response Plan (HRP) plan is prepared for a protracted or sudden onset emergency that requires international humanitarian assistance. The graphs bellow portray how  CBPF funding is recorded against  an HRP having in mind the Secretary-General's vision to increase the  overall proportion of humanitarian appeal funding requirements channeled through CBPFs to 15% by 2019.", (210 - pdfMargins.left - pdfMargins.right), {
+						fontSize: 10
 					});
 
 					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
@@ -2875,19 +3066,20 @@
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
 					pdf.setFontType("normal");
-					pdf.setFontSize(12);
+					pdf.setFontSize(10);
 					pdf.text(pdfMargins.left, 48, intro);
 
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
-					pdf.text(chartTitle, pdfMargins.left, 65);
+					pdf.text(chartTitle, pdfMargins.left, 75);
 
 					pdf.setFontSize(12);
 
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70, {
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Selected year: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						chartState.selectedYear + "</span></div>", pdfMargins.left, 80, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
