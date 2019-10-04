@@ -2781,7 +2781,7 @@
 				.style("opacity", 0.95);
 
 			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationText")
+				.attr("class", "pbihrpAnnotationText")
 				.attr("x", 360)
 				.attr("y", 68)
 				.text("Use these buttons to select the year. You can select only one year at a time.")
