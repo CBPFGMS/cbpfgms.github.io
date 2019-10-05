@@ -165,7 +165,7 @@
 			stackedBarPanelHeight = 94,
 			donutsPanelHeight = 58,
 			barGroupHeight = 50,
-			nonHrpBarHeight = 24,
+			nonHrpBarHeight = 50,
 			buttonsNumber = 12,
 			sortMenuRectangleOpacity = 0.85,
 			sortMenuVertAlign = -2,
@@ -178,9 +178,10 @@
 			barChartPercentageLabelVertPadding = 8,
 			formatPercent = d3.format(".0%"),
 			unBlue = "#1F69B3",
-			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#C7C8CA"], //dark blue, light blue, dark gray, light gray
+			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"], //dark blue, light blue, dark gray, light gray
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
+			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
 			legendRectangleSize = 16,
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
@@ -211,8 +212,7 @@
 		let isSnapshotTooltipVisible = false,
 			height = 600,
 			yearsArray,
-			targetPercentage = "15%", //CHANGE???
-			activeSortMenu = false,
+			targetPercentage = "15%", //THIS IS HARDCODED, SHOUDL BE CHANGED
 			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -387,9 +387,9 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 32, 0, 192],
+			padding: [70, 32, 0, 196],
 			get mainAxisPadding() {
-				return this.padding[3] - 100;
+				return this.padding[3] - 104;
 			},
 			donutPadding: 30,
 			get titlePadding() {
@@ -404,18 +404,25 @@
 			main: svg.append("g")
 				.attr("class", "pbihrpnonHrpPanel"),
 			width: width - padding[1] - padding[3],
-			padding: [24, 32, 0, 192],
+			padding: [70, 32, 0, 196],
 			get mainAxisPadding() {
-				return this.padding[3] - 48;
+				return this.padding[3] - 104;
+			},
+			donutPadding: 30,
+			get titlePadding() {
+				return this.padding[0] * 0.4;
+			},
+			get legendPadding() {
+				return this.padding[0] * 0.5;
 			}
 		};
 
 		const sortMenuPanel = {
 			main: svg.append("g")
 				.attr("class", "pbihrpsortMenuPanel")
-				.attr("transform", "translate(" + (barChartPanel.width - 300) + "," +
+				.attr("transform", "translate(" + (barChartPanel.width - 310) + "," +
 					(padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.legendPadding + 6 * panelVerticalPadding) + ")"),
-			width: 258,
+			width: 268,
 			height: 102,
 			padding: [0, 0, 0, 4],
 			titlePadding: 48,
@@ -462,9 +469,10 @@
 		const yScaleBarChartNonHrp = d3.scaleBand();
 
 		const yScaleBarChartNonHrpInner = d3.scaleBand()
-			.domain([yScaleBarChartInnerDomain[1]])
+			.domain(yScaleBarChartNonHrpInnerDomain)
 			.range([0, nonHrpBarHeight])
-			.paddingOuter(0.5);
+			.paddingOuter(0.75)
+			.paddingInner(0.2);
 
 		const xScaleBarChartNonHrp = d3.scaleLinear()
 			.range([nonHrpPanel.padding[3], nonHrpPanel.width - nonHrpPanel.padding[1]]);
@@ -474,8 +482,7 @@
 		const yAxisBarChartInner = d3.axisLeft(yScaleBarChartInner)
 			.tickSize(4);
 
-		const yAxisBarChartNonHrp = d3.axisLeft(yScaleBarChartNonHrp)
-			.tickSize(0);
+		const yAxisBarChartNonHrp = d3.axisLeft(yScaleBarChartNonHrp);
 
 		const yAxisBarChartNonHrpInner = d3.axisLeft(yScaleBarChartNonHrpInner)
 			.tickSize(4);
@@ -1411,56 +1418,56 @@
 			// 	.on("mousemove", mouseMoveTopPanel)
 			// 	.on("mouseout", mouseOutTopPanel);
 
-			// function mouseOverTopPanel() {
+			function mouseOverTopPanel() {
 
-			// 	currentHoveredElement = this;
+				currentHoveredElement = this;
 
-			// 	const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
 
-			// 	const mouseContainer = d3.mouse(containerDiv.node());
+				const mouseContainer = d3.mouse(containerDiv.node());
 
-			// 	const mouse = d3.mouse(this);
+				const mouse = d3.mouse(this);
 
-			// 	tooltip.style("display", "block");
+				tooltip.style("display", "block");
 
-			// 	tooltip.html("Foo Bar Baz");
+				tooltip.html("Foo Bar Baz");
 
-			// 	const tooltipSize = tooltip.node().getBoundingClientRect();
+				const tooltipSize = tooltip.node().getBoundingClientRect();
 
-			// 	localVariable.set(this, tooltipSize);
+				localVariable.set(this, tooltipSize);
 
-			// 	tooltip.style("top", thisOffset + "px")
-			// 		.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
-			// 			mouseContainer[0] + 14 + "px" :
-			// 			mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
+				tooltip.style("top", thisOffset + "px")
+					.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
 
-			// };
+			};
 
-			// function mouseMoveTopPanel() {
+			function mouseMoveTopPanel() {
 
-			// 	const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
 
-			// 	const mouseContainer = d3.mouse(containerDiv.node());
+				const mouseContainer = d3.mouse(containerDiv.node());
 
-			// 	const mouse = d3.mouse(this);
+				const mouse = d3.mouse(this);
 
-			// 	const tooltipSize = localVariable.get(this);
+				const tooltipSize = localVariable.get(this);
 
-			// 	tooltip.style("top", thisOffset + "px")
-			// 		.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
-			// 			mouseContainer[0] + 14 + "px" :
-			// 			mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
+				tooltip.style("top", thisOffset + "px")
+					.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
+						mouseContainer[0] + 14 + "px" :
+						mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
 
-			// };
+			};
 
-			// function mouseOutTopPanel() {
+			function mouseOutTopPanel() {
 
-			// 	if (isSnapshotTooltipVisible) return;
-			// 	currentHoveredRect = null;
+				if (isSnapshotTooltipVisible) return;
+				currentHoveredRect = null;
 
-			// 	tooltip.style("display", "none");
+				tooltip.style("display", "none");
 
-			// };
+			};
 
 			//end of createTopSummaryPanel
 		};
@@ -1507,16 +1514,15 @@
 				.attr("class", "pbihrpstackedBarsLabels")
 				.attr("x", stackedBarScale(0))
 				.attr("y", stackedBarPanel.height - stackedBarPanel.padding[2] + stackedBarPanel.labelPadding)
-				.attr("font-family", "Roboto")
+				.attr("font-family", "Arial")
 				.attr("font-size", "12px")
-				.attr("font-weight", 500)
+				.attr("font-weight", 700)
 				.text(formatSIFloat(0));
 
 			const stackedBarsLabelsSpan = stackedBarsGroupEnter.append("text")
 				.attr("class", "pbihrpstackedBarsLabelsSpan")
-				.attr("font-family", "Roboto")
+				.attr("font-family", "Arial")
 				.attr("font-size", "12px")
-				.attr("font-weight", 400)
 				.attr("x", stackedBarScale(0))
 				.attr("y", stackedBarPanel.height - stackedBarPanel.padding[2] + stackedBarPanel.labelPadding * 2.3)
 				.text(function(d) {
@@ -2133,7 +2139,10 @@
 
 			barChartGroup.select(".pbihrpbarChartPercentageText")
 				.text(function(d) {
-					return targetPercentage + " of " + formatSIFloat(d.hrpfunding) + " target: ";
+					//THIS IS HARDCODED, SHOULD BE REMOVED
+					const thisPercentage = d.cbpfId === "62" || d.cbpfId === "70" ? "7.5%" : targetPercentage;
+
+					return thisPercentage + " of " + formatSIFloat(d.hrpfunding) + " target: ";
 				})
 				.append("tspan")
 				.attr("class", "pbihrpbarChartPercentageTextSpan")
@@ -2168,9 +2177,9 @@
 						const requirementsDatum = d3.select(this.nextSibling).datum();
 						const dummyText = barChartGroup.append("text")
 							.style("opacity", 0)
-							.style("font-family", "Roboto")
+							.style("font-family", "Arial")
 							.style("font-size", 10)
-							.style("font-weight", 500)
+							.style("font-weight", 700)
 							.text(formatSIFloat(d.value));
 						const size = dummyText.node().getBoundingClientRect().width;
 						const move = Math.abs(xScaleBarChart(d.value) - xScaleBarChart(requirementsDatum.value)) < size + 1.5 * barChartLabelPadding;
@@ -2264,7 +2273,7 @@
 				.append("text")
 				.attr("class", "pbihrpnonHrpPanelTitle")
 				.attr("x", 0)
-				.attr("y", nonHrpPanel.padding[0] - 7)
+				.attr("y", nonHrpPanel.titlePadding - 7)
 				.text("Non-HRP CBPFs:");
 
 			const nonHrpPanelLine = nonHrpPanel.main.selectAll(".pbihrpnonHrpPanelLine")
@@ -2274,11 +2283,82 @@
 				.attr("class", "pbihrpnonHrpPanelLine")
 				.attr("x1", 0)
 				.attr("x2", nonHrpPanel.width)
-				.attr("y1", nonHrpPanel.padding[0] - 2)
-				.attr("y2", nonHrpPanel.padding[0] - 2)
+				.attr("y1", nonHrpPanel.titlePadding)
+				.attr("y2", nonHrpPanel.titlePadding)
 				.style("opacity", 0.5)
 				.style("stroke-width", "1px")
 				.style("stroke", colorsArray[0]);
+
+			const legendGroupNonHrp = nonHrpPanel.main.selectAll(".pbihrplegendGroupNonHrp")
+				.data(variablesArray.filter(function(_, i) {
+					return i !== 2 && i !== 3;
+				}))
+				.enter()
+				.append("g")
+				.attr("class", "pbihrplegendGroupNonHrp")
+				.attr("transform", "translate(0," + nonHrpPanel.legendPadding + ")");
+
+			const legendRectangleNonHrp = legendGroupNonHrp.append("rect")
+				.attr("width", legendRectangleSize)
+				.attr("height", legendRectangleSize)
+				.style("fill", function(d) {
+					return colorsScale(d)
+				});
+
+			const legendTextNonHrp = legendGroupNonHrp.append("text")
+				.attr("y", legendRectangleSize - 3)
+				.attr("x", legendRectangleSize + 3)
+				.attr("class", "pbihrplegendText")
+				.style("font-family", "Roboto")
+				.style("font-size", "13px")
+				.text(function(d) {
+					return sortByValues[d.toLowerCase()];
+				});
+
+			if (legendGroupNonHrp.size()) {
+				let counter = 0;
+				legendGroupNonHrp.each(function(_, i, nodes) {
+					if (i) {
+						d3.select(this)
+							.attr("transform", "translate(" + (counter += this.previousSibling.getBoundingClientRect().width + 26) + "," + nonHrpPanel.legendPadding + ")");
+					};
+				});
+
+				counter += legendGroupNonHrp.nodes()[legendGroupNonHrp.nodes().length - 1].getBoundingClientRect().width + 34;
+
+				const legendRadius = 8,
+					legendData = [{
+						value: 0.7
+					}, {
+						value: 0.3
+					}],
+					legendArc = d3.arc().outerRadius(legendRadius + 1).innerRadius(legendRadius - 2);
+				const legendDonutGroup = nonHrpPanel.main.append("g")
+					.attr("transform", "translate(" + counter + "," + (nonHrpPanel.legendPadding + 8) + ")");
+				const legendPie = legendDonutGroup.selectAll(null)
+					.data(donutGenerator(legendData))
+					.enter()
+					.append("path")
+					.attr("d", legendArc)
+					.style("fill", function(_, i) {
+						return i ? colorsArray[3] : colorsArray[0];
+					});
+
+				const legendDonutText = legendDonutGroup.append("text")
+					.attr("class", "pbihrplegendDonutText")
+					.attr("text-anchor", "middle")
+					.attr("y", 4)
+					.text("%");
+
+				const legendDonutTextDescription = legendDonutGroup.append("text")
+					.attr("y", 5)
+					.attr("x", legendRadius + 3)
+					.attr("class", "pbihrplegendText")
+					.style("font-family", "Roboto")
+					.style("font-size", "13px")
+					.text("CBPF Funding as Percentage of the Target");
+
+			};
 
 			data.nonHrpData.sort(function(a, b) {
 				if (chartState.sortBy === "alphabetically") {
@@ -2330,6 +2410,33 @@
 					return "translate(0," + yScaleBarChartNonHrp(d.cbpfName) + ")";
 				});
 
+			const barChartDonutsGroupNonHrpEnter = barChartGroupNonHrpEnter.append("g")
+				.attr("transform", "translate(" + (nonHrpPanel.mainAxisPadding + nonHrpPanel.donutPadding) + "," + (nonHrpBarHeight / 2) + ")");
+
+			const barChartDonutsPathsNonHrpEnter = barChartDonutsGroupNonHrpEnter.selectAll(null)
+				.data(donutGenerator([{
+					value: 0
+				}, {
+					value: 1
+				}]))
+				.enter()
+				.append("path")
+				.attr("class", "pbihrpbarChartDonutsPathsNonHrp")
+				.attr("d", arcGenerator)
+				.style("fill", function(_, i) {
+					return i ? colorsArray[3] : colorsArray[0]
+				})
+				.each(function(d) {
+					localVariable.set(this, d);
+				});
+
+			const barChartDonutsPercentageNonHrpEnter = barChartDonutsGroupNonHrpEnter.append("text")
+				.attr("class", "pbihrpbarChartDonutsPercentageNonHrp")
+				.attr("text-anchor", "middle")
+				.attr("y", 4)
+				.attr("x", 0)
+				.text(formatPercent(0));
+
 			const groupYAxisBarChartNonHrpInner = barChartGroupNonHrpEnter.append("g")
 				.attr("class", "pbihrpgroupYAxisBarChartNonHrpInner")
 				.attr("transform", "translate(" + nonHrpPanel.padding[3] + ",0)")
@@ -2342,7 +2449,12 @@
 					return [{
 						key: "cbpffunding",
 						value: 0
+					}, {
+						key: "cbpftarget",
+						value: 0
 					}];
+				}, function(d) {
+					return d.key;
 				})
 				.enter()
 				.append("rect")
@@ -2353,20 +2465,29 @@
 				.attr("width", 0)
 				.attr("height", yScaleBarChartNonHrpInner.bandwidth())
 				.attr("x", nonHrpPanel.padding[3])
-				.attr("y", yScaleBarChartNonHrpInner("CBPF"));
+				.attr("y", function(d) {
+					return d.key === "cbpffunding" ? yScaleBarChartNonHrpInner("CBPF") : yScaleBarChartNonHrpInner("TARGET")
+				});
 
 			const barChartLabelsNonHrpEnter = barChartGroupNonHrpEnter.selectAll(null)
 				.data(function(d) {
 					return [{
 						key: "cbpffunding",
 						value: 0
+					}, {
+						key: "cbpftarget",
+						value: 0
 					}];
+				}, function(d) {
+					return d.key;
 				})
 				.enter()
 				.append("text")
 				.attr("class", "pbihrpbarChartsLabelsNonHrp")
 				.attr("x", nonHrpPanel.padding[3] + barChartLabelPadding)
-				.attr("y", yScaleBarChartNonHrpInner("CBPF") + barChartLabelVertPadding)
+				.attr("y", function(d) {
+					return (d.key === "cbpffunding" ? yScaleBarChartNonHrpInner("CBPF") : yScaleBarChartNonHrpInner("TARGET")) + barChartLabelVertPadding;
+				})
 				.text(formatSIFloat(0));
 
 			barChartGroupNonHrp = barChartGroupNonHrpEnter.merge(barChartGroupNonHrp);
@@ -2377,12 +2498,48 @@
 					return "translate(0," + yScaleBarChartNonHrp(d.cbpfName) + ")";
 				});
 
+			barChartGroupNonHrp.selectAll(".pbihrpbarChartDonutsPathsNonHrp")
+				.data(function(d) {
+					return donutGenerator([{
+						value: d.cbpfpercentage
+					}, {
+						value: d.cbpfpercentage > 1 ? 0 : 1 - d.cbpfpercentage
+					}])
+				})
+				.transition()
+				.duration(duration)
+				.attrTween("d", function(d) {
+					const i = d3.interpolate(localVariable.get(this), d);
+					localVariable.set(this, i(0));
+					return function(t) {
+						return arcGenerator(i(t));
+					};
+				});
+
+			barChartGroupNonHrp.select(".pbihrpbarChartDonutsPercentageNonHrp")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const thisPercentage = d.cbpfpercentage < 10 ? d.cbpfpercentage : 9.99;
+					const node = this;
+					const thisValue = +(node.textContent.match(/\d+/)[0]);
+					const i = d3.interpolate(thisValue / 100, thisPercentage);
+					return function(t) {
+						node.textContent = formatPercent(i(t));
+					};
+				});
+
 			barChartGroupNonHrp.selectAll(".pbihrpbarChartBarsNonHrp")
 				.data(function(d) {
 					return [{
 						key: "cbpffunding",
 						value: d.cbpffunding
+					}, {
+						key: "cbpftarget",
+						value: d.cbpftarget
 					}];
+				}, function(d) {
+					return d.key;
 				})
 				.transition()
 				.duration(duration)
@@ -2395,7 +2552,12 @@
 					return [{
 						key: "cbpffunding",
 						value: d.cbpffunding
+					}, {
+						key: "cbpftarget",
+						value: d.cbpftarget
 					}];
+				}, function(d) {
+					return d.key;
 				})
 				.transition()
 				.duration(duration)
@@ -2424,7 +2586,7 @@
 			const menuRectangle = sortMenuPanel.main.append("rect")
 				.attr("rx", 2)
 				.attr("ry", 2)
-				.attr("x", sortMenuPanel.titlePadding)
+				.attr("x", sortMenuPanel.titlePadding + 2)
 				.attr("y", -2)
 				.attr("width", sortMenuPanel.width)
 				.attr("height", sortMenuPanel.groupHeight)
@@ -2452,7 +2614,7 @@
 				.attr("clip-path", "url(#pbihrpsortMenuClip)");
 
 			const sortMenuContainer = sortMenuContainerClipGroup.append("g")
-				.attr("transform", "translate(" + (sortMenuPanel.titlePadding - sortMenuPanel.circleSize * 2 - sortMenuPanel.padding[3]) + "," + currentTranslate + ")");
+				.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + currentTranslate + ")");
 
 			const menuRectangleBackground = sortMenuContainer.append("rect")
 				.attr("x", 0)
@@ -2477,7 +2639,7 @@
 				.attr("x", sortMenuPanel.itemPadding)
 				.attr("y", sortMenuPanel.groupHeight / 1.35)
 				.text(function(d) {
-					return d === "hrpfunding" ? sortByValues[d] + "/CBPF target" : sortByValues[d];
+					return sortByValues[d];
 				});
 
 			const sortGroupsOuterCircle = sortGroups.append("circle")
@@ -2500,50 +2662,28 @@
 
 			sortMenuPanel.main.on("mouseover", function() {
 
-				if (activeSortMenu) return;
-
 				currentHoveredElement = this;
 
-				sortMenuContainer.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + sortMenuPanel.titlePadding + "," + sortMenuVertAlign + ")")
-					.on("start", function() {
-						activeSortMenu = true;
-					})
-					.on("end", function() {
-						activeSortMenu = false;
-					});
+				sortMenuContainer.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + sortMenuVertAlign + ")");
 
-				menuRectangle.transition()
-					.duration(duration)
-					.style("opacity", sortMenuRectangleOpacity)
+				menuRectangle.style("opacity", sortMenuRectangleOpacity)
 					.attr("height", sortMenuPanel.height);
 
-				menuRectangleClip.transition()
-					.duration(duration)
-					.attr("height", sortMenuPanel.height);
+				menuRectangleClip.attr("height", sortMenuPanel.height);
 
 			}).on("mouseleave", function() {
 
 				if (isSnapshotTooltipVisible) return;
 				currentHoveredElement = null;
 
-				activeSortMenu = false;
-
 				currentTranslate = calculateTranslate();
 
-				sortMenuContainer.transition()
-					.duration(duration)
-					.attr("transform", "translate(" + (sortMenuPanel.titlePadding - sortMenuPanel.circleSize * 2 - sortMenuPanel.padding[3]) + "," + currentTranslate + ")");
+				sortMenuContainer.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + currentTranslate + ")");
 
-				menuRectangle.transition()
-					.duration(duration)
-					.style("opacity", 0)
+				menuRectangle.style("opacity", 0)
 					.attr("height", sortMenuPanel.groupHeight);
 
-				menuRectangleClip.transition()
-					.duration(duration)
-					.attr("height", sortMenuPanel.groupHeight);
+				menuRectangleClip.attr("height", sortMenuPanel.groupHeight);
 
 			});
 
@@ -2598,11 +2738,11 @@
 						return d.year === +row.TargYr
 					});
 					if (foundYear) {
+						foundYear.totalData.cbpffunding += +row.PFFunded;
+						foundYear.totalData.cbpftarget += +row.PFHRPTarget;
+						foundYear.totalData.hrpfunding += +row.HRPClstFunded;
+						foundYear.totalData.hrprequirements += +row.HRPClstReq;
 						if (row.ClstNm === "xxx") {
-							foundYear.totalData.cbpffunding += +row.PFFunded;
-							foundYear.totalData.cbpftarget += +row.PFHRPTarget;
-							foundYear.totalData.hrpfunding += +row.HRPClstFunded;
-							foundYear.totalData.hrprequirements += +row.HRPClstReq;
 							foundYear.hrpData.push(thisValues);
 						} else {
 							foundYear.nonHrpData.push(thisValues);
@@ -2667,6 +2807,7 @@
 
 		function reverseFormat(s) {
 			if (+s === 0) return 0;
+			if (+s === +s) return +s;
 			let returnValue;
 			const transformation = {
 				Y: Math.pow(10, 24),

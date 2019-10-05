@@ -86,7 +86,7 @@ p#pbihrpd3chartTitle {
 .pbihrptopSummaryPanelTitle, .pbihrpbarChartPanelTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 20px;
-	fill: #666;
+	fill: #444;
 	pointer-events: none;
 	font-weight: 700;
 }
@@ -94,7 +94,7 @@ p#pbihrpd3chartTitle {
 .pbihrpnonHrpPanelTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
-	fill: #666;
+	fill: #444;
 	pointer-events: none;
 	font-weight: 700;
 }
@@ -102,17 +102,17 @@ p#pbihrpd3chartTitle {
 .pbihrpstackedBarPanelText {
 	font-family: "Arial", sans-serif;
 	font-size: 15px;
-	fill: #666;
+	fill: #222;
 	pointer-events: none;
 }
 
 .pbihrplegendText {
-	fill: #666;
+	fill: #222;
 	pointer-events: none;
 }
 
 .pbihrpsortMenuTitle {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 13px;
 	font-weight: 700;
 }
@@ -120,26 +120,26 @@ p#pbihrpd3chartTitle {
 .pbihrpsortGroupText {
 	font-family: "Roboto", sans-serif;
 	font-size: 13px;
-	fill: #444;
+	fill: #222;
 }
 
 .pbihrptopSummaryPanelCbpfValue, .pbihrptopSummaryPanelHrpValue, .pbihrpdonutsPanelFundingValue {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 40px;
-	font-weight: 500;
+	font-weight: 700;
 }
 
 .pbihrptopSummaryPanelCbpfTopText, .pbihrptopSummaryPanelHrpTopText, .pbihrpdonutsPanelTopText, .pbihrpdonutsPanelDonutsText {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
-	fill: #666;
+	fill: #222;
 	pointer-events: none;
 }
 
 .pbihrptopSummaryPanelCbpfBottomText, .pbihrptopSummaryPanelHrpBottomText {
 	font-family: "Arial", sans-serif;
 	font-size: 12px;
-	fill: #666;
+	fill: #222;
 	pointer-events: none;
 }
 
@@ -151,10 +151,10 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpcbpfTargetBarValue, .pbihrpcbpfFundingBarValue, .pbihrphrpRequirementsBarValue, .pbihrphrpFundingBarValue, .pbihrpbarChartPercentageTextSpan {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #444;
-	font-weight: 500;
+	font-weight: 700;
 	pointer-events: none;
 }
 
@@ -166,47 +166,47 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpstackedBarsLabelsSpan {
-	fill: #666;
+	fill: #444;
 	pointer-events: none;
 }
 
 .pbihrpstackedBarsLabels {
-	fill: #444;
+	fill: #222;
 	pointer-events: none;
 }
 
 .pbihrpbarChartsLabels, .pbihrpbarChartsLabelsNonHrp {
 	fill: #444;
 	pointer-events: none;
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
-	font-weight: 500;
+	font-weight: 700;
 }
 
 .pbihrpbarChartsLabelsBack {
 	fill: white;
 	pointer-events: none;
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
-	font-weight: 500;
+	font-weight: 700;
 	stroke: white;
 	stroke-width: 4px;
 }
 
-.pbihrpdonutsPercentage, .pbihrpbarChartDonutsPercentage {
-	fill: #444;
+.pbihrpdonutsPercentage, .pbihrpbarChartDonutsPercentage, .pbihrpbarChartDonutsPercentageNonHrp {
+	fill: #222;
 	pointer-events: none;
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 12px;
-	font-weight: 500;
+	font-weight: 700;
 }
 
 .pbihrplegendDonutText {
-	fill: #444;
+	fill: #222;
 	pointer-events: none;
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
-	font-weight: 500;
+	font-weight: 700;
 }
 
 .pbihrpgroupYAxisBarChartMain line , .pbihrpgroupYAxisBarChartNonHrp line{
@@ -214,22 +214,22 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpgroupYAxisBarChartInner line, .pbihrpgroupYAxisBarChartNonHrpInner line {
-	stroke: #666;
+	stroke: #888;
 }
 
 .pbihrpgroupYAxisBarChartInner text, .pbihrpgroupYAxisBarChartNonHrpInner text {
-	fill: #666;
+	fill: #888;
 }
 
 .pbihrpgroupYAxisBarChartMain text, .pbihrpgroupYAxisBarChartNonHrp text {
 	font-size: 14px;
-	font-family: "Roboto", sans-serif;
-	fill: #666;
-	font-weight: 500;
+	font-family: "Arial", sans-serif;
+	fill: #444;
+	font-weight: 700;
 }
 
 .pbihrpAnnotationMainText {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 26px;
 	font-weight: 700;
 	pointer-events: none;
