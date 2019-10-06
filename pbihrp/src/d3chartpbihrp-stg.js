@@ -168,6 +168,7 @@
 			nonHrpBarHeight = 50,
 			buttonsNumber = 12,
 			sortMenuRectangleOpacity = 0.85,
+			groupOpacity = 0.2,
 			sortMenuVertAlign = -2,
 			duration = 1000,
 			topSummaryBarsHeight = 10,
@@ -177,6 +178,8 @@
 			barChartPercentageLabelPadding = 6,
 			barChartPercentageLabelVertPadding = 8,
 			formatPercent = d3.format(".0%"),
+			formatPercent2Decimals = d3.format(".2%"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
 			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"], //dark blue, light blue, dark gray, light gray
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
@@ -431,6 +434,10 @@
 			circleSize: 6,
 			innerCircleSize: 3
 		};
+
+		stackedBarPanel.main.attr("pointer-events", "none");
+
+		donutsPanel.main.attr("pointer-events", "none");
 
 		const arcGenerator = d3.arc()
 			.outerRadius((donutsPanel.height - donutsPanel.padding[0] - donutsPanel.padding[2]) / 2 - 5)
@@ -1414,38 +1421,75 @@
 				.attr("height", topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 2 * panelVerticalPadding)
 				.style("opacity", 0);
 
-			// overlayRectangle.on("mouseover", mouseOverTopPanel)
-			// 	.on("mousemove", mouseMoveTopPanel)
-			// 	.on("mouseout", mouseOutTopPanel);
+			overlayRectangle.on("mouseover", mouseOverTopPanel)
+				.on("mousemove", mouseMoveTopPanel)
+				.on("mouseout", mouseOutTopPanel);
 
 			function mouseOverTopPanel() {
 
 				currentHoveredElement = this;
 
-				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+				const thisHeight = topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 2 * panelVerticalPadding;
 
 				const mouseContainer = d3.mouse(containerDiv.node());
 
 				const mouse = d3.mouse(this);
 
-				tooltip.style("display", "block");
+				tooltip.style("display", "block")
+					.html(null);
 
-				tooltip.html("Foo Bar Baz");
+				const tooltipData = [{
+					title: "Total HRP Requirements",
+					property: "hrprequirements"
+				}, {
+					title: "Total HRP Funding",
+					property: "hrpfunding"
+				}, {
+					title: "Total CBPF Target",
+					property: "cbpftarget"
+				}, {
+					title: "Total CBPF Funding",
+					property: "cbpffunding"
+				}];
+
+				const tooltipContainer = tooltip.append("div")
+					.style("margin", "0px")
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "310px");
+
+				tooltipData.forEach(function(d) {
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 56%")
+						.html(d.title + ":");
+
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 44%")
+						.style("justify-content", "flex-end")
+						.attr("class", "contributionColorHTMLcolor")
+						.html("$" + formatMoney0Decimals(data[d.property]));
+				});
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				localVariable.set(this, tooltipSize);
 
-				tooltip.style("top", thisOffset + "px")
-					.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
-						mouseContainer[0] + 14 + "px" :
+				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
+						mouseContainer[1] - mouse[1] + "px" :
+						mouse[1] < thisHeight - tooltipSize.height / 2 ?
+						mouseContainer[1] - (tooltipSize.height / 2) + "px" :
+						mouseContainer[1] - (mouse[1] - (thisHeight - tooltipSize.height)) + "px")
+					.style("left", mouse[0] < topSummaryPanel.width - 12 - tooltipSize.width ?
+						mouseContainer[0] + 12 + "px" :
 						mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
 
 			};
 
 			function mouseMoveTopPanel() {
 
-				const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+				const thisHeight = topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 2 * panelVerticalPadding;
 
 				const mouseContainer = d3.mouse(containerDiv.node());
 
@@ -1453,9 +1497,13 @@
 
 				const tooltipSize = localVariable.get(this);
 
-				tooltip.style("top", thisOffset + "px")
-					.style("left", mouse[0] < topSummaryPanel.width - 14 - tooltipSize.width ?
-						mouseContainer[0] + 14 + "px" :
+				tooltip.style("top", mouse[1] < tooltipSize.height / 2 ?
+						mouseContainer[1] - mouse[1] + "px" :
+						mouse[1] < thisHeight - tooltipSize.height / 2 ?
+						mouseContainer[1] - (tooltipSize.height / 2) + "px" :
+						mouseContainer[1] - (mouse[1] - (thisHeight - tooltipSize.height)) + "px")
+					.style("left", mouse[0] < topSummaryPanel.width - 12 - tooltipSize.width ?
+						mouseContainer[0] + 12 + "px" :
 						mouseContainer[0] - (mouse[0] - (topSummaryPanel.width - tooltipSize.width)) + "px");
 
 			};
@@ -2065,6 +2113,14 @@
 				})
 				.text(formatSIFloat(0));
 
+			const tooltipRectangleEnter = barChartGroupEnter.append("rect")
+				.attr("class", "pbihrptooltipRectangle")
+				.attr("height", barGroupHeight)
+				.attr("width", barChartPanel.width)
+				.style("fill", "none")
+				.attr("pointer-events", "all")
+				.attr("cursor", "pointer");
+
 			barChartGroup = barChartGroupEnter.merge(barChartGroup);
 
 			barChartGroup.transition()
@@ -2255,6 +2311,102 @@
 					})
 					.attrTween("x", null)
 					.tween("text", null);
+			};
+
+			const tooltipRectangle = barChartGroup.select(".pbihrptooltipRectangle");
+
+			tooltipRectangle.on("mouseover", mouseOverBarChart)
+				.on("mouseout", mouseOutBarChart);
+
+			function mouseOverBarChart(d) {
+
+				currentHoveredElement = this;
+
+				const thisGroup = this.parentNode;
+
+				barChartGroup.style("opacity", function() {
+					return this === thisGroup ? 1 : groupOpacity;
+				});
+
+				groupYAxisBarChartMain.selectAll(".tick")
+					.style("opacity", function(e) {
+						return e === d.cbpfName ? 1 : groupOpacity;
+					});
+
+				tooltip.style("display", "block")
+					.html(null);
+
+				const tooltipData = [{
+					title: "HRP Requirements",
+					property: "hrprequirements"
+				}, {
+					title: "HRP Funding",
+					property: "hrpfunding"
+				}, {
+					title: "CBPF Target",
+					property: "cbpftarget"
+				}, {
+					title: "CBPF Funding",
+					property: "cbpffunding"
+				}];
+
+				tooltip.append("div")
+					.style("margin-bottom", "10px")
+					.style("font-size", "16px")
+					.attr("class", "contributionColorHTMLcolor")
+					.append("strong")
+					.html(d.cbpfName);
+
+				const tooltipContainer = tooltip.append("div")
+					.style("margin", "0px")
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "310px");
+
+				tooltipData.forEach(function(e) {
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 56%")
+						.html(e.title + ":");
+
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 44%")
+						.style("justify-content", "flex-end")
+						.attr("class", "contributionColorHTMLcolor")
+						.html("$" + formatMoney0Decimals(d[e.property]));
+				});
+
+				tooltipContainer.append("div")
+					.style("margin-top", "8px")
+					.style("margin-bottom", "10px")
+					.html(formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved");
+
+				const thisBox = this.getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top;
+
+				const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+				tooltip.style("top", thisOffsetTop + barGroupHeight + "px")
+					.style("left", thisOffsetLeft + "px");
+
+			};
+
+			function mouseOutBarChart() {
+
+				if (isSnapshotTooltipVisible) return;
+				currentHoveredRect = null;
+
+				barChartGroup.style("opacity", 1);
+				groupYAxisBarChartMain.selectAll(".tick")
+					.style("opacity", 1);
+
+				tooltip.style("display", "none");
 			};
 
 			//end of createBarChartPanel

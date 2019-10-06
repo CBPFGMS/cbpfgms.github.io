@@ -31,7 +31,7 @@
 	border-radius: 4px;
 	pointer-events: none;
 	cursor: none;
-	max-width: 300px;
+	max-width: 310px;
 	z-index: 1500;
 }
 
@@ -78,7 +78,7 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpbuttonsText {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 12px;
 	pointer-events: none;
 }
@@ -118,7 +118,7 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpsortGroupText {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 13px;
 	fill: #222;
 }
@@ -144,7 +144,7 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpcbpfTargetLabel, .pbihrpcbpfFundingLabel, .pbihrphrpRequirementsLabel, .pbihrphrpFundingLabel {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #888;
 	pointer-events: none;
@@ -159,7 +159,7 @@ p#pbihrpd3chartTitle {
 }
 
 .pbihrpbarChartPercentageText {
-	font-family: "Roboto", sans-serif;
+	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #444;
 	pointer-events: none;
