@@ -179,7 +179,7 @@
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
-			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"], 
+			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"],
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
@@ -2535,6 +2535,10 @@
 				if (chartState.sortBy === "alphabetically") {
 					return a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
 						a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0;
+				} else if (chartState.sortBy === "cbpfpercentage") {
+					return b.cbpfpercentage - a.cbpfpercentage ||
+						(a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
+							a.cbpfName.toLowerCase() > b.cbpfName.toLowerCase() ? 1 : 0);
 				} else {
 					return b.cbpffunding - a.cbpffunding ||
 						(a.cbpfName.toLowerCase() < b.cbpfName.toLowerCase() ? -1 :
