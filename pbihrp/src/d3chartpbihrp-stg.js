@@ -5,17 +5,15 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-sth.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
 		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
-
-	//CHANGE CSS LINK!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -181,7 +179,7 @@
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
-			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"], //dark blue, light blue, dark gray, light gray
+			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"], 
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
@@ -192,8 +190,10 @@
 			localStorageTime = 600000,
 			localVariable = d3.local(),
 			chartTitleDefault = "CBPF Target vs HRP",
+			thumbnailsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/mapthumbnails/mapshot",
+			thumbnailsDirectoryCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/mapthumbnails/mapshot",
 			vizNameQueryString = "cbpfvshrp",
-			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
+			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			sortByValues = {
 				cbpffunding: "CBPF Funding",
@@ -206,6 +206,7 @@
 			legendNamesArray = ["HRP Requirements", "HRP Funding", "CBPF Funding"],
 			sortByArray = Object.keys(sortByValues),
 			dataFile = "https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary?PoolfundCodeAbbrv=&$format=csv",
+			allFunds = [],
 			totalValues = {},
 			chartState = {
 				selectedYear: null,
@@ -215,7 +216,7 @@
 		let isSnapshotTooltipVisible = false,
 			height = 600,
 			yearsArray,
-			targetPercentage = "15%", //THIS IS HARDCODED, SHOUDL BE CHANGED
+			targetPercentage = "15%", //THIS IS HARDCODED, SHOULD BE CHANGED
 			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -594,6 +595,10 @@
 			if (!isPfbiSite) createFooterDiv();
 
 			if (showHelp) createAnnotationsDiv();
+
+			allFunds.forEach(function(d) {
+				saveImage(thumbnailsDirectoryCors + d + ".png", d);
+			});
 
 			//end of draw
 		};
@@ -2361,7 +2366,7 @@
 					.style("margin", "0px")
 					.style("display", "flex")
 					.style("flex-wrap", "wrap")
-					.style("width", "310px");
+					.style("width", "300px");
 
 				tooltipData.forEach(function(e) {
 					tooltipContainer.append("div")
@@ -2377,10 +2382,23 @@
 						.html("$" + formatMoney0Decimals(d[e.property]));
 				});
 
-				tooltipContainer.append("div")
+				tooltip.append("div")
+					.style("margin-top", "8px")
+					.html("\u2192 " + formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved.");
+
+				tooltip.append("div")
 					.style("margin-top", "8px")
 					.style("margin-bottom", "10px")
-					.html(formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved");
+					.attr("class", "contributionColorHTMLcolor")
+					.html("Allocations in " + d.cbpfName + ":");
+
+				tooltip.append("img")
+					.attr("width", "300px")
+					.attr("height", "200px")
+					.style("border", "1px solid lightgray")
+					.attr("src", localStorage.getItem("storedImage" + d.cbpfId) ?
+						localStorage.getItem("storedImage" + d.cbpfId) :
+						thumbnailsDirectory + d.cbpfId + ".png");
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -2388,7 +2406,8 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top;
+				const thisOffsetTop = thisBox.top - containerBox.top < containerBox.height - tooltipBox.height - thisBox.height ?
+					thisBox.top - containerBox.top + 2 : thisBox.top - containerBox.top - tooltipBox.height - thisBox.height - 2;
 
 				const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
 
@@ -2642,6 +2661,14 @@
 				})
 				.text(formatSIFloat(0));
 
+			const tooltipRectangleNonHrpEnter = barChartGroupNonHrpEnter.append("rect")
+				.attr("class", "pbihrptooltipRectangleNonHrp")
+				.attr("height", nonHrpBarHeight)
+				.attr("width", nonHrpPanel.width)
+				.style("fill", "none")
+				.attr("pointer-events", "all")
+				.attr("cursor", "pointer");
+
 			barChartGroupNonHrp = barChartGroupNonHrpEnter.merge(barChartGroupNonHrp);
 
 			barChartGroupNonHrp.transition()
@@ -2723,6 +2750,110 @@
 						node.textContent = formatSIFloat(i(t));
 					};
 				});
+
+			const tooltipRectangleNonHrp = barChartGroupNonHrp.select(".pbihrptooltipRectangleNonHrp");
+
+			tooltipRectangleNonHrp.on("mouseover", mouseOverBarChartNonHrp)
+				.on("mouseout", mouseOutBarChartNonHrp);
+
+			function mouseOverBarChartNonHrp(d) {
+
+				currentHoveredElement = this;
+
+				const thisGroup = this.parentNode;
+
+				barChartGroupNonHrp.style("opacity", function() {
+					return this === thisGroup ? 1 : groupOpacity;
+				});
+
+				groupYAxisBarChartNonHrp.selectAll(".tick")
+					.style("opacity", function(e) {
+						return e === d.cbpfName ? 1 : groupOpacity;
+					});
+
+				tooltip.style("display", "block")
+					.html(null);
+
+				const tooltipData = [{
+					title: "CBPF Target",
+					property: "cbpftarget"
+				}, {
+					title: "CBPF Funding",
+					property: "cbpffunding"
+				}];
+
+				tooltip.append("div")
+					.style("margin-bottom", "10px")
+					.style("font-size", "16px")
+					.attr("class", "contributionColorHTMLcolor")
+					.append("strong")
+					.html(d.cbpfName);
+
+				const tooltipContainer = tooltip.append("div")
+					.style("margin", "0px")
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "300px");
+
+				tooltipData.forEach(function(e) {
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 56%")
+						.html(e.title + ":");
+
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 44%")
+						.style("justify-content", "flex-end")
+						.attr("class", "contributionColorHTMLcolor")
+						.html("$" + formatMoney0Decimals(d[e.property]));
+				});
+
+				tooltip.append("div")
+					.style("margin-top", "8px")
+					.html("\u2192 " + formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved.");
+
+				tooltip.append("div")
+					.style("margin-top", "8px")
+					.style("margin-bottom", "10px")
+					.attr("class", "contributionColorHTMLcolor")
+					.html("Allocations in " + d.cbpfName + ":");
+
+				tooltip.append("img")
+					.attr("width", "300px")
+					.attr("height", "200px")
+					.style("border", "1px solid lightgray")
+					.attr("src", localStorage.getItem("storedImage" + d.cbpfId) ?
+						localStorage.getItem("storedImage" + d.cbpfId) :
+						thumbnailsDirectory + d.cbpfId + ".png");
+
+				const thisBox = this.getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top < containerBox.height - tooltipBox.height - thisBox.height ?
+					thisBox.top - containerBox.top + 2 : thisBox.top - containerBox.top - tooltipBox.height - thisBox.height - 2;
+
+				const thisOffsetLeft = thisBox.left - containerBox.left + (thisBox.width - tooltipBox.width) / 2;
+
+				tooltip.style("top", thisOffsetTop + barGroupHeight + "px")
+					.style("left", thisOffsetLeft + "px");
+
+			};
+
+			function mouseOutBarChartNonHrp() {
+
+				if (isSnapshotTooltipVisible) return;
+				currentHoveredRect = null;
+
+				barChartGroupNonHrp.style("opacity", 1);
+				groupYAxisBarChartNonHrp.selectAll(".tick")
+					.style("opacity", 1);
+
+				tooltip.style("display", "none");
+			};
 
 			//end of createNonHrpPanel
 		};
@@ -2876,6 +3007,8 @@
 
 			rawData.forEach(function(row) {
 				if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
+
+					if (allFunds.indexOf(row.PFId) === -1) allFunds.push(row.PFId);
 
 					const thisValues = {
 						cbpfName: row.PFNm,
@@ -3190,6 +3323,50 @@
 					}
 				}
 			});
+		};
+
+		function saveImage(link, filename) {
+
+			if (!localStorage.getItem("storedImage" + filename)) {
+				getBase64FromImage(link, setLocal, null, filename);
+			};
+
+			function getBase64FromImage(url, onSuccess, onError, filename) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(filename, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(filename, base64) {
+				localStorage.setItem("storedImage" + filename, base64);
+			};
+
+			//end of saveImage
 		};
 
 		function createSnapshot(type, fromContextMenu) {
