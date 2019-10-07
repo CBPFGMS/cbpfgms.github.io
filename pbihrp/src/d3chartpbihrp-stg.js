@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-sth.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
 		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
