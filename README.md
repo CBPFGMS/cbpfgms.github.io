@@ -93,6 +93,14 @@ Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Inte
 
 This chart shows a timeline with the allocations for a selected period. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac) for more information.
 
+- **PFBI: CBPF Target versus HRP**
+
+Chart for the Country-based Pooled Funds (CBPF) Target versus HRP in the Business Intelligence Portal at the OCHA PFBI.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbihrp.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbiuac)
+
+This chart shows HRP requirements, HRP funding, CBPF target and CBPF funding for each Fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbihrp) for more information.
+
 - **GMS Landing Page**
 
 Chart for the Grant Management System landing page.
