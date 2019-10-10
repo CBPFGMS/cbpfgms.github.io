@@ -943,8 +943,9 @@
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
-					.data([true])
-					.enter()
+					.data([true]);
+
+				topPanelSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelSubText")
 					.style("opacity", 0)
@@ -954,7 +955,15 @@
 					.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text("Targeted");
+					.text(function() {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						return "Targeted in " + yearsText;
+					});
+
+				topPanelSubText.text(function() {
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					return "Targeted in " + yearsText;
+				});
 
 				let topPanelPersonsActual = mainValueGroup.selectAll(".pbiobetopPanelPersonsActual")
 					.data([actualValue]);
@@ -1003,19 +1012,25 @@
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
 					.data([true]);
 
-				topPanelPersonsTextSubText = topPanelPersonsTextSubText.enter()
+				topPanelPersonsTextSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelPersonsTextSubText")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
 					.style("opacity", 0)
-					.merge(topPanelPersonsTextSubText);
-
-				topPanelPersonsTextSubText.transition()
+					.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text("Affected (" + (~~(percentageValue * 100)) + "%)");
+					.text(function() {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+					});
+
+				topPanelPersonsTextSubText.text(function() {
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+				});
 
 				//end of createTopPanel
 			}
