@@ -19,7 +19,7 @@ Also, at the top right corner, there is a set of buttons:
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-sortbuttons="total" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
+```<div id="d3chartcontainerpbiali" data-title="Allocation Trends" data-selectedcbpfs="none" data-sortbuttons="total" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbiali/src/d3chartpbiali.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet.
 
@@ -27,9 +27,23 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are six parameters:
+There are seven parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocation Trends*.
+
+**`data-selectedcbpfs`**: defines the selected CBPF when the page loads. For not selecting any CBPF set the value to `"none"`, or just leave it empty:
+
+`""`
+
+For individual funds set the value accordingly, such as:
+
+`"Yemen"`.
+
+For more than one fund separate the values with commas, such as:
+
+`"Yemen, Sudan, Iraq"`.
+
+For the accepted values, please refer to the data API. If the value is not a valid one it defaults to `"none"`. This value defines only the selected CBPFs when the page loads: the CBPFs can be easily selected by clicking on the buttons.
 
 **`data-sortbuttons`**: defines the criterion for ordering the small multiples. Accepted values:
 
