@@ -1138,7 +1138,10 @@
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
 					.merge(topPanelPersonsTextSubText)
-					.text("(" + (chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + ")");
+					.text(function() {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						return (chartState.selectedBeneficiary === "actual" ? "Affected" : "Targeted") + " in " + yearsText;
+					});
 
 				// 	//end of createTopPanel
 			};
