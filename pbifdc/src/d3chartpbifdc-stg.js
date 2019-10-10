@@ -225,6 +225,7 @@
 			topPanelRectBoundingRect,
 			containerDivBoundingRect,
 			isSnapshotTooltipVisible = false,
+			timer,
 			currentHoveredElem;
 
 		const geoRegions = {
@@ -649,6 +650,76 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				const playIcon = iconsDiv.append("button")
+					.datum({
+						clicked: false
+					})
+					.attr("id", "pbifdcPlayButton");
+
+				playIcon.html("PLAY  ")
+					.append("span")
+					.attr("class", "fas fa-play");
+
+				playIcon.on("click", function(d) {
+					d.clicked = !d.clicked;
+
+					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+						.append("span")
+						.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+					if (d.clicked) {
+						chartState.selectedYear.length = 1;
+						loopButtons();
+						timer = d3.interval(loopButtons, 2 * duration);
+					} else {
+						timer.stop();
+					};
+
+					function loopButtons() {
+						const index = yearsArray.indexOf(chartState.selectedYear[0]);
+
+						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+
+						const yearButton = d3.selectAll(".pbifdcbuttonsRects")
+							.filter(function(d) {
+								return d === chartState.selectedYear[0]
+							});
+
+						yearButton.dispatch("click");
+						yearButton.dispatch("click");
+
+						const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+							0 :
+							chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+							yearsArray.length - buttonsNumber :
+							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+
+						const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+
+						if (currentTranslate === 0) {
+							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "all");
+						};
+
+						if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "all");
+						};
+
+						svg.select(".pbifdcbuttonsGroup").transition()
+							.duration(duration)
+							.attrTween("transform", function() {
+								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+							});
+					};
+				});
 
 				if (!isBookmarkPage) {
 
