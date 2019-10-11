@@ -3367,7 +3367,19 @@
 			};
 
 			function setLocal(filename, base64) {
-				localStorage.setItem("storedImage" + filename, base64);
+				try {
+					localStorage.setItem("storedImage" + filename, base64);
+				} catch (error) {
+					try {
+						localStorage.removeItem("pbihrpdata");
+						console.info("D3 chart pbihrp, local data removed, error: " + error);
+						localStorage.setItem("storedImage" + filename, base64);
+					} catch (newError) {
+						localStorage.clear();
+						console.info("D3 chart pbihrp, local storage cleared, error: " + newError);
+						localStorage.setItem("storedImage" + filename, base64);
+					};
+				};
 			};
 
 			//end of saveImage
