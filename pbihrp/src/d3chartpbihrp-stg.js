@@ -518,14 +518,14 @@
 
 		if (localStorage.getItem("pbihrpdata") &&
 			JSON.parse(localStorage.getItem("pbihrpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbihrpdata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbihrpdata")).data);
 			console.info("pbihrp: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(dataFile).then(function(rawData) {
 				try {
 					localStorage.setItem("pbihrpdata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {

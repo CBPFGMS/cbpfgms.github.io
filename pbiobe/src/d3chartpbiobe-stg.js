@@ -421,14 +421,14 @@
 
 		if (localStorage.getItem("pbiobedata") &&
 			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbiobedata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
 			console.info("pbiobe: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
 				try {
 					localStorage.setItem("pbiobedata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {

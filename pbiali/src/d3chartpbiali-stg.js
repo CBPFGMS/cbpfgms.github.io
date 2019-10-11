@@ -396,14 +396,14 @@
 
 		if (localStorage.getItem("pbialidata") &&
 			JSON.parse(localStorage.getItem("pbialidata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbialidata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbialidata")).data);
 			console.info("pbiali: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv(file).then(function(rawData) {
 				try {
 					localStorage.setItem("pbialidata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {

@@ -515,14 +515,14 @@
 		function getData(mapData) {
 			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+				const apiData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
 				console.info("pbifdc: data from local storage");
 				csvCallback([apiData, mapData]);
 			} else {
 				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
 					try {
 						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-							data: apiData,
+							data: d3.csvFormat(apiData),
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {

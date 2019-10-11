@@ -437,7 +437,7 @@
 
 		if (localStorage.getItem("pbiuacdata") &&
 			JSON.parse(localStorage.getItem("pbiuacdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbiuacdata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiuacdata")).data);
 			rawData.forEach(function(d) {
 				d.PlannedStartDate = new Date(d.PlannedStartDate);
 				d.PlannedEndDate = new Date(d.PlannedEndDate);
@@ -448,7 +448,7 @@
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
 				try {
 					localStorage.setItem("pbiuacdata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
