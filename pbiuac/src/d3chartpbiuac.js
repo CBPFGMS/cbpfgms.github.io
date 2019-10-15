@@ -10,7 +10,10 @@
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
+		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
+		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -32,20 +35,30 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(URLSearchParamsPolyfill, function() {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
-			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, function() {
 						loadScript(d3URL, d3Chart);
 					});
 				});
 			});
 		};
 	} else if (typeof d3 !== "undefined") {
-		d3Chart();
+		if (hasFetch && hasURLSearchParams) {
+			d3Chart();
+		} else if (hasFetch && !hasURLSearchParams) {
+			loadScript(URLSearchParamsPolyfill, d3Chart);
+		} else {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, d3Chart);
+				});
+			});
+		};
 	} else {
 		let d3Script;
 		const scripts = document.getElementsByTagName('script');
@@ -424,7 +437,7 @@
 
 		if (localStorage.getItem("pbiuacdata") &&
 			JSON.parse(localStorage.getItem("pbiuacdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbiuacdata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiuacdata")).data);
 			rawData.forEach(function(d) {
 				d.PlannedStartDate = new Date(d.PlannedStartDate);
 				d.PlannedEndDate = new Date(d.PlannedEndDate);
@@ -435,7 +448,7 @@
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
 				try {
 					localStorage.setItem("pbiuacdata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {

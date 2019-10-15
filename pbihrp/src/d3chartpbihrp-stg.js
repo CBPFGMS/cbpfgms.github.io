@@ -540,7 +540,7 @@
 
 			removeProgressWheel();
 
-			const completeData = processData(rawData)
+			const completeData = processData(rawData);
 
 			yearsArray = completeData.map(function(d) {
 				return d.year;
@@ -679,6 +679,79 @@
 				.on("click", function() {
 					createSnapshot("png", false);
 				});
+
+			const playIcon = iconsDiv.append("button")
+				.datum({
+					clicked: false
+				})
+				.attr("id", "pbihrpPlayButton");
+
+			playIcon.html("PLAY  ")
+				.append("span")
+				.attr("class", "fas fa-play");
+
+			playIcon.on("click", function(d) {
+				d.clicked = !d.clicked;
+
+				playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+					.append("span")
+					.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+				if (d.clicked) {
+					chartState.selectedYear.length = 1;
+					loopButtons();
+					timer = d3.interval(loopButtons, 2 * duration);
+				} else {
+					timer.stop();
+				};
+
+				function loopButtons() {
+					const index = yearsArray.indexOf(chartState.selectedYear);
+
+					chartState.selectedYear = yearsArray[(index + 1) % yearsArray.length];
+
+					const yearButton = d3.selectAll(".pbihrpbuttonsRects")
+						.filter(function(d) {
+							return d === chartState.selectedYear
+						});
+
+					yearButton.dispatch("click");
+					yearButton.dispatch("click");
+
+					if (yearsArray.length > buttonsNumber) {
+
+						const firstYearIndex = chartState.selectedYear < yearsArray[buttonsNumber / 2] ?
+							0 :
+							chartState.selectedYear > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+							yearsArray.length - buttonsNumber :
+							yearsArray.indexOf(chartState.selectedYear) - (buttonsNumber / 2);
+
+						const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+
+						if (currentTranslate === 0) {
+							svg.select(".pbihrpLeftArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbihrpLeftArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbihrpLeftArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbihrpLeftArrowGroup").attr("pointer-events", "all");
+						};
+
+						if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+							svg.select(".pbihrpRightArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbihrpRightArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbihrpRightArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbihrpRightArrowGroup").attr("pointer-events", "all");
+						};
+
+						svg.select(".pbihrpbuttonsGroup").transition()
+							.duration(duration)
+							.attrTween("transform", function() {
+								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+							});
+					};
+				};
+			});
 
 			if (!isBookmarkPage) {
 
@@ -1913,7 +1986,7 @@
 				.attr("y", legendRectangleSize - 3)
 				.attr("x", legendRectangleSize + 3)
 				.attr("class", "pbihrplegendText")
-				.style("font-family", "Roboto")
+				.style("font-family", "Arial")
 				.style("font-size", "13px")
 				.text(function(d) {
 					return sortByValues[d.toLowerCase()];
@@ -1958,7 +2031,7 @@
 					.attr("y", 5)
 					.attr("x", legendRadius + 3)
 					.attr("class", "pbihrplegendText")
-					.style("font-family", "Roboto")
+					.style("font-family", "Arial")
 					.style("font-size", "13px")
 					.text("CBPF Funding as Percentage of the Target");
 
@@ -2480,7 +2553,7 @@
 				.attr("y", legendRectangleSize - 3)
 				.attr("x", legendRectangleSize + 3)
 				.attr("class", "pbihrplegendText")
-				.style("font-family", "Roboto")
+				.style("font-family", "Arial")
 				.style("font-size", "13px")
 				.text(function(d) {
 					return sortByValues[d.toLowerCase()];
@@ -2525,7 +2598,7 @@
 					.attr("y", 5)
 					.attr("x", legendRadius + 3)
 					.attr("class", "pbihrplegendText")
-					.style("font-family", "Roboto")
+					.style("font-family", "Arial")
 					.style("font-size", "13px")
 					.text("CBPF Funding as Percentage of the Target");
 
@@ -3187,7 +3260,7 @@
 				.attr("d", "M0,-5L10,0L0,5");
 
 			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
+				.attr("font-family", "Arial")
 				.attr("font-size", "26px")
 				.style("stroke-width", "5px")
 				.attr("font-weight", 700)
@@ -3611,7 +3684,7 @@
 
 			const loadingText = wheelGroup.append("text")
 				.attr("text-anchor", "middle")
-				.style("font-family", "Roboto")
+				.style("font-family", "Arial")
 				.style("font-weight", "bold")
 				.style("font-size", "11px")
 				.attr("y", 50)

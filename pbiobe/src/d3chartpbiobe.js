@@ -10,7 +10,10 @@
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiobe.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
+		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
+		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -32,20 +35,30 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(URLSearchParamsPolyfill, function() {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
-			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, function() {
 						loadScript(d3URL, d3Chart);
 					});
 				});
 			});
 		};
 	} else if (typeof d3 !== "undefined") {
-		d3Chart();
+		if (hasFetch && hasURLSearchParams) {
+			d3Chart();
+		} else if (hasFetch && !hasURLSearchParams) {
+			loadScript(URLSearchParamsPolyfill, d3Chart);
+		} else {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, d3Chart);
+				});
+			});
+		};
 	} else {
 		let d3Script;
 		const scripts = document.getElementsByTagName('script');
@@ -185,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["Actual Affected Persons", "Targeted Affected Persons"],
+			legendData = ["Affected Persons", "Targeted Persons"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -219,6 +232,7 @@
 
 		let yearsArray,
 			isSnapshotTooltipVisible = false,
+			timer,
 			currentHoveredElem;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -407,14 +421,14 @@
 
 		if (localStorage.getItem("pbiobedata") &&
 			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = JSON.parse(localStorage.getItem("pbiobedata")).data;
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
 			console.info("pbiobe: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
 				try {
 					localStorage.setItem("pbiobedata", JSON.stringify({
-						data: rawData,
+						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
 				} catch (error) {
@@ -534,6 +548,79 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				const playIcon = iconsDiv.append("button")
+					.datum({
+						clicked: false
+					})
+					.attr("id", "pbiobePlayButton");
+
+				playIcon.html("PLAY  ")
+					.append("span")
+					.attr("class", "fas fa-play");
+
+				playIcon.on("click", function(d) {
+					d.clicked = !d.clicked;
+
+					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+						.append("span")
+						.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+					if (d.clicked) {
+						chartState.selectedYear.length = 1;
+						loopButtons();
+						timer = d3.interval(loopButtons, 2 * duration);
+					} else {
+						timer.stop();
+					};
+
+					function loopButtons() {
+						const index = yearsArray.indexOf(chartState.selectedYear[0]);
+
+						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+
+						const yearButton = d3.selectAll(".pbiobebuttonsRects")
+							.filter(function(d) {
+								return d === chartState.selectedYear[0]
+							});
+
+						yearButton.dispatch("click");
+						yearButton.dispatch("click");
+
+						if (yearsArray.length > buttonsNumber) {
+
+							const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+								0 :
+								chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+								yearsArray.length - buttonsNumber :
+								yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+
+							const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+
+							if (currentTranslate === 0) {
+								svg.select(".pbiobeLeftArrowGroup").select("text").style("fill", "#ccc")
+								svg.select(".pbiobeLeftArrowGroup").attr("pointer-events", "none");
+							} else {
+								svg.select(".pbiobeLeftArrowGroup").select("text").style("fill", "#666")
+								svg.select(".pbiobeLeftArrowGroup").attr("pointer-events", "all");
+							};
+
+							if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+								svg.select(".pbiobeRightArrowGroup").select("text").style("fill", "#ccc")
+								svg.select(".pbiobeRightArrowGroup").attr("pointer-events", "none");
+							} else {
+								svg.select(".pbiobeRightArrowGroup").select("text").style("fill", "#666")
+								svg.select(".pbiobeRightArrowGroup").attr("pointer-events", "all");
+							};
+
+							svg.select(".pbiobebuttonsGroup").transition()
+								.duration(duration)
+								.attrTween("transform", function() {
+									return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+								});
+						};
+					};
+				});
 
 				if (!isBookmarkPage) {
 
@@ -856,8 +943,9 @@
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
-					.data([true])
-					.enter()
+					.data([true]);
+
+				topPanelSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelSubText")
 					.style("opacity", 0)
@@ -867,7 +955,15 @@
 					.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text("Targeted");
+					.text(function() {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						return "Targeted in " + yearsText;
+					});
+
+				topPanelSubText.text(function() {
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					return "Targeted in " + yearsText;
+				});
 
 				let topPanelPersonsActual = mainValueGroup.selectAll(".pbiobetopPanelPersonsActual")
 					.data([actualValue]);
@@ -916,19 +1012,25 @@
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
 					.data([true]);
 
-				topPanelPersonsTextSubText = topPanelPersonsTextSubText.enter()
+				topPanelPersonsTextSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelPersonsTextSubText")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
 					.style("opacity", 0)
-					.merge(topPanelPersonsTextSubText);
-
-				topPanelPersonsTextSubText.transition()
+					.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text("Affected (" + (~~(percentageValue * 100)) + "%)");
+					.text(function() {
+						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+					});
+
+				topPanelPersonsTextSubText.text(function() {
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+				});
 
 				//end of createTopPanel
 			}

@@ -198,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["Actual Affected Persons", "Targeted Affected Persons"],
+			legendData = ["Affected Persons", "Targeted Persons"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],

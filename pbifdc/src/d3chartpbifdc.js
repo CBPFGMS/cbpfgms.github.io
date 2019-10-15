@@ -10,7 +10,10 @@
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js";
+		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
+		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
+		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -32,20 +35,30 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(URLSearchParamsPolyfill, function() {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
-			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
-					loadScript("https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js", function() {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, function() {
 						loadScript(d3URL, d3Chart);
 					});
 				});
 			});
 		};
 	} else if (typeof d3 !== "undefined") {
-		d3Chart();
+		if (hasFetch && hasURLSearchParams) {
+			d3Chart();
+		} else if (hasFetch && !hasURLSearchParams) {
+			loadScript(URLSearchParamsPolyfill, d3Chart);
+		} else {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
+					loadScript(URLSearchParamsPolyfill, d3Chart);
+				});
+			});
+		};
 	} else {
 		let d3Script;
 		const scripts = document.getElementsByTagName('script');
@@ -212,6 +225,7 @@
 			topPanelRectBoundingRect,
 			containerDivBoundingRect,
 			isSnapshotTooltipVisible = false,
+			timer,
 			currentHoveredElem;
 
 		const geoRegions = {
@@ -501,14 +515,14 @@
 		function getData(mapData) {
 			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const apiData = JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data;
+				const apiData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
 				console.info("pbifdc: data from local storage");
 				csvCallback([apiData, mapData]);
 			} else {
 				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
 					try {
 						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-							data: apiData,
+							data: d3.csvFormat(apiData),
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {
@@ -636,6 +650,76 @@
 					.on("click", function() {
 						createSnapshot("png", false);
 					});
+
+				const playIcon = iconsDiv.append("button")
+					.datum({
+						clicked: false
+					})
+					.attr("id", "pbifdcPlayButton");
+
+				playIcon.html("PLAY  ")
+					.append("span")
+					.attr("class", "fas fa-play");
+
+				playIcon.on("click", function(d) {
+					d.clicked = !d.clicked;
+
+					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+						.append("span")
+						.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+					if (d.clicked) {
+						chartState.selectedYear.length = 1;
+						loopButtons();
+						timer = d3.interval(loopButtons, 2 * duration);
+					} else {
+						timer.stop();
+					};
+
+					function loopButtons() {
+						const index = yearsArray.indexOf(chartState.selectedYear[0]);
+
+						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+
+						const yearButton = d3.selectAll(".pbifdcbuttonsRects")
+							.filter(function(d) {
+								return d === chartState.selectedYear[0]
+							});
+
+						yearButton.dispatch("click");
+						yearButton.dispatch("click");
+
+						const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+							0 :
+							chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+							yearsArray.length - buttonsNumber :
+							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+
+						const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+
+						if (currentTranslate === 0) {
+							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "all");
+						};
+
+						if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#ccc")
+							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "none");
+						} else {
+							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#666")
+							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "all");
+						};
+
+						svg.select(".pbifdcbuttonsGroup").transition()
+							.duration(duration)
+							.attrTween("transform", function() {
+								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+							});
+					};
+				});
 
 				if (!isBookmarkPage) {
 
