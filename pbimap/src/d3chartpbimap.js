@@ -1031,13 +1031,7 @@
 					modalitiesDropdown.call(populateDropdown, ["All"].concat(data.allocationsTypeList.sort()), chartState.selectedModality);
 					modalitiesDropdown.selectAll("li")
 						.on("click", function(d) {
-							if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
-							changeSelected(d, chartState.selectedModality);
-							if (chartState.selectedModality[0] === "all") {
-								queryStringValues.delete("modality");
-							} else {
-								setQueryString("modality", chartState.selectedModality.join("|"));
-							};
+							clickModalities(d);
 						});
 
 					const newMaxCombinedLevel = d3.max(data.map, function(d) {
@@ -1077,6 +1071,7 @@
 			cbpfsDropdown.selectAll("li")
 				.on("click", function(d) {
 					if (chartState.selectedCBPF.indexOf(d.toLowerCase()) > -1 && chartState.selectedCBPF.length === 1) return;
+					chartState.selectedModality = ["all"];
 					changeSelected(d, chartState.selectedCBPF);
 					if (chartState.selectedCBPF[0] === "all") {
 						queryStringValues.delete("fund");
@@ -1113,13 +1108,7 @@
 
 			modalitiesDropdown.selectAll("li")
 				.on("click", function(d) {
-					if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
-					changeSelected(d, chartState.selectedModality);
-					if (chartState.selectedModality[0] === "all") {
-						queryStringValues.delete("modality");
-					} else {
-						setQueryString("modality", chartState.selectedModality.join("|"));
-					};
+					clickModalities(d);
 				});
 
 			adminLevelDropdown.selectAll("li")
@@ -1163,13 +1152,7 @@
 				modalitiesDropdown.call(populateDropdown, ["All"].concat(data.allocationsTypeList.sort()), chartState.selectedModality);
 				modalitiesDropdown.selectAll("li")
 					.on("click", function(d) {
-						if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
-						changeSelected(d, chartState.selectedModality);
-						if (chartState.selectedModality[0] === "all") {
-							queryStringValues.delete("modality");
-						} else {
-							setQueryString("modality", chartState.selectedModality.join("|"));
-						};
+						clickModalities(d);
 					});
 				createTopSvg(data.topSvgObject);
 				createMap(data.map);
@@ -1225,13 +1208,7 @@
 
 					modalitiesDropdown.selectAll("li")
 						.on("click", function(d) {
-							if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
-							changeSelected(d, chartState.selectedModality);
-							if (chartState.selectedModality[0] === "all") {
-								queryStringValues.delete("modality");
-							} else {
-								setQueryString("modality", chartState.selectedModality.join("|"));
-							};
+							clickModalities(d);
 						});
 
 					adminLevelDropdown.selectAll("li")
@@ -1257,7 +1234,19 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					listDiv.html("");
+					partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
+					clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
 				});
+
+			function clickModalities(d) {
+				if (chartState.selectedModality.indexOf(d.toLowerCase()) > -1 && chartState.selectedModality.length === 1) return;
+				changeSelected(d, chartState.selectedModality);
+				if (chartState.selectedModality[0] === "all") {
+					queryStringValues.delete("modality");
+				} else {
+					setQueryString("modality", chartState.selectedModality.join("|"));
+				};
+			};
 
 			function filterCbpfsDropdown() {
 
@@ -3175,6 +3164,16 @@
 				ne: {
 					lat: 32.5521479,
 					lng: 35.5739235
+				}
+			},
+			"Ukraine": {
+				sw: {
+					lat: 44.184598,
+					lng: 22.137059
+				},
+				ne: {
+					lat: 52.3791473,
+					lng: 40.2275801
 				}
 			}
 		};
