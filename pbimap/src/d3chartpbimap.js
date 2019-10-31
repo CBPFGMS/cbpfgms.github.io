@@ -226,7 +226,7 @@
 			yearsArrayString = d3.range(initialYear, currentYear + 1, 1).map(function(d) {
 				return d.toString();
 			}),
-			chartTitleDefault = "Allocations map",
+			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			formatMoney0Decimals = d3.format(",.0f"),
