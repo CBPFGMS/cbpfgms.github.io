@@ -1667,8 +1667,9 @@
 
 			beeswarm.on("mouseover", function(d) {
 
-				beeswarm.style("opacity", fadeOpacity);
-				d3.select(this).style("opacity", 1);
+				beeswarm.style("opacity", function(e) {
+					return e.cbpfId === d.cbpfId ? 1 : fadeOpacity;
+				});
 
 				tooltip.style("display", "block")
 					.html(null);
