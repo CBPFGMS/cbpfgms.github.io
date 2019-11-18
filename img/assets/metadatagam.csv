@@ -1,0 +1,12 @@
+﻿GenderMarkerGroup,GenderMarkerCode,GenderMarker_clean
+GAM,2,2-Unlikely to contribute to gender equality (no gender equality measure but includes age consideration)
+GAM,0,0-Does not systematically link programming actions (no action related to gender and age consideration)
+GAM,1,1-Unlikely to contribute to gender equality (no gender equality measure and no age consideration)
+GAM,3,"3-Likely to contribute to gender equality, but without attention to age groups"
+GAM,4,"4-Likely to contribute to gender equality, including across age groups"
+GM,0,0-No signs that gender issues were considered in project design
+GM,1,1-The project is designed to contribute in some limited way to gender equality
+GM,2a,2a-The project is designed to contribute significantly to gender equality
+GM,2b,2b-The principal purpose of the project is to advance gender equality
+GM,3,3-Not Specified
+GM,4,"4-Not applicable -Only used for very small number of projects, such as 'support services'"
