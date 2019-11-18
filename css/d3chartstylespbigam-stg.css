@@ -34,6 +34,26 @@
 	z-index: 1500;
 }
 
+#pbigamalertDiv {
+	position: absolute;    
+	text-align: center;
+	color: whitesmoke;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 12px;
+	line-height: 120%;
+	font-size: 16px;
+	background: #418fde; 
+	border: 2px solid #fff; 
+	border-radius: 4px;
+	max-width: 200px;
+	z-index: 200;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	cursor: pointer;
+}
+
 .pbigamTopDiv {
 	display: flex;
 	width: 100%;
@@ -59,6 +79,14 @@
 	margin-top: 8px;
 }
 
+.pbigamYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
 .pbigamOverDivHelp {
 	position: absolute;
 	width: 100%;
@@ -70,10 +98,169 @@
 }
 
 p#pbigamd3chartTitle {
-	font-size: 32px;
+	font-size: 26px;
 	font-family: "Arial", sans-serif;
 	margin: 0px;
 	color: #418fde;
+}
+
+.pbigamSelectTitleDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 8px;
+	margin-top: 8px;
+	margin-left: 10px;
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+}
+
+.pbigamSelectDiv {
+	display: flex;
+	margin-left: 10px;
+	margin-right: 4px;
+	flex-wrap: wrap;
+}
+
+.pbigamCheckboxDiv {
+	display: flex;
+	margin-right: 12px;
+	align-items: center;
+}
+
+.pbigamCheckboxDiv label, .pbigamCheckboxDiv input {
+	cursor: pointer;
+}
+
+.pbigamCheckboxText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	color: #666;
+	margin-left: 2px;
+}
+
+.pbigamtopPanelMainValue, .pbigamtopPanelProjectsNumber, .pbigamtopPanelCbpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbigamtopPanelMainText, .pbigamtopPanelSubText, .pbigamtopPanelProjectsText, .pbigamtopPanelCbpfsText, .pbigamtopPanelProjectsTextSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.pbigambuttonsLegendText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #888;
+}
+
+.pbigambuttonsText, .pbigambuttonsAllocationsText, .pbigambuttonsDisplayText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbigamleftArrowText, .pbigamrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbigamxAxisGroup text {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbigamaxisLabelCode {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamlegendSizeTitle, .pbigamlegendColorTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbigamshowMeanText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #666;
+}
+
+.pbigamlegendSizeLabels {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #888;
+}
+
+.pbigamsizeTitleSpan, .pbigamcolorTitleSpan {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamlegendColorGroup {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #777;
+}
+
+.pbigamxAxisGroup path {
+	stroke: none;
+}
+
+.pbigamxAxisGroup line {
+	stroke: #e7e7e7;
+	stroke-dasharray: 2, 2;
+}
+
+.pbigamyAxisGroup text {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	font-weight: 700;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamaxisDescriptions {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigammeanGroupTextBack {
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	fill: white;
+	stroke: white;
+	stroke-width: 2px;
+	pointer-events: none;
+}
+
+.pbigammeanGroupText {
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.pbigamyAxisGroup path {
+	stroke: none;
+}
+
+.pbigamyAxisGroup line {
+	stroke: #ddd;
 }
 
 .pbigamAnnotationMainText {
