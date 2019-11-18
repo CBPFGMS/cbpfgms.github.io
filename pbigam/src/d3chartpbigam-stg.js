@@ -15,6 +15,8 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
+	//CHANGE CSS LINK!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
@@ -1703,9 +1705,9 @@
 					.style("text-align", "justify")
 					.style("text-justify", "auto")
 					.style("line-height", "110%")
-					.html("(the allocation corresponds to " + formatPercent1Decimal(d.percentageCbpf) +
-						" of the total allocations in " + d.cbpfName + ", and corresponds to " + formatPercent1Decimal(d.percentageGam) +
-						" of all CBPF allocations in the Marker " + d.gamCode + ")");
+					.html("(these allocations correspond to " + formatPercent1Decimal(d.percentageCbpf) +
+						" of the total allocations in " + d.cbpfName + ", and it corresponds to " + formatPercent1Decimal(d.percentageGam) +
+						" of all CBPF allocations with Marker " + d.gamCode + ")");
 
 				const thisBoundingRect = this.getBoundingClientRect();
 
@@ -1861,7 +1863,7 @@
 
 			meanGroup.raise();
 
-			meanGroup.style("opacity", chartState.showMean && !(chartState.display === "aggregated" && chartState.allocationValue !== "allocations") ? 1 : 0)
+			meanGroup.style("opacity", chartState.showMean && chartState.allocationValue === "allocations" ? 1 : 0)
 				.transition()
 				.duration(duration)
 				.attr("transform", function(d) {
@@ -2076,8 +2078,8 @@
 
 			showMeanGroup = showMeanGroupEnter.merge(showMeanGroup);
 
-			showMeanGroup.style("opacity", chartState.display === "aggregated" && chartState.allocationValue !== "allocations" ? 0 : 1)
-				.style("pointer-events", chartState.display === "aggregated" && chartState.allocationValue !== "allocations" ? "none" : "all");
+			showMeanGroup.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0)
+				.style("pointer-events", chartState.allocationValue === "allocations" ? "all" : "none");
 
 			showMeanGroup.select("text")
 				.text("Show " + (chartState.display === "aggregated" ? "mean" : "means"));
