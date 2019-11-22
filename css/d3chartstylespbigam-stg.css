@@ -34,26 +34,6 @@
 	z-index: 1500;
 }
 
-#pbigamalertDiv {
-	position: absolute;    
-	text-align: center;
-	color: whitesmoke;
-	font-family: "Arial";
-	white-space: normal;
-	padding: 12px;
-	line-height: 120%;
-	font-size: 16px;
-	background: #418fde; 
-	border: 2px solid #fff; 
-	border-radius: 4px;
-	max-width: 200px;
-	z-index: 200;
-	top: 40%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	cursor: pointer;
-}
-
 .pbigamTopDiv {
 	display: flex;
 	width: 100%;
@@ -242,6 +222,22 @@ p#pbigamd3chartTitle {
 .pbigammeanGroupTextBack {
 	font-family: "Arial", sans-serif;
 	font-size: 13px;
+	fill: white;
+	stroke: white;
+	stroke-width: 2px;
+	pointer-events: none;
+}
+
+.pbigambeeswarmLabel {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #444;
+	pointer-events: none;
+}
+
+.pbigambeeswarmLabelBack {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
 	fill: white;
 	stroke: white;
 	stroke-width: 2px;

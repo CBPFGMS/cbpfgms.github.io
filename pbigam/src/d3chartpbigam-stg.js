@@ -15,8 +15,6 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	//CHANGE CSS LINK!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
@@ -183,7 +181,9 @@
 			legendSizeLine = maxRadius + 10,
 			legendColorPadding = 164,
 			fadeOpacity = 0.15,
+			fadeOpacity2 = 0.05,
 			showMeanPadding = 100,
+			filteredCbpfsStep = 3,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
 			formatPercent = d3.format(".0%"),
@@ -191,7 +191,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			localVariable = d3.local(),
 			unBlue = "#1F69B3",
-			buttonBlue = "#418FDE",
+			buttonBlue = "#ECA154",
 			buttonGray = "#eaeaea",
 			buttonGrayDarker = "#BFBFBF",
 			chartTitleDefault = "Gender with Age Marker (GAM)",
@@ -212,9 +212,9 @@
 				percentagecbpf: "percentageCbpf"
 			},
 			allocationTooltipDescriptions = {
-				dollar: "This option distributes the circles in the x axis according to the allocations, in US dollars (each circle represents a given Marker for a given CBPF). By selecting this option, you can see how each CBPF-Marker combination compares to all others regarding the amount allocated, in dollars.",
-				percentagegam: "This option distributes the circles in the x axis according to the total amount allocated for each marker (each circle represents a given Marker for a given CBPF). By selecting this option, you can see how each CBPF compares to the others in the same Marker.",
-				percentagecbpf: "This option distributes the circles in the x axis according to the total amount allocated for each CBPF (each circle represents a given Marker for a given CBPF). By selecting this option, you can see how each Marker compares to the others among all CBPFs."
+				percentagegam: "Total allocations for the Marker",
+				percentagecbpf: "Total allocations for the CBPF",
+				numerator: "Allocations in the CBPF−Marker combination"
 			},
 			gamGroupsArray = ["GM", "GAM"],
 			gmDomain = ["2b", "2a", "1", "0", "3"],
@@ -236,8 +236,7 @@
 
 		let isSnapshotTooltipVisible = false,
 			firstTime = true,
-			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + beeswarmGroupHeight + legendPanelHeight + (3 * panelHorizontalPadding),
-			currentHoveredRect;
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + beeswarmGroupHeight + legendPanelHeight + (3 * panelHorizontalPadding);
 
 		const queryStringValues = new URLSearchParams(location.search);
 
@@ -345,10 +344,6 @@
 			.attr("id", "pbigamtooltipdiv")
 			.style("display", "none");
 
-		const alertDiv = containerDiv.append("div")
-			.attr("id", "pbigamalertDiv")
-			.style("display", "none");
-
 		containerDiv.on("contextmenu", function() {
 			d3.event.preventDefault();
 			const thisMouse = d3.mouse(this);
@@ -382,8 +377,8 @@
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
 			arrowPadding: 18,
-			buttonsAllocationsWidth: 76,
-			displayPadding: 688,
+			buttonsAllocationsWidth: 106,
+			displayPadding: 696,
 			buttonDisplayWidth: 96
 		};
 
@@ -393,7 +388,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: beeswarmGroupHeight,
-			padding: [38, maxRadius + 22, 14, 220],
+			padding: [38, maxRadius + 30, 14, 220],
 			axisVerticalPadding: 16
 		};
 
@@ -673,7 +668,7 @@
 
 			downloadIcon.on("click", function() {
 
-				const csv = createCsv(rawData); //CHANGE
+				const csv = createCsv(rawData);
 
 				const currentDate = new Date();
 
@@ -1035,7 +1030,7 @@
 				.attr("class", "pbigambuttonsLegendGroup")
 				.attr("pointer-events", "none")
 				.attr("transform", function(_, i) {
-					return "translate(" + (buttonsPanel.arrowPadding + buttonsPanel.buttonPadding / 2 + i * 162) + "," + (buttonsPanel.height - buttonsPanel.padding[2] + 12) + ")";
+					return "translate(" + (buttonsPanel.arrowPadding + buttonsPanel.buttonPadding / 2 + i * 220) + "," + (buttonsPanel.height - buttonsPanel.padding[2] + 12) + ")";
 				});
 
 			const buttonsLegendRects = buttonsLegendGroup.append("rect")
@@ -1052,7 +1047,7 @@
 				.attr("x", buttonsLegendRectSize + 3)
 				.attr("y", buttonsLegendRectSize - 2)
 				.text(function(_, i) {
-					return i ? "Years with Gender and Age Marker" : "Years with Gender Marker only"
+					return i ? "GAM, post 2019" : "GM, pre 2019";
 				})
 
 			const clipPathButtons = buttonsPanel.main.append("clipPath")
@@ -1091,7 +1086,7 @@
 			const gamRect = buttonsGroup.append("rect")
 				.attr("rx", "1px")
 				.attr("ry", "1px")
-				.attr("x", buttonsPanel.buttonPadding / 2 + gmYears * buttonsPanel.buttonWidth)
+				.attr("x", buttonsPanel.buttonPadding / 2 + gmYears * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth)
 				.attr("y", buttonsPanel.height - buttonsPanel.padding[2])
 				.attr("height", 4)
 				.attr("width", gamYears * buttonsPanel.buttonWidth - buttonsPanel.buttonPadding)
@@ -1112,6 +1107,12 @@
 				})
 				.style("fill", function(d) {
 					return chartState.selectedYear.indexOf(d.year) > -1 && chartState.gamGroup === d.gamGroup ? unBlue : buttonGray;
+				})
+				.style("opacity", function(d) {
+					return d.year !== "gap" ? 1 : 0;
+				})
+				.attr("pointer-events", function(d) {
+					return d.year !== "gap" ? "all" : "none";
 				});
 
 			const buttonsText = buttonsGroup.selectAll(null)
@@ -1126,6 +1127,9 @@
 				})
 				.style("fill", function(d) {
 					return chartState.selectedYear.indexOf(d.year) > -1 && chartState.gamGroup === d.gamGroup ? "white" : "#444";
+				})
+				.style("opacity", function(d) {
+					return d.year !== "gap" ? 1 : 0;
 				})
 				.text(function(d) {
 					return d.year;
@@ -1236,11 +1240,13 @@
 				.attr("rx", "2px")
 				.attr("ry", "2px")
 				.attr("class", "pbigambuttonsAllocationsRects")
-				.attr("width", buttonsPanel.buttonsAllocationsWidth - buttonsPanel.buttonPadding)
+				.attr("width", function(_, i) {
+					return buttonsPanel.buttonsAllocationsWidth + (i ? 18 : -36) - buttonsPanel.buttonPadding;
+				})
 				.attr("height", buttonsPanel.height - buttonsPanel.padding[0] - buttonsPanel.padding[2] - buttonsPanel.buttonVerticalPadding * 2)
 				.attr("y", buttonsPanel.padding[0] + buttonsPanel.buttonVerticalPadding)
 				.attr("x", function(_, i) {
-					return i * buttonsPanel.buttonsAllocationsWidth + buttonsPanel.buttonPadding / 2;
+					return i * (buttonsPanel.buttonsAllocationsWidth + (i === 1 ? -36 : -9)) + buttonsPanel.buttonPadding / 2;
 				})
 				.style("fill", function(d) {
 					return allocationValueTypes[d] === chartState.allocationValue ? unBlue : "#eaeaea";
@@ -1254,13 +1260,16 @@
 				.attr("class", "pbigambuttonsAllocationsText")
 				.attr("y", 4.8 * buttonsPanel.buttonVerticalPadding)
 				.attr("x", function(_, i) {
-					return i * buttonsPanel.buttonsAllocationsWidth + buttonsPanel.buttonsAllocationsWidth / 2;
+					return i * buttonsPanel.buttonsAllocationsWidth + buttonsPanel.buttonsAllocationsWidth / 2 - (i === 1 ? 27 : i ? 9 : 18);
 				})
 				.style("fill", function(d) {
 					return allocationValueTypes[d] === chartState.allocationValue ? "white" : "#444";
 				})
+				.attr("letter-spacing", function(_, i) {
+					return i ? -0.6 : "normal";
+				})
 				.text(function(d) {
-					return d === "dollar" ? "Dollars" : d === "percentagegam" ? "% of Marker" : "% of CBPF";
+					return d === "dollar" ? "Budget" : d === "percentagegam" ? "Budget % of per Marker" : "Budget % of per CBPF";
 				});
 
 			const buttonsGroupSize = Math.min(buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsGroup.node().getBoundingClientRect().width,
@@ -1391,14 +1400,10 @@
 
 			function clickButtonsRects(d, singleSelection) {
 
-				if (singleSelection) {
+				if (singleSelection || d.gamGroup !== chartState.gamGroup) {
 					chartState.selectedYear = [d.year];
 					chartState.gamGroup = d.gamGroup;
 				} else {
-					if (d.gamGroup !== chartState.gamGroup) {
-						showAlert();
-						return;
-					};
 					const index = chartState.selectedYear.indexOf(d.year);
 					if (index > -1) {
 						if (chartState.selectedYear.length === 1) {
@@ -1472,6 +1477,8 @@
 					})
 					.style("fill", "white");
 
+				if (d === "dollar") return;
+
 				const thisBoundingRect = this.getBoundingClientRect();
 
 				const containerBoundingRect = containerDiv.node().getBoundingClientRect();
@@ -1480,11 +1487,33 @@
 					.html(null)
 
 				const tooltipContainer = tooltip.append("div")
-					.style("text-align", "justify")
-					.style("text-justify", "auto")
-					.style("width", "290px");
+					.style("display", "flex")
+					.style("align-items", "center")
+					.style("font-style", "italic")
+					.style("font-size", "12px")
+					.style("width", "270px");
 
-				tooltipContainer.html(allocationTooltipDescriptions[d]);
+				const leftSide = tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 92%")
+					.style("flex-direction", "column");
+
+				const rightSide = tooltipContainer.append("div")
+					.style("flex", "0 8%")
+					.style("white-space", "pre")
+					.html(" %");
+
+				const numerator = leftSide.append("div")
+					.style("text-align", "center")
+					.style("border-bottom", "1px solid gray")
+					.html(allocationTooltipDescriptions.numerator);
+
+				const denominator = leftSide.append("div")
+					.style("text-align", "center")
+					.html(allocationTooltipDescriptions[d]);
+
+
+				//tooltipContainer.html(allocationTooltipDescriptions[d]);
 
 				const tooltipBoundingRect = tooltip.node().getBoundingClientRect();
 
@@ -1569,17 +1598,6 @@
 
 				createBeeswarm(data);
 				createLegend(data);
-			};
-
-			function showAlert() {
-
-				alertDiv.style("display", "block")
-					.html("You cannot select multiple years if they belong to different Marker systems. For selecting a single year, please double click the year, or click it while pressing the ALT key.<br><br>(click anywhere to close)");
-
-				alertDiv.on("click", function() {
-					alertDiv.style("display", "none");
-				});
-
 			};
 
 			//end of createButtonsPanel
@@ -1667,65 +1685,19 @@
 					return d3.color(colorsScale(d.gamCode)).darker();
 				});
 
-			beeswarm.on("mouseover", function(d) {
+			beeswarm.on("mouseover", mouseOverBeeswarm)
+				.on("mouseout", function() {
+					if (isSnapshotTooltipVisible) return;
 
-				beeswarm.style("opacity", function(e) {
-					return e.cbpfId === d.cbpfId ? 1 : fadeOpacity;
+					beeswarmPanel.main.selectAll(".pbigambeeswarmLabel, .pbigambeeswarmLabelBack")
+						.remove();
+
+					legendPanel.main.select("#pbigamwhiteRectangle")
+						.remove();
+
+					beeswarm.style("opacity", 1);
+					tooltip.style("display", "none");
 				});
-
-				tooltip.style("display", "block")
-					.html(null);
-
-				const tooltipContainer = tooltip.append("div")
-					.style("width", "260px");
-
-				const cbpf = tooltipContainer.append("div")
-					.classed("contributionColorHTMLcolor", true)
-					.style("font-size", "16px")
-					.style("font-weight", 700)
-					.style("margin-bottom", "10px")
-					.text(d.cbpfName);
-
-				const gamMarker = tooltipContainer.append("div")
-					.text((chartState.gamGroup === "GM" ? "Gender Marker: " : "Gender and Age Marker: ") + d.gamCode);
-
-				const projects = tooltipContainer.append("div")
-					.text("Number of projects: " + d.projects);
-
-				const allocations = tooltipContainer.append("div")
-					.html("Allocations: ")
-					.append("span")
-					.attr("class", "contributionColorHTMLcolor")
-					.style("font-weight", 700)
-					.html("$" + formatMoney0Decimals(d.allocations));
-
-				const percentages = tooltipContainer.append("div")
-					.style("margin-top", "10px")
-					.style("font-size", "12px")
-					.style("text-align", "justify")
-					.style("text-justify", "auto")
-					.style("line-height", "110%")
-					.html("(these allocations correspond to " + formatPercent1Decimal(d.percentageCbpf) +
-						" of the total allocations in " + d.cbpfName + ", and it corresponds to " + formatPercent1Decimal(d.percentageGam) +
-						" of all CBPF allocations with Marker " + d.gamCode + ")");
-
-				const thisBoundingRect = this.getBoundingClientRect();
-
-				const containerBoundingRect = containerDiv.node().getBoundingClientRect();
-
-				const tooltipBoundingRect = tooltip.node().getBoundingClientRect();
-
-				console.log(tooltipBoundingRect)
-
-				tooltip.style("top", thisBoundingRect.bottom - containerBoundingRect.top + 8 + "px")
-					.style("left", thisBoundingRect.left - containerBoundingRect.left > containerBoundingRect.width - tooltipBoundingRect.width ?
-						containerBoundingRect.width - padding[1] - tooltipBoundingRect.width + "px" :
-						thisBoundingRect.left - containerBoundingRect.left + thisBoundingRect.width / 2 - tooltipBoundingRect.width / 2 + "px");
-
-			}).on("mouseout", function() {
-				beeswarm.style("opacity", 1);
-				tooltip.style("display", "none");
-			});
 
 			xAxis.tickSizeInner(-(beeswarmPanel.height - beeswarmPanel.padding[0] - beeswarmPanel.padding[2] + beeswarmPanel.axisVerticalPadding))
 				.tickFormat(function(d) {
@@ -1747,7 +1719,11 @@
 
 			yAxisGroup.transition()
 				.duration(duration)
-				.call(yAxis);
+				.call(yAxis)
+				.selectAll(".tick text")
+				.style("fill", function(d) {
+					return d3.color(colorsScale(d)).darker(0.8);
+				});
 
 			const axisLabelCode = beeswarmPanel.main.selectAll(".pbigamaxisLabelCode")
 				.data([true])
@@ -1880,6 +1856,123 @@
 					return "mean: " + (chartState.allocationValue === "allocations" ? formatSIFloat(d.mean) : formatPercent(d.mean));
 				});
 
+			function mouseOverBeeswarm(d) {
+
+				const labelsData = chartState.allocationValue === "percentageGam" ?
+					JSON.parse(JSON.stringify(data.filter(function(e) {
+						return e.gamCode === d.gamCode;
+					}))).sort(function(a, b) {
+						return a.percentageGam - b.percentageGam;
+					}).filter(function(e, i) {
+						return !(i % filteredCbpfsStep) || e.cbpfId === d.cbpfId;
+					}) :
+					JSON.parse(JSON.stringify(data.filter(function(e) {
+						return e.cbpfId === d.cbpfId;
+					})));
+
+				const beeswarmLabelBack = beeswarmPanel.main.selectAll(null)
+					.data(labelsData)
+					.enter()
+					.append("text")
+					.attr("class", "pbigambeeswarmLabelBack")
+					.attr("x", function(d) {
+						return d.x + radiusScale(d.projects) + 2
+					})
+					.attr("y", function(d) {
+						return d.y + 3;
+					})
+					.text(function(d) {
+						return chartState.allocationValue === "allocations" ? formatSIFloat(d.allocations) : formatPercent(d[chartState.allocationValue])
+					});
+
+				const beeswarmLabel = beeswarmPanel.main.selectAll(null)
+					.data(labelsData)
+					.enter()
+					.append("text")
+					.attr("class", "pbigambeeswarmLabel")
+					.attr("x", function(d) {
+						return d.x + radiusScale(d.projects) + 2
+					})
+					.attr("y", function(d) {
+						return d.y + 3;
+					})
+					.text(function(d) {
+						return chartState.allocationValue === "allocations" ? formatSIFloat(d.allocations) : formatPercent(d[chartState.allocationValue])
+					});
+
+				beeswarm.style("opacity", function(e) {
+					if (chartState.allocationValue !== "percentageGam") {
+						return e.cbpfId === d.cbpfId ? 1 : fadeOpacity2;
+					} else {
+						return e.gamCode === d.gamCode ? 1 : fadeOpacity2;
+					};
+				});
+
+				tooltip.style("display", "block")
+					.html(null);
+
+				const tooltipContainer = tooltip.append("div")
+					.style("display", "flex")
+					.style("align-items", "center")
+					.style("width", (legendPanel.width - 16) * 0.6 + "px")
+					.style("height", legendPanel.height + panelHorizontalPadding + "px");
+
+				const leftDiv = tooltipContainer.append("div")
+					.style("padding-right", "10px")
+					.style("text-align", "center")
+					.style("flex", "0 20%");
+
+				const middleDiv = tooltipContainer.append("div")
+					.style("flex", "0 36%");
+
+				const rightDiv = tooltipContainer.append("div")
+					.style("flex", "0 44%");
+
+				const cbpf = leftDiv.append("div")
+					.classed("contributionColorHTMLcolor", true)
+					.style("font-size", "16px")
+					.style("font-weight", 700)
+					.text(d.cbpfName);
+
+				const gamMarker = middleDiv.append("div")
+					.text((chartState.gamGroup === "GM" ? "Gender Marker: " : "Gender and Age Marker: ") + d.gamCode);
+
+				const projects = middleDiv.append("div")
+					.text("Number of projects: " + d.projects);
+
+				const allocations = middleDiv.append("div")
+					.html("Allocations: ")
+					.append("span")
+					.attr("class", "contributionColorHTMLcolor")
+					.style("font-weight", 700)
+					.html("$" + formatMoney0Decimals(d.allocations));
+
+				const percentages = rightDiv.append("div")
+					.style("font-size", "12px")
+					.style("text-align", "justify")
+					.style("text-justify", "auto")
+					.style("line-height", "110%")
+					.html("(these allocations correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageCbpf) +
+						"</strong></span> of the total allocations in " + d.cbpfName + ", and it corresponds to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
+						"</strong></span> of all CBPF allocations with Marker " + d.gamCode + ")");
+
+				const whiteRectangle = legendPanel.main.append("rect")
+					.raise()
+					.attr("id", "pbigamwhiteRectangle")
+					.attr("width", legendPanel.width)
+					.attr("height", legendPanel.height)
+					.style("fill", "white");
+
+				const containerBoundingRect = containerDiv.node().getBoundingClientRect();
+
+				const legendPanelBoundingRect = legendPanel.main.node().getBoundingClientRect();
+
+				tooltip.style("top", legendPanelBoundingRect.top - containerBoundingRect.top - (2 * panelHorizontalPadding) + "px")
+					.style("left", padding[3] + ((legendPanel.width - 16) * 0.2) + "px");
+
+				//end of mouseOverBeeswarm
+			};
+
 			//end of createBeeswarm
 		};
 
@@ -1898,7 +1991,7 @@
 				.attr("dy", "1em")
 				.attr("x", beeswarmPanel.padding[3] - 10)
 				.attr("class", "pbigamsizeTitleSpan")
-				.text(" (number of projects)");
+				.text("(# of projects per CBPF)");
 
 			const projectsMaxValue = d3.max(data, function(d) {
 				return d.projects;
@@ -2175,6 +2268,15 @@
 				return a.year - b.year || (a.gamGroup === gamGroupsArray[0] ? -1 : 1);
 			});
 
+			const firstGamIndex = yearsArray.map(function(d) {
+				return d.gamGroup;
+			}).indexOf("GAM");
+
+			yearsArray.splice(firstGamIndex, 0, {
+				year: "gap",
+				gamGroup: "gap"
+			});
+
 			//end of processRawData
 		};
 
@@ -2268,9 +2370,13 @@
 			//end of processData
 		};
 
-		function createCsv(datahere) {
+		function createCsv(rawData) {
 
-			const csv = d3.csvFormat(changedDataHere);
+			const filteredData = JSON.parse(JSON.stringify(rawData.filter(function(row) {
+				return chartState.selectedYear.indexOf(+row.AllocationYear) > -1 && chartState.selectedCbpfs.indexOf("id" + row.PooledFundId) > -1 && chartState.gamGroup === row.GenderMarkerGroup;
+			})));
+
+			const csv = d3.csvFormat(filteredData);
 
 			return csv;
 		};
@@ -2540,8 +2646,6 @@
 					downloadSnapshotPdf(canvas);
 				};
 
-				if (fromContextMenu && currentHoveredRect) d3.select(currentHoveredRect).dispatch("mouseout");
-
 			});
 
 			function setSvgStyles(node) {
@@ -2646,8 +2750,22 @@
 
 					pdf.setFontSize(12);
 
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
+
+					const selectedCountry = chartState.selectedCbpfs.length === d3.keys(cbpfsList).length ?
+						"Selected CBPFs-All" : countriesList();
+
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70, {
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Marker System: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						(chartState.gamGroup === "GM" ? "Gender Marker" : "Gender and Age Marker") + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 70, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
@@ -2691,6 +2809,21 @@
 						pdf.setFontSize(10);
 						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
 
+					};
+
+					function countriesList() {
+						const plural = chartState.selectedCbpfs.length === 1 ? "" : "s";
+						const countryList = chartState.selectedCbpfs.map(function(d) {
+								return cbpfsList[d];
+							})
+							.sort(function(a, b) {
+								return a.toLowerCase() < b.toLowerCase() ? -1 :
+									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= chartState.selectedCbpfs.length - 2 ? index > chartState.selectedCbpfs.length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+						return "Selected CBPF" + plural + "-" + countryList;
 					};
 
 				});
