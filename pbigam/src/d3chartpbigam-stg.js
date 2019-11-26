@@ -207,7 +207,7 @@
 			metadataFile = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/metadatagam.csv",
 			displayTypes = ["marker", "aggregated"],
 			allocationValueTypes = {
-				dollar: "allocations",
+				budget: "allocations",
 				percentagegam: "percentageGam",
 				percentagecbpf: "percentageCbpf"
 			},
@@ -1269,7 +1269,7 @@
 					return i ? -0.6 : "normal";
 				})
 				.text(function(d) {
-					return d === "dollar" ? "Budget" : d === "percentagegam" ? "Budget % of per Marker" : "Budget % of per CBPF";
+					return d === "budget" ? "Budget" : d === "percentagegam" ? "Budget % of per Marker" : "Budget % of per CBPF";
 				});
 
 			const buttonsGroupSize = Math.min(buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsGroup.node().getBoundingClientRect().width,
@@ -1477,7 +1477,7 @@
 					})
 					.style("fill", "white");
 
-				if (d === "dollar") return;
+				if (d === "budget") return;
 
 				const thisBoundingRect = this.getBoundingClientRect();
 
