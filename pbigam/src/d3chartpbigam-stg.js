@@ -174,7 +174,7 @@
 			radiusPadding = 1,
 			iterations = 300,
 			xStrength = 1,
-			yStrength = 0.1,
+			yStrength = 0.2,
 			collisionStrength = 1,
 			axisDescriptionsPadding = 48,
 			axisDescriptionsLineHeight = 4.5,
@@ -203,8 +203,8 @@
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
 				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
 			],
-			dataFile = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/datagam.csv",
-			metadataFile = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/metadatagam.csv",
+			dataFile = "https://cbpfapi.unocha.org/vo2/odata/ProjectGAMSummary?PoolfundCodeAbbrv=&$format=csv",
+			metadataFile = "https://cbpfapi.unocha.org/vo2/odata/GenderMarker?$format=csv",
 			displayTypes = ["marker", "aggregated"],
 			allocationValueTypes = {
 				budget: "allocations",
@@ -236,7 +236,8 @@
 
 		let isSnapshotTooltipVisible = false,
 			firstTime = true,
-			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + beeswarmGroupHeight + legendPanelHeight + (3 * panelHorizontalPadding);
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + beeswarmGroupHeight + legendPanelHeight + (3 * panelHorizontalPadding),
+			currentHoveredElem;
 
 		const queryStringValues = new URLSearchParams(location.search);
 
@@ -1005,19 +1006,6 @@
 					return d > 1 ? "CBPFs" : "CBPF"
 				});
 
-			// const overRectangle = topPanel.main.selectAll(".pbigamtopPanelOverRectangle")
-			// 	.data([true])
-			// 	.enter()
-			// 	.append("rect")
-			// 	.attr("class", "pbigamtopPanelOverRectangle")
-			// 	.attr("width", topPanel.width)
-			// 	.attr("height", topPanel.height)
-			// 	.style("opacity", 0);
-
-			// overRectangle.on("mouseover", mouseOverTopPanel)
-			// 	.on("mousemove", mouseMoveTopPanel)
-			// 	.on("mouseout", mouseOutTopPanel);
-
 			//end of createTopPanel
 		};
 
@@ -1512,9 +1500,6 @@
 					.style("text-align", "center")
 					.html(allocationTooltipDescriptions[d]);
 
-
-				//tooltipContainer.html(allocationTooltipDescriptions[d]);
-
 				const tooltipBoundingRect = tooltip.node().getBoundingClientRect();
 
 				tooltip.style("top", thisBoundingRect.top - containerBoundingRect.top - tooltipBoundingRect.height - 8 + "px")
@@ -1689,6 +1674,8 @@
 				.on("mouseout", function() {
 					if (isSnapshotTooltipVisible) return;
 
+					currentHoveredElem = null;
+
 					beeswarmPanel.main.selectAll(".pbigambeeswarmLabel, .pbigambeeswarmLabelBack")
 						.remove();
 
@@ -1857,6 +1844,8 @@
 				});
 
 			function mouseOverBeeswarm(d) {
+
+				currentHoveredElem = this;
 
 				const labelsData = chartState.allocationValue === "percentageGam" ?
 					JSON.parse(JSON.stringify(data.filter(function(e) {
@@ -2244,8 +2233,8 @@
 				gamDescriptions.push({
 					gamGroup: d.GenderMarkerGroup,
 					gamCode: d.GenderMarkerCode,
-					gamFullDescription: d.GenderMarker_clean,
-					gamDescription: d.GenderMarker_clean.split("-")[1]
+					gamFullDescription: d.GenderMarkerDescription,
+					gamDescription: d.GenderMarkerDescription.split("-")[1].trim()
 				});
 			});
 
@@ -2316,7 +2305,7 @@
 
 					if (foundCbpf) {
 						foundCbpf.projects += +row.TotalProjects;
-						foundCbpf.beneficiaries += +row.TotalBeneficiary;
+						foundCbpf.beneficiaries += +row.TotalBeneficiaries;
 						foundCbpf.allocations += +row.TotalBudget;
 					} else {
 						data.push({
@@ -2324,7 +2313,7 @@
 							cbpfId: "id" + row.PooledFundId,
 							gamCode: row.GenderMarkerCode,
 							projects: +row.TotalProjects,
-							beneficiaries: +row.TotalBeneficiary,
+							beneficiaries: +row.TotalBeneficiaries,
 							allocations: +row.TotalBudget,
 							keygamGroup: row.GenderMarkerGroup
 						});
@@ -2499,7 +2488,7 @@
 				.attr("d", "M0,-5L10,0L0,5");
 
 			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
+				.attr("font-family", "Arial")
 				.attr("font-size", "26px")
 				.style("stroke-width", "5px")
 				.attr("font-weight", 700)
@@ -2516,7 +2505,97 @@
 				.attr("y", 320)
 				.text("CLICK ANYWHERE TO START");
 
+			const yearsAnnotationRect = helpSVG.append("rect")
+				.attr("x", 30 - padding)
+				.attr("y", 30 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
 
+			const yearsAnnotation = helpSVG.append("text")
+				.attr("class", "pbigamAnnotationText")
+				.attr("x", 30)
+				.attr("y", 30)
+				.text("Use these buttons to select the year. You can select more than one year, as long as they belong to the same Marker system. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years. If you select a year that belongs to a different Marker system, that year will be selected as a single year.")
+				.call(wrapText, 350);
+
+			const yearsPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbigamArrowMarker)")
+				.attr("d", "M200,135 L200,160");
+
+			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
+
+			const markerAnnotationRect = helpSVG.append("rect")
+				.attr("x", 440 - padding)
+				.attr("y", 30 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const markerAnnotation = helpSVG.append("text")
+				.attr("class", "pbigamAnnotationText")
+				.attr("x", 440)
+				.attr("y", 30)
+				.text("Use these buttons to change how the circles are distributed along the x axis. Each circle represents a given CBPF/Marker combination. “Budget” shows the allocation values, in dollars. “Budget % of per Marker” will show that value as a percentage of the total for the same Marker, which is adequate for comparing CBPFs in the same Marker. ““Budget % of per CBPF” will show that value as a percentage of the total for that CBPF, which is adequate for comparing Markers in the same CBPF.")
+				.call(wrapText, 450);
+
+			const markerPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbigamArrowMarker)")
+				.attr("d", "M434,110 Q400,110 400,160");
+
+			markerAnnotationRect.attr("width", markerAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", markerAnnotation.node().getBBox().height + padding * 2);
+
+			const overallAnnotationRect = helpSVG.append("rect")
+				.attr("x", 440 - padding)
+				.attr("y", 230 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const overallAnnotation = helpSVG.append("text")
+				.attr("class", "pbigamAnnotationText")
+				.attr("x", 440)
+				.attr("y", 230)
+				.text("Use these buttons to aggregate all Markers in a single row or to separate the CBPF/Marker combination by Marker.")
+				.call(wrapText, 300);
+
+			const overallPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbigamArrowMarker)")
+				.attr("d", "M730,240 Q760,240 760,216");
+
+			overallAnnotationRect.attr("width", overallAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", overallAnnotation.node().getBBox().height + padding * 2);
+
+			const beeswarmAnnotationRect = helpSVG.append("rect")
+				.attr("x", 440 - padding)
+				.attr("y", 430 - padding - 14)
+				.style("fill", "white")
+				.style("opacity", 0.95);
+
+			const beeswarmAnnotation = helpSVG.append("text")
+				.attr("class", "pbigamAnnotationText")
+				.attr("x", 440)
+				.attr("y", 430)
+				.text("Hover over the circles to get additional information. The tooltip will show up below the chart, over the legend area.")
+				.call(wrapText, 220);
+
+			const beeswarmPath = helpSVG.append("path")
+				.style("fill", "none")
+				.style("stroke", "#E56A54")
+				.attr("pointer-events", "none")
+				.attr("marker-end", "url(#pbigamArrowMarker)")
+				.attr("d", "M432,446 Q400,460 400,630");
+
+			beeswarmAnnotationRect.attr("width", beeswarmAnnotation.node().getBBox().width + padding * 2)
+				.attr("height", beeswarmAnnotation.node().getBBox().height + padding * 2);
 
 			helpSVG.on("click", function() {
 				overDiv.remove();
@@ -2646,6 +2725,8 @@
 					downloadSnapshotPdf(canvas);
 				};
 
+				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
+
 			});
 
 			function setSvgStyles(node) {
@@ -2730,7 +2811,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("TEXT HERE.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
