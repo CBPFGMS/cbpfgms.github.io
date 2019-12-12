@@ -101,6 +101,14 @@ Chart for the Country-based Pooled Funds (CBPF) Target versus HRP in the Busines
 
 This chart shows HRP requirements, HRP funding, CBPF target and CBPF funding for each Fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbihrp) for more information.
 
+- **PFBI: Gender with Age Marker (GAM), beeswarm chart**
+
+Chart for the Country-based Pooled Funds (CBPF) Gender with Age Marker (GAM) in the Business Intelligence Portal at the OCHA PFBI.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/pbigam.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbigam)
+
+This chart shows the Gender with Age Marker (GAM) for each project in each Fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbigam) for more information.
+
 - **GMS Landing Page**
 
 Chart for the Grant Management System landing page.
@@ -131,3 +139,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |PFBI: Allocations map|`pbimap`|
 |PFBI: Allocations Timeline|`pbiuac`|
 |PFBI: CBPF versus HRP|`pbihrp`|
+|PFBI: Gender with Age Marker|`pbigam`|
