@@ -3029,10 +3029,10 @@
 				.attr("viewBox", "0 0 " + width + " " + height);
 
 			const mainTextRect = helpSVG.append("rect")
-				.attr("x", width - 400)
+				.attr("x", width - 410)
 				.attr("y", 4)
-				.attr("width", 390)
-				.attr("height", 30)
+				.attr("width", 400)
+				.attr("height", 32)
 				.style("fill", "white")
 				.style("pointer-events", "all")
 				.style("cursor", "pointer")
@@ -3043,7 +3043,7 @@
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width - 205)
+				.attr("x", width - 210)
 				.attr("y", 25)
 				.text("CLICK HERE TO CLOSE THE HELP");
 
