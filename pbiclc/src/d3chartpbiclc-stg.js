@@ -3020,19 +3020,23 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiclcOverDivHelp");
 
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
 			const mainTextRect = helpSVG.append("rect")
-				.attr("x", width - 410)
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
 				.attr("y", 4)
-				.attr("width", 400)
-				.attr("height", 32)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
 				.style("fill", "white")
 				.style("pointer-events", "all")
 				.style("cursor", "pointer")
@@ -3043,49 +3047,49 @@
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width - 210)
-				.attr("y", 25)
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
 				.text("CLICK HERE TO CLOSE THE HELP");
 
 			const helpData = [{
 				x: 96,
-				y: 106,
+				y: 72 + topDivHeight,
 				width: 480,
-				height: 34,
-				xTooltip: 180,
-				yTooltip: 150,
+				height: 30,
+				xTooltip: 180 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
 				text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
 			}, {
 				x: 592,
-				y: 106,
+				y: 72 + topDivHeight,
 				width: 224,
-				height: 34,
-				xTooltip: 550,
-				yTooltip: 150,
+				height: 30,
+				xTooltip: 550 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
 				text: "Use these buttons to select the type of contribution: paid, pledged or total (paid plus pledged)."
 			}, {
 				x: 96,
-				y: 46,
+				y: 10 + topDivHeight,
 				width: 720,
 				height: 57,
-				xTooltip: 300,
-				yTooltip: 112,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 76) * (topDivSize.width / width),
 				text: "This banner shows the total amount of contributions received for the selected year (or years). It also shows the number of donors and CBPFs in that period."
 			}, {
 				x: 6,
-				y: 144,
+				y: 108 + topDivHeight,
 				width: 440,
 				height: 660,
-				xTooltip: 452,
-				yTooltip: 200,
+				xTooltip: 452 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
 				text: "Hover over the donors to get additional information. Hovering over a donor filters the CBPFs accordingly, so only CBPFs that received from that donor are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
 			}, {
 				x: 466,
-				y: 144,
+				y: 108 + topDivHeight,
 				width: 398,
 				height: 380,
-				xTooltip: 136,
-				yTooltip: 200,
+				xTooltip: 136 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
 				text: "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
 			}];
 
@@ -3115,6 +3119,7 @@
 				.attr("y", 244)
 				.attr("width", 360)
 				.attr("height", 50)
+				.attr("pointer-events", "none")
 				.style("fill", "white");
 
 			const explanationText = helpSVG.append("text")
