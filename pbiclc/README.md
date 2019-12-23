@@ -67,6 +67,8 @@ For more than one country separate the values with commas, such as:
 
 In such cases, the list must contain only donors or only CBPFs.
 
+If the selected country is both a donor and a CBPF, define which one will be selected by using `"@"` followed by `"donor"` or `"fund"`. For instance, `"Ukraine@donor"` will select Ukraine as a donor, while `"Ukraine@fund"` will select Ukraine as a fund. If the selected country is both a donor and a CBPF but there is no indication regarding which one should be selected (`"@fund"` or `"@donor"`), the value will default to `"none"`.
+
 For the accepted values, please refer to the data API. If the value is not a valid one it defaults to `"none"`. This value defines only the selected country when the page loads: the CBPFs (and donors) can be easily selected by clicking on the lollipops.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:

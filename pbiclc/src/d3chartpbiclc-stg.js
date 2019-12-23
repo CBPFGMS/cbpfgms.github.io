@@ -2062,7 +2062,7 @@
 					};
 
 					const allCountries = chartState.selectedDonors.map(function(d) {
-						return countryNames[d];
+						return allCbpfs.indexOf(d) > -1 ? countryNames[d] + "@donor" : countryNames[d];
 					}).join("|");
 
 					if (queryStringValues.has("country")) {
@@ -2453,7 +2453,7 @@
 					};
 
 					const allCountries = chartState.selectedCbpfs.map(function(d) {
-						return countryNames[d];
+						return allDonors.indexOf(d) > -1 ? countryNames[d] + "@fund" : countryNames[d];
 					}).join("|");
 
 					if (queryStringValues.has("country")) {
@@ -3558,14 +3558,29 @@
 			});
 			const countryCodes = Object.keys(countryNames);
 			namesArray.forEach(function(d) {
-				const foundDonor = countryCodes.find(function(e) {
-					return countryNames[e].toLowerCase() === d && allDonors.indexOf(e) > -1;
-				});
-				const foundCbpf = countryCodes.find(function(e) {
-					return countryNames[e].toLowerCase() === d && allCbpfs.indexOf(e) > -1;
-				});
-				if (foundDonor) chartState.selectedDonors.push(foundDonor);
-				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+				const nameSplit = d.split("@");
+				if (nameSplit.length === 1) {
+					const foundDonor = countryCodes.find(function(e) {
+						return countryNames[e].toLowerCase() === nameSplit[0] && allDonors.indexOf(e) > -1;
+					});
+					const foundCbpf = countryCodes.find(function(e) {
+						return countryNames[e].toLowerCase() === nameSplit[0] && allCbpfs.indexOf(e) > -1;
+					});
+					if (foundDonor) chartState.selectedDonors.push(foundDonor);
+					if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+				} else {
+					if (nameSplit[1] === "donor") {
+						const foundDonor = countryCodes.find(function(e) {
+							return countryNames[e].toLowerCase() === nameSplit[0] && allDonors.indexOf(e) > -1;
+						});
+						if (foundDonor) chartState.selectedDonors.push(foundDonor);
+					} else if (nameSplit[1] === "fund") {
+						const foundCbpf = countryCodes.find(function(e) {
+							return countryNames[e].toLowerCase() === nameSplit[0] && allCbpfs.indexOf(e) > -1;
+						});
+						if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+					};
+				};
 			});
 			if (chartState.selectedDonors.length && chartState.selectedCbpfs.length) {
 				chartState.selectedDonors.length = 0;
