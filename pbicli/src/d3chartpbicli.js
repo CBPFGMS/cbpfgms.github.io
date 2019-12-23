@@ -1066,7 +1066,7 @@
 					};
 
 					const allCountries = chartState.selectedDonors.map(function(d) {
-						return iso2Names[d];
+						return list.cbpfsArray.indexOf(d) > -1 ? iso2Names[d] + "@donor" : iso2Names[d];
 					}).join("|");
 
 					if (queryStringValues.has("country")) {
@@ -1157,7 +1157,7 @@
 				};
 
 				const allCountries = chartState.selectedCbpfs.map(function(d) {
-					return iso2Names[d];
+					return list.donorsArray.indexOf(d) > -1 ? iso2Names[d] + "@fund" : iso2Names[d];
 				}).join("|");
 
 				if (queryStringValues.has("country")) {
@@ -1587,7 +1587,7 @@
 					if (!chartState.selectedDonors.length) chartState.selectedLocalCurrency = null;
 
 					const allCountries = chartState.selectedDonors.map(function(d) {
-						return iso2Names[d];
+						return list.cbpfsArray.indexOf(d) > -1 ? iso2Names[d] + "@donor" : iso2Names[d];
 					}).join("|");
 
 					if (queryStringValues.has("country")) {
@@ -1663,7 +1663,7 @@
 						});
 
 					const allCountries = chartState.selectedCbpfs.map(function(d) {
-						return iso2Names[d];
+						return list.donorsArray.indexOf(d) > -1 ? iso2Names[d] + "@fund" : iso2Names[d];
 					}).join("|");
 
 					if (queryStringValues.has("country")) {
@@ -4182,15 +4182,30 @@
 			});
 			const countryCodes = Object.keys(iso2Names);
 			namesArray.forEach(function(d) {
-				const foundDonor = countryCodes.find(function(e) {
-					return iso2Names[e].toLowerCase() === d && donorsList.indexOf(e) > -1;
-				});
-				const foundCbpf = countryCodes.find(function(e) {
-					return iso2Names[e].toLowerCase() === d && cbpfsList.indexOf(e) > -1;
-				});
-				if (d === "all donors") chartState.selectedDonors.push("alldonors");
-				if (foundDonor) chartState.selectedDonors.push(foundDonor);
-				if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+				const nameSplit = d.split("@");
+				if (nameSplit.length === 1) {
+					const foundDonor = countryCodes.find(function(e) {
+						return iso2Names[e].toLowerCase() === nameSplit[0] && donorsList.indexOf(e) > -1;
+					});
+					const foundCbpf = countryCodes.find(function(e) {
+						return iso2Names[e].toLowerCase() === nameSplit[0] && cbpfsList.indexOf(e) > -1;
+					});
+					if (nameSplit[0] === "all donors") chartState.selectedDonors.push("alldonors");
+					if (foundDonor) chartState.selectedDonors.push(foundDonor);
+					if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+				} else {
+					if (nameSplit[1] === "donor") {
+						const foundDonor = countryCodes.find(function(e) {
+							return iso2Names[e].toLowerCase() === nameSplit[0] && donorsList.indexOf(e) > -1;
+						});
+						if (foundDonor) chartState.selectedDonors.push(foundDonor);
+					} else if (nameSplit[1] === "fund") {
+						const foundCbpf = countryCodes.find(function(e) {
+							return iso2Names[e].toLowerCase() === nameSplit[0] && cbpfsList.indexOf(e) > -1;
+						});
+						if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
+					};
+				};
 			});
 			if (chartState.selectedDonors.length && chartState.selectedCbpfs.length) {
 				chartState.selectedDonors.length = 0;
