@@ -530,6 +530,9 @@
 				draw(rawData);
 			} else {
 				d3.select(window).on("scroll.pbialp", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbialp", function() {
+					chartState.selectedYear = [+d3.event.detail]
+				});
 				checkPosition();
 			};
 
@@ -1298,6 +1301,11 @@
 							localVariable.set(this, null);
 						};
 					});
+
+				d3.select("body").on("d3ChartsYear.pbialp", function() {
+					clickButtonsRects(+d3.event.detail, true);
+					repositionButtonsGroup();
+				});
 
 				buttonsPartnersRects.on("mouseover", mouseOverButtonsPartnersRects)
 					.on("mouseout", mouseOutButtonsPartnersRects)

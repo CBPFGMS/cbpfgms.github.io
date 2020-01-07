@@ -521,6 +521,9 @@
 				draw(rawData);
 			} else {
 				d3.select(window).on("scroll.pbiolc", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbiolc", function() {
+					chartState.selectedYear = [+d3.event.detail]
+				});
 				checkPosition();
 			};
 
@@ -1397,6 +1400,11 @@
 							localVariable.set(this, null);
 						};
 					});
+
+				d3.select("body").on("d3ChartsYear.pbiolc", function() {
+					clickButtonsRects(+d3.event.detail, true);
+					if (yearsArray.length > buttonsNumber) repositionButtonsGroup();
+				});
 
 				buttonsModalitiesRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsModalitiesRects)
