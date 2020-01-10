@@ -531,7 +531,7 @@
 			} else {
 				d3.select(window).on("scroll.pbialp", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbialp", function() {
-					chartState.selectedYear = [+d3.event.detail]
+					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
 				});
 				checkPosition();
 			};
@@ -1303,7 +1303,7 @@
 					});
 
 				d3.select("body").on("d3ChartsYear.pbialp", function() {
-					clickButtonsRects(+d3.event.detail, true);
+					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
 					repositionButtonsGroup();
 				});
 
@@ -3692,6 +3692,16 @@
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+		};
+
+		function validateCustomEventYear(yearNumber) {
+			if (yearsArray.indexOf(yearNumber) > -1) {
+				return yearNumber;
+			};
+			while (yearsArray.indexOf(yearNumber) === -1) {
+				yearNumber = yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			};
+			return yearNumber;
 		};
 
 		function validateCbpfs(cbpfString) {
