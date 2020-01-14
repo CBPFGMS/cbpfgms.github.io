@@ -168,7 +168,7 @@
 			panelVerticalPadding = 4,
 			fadeOpacity = 0.3,
 			beneficiariesHeight = 370,
-			buttonsNumber = 16,
+			buttonsNumber = 14,
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
@@ -462,6 +462,9 @@
 				draw(rawData);
 			} else {
 				d3.select(window).on("scroll.pbiobe", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbiobe", function() {
+					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
+				});
 				checkPosition();
 			};
 
@@ -1152,14 +1155,7 @@
 							.duration(duration)
 							.attr("transform", "translate(" +
 								Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
-							.on("end", function() {
-								const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-								if (currentTranslate === 0) {
-									leftArrow.select("text").style("fill", "#ccc")
-								} else {
-									leftArrow.attr("pointer-events", "all");
-								}
-							})
+							.on("end", checkArrows);
 					});
 
 					rightArrow.on("click", function() {
@@ -1173,14 +1169,7 @@
 								Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
 									(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
 								",0)")
-							.on("end", function() {
-								const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-								if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
-									rightArrow.select("text").style("fill", "#ccc")
-								} else {
-									rightArrow.attr("pointer-events", "all");
-								}
-							})
+							.on("end", checkArrows);
 					});
 				};
 
@@ -1202,6 +1191,36 @@
 							localVariable.set(this, null);
 						};
 					});
+
+				d3.select("body").on("d3ChartsYear.pbiobe", function() {
+					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
+					if (yearsArray.length > buttonsNumber) {
+						repositionButtonsGroup();
+						checkArrows();
+					};
+				});
+
+				function checkArrows() {
+
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+					if (currentTranslate === 0) {
+						leftArrow.select("text").style("fill", "#ccc");
+						leftArrow.attr("pointer-events", "none");
+					} else {
+						leftArrow.select("text").style("fill", "#666");
+						leftArrow.attr("pointer-events", "all");
+					};
+
+					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+						rightArrow.select("text").style("fill", "#ccc");
+						rightArrow.attr("pointer-events", "none");
+					} else {
+						rightArrow.select("text").style("fill", "#666");
+						rightArrow.attr("pointer-events", "all");
+					}
+
+				};
 
 				function checkCurrentTranslate() {
 
@@ -2065,6 +2084,16 @@
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+		};
+
+		function validateCustomEventYear(yearNumber) {
+			if (yearsArray.indexOf(yearNumber) > -1) {
+				return yearNumber;
+			};
+			while (yearsArray.indexOf(yearNumber) === -1) {
+				yearNumber = yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			};
+			return yearNumber;
 		};
 
 		function populateSelectedCbpfs(cbpfsString) {

@@ -1305,6 +1305,7 @@
 				d3.select("body").on("d3ChartsYear.pbialp", function() {
 					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
 					repositionButtonsGroup();
+					checkArrows();
 				});
 
 				buttonsPartnersRects.on("mouseover", mouseOverButtonsPartnersRects)
@@ -1324,14 +1325,7 @@
 						.duration(duration)
 						.attr("transform", "translate(" +
 							Math.min(0, (currentTranslate + buttonsNumber * buttonPanel.buttonWidth)) + ",0)")
-						.on("end", function() {
-							const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-							if (currentTranslate === 0) {
-								leftArrow.select("text").style("fill", "#ccc")
-							} else {
-								leftArrow.attr("pointer-events", "all");
-							}
-						})
+						.on("end", checkArrows);
 				});
 
 				rightArrow.on("click", function() {
@@ -1345,15 +1339,30 @@
 							Math.max(-((yearsArray.length - buttonsNumber) * buttonPanel.buttonWidth),
 								(-(Math.abs(currentTranslate) + buttonsNumber * buttonPanel.buttonWidth))) +
 							",0)")
-						.on("end", function() {
-							const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-							if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonPanel.buttonWidth)) {
-								rightArrow.select("text").style("fill", "#ccc")
-							} else {
-								rightArrow.attr("pointer-events", "all");
-							}
-						})
+						.on("end", checkArrows);
 				});
+
+				function checkArrows() {
+
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+					if (currentTranslate === 0) {
+						leftArrow.select("text").style("fill", "#ccc");
+						leftArrow.attr("pointer-events", "none");
+					} else {
+						leftArrow.select("text").style("fill", "#666");
+						leftArrow.attr("pointer-events", "all");
+					};
+
+					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonPanel.buttonWidth)) {
+						rightArrow.select("text").style("fill", "#ccc");
+						rightArrow.attr("pointer-events", "none");
+					} else {
+						rightArrow.select("text").style("fill", "#666");
+						rightArrow.attr("pointer-events", "all");
+					}
+
+				};
 
 				function checkCurrentTranslate() {
 

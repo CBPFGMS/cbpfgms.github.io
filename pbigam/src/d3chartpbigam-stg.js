@@ -1942,7 +1942,7 @@
 					.style("text-justify", "auto")
 					.style("line-height", "110%")
 					.html("(these allocations correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageCbpf) +
-						"</strong></span> of the total allocations in " + d.cbpfName + ", and it corresponds to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
+						"</strong></span> of the total allocations in " + d.cbpfName + ", and they correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
 						"</strong></span> of all CBPF allocations with Marker " + d.gamCode + ")");
 
 				const whiteRectangle = legendPanel.main.append("rect")
