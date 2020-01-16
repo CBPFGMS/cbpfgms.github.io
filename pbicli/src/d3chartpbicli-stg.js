@@ -4259,198 +4259,155 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbicliOverDivHelp");
 
-			const overDivSize = overDiv.node().getBoundingClientRect();
+			const outerDivSize = outerDiv.node().getBoundingClientRect();
 
-			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+			const outerDivHeight = outerDivSize.height * (width / outerDivSize.width);
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
+				.attr("viewBox", "0 0 " + width + " " + (height + outerDivHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbicliArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.attr("font-size", 0.064 * (iconsDivSize.width * (width / topDivSize.width)) + "px")
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const donorsDropdownAnnotationRect = helpSVG.append("rect")
-				.attr("x", 65 - padding)
-				.attr("y", 20 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
+			const selectedText = "Click on the “x” to deselect a donor or CBPF. This affects the total value.";
 
-			const donorsDropdownAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 65)
-				.attr("y", 20)
-				.text("Use this menu to select one or more donors. When donors are selected here the values of all displayed CBPFs correspond to donations made only by those selected donors.")
-				.call(wrapText2, 420);
+			const nonSelectedText = "Click on the checkbox to deselect a donor or CBPF. This does not affects the total value.";
 
-			donorsDropdownAnnotationRect.attr("width", donorsDropdownAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", donorsDropdownAnnotation.node().getBBox().height + padding * 2);
+			const helpData = [{
+				x: 31,
+				y: 10 + topDivHeight,
+				width: 146,
+				height: 46,
+				xTooltip: 31 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 68) * (topDivSize.width / width),
+				text: "Use this menu to select one or more donors. When donors are selected here the values of all displayed CBPFs correspond to donations made only by those selected donors."
+			}, {
+				x: 182,
+				y: 10 + topDivHeight,
+				width: 146,
+				height: 46,
+				xTooltip: 182 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 68) * (topDivSize.width / width),
+				text: "Use this menu to select donors by their currencies. This is useful before selecting “local currency” in the radio buttons below."
+			}, {
+				x: 478,
+				y: 10 + topDivHeight,
+				width: 146,
+				height: 46,
+				xTooltip: 478 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 68) * (topDivSize.width / width),
+				text: "Use this menu to select one or more CBPFs. When CBPFs are selected the values of all donors correspond to donations made only to those CBPFs."
+			}, {
+				x: 31,
+				y: 60 + topDivHeight,
+				width: 150,
+				height: 20,
+				xTooltip: 31 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 92) * (topDivSize.width / width),
+				text: "Use these radio buttons to show the donations in USD or in the donor's local currency. This option is not available when CBPFs are selected, and also not available when the selected donors have different local currencies."
+			}, {
+				x: 31,
+				y: 86 + topDivHeight,
+				width: 430,
+				height: outerDivHeight - topDivHeight - 86,
+				xTooltip: 31 * (topDivSize.width / width),
+				yTooltip: outerDivHeight + 12,
+				text: chartState.controlledBy === "donor" ? selectedText : nonSelectedText
+			}, {
+				x: 466,
+				y: 86 + topDivHeight,
+				width: 430,
+				height: outerDivHeight - topDivHeight - 86,
+				xTooltip: 466 * (topDivSize.width / width),
+				yTooltip: outerDivHeight + 12,
+				text: chartState.controlledBy === "donor" ? nonSelectedText : selectedText
+			}];
 
-			const donorsDropdownPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M60,35 Q45,35 45,54");
-
-			const currencyDropdownAnnotationRect = helpSVG.append("rect")
-				.attr("x", 400 - padding)
-				.attr("y", 150 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const currencyDropdownAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 400)
-				.attr("y", 150)
-				.text("Use this menu to select donors by their currencies. This is useful before selecting “local currency” in the radio buttons below.")
-				.call(wrapText2, 200);
-
-			currencyDropdownAnnotationRect.attr("width", currencyDropdownAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", currencyDropdownAnnotation.node().getBBox().height + padding * 2);
-
-			const currencyDropdownPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M470,140 Q470,78 360,78");
-
-			const cbpfsDropdownAnnotationRect = helpSVG.append("rect")
-				.attr("x", 530 - padding)
-				.attr("y", 20 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const cbpfsDropdownAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 530)
-				.attr("y", 20)
-				.text("Use this menu to select one or more CBPFs. When CBPFs are selected the values of all donors correspond to donations made only to those CBPFs.")
-				.call(wrapText2, 360);
-
-			cbpfsDropdownAnnotationRect.attr("width", cbpfsDropdownAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", cbpfsDropdownAnnotation.node().getBBox().height + padding * 2);
-
-			const cbpfsDropdownPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M525,35 Q510,35 510,54");
-
-			const radioAnnotationRect = helpSVG.append("rect")
-				.attr("x", 220 - padding)
-				.attr("y", 380 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const radioAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 220)
-				.attr("y", 380)
-				.text("Use these radio buttons to show the donations in USD or in the donor's local currency. This option is not available when CBPFs are selected, and also not available when the selected donors have different local currencies.")
-				.call(wrapText2, 360);
-
-			radioAnnotationRect.attr("width", radioAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", radioAnnotation.node().getBBox().height + padding * 2);
-
-			const radioPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M210,400 Q80,350 80,130");
-
-			const radioEllipse = helpSVG.append("ellipse")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("cx", 80)
-				.attr("cy", 105)
-				.attr("rx", 60)
-				.attr("ry", 10);
-
-			const closeAnnotationRect = helpSVG.append("rect")
-				.attr("x", 220 - padding)
-				.attr("y", 240 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const closeAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 220)
-				.attr("y", 240)
-				.text("Click on the “x” to deselect a donor or CBPF. This affects the total value.")
-				.call(wrapText2, 220);
-
-			closeAnnotationRect.attr("width", closeAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", closeAnnotation.node().getBBox().height + padding * 2);
-
-			const closePath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M210,260 Q170,260 170,200");
-
-			const closeCheckAnnotationRect = helpSVG.append("rect")
-				.attr("x", 650 - padding)
-				.attr("y", 240 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const closeCheckAnnotation = helpSVG.append("text")
-				.attr("class", "pbicliAnnotationText")
-				.attr("x", 650)
-				.attr("y", 240)
-				.text("Click on the checkbox to deselect a donor or CBPF. This does not affects the total value.")
-				.call(wrapText2, 220);
-
-			closeCheckAnnotationRect.attr("width", closeCheckAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", closeCheckAnnotation.node().getBBox().height + padding * 2);
-
-			const closeCheckPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbicliArrowMarker)")
-				.attr("d", "M645,255 Q630,255 630,230");
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.35)
+					.attr("class", "pbicliHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", outerDivHeight + 40)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbicliAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", outerDivHeight + 60)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbicliHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");;
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbicliHelpRectangle").style("opacity", 0.35);
+			};
 
 			//end of createAnnotationsDiv
 		};
