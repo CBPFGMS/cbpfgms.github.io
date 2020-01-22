@@ -4292,7 +4292,7 @@
 				.attr("text-anchor", "middle")
 				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
 				.attr("y", 10 + topDivHeight / 2)
-				.attr("font-size", 0.064 * (iconsDivSize.width * (width / topDivSize.width)) + "px")
+				.attr("font-size", 0.053 * (iconsDivSize.width * (width / topDivSize.width)) + "px")
 				.text("CLICK HERE TO CLOSE THE HELP");
 
 			const selectedText = "Click on the “x” to deselect a donor or CBPF. This affects the total value.";
@@ -4360,7 +4360,7 @@
 					.style("stroke", unBlue)
 					.style("stroke-width", "3px")
 					.style("fill", "none")
-					.style("opacity", 0.35)
+					.style("opacity", 0.5)
 					.attr("class", "pbicliHelpRectangle")
 					.attr("pointer-events", "all")
 					.on("mouseover", function() {
@@ -4376,7 +4376,8 @@
 				.attr("width", 360)
 				.attr("height", 50)
 				.attr("pointer-events", "none")
-				.style("fill", "white");
+				.style("fill", "white")
+				.style("stroke", "#888");
 
 			const explanationText = helpSVG.append("text")
 				.attr("class", "pbicliAnnotationExplanationText")
@@ -4406,7 +4407,7 @@
 				tooltip.style("display", "none");;
 				explanationText.style("opacity", 1);
 				explanationTextRect.style("opacity", 1);
-				helpSVG.selectAll(".pbicliHelpRectangle").style("opacity", 0.35);
+				helpSVG.selectAll(".pbicliHelpRectangle").style("opacity", 0.5);
 			};
 
 			//end of createAnnotationsDiv

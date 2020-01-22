@@ -2110,124 +2110,139 @@
 
 			function createAnnotationsDiv() {
 
-				const padding = 6;
-
 				const overDiv = containerDiv.append("div")
 					.attr("class", "pbialpOverDivHelp");
 
-				const totalHeight = overDiv.node().clientHeight;
+				const topDivSize = topDiv.node().getBoundingClientRect();
+
+				const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+				const topDivHeight = topDivSize.height * (width / topDivSize.width);
 
 				const helpSVG = overDiv.append("svg")
-					.attr("viewBox", "0 0 " + width + " " + totalHeight);
+					.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + 2));
 
-				const arrowMarker = helpSVG.append("defs")
-					.append("marker")
-					.attr("id", "pbialpArrowMarker")
-					.attr("viewBox", "0 -5 10 10")
-					.attr("refX", 0)
-					.attr("refY", 0)
-					.attr("markerWidth", 12)
-					.attr("markerHeight", 12)
-					.attr("orient", "auto")
-					.append("path")
-					.style("fill", "#E56A54")
-					.attr("d", "M0,-5L10,0L0,5");
+				const mainTextRect = helpSVG.append("rect")
+					.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+					.attr("y", 4)
+					.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+					.attr("height", topDivHeight)
+					.style("fill", "white")
+					.style("pointer-events", "all")
+					.style("cursor", "pointer")
+					.on("click", function() {
+						overDiv.remove();
+					});
 
 				const mainText = helpSVG.append("text")
 					.attr("class", "pbialpAnnotationMainText contributionColorFill")
 					.attr("text-anchor", "middle")
-					.attr("x", width / 2)
-					.attr("y", 280)
-					.text("CLICK ANYWHERE TO START");
+					.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+					.attr("y", 10 + topDivHeight / 2)
+					.text("CLICK HERE TO CLOSE THE HELP");
 
-				const yearsButtonsAnnotationRect = helpSVG.append("rect")
-					.attr("x", 120 - padding)
-					.attr("y", 160 - padding - 14)
-					.style("fill", "white")
-					.style("opacity", 0.95);
+				const helpData = [{
+					x: 10,
+					y: 72 + topDivHeight,
+					width: 448,
+					height: 30,
+					xTooltip: 25 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+					text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+				}, {
+					x: 464,
+					y: 72 + topDivHeight,
+					width: 420,
+					height: 30,
+					xTooltip: 530 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+					text: "Use these buttons to select the partner type."
+				}, {
+					x: 10,
+					y: 138 + topDivHeight,
+					width: 464,
+					height: 330,
+					xTooltip: 482 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 184) * (topDivSize.width / width),
+					text: "Hover over the CBPFs to get the additional info and to highlight the corresponding line on the right-hand side (Allocations by Partner Type). Clicking a CBPF keeps it selected, allowing you to hover over the lines on the right-hand side for more info. You can click more than one CBPF."
+				}, {
+					x: 484,
+					y: 132 + topDivHeight,
+					width: 378,
+					height: 347,
+					xTooltip: 56 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 184) * (topDivSize.width / width),
+					text: "This area shows the allocations by partner type for all CBPFs. Clicking a CBPF on the right-hand side keeps the respective line highlighted. Hover over the line to get additional info. The dotted line is the average for all CBPFs."
+				}, {
+					x: 722,
+					y: 512 + topDivHeight,
+					width: 80,
+					height: 18,
+					xTooltip: 580 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 472) * (topDivSize.width / width),
+					text: "Click here to show sub-implementing partners."
+				}];
 
-				const yearsButtonsAnnotation = helpSVG.append("text")
-					.attr("class", "pbialpAnnotationText")
-					.attr("x", 120)
-					.attr("y", 160)
-					.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-					.call(wrapText2, 330);
-
-				const yearsButtonPath = helpSVG.append("path")
-					.style("fill", "none")
-					.style("stroke", "#E56A54")
-					.attr("pointer-events", "none")
-					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M110,170 Q90,170 90,155");
-
-				yearsButtonsAnnotationRect.attr("width", yearsButtonsAnnotation.node().getBBox().width + padding * 2)
-					.attr("height", yearsButtonsAnnotation.node().getBBox().height + padding * 2);
-
-				const partnersButtonsAnnotationRect = helpSVG.append("rect")
-					.attr("x", 480 - padding)
-					.attr("y", 160 - padding - 14)
-					.style("fill", "white")
-					.style("opacity", 0.95);
-
-				const partnersButtonsAnnotation = helpSVG.append("text")
-					.attr("class", "pbialpAnnotationText")
-					.attr("x", 480)
-					.attr("y", 160)
-					.text("Click these buttons to select the partner type.")
-					.call(wrapText2, 200);
-
-				const partnersButtonPath = helpSVG.append("path")
-					.style("fill", "none")
-					.style("stroke", "#E56A54")
-					.attr("pointer-events", "none")
-					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M680,170 Q720,170 720,155");
-
-				partnersButtonsAnnotationRect.attr("width", partnersButtonsAnnotation.node().getBBox().width + padding * 2)
-					.attr("height", partnersButtonsAnnotation.node().getBBox().height + padding * 2);
-
-				const lollipopAnnotationRect = helpSVG.append("rect")
-					.attr("x", 220 - padding)
-					.attr("y", 340 - padding - 14)
-					.style("fill", "white")
-					.style("opacity", 0.95);
-
-				const lollipopAnnotation = helpSVG.append("text")
-					.attr("class", "pbialpAnnotationText")
-					.attr("x", 220)
-					.attr("y", 340)
-					.text("Hover over the CBPFs to get the additional info and to highlight the corresponding line on the right-hand side (Allocations by Partner Type). Clicking a CBPF keeps it selected, allowing you to hover over the lines on the right-hand side for more info. You can click more than one CBPF.")
-					.call(wrapText2, 250);
-
-				const lollipopPath = helpSVG.append("path")
-					.style("fill", "none")
-					.style("stroke", "#E56A54")
-					.attr("pointer-events", "none")
-					.attr("marker-end", "url(#pbialpArrowMarker)")
-					.attr("d", "M210,370 Q180,370 170,340");
-
-				lollipopAnnotationRect.attr("width", lollipopAnnotation.node().getBBox().width + padding * 2)
-					.attr("height", lollipopAnnotation.node().getBBox().height + padding * 2);
-
-				const parallelAnnotationRect = helpSVG.append("rect")
-					.attr("x", 590 - padding)
-					.attr("y", 340 - padding - 14)
-					.style("fill", "white")
-					.style("opacity", 0.95);
-
-				const parallelAnnotation = helpSVG.append("text")
-					.attr("class", "pbialpAnnotationText")
-					.attr("x", 590)
-					.attr("y", 340)
-					.text("This area shows the allocations by partner type for all CBPFs. Clicking a CBPF on the right-hand side keeps the respective line highlighted. Hover over the line to get additional info. The dotted line is the average for all CBPFs.")
-					.call(wrapText2, 260);
-
-				parallelAnnotationRect.attr("width", parallelAnnotation.node().getBBox().width + padding * 2)
-					.attr("height", parallelAnnotation.node().getBBox().height + padding * 2);
-
-				helpSVG.on("click", function() {
-					overDiv.remove();
+				helpData.forEach(function(d) {
+					helpSVG.append("rect")
+						.attr("rx", 4)
+						.attr("ry", 4)
+						.attr("x", d.x)
+						.attr("y", d.y)
+						.attr("width", d.width)
+						.attr("height", d.height)
+						.style("stroke", unBlue)
+						.style("stroke-width", "3px")
+						.style("fill", "none")
+						.style("opacity", 0.5)
+						.attr("class", "pbialpHelpRectangle")
+						.attr("pointer-events", "all")
+						.on("mouseover", function() {
+							const self = this;
+							createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+						})
+						.on("mouseout", removeTooltip);
 				});
+
+				const explanationTextRect = helpSVG.append("rect")
+					.attr("x", (width / 2) - 180)
+					.attr("y", 244)
+					.attr("width", 360)
+					.attr("height", 50)
+					.attr("pointer-events", "none")
+					.style("fill", "white")
+					.style("stroke", "#888");
+
+				const explanationText = helpSVG.append("text")
+					.attr("class", "pbialpAnnotationExplanationText")
+					.attr("font-family", "Roboto")
+					.attr("font-size", "18px")
+					.style("fill", "#222")
+					.attr("text-anchor", "middle")
+					.attr("x", width / 2)
+					.attr("y", 264)
+					.attr("pointer-events", "none")
+					.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+					.call(wrapText2, 350);
+
+				function createTooltip(xPos, yPos, text, self) {
+					explanationText.style("opacity", 0);
+					explanationTextRect.style("opacity", 0);
+					helpSVG.selectAll(".pbialpHelpRectangle").style("opacity", 0.1);
+					d3.select(self).style("opacity", 1);
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					tooltip.style("top", yPos + "px")
+						.style("left", xPos + "px")
+						.style("display", "block")
+						.html(text);
+				};
+
+				function removeTooltip() {
+					tooltip.style("display", "none");;
+					explanationText.style("opacity", 1);
+					explanationTextRect.style("opacity", 1);
+					helpSVG.selectAll(".pbialpHelpRectangle").style("opacity", 0.5);
+				};
 
 				//end of createAnnotationsDiv
 			};

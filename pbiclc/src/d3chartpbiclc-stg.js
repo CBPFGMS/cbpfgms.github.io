@@ -3121,7 +3121,7 @@
 					.style("stroke", unBlue)
 					.style("stroke-width", "3px")
 					.style("fill", "none")
-					.style("opacity", 0.35)
+					.style("opacity", 0.5)
 					.attr("class", "pbiclcHelpRectangle")
 					.attr("pointer-events", "all")
 					.on("mouseover", function() {
@@ -3137,7 +3137,8 @@
 				.attr("width", 360)
 				.attr("height", 50)
 				.attr("pointer-events", "none")
-				.style("fill", "white");
+				.style("fill", "white")
+				.style("stroke", "#888");
 
 			const explanationText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationExplanationText")
@@ -3167,7 +3168,7 @@
 				tooltip.style("display", "none");;
 				explanationText.style("opacity", 1);
 				explanationTextRect.style("opacity", 1);
-				helpSVG.selectAll(".pbiclcHelpRectangle").style("opacity", 0.35);
+				helpSVG.selectAll(".pbiclcHelpRectangle").style("opacity", 0.5);
 			};
 
 			//end of createAnnotationsDiv

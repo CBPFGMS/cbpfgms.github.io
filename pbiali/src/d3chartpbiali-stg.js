@@ -180,6 +180,7 @@
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
 			fadeOpacity = 0.1,
+			unBlue = "#1F69B3",
 			vizNameQueryString = "allocation-trends",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
@@ -1620,116 +1621,123 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbialiOverDivHelp");
 
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + (height + 50));
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + 2));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbialiArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 80)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbialiAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 80)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const buttonsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 120 - padding)
-				.attr("y", 200 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.9);
+			const helpData = [{
+				x: padding[3] + mainPanel.padding[3] + 10,
+				y: 20 + topDivHeight,
+				width: width - (padding[3] + mainPanel.padding[3] + padding[1] + mainPanel.padding[1] + 30),
+				height: 254,
+				xTooltip: 240 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
+				text: "Selected CBPFs will show up in this area. Hover over this area to get detailed values."
+			}, {
+				x: padding[3] + mainPanel.padding[3] - 10,
+				y: 304 + topDivHeight,
+				width: width - (padding[3] + padding[1] + buttonsPanel.padding[3]),
+				height: 116,
+				xTooltip: 280 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 200) * (topDivSize.width / width),
+				text: "Hover over a CBPF button to show its correspondent line in the chart area. Clicking a button keeps the line in the chart area, clicking again removes it. You can click several buttons."
+			}, {
+				x: 646,
+				y: 424 + topDivHeight,
+				width: 240,
+				height: 14,
+				xTooltip: 600 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 350) * (topDivSize.width / width),
+				text: "You can sort the CBPFs buttons alphabetically or by total allocations in each CBPF."
+			}];
 
-			const buttonsAnnotation = helpSVG.append("text")
-				.attr("class", "pbialiAnnotationText")
-				.attr("x", 120)
-				.attr("y", 200)
-				.text("Hover over a CBPF button to show its correspondent line in the chart area. Clicking a button keeps the line in the chart area, clicking again removes it. You can click several buttons.")
-				.call(wrapText2, 280);
-
-			const buttonsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbialiArrowMarker)")
-				.attr("d", "M110,230 Q80,230 80,320");
-
-			buttonsAnnotationRect.attr("width", buttonsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", buttonsAnnotation.node().getBBox().height + padding * 2);
-
-			const areaAnnotationRect = helpSVG.append("rect")
-				.attr("x", 630 - padding)
-				.attr("y", 190 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.9);
-
-			const areaAnnotation = helpSVG.append("text")
-				.attr("class", "pbialiAnnotationText")
-				.attr("x", 630)
-				.attr("y", 190)
-				.text("Selected CBPFs will show up in this area. Hover over this area to get detailed values.")
-				.call(wrapText2, 200);
-
-			const areaPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("d", "M 600 300 Q 612 300 608 250 T 620 200 M 600 100 Q 612 100 608 150 T 620 200");
-
-			areaAnnotationRect.attr("width", areaAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", areaAnnotation.node().getBBox().height + padding * 2);
-
-			const sortAnnotationRect = helpSVG.append("rect")
-				.attr("x", 470 - padding)
-				.attr("y", 370 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.9);
-
-			const sortAnnotation = helpSVG.append("text")
-				.attr("class", "pbialiAnnotationText")
-				.attr("x", 470)
-				.attr("y", 370)
-				.text("Sorts the CBPFs buttons alphabetically or by total allocations in each CBPF.")
-				.call(wrapText2, 230);
-
-			const sortPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbialiArrowMarker)")
-				.attr("d", "M640,380 Q730,390 730,438");
-
-			sortAnnotationRect.attr("width", sortAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", sortAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbialiHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 164)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbialiAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 184)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbialiHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");;
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbialiHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};
