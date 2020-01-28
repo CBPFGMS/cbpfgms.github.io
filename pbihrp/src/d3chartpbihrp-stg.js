@@ -179,7 +179,7 @@
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
-			colorsArray = ["#1175BA", "#9BB9DF", "#8A8C8E", "#E4E5E6"],
+			colorsArray = ["#1175BA", "#9BB9DF", "#D0D1D1", "#E9EAEB"],
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
@@ -190,8 +190,6 @@
 			localStorageTime = 600000,
 			localVariable = d3.local(),
 			chartTitleDefault = "CBPF Target vs HRP",
-			thumbnailsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/mapthumbnails/mapshot",
-			thumbnailsDirectoryCors = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/mapthumbnails/mapshot",
 			vizNameQueryString = "cbpfvshrp",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
@@ -391,16 +389,16 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 32, 0, 196],
+			padding: [100, 32, 0, 196],
 			get mainAxisPadding() {
 				return this.padding[3] - 104;
 			},
 			donutPadding: 30,
 			get titlePadding() {
-				return this.padding[0] * 0.4;
+				return this.padding[0] * 0.28;
 			},
 			get legendPadding() {
-				return this.padding[0] * 0.5;
+				return this.padding[0] * 0.35;
 			}
 		};
 
@@ -424,16 +422,17 @@
 		const sortMenuPanel = {
 			main: svg.append("g")
 				.attr("class", "pbihrpsortMenuPanel")
-				.attr("transform", "translate(" + (barChartPanel.width - 310) + "," +
-					(padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + barChartPanel.legendPadding + 6 * panelVerticalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," +
+					(padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + (1.6 * barChartPanel.legendPadding) + 6 * panelVerticalPadding) + ")"),
 			width: 268,
 			height: 102,
 			padding: [0, 0, 0, 4],
-			titlePadding: 48,
 			itemPadding: 16,
 			groupHeight: 20,
 			circleSize: 6,
-			innerCircleSize: 3
+			innerCircleSize: 3,
+			leftPadding: 58,
+			groupPadding: 18,
 		};
 
 		stackedBarPanel.main.attr("pointer-events", "none");
@@ -595,10 +594,6 @@
 			if (!isPfbiSite) createFooterDiv();
 
 			if (showHelp) createAnnotationsDiv();
-
-			allFunds.forEach(function(d) {
-				saveImage(thumbnailsDirectoryCors + d + ".png", d);
-			});
 
 			//end of draw
 		};
@@ -2033,7 +2028,7 @@
 					.attr("class", "pbihrplegendText")
 					.style("font-family", "Arial")
 					.style("font-size", "13px")
-					.text("CBPF Funding as Percentage of the Target");
+					.text("CBPF Funding as percentage of HRP Funding (blue circle represents target)");
 
 			};
 
@@ -2231,7 +2226,7 @@
 				.tween("text", function(d) {
 					const node = this;
 					const thisValue = +(node.textContent.match(/\d+/)[0]);
-					const i = d3.interpolate(thisValue / 100, d.cbpfpercentage);
+					const i = d3.interpolate(thisValue / 100, d.cbpftotalpercentage);
 					return function(t) {
 						node.textContent = formatPercent(i(t));
 					};
@@ -2452,26 +2447,32 @@
 						.style("flex", "0 44%")
 						.style("justify-content", "flex-end")
 						.attr("class", "contributionColorHTMLcolor")
-						.html("$" + formatMoney0Decimals(d[e.property]));
+						.html("$" + d3.formatPrefix(".2", d[e.property])(d[e.property]).replace("G", "B"));
 				});
 
 				tooltip.append("div")
 					.style("margin-top", "8px")
-					.html("\u2192 " + formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved.");
+					.html("The current CBPF Funding represents:<br>\u2192 " + formatPercent2Decimals(d.cbpfpercentage) +
+						" of the target<br>\u2192 " + formatPercent2Decimals(d.cbpftotalpercentage) + " of the HRP Funding");
 
-				tooltip.append("div")
+				const tooltipContainer2 = tooltip.append("div")
+					.style("margin", "0px")
 					.style("margin-top", "8px")
-					.style("margin-bottom", "10px")
-					.attr("class", "contributionColorHTMLcolor")
-					.html("Allocations in " + d.cbpfName + ":");
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "300px");
 
-				tooltip.append("img")
-					.attr("width", "300px")
-					.attr("height", "200px")
-					.style("border", "1px solid lightgray")
-					.attr("src", localStorage.getItem("storedImage" + d.cbpfId) ?
-						localStorage.getItem("storedImage" + d.cbpfId) :
-						thumbnailsDirectory + d.cbpfId + ".png");
+				tooltipContainer2.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html("Remaining for the target:");
+
+				tooltipContainer2.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.attr("class", "contributionColorHTMLcolor")
+					.html("$" + (d.cbpftarget - d.cbpffunding > 0 ? d3.formatPrefix(".2", (d.cbpftarget - d.cbpffunding))((d.cbpftarget - d.cbpffunding)).replace("G", "B") : "0.00"));
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -2883,26 +2884,31 @@
 						.style("flex", "0 44%")
 						.style("justify-content", "flex-end")
 						.attr("class", "contributionColorHTMLcolor")
-						.html("$" + formatMoney0Decimals(d[e.property]));
+						.html("$" + d3.formatPrefix(".2", d[e.property])(d[e.property]));
 				});
 
 				tooltip.append("div")
 					.style("margin-top", "8px")
-					.html("\u2192 " + formatPercent2Decimals(d.cbpfpercentage) + " of the target achieved.");
+					.html("The current CBPF Funding represents:<br>\u2192 " + formatPercent2Decimals(d.cbpfpercentage) + " of the target");
 
-				tooltip.append("div")
+				const tooltipContainer2 = tooltip.append("div")
+					.style("margin", "0px")
 					.style("margin-top", "8px")
-					.style("margin-bottom", "10px")
-					.attr("class", "contributionColorHTMLcolor")
-					.html("Allocations in " + d.cbpfName + ":");
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "300px");
 
-				tooltip.append("img")
-					.attr("width", "300px")
-					.attr("height", "200px")
-					.style("border", "1px solid lightgray")
-					.attr("src", localStorage.getItem("storedImage" + d.cbpfId) ?
-						localStorage.getItem("storedImage" + d.cbpfId) :
-						thumbnailsDirectory + d.cbpfId + ".png");
+				tooltipContainer2.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html("Remaining for the target:");
+
+				tooltipContainer2.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.attr("class", "contributionColorHTMLcolor")
+					.html("$" + (d.cbpftarget - d.cbpffunding > 0 ? d3.formatPrefix(".2", (d.cbpftarget - d.cbpffunding))((d.cbpftarget - d.cbpffunding)).replace("G", "B") : "0.00"));
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -2940,57 +2946,17 @@
 			const sortMenuTitle = sortMenuPanel.main.append("text")
 				.attr("class", "pbihrpsortMenuTitle contributionColorDarkerFill")
 				.attr("x", 0)
-				.attr("y", legendRectangleSize - 3)
+				.attr("y", legendRectangleSize - 1)
 				.text("Sort by:");
-
-			const menuRectangle = sortMenuPanel.main.append("rect")
-				.attr("rx", 2)
-				.attr("ry", 2)
-				.attr("x", sortMenuPanel.titlePadding + 2)
-				.attr("y", -2)
-				.attr("width", sortMenuPanel.width)
-				.attr("height", sortMenuPanel.groupHeight)
-				.style("fill", "whitesmoke")
-				.style("stroke-width", 1)
-				.style("opacity", 0)
-				.style("stroke", "#aaa")
-				.attr("pointer-events", "none");
-
-			const menuRectangleClip = sortMenuPanel.main.append("clipPath")
-				.attr("id", "pbihrpsortMenuClip")
-				.append("rect")
-				.attr("x", sortMenuPanel.titlePadding + 1)
-				.attr("y", -2)
-				.attr("width", sortMenuPanel.width)
-				.attr("height", sortMenuPanel.groupHeight);
 
 			const sortByArrayFiltered = sortByArray.filter(function(d) {
 				return d !== "cbpftarget"
 			});
 
-			let currentTranslate = calculateTranslate();
-
-			const sortMenuContainerClipGroup = sortMenuPanel.main.append("g")
-				.attr("clip-path", "url(#pbihrpsortMenuClip)");
-
-			const sortMenuContainer = sortMenuContainerClipGroup.append("g")
-				.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + currentTranslate + ")");
-
-			const menuRectangleBackground = sortMenuContainer.append("rect")
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("width", sortMenuPanel.width)
-				.attr("height", sortMenuPanel.height)
-				.style("fill", "none")
-				.attr("pointer-events", "all");
-
-			const sortGroups = sortMenuContainer.selectAll(null)
+			const sortGroups = sortMenuPanel.main.selectAll(null)
 				.data(sortByArrayFiltered)
 				.enter()
 				.append("g")
-				.attr("transform", function(_, i) {
-					return "translate(" + sortMenuPanel.padding[3] + "," + (sortMenuPanel.groupHeight * i) + ")";
-				})
 				.attr("cursor", "pointer")
 				.attr("pointer-events", "all");
 
@@ -3020,31 +2986,9 @@
 					return chartState.sortBy === d ? "darkslategray" : "none";
 				});
 
-			sortMenuPanel.main.on("mouseover", function() {
-
-				currentHoveredElement = this;
-
-				sortMenuContainer.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + sortMenuVertAlign + ")");
-
-				menuRectangle.style("opacity", sortMenuRectangleOpacity)
-					.attr("height", sortMenuPanel.height);
-
-				menuRectangleClip.attr("height", sortMenuPanel.height);
-
-			}).on("mouseleave", function() {
-
-				if (isSnapshotTooltipVisible) return;
-				currentHoveredElement = null;
-
-				currentTranslate = calculateTranslate();
-
-				sortMenuContainer.attr("transform", "translate(" + (sortMenuPanel.titlePadding + 2) + "," + currentTranslate + ")");
-
-				menuRectangle.style("opacity", 0)
-					.attr("height", sortMenuPanel.groupHeight);
-
-				menuRectangleClip.attr("height", sortMenuPanel.groupHeight);
-
+			sortGroups.each(function(_, i) {
+				d3.select(this).attr("transform", "translate(" + (i ? localVariable.get(this.previousSibling) : sortMenuPanel.leftPadding) + ",0)")
+				localVariable.set(this, this.getBBox().width + sortMenuPanel.groupPadding + (i ? localVariable.get(this.previousSibling) : sortMenuPanel.leftPadding));
 			});
 
 			sortGroups.on("click", function(d) {
@@ -3070,11 +3014,6 @@
 				createNonHrpPanel(data);
 			});
 
-			function calculateTranslate() {
-				const index = sortByArrayFiltered.indexOf(chartState.sortBy);
-				return index ? -sortMenuPanel.groupHeight * index + sortMenuVertAlign : sortMenuVertAlign;
-			};
-
 			//end of createSortMenu
 		};
 
@@ -3093,6 +3032,7 @@
 						cbpffunding: +row.PFFunded,
 						cbpftarget: +row.PFHRPTarget,
 						cbpfpercentage: +row.PFHRPTarget === 0 ? 0 : (+row.PFFunded) / (+row.PFHRPTarget),
+						cbpftotalpercentage: +row.HRPClstFunded === 0 ? 0 : (+row.PFFunded) / (+row.HRPClstFunded),
 						hrpfunding: +row.HRPClstFunded,
 						hrprequirements: +row.HRPClstReq
 					};
@@ -3210,7 +3150,7 @@
 					"CBPF Name": d.cbpfName,
 					"CBPF Funding": d.cbpffunding,
 					"CBPF Target": d.cbpftarget,
-					"CBPF Funding as % of Target": ~~(10000 * d.cbpfpercentage) / 100,
+					"CBPF Funding as % of HRP Funding": ~~(10000 * d.cbpftotalpercentage) / 100,
 					"HRP Funding": d.hrpfunding,
 					"HRP Requirements": d.hrprequirements,
 					"Has HRP?": "yes"
@@ -3221,8 +3161,8 @@
 				return {
 					"CBPF Name": d.cbpfName,
 					"CBPF Funding": d.cbpffunding,
-					"CBPF Target": "n/a",
-					"CBPF Funding as % of Target": "n/a",
+					"CBPF Target": d.cbpftarget,
+					"CBPF Funding as % of HRP Funding": "n/a",
 					"HRP Funding": d.hrpfunding,
 					"HRP Requirements": d.hrprequirements,
 					"Has HRP?": "no"
@@ -3400,50 +3340,6 @@
 					}
 				}
 			});
-		};
-
-		function saveImage(link, filename) {
-
-			if (!localStorage.getItem("storedImage" + filename)) {
-				getBase64FromImage(link, setLocal, null, filename);
-			};
-
-			function getBase64FromImage(url, onSuccess, onError, filename) {
-				const xhr = new XMLHttpRequest();
-
-				xhr.responseType = "arraybuffer";
-				xhr.open("GET", url);
-
-				xhr.onload = function() {
-					let base64, binary, bytes, mediaType;
-
-					bytes = new Uint8Array(xhr.response);
-
-					binary = [].map.call(bytes, function(byte) {
-						return String.fromCharCode(byte);
-					}).join('');
-
-					mediaType = xhr.getResponseHeader('content-type');
-
-					base64 = [
-						'data:',
-						mediaType ? mediaType + ';' : '',
-						'base64,',
-						btoa(binary)
-					].join('');
-					onSuccess(filename, base64);
-				};
-
-				xhr.onerror = onError;
-
-				xhr.send();
-			};
-
-			function setLocal(filename, base64) {
-				localStorage.setItem("storedImage" + filename, base64);
-			};
-
-			//end of saveImage
 		};
 
 		function createSnapshot(type, fromContextMenu) {
