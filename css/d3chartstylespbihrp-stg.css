@@ -157,7 +157,7 @@ p#pbihrpd3chartTitle {
 	pointer-events: none;
 }
 
-.pbihrpbarChartPercentageText {
+.pbihrpbarChartPercentageText, .pbihrpbarChartPercentageText2 {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #444;
