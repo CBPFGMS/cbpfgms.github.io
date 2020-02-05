@@ -599,6 +599,89 @@
 					createSnapshot("png", false);
 				});
 
+			const playIcon = iconsDiv.append("button")
+				.datum({
+					clicked: false
+				})
+				.attr("id", "pbigamPlayButton");
+
+			playIcon.html("PLAY  ")
+				.append("span")
+				.attr("class", "fas fa-play");
+
+			playIcon.on("click", function(d) {
+				d.clicked = !d.clicked;
+
+				playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+					.append("span")
+					.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+				if (d.clicked) {
+					chartState.selectedYear.length = 1;
+					loopButtons();
+					timer = d3.interval(loopButtons, 2 * duration);
+				} else {
+					timer.stop();
+				};
+
+				function loopButtons() {
+
+					const yearsArrayButtons = yearsArray.filter(function(d) {
+						return d.year !== "gap";
+					}).map(function(d) {
+						return d.year + d.gamGroup;
+					});
+
+					const index = yearsArrayButtons.indexOf(chartState.selectedYear[0] + chartState.gamGroup);
+
+					chartState.selectedYear[0] = +(yearsArrayButtons[(index + 1) % yearsArrayButtons.length].slice(0, 4));
+
+					chartState.gamGroup = yearsArrayButtons[(index + 1) % yearsArrayButtons.length].slice(4);
+
+					const yearButton = d3.selectAll(".pbigambuttonsRects")
+						.filter(function(d) {
+							return d.year === chartState.selectedYear[0] && d.gamGroup === chartState.gamGroup;
+						});
+
+					yearButton.dispatch("click");
+					yearButton.dispatch("click");
+
+					const yearWithGamGroupArray = yearsArray.map(function(d) {
+						return d.year + d.gamGroup;
+					});
+
+					const firstYearIndex = yearWithGamGroupArray.indexOf(chartState.selectedYear[0] + chartState.gamGroup) < buttonsNumber / 2 ?
+						0 :
+						yearWithGamGroupArray.indexOf(chartState.selectedYear[0] + chartState.gamGroup) > yearsArray.length - (buttonsNumber / 2) ?
+						yearsArray.length - buttonsNumber :
+						yearWithGamGroupArray.indexOf(chartState.selectedYear[0] + chartState.gamGroup) - (buttonsNumber / 2);
+
+					const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+
+					if (currentTranslate === 0) {
+						svg.select(".pbigamLeftArrowGroup").select("text").style("fill", "#ccc")
+						svg.select(".pbigamLeftArrowGroup").attr("pointer-events", "none");
+					} else {
+						svg.select(".pbigamLeftArrowGroup").select("text").style("fill", "#666")
+						svg.select(".pbigamLeftArrowGroup").attr("pointer-events", "all");
+					};
+
+					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+						svg.select(".pbigamRightArrowGroup").select("text").style("fill", "#ccc")
+						svg.select(".pbigamRightArrowGroup").attr("pointer-events", "none");
+					} else {
+						svg.select(".pbigamRightArrowGroup").select("text").style("fill", "#666")
+						svg.select(".pbigamRightArrowGroup").attr("pointer-events", "all");
+					};
+
+					svg.select(".pbigambuttonsGroup").transition()
+						.duration(duration)
+						.attrTween("transform", function() {
+							return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+						});
+				};
+			});
+
 			if (!isBookmarkPage) {
 
 				const shareIcon = iconsDiv.append("button")
