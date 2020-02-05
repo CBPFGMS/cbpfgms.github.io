@@ -2028,7 +2028,7 @@
 					.attr("class", "pbihrplegendText")
 					.style("font-family", "Arial")
 					.style("font-size", "13px")
-					.text("CBPF Funding as percentage of HRP Funding (blue circle represents target)");
+					.text("CBPF Funding as percentage of HRP Funding (blue circle relative to target)");
 
 			};
 
@@ -2267,16 +2267,19 @@
 				});
 
 			barChartGroup.select(".pbihrpbarChartPercentageText")
-				.text(function(d) {
-					//THIS IS HARDCODED, SHOULD BE REMOVED
-					const thisPercentage = d.cbpfId === "62" || d.cbpfId === "70" ? "7.5%" : targetPercentage;
-
-					return thisPercentage + " of " + formatSIFloat(d.hrpfunding) + " target: ";
-				})
+				.text("Target: ")
 				.append("tspan")
 				.attr("class", "pbihrpbarChartPercentageTextSpan")
 				.text(function(d) {
 					return formatSIFloat(d.cbpftarget)
+				})
+				.append("tspan")
+				.style("font-weight", 400)
+				.text(function(d) {
+					//THIS IS HARDCODED, SHOULD BE REMOVED
+					const thisPercentage = d.cbpfId === "62" || d.cbpfId === "70" ? "7.5%" : targetPercentage;
+
+					return " (" + thisPercentage + " of " + formatSIFloat(d.hrpfunding) + ")"
 				});
 
 			barChartGroup.select(".pbihrpbarChartPercentageText")
