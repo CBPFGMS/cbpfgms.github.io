@@ -998,7 +998,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.text(function(d) {
-					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] === yearWithMixedGroups ? yearWithMixedGroups + "\u002A" : chartState.selectedYear[0] : "years\u002A";
 					return "in " + yearsText;
 				});
 
@@ -2537,7 +2537,9 @@
 
 		function setYearsDescriptionDiv() {
 			yearsDescriptionDiv.html(function() {
-				if (chartState.selectedYear.length === 1) return null;
+				if (chartState.selectedYear.length === 1 && chartState.selectedYear[0] !== yearWithMixedGroups) return null;
+				if (chartState.selectedYear.length === 1 && chartState.selectedYear[0] === yearWithMixedGroups && chartState.gamGroup === "GAM") return "\u002AAllocations in " + yearWithMixedGroups + " with the new Gender and Age Marker (GAM)";
+				if (chartState.selectedYear.length === 1 && chartState.selectedYear[0] === yearWithMixedGroups && chartState.gamGroup === "GM") return "\u002AAllocations in " + yearWithMixedGroups + " with the old Gender Marker (GM)";
 				const yearsList = chartState.selectedYear.sort(function(a, b) {
 					return a - b;
 				}).reduce(function(acc, curr, index) {
