@@ -1,0 +1,241 @@
+/*One BI, divergent lollipop chart (code: onecdc)*/
+
+#d3chartcontaineronecdc {
+	position: relative;
+}
+
+#onecdcDownloadingDiv {
+	position: absolute;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
+#onecdctooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f8f8f8; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	z-index: 1500;
+}
+
+.onecdcTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.onecdcTitleDiv {
+	display: flex;
+	flex:0 50%;
+	margin-left: 8px;
+}
+
+.onecdcIconsDiv {
+	display: flex;
+	flex:0 50%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.onecdcFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.onecdcYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.onecdcOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#onecdcd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.onecdcbuttonsText, .onecdcbuttonsContributionsText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.onecdcleftArrowText, .onecdcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.onecdcdonorsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.onecdccerfLabel, .onecdccbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.onecdctotalValue {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.onecdccerfTitleText, .onecdccbpfTitleText {
+	font-family: "Roboto", sans-serif;
+	font-weight: 700;
+	font-size: 15px;
+	fill: #666;
+}
+
+.onecdccerfTitleSpan, .onecdccbpfTitleSpan {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #888;
+}
+
+.onecdcdonorsName {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+}
+
+.onecdcSvgLegend {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: #666;
+	pointer-events: none;	
+}
+
+.onecdcxAxisCerfGroup text, .onecdcxAxisCbpfGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.onecdcsumTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: #aaa;
+}
+
+.onecdcxAxisCerfGroup path, .onecdcxAxisCbpfGroup path{
+	stroke: none;
+}
+
+.onecdcxAxisCerfGroup line, .onecdcxAxisCbpfGroup line{
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.onecdcTooltipSvgYAxisGroup path, .onecdcTooltipSvgXAxisGroup path {
+	stroke: none;
+}
+
+.onecdcTooltipSvgYAxisGroup text {
+	font-family: "Arial";
+	font-size: 11px;
+	fill: #444;
+}
+
+.onecdcTooltipSvgXAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.onecdcTooltipSvgXAxisGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.onecdcAnnotationMainText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.onecdcAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+#onecdcSnapshotTooltip {
+	z-index: 1600;
+}
+
+.onecdcSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.onecdcSnapshotContent #onecdcSnapshotPdfText, .onecdcSnapshotContent #onecdcSnapshotPngText, .onecdcSnapshotContent #onecdcSnapshotTooltipPdfText, .onecdcSnapshotContent #onecdcSnapshotTooltipPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.onecdcSnapshotContent #onecdcBestVisualizedText, .onecdcSnapshotContent #onecdcTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	width: 202px;
+}
+
+.onecdcSnapshotContent #onecdcSnapshotPdfText:hover, .onecdcSnapshotContent #onecdcSnapshotPngText:hover, .onecdcSnapshotContent #onecdcSnapshotTooltipPdfText:hover, .onecdcSnapshotContent #onecdcSnapshotTooltipPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
