@@ -187,7 +187,7 @@
 			tooltipWidth = 278,
 			disabledOpacity = 0.6,
 			localVariable = d3.local(),
-			chartTitleDefault = "Affected Persons Overview",
+			chartTitleDefault = "Targeted and Reached People Overview",
 			vizNameQueryString = "affected-persons-trends",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			currentDate = new Date(),
@@ -198,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["Affected Persons", "Targeted Persons"],
+			legendData = ["People Reached", "People Targeted"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -942,7 +942,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Persons";
+							" People";
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
@@ -1009,7 +1009,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Persons";
+							" People";
 					});
 
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
@@ -1027,12 +1027,12 @@
 					.style("opacity", 1)
 					.text(function() {
 						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-						return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+						return "Reached in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
 					});
 
 				topPanelPersonsTextSubText.text(function() {
 					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-					return "Affected in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+					return "Reached in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
 				});
 
 				//end of createTopPanel
@@ -1264,7 +1264,7 @@
 					.attr("class", "pbiobePercentagePanelTitle")
 					.attr("x", percentagePanel.padding[3])
 					.attr("y", percentagePanel.padding[0] - titlePadding)
-					.text("Affected Persons, in percentage");
+					.text("People Reached, in percentage");
 
 				let beneficiaryGroup = percentagePanel.main.selectAll(".pbiobeBeneficiaryGroup")
 					.data(data, function(d) {
@@ -1403,7 +1403,7 @@
 					.attr("class", "pbiobePictogramsPanelTitle")
 					.attr("x", pictogramsPanel.padding[3])
 					.attr("y", pictogramsPanel.padding[0] - titlePadding)
-					.text("Affected Persons, real proportions");
+					.text("People Reached, real proportions");
 
 				let pictogramGroupGray = pictogramsPanel.main.selectAll(".pbiobePictogramGroupGray")
 					.data(data, function(d) {
@@ -1713,12 +1713,12 @@
 						return e.beneficiary === d.beneficiary ? 1 : fadeOpacity;
 					});
 
-				const percentageText = d.targeted ? "(actually affected: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
+				const percentageText = d.targeted ? "(" + (d.beneficiary === "total" ? "people" : d.beneficiary) + " reached: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
 
 				tooltip.style("display", "block")
 					.html("<strong>" + capitalize(d.beneficiary) + "</strong><br><div style='margin:8px 0px 8px 0px;display:flex;flex-wrap:wrap;align-items:center;width:" + tooltipWidth +
 						"px;'><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " targeted:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
-						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " actually affected:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
+						formatComma(d.targeted) + "</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " + (d.beneficiary === "total" ? "people" : d.beneficiary) + " reached:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
 						formatComma(d.actual) + "</strong></div></div><div>" + percentageText + "</div>");
 
 				const thisBox = this.getBoundingClientRect();
