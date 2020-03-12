@@ -1691,7 +1691,7 @@
 							return e.gamCode === d;
 						}), function(e) {
 							return e[chartState.allocationValue];
-						})
+						}) || 0
 				};
 			});
 
