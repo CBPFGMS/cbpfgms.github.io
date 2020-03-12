@@ -1410,6 +1410,13 @@
 					};
 				});
 
+			d3.select("body").on("d3ChartsYear.pbiclc", function() {
+				// clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
+				// repositionButtonsGroup();
+				// checkArrows();
+				console.log("button working")
+			});
+
 			buttonsAllocationsRects.on("mouseover", mouseOverButtonsAllocationsRects)
 				.on("mouseout", mouseOutButtonsAllocationsRects)
 				.on("click", clickButtonsAllocationsRects);
