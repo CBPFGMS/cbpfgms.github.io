@@ -512,7 +512,7 @@
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail).year];
 					chartState.gamGroup = yearsArray.find(function(d) {
-						return d.year === chartState.selectedYear;
+						return d.year === chartState.selectedYear[0];
 					}).gamGroup;
 				});
 				checkPosition();
