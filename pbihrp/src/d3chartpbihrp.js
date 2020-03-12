@@ -3245,15 +3245,15 @@
 
 			const sortAnnotationRect = helpSVG.append("rect")
 				.attr("x", 800 - padding)
-				.attr("y", 280 - padding - 14)
+				.attr("y", 340 - padding - 14)
 				.style("fill", "white")
 				.style("opacity", 0.95);
 
 			const sortAnnotation = helpSVG.append("text")
 				.attr("class", "pbihrpAnnotationText")
 				.attr("x", 800)
-				.attr("y", 280)
-				.text("Hover over this area to open a menu which you can use to sort the Funds according to several variables.")
+				.attr("y", 340)
+				.text("Click these radio buttons to sort the Funds according to several variables.")
 				.call(wrapText2, 220);
 
 			const sortPath = helpSVG.append("path")
@@ -3261,7 +3261,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbihrpArrowMarker)")
-				.attr("d", "M900,325 Q1050,380 940,430");
+				.attr("d", "M900,380 Q900,450 840,450");
 
 			sortAnnotationRect.attr("width", sortAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", sortAnnotation.node().getBBox().height + padding * 2);
@@ -3284,7 +3284,7 @@
 				.style("stroke", "#E56A54")
 				.attr("pointer-events", "none")
 				.attr("marker-end", "url(#pbihrpArrowMarker)")
-				.attr("d", "M120,365 Q120,420 200,460");
+				.attr("d", "M120,365 Q120,445 200,510");
 
 			barsAnnotationRect.attr("width", barsAnnotation.node().getBBox().width + padding * 2)
 				.attr("height", barsAnnotation.node().getBBox().height + padding * 2);
