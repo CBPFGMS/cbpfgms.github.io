@@ -1,0 +1,235 @@
+/*Covid-19 Allocations (code: covmap)*/
+
+#d3chartcontainercovmap {
+	position: relative;
+}
+
+#covmapDownloadingDiv {
+	position: absolute;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
+#covmaptooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f8f8f8; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	z-index: 1500;
+}
+
+.covmapTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.covmapTitleDiv {
+	display: flex;
+	flex:0 50%;
+	margin-left: 8px;
+}
+
+.covmapIconsDiv {
+	display: flex;
+	flex:0 50%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+}
+
+.covmapFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.covmapYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.covmapOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+p#covmapd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.covmapbuttonsText, .covmapbuttonsCbpfText, .covmapbuttonsCerfText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.covmapcbpfTitle, .covmapcerfTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	fill: #666;
+	pointer-events: none;
+}
+
+.covmapleftArrowText, .covmaprightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.covmaplegendTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+.covmaplegendCirclesText {
+	font-family: "Arial", sans-serif;
+	font-size: 9px;
+	fill: darkslategray;	
+}
+
+.covmaplegendColors text {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;	
+}
+
+.covmapshowNamesText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+}
+
+.covmapgroupName {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+	fill: darkslategray;
+	paint-order: stroke;
+    stroke: white;
+    stroke-width: 2px;
+}
+
+.covmapzoomPath {
+	fill: white;
+}
+
+.covmapzoomPath:hover {
+	fill: #f4f4f4;
+}
+
+.covmapzoomText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #222;
+	pointer-events: none;	
+}
+
+.covmapTooltipSvgYAxisGroup path, .covmapTooltipSvgXAxisGroup path {
+	stroke: none;
+}
+
+.covmapTooltipSvgYAxisGroup text {
+	font-family: "Arial";
+	font-size: 11px;
+	fill: #444;
+}
+
+.covmapTooltipSvgXAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.covmapTooltipSvgXAxisGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.covmapcbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
+}
+
+.covmapAnnotationMainText {
+	font-family: "Arial", sans-serif;
+	font-size: 26px;
+	font-weight: 700;
+	pointer-events: none;
+}
+
+.covmapAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+#covmapSnapshotTooltip {
+	z-index: 1600;
+}
+
+.covmapSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.covmapSnapshotContent #covmapSnapshotPdfText, .covmapSnapshotContent #covmapSnapshotPngText, .covmapSnapshotContent #covmapSnapshotTooltipPdfText, .covmapSnapshotContent #covmapSnapshotTooltipPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.covmapSnapshotContent #covmapBestVisualizedText, .covmapSnapshotContent #covmapTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	width: 202px;
+}
+
+.covmapSnapshotContent #covmapSnapshotPdfText:hover, .covmapSnapshotContent #covmapSnapshotPngText:hover, .covmapSnapshotContent #covmapSnapshotTooltipPdfText:hover, .covmapSnapshotContent #covmapSnapshotTooltipPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
