@@ -1025,8 +1025,7 @@
 					const node = this;
 					const i = d3.interpolate(previousProjects, d);
 					return function(t) {
-						const siString = formatSIFloat(i(t));
-						node.textContent = +siString === +siString ? siString : siString.substring(0, siString.length - 1);
+						node.textContent = ~~(i(t))
 					};
 				});
 
@@ -1039,26 +1038,8 @@
 				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 				.attr("text-anchor", "start")
 				.merge(topPanelProjectsText)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
-				.text(function(d) {
-					const valueSI = formatSIFloat(d);
-					const unit = valueSI[valueSI.length - 1];
-					return unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "B" ? "Billion" : "";
-				});
-
-			let topPanelProjectsTextSubText = mainValueGroup.selectAll(".pbigamtopPanelProjectsTextSubText")
-				.data([projectsValue]);
-
-			topPanelProjectsTextSubText = topPanelProjectsTextSubText.enter()
-				.append("text")
-				.attr("class", "pbigamtopPanelProjectsTextSubText")
-				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
-				.attr("text-anchor", "start")
-				.merge(topPanelProjectsTextSubText)
-				.attr("y", function(d) {
-					return d < 1000 ? topPanel.height - topPanel.mainValueVerPadding * 2 : topPanel.height - topPanel.mainValueVerPadding * 1.2;
-				})
-				.text("projects");
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+				.text("Projects");
 
 			let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbigamtopPanelCbpfsNumber")
 				.data([cbpfsValue]);
