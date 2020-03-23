@@ -1473,7 +1473,7 @@
 
 				const data = processData(rawData);
 
-				//createTopPanel(data);
+				createTopPanel(data);
 
 				createPies(data);
 
