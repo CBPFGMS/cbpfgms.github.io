@@ -34,29 +34,51 @@
 	z-index: 1500;
 }
 
-.covmapTopDiv {
-	display: flex;
-	width: 100%;
-	margin-bottom: 4px;
-}
-
-.covmapTitleDiv {
-	display: flex;
-	flex:0 50%;
-	margin-left: 8px;
-}
-
 .covmapIconsDiv {
 	display: flex;
-	flex:0 50%;
+	width: 40%;
+	left: 60%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
+	position: absolute;
+	top: 11.25%;
+}
+
+.covmapIconsDiv button {
+	white-space: pre;
+	font-size: 0.833vw;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 0.14vw 0.556vw 0.14vw 0.556vw;
+	border-radius: 0.417vw;
+	-moz-border-radius: 0.417vw;
+	-webkit-border-radius: 0.417vw;
+	border: 0.069vw solid rgba(0,0,0,0.3);
+	box-shadow: 0.139vw 0.139vw 0.139vw rgba(0,0,0,0.4);
+	margin-right: 0.417vw;
+  }
+
+.covmapIconsDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.covmapIconsDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.covmapIconsDiv button:focus {
+	outline: none;
 }
 
 .covmapFooterDiv {
 	width: 100%;
 	margin-top: 8px;
+	display: flex;
 }
 
 .covmapYearsDescriptionDiv {
@@ -75,13 +97,6 @@
 	top: 0;
 	left: 0;
 	z-index: 10;
-}
-
-p#covmapd3chartTitle {
-	font-size: 26px;
-	font-family: "Arial", sans-serif;
-	margin: 0px;
-	color: #418fde;
 }
 
 .covmapbuttonsText, .covmapbuttonsCbpfText, .covmapbuttonsCerfText {
@@ -106,25 +121,24 @@ p#covmapd3chartTitle {
 
 .covmaplegendTitle {
 	font-family: "Roboto", sans-serif;
-	font-size: 10px;
-	font-weight: 700;
+	font-size: 12px;
 }
 
 .covmaplegendCirclesText {
 	font-family: "Arial", sans-serif;
-	font-size: 9px;
+	font-size: 10px;
 	fill: darkslategray;	
 }
 
 .covmaplegendColors text {
 	font-family: "Arial", sans-serif;
-	font-size: 10px;
+	font-size: 11px;
 	fill: darkslategray;	
 }
 
 .covmapshowNamesText {
 	font-family: "Arial", sans-serif;
-	font-size: 10px;
+	font-size: 11px;
 	fill: darkslategray;
 }
 
@@ -151,6 +165,30 @@ p#covmapd3chartTitle {
 	font-size: 20px;
 	fill: #222;
 	pointer-events: none;	
+}
+
+.covmaptopPanelAllocationsNumber, .covmaptopPanelCountriesNumber, .covmaptopPanelBeneficiariesNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+	fill: #888;
+}
+
+.covmaptopPanelCbpfNumber, .covmaptopPanelCerfNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+	letter-spacing: -2px;
+}
+
+.covmaptopPanelAllocationsText, .covmaptopPanelAllocationsSuperText, .covmaptopPanelCountriesText, .covmaptopPanelBeneficiariesText, .covmaptopPanelBeneficiariesSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.covmaptopPanelCbpfText, .covmaptopPanelCerfText {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
+	fill: #888;
 }
 
 .covmapTooltipSvgYAxisGroup path, .covmapTooltipSvgXAxisGroup path {
