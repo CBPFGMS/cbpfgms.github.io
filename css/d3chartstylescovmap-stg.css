@@ -188,11 +188,52 @@
 }
 
 .covmaptooltipButtons {
+	white-space: pre;
 	font-size: 10px;
-	letter-spacing: -0.4px;
+	color: #444;
+	background-color: white;
+	padding: 1px 4px 1px 4px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid rgba(0,0,0,0.5);
 	margin-left: 0px;
-	margin-right: 1px;
-	cursor: pointer;
+	margin-right: 5px;
+  }
+
+ .covmaptooltipButtons:disabled {
+	color: #bbb;
+	background-color: #f8f8f8;
+	border: 1px solid rgba(0,0,0,0.2);
+} 
+
+.covmaptooltipButtons:hover:enabled {
+	background-color: #d9d9d9;
+	border-color: rgba(0,0,0,0.6);
+}
+
+.covmaptooltipButtons:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.covmaptooltipButtons:focus {
+	outline: none;
+}
+
+#covmaptooltipButtonsDisabled {
+	color: white;
+	background-color: #666;
+}
+
+#covmaptooltipButtonsDisabled:disabled {
+	color: white;
+	background-color: #ccc;
+	border-color: rgba(0,0,0,0.2);
+}
+
+#covmaptooltipButtonsDisabled:hover:enabled {
+	background-color: #444;
 }
 
 .covmaptopPanelAllocationsText, .covmaptopPanelAllocationsSuperText, .covmaptopPanelCountriesText, .covmaptopPanelBeneficiariesText, .covmaptopPanelBeneficiariesSubText {

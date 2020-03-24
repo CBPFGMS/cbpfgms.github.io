@@ -186,7 +186,7 @@
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
-			tooltipMargin = -2,
+			tooltipMargin = -4,
 			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
 			showNamesMargin = 12,
@@ -515,7 +515,7 @@
 
 		const targetedScale = d3.scaleOrdinal()
 			.domain(typesOfTargeted)
-			.range(["Host", "Refugees", "Returnees", "IDPs", "Others", "Disabled"]);
+			.range(["Host Communities", "Refugees", "Returnees", "IDPs", "Others", "Disabled"]);
 
 		const tooltipSvgYScale = d3.scalePoint()
 			.range([tooltipSvgPadding[0], tooltipSvgHeight - tooltipSvgPadding[2]])
@@ -1058,7 +1058,6 @@
 				})
 				.merge(topPanelAllocationsSuperText)
 				.style("opacity", function(d) {
-					console.log(d)
 					return d < 1000 ? 0 : 1;
 				});
 
@@ -1738,7 +1737,7 @@
 				innerTooltip.append("div")
 					.style("margin-bottom", "10px")
 					.style("font-size", "16px")
-					.attr("class", "contributionColorHTMLcolor")
+					.style("color", "dimgray")
 					.style("width", "300px")
 					.append("strong")
 					.html(datum.country);
@@ -1777,147 +1776,177 @@
 						.html("$" + formatMoney0Decimals(datum[e.property]));
 				});
 
-				let selectedTooltipButton = typesOfTargeted[0];
+				let selectedTooltipButton = null;
+
+				typesOfTargeted.some(function(target) {
+					let total = 0;
+					typesOfPeople.forEach(function(people) {
+						total += datum["target" + target + peopleScale(people)];
+					});
+					if (total) selectedTooltipButton = target;
+					return !!total;
+				});
 
 				const buttonsTitle = innerTooltip.append("div")
 					.style("margin-bottom", "4px")
 					.style("margin-top", "12px")
 					.style("font-size", "12px")
-					.attr("class", "contributionColorHTMLcolor")
-					.html("Targeted People: " + targetedScale(selectedTooltipButton));
+					.html(selectedTooltipButton ? "Targeted People: " + targetedScale(selectedTooltipButton) : "No targeted people");
 
-				const buttonsDiv = innerTooltip.append("div")
-					.attr("class", "covmapbuttonsDiv")
+				if (selectedTooltipButton) {
 
-				const tooltipButtons = buttonsDiv.selectAll(null)
-					.data(typesOfTargeted)
-					.enter()
-					.append("button")
-					.attr("class", "covmaptooltipButtons")
-					.html(function(d) {
-						return targetedScale(d);
+					const buttonsDiv = innerTooltip.append("div")
+						.attr("class", "covmapbuttonsDiv")
+
+					const tooltipButtons = buttonsDiv.selectAll(null)
+						.data(typesOfTargeted)
+						.enter()
+						.append("button")
+						.attr("class", "covmaptooltipButtons")
+						.property("disabled", function(d) {
+							let total = 0;
+							typesOfPeople.forEach(function(e) {
+								total += datum["target" + d + peopleScale(e)];
+							});
+							return total ? false : true;
+						})
+						.style("cursor", function(d) {
+							let total = 0;
+							typesOfPeople.forEach(function(e) {
+								total += datum["target" + d + peopleScale(e)];
+							});
+							return total ? "pointer" : "default";
+						})
+						.html(function(d) {
+							return d === "HostCommunities" ? "Host" : targetedScale(d);
+						});
+
+					tooltipButtons.filter(function(d) {
+						return d === "Disable";
+					}).attr("id", "covmaptooltipButtonsDisabled");
+
+					tooltipButtons.on("click", function(d) {
+						if (selectedTooltipButton === d) return;
+						selectedTooltipButton = d;
+						buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
+						createTooltipSvg(selectedTooltipButton);
 					});
 
-				tooltipButtons.on("click", function(d) {
-					selectedTooltipButton = d;
-					buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
+					const tooltipSvg = innerTooltip.append("svg")
+						.attr("width", tooltipSvgWidth)
+						.attr("height", tooltipSvgHeight);
+
+					const yAxisGroup = tooltipSvg.append("g")
+						.attr("class", "covmapTooltipSvgYAxisGroup")
+						.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
+
+					const xAxisGroup = tooltipSvg.append("g")
+						.attr("class", "covmapTooltipSvgXAxisGroup")
+						.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
+
 					createTooltipSvg(selectedTooltipButton);
-				});
 
-				const tooltipSvg = innerTooltip.append("svg")
-					.attr("width", tooltipSvgWidth)
-					.attr("height", tooltipSvgHeight);
+					function createTooltipSvg(selectedTargeted) {
 
-				const yAxisGroup = tooltipSvg.append("g")
-					.attr("class", "covmapTooltipSvgYAxisGroup")
-					.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
+						const svgData = typesOfPeople.map(function(d) {
+							return {
+								people: peopleScale(d),
+								value: datum["target" + selectedTargeted + peopleScale(d)]
+							};
+						}).sort(function(a, b) {
+							return b.value - a.value;
+						});
 
-				const xAxisGroup = tooltipSvg.append("g")
-					.attr("class", "covmapTooltipSvgXAxisGroup")
-					.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
+						tooltipSvgYScale.domain(svgData.map(function(d) {
+							return d.people;
+						}));
 
-				createTooltipSvg(selectedTooltipButton);
+						tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
+							return d.value;
+						})]);
 
-				function createTooltipSvg(selectedTargeted) {
-
-					const svgData = typesOfPeople.map(function(d) {
-						console.log("targeted" + selectedTargeted + peopleScale(d))
-						return {
-							people: peopleScale(d),
-							value: datum["target" + selectedTargeted + peopleScale(d)]
+						if (tooltipSvgXScale.domain()[1] === 0) {
+							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
+						} else {
+							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
 						};
-					}).sort(function(a, b) {
-						return b.value - a.value;
-					});
 
-					tooltipSvgYScale.domain(svgData.map(function(d) {
-						return d.people;
-					}));
+						yAxisGroup.transition()
+							.duration(duration)
+							.call(tooltipSvgYAxis);
 
-					tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
-						return d.value;
-					})]);
+						xAxisGroup.transition()
+							.duration(duration)
+							.call(tooltipSvgXAxis);
 
-					if (tooltipSvgXScale.domain()[1] === 0) {
-						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
-					} else {
-						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
+						xAxisGroup.selectAll(".tick")
+							.filter(function(d) {
+								return d === 0;
+							})
+							.remove();
+
+						let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
+							.data(svgData);
+
+						const peopleGroupsEnter = peopleGroups.enter()
+							.append("g")
+							.attr("class", "covmappeopleGroups");
+
+						const peopleGroupStick = peopleGroupsEnter.append("rect")
+							.attr("x", tooltipSvgPadding[3])
+							.attr("y", -stickHeight / 4)
+							.attr("height", stickHeight)
+							.attr("width", 0)
+							.style("fill", cbpfColor);
+
+						const peopleGroupLollipop = peopleGroupsEnter.append("circle")
+							.attr("cx", tooltipSvgPadding[3])
+							.attr("cy", (stickHeight / 4))
+							.attr("r", lollipopRadius)
+							.style("fill", cbpfColor);
+
+						const peopleGroupLabel = peopleGroupsEnter.append("text")
+							.attr("class", "covmapcbpfLabel")
+							.attr("x", tooltipSvgXScale(0))
+							.attr("y", 4)
+							.text(formatNumberSI(0));
+
+						peopleGroups = peopleGroupsEnter.merge(peopleGroups);
+
+						peopleGroups.attr("transform", function(d) {
+							return "translate(0," + tooltipSvgYScale(d.people) + ")";
+						});
+
+						peopleGroups.select("rect")
+							.transition()
+							.duration(duration)
+							.attr("width", function(d) {
+								return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
+							});
+
+						peopleGroups.select("circle")
+							.transition()
+							.duration(duration)
+							.attr("cx", function(d) {
+								return tooltipSvgXScale(d.value);
+							});
+
+						peopleGroups.select("text")
+							.transition()
+							.duration(duration)
+							.attr("x", function(d) {
+								return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
+							})
+							.textTween(function(d) {
+								const i = d3.interpolate(0, d.value);
+								return function(t) {
+									return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
+								};
+							});
+
+						//end of createTooltipSvg 
 					};
 
-					yAxisGroup.transition()
-						.duration(duration)
-						.call(tooltipSvgYAxis);
-
-					xAxisGroup.transition()
-						.duration(duration)
-						.call(tooltipSvgXAxis);
-
-					xAxisGroup.selectAll(".tick")
-						.filter(function(d) {
-							return d === 0;
-						})
-						.remove();
-
-					let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
-						.data(svgData);
-
-					const peopleGroupsEnter = peopleGroups.enter()
-						.append("g")
-						.attr("class", "covmappeopleGroups");
-
-					const peopleGroupStick = peopleGroupsEnter.append("rect")
-						.attr("x", tooltipSvgPadding[3])
-						.attr("y", -stickHeight / 4)
-						.attr("height", stickHeight)
-						.attr("width", 0)
-						.style("fill", cbpfColor);
-
-					const peopleGroupLollipop = peopleGroupsEnter.append("circle")
-						.attr("cx", tooltipSvgPadding[3])
-						.attr("cy", (stickHeight / 4))
-						.attr("r", lollipopRadius)
-						.style("fill", cbpfColor);
-
-					const peopleGroupLabel = peopleGroupsEnter.append("text")
-						.attr("class", "covmapcbpfLabel")
-						.attr("x", tooltipSvgXScale(0))
-						.attr("y", 4)
-						.text(formatNumberSI(0));
-
-					peopleGroups = peopleGroupsEnter.merge(peopleGroups);
-
-					peopleGroups.attr("transform", function(d) {
-						return "translate(0," + tooltipSvgYScale(d.people) + ")";
-					});
-
-					peopleGroups.select("rect")
-						.transition()
-						.duration(duration)
-						.attr("width", function(d) {
-							return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
-						});
-
-					peopleGroups.select("circle")
-						.transition()
-						.duration(duration)
-						.attr("cx", function(d) {
-							return tooltipSvgXScale(d.value);
-						});
-
-					peopleGroups.select("text")
-						.transition()
-						.duration(duration)
-						.attr("x", function(d) {
-							return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
-						})
-						.textTween(function(d) {
-							const i = d3.interpolate(0, d.value);
-							return function(t) {
-								return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
-							};
-						});
-
-					//end of createTooltipSvg 
 				};
 
 				const thisBox = this.getBoundingClientRect();
