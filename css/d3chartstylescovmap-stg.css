@@ -19,6 +19,12 @@
 
 #covmaptooltipdiv {    
 	position: absolute;
+	padding: 10px;
+	background-color: rgba(0,0,0,0);
+	z-index: 1500;
+}
+
+#covmapInnerTooltipDiv {    
 	text-align: left;
 	color: darkslategray;
 	font-family: "Arial";
@@ -29,9 +35,6 @@
 	background: #f8f8f8; 
 	border: 1px solid #999; 
 	border-radius: 4px;
-	pointer-events: none;
-	cursor: none;
-	z-index: 1500;
 }
 
 .covmapIconsDiv {
@@ -177,6 +180,19 @@
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
 	letter-spacing: -2px;
+}
+
+.covmapbuttonsDiv {
+	display: flex;
+	margin-bottom: 4px;
+}
+
+.covmaptooltipButtons {
+	font-size: 10px;
+	letter-spacing: -0.4px;
+	margin-left: 0px;
+	margin-right: 1px;
+	cursor: pointer;
 }
 
 .covmaptopPanelAllocationsText, .covmaptopPanelAllocationsSuperText, .covmaptopPanelCountriesText, .covmaptopPanelBeneficiariesText, .covmaptopPanelBeneficiariesSubText {

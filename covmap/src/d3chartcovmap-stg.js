@@ -186,11 +186,11 @@
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
-			tooltipMargin = 8,
-			tooltipSvgWidth = 310,
+			tooltipMargin = -2,
+			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
 			showNamesMargin = 12,
-			tooltipSvgPadding = [12, 36, 2, 96],
+			tooltipSvgPadding = [14, 34, 2, 45],
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + (2 * panelHorizontalPadding),
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
@@ -513,6 +513,10 @@
 			.domain(typesOfPeople)
 			.range(["Men", "Women", "Boys", "Girls"]);
 
+		const targetedScale = d3.scaleOrdinal()
+			.domain(typesOfTargeted)
+			.range(["Host", "Refugees", "Returnees", "IDPs", "Others", "Disabled"]);
+
 		const tooltipSvgYScale = d3.scalePoint()
 			.range([tooltipSvgPadding[0], tooltipSvgHeight - tooltipSvgPadding[2]])
 			.padding(0.5);
@@ -530,7 +534,7 @@
 			.ticks(3)
 			.tickPadding(4)
 			.tickFormat(function(d) {
-				return "$" + formatSIaxes(d).replace("G", "B");
+				return formatSIaxes(d).replace("G", "B");
 			});
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
@@ -1688,8 +1692,9 @@
 				};
 			};
 
-			pieGroup.on("mouseover", pieGroupMouseover)
-				.on("mouseout", pieGroupMouseout);
+			pieGroup.on("mouseover", pieGroupMouseover);
+
+			zoomRectangle.on("mouseover", pieGroupMouseout);
 
 			function zoomed() {
 
@@ -1727,37 +1732,34 @@
 				tooltip.style("display", "block")
 					.html(null);
 
-				tooltip.append("div")
+				const innerTooltip = tooltip.append("div")
+					.attr("id", "covmapInnerTooltipDiv");
+
+				innerTooltip.append("div")
 					.style("margin-bottom", "10px")
 					.style("font-size", "16px")
 					.attr("class", "contributionColorHTMLcolor")
-					.style("width", "310px")
+					.style("width", "300px")
 					.append("strong")
 					.html(datum.country);
 
-				const tooltipContainer = tooltip.append("div")
+				const tooltipContainer = innerTooltip.append("div")
 					.style("margin", "0px")
 					.style("display", "flex")
 					.style("flex-wrap", "wrap")
-					.style("width", "310px");
+					.style("width", "300px");
 
 				const tooltipData = [{
-					title: "CBPF (" + chartState.selectedCbpfAllocation + ")",
-					property: "cbpf" + chartState.selectedCbpfAllocation,
+					title: "CBPF ",
+					property: "cbpf",
 					color: cbpfColor
 				}, {
-					title: "under approval",
-					property: "cbpf" + chartState.selectedCbpfAllocation + "underapproval",
-					color: cbpfColor
-				}, {
-					title: "CERF (" + (chartState.selectedCerfAllocation === "rapidresponse" ? "rapid response" : chartState.selectedCerfAllocation) + ")",
-					property: "cerf" + chartState.selectedCerfAllocation,
+					title: "CERF ",
+					property: "cerf",
 					color: d3.color(cerfColor).darker(0.4)
-				}, {
-					title: "under approval",
-					property: "cerf" + chartState.selectedCerfAllocation + "underapproval",
-					color: d3.color(cerfColor).darker(0.4)
-				}];
+				}].filter(function(e) {
+					return datum[e.property];
+				});
 
 				tooltipData.forEach(function(e, i) {
 					tooltipContainer.append("div")
@@ -1772,97 +1774,150 @@
 						.style("justify-content", "flex-end")
 						.style("color", e.color)
 						.style("margin-bottom", i === 1 ? "8px" : null)
-						.html("$" + formatMoney0Decimals(datum[e.property]).replace("G", "B"));
+						.html("$" + formatMoney0Decimals(datum[e.property]));
 				});
 
-				if (datum.cbpf) {
+				let selectedTooltipButton = typesOfTargeted[0];
 
-					tooltip.append("div")
-						.style("margin-bottom", "4px")
-						.style("margin-top", "12px")
-						.style("font-size", "12px")
-						.attr("class", "contributionColorHTMLcolor")
-						.html("CBPF Partners:");
+				const buttonsTitle = innerTooltip.append("div")
+					.style("margin-bottom", "4px")
+					.style("margin-top", "12px")
+					.style("font-size", "12px")
+					.attr("class", "contributionColorHTMLcolor")
+					.html("Targeted People: " + targetedScale(selectedTooltipButton));
 
-					const tooltipSvg = tooltip.append("svg")
-						.attr("width", tooltipSvgWidth)
-						.attr("height", tooltipSvgHeight);
+				const buttonsDiv = innerTooltip.append("div")
+					.attr("class", "covmapbuttonsDiv")
 
-					// const svgData = partnerTypes.map(function(d) {
-					// 	return {
-					// 		partner: d,
-					// 		value: datum["cbpf" + chartState.selectedCbpfAllocation + d]
-					// 	};
-					// }).sort(function(a, b) {
-					// 	return b.value - a.value;
-					// });
+				const tooltipButtons = buttonsDiv.selectAll(null)
+					.data(typesOfTargeted)
+					.enter()
+					.append("button")
+					.attr("class", "covmaptooltipButtons")
+					.html(function(d) {
+						return targetedScale(d);
+					});
 
-					// tooltipSvgYScale.domain(svgData.map(function(d) {
-					// 	return d.partner;
-					// }));
+				tooltipButtons.on("click", function(d) {
+					selectedTooltipButton = d;
+					buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
+					createTooltipSvg(selectedTooltipButton);
+				});
 
-					// tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
-					// 	return d.value;
-					// })]);
+				const tooltipSvg = innerTooltip.append("svg")
+					.attr("width", tooltipSvgWidth)
+					.attr("height", tooltipSvgHeight);
 
-					// const yAxisGroup = tooltipSvg.append("g")
-					// 	.attr("class", "covmapTooltipSvgYAxisGroup")
-					// 	.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)")
-					// 	.call(tooltipSvgYAxis);
+				const yAxisGroup = tooltipSvg.append("g")
+					.attr("class", "covmapTooltipSvgYAxisGroup")
+					.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
 
-					// const xAxisGroup = tooltipSvg.append("g")
-					// 	.attr("class", "covmapTooltipSvgXAxisGroup")
-					// 	.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")")
-					// 	.call(tooltipSvgXAxis)
-					// 	.selectAll(".tick")
-					// 	.filter(function(d) {
-					// 		return d === 0;
-					// 	})
-					// 	.remove();
+				const xAxisGroup = tooltipSvg.append("g")
+					.attr("class", "covmapTooltipSvgXAxisGroup")
+					.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
 
-					// const cbpfGroups = tooltipSvg.selectAll(null)
-					// 	.data(svgData)
-					// 	.enter()
-					// 	.append("g")
-					// 	.attr("transform", function(d) {
-					// 		return "translate(0," + tooltipSvgYScale(d.partner) + ")";
-					// 	})
-					// 	.each(function(d) {
-					// 		d3.select(this).append("rect")
-					// 			.attr("x", tooltipSvgPadding[3])
-					// 			.attr("y", -stickHeight / 4)
-					// 			.attr("height", stickHeight)
-					// 			.attr("width", 0)
-					// 			.style("fill", cbpfColor)
-					// 			.transition()
-					// 			.duration(duration)
-					// 			.attr("width", tooltipSvgXScale(d.value) - tooltipSvgPadding[3]);
+				createTooltipSvg(selectedTooltipButton);
 
-					// 		d3.select(this).append("circle")
-					// 			.attr("cx", tooltipSvgPadding[3])
-					// 			.attr("cy", (stickHeight / 4))
-					// 			.attr("r", lollipopRadius)
-					// 			.style("fill", cbpfColor)
-					// 			.transition()
-					// 			.duration(duration)
-					// 			.attr("cx", tooltipSvgXScale(d.value));
+				function createTooltipSvg(selectedTargeted) {
 
-					// 		d3.select(this).append("text")
-					// 			.attr("class", "covmapcbpfLabel")
-					// 			.attr("x", tooltipSvgXScale(0))
-					// 			.attr("y", 4)
-					// 			.text(formatNumberSI(0))
-					// 			.transition()
-					// 			.duration(duration)
-					// 			.attr("x", tooltipSvgXScale(d.value) + labelPadding + lollipopRadius)
-					// 			.textTween(function() {
-					// 				const i = d3.interpolate(0, d.value);
-					// 				return function(t) {
-					// 					return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
-					// 				};
-					// 			});
-					// 	})
+					const svgData = typesOfPeople.map(function(d) {
+						console.log("targeted" + selectedTargeted + peopleScale(d))
+						return {
+							people: peopleScale(d),
+							value: datum["target" + selectedTargeted + peopleScale(d)]
+						};
+					}).sort(function(a, b) {
+						return b.value - a.value;
+					});
 
+					tooltipSvgYScale.domain(svgData.map(function(d) {
+						return d.people;
+					}));
+
+					tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
+						return d.value;
+					})]);
+
+					if (tooltipSvgXScale.domain()[1] === 0) {
+						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
+					} else {
+						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
+					};
+
+					yAxisGroup.transition()
+						.duration(duration)
+						.call(tooltipSvgYAxis);
+
+					xAxisGroup.transition()
+						.duration(duration)
+						.call(tooltipSvgXAxis);
+
+					xAxisGroup.selectAll(".tick")
+						.filter(function(d) {
+							return d === 0;
+						})
+						.remove();
+
+					let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
+						.data(svgData);
+
+					const peopleGroupsEnter = peopleGroups.enter()
+						.append("g")
+						.attr("class", "covmappeopleGroups");
+
+					const peopleGroupStick = peopleGroupsEnter.append("rect")
+						.attr("x", tooltipSvgPadding[3])
+						.attr("y", -stickHeight / 4)
+						.attr("height", stickHeight)
+						.attr("width", 0)
+						.style("fill", cbpfColor);
+
+					const peopleGroupLollipop = peopleGroupsEnter.append("circle")
+						.attr("cx", tooltipSvgPadding[3])
+						.attr("cy", (stickHeight / 4))
+						.attr("r", lollipopRadius)
+						.style("fill", cbpfColor);
+
+					const peopleGroupLabel = peopleGroupsEnter.append("text")
+						.attr("class", "covmapcbpfLabel")
+						.attr("x", tooltipSvgXScale(0))
+						.attr("y", 4)
+						.text(formatNumberSI(0));
+
+					peopleGroups = peopleGroupsEnter.merge(peopleGroups);
+
+					peopleGroups.attr("transform", function(d) {
+						return "translate(0," + tooltipSvgYScale(d.people) + ")";
+					});
+
+					peopleGroups.select("rect")
+						.transition()
+						.duration(duration)
+						.attr("width", function(d) {
+							return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
+						});
+
+					peopleGroups.select("circle")
+						.transition()
+						.duration(duration)
+						.attr("cx", function(d) {
+							return tooltipSvgXScale(d.value);
+						});
+
+					peopleGroups.select("text")
+						.transition()
+						.duration(duration)
+						.attr("x", function(d) {
+							return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
+						})
+						.textTween(function(d) {
+							const i = d3.interpolate(0, d.value);
+							return function(t) {
+								return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
+							};
+						});
+
+					//end of createTooltipSvg 
 				};
 
 				const thisBox = this.getBoundingClientRect();
