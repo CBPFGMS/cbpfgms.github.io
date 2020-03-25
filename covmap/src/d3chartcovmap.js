@@ -627,7 +627,7 @@
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "covmapHelpButton")
-				.property("disabled", true);//CHANGE!!!!
+				.property("disabled", true); //CHANGE!!!!
 
 			helpIcon.html("HELP  ")
 				.append("span")
@@ -1395,6 +1395,28 @@
 			};
 
 			function mouseOverButtonsRects(d) {
+
+				tooltip.style("display", "block")
+					.html(null)
+
+				const innerTooltip = tooltip.append("div")
+					.style("max-width", "200px")
+					.attr("id", "covmapInnerTooltipDiv");
+
+				innerTooltip.html("Click for selecting a month. Double-click or ALT + click for selecting a single month.");
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
+						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 1 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height + "px");
+
 				d3.select(this).style("fill", unBlue);
 				buttonsText.filter(function(e) {
 						return e === d
@@ -1403,6 +1425,7 @@
 			};
 
 			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
 				if (chartState.selectedMonth.indexOf(d) > -1) return;
 				d3.select(this).style("fill", "#eaeaea");
 				buttonsText.filter(function(e) {
@@ -1412,6 +1435,8 @@
 			};
 
 			function clickButtonsRects(d, singleSelection) {
+
+				tooltip.style("display", "none");
 
 				if (singleSelection || d === allData) {
 					chartState.selectedMonth = [d];
@@ -2368,7 +2393,7 @@
 
 			const data = processData(rawData);
 
-			data.forEach(function(row){
+			data.forEach(function(row) {
 				delete row.allocationsList;
 				delete row.labelText;
 			});
