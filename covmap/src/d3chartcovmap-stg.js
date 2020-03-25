@@ -205,13 +205,12 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
-			timeParser = d3.timeParse("%d/%m/%y"),
 			timeFormat = d3.timeFormat("%b-%y"),
 			timeParserButtons = d3.timeParse("%b-%y"),
 			timeFormatList = d3.timeFormat("%d %B, %Y"),
 			vizNameQueryString = "allocationsmap",
 			allData = "allData",
-			dataUrl = "covmapdata.csv",
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			typesOfTargeted = ["HostCommunities", "Refugees", "Returnees", "IDPs", "Others", "Disable"],
@@ -2181,7 +2180,7 @@
 			const allocationTitleDivValue = allocationTitleDiv.append("div")
 				.attr("class", "covmapallocationTitleDivValue")
 				.html(function(d) {
-					return d.AllocationTitle || "Not available";
+					return d.AllocTitle || "Not available";
 				});
 
 			const allocationSourceDivValue = allocationSourceDiv.append("div")
@@ -2193,7 +2192,7 @@
 			const allocationDateDivValue = allocationDateDiv.append("div")
 				.attr("class", "covmapallocationDateDivValue")
 				.html(function(d) {
-					return timeFormatList(timeParser(d.DateOfAlloc)) || "Not available";
+					return timeFormatList(new Date(d.DateOfAlloc)) || "Not available";
 				});
 
 			const allocationThemeDiv = allocationContainerDiv.append("div")
@@ -2322,7 +2321,7 @@
 		function preProcessData(rawData) {
 
 			rawData.forEach(function(row) {
-				if (monthsArray.indexOf(timeFormat(timeParser(row.DateOfAlloc))) === -1) monthsArray.push(timeFormat(timeParser(row.DateOfAlloc)));
+				if (monthsArray.indexOf(timeFormat(new Date(row.DateOfAlloc))) === -1) monthsArray.push(timeFormat(new Date(row.DateOfAlloc)));
 				if (!countryNames[row.ISO2Country] && row.ISO2Country) countryNames[row.ISO2Country] = row.Country;
 			});
 
@@ -2340,7 +2339,7 @@
 			const data = [];
 
 			rawData.forEach(function(row) {
-				if (chartState.selectedMonth[0] === allData || (chartState.selectedMonth.indexOf(timeFormat(timeParser(row.DateOfAlloc))) > -1 && row.ISO2Country)) {
+				if (chartState.selectedMonth[0] === allData || (chartState.selectedMonth.indexOf(timeFormat(new Date(row.DateOfAlloc))) > -1 && row.ISO2Country)) {
 
 					if (chartState.countriesInData.indexOf(row.ISO2Country) === -1) chartState.countriesInData.push(row.ISO2Country);
 
