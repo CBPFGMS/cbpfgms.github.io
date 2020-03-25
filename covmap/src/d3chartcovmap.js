@@ -1,17 +1,11 @@
 (function d3ChartIIFE() {
 
-	//PENDING INFO:
-	//1. One BI hostname
-	//2. One BI bookmark page
-
 	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescovmap.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
 		topoJsonUrl = "https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -19,8 +13,6 @@
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
-
-	//CHANGE CSS LINK!!!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -171,32 +163,33 @@
 
 		//END OF POLYFILLS
 
-		const width = 900,
+		const width = 1100,
 			padding = [4, 4, 4, 4],
 			panelHorizontalPadding = 4,
 			buttonsPanelHeight = 30,
-			mapPanelHeight = 430,
-			legendPanelHeight = 80,
-			legendPanelWidth = 86,
+			mapPanelHeight = 490,
+			topPanelHeight = 60,
+			legendPanelHeight = 140,
+			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
 			legendPanelVertPadding = 2,
 			mapZoomButtonHorPadding = 10,
 			mapZoomButtonVertPadding = 10,
 			mapZoomButtonSize = 26,
-			maxPieSize = 20,
+			maxPieSize = 32,
 			minPieSize = 1,
-			buttonsNumber = 6,
+			buttonsNumber = 10,
 			groupNamePadding = 2,
 			unBlue = "#1F69B3",
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
-			tooltipMargin = 8,
-			tooltipSvgWidth = 310,
+			tooltipMargin = -4,
+			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
 			showNamesMargin = 12,
-			tooltipSvgPadding = [12, 36, 2, 96],
-			height = padding[0] + padding[2] + buttonsPanelHeight + mapPanelHeight + panelHorizontalPadding,
+			tooltipSvgPadding = [14, 34, 2, 45],
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + (2 * panelHorizontalPadding),
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
@@ -210,24 +203,22 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
-			mapBackgroundColor = "#D4DADC",
-			chartTitleDefault = "Allocations",
+			timeFormat = d3.timeFormat("%b-%y"),
+			timeParserButtons = d3.timeParse("%b-%y"),
+			timeFormatList = d3.timeFormat("%d %B, %Y"),
 			vizNameQueryString = "allocationsmap",
-			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
-			dataUrl = "covmapdata5combined.csv",
+			allData = "allData",
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
-			yearsArray = [],
+			typesOfTargeted = ["HostCommunities", "Refugees", "Returnees", "IDPs", "Others", "Disable"],
+			typesOfPeople = ["M", "W", "B", "G"],
+			monthsArray = [],
 			countryNames = {},
 			centroids = {},
-			partnerTypes = [],
-			cbpfAllocationTypes = ["standard", "reserve", "total"],
-			cerfAllocationTypes = ["rapidresponse", "underfunded", "total"],
 			chartState = {
-				selectedYear: [],
+				selectedMonth: [allData],
 				countriesInData: [],
-				selectedCbpfAllocation: null,
-				selectedCerfAllocation: null,
 				showNames: null
 			};
 
@@ -288,25 +279,7 @@
 
 		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
 
-		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
-
 		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
-
-		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
-
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
-
-		const selectedCbpfAllocation = queryStringValues.has("cbpfallocation") && cbpfAllocationTypes.indexOf(queryStringValues.get("cbpfallocation")) > -1 ? queryStringValues.get("cbpfallocation") :
-			cbpfAllocationTypes.indexOf(containerDiv.node().getAttribute("data-cbpfallocation")) > -1 ?
-			containerDiv.node().getAttribute("data-cbpfallocation") : "total";
-
-		const selectedCerfAllocation = queryStringValues.has("cerfallocation") && cerfAllocationTypes.indexOf(queryStringValues.get("cerfallocation")) > -1 ? queryStringValues.get("cerfallocation") :
-			cerfAllocationTypes.indexOf(containerDiv.node().getAttribute("data-cerfallocation")) > -1 ?
-			containerDiv.node().getAttribute("data-cerfallocation") : "total";
-
-		chartState.selectedCbpfAllocation = selectedCbpfAllocation;
-
-		chartState.selectedCerfAllocation = selectedCerfAllocation;
 
 		chartState.showNames = showNamesOption;
 
@@ -315,14 +288,8 @@
 				.style("height", height + "px");
 		};
 
-		const topDiv = containerDiv.append("div")
-			.attr("class", "covmapTopDiv");
-
-		const titleDiv = topDiv.append("div")
-			.attr("class", "covmapTitleDiv");
-
-		const iconsDiv = topDiv.append("div")
-			.attr("class", "covmapIconsDiv d3chartIconsDiv");
+		const iconsDiv = containerDiv.append("div")
+			.attr("class", "covmapIconsDiv");
 
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -332,11 +299,15 @@
 			svg.attr("height", height);
 		};
 
-		const yearsDescriptionDiv = containerDiv.append("div")
-			.attr("class", "covmapYearsDescriptionDiv");
+		const listContainerDiv = containerDiv.append("div")
+			.attr("class", "covmaplistContainerDiv")
+			.style("display", "none");
 
-		const footerDiv = !isPfbiSite ? containerDiv.append("div")
-			.attr("class", "covmapFooterDiv") : null;
+		const footerDiv = containerDiv.append("div")
+			.attr("class", "covmapFooterDiv");
+
+		const yearsDescriptionDiv = footerDiv.append("div")
+			.attr("class", "covmapYearsDescriptionDiv");
 
 		createProgressWheel(svg, width, height, "Loading visualisation...");
 
@@ -389,14 +360,27 @@
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
+		const topPanel = {
+			main: svg.append("g")
+				.attr("class", "covmaptopPanel")
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+			width: width - padding[1] - padding[3],
+			height: topPanelHeight,
+			padding: [0, 0, 0, 0],
+			leftPadding: [94, 264, 464, 790, 940],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 2,
+			linePadding: 8
+		};
+
 		const buttonsPanel = {
 			main: svg.append("g")
 				.attr("class", "covmapbuttonsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
 			padding: [0, 0, 0, 0],
-			buttonWidth: 54,
+			buttonWidth: 64,
 			buttonsMargin: 4,
 			buttonsPadding: 6,
 			buttonVerticalPadding: 4,
@@ -410,7 +394,7 @@
 		const mapPanel = {
 			main: svg.append("g")
 				.attr("class", "covmapmapPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: mapPanelHeight,
 			padding: [0, 0, 0, 0],
@@ -419,16 +403,16 @@
 		const legendPanel = {
 			main: svg.append("g")
 				.attr("class", "covmaplegendPanel")
-				.attr("transform", "translate(" + (padding[3] + legendPanelHorPadding) + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding + mapPanel.height - legendPanelHeight - legendPanelVertPadding) + ")"),
+				.attr("transform", "translate(" + (padding[3] + legendPanelHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapPanel.height - legendPanelHeight - legendPanelVertPadding) + ")"),
 			width: legendPanelWidth,
 			height: legendPanelHeight,
-			padding: [20, 0, 12, 4],
+			padding: [30, 0, 12, 4],
 		};
 
 		const mapZoomButtonPanel = {
 			main: svg.append("g")
 				.attr("class", "covmapmapZoomButtonPanel")
-				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding + mapZoomButtonVertPadding) + ")"),
+				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapZoomButtonVertPadding) + ")"),
 			width: mapZoomButtonSize,
 			height: mapZoomButtonSize * 2,
 			padding: [4, 4, 4, 4],
@@ -437,15 +421,9 @@
 		const checkboxesPanel = {
 			main: svg.append("g")
 				.attr("class", "covmapcheckboxesPanel")
-				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding + 1) + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding + mapZoomButtonVertPadding + mapZoomButtonPanel.height + showNamesMargin) + ")"),
+				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding + 1) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapZoomButtonVertPadding + mapZoomButtonPanel.height + showNamesMargin) + ")"),
 			padding: [0, 0, 0, 0],
 		};
-
-		const mapBackground = mapPanel.main.append("rect")
-			.attr("class", "covmapmapBackground")
-			.attr("width", mapPanel.width)
-			.attr("height", mapPanel.height)
-			.style("fill", mapBackgroundColor);
 
 		const mapPanelClip = mapPanel.main.append("clipPath")
 			.attr("id", "covmapmapPanelClip")
@@ -471,7 +449,7 @@
 		const piesContainer = mapPanel.main.append("g")
 			.attr("class", "covmappiesContainer");
 
-		const mapProjection = d3.geoEquirectangular();
+		const mapProjection = d3.geoEqualEarth();
 
 		const mapPath = d3.geoPath()
 			.projection(mapProjection);
@@ -533,6 +511,14 @@
 
 		mapZoomButtonPanel.main.style("filter", "url(#covmapdropshadow)");
 
+		const peopleScale = d3.scaleOrdinal()
+			.domain(typesOfPeople)
+			.range(["Men", "Women", "Boys", "Girls"]);
+
+		const targetedScale = d3.scaleOrdinal()
+			.domain(typesOfTargeted)
+			.range(["Host Communities", "Refugees", "Returnees", "IDPs", "Others", "Disabled"]);
+
 		const tooltipSvgYScale = d3.scalePoint()
 			.range([tooltipSvgPadding[0], tooltipSvgHeight - tooltipSvgPadding[2]])
 			.padding(0.5);
@@ -550,7 +536,7 @@
 			.ticks(3)
 			.tickPadding(4)
 			.tickFormat(function(d) {
-				return "$" + formatSIaxes(d).replace("G", "B");
+				return formatSIaxes(d).replace("G", "B");
 			});
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
@@ -599,50 +585,14 @@
 
 			preProcessData(rawData);
 
-			validateYear(selectedYearString);
-
 			removeProgressWheel();
 
-			if (!lazyLoad) {
-				draw(rawData, mapData);
-			} else {
-				d3.select(window).on("scroll.covmap", checkPosition);
-				checkPosition();
-			};
-
-			function checkPosition() {
-				const containerPosition = containerDiv.node().getBoundingClientRect();
-				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.covmap", null);
-					draw(rawData, mapData);
-				};
-			};
+			draw(rawData, mapData);
 
 			//end of csvCallback
 		};
 
 		function draw(rawData, mapData) {
-
-			//TEST
-			// buttonsPanel.main.append("rect")
-			// 	.attr("width", buttonsPanel.width)
-			// 	.attr("height", buttonsPanel.height)
-			// 	.style("opacity", 0.15);
-			// mapLayer.append("rect")
-			// 	.attr("width", mapPanel.width)
-			// 	.attr("height", mapPanel.height)
-			// 	.style("opacity", 0.15);
-			// legendPanel.main.append("rect")
-			// 	.attr("width", legendPanel.width)
-			// 	.attr("height", legendPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.15);
-			// mapZoomButtonPanel.main.append("rect")
-			// 	.attr("width", mapZoomButtonPanel.width)
-			// 	.attr("height", mapZoomButtonPanel.height)
-			// 	.style("fill", "blue")
-			// 	.style("opacity", 0.15);
-			//TEST
 
 			const data = processData(rawData);
 
@@ -658,11 +608,15 @@
 
 			createCheckboxes();
 
+			createTopPanel(data);
+
 			createPies(data);
 
 			createLegend(data);
 
-			if (!isPfbiSite) createFooterDiv();
+			createFooterDiv();
+
+			setYearsDescriptionDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -671,12 +625,9 @@
 
 		function createTitle(rawData) {
 
-			const title = titleDiv.append("p")
-				.attr("id", "covmapd3chartTitle")
-				.html(chartTitle);
-
 			const helpIcon = iconsDiv.append("button")
-				.attr("id", "covmapHelpButton");
+				.attr("id", "covmapHelpButton")
+				.property("disabled", true);//CHANGE!!!!
 
 			helpIcon.html("HELP  ")
 				.append("span")
@@ -734,7 +685,7 @@
 					.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
 
 				if (d.clicked) {
-					chartState.selectedYear.length = 1;
+					chartState.selectedMonth.length = 1;
 					loopButtons();
 					timer = d3.interval(loopButtons, 2 * duration);
 				} else {
@@ -742,23 +693,23 @@
 				};
 
 				function loopButtons() {
-					const index = yearsArray.indexOf(chartState.selectedYear[0]);
+					const index = monthsArray.indexOf(chartState.selectedMonth[0]);
 
-					chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+					chartState.selectedMonth[0] = monthsArray[(index + 1) % monthsArray.length];
 
 					const yearButton = d3.selectAll(".covmapbuttonsRects")
 						.filter(function(d) {
-							return d === chartState.selectedYear[0]
+							return d === chartState.selectedMonth[0]
 						});
 
 					yearButton.dispatch("click");
 					yearButton.dispatch("click");
 
-					const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+					const firstYearIndex = monthsArray.indexOf(chartState.selectedMonth[0]) < buttonsNumber / 2 ?
 						0 :
-						chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-						yearsArray.length - buttonsNumber :
-						yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+						monthsArray.indexOf(chartState.selectedMonth[0]) > monthsArray.length - (buttonsNumber / 2) ?
+						Math.max(monthsArray.length - buttonsNumber, 0) :
+						monthsArray.indexOf(monthsArray.indexOf(chartState.selectedMonth[0])) - (buttonsNumber / 2);
 
 					const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
 
@@ -770,7 +721,7 @@
 						svg.select(".covmapLeftArrowGroup").attr("pointer-events", "all");
 					};
 
-					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					if (Math.abs(currentTranslate) >= ((monthsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
 						svg.select(".covmapRightArrowGroup").select("text").style("fill", "#ccc")
 						svg.select(".covmapRightArrowGroup").attr("pointer-events", "none");
 					} else {
@@ -785,58 +736,6 @@
 						});
 				};
 			});
-
-			if (!isBookmarkPage) {
-
-				const shareIcon = iconsDiv.append("button")
-					.attr("id", "covmapShareButton");
-
-				shareIcon.html("SHARE  ")
-					.append("span")
-					.attr("class", "fas fa-share");
-
-				const shareDiv = containerDiv.append("div")
-					.attr("class", "d3chartShareDiv")
-					.style("display", "none");
-
-				shareIcon.on("mouseover", function() {
-						shareDiv.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					}).on("mouseout", function() {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function() {
-
-						const newURL = bookmarkSite + queryStringValues.toString();
-
-						const shareInput = shareDiv.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-
-					});
-
-			};
 
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent.append("p")
@@ -856,11 +755,11 @@
 
 			downloadIcon.on("click", function() {
 
-				const csv = createCsv(rawData); //CHANGE
+				const csv = createCsv(rawData);
 
 				const currentDate = new Date();
 
-				const fileName = "covmap_" + csvDateFormat(currentDate) + ".csv";
+				const fileName = "Covid19Allocations_" + csvDateFormat(currentDate) + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -900,21 +799,27 @@
 
 			const landObject = topojson.feature(mapData, mapData.objects.land);
 
+			const featuresWithoutAntarctica = topojson.feature(mapData, mapData.objects.countries);
+
+			featuresWithoutAntarctica.features = featuresWithoutAntarctica.features.filter(function(d) {
+				return d.properties.isoCode !== "AQ";
+			});
+
 			mapProjection.fitExtent([
 				[mapPanel.padding[3], mapPanel.padding[0]],
 				[(mapPanel.width - mapPanel.padding[1] - mapPanel.padding[3]), (mapPanel.height - mapPanel.padding[0] - mapPanel.padding[2])]
-			], landObject);
+			], featuresWithoutAntarctica);
 
 			const land = mapContainer.append("path")
 				.attr("d", mapPath(landObject))
-				.style("fill", "#F9F9F7");
+				.style("fill", "#F1F1F1");
 
 			const borders = mapContainer.append("path")
 				.attr("d", mapPath(topojson.mesh(mapData, mapData.objects.countries, function(a, b) {
 					return a !== b;
 				})))
 				.style("fill", "none")
-				.style("stroke", "#F3E9EA")
+				.style("stroke", "#DADADA")
 				.style("stroke-width", "1px");
 
 			features.forEach(function(d) {
@@ -1026,7 +931,7 @@
 
 			const showNamesText = showNamesGroup.append("text")
 				.attr("class", "covmapshowNamesText")
-				.attr("x", 16)
+				.attr("x", 18)
 				.attr("y", 11)
 				.text("Show names");
 
@@ -1050,6 +955,243 @@
 			//end of createCheckboxes
 		};
 
+		function createTopPanel(data) {
+
+			const allocationsValue = d3.sum(data, function(d) {
+				return d.allocationsList.length;
+			});
+
+			const countriesValue = data.length;
+
+			const beneficiariesValue = d3.sum(data, function(d) {
+				return d.targetTotal;
+			});
+
+			const cbpfValue = d3.sum(data, function(d) {
+				return d.cbpf;
+			});
+
+			const cerfValue = d3.sum(data, function(d) {
+				return d.cerf;
+			});
+
+			const previousAllocations = d3.select(".covmaptopPanelAllocationsNumber").size() !== 0 ? d3.select(".covmaptopPanelAllocationsNumber").datum() : 0;
+
+			const previousCountries = d3.select(".covmaptopPanelCountriesNumber").size() !== 0 ? d3.select(".covmaptopPanelCountriesNumber").datum() : 0;
+
+			const previousBeneficiaries = d3.select(".covmaptopPanelBeneficiariesNumber").size() !== 0 ? d3.select(".covmaptopPanelBeneficiariesNumber").datum() : 0;
+
+			const previousCbpf = d3.select(".covmaptopPanelCbpfNumber").size() !== 0 ? d3.select(".covmaptopPanelCbpfNumber").datum() : 0;
+
+			const previousCerf = d3.select(".covmaptopPanelCerfNumber").size() !== 0 ? d3.select(".covmaptopPanelCerfNumber").datum() : 0;
+
+			let topPanelAllocationsNumber = topPanel.main.selectAll(".covmaptopPanelAllocationsNumber")
+				.data([allocationsValue]);
+
+			topPanelAllocationsNumber = topPanelAllocationsNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelAllocationsNumber")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
+				.merge(topPanelAllocationsNumber);
+
+			topPanelAllocationsNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousAllocations, d);
+					return function(t) {
+						return d < 1000 ? ~~(i(t)) : formatSIFloatWithoutUnit(i(t));
+					};
+				});
+
+			let topPanelAllocationsText = topPanel.main.selectAll(".covmaptopPanelAllocationsText")
+				.data([allocationsValue]);
+
+			topPanelAllocationsText = topPanelAllocationsText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelAllocationsText")
+				.attr("x", topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.text("Allocations")
+				.merge(topPanelAllocationsText)
+				.attr("y", function(d) {
+					return d < 1000 ? topPanel.height - topPanel.mainValueVerPadding * 2 :
+						topPanel.height - topPanel.mainValueVerPadding * 1.15;
+				});
+
+			let topPanelAllocationsSuperText = topPanel.main.selectAll(".covmaptopPanelAllocationsSuperText")
+				.data([allocationsValue]);
+
+			topPanelAllocationsSuperText = topPanelAllocationsSuperText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelAllocationsSuperText")
+				.attr("x", topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "");
+				})
+				.merge(topPanelAllocationsSuperText)
+				.style("opacity", function(d) {
+					return d < 1000 ? 0 : 1;
+				});
+
+			let topPanelCountriesNumber = topPanel.main.selectAll(".covmaptopPanelCountriesNumber")
+				.data([countriesValue]);
+
+			topPanelCountriesNumber = topPanelCountriesNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCountriesNumber")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+				.merge(topPanelCountriesNumber);
+
+			topPanelCountriesNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousCountries, d);
+					return function(t) {
+						return ~~(i(t))
+					};
+				});
+
+			const topPanelCountriesText = topPanel.main.selectAll(".covmaptopPanelCountriesText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCountriesText")
+				.attr("x", topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+				.text("Countries");
+
+			let topPanelBeneficiariesNumber = topPanel.main.selectAll(".covmaptopPanelBeneficiariesNumber")
+				.data([beneficiariesValue]);
+
+			topPanelBeneficiariesNumber = topPanelBeneficiariesNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesNumber")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
+				.merge(topPanelBeneficiariesNumber);
+
+			topPanelBeneficiariesNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousBeneficiaries, d);
+					return function(t) {
+						return formatSIFloatWithoutUnit(i(t))
+					};
+				});
+
+			let topPanelBeneficiariesText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesText")
+				.data([beneficiariesValue]);
+
+			topPanelBeneficiariesText = topPanelBeneficiariesText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesText")
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+				.merge(topPanelBeneficiariesText)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" People";
+				});
+
+			const topPanelBeneficiariesSubText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesSubText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesSubText")
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.15)
+				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+				.text("Targeted");
+
+			let topPanelCbpfNumber = topPanel.main.selectAll(".covmaptopPanelCbpfNumber")
+				.data([cbpfValue]);
+
+			topPanelCbpfNumber = topPanelCbpfNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCbpfNumber")
+				.attr("text-anchor", "end")
+				.style("fill", cbpfColor)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[3] - topPanel.mainValueHorPadding)
+				.merge(topPanelCbpfNumber);
+
+			topPanelCbpfNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousCbpf, d);
+					return function(t) {
+						return "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const topPanelCbpfText = topPanel.main.selectAll(".covmaptopPanelCbpfText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCbpfText")
+				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
+				.text("CBPF");
+
+			let topPanelCerfNumber = topPanel.main.selectAll(".covmaptopPanelCerfNumber")
+				.data([cerfValue]);
+
+			topPanelCerfNumber = topPanelCerfNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCerfNumber")
+				.attr("text-anchor", "start")
+				.style("fill", d3.color(cerfColor).darker(0.3))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[4] + topPanel.mainValueHorPadding)
+				.merge(topPanelCerfNumber);
+
+			topPanelCerfNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousCerf, d);
+					return function(t) {
+						return "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const topPanelCerfText = topPanel.main.selectAll(".covmaptopPanelCerfText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCerfText")
+				.attr("x", topPanel.leftPadding[4] - topPanel.mainValueHorPadding)
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
+				.text("CERF");
+
+			const dividingLine = topPanel.main.selectAll(".covmapdividingLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("y1", topPanel.linePadding)
+				.attr("y2", topPanel.height - topPanel.linePadding)
+				.attr("x1", (topPanel.leftPadding[3] + topPanel.leftPadding[4]) / 2)
+				.attr("x2", (topPanel.leftPadding[3] + topPanel.leftPadding[4]) / 2)
+				.style("stroke", "#ccc")
+				.style("stroke-width", "2px");
+
+			//end of createTopPanel
+		};
+
 		function createButtonsPanel(rawData) {
 
 			const clipPath = buttonsPanel.main.append("clipPath")
@@ -1069,7 +1211,7 @@
 				.style("cursor", "pointer");
 
 			const buttonsRects = buttonsGroup.selectAll(null)
-				.data(yearsArray)
+				.data(monthsArray)
 				.enter()
 				.append("rect")
 				.attr("rx", "2px")
@@ -1082,11 +1224,11 @@
 					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonsMargin / 2;
 				})
 				.style("fill", function(d) {
-					return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
+					return chartState.selectedMonth.indexOf(d) > -1 ? unBlue : "#eaeaea";
 				});
 
 			const buttonsText = buttonsGroup.selectAll(null)
-				.data(yearsArray)
+				.data(monthsArray)
 				.enter()
 				.append("text")
 				.attr("text-anchor", "middle")
@@ -1096,114 +1238,16 @@
 					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
 				})
 				.style("fill", function(d) {
-					return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
+					return chartState.selectedMonth.indexOf(d) > -1 ? "white" : "#444";
 				})
 				.text(function(d) {
-					return d;
+					return d === allData ? "All" : d;
 				});
-
-			const cbpfTitle = buttonsPanel.main.append("text")
-				.attr("class", "covmapcbpfTitle")
-				.attr("y", buttonsPanel.height / 1.6)
-				.attr("x", buttonsPanel.cbpfMargin)
-				.text("CBPF:");
-
-			const buttonsCbpfGroup = buttonsPanel.main.selectAll(null)
-				.data(cbpfAllocationTypes)
-				.enter()
-				.append("g")
-				.attr("class", "covmapbuttonsCbpfGroup")
-				.attr("transform", "translate(" + (buttonsPanel.cbpfButtonsMargin) + ",0)")
-				.style("cursor", "pointer");
-
-			const buttonsCbpfRects = buttonsCbpfGroup.append("rect")
-				.attr("rx", "2px")
-				.attr("ry", "2px")
-				.attr("class", "covmapbuttonsCbpfRects")
-				.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
-				.attr("y", buttonsPanel.buttonVerticalPadding)
-				.style("fill", function(d) {
-					return d === chartState.selectedCbpfAllocation ? cbpfColor : "#eaeaea";
-				});
-
-			const buttonsCbpfText = buttonsCbpfGroup.append("text")
-				.attr("class", "covmapbuttonsCbpfText")
-				.attr("font-family", "Arial")
-				.attr("font-size", 12)
-				.attr("y", buttonsPanel.height / 1.6)
-				.attr("x", buttonsPanel.buttonsPadding)
-				.style("fill", function(d) {
-					return d === chartState.selectedCbpfAllocation ? "white" : "#444";
-				})
-				.text(function(d) {
-					return capitalize(d);
-				})
-				.each(function() {
-					localVariable.set(this.parentNode, this.getComputedTextLength())
-				});
-
-			buttonsCbpfRects.each(function() {
-				d3.select(this)
-					.attr("width", localVariable.get(this.parentNode) + 2 * buttonsPanel.buttonsPadding);
-			});
-
-			buttonsCbpfGroup.each(function(_, i) {
-				d3.select(this).attr("transform", "translate(" + (i ? localVariable.get(this.previousSibling) : buttonsPanel.cbpfButtonsMargin) + ",0)")
-				localVariable.set(this, this.getBBox().width + buttonsPanel.buttonsMargin + (i ? localVariable.get(this.previousSibling) : buttonsPanel.cbpfButtonsMargin));
-			});
-
-			const cerfTitle = buttonsPanel.main.append("text")
-				.attr("class", "covmapcerfTitle")
-				.attr("y", buttonsPanel.height / 1.6)
-				.attr("x", buttonsPanel.cerfMargin)
-				.text("CERF:");
-
-			const buttonsCerfGroup = buttonsPanel.main.selectAll(null)
-				.data(cerfAllocationTypes)
-				.enter()
-				.append("g")
-				.attr("class", "covmapbuttonsCerfGroup")
-				.attr("transform", "translate(" + (buttonsPanel.cerfButtonsMargin) + ",0)")
-				.style("cursor", "pointer");
-
-			const buttonsCerfRects = buttonsCerfGroup.append("rect")
-				.attr("rx", "2px")
-				.attr("ry", "2px")
-				.attr("class", "covmapbuttonsCerfRects")
-				.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
-				.attr("y", buttonsPanel.buttonVerticalPadding)
-				.style("fill", function(d) {
-					return d === chartState.selectedCbpfAllocation ? d3.color(cerfColor).darker(0.4) : "#eaeaea";
-				});
-
-			const buttonsCerfText = buttonsCerfGroup.append("text")
-				.attr("class", "covmapbuttonsCerfText")
-				.attr("font-family", "Arial")
-				.attr("font-size", 12)
-				.attr("y", buttonsPanel.height / 1.6)
-				.attr("x", buttonsPanel.buttonsPadding)
-				.style("fill", function(d) {
-					return d === chartState.selectedCbpfAllocation ? "white" : "#444";
-				})
-				.text(function(d) {
-					return d === "rapidresponse" ? "Rapid Response" : capitalize(d);
-				})
-				.each(function() {
-					localVariable.set(this.parentNode, this.getComputedTextLength())
-				});
-
-			buttonsCerfRects.each(function() {
-				d3.select(this)
-					.attr("width", localVariable.get(this.parentNode) + 2 * buttonsPanel.buttonsPadding);
-			});
-
-			buttonsCerfGroup.each(function(_, i) {
-				d3.select(this).attr("transform", "translate(" + (i ? localVariable.get(this.previousSibling) : buttonsPanel.cerfButtonsMargin) + ",0)")
-				localVariable.set(this, this.getBBox().width + buttonsPanel.buttonsMargin + (i ? localVariable.get(this.previousSibling) : buttonsPanel.cerfButtonsMargin));
-			});
 
 			const leftArrow = buttonsPanel.main.append("g")
 				.attr("class", "covmapLeftArrowGroup")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
 				.style("cursor", "pointer")
 				.attr("transform", "translate(" + buttonsPanel.padding[3] + ",0)");
 
@@ -1221,6 +1265,8 @@
 
 			const rightArrow = buttonsPanel.main.append("g")
 				.attr("class", "covmapRightArrowGroup")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
 				.style("cursor", "pointer")
 				.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding +
 					(buttonsNumber * buttonsPanel.buttonWidth)) + ",0)");
@@ -1256,41 +1302,45 @@
 					};
 				});
 
-			buttonsCbpfRects.on("mouseover", mouseOverButtonsCbpfRects)
-				.on("mouseout", mouseOutButtonsCbpfRects);
+			if (monthsArray.length > buttonsNumber) {
 
-			buttonsCerfRects.on("mouseover", mouseOverButtonsCerfRects)
-				.on("mouseout", mouseOutButtonsCerfRects);
+				rightArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
 
-			repositionButtonsGroup();
+				leftArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
 
-			checkCurrentTranslate();
+				repositionButtonsGroup();
 
-			leftArrow.on("click", function() {
-				leftArrow.attr("pointer-events", "none");
-				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-				rightArrow.select("text").style("fill", "#666");
-				rightArrow.attr("pointer-events", "all");
-				buttonsGroup.transition()
-					.duration(duration)
-					.attr("transform", "translate(" +
-						Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
-					.on("end", checkArrows);
-			});
+				checkCurrentTranslate();
 
-			rightArrow.on("click", function() {
-				rightArrow.attr("pointer-events", "none");
-				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
-				leftArrow.select("text").style("fill", "#666");
-				leftArrow.attr("pointer-events", "all");
-				buttonsGroup.transition()
-					.duration(duration)
-					.attr("transform", "translate(" +
-						Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
-							(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
-						",0)")
-					.on("end", checkArrows);
-			});
+				leftArrow.on("click", function() {
+					leftArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
+						.on("end", checkArrows);
+				});
+
+				rightArrow.on("click", function() {
+					rightArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.max(-((monthsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
+								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
+							",0)")
+						.on("end", checkArrows);
+				});
+
+			};
 
 			function checkArrows() {
 
@@ -1304,7 +1354,7 @@
 					leftArrow.attr("pointer-events", "all");
 				};
 
-				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+				if (Math.abs(currentTranslate) >= ((monthsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
 					rightArrow.select("text").style("fill", "#ccc");
 					rightArrow.attr("pointer-events", "none");
 				} else {
@@ -1323,7 +1373,7 @@
 					leftArrow.attr("pointer-events", "none");
 				};
 
-				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+				if (Math.abs(currentTranslate) >= ((monthsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
 					rightArrow.select("text").style("fill", "#ccc")
 					rightArrow.attr("pointer-events", "none");
 				};
@@ -1332,11 +1382,11 @@
 
 			function repositionButtonsGroup() {
 
-				const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+				const firstYearIndex = monthsArray.indexOf(chartState.selectedMonth[0]) < buttonsNumber / 2 ?
 					0 :
-					chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-					yearsArray.length - buttonsNumber :
-					yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+					monthsArray.indexOf(chartState.selectedMonth[0]) > monthsArray.length - (buttonsNumber / 2) ?
+					Math.max(monthsArray.length - buttonsNumber, 0) :
+					monthsArray.indexOf(monthsArray.indexOf(chartState.selectedMonth[0])) - (buttonsNumber / 2);
 
 				buttonsGroup.attr("transform", "translate(" +
 					(-(buttonsPanel.buttonWidth * firstYearIndex)) +
@@ -1353,7 +1403,7 @@
 			};
 
 			function mouseOutButtonsRects(d) {
-				if (chartState.selectedYear.indexOf(d) > -1) return;
+				if (chartState.selectedMonth.indexOf(d) > -1) return;
 				d3.select(this).style("fill", "#eaeaea");
 				buttonsText.filter(function(e) {
 						return e === d
@@ -1361,58 +1411,30 @@
 					.style("fill", "#444");
 			};
 
-			function mouseOverButtonsCbpfRects(d) {
-				d3.select(this).style("fill", cbpfColor);
-				buttonsCbpfText.filter(function(e) {
-						return e === d
-					})
-					.style("fill", "white");
-			};
-
-			function mouseOutButtonsCbpfRects(d) {
-				if (d === chartState.selectedCbpfAllocation) return;
-				d3.select(this).style("fill", "#eaeaea");
-				buttonsCbpfText.filter(function(e) {
-						return e === d
-					})
-					.style("fill", "#444");
-			};
-
-			function mouseOverButtonsCerfRects(d) {
-				d3.select(this).style("fill", d3.color(cerfColor).darker(0.4));
-				buttonsCerfText.filter(function(e) {
-						return e === d
-					})
-					.style("fill", "white");
-			};
-
-			function mouseOutButtonsCerfRects(d) {
-				if (d === chartState.selectedCerfAllocation) return;
-				d3.select(this).style("fill", "#eaeaea");
-				buttonsCerfText.filter(function(e) {
-						return e === d
-					})
-					.style("fill", "#444");
-			};
-
 			function clickButtonsRects(d, singleSelection) {
 
-				if (singleSelection) {
-					chartState.selectedYear = [d];
+				if (singleSelection || d === allData) {
+					chartState.selectedMonth = [d];
 				} else {
-					const index = chartState.selectedYear.indexOf(d);
+					const index = chartState.selectedMonth.indexOf(d);
 					if (index > -1) {
-						if (chartState.selectedYear.length === 1) {
+						if (chartState.selectedMonth.length === 1) {
 							return;
 						} else {
-							chartState.selectedYear.splice(index, 1);
+							chartState.selectedMonth.splice(index, 1);
 						}
 					} else {
-						chartState.selectedYear.push(d);
+						chartState.selectedMonth.push(d);
 					};
 				};
 
-				const allYears = chartState.selectedYear.map(function(d) {
+				if (chartState.selectedMonth.indexOf(allData) > -1 && chartState.selectedMonth.length > 1) {
+					chartState.selectedMonth = chartState.selectedMonth.filter(function(d) {
+						return d !== allData;
+					});
+				};
+
+				const allYears = chartState.selectedMonth.map(function(d) {
 					return d;
 				}).join("|");
 
@@ -1423,14 +1445,16 @@
 				};
 
 				buttonsRects.style("fill", function(e) {
-					return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
+					return chartState.selectedMonth.indexOf(e) > -1 ? unBlue : "#eaeaea";
 				});
 
 				buttonsText.style("fill", function(e) {
-					return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
+					return chartState.selectedMonth.indexOf(e) > -1 ? "white" : "#444";
 				});
 
 				const data = processData(rawData);
+
+				createTopPanel(data);
 
 				createPies(data);
 
@@ -1441,69 +1465,13 @@
 				//end of clickButtonsRects
 			};
 
-			buttonsCbpfRects.on("click", function(d) {
-
-				chartState.selectedCbpfAllocation = d;
-
-				if (queryStringValues.has("cbpfallocation")) {
-					queryStringValues.set("cbpfallocation", d);
-				} else {
-					queryStringValues.append("cbpfallocation", d);
-				};
-
-				buttonsPanel.main.selectAll(".covmapbuttonsCbpfRects")
-					.style("fill", function(e) {
-						return e === chartState.selectedCbpfAllocation ? cbpfColor : "#eaeaea";
-					});
-
-				buttonsPanel.main.selectAll(".covmapbuttonsCbpfText")
-					.style("fill", function(e) {
-						return e === chartState.selectedCbpfAllocation ? "white" : "#444";
-					});
-
-				const data = processData(rawData);
-
-				createPies(data);
-
-				createLegend(data);
-
-			});
-
-			buttonsCerfRects.on("click", function(d) {
-
-				chartState.selectedCerfAllocation = d;
-
-				if (queryStringValues.has("cerfallocation")) {
-					queryStringValues.set("cerfallocation", d);
-				} else {
-					queryStringValues.append("cerfallocation", d);
-				};
-
-				buttonsPanel.main.selectAll(".covmapbuttonsCerfRects")
-					.style("fill", function(e) {
-						return e === chartState.selectedCerfAllocation ? d3.color(cerfColor).darker(0.4) : "#eaeaea";
-					});
-
-				buttonsPanel.main.selectAll(".covmapbuttonsCerfText")
-					.style("fill", function(e) {
-						return e === chartState.selectedCerfAllocation ? "white" : "#444";
-					});
-
-				const data = processData(rawData);
-
-				createPies(data);
-
-				createLegend(data);
-
-			});
-
 			//end of createButtonsPanel
 		};
 
 		function createPies(unfilteredData) {
 
 			const data = unfilteredData.filter(function(d) {
-				return d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation];
+				return d.cbpf + d.cerf;
 			});
 
 			zoom.on("zoom", zoomed);
@@ -1511,12 +1479,12 @@
 			const currentTransform = d3.zoomTransform(mapPanel.main.node());
 
 			data.sort(function(a, b) {
-				return (b["cbpf" + chartState.selectedCbpfAllocation] + b["cerf" + chartState.selectedCerfAllocation]) -
-					(a["cbpf" + chartState.selectedCbpfAllocation] + a["cerf" + chartState.selectedCerfAllocation]);
+				return (b.cbpf + b.cerf) -
+					(a.cbpf + a.cerf);
 			});
 
 			const maxValue = d3.max(data, function(d) {
-				return d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation];
+				return d.cbpf + d.cerf;
 			});
 
 			radiusScale.domain([0, maxValue || 0]);
@@ -1570,7 +1538,7 @@
 			const groupName = pieGroupEnter.append("text")
 				.attr("class", "covmapgroupName")
 				.attr("x", function(d) {
-					return radiusScale(d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation]) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				})
 				.attr("y", function(d) {
 					return d.labelText.length > 1 ? groupNamePadding * 2 - 5 : groupNamePadding * 2;
@@ -1583,7 +1551,7 @@
 				.each(function(d) {
 					if (d.labelText.length > 1) {
 						d3.select(this).append("tspan")
-							.attr("x", radiusScale(d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation]) + groupNamePadding)
+							.attr("x", radiusScale(d.cbpf + d.cerf) + groupNamePadding)
 							.attr("dy", 12)
 							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
 									return i > 1;
@@ -1601,7 +1569,7 @@
 				.duration(duration)
 				.style("opacity", chartState.showNames ? 1 : 0)
 				.attr("x", function(d) {
-					return radiusScale(d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation]) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
 			pieGroup.select("tspan")
@@ -1609,18 +1577,18 @@
 				.duration(duration)
 				.style("opacity", chartState.showNames ? 1 : 0)
 				.attr("x", function(d) {
-					return radiusScale(d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation]) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
 			let slices = pieGroup.selectAll(".covmapslice")
 				.data(function(d) {
 					return pieGenerator([{
-						value: d["cerf" + chartState.selectedCerfAllocation],
-						total: d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation],
+						value: d.cerf,
+						total: d.cbpf + d.cerf,
 						type: "cerf"
 					}, {
-						value: d["cbpf" + chartState.selectedCbpfAllocation],
-						total: d["cbpf" + chartState.selectedCbpfAllocation] + d["cerf" + chartState.selectedCerfAllocation],
+						value: d.cbpf,
+						total: d.cbpf + d.cerf,
 						type: "cbpf"
 					}].filter(function(e) {
 						return e.value !== 0;
@@ -1634,7 +1602,7 @@
 				.duration(duration)
 				.attrTween("d", function(d) {
 					const parentDatum = d3.select(this.parentNode).datum();
-					const thisTotal = radiusScale(parentDatum["cbpf" + chartState.selectedCbpfAllocation] + parentDatum["cerf" + chartState.selectedCerfAllocation]);
+					const thisTotal = radiusScale(parentDatum.cbpf + parentDatum.cerf);
 					const finalObject = d.data.type === "cerf" ? {
 						startAngle: 0,
 						endAngle: 0,
@@ -1701,8 +1669,9 @@
 				};
 			};
 
-			pieGroup.on("mouseover", pieGroupMouseover)
-				.on("mouseout", pieGroupMouseout);
+			pieGroup.on("mouseover", pieGroupMouseover);
+
+			zoomRectangle.on("mouseover", pieGroupMouseout);
 
 			function zoomed() {
 
@@ -1740,37 +1709,34 @@
 				tooltip.style("display", "block")
 					.html(null);
 
-				tooltip.append("div")
+				const innerTooltip = tooltip.append("div")
+					.attr("id", "covmapInnerTooltipDiv");
+
+				innerTooltip.append("div")
 					.style("margin-bottom", "10px")
 					.style("font-size", "16px")
-					.attr("class", "contributionColorHTMLcolor")
-					.style("width", "310px")
+					.style("color", "dimgray")
+					.style("width", "300px")
 					.append("strong")
 					.html(datum.country);
 
-				const tooltipContainer = tooltip.append("div")
+				const tooltipContainer = innerTooltip.append("div")
 					.style("margin", "0px")
 					.style("display", "flex")
 					.style("flex-wrap", "wrap")
-					.style("width", "310px");
+					.style("width", "300px");
 
 				const tooltipData = [{
-					title: "CBPF (" + chartState.selectedCbpfAllocation + ")",
-					property: "cbpf" + chartState.selectedCbpfAllocation,
+					title: "CBPF ",
+					property: "cbpf",
 					color: cbpfColor
 				}, {
-					title: "under approval",
-					property: "cbpf" + chartState.selectedCbpfAllocation + "underapproval",
-					color: cbpfColor
-				}, {
-					title: "CERF (" + (chartState.selectedCerfAllocation === "rapidresponse" ? "rapid response" : chartState.selectedCerfAllocation) + ")",
-					property: "cerf" + chartState.selectedCerfAllocation,
+					title: "CERF ",
+					property: "cerf",
 					color: d3.color(cerfColor).darker(0.4)
-				}, {
-					title: "under approval",
-					property: "cerf" + chartState.selectedCerfAllocation + "underapproval",
-					color: d3.color(cerfColor).darker(0.4)
-				}];
+				}].filter(function(e) {
+					return datum[e.property];
+				});
 
 				tooltipData.forEach(function(e, i) {
 					tooltipContainer.append("div")
@@ -1785,98 +1751,194 @@
 						.style("justify-content", "flex-end")
 						.style("color", e.color)
 						.style("margin-bottom", i === 1 ? "8px" : null)
-						.html("$" + formatMoney0Decimals(datum[e.property]).replace("G", "B"));
+						.html("$" + formatMoney0Decimals(datum[e.property]));
 				});
 
-				if (datum["cbpf" + chartState.selectedCbpfAllocation]) {
+				let selectedTooltipButton = null;
 
-					tooltip.append("div")
-						.style("margin-bottom", "4px")
-						.style("margin-top", "12px")
-						.style("font-size", "12px")
-						.attr("class", "contributionColorHTMLcolor")
-						.html("CBPF Partners:");
+				typesOfTargeted.some(function(target) {
+					let total = 0;
+					typesOfPeople.forEach(function(people) {
+						total += datum["target" + target + peopleScale(people)];
+					});
+					if (total) selectedTooltipButton = target;
+					return !!total;
+				});
 
-					const tooltipSvg = tooltip.append("svg")
+				const buttonsDiv = innerTooltip.append("div")
+					.attr("class", "covmapbuttonsDiv");
+
+				const buttonsTitle = innerTooltip.append("div")
+					.style("margin-bottom", selectedTooltipButton ? "0px" : "12px")
+					.style("margin-top", "0px")
+					.style("font-size", "12px")
+					.html(selectedTooltipButton ? "Targeted People: " + targetedScale(selectedTooltipButton) : "No targeted people");
+
+				if (selectedTooltipButton) {
+
+					const tooltipButtons = buttonsDiv.selectAll(null)
+						.data(typesOfTargeted)
+						.enter()
+						.append("button")
+						.attr("class", "covmaptooltipButtons")
+						.property("disabled", function(d) {
+							let total = 0;
+							typesOfPeople.forEach(function(e) {
+								total += datum["target" + d + peopleScale(e)];
+							});
+							return total ? false : true;
+						})
+						.style("cursor", function(d) {
+							let total = 0;
+							typesOfPeople.forEach(function(e) {
+								total += datum["target" + d + peopleScale(e)];
+							});
+							return total ? "pointer" : "default";
+						})
+						.html(function(d) {
+							return d === "HostCommunities" ? "Host" : targetedScale(d);
+						});
+
+					tooltipButtons.filter(function(d) {
+						return d === "Disable";
+					}).attr("id", "covmaptooltipButtonsDisabled");
+
+					tooltipButtons.on("click", function(d) {
+						if (selectedTooltipButton === d) return;
+						selectedTooltipButton = d;
+						buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
+						createTooltipSvg(selectedTooltipButton);
+					});
+
+					const tooltipSvg = innerTooltip.append("svg")
 						.attr("width", tooltipSvgWidth)
 						.attr("height", tooltipSvgHeight);
 
-					const svgData = partnerTypes.map(function(d) {
-						return {
-							partner: d,
-							value: datum["cbpf" + chartState.selectedCbpfAllocation + d]
-						};
-					}).sort(function(a, b) {
-						return b.value - a.value;
-					});
-
-					tooltipSvgYScale.domain(svgData.map(function(d) {
-						return d.partner;
-					}));
-
-					tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
-						return d.value;
-					})]);
-
 					const yAxisGroup = tooltipSvg.append("g")
 						.attr("class", "covmapTooltipSvgYAxisGroup")
-						.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)")
-						.call(tooltipSvgYAxis);
+						.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
 
 					const xAxisGroup = tooltipSvg.append("g")
 						.attr("class", "covmapTooltipSvgXAxisGroup")
-						.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")")
-						.call(tooltipSvgXAxis)
-						.selectAll(".tick")
-						.filter(function(d) {
-							return d === 0;
-						})
-						.remove();
+						.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
 
-					const cbpfGroups = tooltipSvg.selectAll(null)
-						.data(svgData)
-						.enter()
-						.append("g")
-						.attr("transform", function(d) {
-							return "translate(0," + tooltipSvgYScale(d.partner) + ")";
-						})
-						.each(function(d) {
-							d3.select(this).append("rect")
-								.attr("x", tooltipSvgPadding[3])
-								.attr("y", -stickHeight / 4)
-								.attr("height", stickHeight)
-								.attr("width", 0)
-								.style("fill", cbpfColor)
-								.transition()
-								.duration(duration)
-								.attr("width", tooltipSvgXScale(d.value) - tooltipSvgPadding[3]);
+					createTooltipSvg(selectedTooltipButton);
 
-							d3.select(this).append("circle")
-								.attr("cx", tooltipSvgPadding[3])
-								.attr("cy", (stickHeight / 4))
-								.attr("r", lollipopRadius)
-								.style("fill", cbpfColor)
-								.transition()
-								.duration(duration)
-								.attr("cx", tooltipSvgXScale(d.value));
+					function createTooltipSvg(selectedTargeted) {
 
-							d3.select(this).append("text")
-								.attr("class", "covmapcbpfLabel")
-								.attr("x", tooltipSvgXScale(0))
-								.attr("y", 4)
-								.text(formatNumberSI(0))
-								.transition()
-								.duration(duration)
-								.attr("x", tooltipSvgXScale(d.value) + labelPadding + lollipopRadius)
-								.textTween(function() {
-									const i = d3.interpolate(0, d.value);
-									return function(t) {
-										return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
-									};
-								});
-						})
+						const svgData = typesOfPeople.map(function(d) {
+							return {
+								people: peopleScale(d),
+								value: datum["target" + selectedTargeted + peopleScale(d)]
+							};
+						}).sort(function(a, b) {
+							return b.value - a.value;
+						});
+
+						tooltipSvgYScale.domain(svgData.map(function(d) {
+							return d.people;
+						}));
+
+						tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
+							return d.value;
+						})]);
+
+						if (tooltipSvgXScale.domain()[1] === 0) {
+							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
+						} else {
+							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
+						};
+
+						yAxisGroup.transition()
+							.duration(duration)
+							.call(tooltipSvgYAxis);
+
+						xAxisGroup.transition()
+							.duration(duration)
+							.call(tooltipSvgXAxis);
+
+						xAxisGroup.selectAll(".tick")
+							.filter(function(d) {
+								return d === 0;
+							})
+							.remove();
+
+						let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
+							.data(svgData);
+
+						const peopleGroupsEnter = peopleGroups.enter()
+							.append("g")
+							.attr("class", "covmappeopleGroups");
+
+						const peopleGroupStick = peopleGroupsEnter.append("rect")
+							.attr("x", tooltipSvgPadding[3])
+							.attr("y", -stickHeight / 4)
+							.attr("height", stickHeight)
+							.attr("width", 0)
+							.style("fill", cbpfColor);
+
+						const peopleGroupLollipop = peopleGroupsEnter.append("circle")
+							.attr("cx", tooltipSvgPadding[3])
+							.attr("cy", (stickHeight / 4))
+							.attr("r", lollipopRadius)
+							.style("fill", cbpfColor);
+
+						const peopleGroupLabel = peopleGroupsEnter.append("text")
+							.attr("class", "covmapcbpfLabel")
+							.attr("x", tooltipSvgXScale(0))
+							.attr("y", 4)
+							.text(formatNumberSI(0));
+
+						peopleGroups = peopleGroupsEnter.merge(peopleGroups);
+
+						peopleGroups.attr("transform", function(d) {
+							return "translate(0," + tooltipSvgYScale(d.people) + ")";
+						});
+
+						peopleGroups.select("rect")
+							.transition()
+							.duration(duration)
+							.attr("width", function(d) {
+								return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
+							});
+
+						peopleGroups.select("circle")
+							.transition()
+							.duration(duration)
+							.attr("cx", function(d) {
+								return tooltipSvgXScale(d.value);
+							});
+
+						peopleGroups.select("text")
+							.transition()
+							.duration(duration)
+							.attr("x", function(d) {
+								return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
+							})
+							.textTween(function(d) {
+								const i = d3.interpolate(0, d.value);
+								return function(t) {
+									return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
+								};
+							});
+
+						//end of createTooltipSvg 
+					};
 
 				};
+
+				const tooltipDetailsButtonDiv = innerTooltip.append("div")
+					.attr("class", "covmaptooltipDetailsButtonDiv");
+
+				const tooltipDetailsButton = tooltipDetailsButtonDiv.append("button")
+					.html("Display Details")
+					.on("click", function() {
+						tooltip.style("display", "none");
+						generateList(datum);
+						listContainerDiv.node().scrollIntoView({
+							behavior: "smooth"
+						});
+					});
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -1887,12 +1949,11 @@
 				const thisOffsetTop = (thisBox.bottom + thisBox.top) / 2 - containerBox.top - (tooltipBox.height / 2);
 
 				const thisOffsetLeft = containerBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					thisBox.right - containerBox.left + tooltipMargin :
+					(thisBox.left + 2 * radiusScale(datum.cbpf + datum.cerf)) - containerBox.left + tooltipMargin :
 					thisBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
-
 
 			};
 
@@ -1924,8 +1985,8 @@
 				.append("text")
 				.attr("class", "covmaplegendTitle")
 				.attr("x", legendPanel.padding[3])
-				.attr("y", legendPanel.padding[0] - 10)
-				.text("Legend");
+				.attr("y", legendPanel.padding[0] - 18)
+				.text("LEGEND");
 
 			let legendSizeGroups = legendPanel.main.selectAll(".covmaplegendSizeGroups")
 				.data([true]);
@@ -1944,7 +2005,7 @@
 
 			const legendSizeLines = legendSizeGroupEnter.append("line")
 				.attr("x1", legendPanel.padding[3] + radiusScale.range()[1])
-				.attr("x2", legendPanel.padding[3] + radiusScale.range()[1] + 30)
+				.attr("x2", legendPanel.padding[3] + radiusScale.range()[1] + 38)
 				.attr("y1", function(d) {
 					return d ? legendPanel.padding[0] + (radiusScale.range()[1] * 2) - radiusScale(d) * 2 :
 						legendPanel.padding[0] + (radiusScale.range()[1] * 2);
@@ -1970,7 +2031,7 @@
 
 			const legendSizeCirclesText = legendSizeGroupEnter.append("text")
 				.attr("class", "covmaplegendCirclesText")
-				.attr("x", legendPanel.padding[3] + radiusScale.range()[1] + 34)
+				.attr("x", legendPanel.padding[3] + radiusScale.range()[1] + 42)
 				.attr("y", function(d, i) {
 					return i === 1 ? legendPanel.padding[0] + 5 + (radiusScale.range()[1] * 2) - radiusScale(d) * 2 :
 						i ? legendPanel.padding[0] + 3 + (radiusScale.range()[1] * 2) - radiusScale(d) * 2 :
@@ -1998,12 +2059,12 @@
 				.append("g")
 				.attr("class", "covmaplegendColors")
 				.attr("transform", function(_, i) {
-					return "translate(" + (legendPanel.padding[3] + i * 44) + "," + (legendPanel.height - legendPanel.padding[2]) + ")";
+					return "translate(" + legendPanel.padding[3] + "," + (legendPanel.height - legendPanel.padding[2] - (+i * 18)) + ")";
 				});
 
 			legendColors.append("rect")
-				.attr("width", 8)
-				.attr("height", 8)
+				.attr("width", 10)
+				.attr("height", 10)
 				.attr("rx", 1)
 				.attr("ry", 1)
 				.style("stroke-width", "0.5px")
@@ -2013,26 +2074,235 @@
 				});
 
 			legendColors.append("text")
-				.attr("x", 10)
-				.attr("y", 8)
+				.attr("x", 14)
+				.attr("y", 9)
 				.text(function(d) {
-					return d.toUpperCase();
+					return d.toUpperCase() + " Allocations";
 				});
 
 			//end of createLegend
 		};
 
+		function generateList(data) {
+
+			yearsDescriptionDiv.html(null);
+
+			listContainerDiv.html("")
+				.style("display", "block");
+
+			const listTopDivContainer = listContainerDiv.append("div")
+				.attr("class", "covmaplistTopDivContainer");
+
+			const listTopDivTitleDiv = listTopDivContainer.append("div")
+				.attr("class", "covmaplistTopDivTitleDiv")
+				.html("Allocation Details");
+
+			const listTopDivButtonDiv = listTopDivContainer.append("div")
+				.attr("class", "covmaplistTopDivButtonDiv");
+
+			const listTopDivButton = listTopDivButtonDiv.append("button")
+				.html("Remove this list")
+				.on("click", function() {
+					listContainerDiv.html("")
+						.style("display", "none");
+					setYearsDescriptionDiv();
+					containerDiv.node().scrollIntoView({
+						behavior: "smooth"
+					});
+				});
+
+			const allocationContainerDiv = listContainerDiv.selectAll(null)
+				.data(data.allocationsList)
+				.enter()
+				.append("div")
+				.attr("class", "covmapallocationContainerDiv");
+
+			const allocationTitle = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationTitle")
+				.style("background-color", function(d) {
+					return d.PFType === "CBPF" ? cbpfColor : d3.color(cerfColor).darker(0.3);
+				})
+				.html(function(d) {
+					return d.PFType + " &mdash; " + d.Country;
+				});
+
+			const allocationHeaderDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationHeaderDiv");
+
+			const allocationTitleDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationTitleDiv");
+
+			const allocationSourceDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationSourceDiv");
+
+			const allocationDateDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationDateDiv");
+
+			const allocationTitleDivText = allocationTitleDiv.append("div")
+				.attr("class", "covmapallocationTitleDivText")
+				.html("Allocation Title");
+
+			const allocationSourceDivText = allocationSourceDiv.append("div")
+				.attr("class", "covmapallocationSourceDivText")
+				.html("Allocation Source");
+
+			const allocationDateDivText = allocationDateDiv.append("div")
+				.attr("class", "covmapallocationDateDivText")
+				.html("Date of launch");
+
+			const allocationTitleDivValue = allocationTitleDiv.append("div")
+				.attr("class", "covmapallocationTitleDivValue")
+				.html(function(d) {
+					return d.AllocTitle || "Not available";
+				});
+
+			const allocationSourceDivValue = allocationSourceDiv.append("div")
+				.attr("class", "covmapallocationSourceDivValue")
+				.html(function(d) {
+					return d.TypeOfAlloc || "Not available";
+				});
+
+			const allocationDateDivValue = allocationDateDiv.append("div")
+				.attr("class", "covmapallocationDateDivValue")
+				.html(function(d) {
+					return timeFormatList(new Date(d.DateOfAlloc)) || "Not available";
+				});
+
+			const allocationThemeDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationThemeDiv");
+
+			const allocationSummaryDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationSummaryDiv");
+
+			const locationSummaryDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmaplocationSummaryDiv");
+
+			const allocationThemeDivText = allocationThemeDiv.append("div")
+				.attr("class", "covmapallocationThemeDivText")
+				.html("Allocation Theme");
+
+			const allocationSummaryDivText = allocationSummaryDiv.append("div")
+				.attr("class", "covmapallocationSummaryDivText")
+				.html("Allocation Summary");
+
+			const locationSummaryDivText = locationSummaryDiv.append("div")
+				.attr("class", "covmaplocationSummaryDivText")
+				.html("Location Summary");
+
+			const allocationThemeDivValue = allocationThemeDiv.append("div")
+				.attr("class", "covmapallocationThemeDivValue")
+				.html(function(d) {
+					return d.AllocTheme || "Not available";
+				});
+
+			const allocationSummaryDivValue = allocationSummaryDiv.append("div")
+				.attr("class", "covmapallocationSummaryDivValue")
+				.html(function(d) {
+					return d.AllocSummary || "Not available";
+				});
+
+			const locationSummaryDivValue = locationSummaryDiv.append("div")
+				.attr("class", "covmaplocationSummaryDivValue")
+				.html(function(d) {
+					return d.AllocLocation || "Not available";
+				});
+
+			const affectedPersonsContainerDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapaffectedPersonsContainerDiv");
+
+			const affectedPersonsContainerText = affectedPersonsContainerDiv.append("div")
+				.attr("class", "covmapaffectedPersonsContainerText")
+				.html("Affected Persons");
+
+			affectedPersonsContainerDiv.each(function(d) {
+				const tableData = typesOfTargeted.map(function(e) {
+					const obj = {
+						targeted: e,
+						Total: 0
+					};
+					typesOfPeople.forEach(function(f) {
+						obj[peopleScale(f)] = +d["Target" + e + f];
+						obj.Total += +d["Target" + e + f];
+					});
+					return obj;
+				});
+				const tableDataFiltered = tableData.filter(function(d) {
+					const thisSum = typesOfPeople.reduce(function(acc, curr) {
+						acc += d[peopleScale(curr)];
+						return acc;
+					}, 0);
+					return thisSum;
+				});
+				if (!tableDataFiltered.length) {
+					const affectedPersonsContainerValue = d3.select(this).append("div")
+						.attr("class", "covmapaffectedPersonsContainerValue")
+						.html("No Affected Persons");
+				} else {
+
+					const thisDiv = d3.select(this);
+
+					const dataWithoutDisabled = tableDataFiltered.filter(function(d) {
+						return d.targeted !== "Disable";
+					});
+					const disabledData = tableDataFiltered.filter(function(d) {
+						return d.targeted === "Disable";
+					});
+
+					const withoutDisabledHeaderDiv = thisDiv.append("div")
+						.attr("class", "covmapwithoutDisabledHeaderDiv");
+
+					const headers = ["Affected Person Type"].concat(typesOfPeople.map(function(d) {
+						return peopleScale(d);
+					}));
+
+					headers.push("Total");
+
+					headers.forEach(function(d) {
+						withoutDisabledHeaderDiv.append("div")
+							.attr("class", "covmapwithoutDisabledHeaderDivText")
+							.html(d);
+					});
+
+					dataWithoutDisabled.forEach(function(d, i) {
+						const withoutDisabledHeaderValues = thisDiv.append("div")
+							.attr("class", "covmapwithoutDisabledHeaderValues")
+							.style("background-color", i % 2 ? "#e6e6e6" : null);
+						headers.forEach(function(e, i) {
+							withoutDisabledHeaderValues.append("div")
+								.attr("class", "covmapwithoutDisabledHeaderValuesText")
+								.html(!i ? targetedScale(d.targeted) : d[peopleScale(e)]);
+						});
+					});
+
+					disabledData.forEach(function(d, i) {
+						const disabledHeaderValues = thisDiv.append("div")
+							.attr("class", "covmapdisabledHeaderValues")
+							.style("margin-top", "12px")
+						headers.forEach(function(e, i) {
+							disabledHeaderValues.append("div")
+								.attr("class", "covmapdisabledHeaderValuesText")
+								.html(!i ? "Persons with disabilities" : d[peopleScale(e)]);
+						});
+					});
+
+				};
+			});
+
+			//end of generateList
+		};
+
 		function preProcessData(rawData) {
 
 			rawData.forEach(function(row) {
-				if (yearsArray.indexOf(+row.AllocationYear) === -1) yearsArray.push(+row.AllocationYear);
-				if (!countryNames[row.PooledFundIso] && row.PooledFundIso) countryNames[row.PooledFundIso] = row.PooledFundName;
-				if (row.FundType.toLowerCase() === "cbpf" && partnerTypes.indexOf(row.OrganizationType) === -1) partnerTypes.push(row.OrganizationType);
+				if (monthsArray.indexOf(timeFormat(new Date(row.DateOfAlloc))) === -1) monthsArray.push(timeFormat(new Date(row.DateOfAlloc)));
+				if (!countryNames[row.ISO2Country] && row.ISO2Country) countryNames[row.ISO2Country] = row.Country;
 			});
 
-			yearsArray.sort(function(a, b) {
-				return a - b;
+			monthsArray.sort(function(a, b) {
+				return timeParserButtons(a) - timeParserButtons(b);
 			});
+
+			monthsArray.push(allData);
 
 			//end of preProcessData
 		};
@@ -2042,39 +2312,40 @@
 			const data = [];
 
 			rawData.forEach(function(row) {
-				if (chartState.selectedYear.indexOf(+row.AllocationYear) > -1 && row.PooledFundIso) {
-					if (chartState.countriesInData.indexOf(row.PooledFundIso) === -1) chartState.countriesInData.push(row.PooledFundIso);
+				if (chartState.selectedMonth[0] === allData || (chartState.selectedMonth.indexOf(timeFormat(new Date(row.DateOfAlloc))) > -1 && row.ISO2Country)) {
+
+					if (chartState.countriesInData.indexOf(row.ISO2Country) === -1) chartState.countriesInData.push(row.ISO2Country);
 
 					const foundCountry = data.find(function(d) {
-						return d.isoCode === row.PooledFundIso;
+						return d.isoCode === row.ISO2Country;
 					});
 
 					if (foundCountry) {
+						foundCountry.allocationsList.push(row);
+						typesOfTargeted.forEach(function(target) {
+							typesOfPeople.forEach(function(people) {
+								foundCountry["target" + target + peopleScale(people)] += +row["Target" + target + people];
+								foundCountry.targetTotal += +row["Target" + target + people];
+							});
+						});
 						pushCbpfOrCerf(foundCountry, row);
 					} else {
 						const countryObject = {
-							country: row.PooledFundName,
-							labelText: row.PooledFundName.split(" "),
-							isoCode: row.PooledFundIso,
-							cbpfstandard: 0,
-							cbpfreserve: 0,
-							cbpftotal: 0,
-							cbpfstandardunderapproval: 0,
-							cbpfreserveunderapproval: 0,
-							cbpftotalunderapproval: 0,
-							cerfrapidresponse: 0,
-							cerfunderfunded: 0,
-							cerftotal: 0,
-							cerfrapidresponseunderapproval: 0,
-							cerfunderfundedunderapproval: 0,
-							cerftotalunderapproval: 0,
+							country: row.Country.trim(),
+							labelText: row.Country.split(" "),
+							isoCode: row.ISO2Country,
+							cbpf: 0,
+							cerf: 0,
+							targetTotal: 0,
+							allocationsList: [row]
 						};
-						partnerTypes.forEach(function(partner) {
-							countryObject["cbpfstandard" + partner] = 0;
-							countryObject["cbpfreserve" + partner] = 0;
-							countryObject["cbpftotal" + partner] = 0;
-						});
 						pushCbpfOrCerf(countryObject, row);
+						typesOfTargeted.forEach(function(target) {
+							typesOfPeople.forEach(function(people) {
+								countryObject["target" + target + peopleScale(people)] = +row["Target" + target + people];
+								countryObject.targetTotal += +row["Target" + target + people];
+							});
+						});
 						data.push(countryObject);
 					};
 				};
@@ -2083,74 +2354,70 @@
 			return data;
 
 			function pushCbpfOrCerf(obj, row) {
-				if (row.FundType.toLowerCase() === "cbpf") {
-					obj.cbpfstandard += +row.ApprovedStandardBudget;
-					obj.cbpfreserve += +row.ApprovedReserveBudget;
-					obj.cbpftotal += (+row.ApprovedStandardBudget) + (+row.ApprovedReserveBudget);
-					obj.cbpfstandardunderapproval += +row.PipelineStandardBudget;
-					obj.cbpfreserveunderapproval += +row.PipelineReserveBudget;
-					obj.cbpftotalunderapproval += (+row.PipelineStandardBudget) + (+row.PipelineReserveBudget);
-					obj["cbpfstandard" + row.OrganizationType] += +row.ApprovedStandardBudget;
-					obj["cbpfreserve" + row.OrganizationType] += +row.ApprovedReserveBudget;
-					obj["cbpftotal" + row.OrganizationType] += (+row.ApprovedStandardBudget) + (+row.ApprovedReserveBudget);
-				} else if (row.FundType.toLowerCase() === "cerf") {
-					obj.cerfrapidresponse += +row.ApprovedRrBudget;
-					obj.cerfunderfunded += +row.ApprovedUnderfundedBudget;
-					obj.cerftotal += (+row.ApprovedRrBudget) + (+row.ApprovedUnderfundedBudget);
-					obj.cerfrapidresponseunderapproval += +row.PipelineRrBudget;;
-					obj.cerfunderfundedunderapproval += +row.PipelineUnderfundedBudget;;
-					obj.cerftotalunderapproval += (+row.PipelineRrBudget) + (+row.PipelineUnderfundedBudget);;
+				if (row.PFType.toLowerCase() === "cbpf") {
+					obj.cbpf += +row.TargetAmt;
+				} else if (row.PFType.toLowerCase() === "cerf") {
+					obj.cerf += +row.TargetAmt;
 				};
 			};
 
 			//end of processData
 		};
 
-		function createCsv(datahere) {
+		function createCsv(rawData) {
 
-			const csv = d3.csvFormat(changedDataHere);
+			const data = processData(rawData);
+
+			data.forEach(function(row){
+				delete row.allocationsList;
+				delete row.labelText;
+			});
+
+			const csv = d3.csvFormat(data);
 
 			return csv;
 		};
 
 		function setYearsDescriptionDiv() {
 			yearsDescriptionDiv.html(function() {
-				if (chartState.selectedYear.length === 1) return null;
-				const yearsList = chartState.selectedYear.sort(function(a, b) {
+				if (chartState.selectedMonth[0] === allData) return "\u002AAggregated data for all months.";
+				if (chartState.selectedMonth.length === 1) return null;
+				const yearsList = chartState.selectedMonth.sort(function(a, b) {
 					return a - b;
 				}).reduce(function(acc, curr, index) {
-					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
 				}, "");
-				return "\u002ASelected years: " + yearsList;
+				return "\u002ASelected months: " + yearsList;
 			});
-		};
-
-		function validateYear(yearString) {
-			const allYears = yearString.split(",").map(function(d) {
-				return +(d.trim());
-			}).sort(function(a, b) {
-				return a - b;
-			});
-			allYears.forEach(function(d) {
-				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
-			});
-			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function verifyCentroids(rawData) {
 			rawData.forEach(function(row) {
-				if (!centroids[row.PooledFundIso]) {
-					centroids[row.PooledFundIso] = {
+				if (!centroids[row.ISO2Country]) {
+					centroids[row.ISO2Country] = {
 						x: mapProjection([0, 0])[0],
 						y: mapProjection([0, 0])[1]
 					};
-					console.warn("Attention: " + row.PooledFundIso + "(" + row.PooledFundName + ") has no centroid");
+					console.warn("Attention: " + row.ISO2Country + "(" + row.Country + ") has no centroid");
 				};
 			});
 		};
 
 		function capitalize(str) {
 			return str[0].toUpperCase() + str.substring(1)
+		};
+
+		function formatSIFloat(value) {
+			const length = (~~Math.log10(value) + 1) % 3;
+			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
+			return d3.formatPrefix("." + digits, value)(value);
+		};
+
+		function formatSIFloatWithoutUnit(value) {
+			const length = (~~Math.log10(value) + 1) % 3;
+			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
+			const returnValue = d3.formatPrefix("." + digits, value)(value)
+			return returnValue.substring(0, returnValue.length - 1);
 		};
 
 		function parseTransform(translate) {
@@ -2307,11 +2574,7 @@
 
 			setSvgStyles(svg.node());
 
-			if (type === "png") {
-				iconsDiv.style("opacity", 0);
-			} else {
-				topDiv.style("opacity", 0)
-			};
+			iconsDiv.style("opacity", 0);
 
 			snapshotTooltip.style("display", "none");
 
@@ -2320,11 +2583,7 @@
 				svg.attr("width", null)
 					.attr("height", null);
 
-				if (type === "png") {
-					iconsDiv.style("opacity", 1);
-				} else {
-					topDiv.style("opacity", 1)
-				};
+				iconsDiv.style("opacity", 1);
 
 				if (type === "png") {
 					downloadSnapshotPng(canvas);
@@ -2358,7 +2617,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "covmap_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "Covid19Allocations_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -2390,7 +2649,7 @@
 				right: 30
 			};
 
-			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/cbpf-cerf-logo.png")
 				.then(function(logo) {
 
 					let pdf;
@@ -2418,7 +2677,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("TEXT HERE.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("CBPF and CERF allocations related to COVID-19 pandemic.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
@@ -2428,29 +2687,29 @@
 					pdf.setFont('helvetica');
 					pdf.setFontType("normal");
 					pdf.setFontSize(12);
-					pdf.text(pdfMargins.left, 48, intro);
+					pdf.text(pdfMargins.left, 60, intro);
 
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
-					pdf.text(chartTitle, pdfMargins.left, 65);
+					pdf.text("COVID-19 Allocations", pdfMargins.left, 44);
 
 					pdf.setFontSize(12);
 
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70, {
+						fullDate + "</span></div>", pdfMargins.left, 64, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
 							pdfTextPosition = position;
 						});
 
-					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 6, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
 
-					pdf.save("covmap_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("Covid19Allocations_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
@@ -2472,7 +2731,7 @@
 						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
 						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
 
-						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top + 2, 90, 14);
 
 						pdf.setFillColor(236, 161, 84);
 						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");

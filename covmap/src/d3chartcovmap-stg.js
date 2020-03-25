@@ -5,7 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
 		topoJsonUrl = "https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -595,31 +595,6 @@
 		};
 
 		function draw(rawData, mapData) {
-
-			//TEST
-			// topPanel.main.append("rect")
-			// 	.attr("width", topPanel.width)
-			// 	.attr("height", topPanel.height)
-			// 	.style("opacity", 0.15);
-			// buttonsPanel.main.append("rect")
-			// 	.attr("width", buttonsPanel.width)
-			// 	.attr("height", buttonsPanel.height)
-			// 	.style("opacity", 0.15);
-			// mapLayer.append("rect")
-			// 	.attr("width", mapPanel.width)
-			// 	.attr("height", mapPanel.height)
-			// 	.style("opacity", 0.15);
-			// legendPanel.main.append("rect")
-			// 	.attr("width", legendPanel.width)
-			// 	.attr("height", legendPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.15);
-			// mapZoomButtonPanel.main.append("rect")
-			// 	.attr("width", mapZoomButtonPanel.width)
-			// 	.attr("height", mapZoomButtonPanel.height)
-			// 	.style("fill", "blue")
-			// 	.style("opacity", 0.15);
-			//TEST
 
 			const data = processData(rawData);
 
