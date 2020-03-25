@@ -45,7 +45,7 @@
 	align-items: center;
 	margin-right: 16px;
 	position: absolute;
-	top: 11.25%;
+	margin-top: 6.35%;
 }
 
 .covmapIconsDiv button {
@@ -151,8 +151,8 @@
 	pointer-events: none;
 	fill: darkslategray;
 	paint-order: stroke;
-    stroke: white;
-    stroke-width: 2px;
+	stroke: white;
+	stroke-width: 2px;
 }
 
 .covmapzoomPath {
@@ -184,7 +184,10 @@
 
 .covmapbuttonsDiv {
 	display: flex;
-	margin-bottom: 4px;
+	width: 100%;
+	margin-bottom: 2px;
+	margin-top: 12px;
+	justify-content: space-between;
 }
 
 .covmaptooltipButtons {
@@ -197,8 +200,6 @@
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border: 1px solid rgba(0,0,0,0.5);
-	margin-left: 0px;
-	margin-right: 5px;
   }
 
  .covmaptooltipButtons:disabled {
@@ -234,6 +235,42 @@
 
 #covmaptooltipButtonsDisabled:hover:enabled {
 	background-color: #444;
+}
+
+.covmaptooltipDetailsButtonDiv {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.covmaptooltipDetailsButtonDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 2px 8px 2px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.covmaptooltipDetailsButtonDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.covmaptooltipDetailsButtonDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.covmaptooltipDetailsButtonDiv button:focus {
+	outline: none;
 }
 
 .covmaptopPanelAllocationsText, .covmaptopPanelAllocationsSuperText, .covmaptopPanelCountriesText, .covmaptopPanelBeneficiariesText, .covmaptopPanelBeneficiariesSubText {
@@ -289,6 +326,169 @@
 	font-size: 15px;
 	fill: #222;
 	pointer-events: none;
+}
+
+html{
+	scroll-behavior: smooth;
+}
+
+.covmaplistContainerDiv {
+	width: 100%;
+	border: 1px solid #eee;
+	padding: 10px;
+	background-color: #f5f5f5;
+	margin-top: 10px;
+	border-radius: 5px;
+	white-space: pre-wrap;
+}
+
+.covmaplistTopDivContainer {
+	width: 100%;
+	display: flex;
+	border-bottom: 1px dotted #ccc;
+	margin-top: 0;
+}
+
+.covmaplistTopDivTitleDiv {
+	font-size: 20px;
+	font-family: "Arial", sans-serif;
+	color: #e27628;
+	flex:0 80%;
+	align-content: center;
+	margin-bottom: 5px;
+}
+
+.covmaplistTopDivButtonDiv {
+	margin-right: 0;
+	margin-bottom: 5px;
+	font-family: "Arial", sans-serif;
+	flex:0 20%;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.covmaplistTopDivButtonDiv button, .covmaptooltipDetailsButtonDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: darkslategray;
+	background-color: white;
+	padding: 2px 8px 2px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.covmaplistTopDivButtonDiv button:hover, .covmaptooltipDetailsButtonDiv button:hover {
+	background-color: whitesmoke;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.covmaplistTopDivButtonDiv button:active, .covmaptooltipDetailsButtonDiv button: active {
+	background-color: gainsboro;
+	border-color: rgba(0,0,0,1);
+}
+
+.covmaplistTopDivButtonDiv button:focus, .covmaptooltipDetailsButtonDiv button:focus {
+	outline: none;
+}
+
+.covmapallocationContainerDiv {
+	width: 100%;
+	margin-bottom: 12px;
+}
+
+.covmapallocationTitle {
+	margin-top: 12px;
+	margin-bottom: 8px;
+	border-radius: 6px;
+	padding: 3px 6px 3px 6px;
+	display: inline-block;
+	min-width: 35%;
+	color: white;
+	font-size: 22px;
+}
+
+.covmapallocationHeaderDiv {
+	width: 100%;
+	display: flex;
+	margin-bottom: 8px;
+}
+
+.covmapallocationTitleDiv {
+	display: flex;
+	flex-direction: column;
+	flex:0 50%;
+	justify-content: center;
+	align-items: center;
+}
+
+.covmapallocationSourceDiv {
+	display: flex;
+	flex-direction: column;
+	flex:0 25%;
+	justify-content: center;
+	align-items: center;
+}
+
+.covmapallocationDateDiv {
+	display: flex;
+	flex-direction: column;
+	flex:0 25%;
+	justify-content: center;
+	align-items: center;
+}
+
+.covmapallocationTitleDivText, .covmapallocationSourceDivText, .covmapallocationDateDivText, .covmapallocationThemeDivText, .covmapallocationSummaryDivText, .covmaplocationSummaryDivText, .covmapaffectedPersonsContainerText {
+	width: 100%;
+	color: #222;
+	font-weight: 700;
+	font-size: 14px;
+	margin-bottom: 4px;
+}
+
+.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue {
+	width: 100%;
+	color: #444;
+	font-size: 12px;
+}
+
+.covmapallocationThemeDiv, .covmapallocationSummaryDiv, .covmapalocationSummaryDiv {
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+.covmapaffectedPersonsContainerDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.covmapwithoutDisabledHeaderDiv, .covmapdisabledHeaderValues {
+	width: 100%;
+	display: flex;
+	font-size: 12px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	background-color: #e6e6e6;
+}
+
+.covmapwithoutDisabledHeaderValues {
+	width: 100%;
+	display: flex;
+	font-size: 12px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.covmapwithoutDisabledHeaderDivText, .covmapwithoutDisabledHeaderValuesText, .covmapdisabledHeaderValuesText {
+	flex:0 16.65%;
+	color: #222;
+	font-size: 12px;
 }
 
 #covmapSnapshotTooltip {

@@ -206,8 +206,9 @@
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
 			timeParser = d3.timeParse("%d/%m/%y"),
-			timeFormat = d3.timeFormat("%b/%y"),
-			timeParserButtons = d3.timeParse("%b-%Y"),
+			timeFormat = d3.timeFormat("%b-%y"),
+			timeParserButtons = d3.timeParse("%b-%y"),
+			timeFormatList = d3.timeFormat("%d %B, %Y"),
 			vizNameQueryString = "allocationsmap",
 			allData = "allData",
 			dataUrl = "covmapdata.csv",
@@ -300,6 +301,10 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		};
+
+		const listContainerDiv = containerDiv.append("div")
+			.attr("class", "covmaplistContainerDiv")
+			.style("display", "none");
 
 		const footerDiv = containerDiv.append("div")
 			.attr("class", "covmapFooterDiv");
@@ -1787,16 +1792,16 @@
 					return !!total;
 				});
 
+				const buttonsDiv = innerTooltip.append("div")
+					.attr("class", "covmapbuttonsDiv");
+
 				const buttonsTitle = innerTooltip.append("div")
-					.style("margin-bottom", "4px")
-					.style("margin-top", "12px")
+					.style("margin-bottom", selectedTooltipButton ? "0px" : "12px")
+					.style("margin-top", "0px")
 					.style("font-size", "12px")
 					.html(selectedTooltipButton ? "Targeted People: " + targetedScale(selectedTooltipButton) : "No targeted people");
 
 				if (selectedTooltipButton) {
-
-					const buttonsDiv = innerTooltip.append("div")
-						.attr("class", "covmapbuttonsDiv")
 
 					const tooltipButtons = buttonsDiv.selectAll(null)
 						.data(typesOfTargeted)
@@ -1949,6 +1954,19 @@
 
 				};
 
+				const tooltipDetailsButtonDiv = innerTooltip.append("div")
+					.attr("class", "covmaptooltipDetailsButtonDiv");
+
+				const tooltipDetailsButton = tooltipDetailsButtonDiv.append("button")
+					.html("Display Details")
+					.on("click", function() {
+						tooltip.style("display", "none");
+						generateList(datum);
+						listContainerDiv.node().scrollIntoView({
+							behavior: "smooth"
+						});
+					});
+
 				const thisBox = this.getBoundingClientRect();
 
 				const containerBox = containerDiv.node().getBoundingClientRect();
@@ -1963,7 +1981,6 @@
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
-
 
 			};
 
@@ -2091,6 +2108,214 @@
 				});
 
 			//end of createLegend
+		};
+
+		function generateList(data) {
+
+			yearsDescriptionDiv.html(null);
+
+			listContainerDiv.html("")
+				.style("display", "block");
+
+			const listTopDivContainer = listContainerDiv.append("div")
+				.attr("class", "covmaplistTopDivContainer");
+
+			const listTopDivTitleDiv = listTopDivContainer.append("div")
+				.attr("class", "covmaplistTopDivTitleDiv")
+				.html("Allocation Details");
+
+			const listTopDivButtonDiv = listTopDivContainer.append("div")
+				.attr("class", "covmaplistTopDivButtonDiv");
+
+			const listTopDivButton = listTopDivButtonDiv.append("button")
+				.html("Remove this list")
+				.on("click", function() {
+					listContainerDiv.html("")
+						.style("display", "none");
+					setYearsDescriptionDiv();
+					containerDiv.node().scrollIntoView({
+						behavior: "smooth"
+					});
+				});
+
+			const allocationContainerDiv = listContainerDiv.selectAll(null)
+				.data(data.allocationsList)
+				.enter()
+				.append("div")
+				.attr("class", "covmapallocationContainerDiv");
+
+			const allocationTitle = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationTitle")
+				.style("background-color", function(d) {
+					return d.PFType === "CBPF" ? cbpfColor : d3.color(cerfColor).darker(0.3);
+				})
+				.html(function(d) {
+					return d.PFType + " &mdash; " + d.Country;
+				});
+
+			const allocationHeaderDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationHeaderDiv");
+
+			const allocationTitleDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationTitleDiv");
+
+			const allocationSourceDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationSourceDiv");
+
+			const allocationDateDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationDateDiv");
+
+			const allocationTitleDivText = allocationTitleDiv.append("div")
+				.attr("class", "covmapallocationTitleDivText")
+				.html("Allocation Title");
+
+			const allocationSourceDivText = allocationSourceDiv.append("div")
+				.attr("class", "covmapallocationSourceDivText")
+				.html("Allocation Source");
+
+			const allocationDateDivText = allocationDateDiv.append("div")
+				.attr("class", "covmapallocationDateDivText")
+				.html("Date of launch");
+
+			const allocationTitleDivValue = allocationTitleDiv.append("div")
+				.attr("class", "covmapallocationTitleDivValue")
+				.html(function(d) {
+					return d.AllocationTitle || "Not available";
+				});
+
+			const allocationSourceDivValue = allocationSourceDiv.append("div")
+				.attr("class", "covmapallocationSourceDivValue")
+				.html(function(d) {
+					return d.TypeOfAlloc || "Not available";
+				});
+
+			const allocationDateDivValue = allocationDateDiv.append("div")
+				.attr("class", "covmapallocationDateDivValue")
+				.html(function(d) {
+					return timeFormatList(timeParser(d.DateOfAlloc)) || "Not available";
+				});
+
+			const allocationThemeDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationThemeDiv");
+
+			const allocationSummaryDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapallocationSummaryDiv");
+
+			const locationSummaryDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmaplocationSummaryDiv");
+
+			const allocationThemeDivText = allocationThemeDiv.append("div")
+				.attr("class", "covmapallocationThemeDivText")
+				.html("Allocation Theme");
+
+			const allocationSummaryDivText = allocationSummaryDiv.append("div")
+				.attr("class", "covmapallocationSummaryDivText")
+				.html("Allocation Summary");
+
+			const locationSummaryDivText = locationSummaryDiv.append("div")
+				.attr("class", "covmaplocationSummaryDivText")
+				.html("Location Summary");
+
+			const allocationThemeDivValue = allocationThemeDiv.append("div")
+				.attr("class", "covmapallocationThemeDivValue")
+				.html(function(d) {
+					return d.AllocTheme || "Not available";
+				});
+
+			const allocationSummaryDivValue = allocationSummaryDiv.append("div")
+				.attr("class", "covmapallocationSummaryDivValue")
+				.html(function(d) {
+					return d.AllocSummary || "Not available";
+				});
+
+			const locationSummaryDivValue = locationSummaryDiv.append("div")
+				.attr("class", "covmaplocationSummaryDivValue")
+				.html(function(d) {
+					return d.AllocLocation || "Not available";
+				});
+
+			const affectedPersonsContainerDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapaffectedPersonsContainerDiv");
+
+			const affectedPersonsContainerText = affectedPersonsContainerDiv.append("div")
+				.attr("class", "covmapaffectedPersonsContainerText")
+				.html("Affected Persons");
+
+			affectedPersonsContainerDiv.each(function(d) {
+				const tableData = typesOfTargeted.map(function(e) {
+					const obj = {
+						targeted: e,
+						Total: 0
+					};
+					typesOfPeople.forEach(function(f) {
+						obj[peopleScale(f)] = +d["Target" + e + f];
+						obj.Total += +d["Target" + e + f];
+					});
+					return obj;
+				});
+				const tableDataFiltered = tableData.filter(function(d) {
+					const thisSum = typesOfPeople.reduce(function(acc, curr) {
+						acc += d[peopleScale(curr)];
+						return acc;
+					}, 0);
+					return thisSum;
+				});
+				if (!tableDataFiltered.length) {
+					const affectedPersonsContainerValue = d3.select(this).append("div")
+						.attr("class", "covmapaffectedPersonsContainerValue")
+						.html("No Affected Persons");
+				} else {
+
+					const thisDiv = d3.select(this);
+
+					const dataWithoutDisabled = tableDataFiltered.filter(function(d) {
+						return d.targeted !== "Disable";
+					});
+					const disabledData = tableDataFiltered.filter(function(d) {
+						return d.targeted === "Disable";
+					});
+
+					const withoutDisabledHeaderDiv = thisDiv.append("div")
+						.attr("class", "covmapwithoutDisabledHeaderDiv");
+
+					const headers = ["Affected Person Type"].concat(typesOfPeople.map(function(d) {
+						return peopleScale(d);
+					}));
+
+					headers.push("Total");
+
+					headers.forEach(function(d) {
+						withoutDisabledHeaderDiv.append("div")
+							.attr("class", "covmapwithoutDisabledHeaderDivText")
+							.html(d);
+					});
+
+					dataWithoutDisabled.forEach(function(d, i) {
+						const withoutDisabledHeaderValues = thisDiv.append("div")
+							.attr("class", "covmapwithoutDisabledHeaderValues")
+							.style("background-color", i % 2 ? "#e6e6e6" : null);
+						headers.forEach(function(e, i) {
+							withoutDisabledHeaderValues.append("div")
+								.attr("class", "covmapwithoutDisabledHeaderValuesText")
+								.html(!i ? targetedScale(d.targeted) : d[peopleScale(e)]);
+						});
+					});
+
+					disabledData.forEach(function(d, i) {
+						const disabledHeaderValues = thisDiv.append("div")
+							.attr("class", "covmapdisabledHeaderValues")
+							.style("margin-top", "12px")
+						headers.forEach(function(e, i) {
+							disabledHeaderValues.append("div")
+								.attr("class", "covmapdisabledHeaderValuesText")
+								.html(!i ? "Persons with disabilities" : d[peopleScale(e)]);
+						});
+					});
+
+				};
+			});
+
+			//end of generateList
 		};
 
 		function preProcessData(rawData) {
@@ -2369,11 +2594,7 @@
 
 			setSvgStyles(svg.node());
 
-			if (type === "png") {
-				iconsDiv.style("opacity", 0);
-			} else {
-				topDiv.style("opacity", 0)
-			};
+			iconsDiv.style("opacity", 0);
 
 			snapshotTooltip.style("display", "none");
 
@@ -2382,11 +2603,7 @@
 				svg.attr("width", null)
 					.attr("height", null);
 
-				if (type === "png") {
-					iconsDiv.style("opacity", 1);
-				} else {
-					topDiv.style("opacity", 1)
-				};
+				iconsDiv.style("opacity", 1);
 
 				if (type === "png") {
 					downloadSnapshotPng(canvas);
@@ -2452,7 +2669,7 @@
 				right: 30
 			};
 
-			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
+			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/cbpf-cerf-logo.png")
 				.then(function(logo) {
 
 					let pdf;
@@ -2480,7 +2697,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("TEXT HERE.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("CBPF and CERF allocations related to COVID-19 pandemic.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
@@ -2490,25 +2707,25 @@
 					pdf.setFont('helvetica');
 					pdf.setFontType("normal");
 					pdf.setFontSize(12);
-					pdf.text(pdfMargins.left, 48, intro);
+					pdf.text(pdfMargins.left, 60, intro);
 
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
 					pdf.setFontSize(16);
-					pdf.text(chartTitle, pdfMargins.left, 65);
+					pdf.text("COVID-19 Allocations", pdfMargins.left, 44);
 
 					pdf.setFontSize(12);
 
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70, {
+						fullDate + "</span></div>", pdfMargins.left, 64, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
 							pdfTextPosition = position;
 						});
 
-					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, heightInMilimeters);
+					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 6, widthInMilimeters, heightInMilimeters);
 
 					const currentDate = new Date();
 
@@ -2534,7 +2751,7 @@
 						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
 						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
 
-						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top + 2, 90, 14);
 
 						pdf.setFillColor(236, 161, 84);
 						pdf.rect(0, pdfHeight - pdfMargins.bottom, 210, 2, "F");
