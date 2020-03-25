@@ -63,7 +63,7 @@
 	margin-right: 0.417vw;
   }
 
-.covmapIconsDiv button:hover {
+.covmapIconsDiv button:hover:enabled {
 	background-color: #2e649b;
 	border-color: rgba(0,0,0,0.6);
 	cursor: pointer;
@@ -76,6 +76,11 @@
 
 .covmapIconsDiv button:focus {
 	outline: none;
+}
+
+.covmapIconsDiv button:disabled {
+	opacity: 0.5;
+	cursor: default;
 }
 
 .covmapFooterDiv {

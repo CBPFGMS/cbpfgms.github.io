@@ -654,7 +654,8 @@
 		function createTitle(rawData) {
 
 			const helpIcon = iconsDiv.append("button")
-				.attr("id", "covmapHelpButton");
+				.attr("id", "covmapHelpButton")
+				.property("disabled", true);//CHANGE!!!!
 
 			helpIcon.html("HELP  ")
 				.append("span")
@@ -782,11 +783,11 @@
 
 			downloadIcon.on("click", function() {
 
-				const csv = createCsv(rawData); //CHANGE
+				const csv = createCsv(rawData);
 
 				const currentDate = new Date();
 
-				const fileName = "covmap_" + csvDateFormat(currentDate) + ".csv";
+				const fileName = "Covid19Allocations_" + csvDateFormat(currentDate) + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -2358,7 +2359,7 @@
 						pushCbpfOrCerf(foundCountry, row);
 					} else {
 						const countryObject = {
-							country: row.Country,
+							country: row.Country.trim(),
 							labelText: row.Country.split(" "),
 							isoCode: row.ISO2Country,
 							cbpf: 0,
@@ -2391,9 +2392,16 @@
 			//end of processData
 		};
 
-		function createCsv(datahere) {
+		function createCsv(rawData) {
 
-			const csv = d3.csvFormat(changedDataHere);
+			const data = processData(rawData);
+
+			data.forEach(function(row){
+				delete row.allocationsList;
+				delete row.labelText;
+			});
+
+			const csv = d3.csvFormat(data);
 
 			return csv;
 		};
@@ -2637,7 +2645,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "covmap_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "Covid19Allocations_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -2729,7 +2737,7 @@
 
 					const currentDate = new Date();
 
-					pdf.save("covmap_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("Covid19Allocations_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
