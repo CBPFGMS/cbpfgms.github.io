@@ -276,8 +276,6 @@
 
 		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
-
 		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
 
 		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
@@ -2662,11 +2660,7 @@
 
 		function createFooterDiv() {
 
-			let footerText = "© OCHA CBPF Section " + currentYear;
-
-			const footerLink = " | For more information, please visit <a href='https://pfbi.unocha.org'>pfbi.unocha.org</a>";
-
-			if (showLink) footerText += footerLink;
+			let footerText = "© OCHA " + currentYear;
 
 			footerDiv.append("div")
 				.attr("class", "d3chartFooterText")
