@@ -436,7 +436,15 @@ html{
 .covmapallocationSourceDiv {
 	display: flex;
 	flex-direction: column;
-	flex:0 25%;
+	flex:0 16.65%;
+	justify-content: center;
+	align-items: center;
+}
+
+.covmapallocationAmountDiv {
+	display: flex;
+	flex-direction: column;
+	flex:0 16.65%;
 	justify-content: center;
 	align-items: center;
 }
@@ -444,12 +452,12 @@ html{
 .covmapallocationDateDiv {
 	display: flex;
 	flex-direction: column;
-	flex:0 25%;
+	flex:0 16.65%;
 	justify-content: center;
 	align-items: center;
 }
 
-.covmapallocationTitleDivText, .covmapallocationSourceDivText, .covmapallocationDateDivText, .covmapallocationThemeDivText, .covmapallocationSummaryDivText, .covmaplocationSummaryDivText, .covmapaffectedPersonsContainerText {
+.covmapallocationTitleDivText, .covmapallocationSourceDivText, .covmapallocationAmountDivText, .covmapallocationDateDivText, .covmapallocationThemeDivText, .covmapallocationSummaryDivText, .covmaplocationSummaryDivText, .covmapaffectedPersonsContainerText {
 	width: 100%;
 	color: #222;
 	font-weight: 700;
@@ -457,7 +465,7 @@ html{
 	margin-bottom: 4px;
 }
 
-.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue {
+.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationAmountDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue {
 	width: 100%;
 	color: #444;
 	font-size: 12px;

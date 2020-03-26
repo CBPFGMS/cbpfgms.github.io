@@ -14,8 +14,6 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	//CHANGE CSS LINK!!!!!!!!!!!!!!!!
-
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
@@ -1798,7 +1796,7 @@
 					.style("margin-bottom", selectedTooltipButton ? "0px" : "12px")
 					.style("margin-top", "0px")
 					.style("font-size", "12px")
-					.html(selectedTooltipButton ? "Targeted People: " + targetedScale(selectedTooltipButton) : "No targeted people");
+					.html("Targeted People: " + (selectedTooltipButton ? targetedScale(selectedTooltipButton) : "to be determined"));
 
 				if (selectedTooltipButton) {
 
@@ -2166,6 +2164,9 @@
 			const allocationSourceDiv = allocationHeaderDiv.append("div")
 				.attr("class", "covmapallocationSourceDiv");
 
+			const allocationAmountDiv = allocationHeaderDiv.append("div")
+				.attr("class", "covmapallocationAmountDiv");
+
 			const allocationDateDiv = allocationHeaderDiv.append("div")
 				.attr("class", "covmapallocationDateDiv");
 
@@ -2176,6 +2177,10 @@
 			const allocationSourceDivText = allocationSourceDiv.append("div")
 				.attr("class", "covmapallocationSourceDivText")
 				.html("Allocation Source");
+
+			const allocationAmountDivText = allocationAmountDiv.append("div")
+				.attr("class", "covmapallocationAmountDivText")
+				.html("Allocation Amount");
 
 			const allocationDateDivText = allocationDateDiv.append("div")
 				.attr("class", "covmapallocationDateDivText")
@@ -2191,6 +2196,12 @@
 				.attr("class", "covmapallocationSourceDivValue")
 				.html(function(d) {
 					return d.TypeOfAlloc || "Not available";
+				});
+
+			const allocationAmountDivValue = allocationAmountDiv.append("div")
+				.attr("class", "covmapallocationAmountDivValue")
+				.html(function(d) {
+					return d.TargetAmt ? "$" + formatMoney0Decimals(+d.TargetAmt) : "Not available";
 				});
 
 			const allocationDateDivValue = allocationDateDiv.append("div")
