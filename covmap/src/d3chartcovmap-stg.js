@@ -186,6 +186,7 @@
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
+			fillOpacityValue = 0.8,
 			tooltipMargin = -4,
 			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
@@ -1655,7 +1656,8 @@
 					return d.data.type === "cbpf" ? cbpfColor : cerfColor;
 				})
 				.style("stroke", "#666")
-				.style("stroke-width", "0.5px")
+				.style("stroke-width", "1px")
+				.style("fill-opacity", fillOpacityValue)
 				.each(function(d) {
 					let siblingRadius = 0
 					const siblings = d3.select(this.parentNode).selectAll("path")
