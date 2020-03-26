@@ -184,6 +184,7 @@
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
+			fillOpacityValue = 0.8,
 			tooltipMargin = -4,
 			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
@@ -626,8 +627,7 @@
 		function createTitle(rawData) {
 
 			const helpIcon = iconsDiv.append("button")
-				.attr("id", "covmapHelpButton")
-				.property("disabled", true); //CHANGE!!!!
+				.attr("id", "covmapHelpButton");
 
 			helpIcon.html("HELP  ")
 				.append("span")
@@ -1653,7 +1653,8 @@
 					return d.data.type === "cbpf" ? cbpfColor : cerfColor;
 				})
 				.style("stroke", "#666")
-				.style("stroke-width", "0.5px")
+				.style("stroke-width", "1px")
+				.style("fill-opacity", fillOpacityValue)
 				.each(function(d) {
 					let siblingRadius = 0
 					const siblings = d3.select(this.parentNode).selectAll("path")
@@ -2115,6 +2116,11 @@
 			listContainerDiv.html("")
 				.style("display", "block");
 
+			listContainerDiv.on("mouseover", function() {
+				tooltip.style("display", "none")
+					.html(null);
+			});
+
 			const listTopDivContainer = listContainerDiv.append("div")
 				.attr("class", "covmaplistTopDivContainer");
 
@@ -2128,12 +2134,12 @@
 			const listTopDivButton = listTopDivButtonDiv.append("button")
 				.html("Remove this list")
 				.on("click", function() {
-					listContainerDiv.html("")
-						.style("display", "none");
-					setYearsDescriptionDiv();
 					containerDiv.node().scrollIntoView({
 						behavior: "smooth"
 					});
+					listContainerDiv.html("")
+						.style("display", "none");
+					setYearsDescriptionDiv();
 				});
 
 			const allocationContainerDiv = listContainerDiv.selectAll(null)
@@ -2489,7 +2495,7 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
+			tooltip.style("pointer-events", "none");
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", "covmapOverDivHelp");
@@ -2497,44 +2503,161 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + height);
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "covmapArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", width * 0.7)
+				.attr("y", topPanel.height + panelHorizontalPadding)
+				.attr("width", width * 0.3)
+				.attr("height", buttonsPanel.height + panelHorizontalPadding)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					tooltip.style("pointer-events", "all")
+						.html(null);
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "covmapAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", width * 0.85)
+				.attr("y", topPanel.height + 28)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
+			const helpData = [{
+				x: 16,
+				y: 68,
+				width: 380,
+				height: 30,
+				xTooltip: 40,
+				yTooltip: 94,
+				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+			}, {
+				x: 9,
+				y: 108,
+				width: 36,
+				height: 60,
+				xTooltip: 40,
+				yTooltip: 130,
+				text: "Use these buttons to zoom in or out. Alternatively, you can use the mousewheel or the trackpad over the map to zoom in or out."
+			}, {
+				x: 10,
+				y: 172,
+				width: 24,
+				height: 22,
+				xTooltip: 30,
+				yTooltip: 166,
+				text: "Click this checkbox for showing or hiding the countries’ names."
+			}, {
+				x: 50,
+				y: 108,
+				width: 1040,
+				height: 480,
+				xTooltip: 400,
+				yTooltip: 260,
+				text: "This area shows the allocations for each country. Hover over the pies to display a tooltip with additional information. In the tooltip you can click the buttons to select the type of targeted people. Also, in the tooltip, you can click “Display Details” to show detailed list of allocations in that given country, just below the map."
+			}];
 
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "covmapHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
 
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "covmapAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 264)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".covmapHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", (yPos * (containerBox.width / width)) + "px")
+					.style("left", (xPos * (containerBox.height / height)) + "px")
+					.style("display", "block")
+					.append("div")
+					.style("max-width", "300px")
+					.attr("id", "covmapInnerTooltipDiv")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none")
+					.html(null);
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".covmapHelpRectangle").style("opacity", 0.5);
+			};
+
 			//end of createAnnotationsDiv
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
 		};
 
 		function createFooterDiv() {
