@@ -155,7 +155,13 @@
 	font-size: 12px;
 	pointer-events: none;
 	fill: darkslategray;
-	paint-order: stroke;
+}
+
+.covmapgroupNameBack {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+	fill: white;
 	stroke: white;
 	stroke-width: 2px;
 }

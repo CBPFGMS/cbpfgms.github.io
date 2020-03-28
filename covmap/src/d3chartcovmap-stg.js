@@ -1558,6 +1558,31 @@
 						"," + (centroids[d.isoCode].y * currentTransform.k + currentTransform.y) + ")";
 				});
 
+			const groupNameBack = pieGroupEnter.append("text")
+				.attr("class", "covmapgroupNameBack")
+				.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				})
+				.attr("y", function(d) {
+					return d.labelText.length > 1 ? groupNamePadding * 2 - 5 : groupNamePadding * 2;
+				})
+				.style("opacity", 0)
+				.text(function(d) {
+					return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
+						d.labelText[0];
+				})
+				.each(function(d) {
+					if (d.labelText.length > 1) {
+						d3.select(this).append("tspan")
+							.attr("x", radiusScale(d.cbpf + d.cerf) + groupNamePadding)
+							.attr("dy", 12)
+							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
+									return i > 1;
+								}).join(" ") :
+								d.labelText[1]);
+					};
+				});
+
 			const groupName = pieGroupEnter.append("text")
 				.attr("class", "covmapgroupName")
 				.attr("x", function(d) {
@@ -1587,15 +1612,12 @@
 
 			pieGroup.order();
 
-			pieGroup.select("text")
-				.transition()
-				.duration(duration)
-				.style("opacity", chartState.showNames ? 1 : 0)
-				.attr("x", function(d) {
-					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+			pieGroup.selectAll("text, tspan")
+				.data(function(d) {
+					return d;
 				});
 
-			pieGroup.select("tspan")
+			pieGroup.selectAll("text, tspan")
 				.transition()
 				.duration(duration)
 				.style("opacity", chartState.showNames ? 1 : 0)
