@@ -137,6 +137,12 @@
 			});
 		};
 
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
 		//toBlob
 
 		if (!HTMLCanvasElement.prototype.toBlob) {
@@ -2943,16 +2949,16 @@
 					pdf.setTextColor(60);
 					pdf.setFont('helvetica');
 					pdf.setFontType("normal");
-					pdf.setFontSize(12);
-					pdf.text(pdfMargins.left, 60, intro);
+					pdf.setFontSize(10);
+					pdf.text(pdfMargins.left, 50, intro);
 
 					pdf.setTextColor(65, 143, 222);
 					pdf.setFont('helvetica');
 					pdf.setFontType("bold");
-					pdf.setFontSize(16);
+					pdf.setFontSize(14);
 					pdf.text("COVID-19 Allocations", pdfMargins.left, 44);
 
-					pdf.setFontSize(12);
+					pdf.setFontSize(10);
 
 					const monthsList = chartState.selectedMonth[0] === allData ? "All" : chartState.selectedMonth.sort(function(a, b) {
 						return timeParserButtons(a) - timeParserButtons(b);
@@ -2960,11 +2966,11 @@
 						return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
 					}, "");
 
-					const monthsText = chartState.selectedMonth.length > 1 ? "Selected months: " : "Selected month: ";
+					const monthsText = chartState.selectedMonth.length > 1 || chartState.selectedMonth[0] === allData ? "Selected months: " : "Selected month: ";
 
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + monthsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						monthsList + "</span></div>", pdfMargins.left, 64, {
+						monthsList + "</span></div>", pdfMargins.left, 58, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
