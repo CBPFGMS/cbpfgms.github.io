@@ -2954,8 +2954,17 @@
 
 					pdf.setFontSize(12);
 
+					const monthsList = chartState.selectedMonth[0] === allData ? "All" : chartState.selectedMonth.sort(function(a, b) {
+						return timeParserButtons(a) - timeParserButtons(b);
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const monthsText = chartState.selectedMonth.length > 1 ? "Selected months: " : "Selected month: ";
+
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 64, {
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + monthsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						monthsList + "</span></div>", pdfMargins.left, 64, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
