@@ -4,8 +4,9 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
+		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
 		topoJsonUrl = "https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -207,7 +208,8 @@
 			timeFormat = d3.timeFormat("%b-%y"),
 			timeParserButtons = d3.timeParse("%b-%y"),
 			timeFormatList = d3.timeFormat("%d %B, %Y"),
-			vizNameQueryString = "allocationsmap",
+			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			vizNameQueryString = "covid19",
 			allData = "allData",
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
@@ -218,7 +220,7 @@
 			countryNames = {},
 			centroids = {},
 			chartState = {
-				selectedMonth: [allData],
+				selectedMonth: [],
 				countriesInData: [],
 				showNames: null
 			};
@@ -274,7 +276,11 @@
 
 		const containerDiv = d3.select("#d3chartcontainercovmap");
 
+		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : null;
+
 		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
+
+		const selectedMonthString = queryStringValues.has("month") ? queryStringValues.get("month").replace(/\|/g, ",") : (containerDiv.node().getAttribute("data-month") ? containerDiv.node().getAttribute("data-month") : allData);
 
 		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
 
@@ -285,6 +291,18 @@
 		if (selectedResponsiveness === false) {
 			containerDiv.style("width", width + "px")
 				.style("height", height + "px");
+		};
+
+		if (chartTitle) {
+			const titleDiv = d3.select(containerDiv.node().parentNode)
+				.insert("div", "#d3chartcontainercovmap")
+				.attr("class", "covmapTitleDiv")
+				.style("margin-left", "8px")
+				.style("margin-bottom", "4px")
+				.style("font-size", "26px")
+				.style("font-family", "Arial")
+				.style("color", cbpfColor)
+				.html(chartTitle);
 		};
 
 		const iconsDiv = containerDiv.append("div")
@@ -584,6 +602,8 @@
 
 			preProcessData(rawData);
 
+			validateMonth(selectedMonthString);
+
 			removeProgressWheel();
 
 			draw(rawData, mapData);
@@ -735,6 +755,58 @@
 				};
 			});
 
+			if (!isBookmarkPage) {
+
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "covmapShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = bookmarkSite + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
+
+			};
+
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent.append("p")
 					.attr("id", "covmapBestVisualizedText")
@@ -814,10 +886,10 @@
 
 			const borders = mapContainer.append("path")
 				.attr("d", mapPath(topojson.mesh(mapData, mapData.objects.countries, function(a, b) {
-					return a !== b;
+					return a !== b && !(a.properties.name === "Somalia" && b.properties.name === "Somaliland");
 				})))
 				.style("fill", "none")
-				.style("stroke", "#DADADA")
+				.style("stroke", "#E5E5E5")
 				.style("stroke-width", "1px");
 
 			features.forEach(function(d) {
@@ -827,12 +899,10 @@
 				}
 			});
 
-			// centroids.XX = centroids.TR;
-
 			//Countries with problems:
 			//"KM","WS","AG","DM","MH","CV"
 			//Comoros, (west) Samoa, Antigua and Barbuda, Dominica, Marshall Islands, Cabo Verde
-			//And the fake codes: XV, XA and XG
+			//And the fake codes: XX, XV, XA and XG
 			hardcodedAllocations.forEach(function(d) {
 				const projected = mapProjection([d.long, d.lat]);
 				centroids[d.isoCode] = {
@@ -1457,14 +1527,14 @@
 					});
 				};
 
-				const allYears = chartState.selectedMonth.map(function(d) {
+				const allMonths = chartState.selectedMonth.map(function(d) {
 					return d;
 				}).join("|");
 
-				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", allYears);
+				if (queryStringValues.has("month")) {
+					queryStringValues.set("month", allMonths);
 				} else {
-					queryStringValues.append("year", allYears);
+					queryStringValues.append("month", allMonths);
 				};
 
 				buttonsRects.style("fill", function(e) {
@@ -2465,6 +2535,16 @@
 					console.warn("Attention: " + row.ISO2Country + "(" + row.Country + ") has no centroid");
 				};
 			});
+		};
+
+		function validateMonth(monthString) {
+			const allMonths = monthString.split(",").map(function(d) {
+				return capitalize(d.trim().toLowerCase());
+			});
+			allMonths.forEach(function(d) {
+				if (d && monthsArray.indexOf(d) > -1) chartState.selectedMonth.push(d);
+			});
+			if (!chartState.selectedMonth.length) chartState.selectedMonth.push(allData);
 		};
 
 		function capitalize(str) {
