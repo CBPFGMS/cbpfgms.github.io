@@ -1688,17 +1688,27 @@
 
 			pieGroup.order();
 
-			pieGroup.selectAll("text, tspan")
-				.data(function(d) {
-					return d;
+			pieGroup.selectAll("text")
+				.each(function() {
+					localVariable.set(this, "right");
 				});
 
-			pieGroup.selectAll("text, tspan")
-				.transition()
+			const allLabels = pieGroup.selectAll("text, tspan");
+
+			allLabels.data(function(d) {
+				return d;
+			});
+
+			repositionLabels(pieGroup.selectAll(".covmapgroupName"));
+
+			allLabels.transition()
 				.duration(duration)
 				.style("opacity", chartState.showNames ? 1 : 0)
+				.attr("text-anchor", function() {
+					return localVariable.get(this) === "right" ? "start" : "end";
+				})
 				.attr("x", function(d) {
-					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+					return (radiusScale(d.cbpf + d.cerf) + groupNamePadding) * (localVariable.get(this) === "right" ? 1 : -1);
 				});
 
 			let slices = pieGroup.selectAll(".covmapslice")
@@ -2551,6 +2561,47 @@
 				if (d && monthsArray.indexOf(d) > -1) chartState.selectedMonth.push(d);
 			});
 			if (!chartState.selectedMonth.length) chartState.selectedMonth.push(allData);
+		};
+
+		function repositionLabels(labelSelectionOriginal) {
+			const labelSelection = labelSelectionOriginal.clone(true);
+			labelSelection.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				})
+				.attr("text-anchor", "start");
+			labelSelection.select("tspan")
+				.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				})
+				.attr("text-anchor", "start");
+			labelSelection.each(function(d) {
+				const outerElement = this;
+				const outerBox = this.getBoundingClientRect();
+				labelSelection.each(function(e) {
+					if (outerElement !== this) {
+						const innerBox = this.getBoundingClientRect();
+						if (!(outerBox.right < innerBox.left ||
+								outerBox.left > innerBox.right ||
+								outerBox.bottom < innerBox.top ||
+								outerBox.top > innerBox.bottom)) {
+							if (centroids[e.isoCode].x < centroids[d.isoCode].x) {
+								d3.select(this).attr("x", function(d) {
+										return -(radiusScale(d.cbpf + d.cerf) + groupNamePadding);
+									})
+									.attr("text-anchor", "end");
+								d3.select(this).select("tspan")
+									.attr("x", function(d) {
+										return -(radiusScale(d.cbpf + d.cerf) + groupNamePadding);
+									})
+									.attr("text-anchor", "end");
+								localVariable.set(this.previousSibling, "left");
+								localVariable.set(this.previousSibling.previousSibling, "left");
+							};
+						};
+					};
+				});
+			});
+			labelSelection.remove();
 		};
 
 		function capitalize(str) {
