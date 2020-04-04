@@ -1109,7 +1109,7 @@
 				.attr("class", "pbihrptopSummaryPanelTitle")
 				.attr("x", 0)
 				.attr("y", topSummaryPanel.titlePadding - 10)
-				.text("Summary of the data");
+				.text("Global target and funding");
 
 			const topSummaryPanelLine = topSummaryPanel.main.selectAll(".pbihrptopSummaryPanelLine")
 				.data([true])
