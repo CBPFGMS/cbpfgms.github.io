@@ -350,7 +350,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [0, 0, 24, 102]
+			padding: [14, 0, 10, 102]
 		};
 
 		const mainPanel = {
@@ -359,7 +359,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
-			padding: [0, 0, 14, 102]
+			padding: [14, 0, 0, 102]
 		};
 
 		const legendPanel = {
@@ -403,9 +403,9 @@
 		const yAxis = d3.axisLeft(yScaleMain)
 			.tickSize(3);
 
-		const xAxisMain = d3.axisBottom(xScaleMain);
+		const xAxisMain = d3.axisTop(xScaleMain);
 
-		const xAxisBrush = d3.axisBottom(xScaleBrush)
+		const xAxisBrush = d3.axisTop(xScaleBrush)
 			.tickPadding(2)
 			.tickSize(2)
 			.tickSizeOuter(0);
@@ -976,7 +976,7 @@
 
 			const xAxisMainGroup = mainPanel.main.append("g")
 				.attr("class", "pbiuacXAxisMainGroup")
-				.attr("transform", "translate(0," + (mainPanel.height - mainPanel.padding[2]) + ")")
+				.attr("transform", "translate(0," + mainPanel.padding[0] + ")")
 				.call(xAxisMain);
 
 			const todayContainerGroup = mainPanel.main.append("g")
@@ -1000,7 +1000,7 @@
 				.attr("font-size", "11px")
 				.style("font-weight", 700)
 				.style("fill", todayColor)
-				.attr("y", mainPanel.height - mainPanel.padding[2] + todayPadding)
+				.attr("y", mainPanel.padding[0] - xAxisMain.tickPadding())
 				.text("Today");
 
 			const rectZoom = mainPanel.main.append("rect")
@@ -1110,7 +1110,7 @@
 
 			const xAxisBrushGroup = brushPanel.main.append("g")
 				.attr("class", "pbiuacXAxisBrushGroup")
-				.attr("transform", "translate(0," + (brushPanel.height - brushPanel.padding[2]) + ")")
+				.attr("transform", "translate(0," + brushPanel.padding[0] + ")")
 				.call(xAxisBrush);
 
 			const todayGroupBrush = brushPanel.main.append("g")
@@ -1128,7 +1128,7 @@
 				.attr("font-size", "11px")
 				.style("font-weight", 700)
 				.style("fill", todayColor)
-				.attr("y", brushPanel.height - brushPanel.padding[2] + todayPadding + 1)
+				.attr("y", brushPanel.padding[0] - xAxisBrush.tickPadding() - xAxisBrush.tickSizeInner())
 				.text("Today");
 
 			const todaySizeBrush = todayTextBrush.node().getBoundingClientRect();
@@ -1184,8 +1184,8 @@
 				.attr("stroke-width", 1)
 				.attr("rx", 2)
 				.attr("ry", 2)
-				.style("y", (brushPanel.height - brushPanel.padding[2]) * .2)
-				.style("height", (brushPanel.height - brushPanel.padding[2]) * .6);
+				.style("y", brushPanel.padding[0] + (brushPanel.height - brushPanel.padding[2] - brushPanel.padding[0]) * .2)
+				.style("height", (brushPanel.height - brushPanel.padding[2] - brushPanel.padding[0]) * .6);
 
 			const brushText = brushPanel.main.append("text")
 				.attr("text-anchor", "end")
