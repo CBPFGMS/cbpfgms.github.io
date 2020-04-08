@@ -191,7 +191,8 @@
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			fadeOpacity = 0.2,
-			fillOpacityValue = 0.8,
+			fillOpacityValue = 0.5,
+			strokeOpacityValue = 0.8,
 			tooltipMargin = -4,
 			tooltipSvgWidth = 300,
 			tooltipSvgHeight = 80,
@@ -1007,7 +1008,7 @@
 				.attr("class", "covmapshowNamesText")
 				.attr("x", 18)
 				.attr("y", 11)
-				.text("Show names");
+				.text("Show All");
 
 			showNamesGroup.on("click", function() {
 
@@ -1022,7 +1023,9 @@
 				innerCheck.style("stroke", chartState.showNames ? "darkslategray" : "white");
 
 				piesContainer.selectAll("text, tspan")
-					.style("opacity", chartState.showNames ? 1 : 0);
+					.style("display", null);
+
+				if (!chartState.showNames) displayLabels(piesContainer.selectAll(".covmapgroupName"));
 
 			});
 
@@ -1688,27 +1691,53 @@
 
 			pieGroup.order();
 
-			pieGroup.selectAll("text")
-				.each(function() {
-					localVariable.set(this, "right");
+			const allTexts = pieGroup.selectAll("text");
+
+			if (!chartState.showNames) {
+				allTexts.each(function() {
+					d3.select(this).style("display", null);
+				});
+				displayLabels(pieGroup.selectAll(".covmapgroupName"));
+			};
+
+			pieGroup.select("text.covmapgroupNameBack tspan")
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
-			const allLabels = pieGroup.selectAll("text, tspan");
-
-			allLabels.data(function(d) {
-				return d;
-			});
-
-			repositionLabels(pieGroup.selectAll(".covmapgroupName"));
-
-			allLabels.transition()
+			pieGroup.select("text.covmapgroupNameBack")
+				.transition()
 				.duration(duration)
-				.style("opacity", chartState.showNames ? 1 : 0)
-				.attr("text-anchor", function() {
-					return localVariable.get(this) === "right" ? "start" : "end";
-				})
+				.style("opacity", 1)
 				.attr("x", function(d) {
-					return (radiusScale(d.cbpf + d.cerf) + groupNamePadding) * (localVariable.get(this) === "right" ? 1 : -1);
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				});
+
+			pieGroup.select("text.covmapgroupName tspan")
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				});
+
+			pieGroup.select("text.covmapgroupName")
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.attr("x", function(d) {
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
+				})
+				.end()
+				.then(function() {
+					if (chartState.showNames) return;
+					allTexts.each(function() {
+						d3.select(this).style("display", null);
+					});
+					displayLabels(pieGroup.selectAll(".covmapgroupName"));
 				});
 
 			let slices = pieGroup.selectAll(".covmapslice")
@@ -1760,6 +1789,7 @@
 				})
 				.style("stroke", "#666")
 				.style("stroke-width", "1px")
+				.style("stroke-opacity", strokeOpacityValue)
 				.style("fill-opacity", fillOpacityValue)
 				.each(function(d) {
 					let siblingRadius = 0
@@ -1816,6 +1846,13 @@
 					return "translate(" + (centroids[d.isoCode].x * d3.event.transform.k + d3.event.transform.x) +
 						"," + (centroids[d.isoCode].y * d3.event.transform.k + d3.event.transform.y) + ")";
 				});
+
+				if (!chartState.showNames) {
+					allTexts.each(function() {
+						d3.select(this).style("display", null);
+					});
+					displayLabels(pieGroup.selectAll(".covmapgroupName"));
+				};
 
 				//end of zoomed
 			};
@@ -2563,17 +2600,7 @@
 			if (!chartState.selectedMonth.length) chartState.selectedMonth.push(allData);
 		};
 
-		function repositionLabels(labelSelectionOriginal) {
-			const labelSelection = labelSelectionOriginal.clone(true);
-			labelSelection.attr("x", function(d) {
-					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
-				})
-				.attr("text-anchor", "start");
-			labelSelection.select("tspan")
-				.attr("x", function(d) {
-					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
-				})
-				.attr("text-anchor", "start");
+		function displayLabels(labelSelection) {
 			labelSelection.each(function(d) {
 				const outerElement = this;
 				const outerBox = this.getBoundingClientRect();
@@ -2584,24 +2611,17 @@
 								outerBox.left > innerBox.right ||
 								outerBox.bottom < innerBox.top ||
 								outerBox.top > innerBox.bottom)) {
-							if (centroids[e.isoCode].x < centroids[d.isoCode].x) {
-								d3.select(this).attr("x", function(d) {
-										return -(radiusScale(d.cbpf + d.cerf) + groupNamePadding);
-									})
-									.attr("text-anchor", "end");
-								d3.select(this).select("tspan")
-									.attr("x", function(d) {
-										return -(radiusScale(d.cbpf + d.cerf) + groupNamePadding);
-									})
-									.attr("text-anchor", "end");
-								localVariable.set(this.previousSibling, "left");
-								localVariable.set(this.previousSibling.previousSibling, "left");
+							if ((e.cbpf + e.cerf) < (d.cbpf + d.cerf)) {
+								d3.select(this).style("display", "none");
+								d3.select(this.previousSibling).style("display", "none");
+							} else {
+								d3.select(outerElement).style("display", "none");
+								d3.select(outerElement.previousSibling).style("display", "none");
 							};
 						};
 					};
 				});
 			});
-			labelSelection.remove();
 		};
 
 		function capitalize(str) {
