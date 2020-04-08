@@ -1294,8 +1294,6 @@
 					return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 				});
 
-				setYearsDescriptionDiv();
-
 				const data = processData(rawData);
 
 				const allDonors = data.map(function(d) {

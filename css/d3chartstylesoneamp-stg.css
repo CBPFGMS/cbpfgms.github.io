@@ -26,7 +26,7 @@
 	padding: 8px;
 	line-height: 120%;
 	font-size: 14px;
-	background: #f1f1f1; 
+	background: #f8f8f8; 
 	border: 1px solid #999; 
 	border-radius: 4px;
 	pointer-events: none;
@@ -82,6 +82,104 @@ p#oneampd3chartTitle {
 	font-family: "Arial", sans-serif;
 	margin: 0px;
 	color: #418fde;
+}
+
+.oneampbuttonsText, .oneampbuttonsCbpfText, .oneampbuttonsCerfText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.oneampcbpfTitle, .oneampcerfTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	fill: #666;
+	pointer-events: none;
+}
+
+.oneampleftArrowText, .oneamprightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.oneamplegendTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+.oneamplegendCirclesText {
+	font-family: "Arial", sans-serif;
+	font-size: 9px;
+	fill: darkslategray;	
+}
+
+.oneamplegendColors text {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;	
+}
+
+.oneampshowNamesText {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+}
+
+.oneampgroupName {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+	fill: darkslategray;
+	paint-order: stroke;
+    stroke: white;
+    stroke-width: 2px;
+}
+
+.oneampzoomPath {
+	fill: white;
+}
+
+.oneampzoomPath:hover {
+	fill: #f4f4f4;
+}
+
+.oneampzoomText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	fill: #222;
+	pointer-events: none;	
+}
+
+.oneampTooltipSvgYAxisGroup path, .oneampTooltipSvgXAxisGroup path {
+	stroke: none;
+}
+
+.oneampTooltipSvgYAxisGroup text {
+	font-family: "Arial";
+	font-size: 11px;
+	fill: #444;
+}
+
+.oneampTooltipSvgXAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.oneampTooltipSvgXAxisGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.oneampcbpfLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
 }
 
 .oneampAnnotationMainText {
