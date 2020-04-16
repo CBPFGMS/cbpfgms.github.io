@@ -53,6 +53,7 @@
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
+	z-index: 1400;	
 }
 
 .pbiolcFooterDiv {
