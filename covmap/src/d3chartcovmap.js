@@ -237,8 +237,8 @@
 
 		const hardcodedAllocations = [{
 			isoCode: "XX",
-			long: 35.24,
-			lat: 38.96
+			long: 37.22,
+			lat: 37.03
 		}, {
 			isoCode: "KM",
 			long: 43.87,
