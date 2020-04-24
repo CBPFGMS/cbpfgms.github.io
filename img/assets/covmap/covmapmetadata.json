@@ -2,20 +2,24 @@
 	"title": "WHO announces that COVID-19 is a Public Health Emergency of International Concern",
 	"icon": "coronavirus",
 	"date": "30/01/2020",
-	"lollipopDate": "30/01/2020"
+	"lollipopDate": "30/01/2020",
+	"size": 200
 }, {
 	"title": "First COVID19 allocation (Lebanon)",
 	"icon": "coronavirus",
 	"date": "03/02/2020",
-	"lollipopDate": "25/02/2020"
+	"lollipopDate": "25/02/2020",
+	"size": 200
 }, {
 	"title": "WHO declares COVID-19 outbreak a pandemic",
 	"icon": "coronavirus",
 	"date": "11/03/2020",
-	"lollipopDate": "11/03/2020"
+	"lollipopDate": "11/03/2020",
+	"size": 200
 }, {
 	"title": "Launch of the COVID-19 Global Humanitarian Response Plan",
 	"icon": "coronavirus",
 	"date": "25/03/2020",
-	"lollipopDate": "25/03/2020"
+	"lollipopDate": "25/03/2020",
+	"size": 200
 }]
