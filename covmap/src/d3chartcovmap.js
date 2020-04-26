@@ -2423,7 +2423,7 @@
 				if (!tableDataFiltered.length) {
 					const affectedPersonsContainerValue = d3.select(this).append("div")
 						.attr("class", "covmapaffectedPersonsContainerValue")
-						.html("No Affected Persons");
+						.html("To be determined");
 				} else {
 
 					const thisDiv = d3.select(this);
