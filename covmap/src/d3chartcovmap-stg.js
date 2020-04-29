@@ -2011,9 +2011,18 @@
 
 		function createTimeline(unfilteredData, timelineMetadata) {
 
+			const radiusScaleTimeline = d3.scaleSqrt()
+				.range([minPieSize, maxPieSize]);
+
 			const data = unfilteredData.filter(function(d) {
 				return d.cbpf + d.cerf;
 			});
+
+			const maxValue = d3.max(data, function(d) {
+				return d.cbpf + d.cerf;
+			});
+
+			radiusScaleTimeline.domain([0, maxValue || 0]);
 
 			const allDates = data.map(function(d) {
 				return timeFormatTickValues(d.allocationDate);
@@ -2191,13 +2200,13 @@
 					return arcGenerator({
 						startAngle: d.startAngle,
 						endAngle: d.endAngle,
-						outerRadius: radiusScale(d.data.total)
+						outerRadius: radiusScaleTimeline(d.data.total)
 					});
 				});
 
 			const pieLines = pieGroupsTimeline.append("line")
 				.attr("y1", function(d) {
-					return -(radiusScale(d.cerf + d.cbpf) + 1);
+					return -(radiusScaleTimeline(d.cerf + d.cbpf) + 1);
 				})
 				.attr("y2", -(maxPieSize + timelinePanel.piePadding))
 				.attr("stroke-width", "1px")
@@ -2206,7 +2215,7 @@
 			const pieLabels = pieGroupsTimeline.append("text")
 				.attr("class", "covmappieLabelsTimeline")
 				.attr("y", function(d) {
-					return radiusScale(d.cerf + d.cbpf) + timelinePanel.labelPadding;
+					return radiusScaleTimeline(d.cerf + d.cbpf) + timelinePanel.labelPadding;
 				})
 				.attr("x", 0)
 				.text(function(d) {
@@ -2396,9 +2405,9 @@
 					countryDiv.on("click", function(d) {
 						tooltip.html(null);
 						createCountryTooltip(d);
-						const mousePosition = d3.mouse(containerDiv.node());
+						const mousePosition = d3.mouse(svg.node());
 						const tooltipBox = tooltip.node().getBoundingClientRect();
-						const thisOffsetTop = Math.min(containerBox.bottom - containerBox.top - tooltipBox.height, containerBox.bottom - containerBox.top - (containerBox.height - mousePosition[1] + 20));
+						const thisOffsetTop = Math.min(svgBox.bottom - svgBox.top - tooltipBox.height, svgBox.bottom - svgBox.top - (svgBox.height - mousePosition[1] + 20));
 						tooltip.style("top", thisOffsetTop + "px");
 					});
 
@@ -2410,15 +2419,15 @@
 					.node()
 					.getBoundingClientRect();
 
-				const containerBox = containerDiv.node().getBoundingClientRect();
+				const svgBox = svg.node().getBoundingClientRect();
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = containerBox.bottom - containerBox.top - tooltipBox.height;
+				const thisOffsetTop = svgBox.bottom - svgBox.top - tooltipBox.height;
 
-				const thisOffsetLeft = containerBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					(thisBox.left + 2 * radiusScale(completeDatum.cbpf + completeDatum.cerf)) - containerBox.left + tooltipMargin :
-					thisBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
+				const thisOffsetLeft = svgBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
+					(thisBox.left + 2 * radiusScaleTimeline(completeDatum.cbpf + completeDatum.cerf)) - svgBox.left + tooltipMargin :
+					thisBox.left - svgBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
