@@ -179,12 +179,15 @@
 			legendPanelHeight = 140,
 			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
-			legendPanelVertPadding = 2,
+			legendPanelVertPadding = 12,
 			mapZoomButtonHorPadding = 10,
 			mapZoomButtonVertPadding = 10,
 			mapZoomButtonSize = 26,
 			maxPieSize = 32,
 			minPieSize = 1,
+			timelinePanelHeight = 238,
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (3 * panelHorizontalPadding),
+			timelinePercentagePadding = 0.1,
 			buttonsNumber = 10,
 			groupNamePadding = 2,
 			unBlue = "#1F69B3",
@@ -198,7 +201,6 @@
 			tooltipSvgHeight = 80,
 			showNamesMargin = 12,
 			tooltipSvgPadding = [14, 34, 2, 45],
-			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + (2 * panelHorizontalPadding),
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
@@ -214,12 +216,17 @@
 			formatNumberSI = d3.format(".3s"),
 			timeFormat = d3.timeFormat("%b-%y"),
 			timeParserButtons = d3.timeParse("%b-%y"),
+			timeParseMetadata = d3.timeParse("%d/%m/%Y"),
+			timeFormatTickValues = d3.timeFormat("%d/%m/%Y"),
 			timeFormatList = d3.timeFormat("%d %B, %Y"),
+			timeFormatAxis = d3.timeFormat("%d-%b"),
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			vizNameQueryString = "covid19",
 			allData = "allData",
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
+			iconsUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/",
+			timelineMetadataUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/covmapmetadata.json",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			typesOfTargeted = ["HostCommunities", "Refugees", "Returnees", "IDPs", "Others", "Disable"],
 			typesOfPeople = ["M", "W", "B", "G"],
@@ -233,12 +240,13 @@
 			};
 
 		let isSnapshotTooltipVisible = false,
+			maxTimelineRadius,
 			currentHoveredElem;
 
 		const hardcodedAllocations = [{
 			isoCode: "XX",
-			long: 35.24,
-			lat: 38.96
+			long: 37.22,
+			lat: 37.03
 		}, {
 			isoCode: "KM",
 			long: 43.87,
@@ -412,7 +420,7 @@
 			cbpfMargin: 386,
 			cbpfButtonsMargin: 426,
 			cerfMargin: 606,
-			cerfButtonsMargin: 646,
+			cerfButtonsMargin: 646
 		};
 
 		const mapPanel = {
@@ -421,7 +429,24 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: mapPanelHeight,
-			padding: [0, 0, 0, 0],
+			padding: [0, 0, 0, 0]
+		};
+
+		const timelinePanel = {
+			main: svg.append("g")
+				.attr("class", "covmaptimelinePanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (3 * panelHorizontalPadding)) + ")"),
+			width: width - padding[1] - padding[3],
+			height: timelinePanelHeight,
+			padding: [22, 6, 12, 6],
+			axisPadding: 110,
+			axisHeight: 14,
+			piePadding: 22,
+			iconPadding: 32,
+			iconRadius: 14,
+			iconSize: 20,
+			labelPadding: 10,
+			iconTextPadding: 6
 		};
 
 		const legendPanel = {
@@ -430,7 +455,7 @@
 				.attr("transform", "translate(" + (padding[3] + legendPanelHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapPanel.height - legendPanelHeight - legendPanelVertPadding) + ")"),
 			width: legendPanelWidth,
 			height: legendPanelHeight,
-			padding: [30, 0, 12, 4],
+			padding: [30, 0, 12, 4]
 		};
 
 		const mapZoomButtonPanel = {
@@ -439,14 +464,14 @@
 				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapZoomButtonVertPadding) + ")"),
 			width: mapZoomButtonSize,
 			height: mapZoomButtonSize * 2,
-			padding: [4, 4, 4, 4],
+			padding: [4, 4, 4, 4]
 		};
 
 		const checkboxesPanel = {
 			main: svg.append("g")
 				.attr("class", "covmapcheckboxesPanel")
 				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding + 1) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapZoomButtonVertPadding + mapZoomButtonPanel.height + showNamesMargin) + ")"),
-			padding: [0, 0, 0, 0],
+			padding: [0, 0, 0, 0]
 		};
 
 		const mapPanelClip = mapPanel.main.append("clipPath")
@@ -456,6 +481,14 @@
 			.attr("height", mapPanel.height);
 
 		mapPanel.main.attr("clip-path", "url(#covmapmapPanelClip)");
+
+		const timelinePanelClip = timelinePanel.main.append("clipPath")
+			.attr("id", "covmaptimelinePanelClip")
+			.append("rect")
+			.attr("width", timelinePanel.width)
+			.attr("height", timelinePanel.height);
+
+		timelinePanel.main.attr("clip-path", "url(#covmaptimelinePanelClip)");
 
 		const mapContainer = mapPanel.main.append("g")
 			.attr("class", "covmapmapContainer");
@@ -469,6 +502,16 @@
 		const zoomRectangle = zoomLayer.append("rect")
 			.attr("width", mapPanel.width)
 			.attr("height", mapPanel.height);
+
+		const zoomLayerTimeline = timelinePanel.main.append("g")
+			.attr("class", "covmapzoomLayerTimeline")
+			.style("opacity", 0)
+			.attr("cursor", "move")
+			.attr("pointer-events", "all");
+
+		const zoomRectangleTimeline = zoomLayerTimeline.append("rect")
+			.attr("width", timelinePanel.width)
+			.attr("height", timelinePanel.height);
 
 		const piesContainer = mapPanel.main.append("g")
 			.attr("class", "covmappiesContainer");
@@ -506,6 +549,19 @@
 			]);
 
 		mapPanel.main.call(zoom);
+
+		const zoomTimeline = d3.zoom()
+			.scaleExtent([1, 10])
+			.extent([
+				[0, 0],
+				[timelinePanel.width, timelinePanel.height]
+			])
+			.translateExtent([
+				[0, 0],
+				[timelinePanel.width, timelinePanel.height]
+			]);
+
+		timelinePanel.main.call(zoomTimeline);
 
 		const defs = svg.append("defs");
 
@@ -550,6 +606,15 @@
 		const tooltipSvgXScale = d3.scaleLinear()
 			.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
 
+		const timelineScale = d3.scaleTime()
+			.range([timelinePanel.padding[3], timelinePanel.width - timelinePanel.padding[1]]);
+
+		const timelineAxis = d3.axisTop(timelineScale)
+			.tickFormat(timeFormatAxis)
+			.tickSizeOuter(0)
+			.tickSizeInner(0)
+			.tickPadding(0);
+
 		const tooltipSvgYAxis = d3.axisLeft(tooltipSvgYScale)
 			.tickSize(0)
 			.tickPadding(5);
@@ -570,7 +635,9 @@
 		if (localStorage.getItem("covmapmap")) {
 			const mapData = JSON.parse(localStorage.getItem("covmapmap"));
 			console.info("covmap: map from local storage");
-			getData(mapData);
+			d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
+				getData(mapData, timelineMetadata);
+			});
 		} else {
 			d3.json(mapUrl).then(function(mapData) {
 				try {
@@ -579,16 +646,18 @@
 					console.info("D3 chart covmap map, " + error);
 				};
 				console.info("covmap: map from API");
-				getData(mapData);
+				d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
+					getData(mapData, timelineMetadata);
+				});
 			});
 		};
 
-		function getData(mapData) {
+		function getData(mapData, timelineMetadata) {
 			if (localStorage.getItem("covmapdata") &&
 				JSON.parse(localStorage.getItem("covmapdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("covmapdata")).data);
 				console.info("covmap: data from local storage");
-				csvCallback(rawData, mapData);
+				csvCallback(rawData, mapData, timelineMetadata);
 			} else {
 				d3.csv(dataUrl).then(function(rawData) {
 					try {
@@ -600,12 +669,12 @@
 						console.info("D3 chart covmap data, " + error);
 					};
 					console.info("covmap: data from API");
-					csvCallback(rawData, mapData);
+					csvCallback(rawData, mapData, timelineMetadata);
 				});
 			};
 		};
 
-		function csvCallback(rawData, mapData) {
+		function csvCallback(rawData, mapData, timelineMetadata) {
 
 			preProcessData(rawData);
 
@@ -613,14 +682,39 @@
 
 			removeProgressWheel();
 
-			draw(rawData, mapData);
+			draw(rawData, mapData, timelineMetadata);
 
 			//end of csvCallback
 		};
 
-		function draw(rawData, mapData) {
+		function draw(rawData, mapData, timelineMetadata) {
+
+			//test
+			// topPanel.main.append("rect")
+			// 	.attr("width", topPanel.width)
+			// 	.attr("height", topPanel.height)
+			// 	.style("fill", "green")
+			// 	.style("opacity", 0.2);
+			// buttonsPanel.main.append("rect")
+			// 	.attr("width", buttonsPanel.width)
+			// 	.attr("height", buttonsPanel.height)
+			// 	.style("fill", "green")
+			// 	.style("opacity", 0.2);
+			// mapPanel.main.append("rect")
+			// 	.attr("width", mapPanel.width)
+			// 	.attr("height", mapPanel.height)
+			// 	.style("fill", "green")
+			// 	.style("opacity", 0.2);
+			// timelinePanel.main.append("rect")
+			// 	.attr("width", timelinePanel.width)
+			// 	.attr("height", timelinePanel.height)
+			// 	.style("fill", "green")
+			// 	.style("opacity", 0.2);
+			//test
 
 			const data = processData(rawData);
+
+			const timelineData = processDataTimeline(rawData);
 
 			createTitle(rawData);
 
@@ -639,6 +733,8 @@
 			createPies(data);
 
 			createLegend(data);
+
+			createTimeline(timelineData, timelineMetadata);
 
 			createFooterDiv();
 
@@ -1878,236 +1974,7 @@
 				tooltip.style("display", "block")
 					.html(null);
 
-				const innerTooltip = tooltip.append("div")
-					.attr("id", "covmapInnerTooltipDiv");
-
-				innerTooltip.append("div")
-					.style("margin-bottom", "10px")
-					.style("font-size", "16px")
-					.style("color", "dimgray")
-					.style("width", "300px")
-					.append("strong")
-					.html(datum.country);
-
-				const tooltipContainer = innerTooltip.append("div")
-					.style("margin", "0px")
-					.style("display", "flex")
-					.style("flex-wrap", "wrap")
-					.style("width", "300px");
-
-				const tooltipData = [{
-					title: "CBPF ",
-					property: "cbpf",
-					color: cbpfColor
-				}, {
-					title: "CERF ",
-					property: "cerf",
-					color: d3.color(cerfColor).darker(0.4)
-				}].filter(function(e) {
-					return datum[e.property];
-				});
-
-				tooltipData.forEach(function(e, i) {
-					tooltipContainer.append("div")
-						.style("display", "flex")
-						.style("flex", "0 56%")
-						.style("margin-bottom", i === 1 ? "8px" : null)
-						.html(e.title);
-
-					tooltipContainer.append("div")
-						.style("display", "flex")
-						.style("flex", "0 44%")
-						.style("justify-content", "flex-end")
-						.style("color", e.color)
-						.style("margin-bottom", i === 1 ? "8px" : null)
-						.html("$" + formatMoney0Decimals(datum[e.property]));
-				});
-
-				let selectedTooltipButton = null;
-
-				typesOfTargeted.some(function(target) {
-					let total = 0;
-					typesOfPeople.forEach(function(people) {
-						total += datum["target" + target + peopleScale(people)];
-					});
-					if (total) selectedTooltipButton = target;
-					return !!total;
-				});
-
-				const buttonsDiv = innerTooltip.append("div")
-					.attr("class", "covmapbuttonsDiv");
-
-				const buttonsTitle = innerTooltip.append("div")
-					.style("margin-bottom", selectedTooltipButton ? "0px" : "12px")
-					.style("margin-top", "0px")
-					.style("font-size", "12px")
-					.html("Targeted People: " + (selectedTooltipButton ? targetedScale(selectedTooltipButton) : "to be determined"));
-
-				if (selectedTooltipButton) {
-
-					const tooltipButtons = buttonsDiv.selectAll(null)
-						.data(typesOfTargeted)
-						.enter()
-						.append("button")
-						.attr("class", "covmaptooltipButtons")
-						.property("disabled", function(d) {
-							let total = 0;
-							typesOfPeople.forEach(function(e) {
-								total += datum["target" + d + peopleScale(e)];
-							});
-							return total ? false : true;
-						})
-						.style("cursor", function(d) {
-							let total = 0;
-							typesOfPeople.forEach(function(e) {
-								total += datum["target" + d + peopleScale(e)];
-							});
-							return total ? "pointer" : "default";
-						})
-						.html(function(d) {
-							return d === "HostCommunities" ? "Host" : targetedScale(d);
-						});
-
-					tooltipButtons.filter(function(d) {
-						return d === "Disable";
-					}).attr("id", "covmaptooltipButtonsDisabled");
-
-					tooltipButtons.on("click", function(d) {
-						if (selectedTooltipButton === d) return;
-						selectedTooltipButton = d;
-						buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
-						createTooltipSvg(selectedTooltipButton);
-					});
-
-					const tooltipSvg = innerTooltip.append("svg")
-						.attr("width", tooltipSvgWidth)
-						.attr("height", tooltipSvgHeight);
-
-					const yAxisGroup = tooltipSvg.append("g")
-						.attr("class", "covmapTooltipSvgYAxisGroup")
-						.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
-
-					const xAxisGroup = tooltipSvg.append("g")
-						.attr("class", "covmapTooltipSvgXAxisGroup")
-						.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
-
-					createTooltipSvg(selectedTooltipButton);
-
-					function createTooltipSvg(selectedTargeted) {
-
-						const svgData = typesOfPeople.map(function(d) {
-							return {
-								people: peopleScale(d),
-								value: datum["target" + selectedTargeted + peopleScale(d)]
-							};
-						}).sort(function(a, b) {
-							return b.value - a.value;
-						});
-
-						tooltipSvgYScale.domain(svgData.map(function(d) {
-							return d.people;
-						}));
-
-						tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
-							return d.value;
-						})]);
-
-						if (tooltipSvgXScale.domain()[1] === 0) {
-							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
-						} else {
-							tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
-						};
-
-						yAxisGroup.transition()
-							.duration(duration)
-							.call(tooltipSvgYAxis);
-
-						xAxisGroup.transition()
-							.duration(duration)
-							.call(tooltipSvgXAxis);
-
-						xAxisGroup.selectAll(".tick")
-							.filter(function(d) {
-								return d === 0;
-							})
-							.remove();
-
-						let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
-							.data(svgData);
-
-						const peopleGroupsEnter = peopleGroups.enter()
-							.append("g")
-							.attr("class", "covmappeopleGroups");
-
-						const peopleGroupStick = peopleGroupsEnter.append("rect")
-							.attr("x", tooltipSvgPadding[3])
-							.attr("y", -stickHeight / 4)
-							.attr("height", stickHeight)
-							.attr("width", 0)
-							.style("fill", cbpfColor);
-
-						const peopleGroupLollipop = peopleGroupsEnter.append("circle")
-							.attr("cx", tooltipSvgPadding[3])
-							.attr("cy", (stickHeight / 4))
-							.attr("r", lollipopRadius)
-							.style("fill", cbpfColor);
-
-						const peopleGroupLabel = peopleGroupsEnter.append("text")
-							.attr("class", "covmapcbpfLabel")
-							.attr("x", tooltipSvgXScale(0))
-							.attr("y", 4)
-							.text(formatNumberSI(0));
-
-						peopleGroups = peopleGroupsEnter.merge(peopleGroups);
-
-						peopleGroups.attr("transform", function(d) {
-							return "translate(0," + tooltipSvgYScale(d.people) + ")";
-						});
-
-						peopleGroups.select("rect")
-							.transition()
-							.duration(duration)
-							.attr("width", function(d) {
-								return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
-							});
-
-						peopleGroups.select("circle")
-							.transition()
-							.duration(duration)
-							.attr("cx", function(d) {
-								return tooltipSvgXScale(d.value);
-							});
-
-						peopleGroups.select("text")
-							.transition()
-							.duration(duration)
-							.attr("x", function(d) {
-								return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
-							})
-							.textTween(function(d) {
-								const i = d3.interpolate(0, d.value);
-								return function(t) {
-									return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
-								};
-							});
-
-						//end of createTooltipSvg 
-					};
-
-				};
-
-				const tooltipDetailsButtonDiv = innerTooltip.append("div")
-					.attr("class", "covmaptooltipDetailsButtonDiv");
-
-				const tooltipDetailsButton = tooltipDetailsButtonDiv.append("button")
-					.html("Display Details")
-					.on("click", function() {
-						tooltip.style("display", "none");
-						generateList(datum);
-						listContainerDiv.node().scrollIntoView({
-							behavior: "smooth"
-						});
-					});
+				createCountryTooltip(datum);
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -2140,6 +2007,671 @@
 			};
 
 			//end of createPies
+		};
+
+		function createTimeline(unfilteredData, timelineMetadata) {
+
+			const data = unfilteredData.filter(function(d) {
+				return d.cbpf + d.cerf;
+			});
+
+			const allDates = data.map(function(d) {
+				return timeFormatTickValues(d.allocationDate);
+			});
+
+			const dateTicks = allDates.concat(timelineMetadata.map(function(d) {
+				return d.date;
+			})).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			}).map(function(d) {
+				return timeParseMetadata(d);
+			}).sort(function(a, b) {
+				return a - b;
+			});
+
+			const allocationDates = allDates.filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			}).map(function(d) {
+				return timeParseMetadata(d);
+			});
+
+			const dateExtent = d3.extent(dateTicks);
+
+			const numberOfDays = d3.timeDay.count(dateExtent[0], dateExtent[1]);
+
+			timelineScale.domain([d3.timeDay.offset(dateExtent[0], -(~~(numberOfDays * timelinePercentagePadding))),
+				d3.timeDay.offset(dateExtent[1], +(~~(numberOfDays * timelinePercentagePadding)))
+			]);
+
+			timelineAxis.tickValues(dateTicks);
+
+			const timelineTitle = timelinePanel.main.append("text")
+				.attr("class", "covmaptimelineTitle")
+				.attr("y", timelinePanel.padding[0])
+				.attr("x", timelinePanel.padding[3])
+				.text("Allocations Timeline");
+
+			const timelineTitleSpan = timelineTitle.append("tspan")
+				.attr("class", "covmaptimelineTitleSpan")
+				.text(" (use the mousewheel or touchpad to zoom)");
+
+			const timelineRect = timelinePanel.main.append("rect")
+				.attr("y", timelinePanel.axisPadding - (timelinePanel.axisHeight / 2))
+				.attr("width", timelinePanel.width)
+				.attr("height", timelinePanel.axisHeight)
+				.style("fill", "#ddd");
+
+			const timelineAxisGroup = timelinePanel.main.append("g")
+				.attr("class", "covmaptimelineAxisGroup")
+				.attr("transform", "translate(0," + (timelinePanel.axisPadding + timelinePanel.axisHeight / 4) + ")")
+				.call(timelineAxis);
+
+			timelineAxisGroup.selectAll(".tick text")
+				.call(removeTicks);
+
+			const keyDatesGroupsTimeline = timelinePanel.main.selectAll(null)
+				.data(timelineMetadata)
+				.enter()
+				.append("g")
+				.attr("class", "keyDatesGroupsTimeline")
+				.attr("transform", function(d) {
+					return "translate(" + timelineScale(timeParseMetadata(d.lollipopDate)) + "," +
+						(timelinePanel.axisPadding - (timelinePanel.axisHeight / 2) - timelinePanel.iconPadding - timelinePanel.iconRadius) + ")";
+				});
+
+			const iconCircles = keyDatesGroupsTimeline.append("circle")
+				.attr("r", timelinePanel.iconRadius)
+				.style("fill", "#f2f2f2")
+				.style("stroke", "#ddd");
+
+			const iconImages = keyDatesGroupsTimeline.append("image")
+				.attr("x", -(timelinePanel.iconSize / 2))
+				.attr("y", -(timelinePanel.iconSize / 2))
+				.attr("height", timelinePanel.iconSize)
+				.attr("width", timelinePanel.iconSize)
+				.attr("xlink:href", function(d) {
+					return iconsUrl + d.icon + "icon.png";
+				});
+
+			const iconText = keyDatesGroupsTimeline.append("text")
+				.attr("class", "covmapiconText")
+				.attr("x", timelinePanel.iconRadius + timelinePanel.iconTextPadding)
+				.attr("y", -(timelinePanel.iconRadius / 4))
+				.text(function(d) {
+					return d.title
+				})
+				.each(function(d) {
+					d3.select(this).call(wrapText2, d.size);
+				});
+
+			const iconPolyline = keyDatesGroupsTimeline.append("polyline")
+				.style("stroke", "#ddd")
+				.style("fill", "none")
+				.attr("points", function(d) {
+					return (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
+						" " + (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) +
+						" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) + " 0," + timelinePanel.iconRadius;
+				});
+
+			//Hardcoded name for Korea DPR
+			data.forEach(function(d) {
+				if (d.country === "Korea, Democratic People's Republic of") d.country = "Korea, DPR";
+			});
+
+			const mergedData = [];
+
+			allocationDates.forEach(function(date) {
+				const allocationsInSameDate = data.filter(function(d) {
+					return timeFormatTickValues(d.allocationDate) === timeFormatTickValues(date);
+				}).sort(function(a, b) {
+					return (b.cbpf + b.cerf) -
+						(a.cbpf + a.cerf);
+				});
+				if (allocationsInSameDate.length === 1) {
+					mergedData.push.apply(mergedData, allocationsInSameDate);
+				} else {
+					const mergedObject = {
+						allocationDate: date,
+						country: "Several countries",
+						cbpf: 0,
+						cerf: 0,
+						countriesList: []
+					};
+					for (let i = 0; i < allocationsInSameDate.length; i++) {
+						mergedObject.cbpf += allocationsInSameDate[i].cbpf;
+						mergedObject.cerf += allocationsInSameDate[i].cerf;
+						mergedObject.countriesList.push(allocationsInSameDate[i]);
+					};
+					mergedData.push(mergedObject);
+				};
+			});
+
+			mergedData.sort(function(a, b) {
+				return (b.cbpf + b.cerf) -
+					(a.cbpf + a.cerf);
+			});
+
+			const pieGroupsTimeline = timelinePanel.main.selectAll(null)
+				.data(mergedData)
+				.enter()
+				.append("g")
+				.attr("class", "covmappieGroupsTimeline")
+				.attr("transform", function(d) {
+					return "translate(" + timelineScale(d.allocationDate) + "," +
+						(timelinePanel.axisPadding + timelinePanel.piePadding + (timelinePanel.axisHeight / 2) + maxPieSize) + ")";
+				});
+
+			const pieGroupsTimelinePieContainer = pieGroupsTimeline.append("g")
+				.attr("class", "covmappieGroupsTimelinePieContainer")
+
+			const slicesTimeline = pieGroupsTimelinePieContainer.selectAll(null)
+				.data(function(d) {
+					return pieGenerator([{
+						value: d.cerf,
+						total: d.cbpf + d.cerf,
+						type: "cerf"
+					}, {
+						value: d.cbpf,
+						total: d.cbpf + d.cerf,
+						type: "cbpf"
+					}].filter(function(e) {
+						return e.value !== 0;
+					}))
+				})
+				.enter()
+				.append("path")
+				.style("fill", function(d) {
+					return d.data.type === "cbpf" ? cbpfColor : cerfColor;
+				})
+				.style("stroke", "#666")
+				.style("stroke-width", "1px")
+				.style("stroke-opacity", strokeOpacityValue)
+				.style("fill-opacity", fillOpacityValue)
+				.attr("d", function(d) {
+					return arcGenerator({
+						startAngle: d.startAngle,
+						endAngle: d.endAngle,
+						outerRadius: radiusScale(d.data.total)
+					});
+				});
+
+			const pieLines = pieGroupsTimeline.append("line")
+				.attr("y1", function(d) {
+					return -(radiusScale(d.cerf + d.cbpf) + 1);
+				})
+				.attr("y2", -(maxPieSize + timelinePanel.piePadding))
+				.attr("stroke-width", "1px")
+				.style("stroke", "#ddd");
+
+			const pieLabels = pieGroupsTimeline.append("text")
+				.attr("class", "covmappieLabelsTimeline")
+				.attr("y", function(d) {
+					return radiusScale(d.cerf + d.cbpf) + timelinePanel.labelPadding;
+				})
+				.attr("x", 0)
+				.text(function(d) {
+					return d.country;
+				})
+				.call(wrapText2, 84);
+
+			pieLabels.call(displayLabelsTimeline);
+
+			zoomTimeline.on("zoom", zoomedTimeline);
+
+			pieGroupsTimeline.on("mouseover", pieGroupsTimelineMouseover);
+
+			zoomRectangleTimeline.on("mouseover", pieGroupsTimelineMouseout);
+
+			function zoomedTimeline() {
+				timelineTitleSpan.remove();
+				const transf = d3.event.transform;
+				timelineAxisGroup.call(timelineAxis.scale(transf.rescaleX(timelineScale)));
+				pieGroupsTimeline.attr("transform", function(d) {
+					return "translate(" + (timelineScale(d.allocationDate) * d3.event.transform.k + d3.event.transform.x) +
+						"," + (timelinePanel.axisPadding + timelinePanel.piePadding + (timelinePanel.axisHeight / 2) + maxPieSize) + ")";
+				});
+				keyDatesGroupsTimeline.attr("transform", function(d) {
+					const xTranslate = d.lollipopDate === d.date ? (timelineScale(timeParseMetadata(d.lollipopDate)) * d3.event.transform.k + d3.event.transform.x) :
+						(timelineScale(timeParseMetadata(d.date)) * d3.event.transform.k + d3.event.transform.x + Math.max(0, ((timelineScale(timeParseMetadata(d.lollipopDate)) - timelineScale(timeParseMetadata(d.date)))) - (d3.event.transform.k - 1) * 50));
+					return "translate(" + xTranslate + "," +
+						(timelinePanel.axisPadding - (timelinePanel.axisHeight / 2) - timelinePanel.iconPadding - timelinePanel.iconRadius) + ")";
+				});
+				keyDatesGroupsTimeline.select("polyline")
+					.attr("points", function(d) {
+						const xTranslate = d.lollipopDate === d.date ? (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) * d3.event.transform.k :
+							Math.min(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) + (d3.event.transform.k - 1) * 50);
+						return xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
+							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) +
+							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) + " 0," + timelinePanel.iconRadius;
+					});
+				pieLabels.style("display", null)
+					.call(displayLabelsTimeline);
+
+				timelineAxisGroup.selectAll(".tick text")
+					.call(removeTicks);
+			};
+
+			function removeTicks(ticks) {
+				ticks.style("opacity", 1);
+				ticks.each(function(_, i, n) {
+					if (n[i + 1] && (window.getComputedStyle(this, null).getPropertyValue("opacity") === "1")) {
+						const thisBox = n[i].getBoundingClientRect();
+						const nextBox = n[i + 1].getBoundingClientRect();
+						if (nextBox.left < thisBox.right) {
+							d3.select(n[i + 1]).style("opacity", 0);
+						};
+					};
+				});
+			};
+
+			function pieGroupsTimelineMouseover(completeDatum) {
+
+				currentHoveredElem = this;
+
+				pieGroupsTimeline.style("opacity", function() {
+					return this === currentHoveredElem ? 1 : fadeOpacity;
+				});
+
+				tooltip.style("display", "block")
+					.html(null);
+
+				if (completeDatum.country === "Several countries") {
+					createCountriesListTooltip(completeDatum);
+				} else {
+					createCountryTooltip(completeDatum);
+				};
+
+				function createCountriesListTooltip(completeDatum) {
+
+					const innerTooltip = tooltip.append("div")
+						.attr("id", "covmapInnerTooltipDiv");
+
+					innerTooltip.append("div")
+						.style("margin-bottom", "8px")
+						.html("Date: " + timeFormatList(completeDatum.allocationDate));
+
+					const tooltipContainerHeader = innerTooltip.append("div")
+						.style("margin", "0px")
+						.style("display", "flex")
+						.style("flex-wrap", "wrap")
+						.style("width", "300px");
+
+					const tooltipDataHeader = [{
+						title: "Total CBPF ",
+						property: "cbpf",
+						color: cbpfColor
+					}, {
+						title: "Total CERF ",
+						property: "cerf",
+						color: d3.color(cerfColor).darker(0.4)
+					}].filter(function(e) {
+						return completeDatum[e.property];
+					});
+
+					tooltipDataHeader.forEach(function(e, i) {
+						tooltipContainerHeader.append("div")
+							.style("display", "flex")
+							.style("flex", "0 56%")
+							.style("margin-bottom", i === 1 ? "8px" : null)
+							.html(e.title);
+
+						tooltipContainerHeader.append("div")
+							.style("display", "flex")
+							.style("flex", "0 44%")
+							.style("justify-content", "flex-end")
+							.style("color", e.color)
+							.style("margin-bottom", i === 1 ? "8px" : null)
+							.html("$" + formatMoney0Decimals(completeDatum[e.property]));
+					});
+
+					const header = innerTooltip.append("div")
+						.style("margin-bottom", "10px")
+						.style("margin-top", "10px")
+						.style("font-size", "16px")
+						.style("color", "dimgray")
+						.style("width", "300px");
+
+					header.append("strong")
+						.html("List of countries ");
+
+					const scrollText = completeDatum.countriesList.length > 6 ? ", scroll down to reveal more" : "";
+
+					header.append("div")
+						.style("font-size", "14px")
+						.html("(click for details " + scrollText + ")");
+
+					const countryDivContainer = innerTooltip.append("div")
+						.attr("class", "covmapcountryDivContainer");
+
+					const countryDiv = countryDivContainer.selectAll(null)
+						.data(completeDatum.countriesList)
+						.enter()
+						.append("div")
+						.style("margin-bottom", "6px")
+						.style("cursor", "pointer");
+
+					countryDiv.append("div")
+						.style("border-top", "1px solid #dbdbdb")
+						.style("padding-top", "6px")
+						.style("margin-bottom", "6px")
+						.style("font-size", "16px")
+						.style("color", "dimgray")
+						.append("strong")
+						.html(function(d) {
+							return d.country
+						});
+
+					const countryDivList = countryDiv.append("div")
+						.attr("class", "covmapcountryDivList");
+
+					countryDivList.each(function(d, i, n) {
+
+						const countryData = [{
+							title: "CBPF ",
+							property: "cbpf",
+							color: cbpfColor
+						}, {
+							title: "CERF ",
+							property: "cerf",
+							color: d3.color(cerfColor).darker(0.4)
+						}].filter(function(e) {
+							return d[e.property];
+						});
+
+						countryData.forEach(function(e) {
+							d3.select(n[i]).append("div")
+								.style("display", "flex")
+								.style("flex", "0 56%")
+								.html(e.title);
+
+							d3.select(n[i]).append("div")
+								.style("display", "flex")
+								.style("flex", "0 44%")
+								.style("justify-content", "flex-end")
+								.style("color", e.color)
+								.html("$" + formatMoney0Decimals(d[e.property]));
+						});
+					});
+
+					countryDiv.on("click", function(d) {
+						tooltip.html(null);
+						createCountryTooltip(d);
+						const mousePosition = d3.mouse(containerDiv.node());
+						const tooltipBox = tooltip.node().getBoundingClientRect();
+						const thisOffsetTop = Math.min(containerBox.bottom - containerBox.top - tooltipBox.height, containerBox.bottom - containerBox.top - (containerBox.height - mousePosition[1] + 20));
+						tooltip.style("top", thisOffsetTop + "px");
+					});
+
+					//end of createCountriesListTooltip
+				};
+
+				const thisBox = d3.select(this)
+					.select(".covmappieGroupsTimelinePieContainer")
+					.node()
+					.getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = containerBox.bottom - containerBox.top - tooltipBox.height;
+
+				const thisOffsetLeft = containerBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
+					(thisBox.left + 2 * radiusScale(completeDatum.cbpf + completeDatum.cerf)) - containerBox.left + tooltipMargin :
+					thisBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
+
+				tooltip.style("top", thisOffsetTop + "px")
+					.style("left", thisOffsetLeft + "px");
+
+				//end of pieGroupsTimelineMouseover
+			};
+
+			function pieGroupsTimelineMouseout() {
+
+				if (isSnapshotTooltipVisible) return;
+
+				currentHoveredElem = null;
+
+				pieGroupsTimeline.style("opacity", 1);
+
+				tooltip.html(null)
+					.style("display", "none");
+
+			};
+
+			//end of createTimeline
+		};
+
+		function createCountryTooltip(datum) {
+
+			const innerTooltip = tooltip.append("div")
+				.attr("id", "covmapInnerTooltipDiv");
+
+			innerTooltip.append("div")
+				.style("margin-bottom", "10px")
+				.style("font-size", "16px")
+				.style("color", "dimgray")
+				.style("width", "300px")
+				.append("strong")
+				.html(datum.country);
+
+			const tooltipContainer = innerTooltip.append("div")
+				.style("margin", "0px")
+				.style("display", "flex")
+				.style("flex-wrap", "wrap")
+				.style("width", "300px");
+
+			const tooltipData = [{
+				title: "CBPF ",
+				property: "cbpf",
+				color: cbpfColor
+			}, {
+				title: "CERF ",
+				property: "cerf",
+				color: d3.color(cerfColor).darker(0.4)
+			}].filter(function(e) {
+				return datum[e.property];
+			});
+
+			tooltipData.forEach(function(e) {
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html(e.title);
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.style("color", e.color)
+					.html("$" + formatMoney0Decimals(datum[e.property]));
+			});
+
+			let selectedTooltipButton = null;
+
+			typesOfTargeted.some(function(target) {
+				let total = 0;
+				typesOfPeople.forEach(function(people) {
+					total += datum["target" + target + peopleScale(people)];
+				});
+				if (total) selectedTooltipButton = target;
+				return !!total;
+			});
+
+			const buttonsDiv = innerTooltip.append("div")
+				.attr("class", "covmapbuttonsDiv");
+
+			const buttonsTitle = innerTooltip.append("div")
+				.style("margin-bottom", selectedTooltipButton ? "0px" : "12px")
+				.style("margin-top", "0px")
+				.style("font-size", "12px")
+				.html("Targeted People: " + (selectedTooltipButton ? targetedScale(selectedTooltipButton) : "to be determined"));
+
+			if (selectedTooltipButton) {
+
+				const tooltipButtons = buttonsDiv.selectAll(null)
+					.data(typesOfTargeted)
+					.enter()
+					.append("button")
+					.attr("class", "covmaptooltipButtons")
+					.property("disabled", function(d) {
+						let total = 0;
+						typesOfPeople.forEach(function(e) {
+							total += datum["target" + d + peopleScale(e)];
+						});
+						return total ? false : true;
+					})
+					.style("cursor", function(d) {
+						let total = 0;
+						typesOfPeople.forEach(function(e) {
+							total += datum["target" + d + peopleScale(e)];
+						});
+						return total ? "pointer" : "default";
+					})
+					.html(function(d) {
+						return d === "HostCommunities" ? "Host" : targetedScale(d);
+					});
+
+				tooltipButtons.filter(function(d) {
+					return d === "Disable";
+				}).attr("id", "covmaptooltipButtonsDisabled");
+
+				tooltipButtons.on("click", function(d) {
+					if (selectedTooltipButton === d) return;
+					selectedTooltipButton = d;
+					buttonsTitle.html("Targeted People: " + targetedScale(selectedTooltipButton));
+					createTooltipSvg(selectedTooltipButton);
+				});
+
+				const tooltipSvg = innerTooltip.append("svg")
+					.attr("width", tooltipSvgWidth)
+					.attr("height", tooltipSvgHeight);
+
+				const yAxisGroup = tooltipSvg.append("g")
+					.attr("class", "covmapTooltipSvgYAxisGroup")
+					.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)");
+
+				const xAxisGroup = tooltipSvg.append("g")
+					.attr("class", "covmapTooltipSvgXAxisGroup")
+					.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")");
+
+				createTooltipSvg(selectedTooltipButton);
+
+				function createTooltipSvg(selectedTargeted) {
+
+					const svgData = typesOfPeople.map(function(d) {
+						return {
+							people: peopleScale(d),
+							value: datum["target" + selectedTargeted + peopleScale(d)]
+						};
+					}).sort(function(a, b) {
+						return b.value - a.value;
+					});
+
+					tooltipSvgYScale.domain(svgData.map(function(d) {
+						return d.people;
+					}));
+
+					tooltipSvgXScale.domain([0, d3.max(svgData, function(d) {
+						return d.value;
+					})]);
+
+					if (tooltipSvgXScale.domain()[1] === 0) {
+						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgPadding[3]]);
+					} else {
+						tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
+					};
+
+					yAxisGroup.transition()
+						.duration(duration)
+						.call(tooltipSvgYAxis);
+
+					xAxisGroup.transition()
+						.duration(duration)
+						.call(tooltipSvgXAxis);
+
+					xAxisGroup.selectAll(".tick")
+						.filter(function(d) {
+							return d === 0;
+						})
+						.remove();
+
+					let peopleGroups = tooltipSvg.selectAll(".covmappeopleGroups")
+						.data(svgData);
+
+					const peopleGroupsEnter = peopleGroups.enter()
+						.append("g")
+						.attr("class", "covmappeopleGroups");
+
+					const peopleGroupStick = peopleGroupsEnter.append("rect")
+						.attr("x", tooltipSvgPadding[3])
+						.attr("y", -stickHeight / 4)
+						.attr("height", stickHeight)
+						.attr("width", 0)
+						.style("fill", cbpfColor);
+
+					const peopleGroupLollipop = peopleGroupsEnter.append("circle")
+						.attr("cx", tooltipSvgPadding[3])
+						.attr("cy", (stickHeight / 4))
+						.attr("r", lollipopRadius)
+						.style("fill", cbpfColor);
+
+					const peopleGroupLabel = peopleGroupsEnter.append("text")
+						.attr("class", "covmapcbpfLabel")
+						.attr("x", tooltipSvgXScale(0))
+						.attr("y", 4)
+						.text(formatNumberSI(0));
+
+					peopleGroups = peopleGroupsEnter.merge(peopleGroups);
+
+					peopleGroups.attr("transform", function(d) {
+						return "translate(0," + tooltipSvgYScale(d.people) + ")";
+					});
+
+					peopleGroups.select("rect")
+						.transition()
+						.duration(duration)
+						.attr("width", function(d) {
+							return tooltipSvgXScale(d.value) - tooltipSvgPadding[3];
+						});
+
+					peopleGroups.select("circle")
+						.transition()
+						.duration(duration)
+						.attr("cx", function(d) {
+							return tooltipSvgXScale(d.value);
+						});
+
+					peopleGroups.select("text")
+						.transition()
+						.duration(duration)
+						.attr("x", function(d) {
+							return tooltipSvgXScale(d.value) + labelPadding + lollipopRadius
+						})
+						.textTween(function(d) {
+							const i = d3.interpolate(0, d.value);
+							return function(t) {
+								return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
+							};
+						});
+
+					//end of createTooltipSvg 
+				};
+
+			};
+
+			const tooltipDetailsButtonDiv = innerTooltip.append("div")
+				.attr("class", "covmaptooltipDetailsButtonDiv");
+
+			const tooltipDetailsButton = tooltipDetailsButtonDiv.append("button")
+				.html("Display Details")
+				.on("click", function() {
+					tooltip.style("display", "none");
+					generateList(datum);
+					listContainerDiv.node().scrollIntoView({
+						behavior: "smooth"
+					});
+				});
 		};
 
 		function createLegend(data) {
@@ -2423,7 +2955,7 @@
 				if (!tableDataFiltered.length) {
 					const affectedPersonsContainerValue = d3.select(this).append("div")
 						.attr("class", "covmapaffectedPersonsContainerValue")
-						.html("No Affected Persons");
+						.html("To be determined");
 				} else {
 
 					const thisDiv = d3.select(this);
@@ -2551,6 +3083,60 @@
 			//end of processData
 		};
 
+		function processDataTimeline(rawData) {
+
+			const data = [];
+
+			rawData.forEach(function(row) {
+
+				const foundAllocation = data.find(function(d) {
+					return d.isoCode === row.ISO2Country && (timeFormatAxis(new Date(row.DateOfAlloc)) === timeFormatAxis(d.allocationDate));
+				});
+
+				if (foundAllocation) {
+					foundAllocation.allocationsList.push(row);
+					typesOfTargeted.forEach(function(target) {
+						typesOfPeople.forEach(function(people) {
+							foundAllocation["target" + target + peopleScale(people)] += +row["Target" + target + people];
+							foundAllocation.targetTotal += +row["Target" + target + people];
+						});
+					});
+					pushCbpfOrCerf(foundAllocation, row);
+				} else {
+					const countryObject = {
+						allocationDate: new Date(row.DateOfAlloc),
+						country: row.Country.trim(),
+						labelText: row.Country.split(" "),
+						isoCode: row.ISO2Country,
+						cbpf: 0,
+						cerf: 0,
+						targetTotal: 0,
+						allocationsList: [row]
+					};
+					pushCbpfOrCerf(countryObject, row);
+					typesOfTargeted.forEach(function(target) {
+						typesOfPeople.forEach(function(people) {
+							countryObject["target" + target + peopleScale(people)] = +row["Target" + target + people];
+							countryObject.targetTotal += +row["Target" + target + people];
+						});
+					});
+					data.push(countryObject);
+				};
+			});
+
+			return data;
+
+			function pushCbpfOrCerf(obj, row) {
+				if (row.PFType.toLowerCase() === "cbpf") {
+					obj.cbpf += +row.TargetAmt;
+				} else if (row.PFType.toLowerCase() === "cerf") {
+					obj.cerf += +row.TargetAmt;
+				};
+			};
+
+			//end of processDataTimeline
+		};
+
 		function createCsv(rawData) {
 
 			const data = processData(rawData);
@@ -2618,6 +3204,27 @@
 								d3.select(outerElement).style("display", "none");
 								d3.select(outerElement.previousSibling).style("display", "none");
 							};
+						};
+					};
+				});
+			});
+		};
+
+		function displayLabelsTimeline(labelSelectionTimeline) {
+			const labelNodes = labelSelectionTimeline.nodes();
+			labelNodes.sort(function(a, b) {
+				return a.parentNode.transform.baseVal.consolidate().matrix.e - b.parentNode.transform.baseVal.consolidate().matrix.e;
+			});
+			labelNodes.forEach(function(outerElem) {
+				const outerBox = outerElem.getBoundingClientRect();
+				labelNodes.forEach(function(innerElem) {
+					if (outerElem !== innerElem) {
+						const innerBox = innerElem.getBoundingClientRect();
+						if (!(outerBox.right < innerBox.left ||
+								outerBox.left > innerBox.right ||
+								outerBox.bottom < innerBox.top ||
+								outerBox.top > innerBox.bottom)) {
+							d3.select(innerElem).style("display", "none");
 						};
 					};
 				});

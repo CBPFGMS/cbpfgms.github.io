@@ -113,14 +113,6 @@
 	pointer-events: none;
 }
 
-.covmapcbpfTitle, .covmapcerfTitle {
-	font-family: "Arial", sans-serif;
-	font-size: 12px;
-	font-weight: 700;
-	fill: #666;
-	pointer-events: none;
-}
-
 .covmapleftArrowText, .covmaprightArrowText {
 	font-family: "Arial", sans-serif;
 	font-size: 20px;
@@ -290,6 +282,20 @@
 	fill: #888;
 }
 
+.covmaptimelineTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	font-weight: 700;
+	fill: #666;
+}
+
+.covmaptimelineTitleSpan {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 400;
+	fill: #666;
+}
+
 .covmaptopPanelCbpfText, .covmaptopPanelCerfText {
 	font-family: "Arial", sans-serif;
 	font-size: 22px;
@@ -318,11 +324,46 @@
 	stroke-dasharray: 2, 2;
 }
 
+.covmaptimelineAxisGroup path, .covmaptimelineAxisGroup line {
+	fill: none;
+	stroke: none;
+}
+
+.covmaptimelineAxisGroup text {
+	fill: darkslategray;
+}
+
 .covmapcbpfLabel {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
 	fill: #666;
 	pointer-events: none;
+}
+
+.covmappieLabelsTimeline {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: darkslategray;
+	pointer-events: none;
+	text-anchor: middle;
+}
+
+.covmapiconText {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.covmapcountryDivList {
+	display: flex;
+	flex-wrap: wrap;
+	width: 300px;
+}
+
+.covmapcountryDivContainer {
+	max-height: 300px;
+	overflow-y: scroll;
 }
 
 .covmapAnnotationMainText {
