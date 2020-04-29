@@ -2338,7 +2338,7 @@
 
 					header.append("div")
 						.style("font-size", "14px")
-						.html("(click for details " + scrollText + ")");
+						.html("(click for details" + scrollText + ")");
 
 					const countryDivContainer = innerTooltip.append("div")
 						.attr("class", "covmapcountryDivContainer");
