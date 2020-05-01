@@ -3310,9 +3310,9 @@
 				.attr("viewBox", "0 0 " + width + " " + height);
 
 			const mainTextRect = helpSVG.append("rect")
-				.attr("x", width * 0.7)
+				.attr("x", width * 0.6)
 				.attr("y", topPanel.height + panelHorizontalPadding)
-				.attr("width", width * 0.3)
+				.attr("width", width * 0.4)
 				.attr("height", buttonsPanel.height + panelHorizontalPadding)
 				.style("fill", "white")
 				.style("pointer-events", "all")
@@ -3362,6 +3362,15 @@
 				xTooltip: 400,
 				yTooltip: 260,
 				text: "This area shows the allocations for each country. Hover over the pies to display a tooltip with additional information. In the tooltip you can click the buttons to select the type of targeted people. Also, in the tooltip, you can click “Display Details” to show detailed list of allocations in that given country, just below the map."
+			},
+			{
+				x: 6,
+				y: 596,
+				width: 1084,
+				height: 240,
+				xTooltip: 400,
+				yTooltip: 430,
+				text: "This timeline shows the allocations according to their dates. Allocations in the same day are merged and displayed as “Several countries”. Hover over the pies to display a tooltip with additional information. In the tooltip for “Several countries” pies you can click on each country to display that country’s information and scroll down to reveal more countries."
 			}];
 
 			helpData.forEach(function(d) {

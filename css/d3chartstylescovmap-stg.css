@@ -282,7 +282,7 @@
 	fill: #888;
 }
 
-.covmaptimelineTitle {
+.covmaptimelineTitle, .covmapmapTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 18px;
 	font-weight: 700;
