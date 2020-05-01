@@ -2018,12 +2018,6 @@
 				return d.cbpf + d.cerf;
 			});
 
-			const maxValue = d3.max(data, function(d) {
-				return d.cbpf + d.cerf;
-			});
-
-			radiusScaleTimeline.domain([0, maxValue || 0]);
-
 			const allDates = data.map(function(d) {
 				return timeFormatTickValues(d.allocationDate);
 			});
@@ -2159,6 +2153,12 @@
 				return (b.cbpf + b.cerf) -
 					(a.cbpf + a.cerf);
 			});
+
+			const maxValue = d3.max(mergedData, function(d) {
+				return d.cbpf + d.cerf;
+			});
+
+			radiusScaleTimeline.domain([0, maxValue || 0]);
 
 			const pieGroupsTimeline = timelinePanel.main.selectAll(null)
 				.data(mergedData)
@@ -3362,8 +3362,7 @@
 				xTooltip: 400,
 				yTooltip: 260,
 				text: "This area shows the allocations for each country. Hover over the pies to display a tooltip with additional information. In the tooltip you can click the buttons to select the type of targeted people. Also, in the tooltip, you can click “Display Details” to show detailed list of allocations in that given country, just below the map."
-			},
-			{
+			}, {
 				x: 6,
 				y: 596,
 				width: 1084,
