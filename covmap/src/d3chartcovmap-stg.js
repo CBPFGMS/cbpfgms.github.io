@@ -185,7 +185,7 @@
 			mapZoomButtonSize = 26,
 			maxPieSize = 32,
 			minPieSize = 1,
-			timelinePanelHeight = 238,
+			timelinePanelHeight = 230,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (3 * panelHorizontalPadding),
 			timelinePercentagePadding = 0.1,
 			buttonsNumber = 10,
