@@ -2558,7 +2558,7 @@
 					});
 					d3.select(this)
 						.transition()
-						.duration(dura)
+						.duration(duration)
 						.style("opacity", inInterval ? 1 : fadeOpacity);
 				});
 
