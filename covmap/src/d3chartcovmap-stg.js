@@ -180,14 +180,15 @@
 			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
 			legendPanelVertPadding = 12,
-			mapZoomButtonHorPadding = 10,
+			mapZoomButtonHorPadding = 6,
 			mapZoomButtonVertPadding = 10,
+			timelineZoomButtonVertPadding = 32,
 			mapZoomButtonSize = 26,
 			maxPieSize = 32,
 			minPieSize = 1,
 			timelinePanelHeight = 230,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (3 * panelHorizontalPadding),
-			timelinePercentagePadding = 0.1,
+			timelinePercentagePadding = 0.07,
 			buttonsNumber = 10,
 			groupNamePadding = 2,
 			unBlue = "#1F69B3",
@@ -411,7 +412,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
-			padding: [0, 0, 0, 0],
+			padding: [0, 6, 0, 6],
 			buttonWidth: 64,
 			buttonsMargin: 4,
 			buttonsPadding: 6,
@@ -462,6 +463,15 @@
 			main: svg.append("g")
 				.attr("class", "covmapmapZoomButtonPanel")
 				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding) + mapZoomButtonVertPadding) + ")"),
+			width: mapZoomButtonSize,
+			height: mapZoomButtonSize * 2,
+			padding: [4, 4, 4, 4]
+		};
+
+		const timelineZoomButtonPanel = {
+			main: svg.append("g")
+				.attr("class", "covmaptimelineZoomButtonPanel")
+				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (3 * panelHorizontalPadding) + timelineZoomButtonVertPadding) + ")"),
 			width: mapZoomButtonSize,
 			height: mapZoomButtonSize * 2,
 			padding: [4, 4, 4, 4]
@@ -590,6 +600,7 @@
 			.attr("in", "SourceGraphic");
 
 		mapZoomButtonPanel.main.style("filter", "url(#covmapdropshadow)");
+		timelineZoomButtonPanel.main.style("filter", "url(#covmapdropshadow)");
 
 		const peopleScale = d3.scaleOrdinal()
 			.domain(typesOfPeople)
@@ -607,7 +618,10 @@
 			.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]]);
 
 		const timelineScale = d3.scaleTime()
-			.range([timelinePanel.padding[3], timelinePanel.width - timelinePanel.padding[1]]);
+			.range([0, timelinePanel.width]);
+
+		const radiusScaleTimeline = d3.scaleSqrt()
+			.range([minPieSize, maxPieSize]);
 
 		const timelineAxis = d3.axisTop(timelineScale)
 			.tickFormat(timeFormatAxis)
@@ -724,7 +738,9 @@
 
 			verifyCentroids(rawData);
 
-			createZoomButtons();
+			createZoomButtons(mapZoomButtonPanel, "Map");
+
+			createZoomButtons(timelineZoomButtonPanel, "Timeline");
 
 			createCheckboxes();
 
@@ -735,6 +751,8 @@
 			createLegend(data);
 
 			createTimeline(timelineData, timelineMetadata);
+
+			createTimelineHighlight();
 
 			createFooterDiv();
 
@@ -1017,22 +1035,22 @@
 			//end of createMap
 		};
 
-		function createZoomButtons() {
+		function createZoomButtons(panel, className) {
 
-			const zoomInGroup = mapZoomButtonPanel.main.append("g")
-				.attr("class", "covmapzoomInGroup")
+			const zoomInGroup = panel.main.append("g")
+				.attr("class", "covmapzoomInGroup" + className)
 				.attr("cursor", "pointer");
 
 			const zoomInPath = zoomInGroup.append("path")
 				.attr("class", "covmapzoomPath")
 				.attr("d", function() {
 					const drawPath = d3.path();
-					drawPath.moveTo(0, mapZoomButtonPanel.height / 2);
-					drawPath.lineTo(0, mapZoomButtonPanel.padding[0]);
-					drawPath.quadraticCurveTo(0, 0, mapZoomButtonPanel.padding[0], 0);
-					drawPath.lineTo(mapZoomButtonPanel.width - mapZoomButtonPanel.padding[1], 0);
-					drawPath.quadraticCurveTo(mapZoomButtonPanel.width, 0, mapZoomButtonPanel.width, mapZoomButtonPanel.padding[1]);
-					drawPath.lineTo(mapZoomButtonPanel.width, mapZoomButtonPanel.height / 2);
+					drawPath.moveTo(0, panel.height / 2);
+					drawPath.lineTo(0, panel.padding[0]);
+					drawPath.quadraticCurveTo(0, 0, panel.padding[0], 0);
+					drawPath.lineTo(panel.width - panel.padding[1], 0);
+					drawPath.quadraticCurveTo(panel.width, 0, panel.width, panel.padding[1]);
+					drawPath.lineTo(panel.width, panel.height / 2);
 					drawPath.closePath();
 					return drawPath.toString();
 				});
@@ -1040,24 +1058,24 @@
 			const zoomInText = zoomInGroup.append("text")
 				.attr("class", "covmapzoomText")
 				.attr("text-anchor", "middle")
-				.attr("x", mapZoomButtonPanel.width / 2)
-				.attr("y", (mapZoomButtonPanel.height / 4) + 7)
+				.attr("x", panel.width / 2)
+				.attr("y", (panel.height / 4) + 7)
 				.text("+");
 
-			const zoomOutGroup = mapZoomButtonPanel.main.append("g")
-				.attr("class", "covmapzoomOutGroup")
+			const zoomOutGroup = panel.main.append("g")
+				.attr("class", "covmapzoomOutGroup" + className)
 				.attr("cursor", "pointer");
 
 			const zoomOutPath = zoomOutGroup.append("path")
 				.attr("class", "covmapzoomPath")
 				.attr("d", function() {
 					const drawPath = d3.path();
-					drawPath.moveTo(0, mapZoomButtonPanel.height / 2);
-					drawPath.lineTo(0, mapZoomButtonPanel.height - mapZoomButtonPanel.padding[3]);
-					drawPath.quadraticCurveTo(0, mapZoomButtonPanel.height, mapZoomButtonPanel.padding[3], mapZoomButtonPanel.height);
-					drawPath.lineTo(mapZoomButtonPanel.width - mapZoomButtonPanel.padding[2], mapZoomButtonPanel.height);
-					drawPath.quadraticCurveTo(mapZoomButtonPanel.width, mapZoomButtonPanel.height, mapZoomButtonPanel.width, mapZoomButtonPanel.height - mapZoomButtonPanel.padding[2]);
-					drawPath.lineTo(mapZoomButtonPanel.width, mapZoomButtonPanel.height / 2);
+					drawPath.moveTo(0, panel.height / 2);
+					drawPath.lineTo(0, panel.height - panel.padding[3]);
+					drawPath.quadraticCurveTo(0, panel.height, panel.padding[3], panel.height);
+					drawPath.lineTo(panel.width - panel.padding[2], panel.height);
+					drawPath.quadraticCurveTo(panel.width, panel.height, panel.width, panel.height - panel.padding[2]);
+					drawPath.lineTo(panel.width, panel.height / 2);
 					drawPath.closePath();
 					return drawPath.toString();
 				});
@@ -1065,15 +1083,15 @@
 			const zoomOutText = zoomOutGroup.append("text")
 				.attr("class", "covmapzoomText")
 				.attr("text-anchor", "middle")
-				.attr("x", mapZoomButtonPanel.width / 2)
-				.attr("y", (3 * mapZoomButtonPanel.height / 4) + 7)
+				.attr("x", panel.width / 2)
+				.attr("y", (3 * panel.height / 4) + 7)
 				.text("−");
 
-			const zoomLine = mapZoomButtonPanel.main.append("line")
+			const zoomLine = panel.main.append("line")
 				.attr("x1", 0)
-				.attr("x2", mapZoomButtonPanel.width)
-				.attr("y1", mapZoomButtonPanel.height / 2)
-				.attr("y2", mapZoomButtonPanel.height / 2)
+				.attr("x2", panel.width)
+				.attr("y1", panel.height / 2)
+				.attr("y2", panel.height / 2)
 				.style("stroke", "#ccc")
 				.style("stroke-width", "1px");
 
@@ -1373,9 +1391,11 @@
 				.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
 				.attr("height", buttonsPanel.height);
 
+			const extraPadding = monthsArray.length > buttonsNumber ? buttonsPanel.arrowPadding : -2;
+
 			const clipPathGroup = buttonsPanel.main.append("g")
 				.attr("class", "covmapClipPathGroup")
-				.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding) + ",0)")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + extraPadding) + ",0)")
 				.attr("clip-path", "url(#covmapclip)");
 
 			const buttonsGroup = clipPathGroup.append("g")
@@ -1611,6 +1631,12 @@
 
 				tooltip.style("display", "none");
 
+				const timelineTransform = d3.zoomTransform(timelinePanel.main.node());
+
+				if (timelineTransform.k !== 1) {
+					zoomTimeline.transform(timelinePanel.main.transition().duration(duration), d3.zoomIdentity);
+				};
+
 				if (singleSelection || d === allData) {
 					chartState.selectedMonth = [d];
 				} else {
@@ -1651,6 +1677,8 @@
 				});
 
 				const data = processData(rawData);
+
+				createTimelineHighlight();
 
 				createTopPanel(data);
 
@@ -1953,12 +1981,12 @@
 				//end of zoomed
 			};
 
-			mapZoomButtonPanel.main.select(".covmapzoomInGroup")
+			mapZoomButtonPanel.main.select(".covmapzoomInGroupMap")
 				.on("click", function() {
 					zoom.scaleBy(mapPanel.main.transition().duration(duration), 2);
 				});
 
-			mapZoomButtonPanel.main.select(".covmapzoomOutGroup")
+			mapZoomButtonPanel.main.select(".covmapzoomOutGroupMap")
 				.on("click", function() {
 					zoom.scaleBy(mapPanel.main.transition().duration(duration), 0.5);
 				});
@@ -1974,7 +2002,9 @@
 				tooltip.style("display", "block")
 					.html(null);
 
-				createCountryTooltip(datum);
+				tooltip.on("mouseleave", null);
+
+				createCountryTooltip(datum, false);
 
 				const thisBox = this.getBoundingClientRect();
 
@@ -2010,9 +2040,6 @@
 		};
 
 		function createTimeline(unfilteredData, timelineMetadata) {
-
-			const radiusScaleTimeline = d3.scaleSqrt()
-				.range([minPieSize, maxPieSize]);
 
 			const data = unfilteredData.filter(function(d) {
 				return d.cbpf + d.cerf;
@@ -2063,6 +2090,10 @@
 				.attr("width", timelinePanel.width)
 				.attr("height", timelinePanel.axisHeight)
 				.style("fill", "#ddd");
+
+			const timelineHighlightGroup = timelinePanel.main.append("g")
+				.attr("class", "covmaptimelineHighlightGroup")
+				.attr("transform", "translate(0," + (timelinePanel.axisPadding - (timelinePanel.axisHeight / 2)) + ")");
 
 			const timelineAxisGroup = timelinePanel.main.append("g")
 				.attr("class", "covmaptimelineAxisGroup")
@@ -2253,12 +2284,29 @@
 							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) +
 							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) + " 0," + timelinePanel.iconRadius;
 					});
+				timelineHighlightGroup.selectAll(".covmaphighlightRects")
+					.attr("x", function(d) {
+						return timelineScale(d[0]) * d3.event.transform.k + d3.event.transform.x;
+					})
+					.attr("width", function(d) {
+						return (timelineScale(d[1]) * d3.event.transform.k + d3.event.transform.x) - (timelineScale(d[0]) * d3.event.transform.k + d3.event.transform.x);
+					});
 				pieLabels.style("display", null)
 					.call(displayLabelsTimeline);
 
 				timelineAxisGroup.selectAll(".tick text")
 					.call(removeTicks);
 			};
+
+			timelineZoomButtonPanel.main.select(".covmapzoomInGroupTimeline")
+				.on("click", function() {
+					zoomTimeline.scaleBy(timelinePanel.main.transition().duration(duration), 1.5);
+				});
+
+			timelineZoomButtonPanel.main.select(".covmapzoomOutGroupTimeline")
+				.on("click", function() {
+					zoomTimeline.scaleBy(timelinePanel.main.transition().duration(duration), 0.5);
+				});
 
 			function removeTicks(ticks) {
 				ticks.style("opacity", 1);
@@ -2277,17 +2325,15 @@
 
 				currentHoveredElem = this;
 
-				pieGroupsTimeline.style("opacity", function() {
-					return this === currentHoveredElem ? 1 : fadeOpacity;
-				});
-
 				tooltip.style("display", "block")
 					.html(null);
+
+				tooltip.on("mouseleave", pieGroupsTimelineMouseout);
 
 				if (completeDatum.country === "Several countries") {
 					createCountriesListTooltip(completeDatum);
 				} else {
-					createCountryTooltip(completeDatum);
+					createCountryTooltip(completeDatum, true);
 				};
 
 				function createCountriesListTooltip(completeDatum) {
@@ -2404,7 +2450,7 @@
 
 					countryDiv.on("click", function(d) {
 						tooltip.html(null);
-						createCountryTooltip(d);
+						createCountryTooltip(d, true);
 						const mousePosition = d3.mouse(svg.node());
 						const tooltipBox = tooltip.node().getBoundingClientRect();
 						const thisOffsetTop = Math.min(svgBox.bottom - svgBox.top - tooltipBox.height, svgBox.bottom - svgBox.top - (svgBox.height - mousePosition[1] + 20));
@@ -2441,8 +2487,6 @@
 
 				currentHoveredElem = null;
 
-				pieGroupsTimeline.style("opacity", 1);
-
 				tooltip.html(null)
 					.style("display", "none");
 
@@ -2451,7 +2495,77 @@
 			//end of createTimeline
 		};
 
-		function createCountryTooltip(datum) {
+		function createTimelineHighlight() {
+
+			const timeData = chartState.selectedMonth.map(function(d) {
+				if (d === allData) {
+					return [timelineScale.domain()[0], timelineScale.domain()[1]]
+				} else {
+					const firstDate = timeParserButtons(d);
+					const lastDate = d3.min([timelineScale.domain()[1], d3.timeMonth.offset(firstDate, 1)]);
+					return [firstDate, lastDate];
+				};
+			});
+
+			const timelineHighlightGroup = timelinePanel.main.select(".covmaptimelineHighlightGroup");
+
+			let highlightRects = timelineHighlightGroup.selectAll(".covmaphighlightRects")
+				.data(timeData);
+
+			const highlightRectsExit = highlightRects.exit()
+				.transition()
+				.duration(duration)
+				.attr("width", 0)
+				.remove();
+
+			const highlightRectsEnter = highlightRects.enter()
+				.append("rect")
+				.attr("class", "covmaphighlightRects")
+				.attr("height", timelinePanel.axisHeight)
+				.attr("x", function(d) {
+					return timelineScale(d[0])
+				})
+				.attr("width", 0)
+				.style("fill", unBlue);
+
+			highlightRects = highlightRectsEnter.merge(highlightRects);
+
+			highlightRects.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return timelineScale(d[0])
+				})
+				.attr("width", function(d) {
+					return timelineScale(d[1]) - timelineScale(d[0]);
+				});
+
+			timelinePanel.main.select(".covmaptimelineAxisGroup")
+				.selectAll(".tick text")
+				.style("fill", null)
+				.each(function(d) {
+					let inInterval = false;
+					timeData.forEach(function(e) {
+						if (d > e[0] && d < e[1]) inInterval = true;
+					});
+					d3.select(this).style("fill", inInterval ? "white" : null);
+				});
+
+			timelinePanel.main.selectAll(".covmappieGroupsTimeline")
+				.each(function(d) {
+					let inInterval = false;
+					timeData.forEach(function(e) {
+						if (d.allocationDate > e[0] && d.allocationDate < e[1]) inInterval = true;
+					});
+					d3.select(this)
+						.transition()
+						.duration(duration)
+						.style("opacity", inInterval ? 1 : fadeOpacity);
+				});
+
+			//end of createTimelineHighlight
+		};
+
+		function createCountryTooltip(datum, showDate) {
 
 			const innerTooltip = tooltip.append("div")
 				.attr("id", "covmapInnerTooltipDiv");
@@ -2463,6 +2577,13 @@
 				.style("width", "300px")
 				.append("strong")
 				.html(datum.country);
+
+			if (showDate) {
+				innerTooltip.append("div")
+					.style("margin-bottom", "8px")
+					.style("margin-top", "-8px")
+					.html("Date: " + timeFormatList(datum.allocationDate));
+			};
 
 			const tooltipContainer = innerTooltip.append("div")
 				.style("margin", "0px")
@@ -2681,6 +2802,8 @@
 						behavior: "smooth"
 					});
 				});
+
+			//end of createCountryTooltip
 		};
 
 		function createLegend(data) {
