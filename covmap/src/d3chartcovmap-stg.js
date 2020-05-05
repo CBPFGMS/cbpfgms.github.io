@@ -2501,8 +2501,9 @@
 				if (d === allData) {
 					return [timelineScale.domain()[0], timelineScale.domain()[1]]
 				} else {
-					const firstDate = timeParserButtons(d);
-					const lastDate = d3.min([timelineScale.domain()[1], d3.timeMonth.offset(firstDate, 1)]);
+					const firstDate = d === "Apr-20" ? d3.timeDay.offset(timeParserButtons(d), -1) : timeParserButtons(d);
+					const lastDate = d === "Mar-20" ? d3.timeDay.offset(d3.timeMonth.offset(firstDate, 1), -1) :
+						d3.min([timelineScale.domain()[1], d3.timeMonth.offset(firstDate, 1)]);
 					return [firstDate, lastDate];
 				};
 			});
