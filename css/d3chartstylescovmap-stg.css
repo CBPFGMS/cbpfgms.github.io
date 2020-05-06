@@ -355,6 +355,13 @@
 	pointer-events: none;
 }
 
+.covmapdisclaimer1, .covmapdisclaimer2 {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #4f6f6f;
+	pointer-events: none;
+}
+
 .covmapcountryDivList {
 	display: flex;
 	flex-wrap: wrap;
