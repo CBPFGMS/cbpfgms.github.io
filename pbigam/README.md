@@ -1,6 +1,6 @@
 # PFBI: Gender with Age Marker (GAM), beeswarm chart
 
-Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org/cbpfvshrp). The datavis contains several elements:
+Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the Business Inteligence Portal at [pfbi.unocha.org](https://pfbi.unocha.org/#gam_heading). The datavis contains several elements:
 
 - A set of checkboxes for the selection of CBPFs.
 - A set of control buttons allowing the selection of the year, value type (budget, budget as the percentage of the Marker and budget as the percentage of the CBPF) and the display type (by Marker or overall). The year selection allows multiple years if those years belong to the same Marker. When the selected year belongs to another Marker, a single year select is automatically made.
@@ -107,7 +107,7 @@ If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 ## CSS
 
-This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles can be found in [d3chartstylespbiclc.css](https://github.com/CBPFGMS/cbpfgms.github.io/blob/master/css/d3chartstylespbigam.css).
+This chart uses the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) for all OCHA charts. The specific styles can be found in [d3chartstylespbigam.css](https://github.com/CBPFGMS/cbpfgms.github.io/blob/master/css/d3chartstylespbigam.css).
 
 ---
 Chart code: `pbigam`

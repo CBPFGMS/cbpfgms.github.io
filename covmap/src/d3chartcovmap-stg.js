@@ -202,7 +202,6 @@
 			tooltipSvgHeight = 80,
 			showNamesMargin = 12,
 			tooltipSvgPadding = [14, 34, 2, 45],
-			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localVariable = d3.local(),

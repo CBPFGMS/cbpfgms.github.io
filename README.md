@@ -109,6 +109,14 @@ Chart for the Country-based Pooled Funds (CBPF) Gender with Age Marker (GAM) in 
 
 This chart shows the Gender with Age Marker (GAM) for each project in each Fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbigam) for more information.
 
+- **PFBI: Covid19, map and timeline chart**
+
+Chart for the Country-based Pooled Funds (CBPF) and Central Emergency Response Fund (CERF) Covid19-related Allocations in the Business Inteligence Portal at the OCHA PFBI.
+
+[<img alt="GMS Landing Page" src="https://cbpfgms.github.io/img/thumbnails/covmap.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/covmap)
+
+This chart shows the Covid19 allocations for each CBPF and CERF fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/covmap) for more information.
+
 - **GMS Landing Page**
 
 Chart for the Grant Management System landing page.
@@ -140,3 +148,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |PFBI: Allocations Timeline|`pbiuac`|
 |PFBI: CBPF versus HRP|`pbihrp`|
 |PFBI: Gender with Age Marker|`pbigam`|
+|PFBI: Covid19 map|`covmap`|
