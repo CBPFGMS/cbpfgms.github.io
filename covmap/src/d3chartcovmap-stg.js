@@ -241,6 +241,7 @@
 			};
 
 		let isSnapshotTooltipVisible = false,
+			clickableButtons = true,
 			maxTimelineRadius,
 			currentHoveredElem;
 
@@ -1483,6 +1484,7 @@
 			buttonsRects.on("mouseover", mouseOverButtonsRects)
 				.on("mouseout", mouseOutButtonsRects)
 				.on("click", function(d) {
+					if (!clickableButtons) return;
 					const self = this;
 					if (d3.event.altKey) clickButtonsRects(d, true);
 					if (localVariable.get(this) !== "clicked") {
@@ -1700,6 +1702,8 @@
 
 		function createPies(unfilteredData) {
 
+			clickableButtons = false;
+
 			const data = unfilteredData.filter(function(d) {
 				return d.cbpf + d.cerf;
 			});
@@ -1861,6 +1865,7 @@
 				})
 				.end()
 				.then(function() {
+					clickableButtons = true;
 					if (chartState.showNames) return;
 					allTexts.each(function() {
 						d3.select(this).style("display", null);
@@ -3318,14 +3323,14 @@
 
 		function setYearsDescriptionDiv() {
 			yearsDescriptionDiv.html(function() {
-				if (chartState.selectedMonth[0] === allData) return "\u002AAggregated data for all months.";
-				if (chartState.selectedMonth.length === 1) return null;
+				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months.";
+				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0];
 				const yearsList = chartState.selectedMonth.sort(function(a, b) {
-					return a - b;
+					return d3.ascending(timeParserButtons(a), timeParserButtons(b));
 				}).reduce(function(acc, curr, index) {
 					return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
 				}, "");
-				return "\u002ASelected months: " + yearsList;
+				return "Selected months: " + yearsList;
 			});
 		};
 
