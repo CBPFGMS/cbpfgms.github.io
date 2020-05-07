@@ -289,7 +289,7 @@
 	fill: #666;
 }
 
-.covmaptimelineTitleSpan {
+.covmaptimelineDisclaimer {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
 	font-weight: 400;
@@ -518,7 +518,7 @@ html{
 	margin-bottom: 4px;
 }
 
-.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationAmountDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue {
+.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationAmountDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue, .covmapdisclaimersDiv {
 	width: 100%;
 	color: #444;
 	font-size: 12px;

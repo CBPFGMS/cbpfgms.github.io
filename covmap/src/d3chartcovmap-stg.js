@@ -182,11 +182,11 @@
 			legendPanelVertPadding = 12,
 			mapZoomButtonHorPadding = 6,
 			mapZoomButtonVertPadding = 10,
-			timelineZoomButtonVertPadding = 32,
+			timelineZoomButtonVertPadding = 62,
 			mapZoomButtonSize = 26,
 			maxPieSize = 32,
 			minPieSize = 1,
-			timelinePanelHeight = 230,
+			timelinePanelHeight = 250,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (3 * panelHorizontalPadding),
 			timelinePercentagePadding = 0.07,
 			buttonsNumber = 10,
@@ -439,8 +439,12 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (3 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: timelinePanelHeight,
-			padding: [22, 6, 12, 6],
-			axisPadding: 110,
+			padding: [42, 6, 12, 6],
+			get axisPadding() {
+				return this.padding[0] + 88;
+			},
+			titlePadding: 20,
+			disclaimerPadding: 2,
 			axisHeight: 14,
 			piePadding: 22,
 			iconPadding: 32,
@@ -1782,7 +1786,7 @@
 							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
 									return i > 1;
 								}).join(" ") :
-								d.labelText[1]);
+								(d.labelText[1] === "Globally" ? "Globally*" : d.labelText[1]));
 					};
 				});
 
@@ -1807,7 +1811,7 @@
 							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
 									return i > 1;
 								}).join(" ") :
-								d.labelText[1]);
+								(d.labelText[1] === "Globally" ? "Globally*" : d.labelText[1]));
 					};
 				});
 
@@ -2036,6 +2040,26 @@
 
 			};
 
+			const disclaimer1 = piesContainer.selectAll(".covmapdisclaimer1")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmapdisclaimer1")
+				.text("* CERF Globally includes $40M allocated for WFP’s global supply chain activities and funding yet to be assigned by UN agencies to countries.")
+				.attr("x", mapPanel.width - mapPanel.padding[1] - 344)
+				.attr("y", mapPanel.height - mapPanel.padding[2] - 54)
+				.call(wrapText2, 340);
+
+			const disclaimer2 = piesContainer.selectAll(".covmapdisclaimer2")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmapdisclaimer2")
+				.text("\u2020 The boundaries and names shown and the designations used on this map do not imply official endorsement or acceptance by the United Nations.")
+				.attr("x", mapPanel.width - mapPanel.padding[1] - 344)
+				.attr("y", mapPanel.height - mapPanel.padding[2] - 20)
+				.call(wrapText2, 340);
+
 			//end of createPies
 		};
 
@@ -2077,13 +2101,15 @@
 
 			const timelineTitle = timelinePanel.main.append("text")
 				.attr("class", "covmaptimelineTitle")
-				.attr("y", timelinePanel.padding[0])
+				.attr("y", timelinePanel.padding[0] - timelinePanel.titlePadding)
 				.attr("x", timelinePanel.padding[3])
 				.text("Allocations Timeline");
 
-			const timelineTitleSpan = timelineTitle.append("tspan")
-				.attr("class", "covmaptimelineTitleSpan")
-				.text(" (use the mousewheel or touchpad to zoom)");
+			const timelineDisclaimer = timelinePanel.main.append("text")
+				.attr("class", "covmaptimelineDisclaimer")
+				.attr("y", timelinePanel.padding[0] - timelinePanel.disclaimerPadding)
+				.attr("x", timelinePanel.padding[3])
+				.text("The interactive timeline represents the chronology of OCHA’s response to the COVID-19 pandemic. It features the key allocations dates and milestones.");
 
 			const timelineRect = timelinePanel.main.append("rect")
 				.attr("y", timelinePanel.axisPadding - (timelinePanel.axisHeight / 2))
@@ -2263,7 +2289,6 @@
 			zoomRectangleTimeline.on("mouseover", pieGroupsTimelineMouseout);
 
 			function zoomedTimeline() {
-				timelineTitleSpan.remove();
 				const transf = d3.event.transform;
 				timelineAxisGroup.call(timelineAxis.scale(transf.rescaleX(timelineScale)));
 				pieGroupsTimeline.attr("transform", function(d) {
@@ -3140,6 +3165,13 @@
 				};
 			});
 
+			const disclaimersDiv = allocationContainerDiv.append("div")
+				.attr("class", "covmapdisclaimersDiv")
+				.style("margin-top", "6px")
+				.style("text-align", "right");
+
+			disclaimersDiv.html("* Number of people targeted with few allocations are not yet available.<br>* Number of people targeted may include double-counting.");
+
 			//end of generateList
 		};
 
@@ -3455,7 +3487,7 @@
 				.text("CLICK HERE TO CLOSE THE HELP");
 
 			const helpData = [{
-				x: 16,
+				x: 6,
 				y: 68,
 				width: 380,
 				height: 30,
@@ -3463,7 +3495,7 @@
 				yTooltip: 94,
 				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
 			}, {
-				x: 9,
+				x: 6,
 				y: 108,
 				width: 36,
 				height: 60,
@@ -3471,7 +3503,7 @@
 				yTooltip: 130,
 				text: "Use these buttons to zoom in or out. Alternatively, you can use the mousewheel or the trackpad over the map to zoom in or out."
 			}, {
-				x: 10,
+				x: 6,
 				y: 172,
 				width: 24,
 				height: 22,
@@ -3479,9 +3511,9 @@
 				yTooltip: 166,
 				text: "Click this checkbox for showing or hiding the countries’ names."
 			}, {
-				x: 50,
+				x: 48,
 				y: 108,
-				width: 1040,
+				width: 1042,
 				height: 480,
 				xTooltip: 400,
 				yTooltip: 260,
@@ -3490,7 +3522,7 @@
 				x: 6,
 				y: 596,
 				width: 1084,
-				height: 240,
+				height: 230,
 				xTooltip: 400,
 				yTooltip: 430,
 				text: "This timeline shows the allocations according to their dates. Allocations in the same day are merged and displayed as “Several countries”. Hover over the pies to display a tooltip with additional information. In the tooltip for “Several countries” pies you can click on each country to display that country’s information and scroll down to reveal more countries."
