@@ -5,6 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isPfbiSite = window.location.hostname === "bi-home.gitlab.io",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
@@ -14,6 +15,8 @@
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
+
+	//CHANGE isPfbiSite!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -400,7 +403,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			leftPadding: [94, 280, 494, 830, 904, 970],
+			leftPadding: [94, 280, 494, 880, 904, 970],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
@@ -1336,16 +1339,6 @@
 					};
 				});
 
-			const topPanelTotalText = topPanel.main.selectAll(".covmaptopPanelTotalText")
-				.data([true])
-				.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelTotalText")
-				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
-				.text("Total");
-
 			let topPanelCbpfNumber = topPanel.main.selectAll(".covmaptopPanelCbpfNumber")
 				.data([cbpfValue]);
 
@@ -1354,13 +1347,13 @@
 				.attr("class", "covmaptopPanelCbpfNumber")
 				.attr("text-anchor", "start")
 				.style("fill", cbpfColor)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
 				.attr("x", topPanel.leftPadding[5])
 				.merge(topPanelCbpfNumber);
 
 			topPanelCbpfNumber.transition()
 				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
 				.textTween(function(d) {
 					const i = d3.interpolate(previousCbpf, d);
 					return function(t) {
@@ -1375,12 +1368,12 @@
 				.append("text")
 				.attr("class", "covmaptopPanelCbpfText")
 				.attr("x", topPanel.leftPadding[4])
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
 				.text("CBPF:");
 
 			topPanelCbpfText.transition()
 				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
 
 			let topPanelCerfNumber = topPanel.main.selectAll(".covmaptopPanelCerfNumber")
 				.data([cerfValue]);
@@ -1389,13 +1382,13 @@
 				.append("text")
 				.attr("class", "covmaptopPanelCerfNumber")
 				.style("fill", d3.color(cerfColor).darker(0.3))
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
 				.attr("x", topPanel.leftPadding[5])
 				.merge(topPanelCerfNumber);
 
 			topPanelCerfNumber.transition()
 				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
 				.textTween(function(d) {
 					const i = d3.interpolate(previousCerf, d);
 					return function(t) {
@@ -1410,24 +1403,12 @@
 				.append("text")
 				.attr("class", "covmaptopPanelCerfText")
 				.attr("x", topPanel.leftPadding[4])
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
 				.text("CERF:");
 
 			topPanelCerfText.transition()
 				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
-
-			const dividingLine = topPanel.main.selectAll(".covmapdividingLine")
-				.data([true])
-				.enter()
-				.append("line")
-				.attr("class", "covmapdividingLine")
-				.attr("y1", topPanel.linePadding)
-				.attr("y2", topPanel.height - topPanel.linePadding)
-				.attr("x1", topPanel.leftPadding[4] - 12)
-				.attr("x2", topPanel.leftPadding[4] - 12)
-				.style("stroke", "#ccc")
-				.style("stroke-width", "2px");
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75));
 
 			//end of createTopPanel
 		};
@@ -3235,9 +3216,12 @@
 
 		function preProcessData(rawData) {
 
+			let totalValue = 0;
+
 			rawData.forEach(function(row) {
 				if (monthsArray.indexOf(timeFormat(new Date(row.DateOfAlloc))) === -1) monthsArray.push(timeFormat(new Date(row.DateOfAlloc)));
 				if (!countryNames[row.ISO2Country] && row.ISO2Country) countryNames[row.ISO2Country] = row.Country;
+				totalValue += +row.TargetAmt;
 			});
 
 			monthsArray.sort(function(a, b) {
@@ -3245,6 +3229,12 @@
 			});
 
 			monthsArray.push(allData);
+
+			if (isPfbiSite) {
+				const totalSpan = d3.select("#covmaptotalSpan");
+				const totalSpanValue = parseInt(formatSIFloat(totalValue), 10);
+				totalSpan.html(totalSpanValue);
+			};
 
 			//end of preProcessData
 		};
@@ -3377,14 +3367,14 @@
 		function setYearsDescriptionDiv() {
 			const timelineScaleText = "Timeline pies follow the legend size when “All” is selected.";
 			yearsDescriptionDiv.html(function() {
-				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months." + timelineScaleText;
-				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0] + "." + timelineScaleText;
+				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months. " + timelineScaleText;
+				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0] + ". " + timelineScaleText;
 				const yearsList = chartState.selectedMonth.sort(function(a, b) {
 					return d3.ascending(timeParserButtons(a), timeParserButtons(b));
 				}).reduce(function(acc, curr, index) {
 					return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
 				}, "");
-				return "Selected months: " + yearsList + "." + timelineScaleText;
+				return "Selected months: " + yearsList + ". " + timelineScaleText;
 			});
 		};
 

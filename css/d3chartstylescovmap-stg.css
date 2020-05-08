@@ -290,7 +290,7 @@
 	fill: #444;
 }
 
-.covmaptopPanelCbpfText, .covmaptopPanelCerfText, .covmaptopPanelTotalText {
+.covmaptopPanelCbpfText, .covmaptopPanelCerfText {
 	font-family: "Arial", sans-serif;
 	font-size: 20px;
 	fill: #888;
