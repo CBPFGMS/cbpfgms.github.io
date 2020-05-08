@@ -403,7 +403,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			leftPadding: [94, 280, 494, 880, 904, 970],
+			leftPadding: [94, 280, 494, 890, 904, 970],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
