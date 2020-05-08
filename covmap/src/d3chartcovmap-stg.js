@@ -182,12 +182,12 @@
 			legendPanelVertPadding = 12,
 			mapZoomButtonHorPadding = 6,
 			mapZoomButtonVertPadding = 10,
-			timelineZoomButtonVertPadding = 62,
+			timelineZoomButtonVertPadding = 76,
 			mapZoomButtonSize = 26,
 			maxPieSize = 32,
 			minPieSize = 1,
-			timelinePanelHeight = 250,
-			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (3 * panelHorizontalPadding),
+			timelinePanelHeight = 264,
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + mapPanelHeight + timelinePanelHeight + (4 * panelHorizontalPadding),
 			timelinePercentagePadding = 0.07,
 			buttonsNumber = 10,
 			groupNamePadding = 2,
@@ -400,7 +400,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			leftPadding: [94, 264, 464, 790, 940],
+			leftPadding: [94, 280, 494, 830, 904, 970],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
@@ -436,15 +436,15 @@
 		const timelinePanel = {
 			main: svg.append("g")
 				.attr("class", "covmaptimelinePanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (3 * panelHorizontalPadding)) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (4 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: timelinePanelHeight,
-			padding: [42, 6, 12, 6],
+			padding: [58, 6, 12, 6],
 			get axisPadding() {
 				return this.padding[0] + 88;
 			},
-			titlePadding: 20,
-			disclaimerPadding: 2,
+			titlePadding: 36,
+			disclaimerPadding: 16,
 			axisHeight: 14,
 			piePadding: 22,
 			iconPadding: 32,
@@ -475,7 +475,7 @@
 		const timelineZoomButtonPanel = {
 			main: svg.append("g")
 				.attr("class", "covmaptimelineZoomButtonPanel")
-				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (3 * panelHorizontalPadding) + timelineZoomButtonVertPadding) + ")"),
+				.attr("transform", "translate(" + (padding[3] + mapZoomButtonHorPadding) + "," + (padding[0] + topPanel.height + buttonsPanel.height + mapPanel.height + (4 * panelHorizontalPadding) + timelineZoomButtonVertPadding) + ")"),
 			width: mapZoomButtonSize,
 			height: mapZoomButtonSize * 2,
 			padding: [4, 4, 4, 4]
@@ -499,8 +499,9 @@
 		const timelinePanelClip = timelinePanel.main.append("clipPath")
 			.attr("id", "covmaptimelinePanelClip")
 			.append("rect")
+			.attr("y", -(panelHorizontalPadding + 1))
 			.attr("width", timelinePanel.width)
-			.attr("height", timelinePanel.height);
+			.attr("height", timelinePanel.height + panelHorizontalPadding + 1);
 
 		timelinePanel.main.attr("clip-path", "url(#covmaptimelinePanelClip)");
 
@@ -1170,11 +1171,15 @@
 				return d.cerf;
 			});
 
+			const totalValue = cbpfValue + cerfValue;
+
 			const previousAllocations = d3.select(".covmaptopPanelAllocationsNumber").size() !== 0 ? d3.select(".covmaptopPanelAllocationsNumber").datum() : 0;
 
 			const previousCountries = d3.select(".covmaptopPanelCountriesNumber").size() !== 0 ? d3.select(".covmaptopPanelCountriesNumber").datum() : 0;
 
 			const previousBeneficiaries = d3.select(".covmaptopPanelBeneficiariesNumber").size() !== 0 ? d3.select(".covmaptopPanelBeneficiariesNumber").datum() : 0;
+
+			const previousTotal = d3.select(".covmaptopPanelTotalNumber").size() !== 0 ? d3.select(".covmaptopPanelTotalNumber").datum() : 0;
 
 			const previousCbpf = d3.select(".covmaptopPanelCbpfNumber").size() !== 0 ? d3.select(".covmaptopPanelCbpfNumber").datum() : 0;
 
@@ -1311,20 +1316,51 @@
 				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 				.text("Targeted");
 
+			let topPanelTotalNumber = topPanel.main.selectAll(".covmaptopPanelTotalNumber")
+				.data([totalValue]);
+
+			topPanelTotalNumber = topPanelTotalNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelTotalNumber")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[3] - topPanel.mainValueHorPadding)
+				.merge(topPanelTotalNumber);
+
+			topPanelTotalNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousTotal, d);
+					return function(t) {
+						return "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const topPanelTotalText = topPanel.main.selectAll(".covmaptopPanelTotalText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelTotalText")
+				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
+				.text("Total");
+
 			let topPanelCbpfNumber = topPanel.main.selectAll(".covmaptopPanelCbpfNumber")
 				.data([cbpfValue]);
 
 			topPanelCbpfNumber = topPanelCbpfNumber.enter()
 				.append("text")
 				.attr("class", "covmaptopPanelCbpfNumber")
-				.attr("text-anchor", "end")
+				.attr("text-anchor", "start")
 				.style("fill", cbpfColor)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr("x", topPanel.leftPadding[3] - topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.attr("x", topPanel.leftPadding[5])
 				.merge(topPanelCbpfNumber);
 
 			topPanelCbpfNumber.transition()
 				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
 				.textTween(function(d) {
 					const i = d3.interpolate(previousCbpf, d);
 					return function(t) {
@@ -1333,14 +1369,18 @@
 				});
 
 			const topPanelCbpfText = topPanel.main.selectAll(".covmaptopPanelCbpfText")
-				.data([true])
-				.enter()
+				.data([true]);
+
+			topPanelCbpfText.enter()
 				.append("text")
 				.attr("class", "covmaptopPanelCbpfText")
-				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
-				.text("CBPF");
+				.attr("x", topPanel.leftPadding[4])
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
+				.text("CBPF:");
+
+			topPanelCbpfText.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.9 : 2.9))
 
 			let topPanelCerfNumber = topPanel.main.selectAll(".covmaptopPanelCerfNumber")
 				.data([cerfValue]);
@@ -1348,14 +1388,14 @@
 			topPanelCerfNumber = topPanelCerfNumber.enter()
 				.append("text")
 				.attr("class", "covmaptopPanelCerfNumber")
-				.attr("text-anchor", "start")
 				.style("fill", d3.color(cerfColor).darker(0.3))
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr("x", topPanel.leftPadding[4] + topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
+				.attr("x", topPanel.leftPadding[5])
 				.merge(topPanelCerfNumber);
 
 			topPanelCerfNumber.transition()
 				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
 				.textTween(function(d) {
 					const i = d3.interpolate(previousCerf, d);
 					return function(t) {
@@ -1364,23 +1404,28 @@
 				});
 
 			const topPanelCerfText = topPanel.main.selectAll(".covmaptopPanelCerfText")
-				.data([true])
-				.enter()
+				.data([true]);
+
+			topPanelCerfText.enter()
 				.append("text")
 				.attr("class", "covmaptopPanelCerfText")
-				.attr("x", topPanel.leftPadding[4] - topPanel.mainValueHorPadding)
-				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.8)
-				.text("CERF");
+				.attr("x", topPanel.leftPadding[4])
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
+				.text("CERF:");
+
+			topPanelCerfText.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.9 : 2.9))
 
 			const dividingLine = topPanel.main.selectAll(".covmapdividingLine")
 				.data([true])
 				.enter()
 				.append("line")
+				.attr("class", "covmapdividingLine")
 				.attr("y1", topPanel.linePadding)
 				.attr("y2", topPanel.height - topPanel.linePadding)
-				.attr("x1", (topPanel.leftPadding[3] + topPanel.leftPadding[4]) / 2)
-				.attr("x2", (topPanel.leftPadding[3] + topPanel.leftPadding[4]) / 2)
+				.attr("x1", topPanel.leftPadding[4] - 12)
+				.attr("x2", topPanel.leftPadding[4] - 12)
 				.style("stroke", "#ccc")
 				.style("stroke-width", "2px");
 
@@ -2103,6 +2148,14 @@
 
 			timelineAxis.tickValues(dateTicks);
 
+			const timelineLine = timelinePanel.main.append("line")
+				.attr("x1", timelinePanel.padding[3])
+				.attr("x2", timelinePanel.width - timelinePanel.padding[1])
+				.attr("y1", -panelHorizontalPadding)
+				.attr("y2", -panelHorizontalPadding)
+				.style("stroke-width", "1px")
+				.style("stroke", "#ddd");
+
 			const timelineTitle = timelinePanel.main.append("text")
 				.attr("class", "covmaptimelineTitle")
 				.attr("y", timelinePanel.padding[0] - timelinePanel.titlePadding)
@@ -2113,7 +2166,8 @@
 				.attr("class", "covmaptimelineDisclaimer")
 				.attr("y", timelinePanel.padding[0] - timelinePanel.disclaimerPadding)
 				.attr("x", timelinePanel.padding[3])
-				.text("The interactive timeline represents the chronology of OCHA’s response to the COVID-19 pandemic. It features the key allocations dates and milestones.");
+				.text("The interactive timeline represents the chronology of OCHA’s response to the COVID-19 pandemic. It features the key allocations dates and milestones.")
+				.call(wrapText2, timelinePanel.width - timelinePanel.padding[1] - timelinePanel.padding[3]);
 
 			const timelineRect = timelinePanel.main.append("rect")
 				.attr("y", timelinePanel.axisPadding - (timelinePanel.axisHeight / 2))
@@ -3321,15 +3375,16 @@
 		};
 
 		function setYearsDescriptionDiv() {
+			const timelineScaleText = "Timeline pies follow the legend size when “All” is selected.";
 			yearsDescriptionDiv.html(function() {
-				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months.";
-				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0];
+				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months." + timelineScaleText;
+				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0] + "." + timelineScaleText;
 				const yearsList = chartState.selectedMonth.sort(function(a, b) {
 					return d3.ascending(timeParserButtons(a), timeParserButtons(b));
 				}).reduce(function(acc, curr, index) {
 					return acc + (index >= chartState.selectedMonth.length - 2 ? index > chartState.selectedMonth.length - 2 ? curr : curr + " and " : curr + ", ");
 				}, "");
-				return "Selected months: " + yearsList;
+				return "Selected months: " + yearsList + "." + timelineScaleText;
 			});
 		};
 

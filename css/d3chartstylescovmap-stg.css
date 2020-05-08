@@ -85,14 +85,14 @@
 
 .covmapFooterDiv {
 	width: 100%;
-	margin-top: 8px;
+	margin-top: 4px;
 	display: flex;
 }
 
 .covmapYearsDescriptionDiv {
 	margin-left: 10px;
 	font-family: "Arial", sans-serif;
-	font-size: 12px;
+	font-size: 10px;
 	color: #888;
 	width: 98%;
 }
@@ -173,16 +173,10 @@
 	pointer-events: none;	
 }
 
-.covmaptopPanelAllocationsNumber, .covmaptopPanelCountriesNumber, .covmaptopPanelBeneficiariesNumber {
+.covmaptopPanelAllocationsNumber, .covmaptopPanelCountriesNumber, .covmaptopPanelBeneficiariesNumber, .covmaptopPanelTotalNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
 	fill: #888;
-}
-
-.covmaptopPanelCbpfNumber, .covmaptopPanelCerfNumber {
-	font-family: "Arial", sans-serif;
-	font-size: 48px;
-	letter-spacing: -2px;
 }
 
 .covmapbuttonsDiv {
@@ -286,20 +280,25 @@
 	font-family: "Arial", sans-serif;
 	font-size: 18px;
 	font-weight: 700;
-	fill: #666;
+	fill: #444;
 }
 
 .covmaptimelineDisclaimer {
-	font-family: "Arial", sans-serif;
-	font-size: 14px;
+	font-family: "Montserrat", sans-serif;
+	font-size: 16px;
 	font-weight: 400;
-	fill: #666;
+	fill: #444;
 }
 
-.covmaptopPanelCbpfText, .covmaptopPanelCerfText {
+.covmaptopPanelCbpfText, .covmaptopPanelCerfText, .covmaptopPanelTotalText {
 	font-family: "Arial", sans-serif;
-	font-size: 22px;
+	font-size: 20px;
 	fill: #888;
+}
+
+.covmaptopPanelCbpfNumber, .covmaptopPanelCerfNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
 }
 
 .covmapTooltipSvgYAxisGroup path, .covmapTooltipSvgXAxisGroup path {
@@ -348,7 +347,7 @@
 	text-anchor: middle;
 }
 
-.covmapiconText, .covmapdisclaimer1, .covmapdisclaimer2 {
+.covmapiconText {
 	font-family: "Arial", sans-serif;
 	font-size: 11px;
 	fill: darkslategray;
@@ -518,10 +517,18 @@ html{
 	margin-bottom: 4px;
 }
 
-.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationAmountDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue, .covmapdisclaimersDiv {
+.covmapallocationTitleDivValue, .covmapallocationSourceDivValue, .covmapallocationAmountDivValue, .covmapallocationDateDivValue, .covmapallocationThemeDivValue, .covmapallocationSummaryDivValue, .covmaplocationSummaryDivValue, .covmapaffectedPersonsContainerValue {
 	width: 100%;
 	color: #444;
 	font-size: 12px;
+}
+
+.covmapdisclaimersDiv {
+	width: 100%;
+	color: #444;
+	font-size: 10px;
+	font-family: "Arial", sans-serif;
+	pointer-events: none;
 }
 
 .covmapallocationThemeDiv, .covmapallocationSummaryDiv, .covmapalocationSummaryDiv {
