@@ -194,6 +194,8 @@
 			unBlue = "#1F69B3",
 			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
+			tooltipStickColor = "lightslategray",
+			tooltipLollipopColor = "lightslategray",
 			fadeOpacity = 0.2,
 			fillOpacityValue = 0.5,
 			strokeOpacityValue = 0.8,
@@ -2800,13 +2802,13 @@
 						.attr("y", -stickHeight / 4)
 						.attr("height", stickHeight)
 						.attr("width", 0)
-						.style("fill", cbpfColor);
+						.style("fill", tooltipStickColor);
 
 					const peopleGroupLollipop = peopleGroupsEnter.append("circle")
 						.attr("cx", tooltipSvgPadding[3])
 						.attr("cy", (stickHeight / 4))
 						.attr("r", lollipopRadius)
-						.style("fill", cbpfColor);
+						.style("fill", tooltipLollipopColor);
 
 					const peopleGroupLabel = peopleGroupsEnter.append("text")
 						.attr("class", "covmapcbpfLabel")
