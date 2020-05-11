@@ -2205,10 +2205,10 @@
 			const iconPolyline = keyDatesGroupsTimeline.append("polyline")
 				.style("stroke", "#ddd")
 				.style("fill", "none")
-				.attr("points", function(d) {
+				.attr("points", function(d, i) {
 					return (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
-						" " + (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) +
-						" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) + " 0," + timelinePanel.iconRadius;
+						" " + (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) +
+						" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) + " 0," + timelinePanel.iconRadius;
 				});
 
 			//Hardcoded name for Korea DPR
@@ -2340,12 +2340,12 @@
 						(timelinePanel.axisPadding - (timelinePanel.axisHeight / 2) - timelinePanel.iconPadding - timelinePanel.iconRadius) + ")";
 				});
 				keyDatesGroupsTimeline.select("polyline")
-					.attr("points", function(d) {
+					.attr("points", function(d, i) {
 						const xTranslate = d.lollipopDate === d.date ? (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) * d3.event.transform.k :
 							Math.min(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) + (d3.event.transform.k - 1) * 50);
 						return xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
-							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) +
-							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - 6) + " 0," + timelinePanel.iconRadius;
+							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) +
+							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) + " 0," + timelinePanel.iconRadius;
 					});
 				timelineHighlightGroup.selectAll(".covmaphighlightRects")
 					.attr("x", function(d) {

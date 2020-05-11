@@ -5,11 +5,17 @@
 	"lollipopDate": "30/01/2020",
 	"size": 150
 }, {
+	"title": "First CERF- funded WHO project starts",
+	"icon": "moneycerf",
+	"date": "03/02/2020",
+	"lollipopDate": "17/02/2020",
+	"size": 80
+}, {
 	"title": "First COVID19 allocation (Syria Cross border, CBPF)",
 	"icon": "money",
 	"date": "07/02/2020",
-	"lollipopDate": "16/02/2020",
-	"size": 140
+	"lollipopDate": "28/02/2020",
+	"size": 90
 }, {
 	"title": "WHO declares COVID-19 outbreak a pandemic",
 	"icon": "coronavirusgreen",
