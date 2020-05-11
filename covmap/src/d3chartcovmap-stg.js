@@ -5,7 +5,6 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
-		isPfbiSite = window.location.hostname === "bi-home.gitlab.io",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
@@ -15,8 +14,6 @@
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
-
-	//CHANGE isPfbiSite!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -3216,6 +3213,12 @@
 
 		function preProcessData(rawData) {
 
+			const totalCountries = rawData.map(function(d) {
+				return d.ISO2Country;
+			}).filter(function(value, index, self) {
+				return self.indexOf(value) === index;
+			});
+
 			let totalValue = 0;
 
 			rawData.forEach(function(row) {
@@ -3230,10 +3233,17 @@
 
 			monthsArray.push(allData);
 
-			if (isPfbiSite) {
-				const totalSpan = d3.select("#covmaptotalSpan");
+			const totalSpan = d3.select("#covmaptotalSpan");
+
+			const totalCountriesSpan = d3.select("#covmaptotalCountriesSpan");
+
+			if (totalSpan.size()) {
 				const totalSpanValue = parseInt(formatSIFloat(totalValue), 10);
 				totalSpan.html(totalSpanValue);
+			};
+
+			if (totalCountriesSpan.size()) {
+				totalCountriesSpan.html(totalCountries.length);
 			};
 
 			//end of preProcessData
