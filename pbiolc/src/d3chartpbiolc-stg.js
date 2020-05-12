@@ -178,7 +178,8 @@
 				"Camp Coordination / Management",
 				"Early Recovery",
 				"Emergency Telecommunications",
-				"Multi-Sector"
+				"Multi-Sector",
+				"COVID-19"
 			],
 			numberOfClusters = clusters.length,
 			lollipopGroupHeight = 24,
@@ -1465,6 +1466,12 @@
 						return d.clusterKey;
 					});
 
+				const labelGroupExit = labelGroup.exit()
+					.transition()
+					.duration(duration)
+					.style("opacity", 0)
+					.remove();
+
 				const labelGroupEnter = labelGroup.enter()
 					.append("g")
 					.attr("class", "pbiolcLabelGroup")
@@ -1556,6 +1563,12 @@
 					.data(data, function(d) {
 						return d.clusterKey;
 					});
+
+				const allocationsGroupExit = allocationsGroup.exit()
+					.transition()
+					.duration(duration)
+					.style("opacity", 0)
+					.remove();
 
 				const allocationsGroupEnter = allocationsGroup.enter()
 					.append("g")
@@ -1719,6 +1732,12 @@
 					.data(data, function(d) {
 						return d.clusterKey;
 					});
+
+				const beneficiariesGroupExit = beneficiariesGroup.exit()
+					.transition()
+					.duration(duration)
+					.style("opacity", 0)
+					.remove();
 
 				const beneficiariesGroupEnter = beneficiariesGroup.enter()
 					.append("g")
@@ -2198,7 +2217,12 @@
 
 			chartState.cbpfsInData.length = 0;
 
-			const data = clusters.map(function(d) {
+			const clustersFiltered = chartState.selectedYear.indexOf(2020) > -1 ? clusters :
+				clusters.filter(function(d) {
+					return d !== "COVID-19";
+				});
+
+			const data = clustersFiltered.map(function(d) {
 				return {
 					cluster: d,
 					clusterKey: d.replace(/\W/g, ""),
@@ -2226,50 +2250,24 @@
 
 			filteredData.forEach(function(d) {
 
-				//THIS IS THE ORIGINAL CODE
-				// const foundCluster = data.find(function(e) {
-				// 	return e.cluster === d.Cluster;
-				// });
-
-				// if (d.AllocationSourceName === "Standard") {
-				// 	foundCluster.standard += +d.BudgetByCluster;
-				// 	foundCluster.total += +d.BudgetByCluster;
-				// 	foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
-				// 	foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-				// 	foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
-				// 	foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-				// } else {
-				// 	foundCluster.reserve += +d.BudgetByCluster;
-				// 	foundCluster.total += +d.BudgetByCluster;
-				// 	foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
-				// 	foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-				// 	foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
-				// 	foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-				// };
-
-				//QUICK FILTER
 				const foundCluster = data.find(function(e) {
-					return (e.cluster === d.Cluster) && (d.Cluster !== "COVID-19");
+					return e.cluster === d.Cluster;
 				});
 
-				if (foundCluster) {
-
-					if (d.AllocationSourceName === "Standard") {
-						foundCluster.standard += +d.BudgetByCluster;
-						foundCluster.total += +d.BudgetByCluster;
-						foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
-						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-						foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
-						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-					} else {
-						foundCluster.reserve += +d.BudgetByCluster;
-						foundCluster.total += +d.BudgetByCluster;
-						foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
-						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-						foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
-						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-					};
-
+				if (d.AllocationSourceName === "Standard") {
+					foundCluster.standard += +d.BudgetByCluster;
+					foundCluster.total += +d.BudgetByCluster;
+					foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
+					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+					foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
+					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+				} else {
+					foundCluster.reserve += +d.BudgetByCluster;
+					foundCluster.total += +d.BudgetByCluster;
+					foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
+					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+					foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
+					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
 				};
 
 			});
