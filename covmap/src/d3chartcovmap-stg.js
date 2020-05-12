@@ -2335,14 +2335,18 @@
 				});
 				keyDatesGroupsTimeline.attr("transform", function(d) {
 					const xTranslate = d.lollipopDate === d.date ? (timelineScale(timeParseMetadata(d.lollipopDate)) * d3.event.transform.k + d3.event.transform.x) :
-						(timelineScale(timeParseMetadata(d.date)) * d3.event.transform.k + d3.event.transform.x + Math.max(0, ((timelineScale(timeParseMetadata(d.lollipopDate)) - timelineScale(timeParseMetadata(d.date)))) - (d3.event.transform.k - 1) * 50));
+						timeParseMetadata(d.lollipopDate) > timeParseMetadata(d.date) ?
+						(timelineScale(timeParseMetadata(d.date)) * d3.event.transform.k + d3.event.transform.x + Math.max(0, ((timelineScale(timeParseMetadata(d.lollipopDate)) - timelineScale(timeParseMetadata(d.date)))) - (d3.event.transform.k - 1) * 50)) :
+						(timelineScale(timeParseMetadata(d.date)) * d3.event.transform.k + d3.event.transform.x - Math.max(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) - (d3.event.transform.k - 1) * 50));
 					return "translate(" + xTranslate + "," +
 						(timelinePanel.axisPadding - (timelinePanel.axisHeight / 2) - timelinePanel.iconPadding - timelinePanel.iconRadius) + ")";
 				});
 				keyDatesGroupsTimeline.select("polyline")
 					.attr("points", function(d, i) {
-						const xTranslate = d.lollipopDate === d.date ? (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) * d3.event.transform.k :
-							Math.min(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) + (d3.event.transform.k - 1) * 50);
+						const xTranslate = d.lollipopDate === d.date ? 0 :
+							timeParseMetadata(d.lollipopDate) > timeParseMetadata(d.date) ?
+							Math.min(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) + (d3.event.transform.k - 1) * 50) :
+							Math.max(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) - (d3.event.transform.k - 1) * 50);
 						return xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
 							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) +
 							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 ? 4 : 7)) + " 0," + timelinePanel.iconRadius;
@@ -2376,9 +2380,11 @@
 				ticks.each(function(_, i, n) {
 					if (n[i + 1] && (window.getComputedStyle(this, null).getPropertyValue("opacity") === "1")) {
 						const thisBox = n[i].getBoundingClientRect();
-						const nextBox = n[i + 1].getBoundingClientRect();
-						if (nextBox.left < thisBox.right) {
-							d3.select(n[i + 1]).style("opacity", 0);
+						for (let j = i + 1; j < n.length; j++) {
+							const nextBox = n[j].getBoundingClientRect();
+							if (nextBox.left < thisBox.right) {
+								d3.select(n[j]).style("opacity", 0);
+							};
 						};
 					};
 				});
