@@ -710,29 +710,6 @@
 
 		function draw(rawData, mapData, timelineMetadata) {
 
-			//test
-			// topPanel.main.append("rect")
-			// 	.attr("width", topPanel.width)
-			// 	.attr("height", topPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// buttonsPanel.main.append("rect")
-			// 	.attr("width", buttonsPanel.width)
-			// 	.attr("height", buttonsPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// mapPanel.main.append("rect")
-			// 	.attr("width", mapPanel.width)
-			// 	.attr("height", mapPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// timelinePanel.main.append("rect")
-			// 	.attr("width", timelinePanel.width)
-			// 	.attr("height", timelinePanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			//test
-
 			const data = processData(rawData);
 
 			const timelineData = processDataTimeline(rawData);
