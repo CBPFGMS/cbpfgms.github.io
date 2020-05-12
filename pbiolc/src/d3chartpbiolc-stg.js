@@ -2226,24 +2226,50 @@
 
 			filteredData.forEach(function(d) {
 
+				//THIS IS THE ORIGINAL CODE
+				// const foundCluster = data.find(function(e) {
+				// 	return e.cluster === d.Cluster;
+				// });
+
+				// if (d.AllocationSourceName === "Standard") {
+				// 	foundCluster.standard += +d.BudgetByCluster;
+				// 	foundCluster.total += +d.BudgetByCluster;
+				// 	foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
+				// 	foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+				// 	foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
+				// 	foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+				// } else {
+				// 	foundCluster.reserve += +d.BudgetByCluster;
+				// 	foundCluster.total += +d.BudgetByCluster;
+				// 	foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
+				// 	foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+				// 	foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
+				// 	foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+				// };
+
+				//QUICK FILTER
 				const foundCluster = data.find(function(e) {
-					return e.cluster === d.Cluster;
+					return (e.cluster === d.Cluster) && (d.Cluster !== "COVID-19");
 				});
 
-				if (d.AllocationSourceName === "Standard") {
-					foundCluster.standard += +d.BudgetByCluster;
-					foundCluster.total += +d.BudgetByCluster;
-					foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
-					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-				} else {
-					foundCluster.reserve += +d.BudgetByCluster;
-					foundCluster.total += +d.BudgetByCluster;
-					foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
-					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+				if (foundCluster) {
+
+					if (d.AllocationSourceName === "Standard") {
+						foundCluster.standard += +d.BudgetByCluster;
+						foundCluster.total += +d.BudgetByCluster;
+						foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
+						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+					} else {
+						foundCluster.reserve += +d.BudgetByCluster;
+						foundCluster.total += +d.BudgetByCluster;
+						foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
+						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+					};
+
 				};
 
 			});
@@ -2584,7 +2610,7 @@
 				width: 420,
 				height: 30,
 				xTooltip: 78 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + totalSelectHeight + 104)  * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
 				text: "Use these buttons to select year. You can select more than one year. Double click or press ALT when clicking to select a single year"
 			}, {
 				x: 465,
