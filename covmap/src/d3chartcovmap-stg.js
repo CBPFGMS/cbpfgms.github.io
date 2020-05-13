@@ -2572,18 +2572,9 @@
 					return timelineScale(d[0])
 				})
 				.attr("width", 0)
-				.style("fill", unBlue);
+				.style("fill", "#555555");
 
 			highlightRects = highlightRectsEnter.merge(highlightRects);
-
-			highlightRects.transition()
-				.duration(duration)
-				.attr("x", function(d) {
-					return timelineScale(d[0])
-				})
-				.attr("width", function(d) {
-					return timelineScale(d[1]) - timelineScale(d[0]);
-				});
 
 			timelinePanel.main.select(".covmaptimelineAxisGroup")
 				.selectAll(".tick text")
@@ -2606,6 +2597,35 @@
 						.transition()
 						.duration(duration)
 						.style("opacity", inInterval ? 1 : fadeOpacity);
+				});
+
+			highlightRects.transition()
+				.duration(duration)
+				.attr("x", function(d) {
+					return timelineScale(d[0])
+				})
+				.attr("width", function(d) {
+					return timelineScale(d[1]) - timelineScale(d[0]);
+				})
+				.end()
+				.then(function() {
+					highlightRects.each(function(d) {
+						let rectX = +d3.select(this).attr("x");
+						let rectWidth = +d3.select(this).attr("width");
+						const highlightedTicks = timelinePanel.main.select(".covmaptimelineAxisGroup")
+							.selectAll(".tick text").filter(function(e) {
+								return ((e >= d[0] && e < d[1]) && d3.select(this).style("opacity") === "1");
+							});
+						const firstTick = highlightedTicks.nodes()[0];
+						const lastTick = highlightedTicks.nodes()[highlightedTicks.size() - 1];
+						while ((firstTick.getBoundingClientRect().left - 1) < this.getBoundingClientRect().left) {
+							d3.select(this).attr("x", --rectX);
+							d3.select(this).attr("width", ++rectWidth);
+						};
+						while ((lastTick.getBoundingClientRect().right + 1) > this.getBoundingClientRect().right) {
+							d3.select(this).attr("width", ++rectWidth);
+						};
+					});
 				});
 
 			//end of createTimelineHighlight
