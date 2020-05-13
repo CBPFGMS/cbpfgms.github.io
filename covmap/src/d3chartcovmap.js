@@ -3512,7 +3512,7 @@
 				.attr("x", width * 0.6)
 				.attr("y", topPanel.height + panelHorizontalPadding)
 				.attr("width", width * 0.4)
-				.attr("height", buttonsPanel.height + panelHorizontalPadding)
+				.attr("height", buttonsPanel.height + panelHorizontalPadding + 4)
 				.style("fill", "white")
 				.style("pointer-events", "all")
 				.style("cursor", "pointer")
@@ -3565,7 +3565,7 @@
 				x: 6,
 				y: 596,
 				width: 1084,
-				height: 230,
+				height: 270,
 				xTooltip: 400,
 				yTooltip: 430,
 				text: "This timeline shows the allocations according to their dates. Allocations in the same day are merged and displayed as “Several countries”. Hover over the pies to display a tooltip with additional information. In the tooltip for “Several countries” pies you can click on each country to display that country’s information and scroll down to reveal more countries."
