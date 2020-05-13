@@ -176,7 +176,7 @@
 			buttonsPanelHeight = 30,
 			mapPanelHeight = 490,
 			topPanelHeight = 60,
-			legendPanelHeight = 140,
+			legendPanelHeight = 132,
 			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
 			legendPanelVertPadding = 12,
@@ -2547,9 +2547,8 @@
 				if (d === allData) {
 					return [timelineScale.domain()[0], timelineScale.domain()[1]]
 				} else {
-					const firstDate = d === "Apr-20" ? d3.timeDay.offset(timeParserButtons(d), -1) : timeParserButtons(d);
-					const lastDate = d === "Mar-20" ? d3.timeDay.offset(d3.timeMonth.offset(firstDate, 1), -1) :
-						d3.min([timelineScale.domain()[1], d3.timeMonth.offset(firstDate, 1)]);
+					const firstDate = timeParserButtons(d);
+					const lastDate = d3.min([timelineScale.domain()[1], d3.timeMonth.offset(firstDate, 1)]);
 					return [firstDate, lastDate];
 				};
 			});
@@ -2592,7 +2591,7 @@
 				.each(function(d) {
 					let inInterval = false;
 					timeData.forEach(function(e) {
-						if (d > e[0] && d < e[1]) inInterval = true;
+						if (d >= e[0] && d < e[1]) inInterval = true;
 					});
 					d3.select(this).style("fill", inInterval ? "white" : null);
 				});
@@ -2601,7 +2600,7 @@
 				.each(function(d) {
 					let inInterval = false;
 					timeData.forEach(function(e) {
-						if (d.allocationDate > e[0] && d.allocationDate < e[1]) inInterval = true;
+						if (d.allocationDate >= e[0] && d.allocationDate < e[1]) inInterval = true;
 					});
 					d3.select(this)
 						.transition()
@@ -2865,7 +2864,7 @@
 				.append("text")
 				.attr("class", "covmaplegendTitle")
 				.attr("x", legendPanel.padding[3])
-				.attr("y", legendPanel.padding[0] - 18)
+				.attr("y", legendPanel.padding[0] - 10)
 				.text("LEGEND");
 
 			let legendSizeGroups = legendPanel.main.selectAll(".covmaplegendSizeGroups")
