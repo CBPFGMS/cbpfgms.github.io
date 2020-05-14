@@ -764,8 +764,7 @@
 				.attr("class", "fas fa-download");
 
 			const snapshotDiv = iconsDiv.append("div")
-				.attr("class", "covmapSnapshotDiv")
-				.style("display", "flex");
+				.attr("class", "covmapSnapshotDiv");
 
 			const snapshotIcon = snapshotDiv.append("button")
 				.attr("id", "covmapSnapshotButton");
@@ -775,8 +774,7 @@
 				.attr("class", "fas fa-camera");
 
 			const snapshotContent = snapshotDiv.append("div")
-				.attr("class", "covmapSnapshotContent")
-				.style("margin-top", "5%");
+				.attr("class", "covmapSnapshotContent");
 
 			const pdfSpan = snapshotContent.append("p")
 				.attr("id", "covmapSnapshotPdfText")
