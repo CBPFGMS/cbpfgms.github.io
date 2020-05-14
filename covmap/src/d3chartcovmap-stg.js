@@ -776,7 +776,7 @@
 
 			const snapshotContent = snapshotDiv.append("div")
 				.attr("class", "covmapSnapshotContent")
-				.style("margin-top", "6%");
+				.style("margin-top", "5%");
 
 			const pdfSpan = snapshotContent.append("p")
 				.attr("id", "covmapSnapshotPdfText")
