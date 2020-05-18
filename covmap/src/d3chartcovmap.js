@@ -749,7 +749,12 @@
 
 		function createTitle(rawData) {
 
+			const containerBox = containerDiv.node().getBoundingClientRect();
+
+			const buttonsFontSize = 12 * (containerBox.width / width);
+
 			const helpIcon = iconsDiv.append("button")
+				.style("font-size", buttonsFontSize + "px", "important")
 				.attr("id", "covmapHelpButton");
 
 			helpIcon.html("HELP  ")
@@ -757,6 +762,7 @@
 				.attr("class", "fas fa-info")
 
 			const downloadIcon = iconsDiv.append("button")
+				.style("font-size", buttonsFontSize + "px", "important")
 				.attr("id", "covmapDownloadButton");
 
 			downloadIcon.html(".CSV  ")
@@ -767,6 +773,7 @@
 				.attr("class", "covmapSnapshotDiv");
 
 			const snapshotIcon = snapshotDiv.append("button")
+				.style("font-size", buttonsFontSize + "px", "important")
 				.attr("id", "covmapSnapshotButton");
 
 			snapshotIcon.html("IMAGE ")
@@ -791,6 +798,7 @@
 				});
 
 			const playIcon = iconsDiv.append("button")
+				.style("font-size", buttonsFontSize + "px", "important")
 				.datum({
 					clicked: false
 				})
@@ -863,6 +871,7 @@
 			if (!isBookmarkPage) {
 
 				const shareIcon = iconsDiv.append("button")
+					.style("font-size", buttonsFontSize + "px", "important")
 					.attr("id", "covmapShareButton");
 
 				shareIcon.html("SHARE  ")
@@ -2025,7 +2034,7 @@
 				const thisOffsetTop = (thisBox.bottom + thisBox.top) / 2 - containerBox.top - (tooltipBox.height / 2);
 
 				const thisOffsetLeft = containerBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					(thisBox.left + 2 * radiusScale(datum.cbpf + datum.cerf)) - containerBox.left + tooltipMargin :
+					(thisBox.left + 2 * (radiusScale(datum.cbpf + datum.cerf) * (containerBox.width / width))) - containerBox.left + tooltipMargin :
 					thisBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
@@ -2497,7 +2506,7 @@
 					countryDiv.on("click", function(d) {
 						tooltip.html(null);
 						createCountryTooltip(d, true);
-						const mousePosition = d3.mouse(svg.node());
+						const mousePosition = d3.mouse(containerDiv.node());
 						const tooltipBox = tooltip.node().getBoundingClientRect();
 						const thisOffsetTop = Math.min(svgBox.bottom - svgBox.top - tooltipBox.height, svgBox.bottom - svgBox.top - (svgBox.height - mousePosition[1] + 20));
 						tooltip.style("top", thisOffsetTop + "px");
@@ -2518,7 +2527,7 @@
 				const thisOffsetTop = svgBox.bottom - svgBox.top - tooltipBox.height;
 
 				const thisOffsetLeft = svgBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					(thisBox.left + 2 * radiusScaleTimeline(completeDatum.cbpf + completeDatum.cerf)) - svgBox.left + tooltipMargin :
+					(thisBox.left + 2 * (radiusScaleTimeline(completeDatum.cbpf + completeDatum.cerf) * (svgBox.width / width))) - svgBox.left + tooltipMargin :
 					thisBox.left - svgBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
