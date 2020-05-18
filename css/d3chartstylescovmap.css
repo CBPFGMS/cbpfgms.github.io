@@ -60,6 +60,7 @@
 	border: 0.069vw solid rgba(0,0,0,0.3);
 	box-shadow: 0.139vw 0.139vw 0.139vw rgba(0,0,0,0.4);
 	margin-right: 0.417vw;
+	line-height: normal !important;
   }
 
 .covmapIconsDiv button:hover:enabled {
