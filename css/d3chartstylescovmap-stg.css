@@ -577,6 +577,11 @@ html{
 	cursor: pointer;
 	border-radius: 4px;
 	overflow: hidden;
+	line-height: normal;
+}
+
+.covmapSnapshotDiv {
+	line-height: 0px;
 }
 
 .covmapSnapshotContent #covmapSnapshotPdfText, .covmapSnapshotContent #covmapSnapshotPngText, .covmapSnapshotContent #covmapSnapshotTooltipPdfText, .covmapSnapshotContent #covmapSnapshotTooltipPngText {
