@@ -697,7 +697,7 @@
 					.attr("class", "pbialiYAxisLabel")
 					.attr("text-anchor", "end")
 					.attr("x", mainPanel.padding[3] - 2)
-					.attr("y", mainPanel.padding[0] + 4)
+					.attr("y", mainPanel.padding[0] - 4)
 					.text("US$");
 
 				const mainGroup = mainPanel.main.selectAll(null)
