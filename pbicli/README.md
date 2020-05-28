@@ -23,7 +23,7 @@ Copy this snippet to the HTML:
 
 ```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-selectedcountry="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
 
-The script will create an SVG inside the `<div>` specified in the snippet.
+The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container 900px wide.
 
 The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbicli.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 

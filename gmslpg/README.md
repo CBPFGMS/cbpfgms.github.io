@@ -10,7 +10,7 @@ Copy this snippet to the HTML:
 
 ```<div id="d3chartcontainergmslpg" data-yearStart="2014" data-yearEnd="2018" data-yearSelected="2018" data-sorting="contributions" data-responsive="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/gmslpg/src/d3chartgmslpg.js"></script>```
 
-The script will create an SVG inside the `<div>` specified in the snippet.
+The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container at least 900px wide.
 
 The JavaScript code will also reference [D3.js](https://d3js.org) version 5 and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/) file.
 

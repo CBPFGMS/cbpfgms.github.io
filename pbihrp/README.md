@@ -22,7 +22,7 @@ Copy this snippet to the HTML:
 
 ```<div id="d3chartcontainerpbihrp" data-title="CBPF Target vs HRP" data-year="2019" data-sortby="CBPF Funding" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbihrp/src/d3chartpbihrp.js"></script>```
 
-The script will create an SVG inside the `<div>` specified in the snippet.
+The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container 1100px wide.
 
 The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbihrp.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 

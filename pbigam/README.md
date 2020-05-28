@@ -22,7 +22,7 @@ Copy this snippet to the HTML:
 
 ```<div id="d3chartcontainerpbigam" data-title="Gender with Age Marker (GAM)" data-cbpf="all" data-year="2019" data-display="marker" data-valuetype="budget" data-showmean="false" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbigam/src/d3chartpbigam.js"></script>```
 
-The script will create an SVG inside the `<div>` specified in the snippet.
+The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container 900px wide.
 
 The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the [specific CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstylespbigam.css) file and the [common CSS](https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/css/d3chartstyles.css) file.
 
