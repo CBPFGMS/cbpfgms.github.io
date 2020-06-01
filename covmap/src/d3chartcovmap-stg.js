@@ -176,7 +176,7 @@
 			buttonsPanelHeight = 30,
 			mapPanelHeight = 490,
 			topPanelHeight = 60,
-			legendPanelHeight = 132,
+			legendPanelHeight = 102,
 			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
 			legendPanelVertPadding = 12,
@@ -228,7 +228,37 @@
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
 			iconsUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/",
-			timelineMetadataUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/covmapmetadata.json",
+			timelineMetadata = [{
+				"title": "WHO announces that COVID-19 is a Public Health Emergency of International Concern",
+				"icon": "coronavirusgreen",
+				"date": "30/01/2020",
+				"lollipopDate": "30/01/2020",
+				"size": 110
+			}, {
+				"title": "First CERF- funded WHO project starts",
+				"icon": "moneycerf",
+				"date": "03/02/2020",
+				"lollipopDate": "20/02/2020",
+				"size": 80
+			}, {
+				"title": "WHO declares COVID-19 outbreak a pandemic",
+				"icon": "coronavirusgreen",
+				"date": "11/03/2020",
+				"lollipopDate": "11/03/2020",
+				"size": 90
+			}, {
+				"title": "Launch of the COVID-19 Global Humanitarian Response Plan",
+				"icon": "advocacygreen",
+				"date": "25/03/2020",
+				"lollipopDate": "27/03/2020",
+				"size": 150
+			}, {
+				"title": "Launch of the COVID-19 revised Global Humanitarian Response Plan",
+				"icon": "advocacygreen",
+				"date": "07/05/2020",
+				"lollipopDate": "07/05/2020",
+				"size": 120
+			}],
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			typesOfTargeted = ["HostCommunities", "Refugees", "Returnees", "IDPs", "Others", "Disable"],
 			typesOfPeople = ["M", "W", "B", "G"],
@@ -402,7 +432,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			leftPadding: [94, 280, 494, 890, 904, 970],
+			leftPadding: [90, 290, 0, 570],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
@@ -656,9 +686,7 @@
 		if (localStorage.getItem("covmapmap")) {
 			const mapData = JSON.parse(localStorage.getItem("covmapmap"));
 			console.info("covmap: map from local storage");
-			d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
 				getData(mapData, timelineMetadata);
-			});
 		} else {
 			d3.json(mapUrl).then(function(mapData) {
 				try {
@@ -667,9 +695,7 @@
 					console.info("D3 chart covmap map, " + error);
 				};
 				console.info("covmap: map from API");
-				d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
 					getData(mapData, timelineMetadata);
-				});
 			});
 		};
 
@@ -695,7 +721,11 @@
 			};
 		};
 
-		function csvCallback(rawData, mapData, timelineMetadata) {
+		function csvCallback(rawDataTotal, mapData, timelineMetadata) {
+
+			const rawData = rawDataTotal.filter(function(row){
+				return row.PFType === "CERF";
+			});
 
 			preProcessData(rawData);
 
@@ -1147,10 +1177,6 @@
 
 			const countriesValue = data.length;
 
-			const beneficiariesValue = d3.sum(data, function(d) {
-				return d.targetTotal;
-			});
-
 			const cbpfValue = d3.sum(data, function(d) {
 				return d.cbpf;
 			});
@@ -1165,13 +1191,7 @@
 
 			const previousCountries = d3.select(".covmaptopPanelCountriesNumber").size() !== 0 ? d3.select(".covmaptopPanelCountriesNumber").datum() : 0;
 
-			const previousBeneficiaries = d3.select(".covmaptopPanelBeneficiariesNumber").size() !== 0 ? d3.select(".covmaptopPanelBeneficiariesNumber").datum() : 0;
-
 			const previousTotal = d3.select(".covmaptopPanelTotalNumber").size() !== 0 ? d3.select(".covmaptopPanelTotalNumber").datum() : 0;
-
-			const previousCbpf = d3.select(".covmaptopPanelCbpfNumber").size() !== 0 ? d3.select(".covmaptopPanelCbpfNumber").datum() : 0;
-
-			const previousCerf = d3.select(".covmaptopPanelCerfNumber").size() !== 0 ? d3.select(".covmaptopPanelCerfNumber").datum() : 0;
 
 			let topPanelAllocationsNumber = topPanel.main.selectAll(".covmaptopPanelAllocationsNumber")
 				.data([allocationsValue]);
@@ -1257,53 +1277,6 @@
 				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
 				.text("Countries");
 
-			let topPanelBeneficiariesNumber = topPanel.main.selectAll(".covmaptopPanelBeneficiariesNumber")
-				.data([beneficiariesValue]);
-
-			topPanelBeneficiariesNumber = topPanelBeneficiariesNumber.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelBeneficiariesNumber")
-				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr("x", topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
-				.merge(topPanelBeneficiariesNumber);
-
-			topPanelBeneficiariesNumber.transition()
-				.duration(duration)
-				.textTween(function(d) {
-					const i = d3.interpolate(previousBeneficiaries, d);
-					return function(t) {
-						return formatSIFloatWithoutUnit(i(t))
-					};
-				});
-
-			let topPanelBeneficiariesText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesText")
-				.data([beneficiariesValue]);
-
-			topPanelBeneficiariesText = topPanelBeneficiariesText.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelBeneficiariesText")
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
-				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
-				.merge(topPanelBeneficiariesText)
-				.text(function(d) {
-					const valueSI = formatSIFloat(d);
-					const unit = valueSI[valueSI.length - 1];
-					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" People";
-				});
-
-			const topPanelBeneficiariesSubText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesSubText")
-				.data([true])
-				.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelBeneficiariesSubText")
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.15)
-				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
-				.text("Targeted");
-
 			let topPanelTotalNumber = topPanel.main.selectAll(".covmaptopPanelTotalNumber")
 				.data([totalValue]);
 
@@ -1324,76 +1297,18 @@
 					};
 				});
 
-			let topPanelCbpfNumber = topPanel.main.selectAll(".covmaptopPanelCbpfNumber")
-				.data([cbpfValue]);
-
-			topPanelCbpfNumber = topPanelCbpfNumber.enter()
+			const topPanelTotalText = topPanel.main.selectAll(".covmaptopPanelTotalText")
+				.data([true])
+				.enter()
 				.append("text")
-				.attr("class", "covmaptopPanelCbpfNumber")
+				.attr("class", "covmaptopPanelTotalText")
+				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
 				.attr("text-anchor", "start")
-				.style("fill", cbpfColor)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
-				.attr("x", topPanel.leftPadding[5])
-				.merge(topPanelCbpfNumber);
-
-			topPanelCbpfNumber.transition()
-				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
-				.textTween(function(d) {
-					const i = d3.interpolate(previousCbpf, d);
-					return function(t) {
-						return "$" + formatSIFloat(i(t));
-					};
-				});
-
-			const topPanelCbpfText = topPanel.main.selectAll(".covmaptopPanelCbpfText")
-				.data([true]);
-
-			topPanelCbpfText.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelCbpfText")
-				.attr("x", topPanel.leftPadding[4])
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
-				.text("CBPF:");
-
-			topPanelCbpfText.transition()
-				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
-
-			let topPanelCerfNumber = topPanel.main.selectAll(".covmaptopPanelCerfNumber")
-				.data([cerfValue]);
-
-			topPanelCerfNumber = topPanelCerfNumber.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelCerfNumber")
-				.style("fill", d3.color(cerfColor).darker(0.3))
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
-				.attr("x", topPanel.leftPadding[5])
-				.merge(topPanelCerfNumber);
-
-			topPanelCerfNumber.transition()
-				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
-				.textTween(function(d) {
-					const i = d3.interpolate(previousCerf, d);
-					return function(t) {
-						return "$" + formatSIFloat(i(t));
-					};
-				});
-
-			const topPanelCerfText = topPanel.main.selectAll(".covmaptopPanelCerfText")
-				.data([true]);
-
-			topPanelCerfText.enter()
-				.append("text")
-				.attr("class", "covmaptopPanelCerfText")
-				.attr("x", topPanel.leftPadding[4])
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
-				.text("CERF:");
-
-			topPanelCerfText.transition()
-				.duration(duration)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75));
+				.text("Allocated")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+				.style("font-family", "Arial")
+				.style("font-size", "18px")
+				.style("fill", "#888");
 
 			//end of createTopPanel
 		};
@@ -2959,33 +2874,6 @@
 					return function(t) {
 						return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
 					};
-				});
-
-			const legendColors = legendPanel.main.selectAll(".covmaplegendColors")
-				.data(["cbpf", "cerf"])
-				.enter()
-				.append("g")
-				.attr("class", "covmaplegendColors")
-				.attr("transform", function(_, i) {
-					return "translate(" + legendPanel.padding[3] + "," + (legendPanel.height - legendPanel.padding[2] - (+i * 18)) + ")";
-				});
-
-			legendColors.append("rect")
-				.attr("width", 10)
-				.attr("height", 10)
-				.attr("rx", 1)
-				.attr("ry", 1)
-				.style("stroke-width", "0.5px")
-				.style("stroke", "#666")
-				.style("fill", function(_, i) {
-					return i ? cerfColor : cbpfColor;
-				});
-
-			legendColors.append("text")
-				.attr("x", 14)
-				.attr("y", 9)
-				.text(function(d) {
-					return d.toUpperCase() + " Allocations";
 				});
 
 			//end of createLegend

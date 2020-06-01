@@ -7,13 +7,16 @@
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
 		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
+
+	//CHANGE CSS LINK!!!!!!!!!!!!!!!!!!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -33,29 +36,39 @@
 
 	if (!isScriptLoaded(d3URL)) {
 		if (hasFetch && hasURLSearchParams) {
-			loadScript(d3URL, d3Chart);
+			loadScript(d3SankeyUrl, function() {
+				loadScript(d3URL, d3Chart);
+			});
 		} else if (hasFetch && !hasURLSearchParams) {
 			loadScript(URLSearchParamsPolyfill, function() {
-				loadScript(d3URL, d3Chart);
+				loadScript(d3SankeyUrl, function() {
+					loadScript(d3URL, d3Chart);
+				});
 			});
 		} else {
 			loadScript(fetchPolyfill1, function() {
 				loadScript(fetchPolyfill2, function() {
 					loadScript(URLSearchParamsPolyfill, function() {
-						loadScript(d3URL, d3Chart);
+						loadScript(d3SankeyUrl, function() {
+							loadScript(d3URL, d3Chart);
+						});
 					});
 				});
 			});
 		};
 	} else if (typeof d3 !== "undefined") {
 		if (hasFetch && hasURLSearchParams) {
-			d3Chart();
+			loadScript(d3SankeyUrl, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript(URLSearchParamsPolyfill, d3Chart);
+			loadScript(URLSearchParamsPolyfill, function() {
+				loadScript(d3SankeyUrl, d3Chart);
+			});
 		} else {
 			loadScript(fetchPolyfill1, function() {
 				loadScript(fetchPolyfill2, function() {
-					loadScript(URLSearchParamsPolyfill, d3Chart);
+					loadScript(URLSearchParamsPolyfill, function() {
+						loadScript(d3SankeyUrl, d3Chart);
+					});
 				});
 			});
 		};
@@ -65,6 +78,7 @@
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == d3URL) d3Script = scripts[i];
 		};
+		loadScript(d3SankeyUrl, null);
 		d3Script.addEventListener("load", d3Chart);
 	};
 
@@ -156,7 +170,11 @@
 
 		const width = 900,
 			padding = [4, 4, 4, 4],
-			height = null,
+			panelHorizontalPadding = 4,
+			buttonsPanelHeight = 30,
+			topPanelHeight = 60,
+			sankeyPanelHeight = 450,
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
@@ -166,6 +184,20 @@
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "data.csv",
+			cbpfListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
+			partnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
+			cerfFundObject = {
+				"PFId": 999,
+				"PFName": "CERF",
+				"PFAbbrv": "CERF",
+				"PFLat": "40.73",
+				"PFLong": "-74",
+				"PFCountryCode": "XG",
+				"MAAgent": "OCHA",
+				"AAgent": "???",
+				"IsPublic": true
+			},
+			cbpfsList = {},
 			chartState = {};
 
 		let isSnapshotTooltipVisible = false,
@@ -263,12 +295,39 @@
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
-		const fooPanel = {
+		const topPanel = {
 			main: svg.append("g")
-				.attr("class", "FOOBARTopPanel")
+				.attr("class", "pbinadtopPanel")
 				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
 			width: width - padding[1] - padding[3],
-			height: topPanelHeight
+			height: topPanelHeight,
+			padding: [0, 0, 0, 0],
+			leftPadding: [],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 2,
+			linePadding: 8
+		};
+
+		const buttonsPanel = {
+			main: svg.append("g")
+				.attr("class", "pbinadbuttonsPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: buttonsPanelHeight,
+			padding: [0, 0, 0, 0],
+			buttonWidth: 52,
+			buttonPadding: 4,
+			buttonVerticalPadding: 4,
+			arrowPadding: 18,
+		};
+
+		const sankeyPanel = {
+			main: svg.append("g")
+				.attr("class", "pbinadsankeyPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: sankeyPanelHeight,
+			padding: [0, 0, 0, 0]
 		};
 
 
@@ -277,43 +336,62 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("FOOBARdata") &&
-			JSON.parse(localStorage.getItem("FOOBARdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("FOOBARdata")).data);
-			console.info("FOOBAR: data from local storage");
-			csvCallback(rawData);
-		} else {
-			d3.csv("URL").then(function(rawData) {
-				try {
-					localStorage.setItem("FOOBARdata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart FOOBAR, " + error);
-				};
-				console.info("FOOBAR: data from API");
-				csvCallback(rawData);
+		fetchFile("pbinad", dataUrl, [], "data")
+			.then(function(previousData) {
+				return fetchFile("pbinadcbpfList", cbpfListUrl, previousData, "cbpfList")
+			})
+			.then(function(previousData) {
+				return fetchFile("pbinadpartnersList", partnersListUrl, previousData, "partnersList")
+			})
+			.then(function(previousData) {
+				csvCallback(previousData);
 			});
+
+		function fetchFile(fileName, url, previousData, warningString) {
+			if (localStorage.getItem(fileName + "data") &&
+				JSON.parse(localStorage.getItem(fileName + "data")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = d3.csvParse(JSON.parse(localStorage.getItem(fileName + "data")).data);
+				console.info("pbinad: " + warningString + " from local storage");
+				previousData.push(fetchedData);
+				return Promise.resolve(previousData);
+			} else {
+				return d3.csv(url).then(function(fetchedData) {
+					try {
+						localStorage.setItem(fileName + "data", JSON.stringify({
+							data: d3.csvFormat(fetchedData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbinad, " + error);
+					};
+					console.info("pbinad: " + warningString + " from API");
+					previousData.push(fetchedData);
+					return previousData;
+				});
+			};
 		};
 
 		function csvCallback(rawData) {
 
 			removeProgressWheel();
 
+			rawData[1].push(cerfFundObject);
 
+			createCbpfsList(rawData[1]);
+
+			console.log(cbpfsList)
 
 			if (!lazyLoad) {
 				draw(rawData);
 			} else {
-				d3.select(window).on("scroll.FOOBAR", checkPosition);
+				d3.select(window).on("scroll.pbinad", checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.FOOBAR", null);
+					d3.select(window).on("scroll.pbinad", null);
 					draw(rawData);
 				};
 			};
@@ -323,168 +401,190 @@
 
 		function draw(rawData) {
 
+			//test
+			svg.append("rect")
+				.attr("width", width)
+				.attr("height", height)
+				.style("opacity", 0.1);
+			topPanel.main.append("rect")
+				.attr("width", topPanel.width)
+				.attr("height", topPanel.height)
+				.style("fill", "green")
+				.style("opacity", 0.2);
+			buttonsPanel.main.append("rect")
+				.attr("width", buttonsPanel.width)
+				.attr("height", buttonsPanel.height)
+				.style("fill", "green")
+				.style("opacity", 0.2);
+			sankeyPanel.main.append("rect")
+				.attr("width", sankeyPanel.width)
+				.attr("height", sankeyPanel.height)
+				.style("fill", "green")
+				.style("opacity", 0.2);
+			//test
+
 			createTitle();
 
 			if (!isPfbiSite) createFooterDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
-			function createTitle() {
+			//end of draw
+		};
 
-				const title = titleDiv.append("p")
-					.attr("id", "FOOBARd3chartTitle")
-					.html(chartTitle);
+		function createTitle() {
 
-				const helpIcon = iconsDiv.append("button")
-					.attr("id", "FOOBARHelpButton");
+			const title = titleDiv.append("p")
+				.attr("id", "pbinadd3chartTitle")
+				.html(chartTitle);
 
-				helpIcon.html("HELP  ")
-					.append("span")
-					.attr("class", "fas fa-info")
+			const helpIcon = iconsDiv.append("button")
+				.attr("id", "pbinadHelpButton");
 
-				const downloadIcon = iconsDiv.append("button")
-					.attr("id", "FOOBARDownloadButton");
+			helpIcon.html("HELP  ")
+				.append("span")
+				.attr("class", "fas fa-info")
 
-				downloadIcon.html(".CSV  ")
-					.append("span")
-					.attr("class", "fas fa-download");
+			const downloadIcon = iconsDiv.append("button")
+				.attr("id", "pbinadDownloadButton");
 
-				const snapshotDiv = iconsDiv.append("div")
-					.attr("class", "FOOBARSnapshotDiv");
+			downloadIcon.html(".CSV  ")
+				.append("span")
+				.attr("class", "fas fa-download");
 
-				const snapshotIcon = snapshotDiv.append("button")
-					.attr("id", "FOOBARSnapshotButton");
+			const snapshotDiv = iconsDiv.append("div")
+				.attr("class", "pbinadSnapshotDiv");
 
-				snapshotIcon.html("IMAGE ")
-					.append("span")
-					.attr("class", "fas fa-camera");
+			const snapshotIcon = snapshotDiv.append("button")
+				.attr("id", "pbinadSnapshotButton");
 
-				const snapshotContent = snapshotDiv.append("div")
-					.attr("class", "FOOBARSnapshotContent");
+			snapshotIcon.html("IMAGE ")
+				.append("span")
+				.attr("class", "fas fa-camera");
 
-				const pdfSpan = snapshotContent.append("p")
-					.attr("id", "FOOBARSnapshotPdfText")
-					.html("Download PDF")
-					.on("click", function() {
-						createSnapshot("pdf", false);
-					});
+			const snapshotContent = snapshotDiv.append("div")
+				.attr("class", "pbinadSnapshotContent");
 
-				const pngSpan = snapshotContent.append("p")
-					.attr("id", "FOOBARSnapshotPngText")
-					.html("Download Image (PNG)")
-					.on("click", function() {
-						createSnapshot("png", false);
-					});
-
-				if (!isBookmarkPage) {
-
-					const shareIcon = iconsDiv.append("button")
-						.attr("id", "FOOBARShareButton");
-
-					shareIcon.html("SHARE  ")
-						.append("span")
-						.attr("class", "fas fa-share");
-
-					const shareDiv = containerDiv.append("div")
-						.attr("class", "d3chartShareDiv")
-						.style("display", "none");
-
-					shareIcon.on("mouseover", function() {
-							shareDiv.html("Click to copy")
-								.style("display", "block");
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("top", thisOffsetTop + "px")
-								.style("left", thisOffsetLeft + "20px");
-						}).on("mouseout", function() {
-							shareDiv.style("display", "none");
-						})
-						.on("click", function() {
-
-							const newURL = bookmarkSite + queryStringValues.toString();
-
-							const shareInput = shareDiv.append("input")
-								.attr("type", "text")
-								.attr("readonly", true)
-								.attr("spellcheck", "false")
-								.property("value", newURL);
-
-							shareInput.node().select();
-
-							document.execCommand("copy");
-
-							shareDiv.html("Copied!");
-
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("left", thisOffsetLeft + "20px");
-
-						});
-
-				};
-
-				if (browserHasSnapshotIssues) {
-					const bestVisualizedSpan = snapshotContent.append("p")
-						.attr("id", "FOOBARBestVisualizedText")
-						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
-						.attr("pointer-events", "none")
-						.style("cursor", "default");
-				};
-
-				snapshotDiv.on("mouseover", function() {
-					snapshotContent.style("display", "block")
-				}).on("mouseout", function() {
-					snapshotContent.style("display", "none")
+			const pdfSpan = snapshotContent.append("p")
+				.attr("id", "pbinadSnapshotPdfText")
+				.html("Download PDF")
+				.on("click", function() {
+					createSnapshot("pdf", false);
 				});
 
-				helpIcon.on("click", createAnnotationsDiv);
-
-				downloadIcon.on("click", function() {
-
-					const csv = createCsv(rawData); //CHANGE
-
-					const currentDate = new Date();
-
-					const fileName = "FOOBAR_" + csvDateFormat(currentDate) + ".csv";
-
-					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
-					});
-
-					if (navigator.msSaveBlob) {
-						navigator.msSaveBlob(blob, filename);
-					} else {
-
-						const link = document.createElement("a");
-
-						if (link.download !== undefined) {
-
-							const url = URL.createObjectURL(blob);
-
-							link.setAttribute("href", url);
-							link.setAttribute("download", fileName);
-							link.style = "visibility:hidden";
-
-							document.body.appendChild(link);
-
-							link.click();
-
-							document.body.removeChild(link);
-
-						};
-					};
-
+			const pngSpan = snapshotContent.append("p")
+				.attr("id", "pbinadSnapshotPngText")
+				.html("Download Image (PNG)")
+				.on("click", function() {
+					createSnapshot("png", false);
 				});
 
-				//end of createTitle
+			if (!isBookmarkPage) {
+
+				const shareIcon = iconsDiv.append("button")
+					.attr("id", "pbinadShareButton");
+
+				shareIcon.html("SHARE  ")
+					.append("span")
+					.attr("class", "fas fa-share");
+
+				const shareDiv = containerDiv.append("div")
+					.attr("class", "d3chartShareDiv")
+					.style("display", "none");
+
+				shareIcon.on("mouseover", function() {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function() {
+						shareDiv.style("display", "none");
+					})
+					.on("click", function() {
+
+						const newURL = bookmarkSite + queryStringValues.toString();
+
+						const shareInput = shareDiv.append("input")
+							.attr("type", "text")
+							.attr("readonly", true)
+							.attr("spellcheck", "false")
+							.property("value", newURL);
+
+						shareInput.node().select();
+
+						document.execCommand("copy");
+
+						shareDiv.html("Copied!");
+
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("left", thisOffsetLeft + "20px");
+
+					});
+
 			};
 
-			//end of draw
+			if (browserHasSnapshotIssues) {
+				const bestVisualizedSpan = snapshotContent.append("p")
+					.attr("id", "pbinadBestVisualizedText")
+					.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+					.attr("pointer-events", "none")
+					.style("cursor", "default");
+			};
+
+			snapshotDiv.on("mouseover", function() {
+				snapshotContent.style("display", "block")
+			}).on("mouseout", function() {
+				snapshotContent.style("display", "none")
+			});
+
+			helpIcon.on("click", createAnnotationsDiv);
+
+			downloadIcon.on("click", function() {
+
+				const csv = createCsv(rawData); //CHANGE
+
+				const currentDate = new Date();
+
+				const fileName = "NetFunding_" + csvDateFormat(currentDate) + ".csv";
+
+				const blob = new Blob([csv], {
+					type: 'text/csv;charset=utf-8;'
+				});
+
+				if (navigator.msSaveBlob) {
+					navigator.msSaveBlob(blob, filename);
+				} else {
+
+					const link = document.createElement("a");
+
+					if (link.download !== undefined) {
+
+						const url = URL.createObjectURL(blob);
+
+						link.setAttribute("href", url);
+						link.setAttribute("download", fileName);
+						link.style = "visibility:hidden";
+
+						document.body.appendChild(link);
+
+						link.click();
+
+						document.body.removeChild(link);
+
+					};
+				};
+
+			});
+
+			//end of createTitle
 		};
 
 
@@ -495,19 +595,25 @@
 			return csv;
 		};
 
+		function createCbpfsList(cbpfsData) {
+			cbpfsData.forEach(function(row) {
+				cbpfsList[row.PFId + ""] = row.PFName;
+			});
+		};
+
 		function createAnnotationsDiv() {
 
 			const padding = 6;
 
 			const overDiv = containerDiv.append("div")
-				.attr("class", "FOOBAROverDivHelp");
+				.attr("class", "pbinadOverDivHelp");
 
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + height);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
-				.attr("id", "FOOBARArrowMarker")
+				.attr("id", "pbinadArrowMarker")
 				.attr("viewBox", "0 -5 10 10")
 				.attr("refX", 0)
 				.attr("refY", 0)
@@ -530,7 +636,7 @@
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
-				.attr("class", "FOOBARAnnotationMainText contributionColorFill")
+				.attr("class", "pbinadAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
 				.attr("y", 320)
@@ -569,12 +675,12 @@
 
 			const downloadingDiv = d3.select("body").append("div")
 				.style("position", "fixed")
-				.attr("id", "FOOBARDownloadingDiv")
+				.attr("id", "pbinadDownloadingDiv")
 				.style("left", window.innerWidth / 2 - 100 + "px")
 				.style("top", window.innerHeight / 2 - 100 + "px");
 
 			const downloadingDivSvg = downloadingDiv.append("svg")
-				.attr("class", "FOOBARDownloadingDivSvg")
+				.attr("class", "pbinadDownloadingDivSvg")
 				.attr("width", 200)
 				.attr("height", 100);
 
@@ -658,7 +764,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "FOOBAR_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "NetFunding_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -677,7 +783,7 @@
 
 			removeProgressWheel();
 
-			d3.select("#FOOBARDownloadingDiv").remove();
+			d3.select("#pbinadDownloadingDiv").remove();
 
 		};
 
@@ -750,11 +856,11 @@
 
 					const currentDate = new Date();
 
-					pdf.save("FOOBAR_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("NetFunding_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
-					d3.select("#FOOBARDownloadingDiv").remove();
+					d3.select("#pbinadDownloadingDiv").remove();
 
 					function createLetterhead() {
 
@@ -792,7 +898,7 @@
 
 		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
 			const wheelGroup = thissvg.append("g")
-				.attr("class", "FOOBARd3chartwheelGroup")
+				.attr("class", "pbinadd3chartwheelGroup")
 				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 
 			const loadingText = wheelGroup.append("text")
@@ -851,7 +957,7 @@
 		};
 
 		function removeProgressWheel() {
-			const wheelGroup = d3.select(".FOOBARd3chartwheelGroup");
+			const wheelGroup = d3.select(".pbinadd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 		};

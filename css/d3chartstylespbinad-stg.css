@@ -42,13 +42,13 @@
 
 .pbinadTitleDiv {
 	display: flex;
-	flex:0 50%;
+	flex:0 45%;
 	margin-left: 8px;
 }
 
 .pbinadIconsDiv {
 	display: flex;
-	flex:0 50%;
+	flex:0 55%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
