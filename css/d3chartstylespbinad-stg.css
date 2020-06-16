@@ -84,6 +84,67 @@ p#pbinadd3chartTitle {
 	color: #418fde;
 }
 
+.pbinadbuttonsText, .pbinadbuttonsAggregationText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbinadleftArrowText, .pbinadrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.pbinadtopPanelMainValue, .pbinadtopPanelPartnersValue, .pbinadtopPanelSubpartnersValue {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbinadtopPanelMainText, .pbinadtopPanelSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.pbinadtopPanelPartnersText, .pbinadtopPanelPartnersSubText, .pbinadtopPanelSubpartnersText, .pbinadtopPanelSubpartnersSubText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #888;
+}
+
+.pbinadsankeyLegendTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	fill: #888;
+}
+
+.pbinadlegendText, .pbinadcurlyText, .pbinadtypePercentage {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
+.pbinadcurlyTspan, .pbinadtypePercentageBold {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #444;
+	font-weight: 700;
+}
+
+.pbinadsankeyFundLabels, .pbinadsankeyPartnerLabels, .pbinadsankeySubpartnerLabels {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #222;
+}
+
+.pbinadsankeyAnnotations {
+	font-family: "Arial", sans-serif;
+	font-size: 10px;
+	fill: #666;
+}
+
 .pbinadAnnotationMainText {
 	font-family: "Arial", sans-serif;
 	font-size: 26px;
