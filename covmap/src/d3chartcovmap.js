@@ -613,6 +613,10 @@
 			.domain(typesOfPeople)
 			.range(["Men", "Women", "Boys", "Girls"]);
 
+		const peopleScaleWithTotal = d3.scaleOrdinal()
+			.domain(typesOfPeople.concat(["Total"]))
+			.range(["Men", "Women", "Boys", "Girls", "Total"]);
+
 		const targetedScale = d3.scaleOrdinal()
 			.domain(typesOfTargeted)
 			.range(["Host Communities", "Refugees", "Returnees", "IDPs", "Others", "Disabled"]);
@@ -3196,7 +3200,7 @@
 						headers.forEach(function(e, i) {
 							withoutDisabledHeaderValues.append("div")
 								.attr("class", "covmapwithoutDisabledHeaderValuesText")
-								.html(!i ? targetedScale(d.targeted) : d[peopleScale(e)]);
+								.html(!i ? targetedScale(d.targeted) : d[peopleScaleWithTotal(e)]);
 						});
 					});
 
@@ -3207,7 +3211,7 @@
 						headers.forEach(function(e, i) {
 							disabledHeaderValues.append("div")
 								.attr("class", "covmapdisabledHeaderValuesText")
-								.html(!i ? "Persons with disabilities" : d[peopleScale(e)]);
+								.html(!i ? "Persons with disabilities" : d[peopleScaleWithTotal(e)]);
 						});
 					});
 
