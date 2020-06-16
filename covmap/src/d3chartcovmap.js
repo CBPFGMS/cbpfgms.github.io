@@ -2081,7 +2081,7 @@
 		function createTimeline(unfilteredData, timelineMetadata) {
 
 			const data = unfilteredData.filter(function(d) {
-				return d.cbpf + d.cerf;
+				return (d.cbpf + d.cerf) && d.allocationDate.getFullYear() >= 2020;
 			});
 
 			const allDates = data.map(function(d) {
@@ -3326,7 +3326,7 @@
 			rawData.forEach(function(row) {
 
 				const foundAllocation = data.find(function(d) {
-					return d.isoCode === row.ISO2Country && (timeFormatAxis(new Date(row.DateOfAlloc)) === timeFormatAxis(d.allocationDate));
+					return d.isoCode === row.ISO2Country && (timeFormatTickValues(new Date(row.DateOfAlloc)) === timeFormatTickValues(d.allocationDate));
 				});
 
 				if (foundAllocation) {
