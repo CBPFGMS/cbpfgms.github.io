@@ -1634,8 +1634,6 @@
 
 			const pieGroupExit = pieGroup.exit();
 
-			console.log(pieGroupExit.size())
-
 			pieGroupExit.transition()
 				.duration(duration)
 				.style("opacity", 0)
