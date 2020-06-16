@@ -176,7 +176,7 @@
 			buttonsPanelHeight = 30,
 			mapPanelHeight = 490,
 			topPanelHeight = 60,
-			legendPanelHeight = 102,
+			legendPanelHeight = 132,
 			legendPanelWidth = 110,
 			legendPanelHorPadding = 2,
 			legendPanelVertPadding = 12,
@@ -192,6 +192,7 @@
 			buttonsNumber = 10,
 			groupNamePadding = 2,
 			unBlue = "#1F69B3",
+			cbpfColor = "#418FDE",
 			cerfColor = "#F9D25B",
 			tooltipStickColor = "lightslategray",
 			tooltipLollipopColor = "lightslategray",
@@ -227,37 +228,7 @@
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
 			mapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmaptopo110m.json",
 			iconsUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/",
-			timelineMetadata = [{
-				"title": "WHO announces that COVID-19 is a Public Health Emergency of International Concern",
-				"icon": "coronavirusgreen",
-				"date": "30/01/2020",
-				"lollipopDate": "30/01/2020",
-				"size": 110
-			}, {
-				"title": "First CERF- funded WHO project starts",
-				"icon": "moneycerf",
-				"date": "03/02/2020",
-				"lollipopDate": "20/02/2020",
-				"size": 80
-			}, {
-				"title": "WHO declares COVID-19 outbreak a pandemic",
-				"icon": "coronavirusgreen",
-				"date": "11/03/2020",
-				"lollipopDate": "11/03/2020",
-				"size": 90
-			}, {
-				"title": "Launch of the COVID-19 Global Humanitarian Response Plan",
-				"icon": "advocacygreen",
-				"date": "25/03/2020",
-				"lollipopDate": "27/03/2020",
-				"size": 150
-			}, {
-				"title": "Launch of the COVID-19 revised Global Humanitarian Response Plan",
-				"icon": "advocacygreen",
-				"date": "07/05/2020",
-				"lollipopDate": "07/05/2020",
-				"size": 120
-			}],
+			timelineMetadataUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/covmap/covmapmetadata.json",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			typesOfTargeted = ["HostCommunities", "Refugees", "Returnees", "IDPs", "Others", "Disable"],
 			typesOfPeople = ["M", "W", "B", "G"],
@@ -431,7 +402,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
-			leftPadding: [90, 290, 0, 570],
+			leftPadding: [94, 280, 494, 890, 904, 970],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
@@ -570,6 +541,19 @@
 		const radiusScale = d3.scaleSqrt()
 			.range([minPieSize, maxPieSize]);
 
+		const arcGenerator = d3.arc()
+			.innerRadius(0);
+
+		const arcGeneratorEnter = d3.arc()
+			.innerRadius(0)
+			.outerRadius(0);
+
+		const pieGenerator = d3.pie()
+			.value(function(d) {
+				return d.value;
+			})
+			.sort(null);
+
 		const zoom = d3.zoom()
 			.scaleExtent([1, 20])
 			.extent([
@@ -672,7 +656,9 @@
 		if (localStorage.getItem("covmapmap")) {
 			const mapData = JSON.parse(localStorage.getItem("covmapmap"));
 			console.info("covmap: map from local storage");
-			getData(mapData);
+			d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
+				getData(mapData, timelineMetadata);
+			});
 		} else {
 			d3.json(mapUrl).then(function(mapData) {
 				try {
@@ -681,16 +667,18 @@
 					console.info("D3 chart covmap map, " + error);
 				};
 				console.info("covmap: map from API");
-				getData(mapData);
+				d3.json(timelineMetadataUrl).then(function(timelineMetadata) {
+					getData(mapData, timelineMetadata);
+				});
 			});
 		};
 
-		function getData(mapData) {
+		function getData(mapData, timelineMetadata) {
 			if (localStorage.getItem("covmapdata") &&
 				JSON.parse(localStorage.getItem("covmapdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("covmapdata")).data);
 				console.info("covmap: data from local storage");
-				csvCallback(rawData, mapData);
+				csvCallback(rawData, mapData, timelineMetadata);
 			} else {
 				d3.csv(dataUrl).then(function(rawData) {
 					try {
@@ -702,16 +690,12 @@
 						console.info("D3 chart covmap data, " + error);
 					};
 					console.info("covmap: data from API");
-					csvCallback(rawData, mapData);
+					csvCallback(rawData, mapData, timelineMetadata);
 				});
 			};
 		};
 
-		function csvCallback(rawDataTotal, mapData) {
-
-			const rawData = rawDataTotal.filter(function(row) {
-				return row.PFType === "CERF";
-			});
+		function csvCallback(rawData, mapData, timelineMetadata) {
 
 			preProcessData(rawData);
 
@@ -719,12 +703,12 @@
 
 			removeProgressWheel();
 
-			draw(rawData, mapData);
+			draw(rawData, mapData, timelineMetadata);
 
 			//end of csvCallback
 		};
 
-		function draw(rawData, mapData) {
+		function draw(rawData, mapData, timelineMetadata) {
 
 			const data = processData(rawData);
 
@@ -1163,15 +1147,31 @@
 
 			const countriesValue = data.length;
 
-			const totalValue = d3.sum(data, function(d) {
+			const beneficiariesValue = d3.sum(data, function(d) {
+				return d.targetTotal;
+			});
+
+			const cbpfValue = d3.sum(data, function(d) {
+				return d.cbpf;
+			});
+
+			const cerfValue = d3.sum(data, function(d) {
 				return d.cerf;
 			});
+
+			const totalValue = cbpfValue + cerfValue;
 
 			const previousAllocations = d3.select(".covmaptopPanelAllocationsNumber").size() !== 0 ? d3.select(".covmaptopPanelAllocationsNumber").datum() : 0;
 
 			const previousCountries = d3.select(".covmaptopPanelCountriesNumber").size() !== 0 ? d3.select(".covmaptopPanelCountriesNumber").datum() : 0;
 
+			const previousBeneficiaries = d3.select(".covmaptopPanelBeneficiariesNumber").size() !== 0 ? d3.select(".covmaptopPanelBeneficiariesNumber").datum() : 0;
+
 			const previousTotal = d3.select(".covmaptopPanelTotalNumber").size() !== 0 ? d3.select(".covmaptopPanelTotalNumber").datum() : 0;
+
+			const previousCbpf = d3.select(".covmaptopPanelCbpfNumber").size() !== 0 ? d3.select(".covmaptopPanelCbpfNumber").datum() : 0;
+
+			const previousCerf = d3.select(".covmaptopPanelCerfNumber").size() !== 0 ? d3.select(".covmaptopPanelCerfNumber").datum() : 0;
 
 			let topPanelAllocationsNumber = topPanel.main.selectAll(".covmaptopPanelAllocationsNumber")
 				.data([allocationsValue]);
@@ -1257,6 +1257,53 @@
 				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
 				.text("Countries");
 
+			let topPanelBeneficiariesNumber = topPanel.main.selectAll(".covmaptopPanelBeneficiariesNumber")
+				.data([beneficiariesValue]);
+
+			topPanelBeneficiariesNumber = topPanelBeneficiariesNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesNumber")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
+				.merge(topPanelBeneficiariesNumber);
+
+			topPanelBeneficiariesNumber.transition()
+				.duration(duration)
+				.textTween(function(d) {
+					const i = d3.interpolate(previousBeneficiaries, d);
+					return function(t) {
+						return formatSIFloatWithoutUnit(i(t))
+					};
+				});
+
+			let topPanelBeneficiariesText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesText")
+				.data([beneficiariesValue]);
+
+			topPanelBeneficiariesText = topPanelBeneficiariesText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesText")
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+				.merge(topPanelBeneficiariesText)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" People";
+				});
+
+			const topPanelBeneficiariesSubText = topPanel.main.selectAll(".covmaptopPanelBeneficiariesSubText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelBeneficiariesSubText")
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.15)
+				.attr("x", topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
+				.text("Targeted");
+
 			let topPanelTotalNumber = topPanel.main.selectAll(".covmaptopPanelTotalNumber")
 				.data([totalValue]);
 
@@ -1277,18 +1324,76 @@
 					};
 				});
 
-			const topPanelTotalText = topPanel.main.selectAll(".covmaptopPanelTotalText")
-				.data([true])
-				.enter()
+			let topPanelCbpfNumber = topPanel.main.selectAll(".covmaptopPanelCbpfNumber")
+				.data([cbpfValue]);
+
+			topPanelCbpfNumber = topPanelCbpfNumber.enter()
 				.append("text")
-				.attr("class", "covmaptopPanelTotalText")
-				.attr("x", topPanel.leftPadding[3] + topPanel.mainValueHorPadding)
+				.attr("class", "covmaptopPanelCbpfNumber")
 				.attr("text-anchor", "start")
-				.text("Allocated")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
-				.style("font-family", "Arial")
-				.style("font-size", "18px")
-				.style("fill", "#888");
+				.style("fill", cbpfColor)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
+				.attr("x", topPanel.leftPadding[5])
+				.merge(topPanelCbpfNumber);
+
+			topPanelCbpfNumber.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
+				.textTween(function(d) {
+					const i = d3.interpolate(previousCbpf, d);
+					return function(t) {
+						return "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const topPanelCbpfText = topPanel.main.selectAll(".covmaptopPanelCbpfText")
+				.data([true]);
+
+			topPanelCbpfText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCbpfText")
+				.attr("x", topPanel.leftPadding[4])
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
+				.text("CBPF:");
+
+			topPanelCbpfText.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue < cerfValue ? 0.95 : 2.75))
+
+			let topPanelCerfNumber = topPanel.main.selectAll(".covmaptopPanelCerfNumber")
+				.data([cerfValue]);
+
+			topPanelCerfNumber = topPanelCerfNumber.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCerfNumber")
+				.style("fill", d3.color(cerfColor).darker(0.3))
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
+				.attr("x", topPanel.leftPadding[5])
+				.merge(topPanelCerfNumber);
+
+			topPanelCerfNumber.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
+				.textTween(function(d) {
+					const i = d3.interpolate(previousCerf, d);
+					return function(t) {
+						return "$" + formatSIFloat(i(t));
+					};
+				});
+
+			const topPanelCerfText = topPanel.main.selectAll(".covmaptopPanelCerfText")
+				.data([true]);
+
+			topPanelCerfText.enter()
+				.append("text")
+				.attr("class", "covmaptopPanelCerfText")
+				.attr("x", topPanel.leftPadding[4])
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75))
+				.text("CERF:");
+
+			topPanelCerfText.transition()
+				.duration(duration)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * (cbpfValue >= cerfValue ? 0.95 : 2.75));
 
 			//end of createTopPanel
 		};
@@ -1610,7 +1715,7 @@
 			clickableButtons = false;
 
 			const data = unfilteredData.filter(function(d) {
-				return d.cerf;
+				return d.cbpf + d.cerf;
 			});
 
 			zoom.on("zoom", zoomed);
@@ -1618,11 +1723,12 @@
 			const currentTransform = d3.zoomTransform(mapPanel.main.node());
 
 			data.sort(function(a, b) {
-				return b.cerf - a.cerf;
+				return (b.cbpf + b.cerf) -
+					(a.cbpf + a.cerf);
 			});
 
 			const maxValue = d3.max(data, function(d) {
-				return d.cerf;
+				return d.cbpf + d.cerf;
 			});
 
 			radiusScale.domain([0, maxValue || 0]);
@@ -1634,15 +1740,35 @@
 
 			const pieGroupExit = pieGroup.exit();
 
-			pieGroupExit.transition()
-				.duration(duration)
-				.style("opacity", 0)
-				.remove();
-
-			pieGroupExit.select(".covmapcircle")
+			pieGroupExit.selectAll("text, tspan")
 				.transition()
-				.duration(duration)
-				.attr("r", 0);
+				.duration(duration * 0.9)
+				.style("opacity", 0);
+
+			pieGroupExit.each(function(d) {
+				const thisGroup = d3.select(this);
+				thisGroup.selectAll(".covmapslice")
+					.transition()
+					.duration(duration)
+					.attrTween("d", function(d) {
+						const finalObject = d.data.type === "cerf" ? {
+							startAngle: 0,
+							endAngle: 0,
+							outerRadius: 0
+						} : {
+							startAngle: Math.PI * 2,
+							endAngle: Math.PI * 2,
+							outerRadius: 0
+						};
+						const i = d3.interpolateObject(localVariable.get(this), finalObject);
+						return function(t) {
+							return arcGenerator(i(t));
+						};
+					})
+					.on("end", function() {
+						thisGroup.remove();
+					})
+			});
 
 			const pieGroupEnter = pieGroup.enter()
 				.append("g")
@@ -1656,7 +1782,7 @@
 			const groupNameBack = pieGroupEnter.append("text")
 				.attr("class", "covmapgroupNameBack")
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				})
 				.attr("y", function(d) {
 					return d.labelText.length > 1 ? groupNamePadding * 2 - 5 : groupNamePadding * 2;
@@ -1669,7 +1795,7 @@
 				.each(function(d) {
 					if (d.labelText.length > 1) {
 						d3.select(this).append("tspan")
-							.attr("x", radiusScale(d.cerf) + groupNamePadding)
+							.attr("x", radiusScale(d.cbpf + d.cerf) + groupNamePadding)
 							.attr("dy", 12)
 							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
 									return i > 1;
@@ -1681,7 +1807,7 @@
 			const groupName = pieGroupEnter.append("text")
 				.attr("class", "covmapgroupName")
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				})
 				.attr("y", function(d) {
 					return d.labelText.length > 1 ? groupNamePadding * 2 - 5 : groupNamePadding * 2;
@@ -1694,7 +1820,7 @@
 				.each(function(d) {
 					if (d.labelText.length > 1) {
 						d3.select(this).append("tspan")
-							.attr("x", radiusScale(d.cerf) + groupNamePadding)
+							.attr("x", radiusScale(d.cbpf + d.cerf) + groupNamePadding)
 							.attr("dy", 12)
 							.text(d.labelText.length > 2 ? d.labelText.filter(function(_, i) {
 									return i > 1;
@@ -1702,15 +1828,6 @@
 								(d.labelText[1] === "Globally" ? "Globally*" : d.labelText[1]));
 					};
 				});
-
-			const circlesEnter = pieGroupEnter.append("circle")
-				.attr("class", "covmapcircle")
-				.style("fill", cerfColor)
-				.style("stroke", "#666")
-				.style("stroke-width", "1px")
-				.style("stroke-opacity", strokeOpacityValue)
-				.style("fill-opacity", fillOpacityValue)
-				.attr("r", 0);
 
 			pieGroup = pieGroupEnter.merge(pieGroup);
 
@@ -1730,7 +1847,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
 			pieGroup.select("text.covmapgroupNameBack")
@@ -1738,7 +1855,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
 			pieGroup.select("text.covmapgroupName tspan")
@@ -1746,7 +1863,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				});
 
 			pieGroup.select("text.covmapgroupName")
@@ -1754,7 +1871,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", function(d) {
-					return radiusScale(d.cerf) + groupNamePadding;
+					return radiusScale(d.cbpf + d.cerf) + groupNamePadding;
 				})
 				.end()
 				.then(function() {
@@ -1766,12 +1883,96 @@
 					displayLabels(pieGroup.selectAll(".covmapgroupName"));
 				});
 
-			pieGroup.select(".covmapcircle")
+			let slices = pieGroup.selectAll(".covmapslice")
+				.data(function(d) {
+					return pieGenerator([{
+						value: d.cerf,
+						total: d.cbpf + d.cerf,
+						type: "cerf"
+					}, {
+						value: d.cbpf,
+						total: d.cbpf + d.cerf,
+						type: "cbpf"
+					}].filter(function(e) {
+						return e.value !== 0;
+					}))
+				}, function(d) {
+					return d.data.type;
+				});
+
+			const slicesRemove = slices.exit()
 				.transition()
 				.duration(duration)
-				.attr("r", function(d) {
-					return radiusScale(d.cerf);
+				.attrTween("d", function(d) {
+					const parentDatum = d3.select(this.parentNode).datum();
+					const thisTotal = radiusScale(parentDatum.cbpf + parentDatum.cerf);
+					const finalObject = d.data.type === "cerf" ? {
+						startAngle: 0,
+						endAngle: 0,
+						outerRadius: thisTotal
+					} : {
+						startAngle: Math.PI * 2,
+						endAngle: Math.PI * 2,
+						outerRadius: thisTotal
+					};
+					const i = d3.interpolateObject(localVariable.get(this), finalObject);
+					return function(t) {
+						return arcGenerator(i(t));
+					};
+				})
+				.on("end", function() {
+					d3.select(this).remove();
+				})
+
+			const slicesEnter = slices.enter()
+				.append("path")
+				.attr("class", "covmapslice")
+				.style("fill", function(d) {
+					return d.data.type === "cbpf" ? cbpfColor : cerfColor;
+				})
+				.style("stroke", "#666")
+				.style("stroke-width", "1px")
+				.style("stroke-opacity", strokeOpacityValue)
+				.style("fill-opacity", fillOpacityValue)
+				.each(function(d) {
+					let siblingRadius = 0
+					const siblings = d3.select(this.parentNode).selectAll("path")
+						.each(function() {
+							const thisLocal = localVariable.get(this)
+							if (thisLocal) siblingRadius = thisLocal.outerRadius;
+						});
+					if (d.data.type === "cerf") {
+						localVariable.set(this, {
+							startAngle: 0,
+							endAngle: 0,
+							outerRadius: siblingRadius
+						});
+					} else {
+						localVariable.set(this, {
+							startAngle: Math.PI * 2,
+							endAngle: Math.PI * 2,
+							outerRadius: siblingRadius
+						});
+					};
+				})
+
+			slices = slicesEnter.merge(slices);
+
+			slices.transition()
+				.duration(duration)
+				.attrTween("d", pieTween);
+
+			function pieTween(d) {
+				const i = d3.interpolateObject(localVariable.get(this), {
+					startAngle: d.startAngle,
+					endAngle: d.endAngle,
+					outerRadius: radiusScale(d.data.total)
 				});
+				localVariable.set(this, i(1));
+				return function(t) {
+					return arcGenerator(i(t));
+				};
+			};
 
 			pieGroup.on("mouseover", pieGroupMouseover);
 
@@ -1833,7 +2034,7 @@
 				const thisOffsetTop = (thisBox.bottom + thisBox.top) / 2 - containerBox.top - (tooltipBox.height / 2);
 
 				const thisOffsetLeft = containerBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					(thisBox.left + 2 * (radiusScale(datum.cerf) * (containerBox.width / width))) - containerBox.left + tooltipMargin :
+					(thisBox.left + 2 * (radiusScale(datum.cbpf + datum.cerf) * (containerBox.width / width))) - containerBox.left + tooltipMargin :
 					thisBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
@@ -1880,7 +2081,7 @@
 		function createTimeline(unfilteredData, timelineMetadata) {
 
 			const data = unfilteredData.filter(function(d) {
-				return d.cerf;
+				return d.cbpf + d.cerf;
 			});
 
 			const allDates = data.map(function(d) {
@@ -2007,7 +2208,8 @@
 				const allocationsInSameDate = data.filter(function(d) {
 					return timeFormatTickValues(d.allocationDate) === timeFormatTickValues(date);
 				}).sort(function(a, b) {
-					return b.cerf - a.cerf;
+					return (b.cbpf + b.cerf) -
+						(a.cbpf + a.cerf);
 				});
 				if (allocationsInSameDate.length === 1) {
 					mergedData.push.apply(mergedData, allocationsInSameDate);
@@ -2015,10 +2217,12 @@
 					const mergedObject = {
 						allocationDate: date,
 						country: "Several countries",
+						cbpf: 0,
 						cerf: 0,
 						countriesList: []
 					};
 					for (let i = 0; i < allocationsInSameDate.length; i++) {
+						mergedObject.cbpf += allocationsInSameDate[i].cbpf;
 						mergedObject.cerf += allocationsInSameDate[i].cerf;
 						mergedObject.countriesList.push(allocationsInSameDate[i]);
 					};
@@ -2027,11 +2231,12 @@
 			});
 
 			mergedData.sort(function(a, b) {
-				return b.cerf - a.cerf;
+				return (b.cbpf + b.cerf) -
+					(a.cbpf + a.cerf);
 			});
 
 			const maxValue = d3.max(mergedData, function(d) {
-				return d.cerf;
+				return d.cbpf + d.cerf;
 			});
 
 			radiusScaleTimeline.domain([0, maxValue || 0]);
@@ -2046,20 +2251,43 @@
 						(timelinePanel.axisPadding + timelinePanel.piePadding + (timelinePanel.axisHeight / 2) + maxPieSize) + ")";
 				});
 
-			const pieGroupsTimelineCircles = pieGroupsTimeline.append("circle")
-				.attr("class", "covmappieGroupsTimelineCircle")
-				.style("fill", cerfColor)
+			const pieGroupsTimelinePieContainer = pieGroupsTimeline.append("g")
+				.attr("class", "covmappieGroupsTimelinePieContainer")
+
+			const slicesTimeline = pieGroupsTimelinePieContainer.selectAll(null)
+				.data(function(d) {
+					return pieGenerator([{
+						value: d.cerf,
+						total: d.cbpf + d.cerf,
+						type: "cerf"
+					}, {
+						value: d.cbpf,
+						total: d.cbpf + d.cerf,
+						type: "cbpf"
+					}].filter(function(e) {
+						return e.value !== 0;
+					}))
+				})
+				.enter()
+				.append("path")
+				.style("fill", function(d) {
+					return d.data.type === "cbpf" ? cbpfColor : cerfColor;
+				})
 				.style("stroke", "#666")
 				.style("stroke-width", "1px")
 				.style("stroke-opacity", strokeOpacityValue)
 				.style("fill-opacity", fillOpacityValue)
-				.attr("r", function(d) {
-					return radiusScaleTimeline(d.cerf);
+				.attr("d", function(d) {
+					return arcGenerator({
+						startAngle: d.startAngle,
+						endAngle: d.endAngle,
+						outerRadius: radiusScaleTimeline(d.data.total)
+					});
 				});
 
 			const pieLines = pieGroupsTimeline.append("line")
 				.attr("y1", function(d) {
-					return -(radiusScaleTimeline(d.cerf) + 1);
+					return -(radiusScaleTimeline(d.cerf + d.cbpf) + 1);
 				})
 				.attr("y2", -(maxPieSize + timelinePanel.piePadding))
 				.attr("stroke-width", "1px")
@@ -2068,7 +2296,7 @@
 			const pieLabels = pieGroupsTimeline.append("text")
 				.attr("class", "covmappieLabelsTimeline")
 				.attr("y", function(d) {
-					return radiusScaleTimeline(d.cerf) + timelinePanel.labelPadding;
+					return radiusScaleTimeline(d.cerf + d.cbpf) + timelinePanel.labelPadding;
 				})
 				.attr("x", 0)
 				.text(function(d) {
@@ -2178,19 +2406,33 @@
 						.style("flex-wrap", "wrap")
 						.style("width", "300px");
 
-					tooltipContainerHeader.append("div")
-						.style("display", "flex")
-						.style("flex", "0 56%")
-						.style("margin-bottom", null)
-						.html("Total for all countries:");
+					const tooltipDataHeader = [{
+						title: "Total CBPF ",
+						property: "cbpf",
+						color: cbpfColor
+					}, {
+						title: "Total CERF ",
+						property: "cerf",
+						color: d3.color(cerfColor).darker(0.4)
+					}].filter(function(e) {
+						return completeDatum[e.property];
+					});
 
-					tooltipContainerHeader.append("div")
-						.style("display", "flex")
-						.style("flex", "0 44%")
-						.style("justify-content", "flex-end")
-						.style("color", d3.color(cerfColor).darker(0.4))
-						.style("margin-bottom", "8px")
-						.html("$" + formatMoney0Decimals(completeDatum.cerf));
+					tooltipDataHeader.forEach(function(e, i) {
+						tooltipContainerHeader.append("div")
+							.style("display", "flex")
+							.style("flex", "0 56%")
+							.style("margin-bottom", i === 1 ? "8px" : null)
+							.html(e.title);
+
+						tooltipContainerHeader.append("div")
+							.style("display", "flex")
+							.style("flex", "0 44%")
+							.style("justify-content", "flex-end")
+							.style("color", e.color)
+							.style("margin-bottom", i === 1 ? "8px" : null)
+							.html("$" + formatMoney0Decimals(completeDatum[e.property]));
+					});
 
 					const header = innerTooltip.append("div")
 						.style("margin-bottom", "10px")
@@ -2232,19 +2474,34 @@
 					const countryDivList = countryDiv.append("div")
 						.attr("class", "covmapcountryDivList");
 
-					countryDivList.append("div")
-						.style("display", "flex")
-						.style("flex", "0 56%")
-						.html("Total Allocated:");
+					countryDivList.each(function(d, i, n) {
 
-					countryDivList.append("div")
-						.style("display", "flex")
-						.style("flex", "0 44%")
-						.style("justify-content", "flex-end")
-						.style("color", d3.color(cerfColor).darker(0.4))
-						.html(function(d) {
-							return "$" + formatMoney0Decimals(d.cerf);
+						const countryData = [{
+							title: "CBPF ",
+							property: "cbpf",
+							color: cbpfColor
+						}, {
+							title: "CERF ",
+							property: "cerf",
+							color: d3.color(cerfColor).darker(0.4)
+						}].filter(function(e) {
+							return d[e.property];
 						});
+
+						countryData.forEach(function(e) {
+							d3.select(n[i]).append("div")
+								.style("display", "flex")
+								.style("flex", "0 56%")
+								.html(e.title);
+
+							d3.select(n[i]).append("div")
+								.style("display", "flex")
+								.style("flex", "0 44%")
+								.style("justify-content", "flex-end")
+								.style("color", e.color)
+								.html("$" + formatMoney0Decimals(d[e.property]));
+						});
+					});
 
 					countryDiv.on("click", function(d) {
 						tooltip.html(null);
@@ -2259,7 +2516,7 @@
 				};
 
 				const thisBox = d3.select(this)
-					.select(".covmappieGroupsTimelineCircle")
+					.select(".covmappieGroupsTimelinePieContainer")
 					.node()
 					.getBoundingClientRect();
 
@@ -2270,7 +2527,7 @@
 				const thisOffsetTop = svgBox.bottom - svgBox.top - tooltipBox.height;
 
 				const thisOffsetLeft = svgBox.right - thisBox.right > tooltipBox.width + (2 * tooltipMargin) ?
-					(thisBox.left + 2 * (radiusScaleTimeline(completeDatum.cerf) * (svgBox.width / width))) - svgBox.left + tooltipMargin :
+					(thisBox.left + 2 * (radiusScaleTimeline(completeDatum.cbpf + completeDatum.cerf) * (svgBox.width / width))) - svgBox.left + tooltipMargin :
 					thisBox.left - svgBox.left - tooltipBox.width - tooltipMargin;
 
 				tooltip.style("top", thisOffsetTop + "px")
@@ -2409,17 +2666,31 @@
 				.style("flex-wrap", "wrap")
 				.style("width", "300px");
 
-			tooltipContainer.append("div")
-				.style("display", "flex")
-				.style("flex", "0 56%")
-				.html("Total Allocated:");
+			const tooltipData = [{
+				title: "CBPF ",
+				property: "cbpf",
+				color: cbpfColor
+			}, {
+				title: "CERF ",
+				property: "cerf",
+				color: d3.color(cerfColor).darker(0.4)
+			}].filter(function(e) {
+				return datum[e.property];
+			});
 
-			tooltipContainer.append("div")
-				.style("display", "flex")
-				.style("flex", "0 44%")
-				.style("justify-content", "flex-end")
-				.style("color", d3.color(cerfColor).darker(0.4))
-				.html("$" + formatMoney0Decimals(datum.cerf));
+			tooltipData.forEach(function(e) {
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html(e.title);
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.style("color", e.color)
+					.html("$" + formatMoney0Decimals(datum[e.property]));
+			});
 
 			let selectedTooltipButton = null;
 
@@ -2688,6 +2959,33 @@
 					return function(t) {
 						return d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
 					};
+				});
+
+			const legendColors = legendPanel.main.selectAll(".covmaplegendColors")
+				.data(["cbpf", "cerf"])
+				.enter()
+				.append("g")
+				.attr("class", "covmaplegendColors")
+				.attr("transform", function(_, i) {
+					return "translate(" + legendPanel.padding[3] + "," + (legendPanel.height - legendPanel.padding[2] - (+i * 18)) + ")";
+				});
+
+			legendColors.append("rect")
+				.attr("width", 10)
+				.attr("height", 10)
+				.attr("rx", 1)
+				.attr("ry", 1)
+				.style("stroke-width", "0.5px")
+				.style("stroke", "#666")
+				.style("fill", function(_, i) {
+					return i ? cerfColor : cbpfColor;
+				});
+
+			legendColors.append("text")
+				.attr("x", 14)
+				.attr("y", 9)
+				.text(function(d) {
+					return d.toUpperCase() + " Allocations";
 				});
 
 			//end of createLegend
@@ -2985,16 +3283,18 @@
 								foundCountry.targetTotal += +row["Target" + target + people];
 							});
 						});
-						foundCountry.cerf += +row.TargetAmt;
+						pushCbpfOrCerf(foundCountry, row);
 					} else {
 						const countryObject = {
 							country: row.Country.trim(),
 							labelText: row.Country.split(" "),
 							isoCode: row.ISO2Country,
-							cerf: +row.TargetAmt,
+							cbpf: 0,
+							cerf: 0,
 							targetTotal: 0,
 							allocationsList: [row]
 						};
+						pushCbpfOrCerf(countryObject, row);
 						typesOfTargeted.forEach(function(target) {
 							typesOfPeople.forEach(function(people) {
 								countryObject["target" + target + peopleScale(people)] = +row["Target" + target + people];
@@ -3007,6 +3307,14 @@
 			});
 
 			return data;
+
+			function pushCbpfOrCerf(obj, row) {
+				if (row.PFType.toLowerCase() === "cbpf") {
+					obj.cbpf += +row.TargetAmt;
+				} else if (row.PFType.toLowerCase() === "cerf") {
+					obj.cerf += +row.TargetAmt;
+				};
+			};
 
 			//end of processData
 		};
@@ -3029,17 +3337,19 @@
 							foundAllocation.targetTotal += +row["Target" + target + people];
 						});
 					});
-					foundAllocation.cerf += +row.TargetAmt;
+					pushCbpfOrCerf(foundAllocation, row);
 				} else {
 					const countryObject = {
 						allocationDate: new Date(row.DateOfAlloc),
 						country: row.Country.trim(),
 						labelText: row.Country.split(" "),
 						isoCode: row.ISO2Country,
-						cerf: +row.TargetAmt,
+						cbpf: 0,
+						cerf: 0,
 						targetTotal: 0,
 						allocationsList: [row]
 					};
+					pushCbpfOrCerf(countryObject, row);
 					typesOfTargeted.forEach(function(target) {
 						typesOfPeople.forEach(function(people) {
 							countryObject["target" + target + peopleScale(people)] = +row["Target" + target + people];
@@ -3051,6 +3361,14 @@
 			});
 
 			return data;
+
+			function pushCbpfOrCerf(obj, row) {
+				if (row.PFType.toLowerCase() === "cbpf") {
+					obj.cbpf += +row.TargetAmt;
+				} else if (row.PFType.toLowerCase() === "cerf") {
+					obj.cerf += +row.TargetAmt;
+				};
+			};
 
 			//end of processDataTimeline
 		};
@@ -3070,7 +3388,7 @@
 		};
 
 		function setYearsDescriptionDiv() {
-			const timelineScaleText = "Timeline sizes follow the legend size when “All” is selected.";
+			const timelineScaleText = "Timeline pies follow the legend size when “All” is selected.";
 			yearsDescriptionDiv.html(function() {
 				if (chartState.selectedMonth[0] === allData) return "Aggregated data for all months. " + timelineScaleText;
 				if (chartState.selectedMonth.length === 1) return "Selected month: " + chartState.selectedMonth[0] + ". " + timelineScaleText;
