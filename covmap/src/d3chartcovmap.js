@@ -3239,7 +3239,7 @@
 			let totalValue = 0;
 
 			rawData.forEach(function(row) {
-				if (monthsArray.indexOf(timeFormat(new Date(row.DateOfAlloc))) === -1) monthsArray.push(timeFormat(new Date(row.DateOfAlloc)));
+				if ((monthsArray.indexOf(timeFormat(new Date(row.DateOfAlloc)))) === -1 && (new Date(row.DateOfAlloc).getFullYear() >= 2020)) monthsArray.push(timeFormat(new Date(row.DateOfAlloc)));
 				if (!countryNames[row.ISO2Country] && row.ISO2Country) countryNames[row.ISO2Country] = row.Country;
 				totalValue += +row.TargetAmt;
 			});
