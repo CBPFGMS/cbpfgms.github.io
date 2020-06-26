@@ -1,0 +1,7 @@
+﻿Id,Type,GenericPartnerTypeCode,GenericPartnerTypeName,Code,Public SubIPName
+1,UN and IOM,UN,UN Agency,UN,UN Agency
+2,International NGO,INGO,International NGO,INGO,International NGO
+3,National NGO,NGO,National Partners,NGO,National NGO
+4,Red Cross/Red Crescent Society,O,Red Cross/Red Crescent Society,O,Red Cross/Red Crescent Society
+5,Others / Government,NGO,National Partners,OG,Others/Government
+7,Private Contractor,NGO,National Partners,PC,Private Contractor
