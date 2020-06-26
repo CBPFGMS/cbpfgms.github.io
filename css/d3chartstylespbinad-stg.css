@@ -113,6 +113,10 @@ p#pbinadd3chartTitle {
 	cursor: pointer;
 }
 
+.pbinadCheckboxDiv label{
+	margin-bottom: 0px;
+}
+
 .pbinadCheckboxText {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
