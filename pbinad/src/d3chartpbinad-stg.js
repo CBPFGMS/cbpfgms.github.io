@@ -2399,8 +2399,6 @@
 			};
 
 			function mouseoverLinkLevel2(d) {
-				console.log("level 2");
-				console.log(d);
 				const firstLevelLinksData = sankeyLinks.filter(function(e) {
 					return e.target.id === d.source.id && e.fund === d.fund;
 				}).data();
