@@ -26,7 +26,7 @@
 	padding: 8px;
 	line-height: 120%;
 	font-size: 14px;
-	background: #f1f1f1; 
+	background: #f8f8f8; 
 	border: 1px solid #999; 
 	border-radius: 4px;
 	pointer-events: none;
@@ -197,6 +197,35 @@ p#pbinadd3chartTitle {
 	fill: #666;
 	pointer-events: none;
 	text-anchor: middle;
+}
+
+.pbinadTooltipSvgYAxisGroup path, .pbinadTooltipSvgXAxisGroup path {
+	stroke: none;
+}
+
+.pbinadTooltipSvgYAxisGroup text {
+	font-family: "Arial";
+	font-size: 11px;
+	fill: #777;
+}
+
+.pbinadTooltipSvgXAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbinadTooltipSvgXAxisGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbinadtooltipSvgLabel {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #666;
+	pointer-events: none;
 }
 
 .pbinadAnnotationMainText {
