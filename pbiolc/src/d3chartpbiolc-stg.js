@@ -2555,6 +2555,9 @@
 
 		function createAnnotationsDiv() {
 
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiolcOverDivHelp");
 
@@ -2584,6 +2587,8 @@
 				.style("pointer-events", "all")
 				.style("cursor", "pointer")
 				.on("click", function() {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
 					overDiv.remove();
 				});
 
