@@ -146,7 +146,7 @@
 	margin-left: 0px;
 }
 
-.pbimapListButtonDiv button, .pbimapResetDiv button {
+.pbimapListButtonDiv button, .pbimapResetDiv button, .pbimapshowAllDiv button {
 	white-space: pre;
 	font-size: 12px;
 	font-weight: 700;
@@ -161,18 +161,18 @@
 	margin-right: 6px;
   }
 
-.pbimapListButtonDiv button:hover, .pbimapResetDiv button:hover {
+.pbimapListButtonDiv button:hover, .pbimapResetDiv button:hover, .pbimapshowAllDiv button: hover {
 	background-color: whitesmoke;
 	border-color: rgba(0,0,0,0.6);
 	cursor: pointer;
 }
 
-.pbimapListButtonDiv button:active, .pbimapResetDiv button:active {
+.pbimapListButtonDiv button:active, .pbimapResetDiv button:active, .pbimapshowAllDiv button:active {
 	background-color: gainsboro;
 	border-color: rgba(0,0,0,1);
 }
 
-.pbimapListButtonDiv button:focus, .pbimapResetDiv button:focus {
+.pbimapListButtonDiv button:focus, .pbimapResetDiv button:focus, .pbimapshowAllDiv button:focus {
 	outline: none;
 }
 
