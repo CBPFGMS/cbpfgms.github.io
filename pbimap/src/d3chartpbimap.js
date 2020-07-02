@@ -273,9 +273,9 @@
 			promises = [],
 			filterTitles = ["Year", "CBPF", "Partner Type", "Cluster", "Allocation Type", "Location Level"],
 			filterColorsArray = ["#E8F5D6", "#F1E9DA", "#E4D8F3", "#E6E6E6", "#F8D8D3", "#D4E5F7"],
-			listHeader = ["Project Code", "Project Title", "Cluster", "Partner Type", "Allocation Type", "Targeted People", "Allocations"],
-			listHeadersWidth = ["18%", "28%", "12%", "12%", "12%", "9%", "9%"],
-			listRowsWidth = ["18%", "28.5%", "12%", "12%", "12.5%", "8.5%", "8.5%"],
+			listHeader = ["Project Code", "Project Title", "Partner", "Allocation Type", "Targeted People", "Allocations"],
+			listHeadersWidth = ["18%", "32%", "20%", "12%", "9%", "9%"],
+			listRowsWidth = ["18%", "32.5%", "20%", "12.5%", "8.5%", "8.5%"],
 			chartState = {
 				selectedYear: [],
 				selectedPartner: [],
@@ -490,7 +490,7 @@
 
 		const listHeaderScale = d3.scaleOrdinal()
 			.domain(listHeader)
-			.range(["PrjCode", "PrjTitle", "cluster", "partnerType", "AllNm", "AdmLocBenClustAgg", "AdmLocClustBdg"]);
+			.range(["PrjCode", "PrjTitle", "OrgNm", "AllNm", "AdmLocBenClustAgg", "AdmLocClustBdg"]);
 
 		if (!isInternetExplorer) saveImage(tooltipThumbnailPathCors, "tooltipThumbnail");
 
@@ -1917,7 +1917,7 @@
 					"</span></div><div style='display:flex;flex:0 54%;'>Number of partners:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor pbimapTooltipTitle2'>" + datum.numberOfPartners +
 					"</span></div><div style='display:flex;flex:0 54%;'>Number of projects:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor pbimapTooltipTitle2'>" + datum.numberOfProjects +
 					"</span></div></div>" + divSpacer + "<span class='pbimapTooltipTitle2'>" + formatMoney0Decimals(datum.beneficiaries) +
-					" Targeted People:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Generate List of Projects</button></div>");
+					" Targeted People:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>");
 
 			createTooltipSvg();
 
@@ -1940,6 +1940,9 @@
 				.on("click", function() {
 					generateProjectsList(datum.values);
 					tooltip.style("display", "none");
+					listDiv.node().scrollIntoView({
+						behavior: "smooth"
+					});
 				});
 
 			function createTooltipSvg() {
@@ -2073,7 +2076,7 @@
 
 					const fileName = "ProjectsList_" + csvDateFormat(currentDate) + ".csv";
 
-					const blob = new Blob([csv], {
+					const blob = new Blob(["\uFEFF" + csv], {
 						type: 'text/csv;charset=utf-8;'
 					});
 
@@ -2115,7 +2118,7 @@
 					return listHeadersWidth[i];
 				})
 				.style("text-align", function(_, i) {
-					return i === 5 || i === 6 ? "center" : "left";
+					return i === 4 || i === 5 ? "center" : "left";
 				});
 
 			headers.append("span")
@@ -2140,8 +2143,11 @@
 				.style("width", function(_, i) {
 					return listRowsWidth[i];
 				})
+				.style("padding-right", function(_, i) {
+					return i === 4 || i === 5 ? null : "8px";
+				})
 				.style("text-align", function(_, i) {
-					return i === 5 || i === 6 ? "right" : "left";
+					return i === 4 || i === 5 ? "right" : "left";
 				});
 
 			const rowCell = rowDivs.append("span");
@@ -2779,7 +2785,7 @@
 				.attr("class", "pbimapAnnotationText")
 				.attr("x", 400)
 				.attr("y", 330)
-				.text("When you hover over a marker a tooltip like this shows up. Click “Generate List of Projects” to create a table below the map, with all the projects for that marker.")
+				.text("When you hover over a marker a tooltip like this shows up. Click “Show Projects” to create a table below the map, with all the projects for that marker.")
 				.call(wrapText2, 220);
 
 			const tooltipThumbnail = helpSVG.append("image")
@@ -2919,6 +2925,7 @@
 					"Project Code": d.PrjCode,
 					"Project Title": d.PrjTitle,
 					Cluster: d.cluster,
+					Partner: d.OrgNm,
 					"Partner Type": d.partnerType,
 					"Allocation Type": d.AllNm,
 					Allocations: Math.floor(d["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)]),
@@ -2926,21 +2933,7 @@
 				})
 			});
 
-			const header = Object.keys(csvData[0]);
-
-			const replacer = function(key, value) {
-				return value === null ? '' : value
-			};
-
-			let rows = csvData.map(function(row) {
-				return header.map(function(fieldName) {
-					return JSON.stringify(row[fieldName], replacer)
-				}).join(',')
-			});
-
-			rows.unshift(header.join(','));
-
-			return rows.join('\r\n');
+			return d3.csvFormat(csvData);
 
 			//end of createCsvProjects
 		};
