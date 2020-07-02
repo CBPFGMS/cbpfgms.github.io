@@ -2327,7 +2327,7 @@
 						return f.target.id === d.id;
 					})) || (d.targetLinks.find(function(f) {
 						return f.fund === e.codeId;
-					})) ? 1 : fadeOpacityNodes;
+					})) || (chartState.selectedAggregation === "type" && d.codeId === e.codeId) ? 1 : fadeOpacityNodes;
 				});
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.target.id === d.id ||
@@ -3316,7 +3316,7 @@
 					.style("align-items", "flex-end")
 					.html("$" + formatMoney0Decimals(datum.value));
 
-				if(datum.target.id.split("#")[0] === "partner"){
+				if (datum.target.id.split("#")[0] === "partner") {
 					innerTooltip.append("div")
 						.style("margin-top", "10px")
 						.style("font-size", "12px")
@@ -3713,50 +3713,164 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbinadOverDivHelp");
 
+			const selectTitleDivSize = selectTitleDiv.node().getBoundingClientRect();
+
+			const titleStyle = window.getComputedStyle(selectTitleDiv.node());
+
+			const selectDivSize = selectDiv.node().getBoundingClientRect();
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
+			const totalSelectHeight = (selectTitleDivSize.height + selectDivSize.height + parseInt(titleStyle["margin-top"]) + parseInt(titleStyle["margin-bottom"])) * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbinadArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbinadAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
+			const helpData = [{
+				x: 4,
+				y: topDivHeight + ((totalSelectHeight - selectDivSize.height) * (topDivSize.width / width)),
+				width: width - 8,
+				height: selectDivSize.height * (width / topDivSize.width),
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 8) * (topDivSize.width / width),
+				text: "Use these checkboxes to select the CBPFs. A disabled checkbox means that the correspondent CBPF has no data for that year."
+			}, {
+				x: 4,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 416,
+				height: 30,
+				xTooltip: 78 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select a single year"
+			}, {
+				x: 456,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 325,
+				height: 30,
+				xTooltip: 456 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
+				text: "Click here to select how the partners depicted in the right-hand side column are aggregated: by partner type or by level (direct or sub-implementing partners)."
+			}, {
+				x: 80,
+				y: 134 + topDivHeight + totalSelectHeight,
+				width: 34,
+				height: 416,
+				xTooltip: 120 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
+				text: "This first column represents all the funds. You can hover over each rectangle for additional information."
+			}, {
+				x: 436,
+				y: 134 + topDivHeight + totalSelectHeight,
+				width: 34,
+				height: 416,
+				xTooltip: 476 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
+				text: "This second column represents all the direct partners. You can hover over each rectangle for additional information."
+			}, {
+				x: 792,
+				y: 134 + topDivHeight + totalSelectHeight,
+				width: 34,
+				height: 416,
+				xTooltip: 466 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
+				text: "This final column represents both the direct partners and the sub-implementing partners. Note: the direct partners represented here are the same of the second column, minus the amount transferred to any sub-implementing partner. You can hover over each rectangle for additional information."
+			}];
 
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbinadHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 180 + topDivHeight + totalSelectHeight)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbinadAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 200 + topDivHeight + totalSelectHeight)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbinadHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(null)
+					.append("div")
+					.style("width", "300px")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");;
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbinadHelpRectangle").style("opacity", 0.5);
+			};
+
 
 			//end of createAnnotationsDiv
 		};

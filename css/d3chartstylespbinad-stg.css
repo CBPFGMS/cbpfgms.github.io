@@ -42,13 +42,13 @@
 
 .pbinadTitleDiv {
 	display: flex;
-	flex:0 45%;
+	flex:0 60%;
 	margin-left: 8px;
 }
 
 .pbinadIconsDiv {
 	display: flex;
-	flex:0 55%;
+	flex:0 40%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
@@ -230,7 +230,7 @@ p#pbinadd3chartTitle {
 
 .pbinadAnnotationMainText {
 	font-family: "Arial", sans-serif;
-	font-size: 26px;
+	font-size: 18px;
 	font-weight: 700;
 	pointer-events: none;
 }
