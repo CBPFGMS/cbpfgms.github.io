@@ -357,8 +357,23 @@
 			.attr("id", "pbimapContainerDiv")
 			.style("height", heightLeafletMap + "px");
 
-		const breadcrumbDiv = containerDiv.append("div")
+		const breadcrumbsDivContainer = containerDiv.append("div")
+			.style("min-height", "30px")
+			.attr("class", "pbimapBreadcrumbDivContainer");
+
+		const breadcrumbDiv = breadcrumbsDivContainer.append("div")
+			.style("pointer-events", "none")
+			.style("position", "absolute")
 			.attr("class", "pbimapBreadcrumbDiv");
+
+		const showAllDiv = breadcrumbsDivContainer.append("div")
+			.style("position", "absolute")
+			.style("display", "flex")
+			.style("width", "99%")
+			.style("min-height", "30px")
+			.style("align-items", "center")
+			.style("justify-content", "flex-end")
+			.attr("class", "pbimapshowAllDiv");
 
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbimapFooterDiv") : null;
@@ -586,6 +601,8 @@
 			createLegendSvg(data.map);
 
 			createBreadcrumbDiv();
+
+			createShowAllButton(data.map);
 
 			leafletMap.on("zoom", redrawMap);
 
@@ -1043,6 +1060,7 @@
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
+					createShowAllButton(data.map);
 
 					adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 					adminLevelDropdown.selectAll("li")
@@ -1059,6 +1077,7 @@
 							createMap(data.map);
 							createLegendSvg(data.map);
 							createBreadcrumbDiv();
+							createShowAllButton(data.map);
 						});
 
 					filterCbpfsDropdown();
@@ -1125,6 +1144,7 @@
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
+					createShowAllButton(data.map);
 					partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
 					clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
 				});
@@ -1164,6 +1184,7 @@
 				chartState.selectedAdminLevel = Math.min(newMaxCombinedLevel, chartState.selectedAdminLevel);
 
 				createBreadcrumbDiv();
+				createShowAllButton(data.map);
 
 				adminLevelDropdown.call(populateDropdown, d3.range(0, newMaxCombinedLevel + 1, 1), chartState.selectedAdminLevel);
 				adminLevelDropdown.selectAll("li")
@@ -1180,6 +1201,7 @@
 						createMap(data.map);
 						createLegendSvg(data.map);
 						createBreadcrumbDiv();
+						createShowAllButton(data.map);
 					});
 
 				partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
@@ -1225,6 +1247,7 @@
 							createMap(data.map);
 							createLegendSvg(data.map);
 							createBreadcrumbDiv();
+							createShowAllButton(data.map);
 						});
 
 					const data = filterData();
@@ -1233,6 +1256,7 @@
 					createMap(data.map);
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
+					createShowAllButton(data.map);
 					listDiv.html("");
 					partnersDropdown.call(filterPartnersAndClusters, data, "partnersTypeList");
 					clustersDropdown.call(filterPartnersAndClusters, data, "clustersList");
@@ -1884,6 +1908,31 @@
 				.style("opacity", 1);
 
 			//end of createBreadcrumbDiv
+		};
+
+		function createShowAllButton(data) {
+
+			let showAllButton = showAllDiv.selectAll(".pbimapshowAllButton")
+				.data(chartState.selectedAdminLevel ? [] : [true]);
+
+			const showAllButtonExit = showAllButton.exit().remove();
+
+			showAllButton = showAllButton.enter()
+				.append("button")
+				.attr("class", "pbimapshowAllButton")
+				.html("Show All Projects")
+				.merge(showAllButton)
+				.on("click", function() {
+					const allValues = data.reduce(function(acc, curr) {
+						return acc.concat(curr.values);
+					}, []);
+					generateProjectsList(allValues);
+					tooltip.style("display", "none");
+					listDiv.node().scrollIntoView({
+						behavior: "smooth"
+					});
+				});
+
 		};
 
 		function createFooterDiv() {
