@@ -161,7 +161,7 @@
 	margin-right: 6px;
   }
 
-.pbimapListButtonDiv button:hover, .pbimapResetDiv button:hover, .pbimapshowAllDiv button: hover {
+.pbimapListButtonDiv button:hover, .pbimapResetDiv button:hover, .pbimapshowAllDiv button:hover {
 	background-color: whitesmoke;
 	border-color: rgba(0,0,0,0.6);
 	cursor: pointer;
