@@ -1912,6 +1912,23 @@
 
 		function createShowAllButton(data) {
 
+			const allValues = data.reduce(function(acc, curr) {
+				curr.values.forEach(function(row) {
+					const foundProject = acc.find(function(d) {
+						return d.PrjCode === row.PrjCode;
+					});
+					if (foundProject) {
+						beneficiariesList.forEach(function(e) {
+							foundProject["AdmLocBenClustAgg1" + e] += row["AdmLocBenClustAgg1" + e];
+						});
+						foundProject.AdmLocClustBdg1 += row.AdmLocClustBdg1;
+					} else {
+						acc.push(JSON.parse(JSON.stringify(row)));
+					};
+				});
+				return acc;
+			}, []);
+
 			let showAllButton = showAllDiv.selectAll(".pbimapshowAllButton")
 				.data(chartState.selectedAdminLevel ? [] : [true]);
 
@@ -1923,9 +1940,6 @@
 				.html("Show All Projects")
 				.merge(showAllButton)
 				.on("click", function() {
-					const allValues = data.reduce(function(acc, curr) {
-						return acc.concat(curr.values);
-					}, []);
 					generateProjectsList(allValues);
 					tooltip.style("display", "none");
 					listDiv.node().scrollIntoView({
