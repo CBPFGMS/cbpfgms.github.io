@@ -705,6 +705,12 @@
 
 			validateMonth(selectedMonthString);
 
+			const iconsList = timelineMetadata.map(function(d) {
+				return d.icon;
+			});
+
+			saveImages(iconsList);
+
 			removeProgressWheel();
 
 			draw(rawData, mapData, timelineMetadata);
@@ -2178,7 +2184,8 @@
 				.attr("height", timelinePanel.iconSize)
 				.attr("width", timelinePanel.iconSize)
 				.attr("xlink:href", function(d) {
-					return iconsUrl + d.icon + "icon.png";
+					return localStorage.getItem("storedIcon" + d.icon) ? localStorage.getItem("storedIcon" + d.icon) :
+						iconsUrl + d.icon + "icon.png";
 				});
 
 			const iconText = keyDatesGroupsTimeline.append("text")
@@ -3531,6 +3538,52 @@
 			return returnValue;
 		};
 
+		function saveImages(iconsList) {
+
+			iconsList.forEach(function(d) {
+				if (!localStorage.getItem("storedIcon" + d)) {
+					getBase64FromImage(iconsUrl + d + "icon.png", setLocal, null, d);
+				};
+			});
+
+			function getBase64FromImage(url, onSuccess, onError, iconName) {
+				const xhr = new XMLHttpRequest();
+
+				xhr.responseType = "arraybuffer";
+				xhr.open("GET", url);
+
+				xhr.onload = function() {
+					let base64, binary, bytes, mediaType;
+
+					bytes = new Uint8Array(xhr.response);
+
+					binary = [].map.call(bytes, function(byte) {
+						return String.fromCharCode(byte);
+					}).join('');
+
+					mediaType = xhr.getResponseHeader('content-type');
+
+					base64 = [
+						'data:',
+						mediaType ? mediaType + ';' : '',
+						'base64,',
+						btoa(binary)
+					].join('');
+					onSuccess(iconName, base64);
+				};
+
+				xhr.onerror = onError;
+
+				xhr.send();
+			};
+
+			function setLocal(iconName, base64) {
+				localStorage.setItem("storedIcon" + iconName, base64);
+			};
+
+			//end of saveImages
+		};
+
 		function createAnnotationsDiv() {
 
 			tooltip.style("pointer-events", "none");
@@ -3769,6 +3822,11 @@
 			iconsDiv.style("opacity", 0);
 
 			snapshotTooltip.style("display", "none");
+
+			svg.selectAll("image")
+				.attr("xlink:href", function(d) {
+					return localStorage.getItem("storedIcon" + d.icon);
+				});
 
 			html2canvas(imageDiv).then(function(canvas) {
 
