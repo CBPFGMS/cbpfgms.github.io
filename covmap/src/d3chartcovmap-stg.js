@@ -3764,6 +3764,8 @@
 
 			setSvgStyles(svg.node());
 
+			if (fromContextMenu && currentHoveredElem) setSvgStyles(tooltip.select("svg").node());
+
 			iconsDiv.style("opacity", 0);
 
 			snapshotTooltip.style("display", "none");
