@@ -3491,7 +3491,7 @@
 			timelines = timelinesEnter.merge(timelines);
 
 			timelines.sort(function(a, b) {
-				return (b.values[3] / b.values[0]) - (a.values[3] / a.values[0]);
+				return b.values[3] - a.values[3];
 			});
 
 			timelines.select("svg")
@@ -3812,7 +3812,7 @@
 			});
 
 			data.sort(function(a, b) {
-				return (b.values[3] / b.values[0]) - (a.values[3] / a.values[0]);
+				return b.values[3] - a.values[3];
 			});
 
 			return data;
