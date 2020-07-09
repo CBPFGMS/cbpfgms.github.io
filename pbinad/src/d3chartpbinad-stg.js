@@ -3417,7 +3417,7 @@
 				.attr("class", "pbinadtimelinesNameDiv")
 				.append("p")
 				.html(function(d) {
-					return d.partner === "O" ? "Red Cross/<br>Red Cresc. Soc." : aggregationNameRule[d.partner];
+					return aggregationNameRule[d.partner];
 				});
 
 			const timelinesChartDiv = timelinesEnter.append("div")
@@ -4317,6 +4317,11 @@
 			setSvgStyles(svg.node());
 
 			if (fromContextMenu && currentHoveredElement) setSvgStyles(tooltip.select("svg").node());
+
+			containerDiv.selectAll(".pbinadtimelinesChartDiv svg")
+				.each(function() {
+					setSvgStyles(this);
+				});
 
 			if (type === "png") {
 				iconsDiv.style("opacity", 0);
