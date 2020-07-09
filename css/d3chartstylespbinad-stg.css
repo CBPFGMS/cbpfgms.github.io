@@ -114,6 +114,7 @@
 .pbinadtimelinesNameDiv p {
 	text-align: right;
 	margin: 0px;
+	line-height: 1;
 }
 
 .pbinadtimelinesChartDiv {
