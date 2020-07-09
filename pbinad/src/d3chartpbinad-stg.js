@@ -16,8 +16,6 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	//CHANGE CSS LINK!!!!!!!!!!!!!!!!!!!!!!!!
-
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
@@ -174,8 +172,7 @@
 			buttonsPanelHeight = 30,
 			topPanelHeight = 60,
 			sankeyPanelHeight = 480,
-			timelinesPanelHeight = 0, //CHANGE WHEN CREATING TIMELINE
-			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + timelinesPanelHeight + (3 * panelHorizontalPadding),
+			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 1,
@@ -210,6 +207,15 @@
 			stickHeight = 2,
 			lollipopRadius = 4,
 			labelPadding = 2,
+			timelinesWidth = 284,
+			timelinesHeight = 50,
+			timelineSvgWidth = 110,
+			timelineSvgHeight = 50,
+			timelineSvgPadding = [10, 34, 10, 34],
+			localTimelineScale = d3.local(),
+			localTimelineGenerator = d3.local(),
+			timelineSvgTextPadding = 2,
+			timelineSvgVertTextPadding = 3,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
@@ -327,6 +333,9 @@
 		const yearsDescriptionDiv = containerDiv.append("div")
 			.attr("class", "pbinadYearsDescriptionDiv");
 
+		const timelineDiv = containerDiv.append("div")
+			.attr("class", "pbinadtimelineDiv");
+
 		const footerDiv = !isPfbiSite ? containerDiv.append("div")
 			.attr("class", "pbinadFooterDiv") : null;
 
@@ -419,15 +428,6 @@
 			padding: [36, 80, 38, 86]
 		};
 
-		const timelinesPanel = {
-			main: svg.append("g")
-				.attr("class", "pbinadtimelinesPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + sankeyPanel.height + 3 * panelHorizontalPadding) + ")"),
-			width: width - padding[1] - padding[3],
-			height: timelinesPanelHeight,
-			padding: [0, 0, 0, 0]
-		};
-
 		const invisibleLayer = svg.append("g")
 			.attr("opacity", 0);
 
@@ -467,6 +467,10 @@
 			.tickFormat(function(d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
+
+		const timelineXScale = d3.scalePoint()
+			.domain(d3.range(4))
+			.range([timelineSvgPadding[3], timelineSvgWidth - timelineSvgPadding[1]]);
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
@@ -578,12 +582,6 @@
 			// 	.attr("height", sankeyPanel.height)
 			// 	.style("fill", "green")
 			// 	.style("opacity", 0.2);
-			// timelinesPanel.main.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("width", timelinesPanel.width)
-			// 	.attr("height", timelinesPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
 			// sankeyPanel.main.append("rect")
 			// 	.attr("pointer-events", "none")
 			// 	.attr("x", sankeyPanel.padding[3])
@@ -605,6 +603,8 @@
 			createSankey(data);
 
 			setYearsDescriptionDiv();
+
+			createTimeline(rawData);
 
 			if (!isPfbiSite) createFooterDiv();
 
@@ -803,7 +803,7 @@
 
 			downloadIcon.on("click", function() {
 
-				const csv = createCsv(rawData); //CHANGE
+				const csv = createCsv(rawData);
 
 				const currentDate = new Date();
 
@@ -845,7 +845,9 @@
 
 			selectTitleDiv.html("Select CBPF:");
 
-			const checkboxData = d3.keys(cbpfsDataList);
+			const checkboxData = d3.keys(cbpfsDataList).sort(function(a, b) {
+				return (cbpfsList[a]).localeCompare(cbpfsList[b]);
+			});
 
 			checkboxData.push("All CBPFs");
 
@@ -940,6 +942,8 @@
 				createTopPanel(data);
 
 				createSankey(data);
+
+				createTimeline(rawData);
 
 			});
 
@@ -2102,7 +2106,7 @@
 			typePercentageGroupEnter.append("text")
 				.attr("class", "pbinadtypePercentage")
 				.text(function(d) {
-					return "$" + formatSIFloat(d.amount)
+					return "$" + formatSIFloat(d.amount).replace("G", "B");
 				});
 
 			const typePercentageGroupEnterSubText = typePercentageGroupEnter.append("text")
@@ -2154,7 +2158,7 @@
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent.substring(1)) || 0, d.amount);
 					return function(t) {
-						node.textContent = "$" + formatSIFloat(i(t));
+						node.textContent = "$" + formatSIFloat(i(t)).replace("G", "B");
 					};
 				});
 
@@ -2198,7 +2202,7 @@
 
 			function mouseOut() {
 				if (isSnapshotTooltipVisible) return;
-				currentHoveredElem = null;
+				currentHoveredElement = null;
 				tooltip.style("display", "none");
 				sankeyNodes.style("opacity", 1);
 				sankeyLinks.style("stroke-opacity", linksOpacity);
@@ -2214,7 +2218,7 @@
 			};
 
 			function mouseoverFund(d, thisElement) {
-				currentHoveredElem = thisElement;
+				currentHoveredElement = thisElement;
 				sankeyNodes.style("opacity", function(e) {
 					return (e.id === d.id) || (e.targetLinks.find(function(f) {
 						return f.fund === d.codeId;
@@ -2265,7 +2269,7 @@
 			};
 
 			function mouseoverPartners(d, thisElement) {
-				currentHoveredElem = thisElement;
+				currentHoveredElement = thisElement;
 				sankeyNodes.style("opacity", function(e) {
 					return (e.id === d.id) || (e.sourceLinks.find(function(f) {
 						return f.target.id === d.id;
@@ -2318,7 +2322,7 @@
 			};
 
 			function mouseoverSubpartners(d, thisElement) {
-				currentHoveredElem = thisElement;
+				currentHoveredElement = thisElement;
 				const thisFistLevelLinks = d.targetLinks.map(function(e) {
 					return e.fund + "_" + e.source.id;
 				});
@@ -2385,7 +2389,7 @@
 			};
 
 			function mouseoverLinkLevel1(d, thisElement) {
-				currentHoveredElem = thisElement;
+				currentHoveredElement = thisElement;
 				const secondLevelLinksData = sankeyLinks.filter(function(e) {
 					return e.source.id === d.target.id && e.fund === d.fund;
 				}).data();
@@ -2443,7 +2447,7 @@
 			};
 
 			function mouseoverLinkLevel2(d, thisElement) {
-				currentHoveredElem = thisElement;
+				currentHoveredElement = thisElement;
 				const firstLevelLinksData = sankeyLinks.filter(function(e) {
 					return e.target.id === d.source.id && e.fund === d.fund;
 				}).data();
@@ -3365,6 +3369,196 @@
 			//end of createSankey
 		};
 
+		function createTimeline(rawData) {
+
+			const timelineData = processTimelineData(rawData);
+
+			const timelineHeader = timelineDiv.selectAll(".pbinadtimelineHeader")
+				.data([true])
+				.enter()
+				.append("div")
+				.attr("class", "pbinadtimelineHeader")
+				.html("Net Funding Timelines");
+
+			const timelineSubtitle = timelineDiv.selectAll(".pbinadtimelineSubtitle")
+				.data([true])
+				.enter()
+				.append("div")
+				.attr("class", "pbinadtimelineSubtitle")
+				.html("Trends for the last three complete years (from " + (currentYear - 4) + " to " + (currentYear - 1) +
+					"). Green arrow (<span class='fa' style='color:" + greenArrowColor + ";'>\uF062</span>) means increase, red arrow (<span class='fa' style='color:" + redArrowColor + ";'>\uF063</span>) means decrease.");
+
+			let timelineContainer = timelineDiv.selectAll(".pbinadtimelineContainer")
+				.data([true]);
+
+			timelineContainer = timelineContainer.enter()
+				.append("div")
+				.attr("class", "pbinadtimelineContainer")
+				.merge(timelineContainer);
+
+			let timelines = timelineContainer.selectAll(".pbinadtimelines")
+				.data(timelineData, function(d) {
+					return d.partner;
+				});
+
+			const timelinesExit = timelines.exit()
+				.transition()
+				.duration(duration)
+				.style("opacity", 0)
+				.remove();
+
+			const timelinesEnter = timelines.enter()
+				.append("div")
+				.attr("class", "pbinadtimelines")
+				.style("width", timelinesWidth + "px")
+				.style("height", timelinesHeight + "px");
+
+			const timelinesNameDiv = timelinesEnter.append("div")
+				.attr("class", "pbinadtimelinesNameDiv")
+				.append("p")
+				.html(function(d) {
+					return d.partner === "O" ? "Red Cross/<br>Red Cresc. Soc." : aggregationNameRule[d.partner];
+				});
+
+			const timelinesChartDiv = timelinesEnter.append("div")
+				.attr("class", "pbinadtimelinesChartDiv")
+
+			const timelinesSvg = timelinesChartDiv.append("svg")
+				.attr("width", timelineSvgWidth)
+				.attr("height", timelineSvgHeight)
+				.each(function(d) {
+					const thisYScale = localTimelineScale.set(this, d3.scaleLinear()
+						.range([timelineSvgHeight - timelineSvgPadding[2], timelineSvgPadding[0]])
+						.domain(d3.extent(d.values)));
+					localTimelineGenerator.set(this, d3.line()
+						.x(function(_, i) {
+							return timelineXScale(i);
+						})
+						.y(function(e) {
+							return thisYScale(e);
+						}));
+				});
+
+			const timelineSvgInitialValue = timelinesSvg.append("text")
+				.attr("class", "pbinadtimelineSvgInitialValue")
+				.attr("text-anchor", "end")
+				.attr("x", timelineSvgPadding[3] - timelineSvgTextPadding)
+				.attr("y", function(d) {
+					return localTimelineScale.get(this)(d.values[0]) + timelineSvgVertTextPadding;
+				})
+				.text(function(d) {
+					return formatSIFloat(d.values[0]).replace("G", "B");
+				});
+
+			const timelineSvgFinalValue = timelinesSvg.append("text")
+				.attr("class", "pbinadtimelineSvgFinalValue")
+				.attr("x", timelineSvgWidth - timelineSvgPadding[3] + timelineSvgTextPadding)
+				.attr("y", function(d) {
+					return localTimelineScale.get(this)(d.values[3]) + timelineSvgVertTextPadding;
+				})
+				.text(function(d) {
+					return formatSIFloat(d.values[3]).replace("G", "B");
+				});
+
+			const timelineSvgPath = timelinesSvg.append("path")
+				.attr("class", "pbinadtimelineSvgPath")
+				.style("fill", "none")
+				.style("stroke", "#bbb")
+				.style("stroke-width", "1px")
+				.attr("d", function(d) {
+					return localTimelineGenerator.get(this)(d.values);
+				});
+
+			const timelinesArrowDiv = timelinesChartDiv.append("div")
+				.attr("class", "pbinadtimelinesArrowDiv");
+
+			const timelineArrow = timelinesArrowDiv.append("div")
+				.attr("class", "pbinadtimelineArrow fa")
+				.style("font-size", "16px")
+				.style("color", function(d) {
+					return d.values[3] >= d.values[0] ? greenArrowColor : redArrowColor;
+				})
+				.html(function(d) {
+					return d.values[3] >= d.values[0] ? "\uF062" : "\uF063";
+				});
+
+			const timelinePercentage = timelinesArrowDiv.append("div")
+				.attr("class", "pbinadtimelinePercentage")
+				.html(function(d) {
+					return d.values[0] && d.values[3] ? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1)) : "n/a";
+				});
+
+			timelines = timelinesEnter.merge(timelines);
+
+			timelines.sort(function(a, b) {
+				return (b.values[3] / b.values[0]) - (a.values[3] / a.values[0]);
+			});
+
+			timelines.select("svg")
+				.each(function(d) {
+					const thisYScale = localTimelineScale.set(this, d3.scaleLinear()
+						.range([timelineSvgHeight - timelineSvgPadding[2], timelineSvgPadding[0]])
+						.domain(d3.extent(d.values)));
+					localTimelineGenerator.set(this, d3.line()
+						.x(function(_, i) {
+							return timelineXScale(i);
+						})
+						.y(function(e) {
+							return thisYScale(e);
+						}));
+				});
+
+			timelines.select(".pbinadtimelineSvgInitialValue")
+				.transition()
+				.duration(duration)
+				.attr("y", function(d) {
+					return localTimelineScale.get(this)(d.values[0]) + timelineSvgVertTextPadding;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent) || 0, d.values[0])
+					return function(t) {
+						node.textContent = formatSIFloat(i(t)).replace("G", "B");
+					};
+				});
+
+			timelines.select(".pbinadtimelineSvgFinalValue")
+				.transition()
+				.duration(duration)
+				.attr("y", function(d) {
+					return localTimelineScale.get(this)(d.values[3]) + timelineSvgVertTextPadding;
+				})
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent) || 0, d.values[3])
+					return function(t) {
+						node.textContent = formatSIFloat(i(t)).replace("G", "B");
+					};
+				});
+
+			timelines.select(".pbinadtimelineSvgPath")
+				.transition()
+				.duration(duration)
+				.attr("d", function(d) {
+					return localTimelineGenerator.get(this)(d.values);
+				});
+
+			timelines.select(".pbinadtimelineArrow")
+				.html(function(d) {
+					return d.values[3] >= d.values[0] ? "\uF062" : "\uF063";
+				})
+				.style("color", function(d) {
+					return d.values[3] >= d.values[0] ? greenArrowColor : redArrowColor;
+				});
+
+			timelines.select(".pbinadtimelinePercentage")
+				.html(function(d) {
+					return d.values[0] && d.values[3] ? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1)) : "n/a";
+				});
+
+			//end of createTimeline
+		};
+
 		function preProcessData(rawData) {
 
 			rawData.forEach(function(row) {
@@ -3574,9 +3768,90 @@
 			//end of processData
 		};
 
-		function createCsv(datahere) {
+		function processTimelineData(rawData) {
 
-			const csv = d3.csvFormat(changedDataHere);
+			const data = [];
+
+			rawData.forEach(function(row) {
+
+				if (chartState.selectedCbpfs.indexOf(row.fund) > -1) {
+
+					const foundSourcePartner = data.find(function(d) {
+						return d.partner === row.source && row.targetType === "2";
+					});
+
+					const foundTargetPartner = data.find(function(d) {
+						return d.partner === row.target;
+					});
+
+					if (+row.year < currentYear && +row.year >= (currentYear - 4)) {
+						if (foundSourcePartner) {
+							foundSourcePartner.values[+row.year - (currentYear - 4)] -= +row.value;
+						} else if (!foundSourcePartner && row.targetType === "2") {
+							const obj = {
+								partner: row.source,
+								values: [0, 0, 0, 0]
+							};
+							obj.values[+row.year - (currentYear - 4)] = -row.value;
+							data.push(values);
+						};
+						if (foundTargetPartner) {
+							foundTargetPartner.values[+row.year - (currentYear - 4)] += +row.value;
+						} else {
+							const obj = {
+								partner: row.target,
+								values: [0, 0, 0, 0]
+							};
+							obj.values[+row.year - (currentYear - 4)] = +row.value;
+							data.push(obj);
+						};
+					};
+
+				};
+
+			});
+
+			data.sort(function(a, b) {
+				return (b.values[3] / b.values[0]) - (a.values[3] / a.values[0]);
+			});
+
+			return data;
+
+			//end of processTimelineData
+		}
+
+		function createCsv(rawData) {
+
+			const csvData = [];
+
+			rawData.forEach(function(row) {
+				if (chartState.selectedYear.indexOf(+row.year) > -1 && chartState.selectedCbpfs.indexOf(row.fund) > -1) {
+
+					if (cbpfsListKeys.indexOf(row.source) > -1) {
+						csvData.push({
+							source: cbpfsList[row.source],
+							"type of source": "fund",
+							target: partnersList[row.target],
+							"type of target": "direct partner",
+							amount: row.value,
+							fund: cbpfsList[row.fund],
+							year: row.year
+						});
+					} else {
+						csvData.push({
+							source: partnersList[row.source],
+							"type of source": "direct partner",
+							target: subPartnersList[row.target],
+							"type of target": "sub-implementing partner",
+							amount: row.value,
+							fund: cbpfsList[row.fund],
+							year: row.year
+						});
+					};
+				};
+			});
+
+			const csv = d3.csvFormat(csvData);
 
 			return csv;
 		};
@@ -3991,6 +4266,11 @@
 
 		function createSnapshot(type, fromContextMenu) {
 
+			d3.selectAll(".pbinadtypePercentageArrow")
+				.text(function(d) {
+					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u2193" : "\u2191";
+				});
+
 			if (isInternetExplorer) {
 				alert("This functionality is not supported by Internet Explorer");
 				return;
@@ -4036,6 +4316,8 @@
 
 			setSvgStyles(svg.node());
 
+			if (fromContextMenu && currentHoveredElement) setSvgStyles(tooltip.select("svg").node());
+
 			if (type === "png") {
 				iconsDiv.style("opacity", 0);
 			} else {
@@ -4062,6 +4344,11 @@
 				};
 
 				if (fromContextMenu && currentHoveredElement) d3.select(currentHoveredElement).dispatch("mouseout");
+
+				d3.selectAll(".pbinadtypePercentageArrow")
+					.text(function(d) {
+						return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\uF063" : "\uF062";
+					});
 
 			});
 
@@ -4147,7 +4434,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("TEXT HERE.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
@@ -4167,8 +4454,20 @@
 
 					pdf.setFontSize(12);
 
+					const yearsList = chartState.selectedYear.sort(function(a, b) {
+						return a - b;
+					}).reduce(function(acc, curr, index) {
+						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					}, "");
+
+					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
+
+					const selectedCountry = countriesList();
+
 					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div>", pdfMargins.left, 70, {
+						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + selectedCountry.split("-")[0] + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedCountry.split("-")[1] + "</span></div>", pdfMargins.left, 70, {
 							width: 210 - pdfMargins.left - pdfMargins.right
 						},
 						function(position) {
@@ -4212,6 +4511,20 @@
 						pdf.setFontSize(10);
 						pdf.text(footer, pdfMargins.left, pdfHeight - pdfMargins.bottom + 10);
 
+					};
+
+					function countriesList() {
+						const plural = chartState.selectedCbpfs.length === 1 ? "" : "s";
+						const countryList = chartState.selectedCbpfs.map(function(d) {
+								return cbpfsList[d];
+							})
+							.sort(function(a, b) {
+								return a.localeCompare(b);
+							})
+							.reduce(function(acc, curr, index) {
+								return acc + (index >= chartState.selectedCbpfs.length - 2 ? index > chartState.selectedCbpfs.length - 2 ? curr : curr + " and " : curr + ", ");
+							}, "");
+						return "Selected CBPF" + plural + "-" + countryList;
 					};
 
 				});
