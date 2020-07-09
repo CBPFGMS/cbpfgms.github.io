@@ -207,7 +207,7 @@
 			stickHeight = 2,
 			lollipopRadius = 4,
 			labelPadding = 2,
-			timelinesWidth = 284,
+			timelinesWidth = 280,
 			timelinesHeight = 50,
 			timelineSvgWidth = 110,
 			timelineSvgHeight = 50,
