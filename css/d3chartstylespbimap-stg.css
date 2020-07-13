@@ -134,10 +134,18 @@
 .pbimapListTitleDivContainer {
 	width: 100%;
 	display: flex;
+	margin-top: 10px;
 }
 
-.pbimapListTitleDivContainer {
-	margin-top: 10px;
+.pbimapListBreadcrumbDivContainer {
+	width: 100%;
+	margin-left: 10px;
+}
+
+.pbimapListBreadcrumbs {
+	font-size: 15px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
 }
 
 .pbimapListTitle {
@@ -450,29 +458,18 @@
 
 .pbimapTopSvgAllocations, .pbimapTopSvgBeneficiaries {
 	font-family: "Arial", sans-serif;
-	font-size: 36px;
+	font-size: 48px;
 }
 
-.pbimapTopSvgAllocationsSpan, .pbimapTopSvgBeneficiariesSpan {
+.pbimapTopSvgAllocationsText, .pbimapTopSvgBeneficiariesText, .pbimapTopSvgAllocationsSubtitle, .pbimapTopSvgBeneficiariesSubtitle, .pbimapTopSvgPartnersText, .pbimapTopSvgProjectsText {
 	font-family: "Arial", sans-serif;
-	font-size: 20px;
+	font-size: 18px;
+	fill: #888;
 }
 
 .pbimapTopSvgPartners, .pbimapTopSvgProjects {
 	font-family: "Arial", sans-serif;
-	font-size: 20px;
-}
-
-.pbimapTopSvgAllocationsSubtitle, .pbimapTopSvgBeneficiariesSubtitle {
-	font-family: "Arial", sans-serif;
-	font-size: 16px;
-	fill: dimgray;
-}
-
-.pbimapTopSvgPartnersSpan, .pbimapTopSvgProjectsSpan {
-	font-family: "Arial", sans-serif;
-	font-size: 16px;
-	fill: dimgray;
+	font-size: 28px;
 }
 
 .pbimapLegendDiv {

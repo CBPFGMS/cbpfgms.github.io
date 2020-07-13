@@ -195,12 +195,13 @@
 
 		//END OF POLYFILLS
 
-		const width = 900,
+		const width = 1100,
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
-			topSvgHorizontalPositions = [0.05, 0.29, 0.54, 0.75],
-			heightTopSvgVerticalPositions = [0.55, 0.85, 0.65],
+			topSvgHorizontalPositions = [0.18, 0.38, 0.58, 0.76],
+			topSvgMainValueVerPadding = 12,
+			topSvgMainValueHorPadding = 2,
 			legendSvgWidth = 110,
 			legendSvgHeight = 134,
 			legendSvgPadding = [4, 4, 4, 12],
@@ -211,7 +212,7 @@
 			legendButtonHeight = 20,
 			duration = 1000,
 			tooltipDuration = 250,
-			tooltipMargin = 8,
+			tooltipMargin = 2,
 			heightProgressSVG = heightLeafletMap + heightTopSvg,
 			windowHeight = window.innerHeight,
 			brighterFactor = 0.3,
@@ -246,8 +247,9 @@
 			markerStroke = "#555",
 			markerAttribute = "M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z",
 			noDataTextPosition = heightLeafletMap / 2,
-			colorInterpolator = d3.interpolateRgb("#ccc", maxMarkerColor),
-			colorInterpolatorGlobal = d3.interpolateRgb("#ccc", maxMarkerGlobalColor),
+			minValueColor = "#eee",
+			colorInterpolator = d3.interpolateRgb(minValueColor, maxMarkerColor),
+			colorInterpolatorGlobal = d3.interpolateRgb(minValueColor, maxMarkerGlobalColor),
 			tooltipSvgWidth = 270,
 			tooltipSvgHeight = 80,
 			tooltipSvgPadding = [6, 36, 14, 45],
@@ -781,8 +783,9 @@
 			topSvgAllocations = topSvgAllocations.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgAllocations contributionColorFill")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[0]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[0]))
+				.attr("text-anchor", "end")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding)
+				.attr("x", (width * topSvgHorizontalPositions[0]) - topSvgMainValueHorPadding)
 				.merge(topSvgAllocations);
 
 			topSvgAllocations.transition()
@@ -794,20 +797,34 @@
 						unit = valueSI[valueSI.length - 1];
 					return function(t) {
 						const siString = formatSIFloat(i(t));
-						d3.select(node).text("$" + (+unit !== +unit ? siString.substring(0, siString.length - 1) : siString))
-							.append("tspan")
-							.attr("class", "pbimapTopSvgAllocationsSpan")
-							.text(unit === "k" ? " Thousand" : unit === "M" ? " Million" : unit === "G" ? " Billion" : "");
+						node.textContent = "$" + (+unit !== +unit ? siString.substring(0, siString.length - 1) : siString);
 					};
 				});
+
+			let topSvgAllocationsText = topSvg.selectAll(".pbimapTopSvgAllocationsText")
+				.data([data.totalAllocations]);
+
+			topSvgAllocationsText = topSvgAllocationsText.enter()
+				.append("text")
+				.attr("class", "pbimapTopSvgAllocationsText")
+				.attr("text-anchor", "start")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.7)
+				.attr("x", (width * topSvgHorizontalPositions[0]) + topSvgMainValueHorPadding)
+				.merge(topSvgAllocationsText);
+
+			topSvgAllocationsText.text(function(d) {
+				const valueSI = formatSIFloat(d),
+					unit = valueSI[valueSI.length - 1];
+				return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "");
+			});
 
 			const topSvgAllocationsSubtitle = topSvg.selectAll(".pbimapTopSvgAllocationsSubtitle")
 				.data([true])
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgAllocationsSubtitle")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[1]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[0]))
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr("x", (width * topSvgHorizontalPositions[0]) + topSvgMainValueHorPadding)
 				.text("Allocated");
 
 			let topSvgBeneficiaries = topSvg.selectAll(".pbimapTopSvgBeneficiaries")
@@ -816,8 +833,9 @@
 			topSvgBeneficiaries = topSvgBeneficiaries.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiaries contributionColorFill")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[0]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[1]))
+				.attr("text-anchor", "end")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding)
+				.attr("x", (width * topSvgHorizontalPositions[1]) - topSvgMainValueHorPadding)
 				.merge(topSvgBeneficiaries);
 
 			topSvgBeneficiaries.transition()
@@ -829,20 +847,34 @@
 						unit = valueSI[valueSI.length - 1];
 					return function(t) {
 						const siString = formatSIFloat(i(t));
-						d3.select(node).text(+unit !== +unit ? siString.substring(0, siString.length - 1) : siString)
-							.append("tspan")
-							.attr("class", "pbimapTopSvgBeneficiariesSpan")
-							.text(unit === "k" ? " Thousand" : unit === "M" ? " Million" : unit === "G" ? " Billion" : "");
+						d3.select(node).text(+unit !== +unit ? siString.substring(0, siString.length - 1) : siString);
 					};
 				});
+
+			let topSvgBeneficiariesText = topSvg.selectAll(".pbimapTopSvgBeneficiariesText")
+				.data([data.totalBeneficiaries]);
+
+			topSvgBeneficiariesText = topSvgBeneficiariesText.enter()
+				.append("text")
+				.attr("class", "pbimapTopSvgBeneficiariesText")
+				.attr("text-anchor", "start")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.7)
+				.attr("x", (width * topSvgHorizontalPositions[1]) + topSvgMainValueHorPadding)
+				.merge(topSvgBeneficiariesText);
+
+			topSvgBeneficiariesText.text(function(d) {
+				const valueSI = formatSIFloat(d),
+					unit = valueSI[valueSI.length - 1];
+				return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "");
+			});
 
 			const topSvgBeneficiariesSubtitle = topSvg.selectAll(".pbimapTopSvgBeneficiariesSubtitle")
 				.data([true])
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[1]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[1]))
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr("x", (width * topSvgHorizontalPositions[1]) + topSvgMainValueHorPadding)
 				.text("Targeted People");
 
 			const partnersLogo = topSvg.selectAll(".pbimapTopSvgPartnersLogo")
@@ -853,10 +885,9 @@
 				.attr("width", partnersProjectSize + "px")
 				.attr("height", partnersProjectSize + "px")
 				.attr("y", (heightTopSvg - partnersProjectSize) / 2)
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[2]))
+				.attr("x", width * topSvgHorizontalPositions[2])
 				.attr("xlink:href", localStorage.getItem("storedImagepartnersLogo") ?
-					localStorage.getItem("storedImagepartnersLogo") :
-					partnersLogoPath);
+					localStorage.getItem("storedImagepartnersLogo") : partnersLogoPath);
 
 			let topSvgPartners = topSvg.selectAll(".pbimapTopSvgPartners")
 				.data([data.totalPartners]);
@@ -864,8 +895,8 @@
 			topSvgPartners = topSvgPartners.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgPartners contributionColorFill")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[2]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[2]) + partnersProjectSize)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.6)
+				.attr("x", (width * topSvgHorizontalPositions[2]) + partnersProjectSize)
 				.merge(topSvgPartners);
 
 			topSvgPartners.transition()
@@ -877,7 +908,8 @@
 						const partnersNumber = i(t);
 						d3.select(node).text(~~partnersNumber)
 							.append("tspan")
-							.attr("class", "pbimapTopSvgPartnersSpan")
+							.attr("dy", "-0.2em")
+							.attr("class", "pbimapTopSvgPartnersText")
 							.text(" Partners");
 					};
 				});
@@ -890,10 +922,9 @@
 				.attr("width", partnersProjectSize + "px")
 				.attr("height", partnersProjectSize + "px")
 				.attr("y", (heightTopSvg - partnersProjectSize) / 2)
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[3]))
+				.attr("x", width * topSvgHorizontalPositions[3])
 				.attr("xlink:href", localStorage.getItem("storedImageprojectsLogo") ?
-					localStorage.getItem("storedImageprojectsLogo") :
-					projectsLogoPath);
+					localStorage.getItem("storedImageprojectsLogo") : projectsLogoPath);
 
 			let topSvgProjects = topSvg.selectAll(".pbimapTopSvgProjects")
 				.data([data.totalProjects]);
@@ -901,8 +932,8 @@
 			topSvgProjects = topSvgProjects.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgProjects contributionColorFill")
-				.attr("y", topSvgPadding[0] + (heightTopSvg * heightTopSvgVerticalPositions[2]))
-				.attr("x", topSvgPadding[3] + (width * topSvgHorizontalPositions[3]) + partnersProjectSize)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.6)
+				.attr("x", (width * topSvgHorizontalPositions[3]) + partnersProjectSize)
 				.merge(topSvgProjects);
 
 			topSvgProjects.transition()
@@ -914,7 +945,8 @@
 						const projectsNumber = i(t);
 						d3.select(node).text(~~projectsNumber)
 							.append("tspan")
-							.attr("class", "pbimapTopSvgProjectsSpan")
+							.attr("dy", "-0.2em")
+							.attr("class", "pbimapTopSvgProjectsText")
 							.text(" Projects");
 					};
 				});
@@ -1912,23 +1944,6 @@
 
 		function createShowAllButton(data) {
 
-			const allValues = data.reduce(function(acc, curr) {
-				curr.values.forEach(function(row) {
-					const foundProject = acc.find(function(d) {
-						return d.PrjCode === row.PrjCode;
-					});
-					if (foundProject) {
-						beneficiariesList.forEach(function(e) {
-							foundProject["AdmLocBenClustAgg1" + e] += row["AdmLocBenClustAgg1" + e];
-						});
-						foundProject.AdmLocClustBdg1 += row.AdmLocClustBdg1;
-					} else {
-						acc.push(JSON.parse(JSON.stringify(row)));
-					};
-				});
-				return acc;
-			}, []);
-
 			let showAllButton = showAllDiv.selectAll(".pbimapshowAllButton")
 				.data(chartState.selectedAdminLevel ? [] : [true]);
 
@@ -1940,7 +1955,23 @@
 				.html("Show All Projects")
 				.merge(showAllButton)
 				.on("click", function() {
-					generateProjectsList(allValues);
+					const allValues = data.reduce(function(acc, curr) {
+						curr.values.forEach(function(row) {
+							const foundProject = acc.find(function(d) {
+								return d.PrjCode === row.PrjCode;
+							});
+							if (foundProject) {
+								beneficiariesList.forEach(function(e) {
+									foundProject["AdmLocBenClustAgg1" + e] += row["AdmLocBenClustAgg1" + e];
+								});
+								foundProject.AdmLocClustBdg1 += row.AdmLocClustBdg1;
+							} else {
+								acc.push(JSON.parse(JSON.stringify(row)));
+							};
+						});
+						return acc;
+					}, []);
+					generateProjectsList(allValues, true);
 					tooltip.style("display", "none");
 					listDiv.node().scrollIntoView({
 						behavior: "smooth"
@@ -2001,7 +2032,21 @@
 
 			tooltip.select("button")
 				.on("click", function() {
-					generateProjectsList(datum.values);
+					const allValues = datum.values.reduce(function(acc, curr) {
+						const foundProject = acc.find(function(d) {
+							return d.PrjCode === curr.PrjCode;
+						});
+						if (foundProject) {
+							beneficiariesList.forEach(function(e) {
+								foundProject["AdmLocBenClustAgg" + (chartState.selectedAdminLevel || 1) + e] += curr["AdmLocBenClustAgg" + (chartState.selectedAdminLevel || 1) + e];
+							});
+							foundProject["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)] += curr["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)];
+						} else {
+							acc.push(JSON.parse(JSON.stringify(curr)));
+						};
+						return acc;
+					}, []);
+					generateProjectsList(allValues, false);
 					tooltip.style("display", "none");
 					listDiv.node().scrollIntoView({
 						behavior: "smooth"
@@ -2106,7 +2151,7 @@
 
 		};
 
-		function generateProjectsList(data) {
+		function generateProjectsList(data, showAll) {
 
 			listDiv.html("");
 
@@ -2118,6 +2163,21 @@
 
 			const listButtonDiv = listTitleDivContainer.append("div")
 				.attr("class", "pbimapListButtonDiv");
+
+			if (!showAll) {
+				const listBreadcrumbDivContainer = listDiv.append("div")
+					.attr("class", "pbimapListBreadcrumbDivContainer");
+
+				const listBreadcrumbs = listBreadcrumbDivContainer.append("p")
+					.attr("class", "pbimapListBreadcrumbs contributionColorHTMLcolor")
+					.html(function() {
+						let breadcrumbArray = [cbpfsList[data[0].PFId]];
+						for (let i = 1; i <= chartState.selectedAdminLevel; i++) {
+							if (breadcrumbArray.indexOf(data[0]["AdmLoc" + i]) === -1) breadcrumbArray.push(data[0]["AdmLoc" + i]);
+						};
+						return breadcrumbArray.join(" \u2192 ");
+					});
+			};
 
 			const listTitle = listTitleDiv.append("p")
 				.attr("class", "pbimapListTitle contributionColorHTMLcolor")
@@ -2137,7 +2197,16 @@
 
 					const currentDate = new Date();
 
-					const fileName = "ProjectsList_" + csvDateFormat(currentDate) + ".csv";
+					let currentLocation;
+
+					if (showAll) {
+						currentLocation = "Global";
+					} else {
+						currentLocation = chartState.selectedAdminLevel ?
+							data[0]["AdmLoc" + chartState.selectedAdminLevel] : cbpfsList[data[0].PFId];
+					};
+
+					const fileName = "ProjectsList_" + currentLocation + "_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob(["\uFEFF" + csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -2987,7 +3056,6 @@
 					CBPF: d.cbpfName,
 					"Project Code": d.PrjCode,
 					"Project Title": d.PrjTitle,
-					Cluster: d.cluster,
 					Partner: d.OrgNm,
 					"Partner Type": d.partnerType,
 					"Allocation Type": d.AllNm,
