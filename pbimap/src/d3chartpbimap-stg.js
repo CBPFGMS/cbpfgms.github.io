@@ -1971,6 +1971,9 @@
 						});
 						return acc;
 					}, []);
+					allValues.sort(function(a, b) {
+						return cbpfsList[a.PFId].localeCompare(cbpfsList[b.PFId]) || b.AdmLocClustBdg1 - a.AdmLocClustBdg1;
+					});
 					generateProjectsList(allValues, true);
 					tooltip.style("display", "none");
 					listDiv.node().scrollIntoView({
@@ -2046,6 +2049,9 @@
 						};
 						return acc;
 					}, []);
+					allValues.sort(function(a, b) {
+						return b["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)] - a["AdmLocClustBdg" + (chartState.selectedAdminLevel || 1)];
+					});
 					generateProjectsList(allValues, false);
 					tooltip.style("display", "none");
 					listDiv.node().scrollIntoView({
