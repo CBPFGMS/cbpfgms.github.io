@@ -2529,6 +2529,7 @@
 				cbpfsGroup.select("path.pbicliCbpfsPathFuture")
 					.transition()
 					.duration(duration)
+					.style("stroke-dasharray", "3,3")
 					.attr("d", function(d) {
 						return lineGeneratorCbpfs(d.values.filter(function(e) {
 							return +e.year === currentYear - 1 || +e.year === currentYear;
