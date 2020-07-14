@@ -175,12 +175,6 @@
 	width: 100%;
 }
 
-.pbicliCheckboxFuture {
-	margin-left: -4px;
-	padding-left: 6px;
-	border-left: 1px solid #ccc; 
-}
-
 .pbicliLegendDiv {
 	display: flex;
 	width: 100%;
@@ -270,6 +264,7 @@
 
 .pbicliCheckboxDonorsDiv, .pbicliCheckboxCbpfsDiv {
 	margin-right: 6px;
+	line-height: 1 !important;
 }
 
 .pbicliCheckboxText {
@@ -321,7 +316,11 @@
 	pointer-events: none;
 }
 
-.pbicligroupXAxisDonors path, .pbicligroupXAxisCbpfs path, .pbicligroupYAxisDonors path, .pbicligroupYAxisCbpfs path{
+.pbicligroupYAxisDonors path, .pbicligroupYAxisCbpfs path {
+	stroke: none;
+}
+
+.pbicligroupXAxisDonors path, .pbicligroupXAxisCbpfs path {
 	stroke: gray;
 }
 
