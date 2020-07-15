@@ -1754,7 +1754,11 @@
 				})
 				.style("fill", "none")
 				.style("stroke", function(d) {
-					return d.fund === "999" ? cerfColor : cbpfColor;
+					if (d.sourceLevel === 1) {
+						return d.fund === "999" ? cerfColor : cbpfColor;
+					} else {
+						return d.target.id.split("#")[0] === "subpartner" ? subpartnerColor : (d.fund === "999" ? cerfColor : cbpfColor);
+					};
 				})
 				.style("mix-blend-mode", "multiply")
 				.style("stroke-opacity", 0)
@@ -2126,7 +2130,7 @@
 					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
 				})
 				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\uF063" : "\uF062";
+					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
 				});
 
 			typePercentageGroupEnterSubText.append("tspan")
@@ -2172,7 +2176,7 @@
 					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
 				})
 				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\uF063" : "\uF062";
+					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
 				});
 
 			typePercentageGroup.select(".pbinadtypePercentageBoldNumber")
@@ -3386,7 +3390,7 @@
 				.append("div")
 				.attr("class", "pbinadtimelineSubtitle")
 				.html("Trends for the last three complete years (from " + (currentYear - 4) + " to " + (currentYear - 1) +
-					"). Green arrow (<span class='fa' style='color:" + greenArrowColor + ";'>\uF062</span>) means increase, red arrow (<span class='fa' style='color:" + redArrowColor + ";'>\uF063</span>) means decrease.");
+					"). Green triangle (<span class='fa' style='color:" + greenArrowColor + ";'>\u25B2</span>) means increase, red triangle (<span class='fa' style='color:" + redArrowColor + ";'>\u25BC</span>) means decrease.");
 
 			let timelineContainer = timelineDiv.selectAll(".pbinadtimelineContainer")
 				.data([true]);
@@ -3479,7 +3483,7 @@
 					return d.values[3] >= d.values[0] ? greenArrowColor : redArrowColor;
 				})
 				.html(function(d) {
-					return d.values[3] >= d.values[0] ? "\uF062" : "\uF063";
+					return d.values[3] >= d.values[0] ? "\u25B2" : "\u25BC";
 				});
 
 			const timelinePercentage = timelinesArrowDiv.append("div")
@@ -3545,7 +3549,7 @@
 
 			timelines.select(".pbinadtimelineArrow")
 				.html(function(d) {
-					return d.values[3] >= d.values[0] ? "\uF062" : "\uF063";
+					return d.values[3] >= d.values[0] ? "\u25B2" : "\u25BC";
 				})
 				.style("color", function(d) {
 					return d.values[3] >= d.values[0] ? greenArrowColor : redArrowColor;
@@ -4266,11 +4270,6 @@
 
 		function createSnapshot(type, fromContextMenu) {
 
-			d3.selectAll(".pbinadtypePercentageArrow")
-				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u2193" : "\u2191";
-				});
-
 			if (isInternetExplorer) {
 				alert("This functionality is not supported by Internet Explorer");
 				return;
@@ -4349,11 +4348,6 @@
 				};
 
 				if (fromContextMenu && currentHoveredElement) d3.select(currentHoveredElement).dispatch("mouseout");
-
-				d3.selectAll(".pbinadtypePercentageArrow")
-					.text(function(d) {
-						return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\uF063" : "\uF062";
-					});
 
 			});
 
