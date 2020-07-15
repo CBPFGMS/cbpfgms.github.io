@@ -2794,7 +2794,7 @@
 			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "6 12 " + width + " " + helpSVGHeight);
+				.attr("viewBox", "6 12 900 " + helpSVGHeight);
 
 			const arrowMarker = helpSVG.append("defs")
 				.append("marker")
@@ -2817,14 +2817,14 @@
 				.style("stroke", "white")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 270)
+				.attr("y", 220)
 				.text("CLICK ANYWHERE TO START");
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 270)
+				.attr("y", 220)
 				.text("CLICK ANYWHERE TO START");
 
 			const yearsAnnotationRect = helpSVG.append("rect")
