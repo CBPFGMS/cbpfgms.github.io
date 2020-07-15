@@ -146,12 +146,14 @@
 	font-size: 15px;
 	font-family: "Arial", sans-serif;
 	margin-left: 0px;
+	margin-bottom: 0px;
 }
 
 .pbimapListTitle {
 	font-size: 20px;
 	font-family: "Arial", sans-serif;
 	margin-left: 0px;
+	margin-bottom: 0px;
 }
 
 .pbimapListButtonDiv button, .pbimapResetDiv button, .pbimapshowAllDiv button {
