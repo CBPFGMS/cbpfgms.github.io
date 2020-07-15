@@ -3476,8 +3476,10 @@
 			const timelinesArrowDiv = timelinesChartDiv.append("div")
 				.attr("class", "pbinadtimelinesArrowDiv");
 
-			const timelineArrow = timelinesArrowDiv.append("div")
-				.attr("class", "pbinadtimelineArrow fa")
+			const timelineArrowAndTextDiv = timelinesArrowDiv.append("div");
+
+			const timelineArrow = timelineArrowAndTextDiv.append("span")
+				.attr("class", "pbinadtimelineArrow")
 				.style("font-size", "16px")
 				.style("color", function(d) {
 					return d.values[3] >= d.values[0] ? greenArrowColor : redArrowColor;
@@ -3486,7 +3488,7 @@
 					return d.values[3] >= d.values[0] ? "\u25B2" : "\u25BC";
 				});
 
-			const timelinePercentage = timelinesArrowDiv.append("div")
+			const timelinePercentage = timelineArrowAndTextDiv.append("span")
 				.attr("class", "pbinadtimelinePercentage")
 				.html(function(d) {
 					return d.values[0] && d.values[3] ? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1)) : "n/a";
