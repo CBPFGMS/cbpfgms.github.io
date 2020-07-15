@@ -2616,11 +2616,11 @@
 				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
 				text: "Use these buttons to select year. You can select more than one year. Double click or press ALT when clicking to select a single year"
 			}, {
-				x: 465,
+				x: 488,
 				y: 68 + topDivHeight + totalSelectHeight,
 				width: 212,
 				height: 30,
-				xTooltip: 430 * (topDivSize.width / width),
+				xTooltip: 444 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
 				text: "Use these buttons to select the modality type."
 			}, {
@@ -2651,7 +2651,7 @@
 				x: 6,
 				y: 152 + topDivHeight + totalSelectHeight,
 				width: 312,
-				height: 312,
+				height: 334,
 				xTooltip: 326 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
 				text: "This area depicts the amount allocated by cluster. The black triangles, when present, indicate standard allocations."
@@ -2659,7 +2659,7 @@
 				x: 582,
 				y: 152 + topDivHeight + totalSelectHeight,
 				width: 312,
-				height: 312,
+				height: 334,
 				xTooltip: 268 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
 				text: "This area depicts the number of targeted or affected persons for each cluster. The black triangles, when present, indicate the number of affected persons."

@@ -2572,140 +2572,154 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbigamOverDivHelp");
 
+			const selectTitleDivSize = selectTitleDiv.node().getBoundingClientRect();
+
+			const titleStyle = window.getComputedStyle(selectTitleDiv.node());
+
+			const selectDivSize = selectDiv.node().getBoundingClientRect();
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
+			const totalSelectHeight = (selectTitleDivSize.height + selectDivSize.height + parseInt(titleStyle["margin-top"]) + parseInt(titleStyle["margin-bottom"])) * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbigamArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Arial")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbigamAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 30 - padding)
-				.attr("y", 30 - padding - 14)
+			const helpData = [{
+				x: 8,
+				y: topDivHeight + ((totalSelectHeight - selectDivSize.height) * (topDivSize.width / width)),
+				width: width - 28,
+				height: selectDivSize.height * (width / topDivSize.width),
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 8) * (topDivSize.width / width),
+				text: "Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year."
+			}, {
+				x: 6,
+				y: 70 + topDivHeight + totalSelectHeight,
+				width: 346,
+				height: 30,
+				xTooltip: 38 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 106) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. You can select more than one year, as long as they belong to the same Marker system. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years. If you select a year that belongs to a different Marker system, that year will be selected as a single year."
+			}, {
+				x: 368,
+				y: 70 + topDivHeight + totalSelectHeight,
+				width: 323,
+				height: 30,
+				xTooltip: 382 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 106) * (topDivSize.width / width),
+				text: "Use these buttons to change how the circles are distributed along the x axis. Each circle represents a given CBPF/Marker combination. “Budget” shows the allocation values, in dollars. “Budget % of per Marker” will show that value as a percentage of the total for the same Marker, which is adequate for comparing CBPFs in the same Marker. ““Budget % of per CBPF” will show that value as a percentage of the total for that CBPF, which is adequate for comparing Markers in the same CBPF."
+			}, {
+				x: 698,
+				y: 70 + topDivHeight + totalSelectHeight,
+				width: 196,
+				height: 30,
+				xTooltip: 650 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 106) * (topDivSize.width / width),
+				text: "Use these buttons to aggregate all Markers in a single row or to separate the CBPF/Marker combination by Marker."
+			}, {
+				x: 190,
+				y: 186 + topDivHeight + totalSelectHeight,
+				width: 700,
+				height: 370,
+				xTooltip: 380 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 112) * (topDivSize.width / width),
+				text: "Hover over the circles to get additional information. The tooltip will show up below the chart, over the legend area."
+			}];
+
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbigamHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
+			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 120 + topDivHeight + totalSelectHeight)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
 				.style("fill", "white")
-				.style("opacity", 0.95);
+				.style("stroke", "#888");
 
-			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbigamAnnotationText")
-				.attr("x", 30)
-				.attr("y", 30)
-				.text("Use these buttons to select the year. You can select more than one year, as long as they belong to the same Marker system. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years. If you select a year that belongs to a different Marker system, that year will be selected as a single year.")
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbigamAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 140 + topDivHeight + totalSelectHeight)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
 				.call(wrapText, 350);
 
-			const yearsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbigamArrowMarker)")
-				.attr("d", "M200,135 L200,160");
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbigamHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block");
+				const innerTooltip = tooltip.append("div")
+					.style("width", "280px")
+					.html(text);
+			};
 
-			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
-
-			const markerAnnotationRect = helpSVG.append("rect")
-				.attr("x", 440 - padding)
-				.attr("y", 30 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const markerAnnotation = helpSVG.append("text")
-				.attr("class", "pbigamAnnotationText")
-				.attr("x", 440)
-				.attr("y", 30)
-				.text("Use these buttons to change how the circles are distributed along the x axis. Each circle represents a given CBPF/Marker combination. “Budget” shows the allocation values, in dollars. “Budget % of per Marker” will show that value as a percentage of the total for the same Marker, which is adequate for comparing CBPFs in the same Marker. ““Budget % of per CBPF” will show that value as a percentage of the total for that CBPF, which is adequate for comparing Markers in the same CBPF.")
-				.call(wrapText, 450);
-
-			const markerPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbigamArrowMarker)")
-				.attr("d", "M434,110 Q400,110 400,160");
-
-			markerAnnotationRect.attr("width", markerAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", markerAnnotation.node().getBBox().height + padding * 2);
-
-			const overallAnnotationRect = helpSVG.append("rect")
-				.attr("x", 440 - padding)
-				.attr("y", 230 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const overallAnnotation = helpSVG.append("text")
-				.attr("class", "pbigamAnnotationText")
-				.attr("x", 440)
-				.attr("y", 230)
-				.text("Use these buttons to aggregate all Markers in a single row or to separate the CBPF/Marker combination by Marker.")
-				.call(wrapText, 300);
-
-			const overallPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbigamArrowMarker)")
-				.attr("d", "M730,240 Q760,240 760,216");
-
-			overallAnnotationRect.attr("width", overallAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", overallAnnotation.node().getBBox().height + padding * 2);
-
-			const beeswarmAnnotationRect = helpSVG.append("rect")
-				.attr("x", 440 - padding)
-				.attr("y", 430 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const beeswarmAnnotation = helpSVG.append("text")
-				.attr("class", "pbigamAnnotationText")
-				.attr("x", 440)
-				.attr("y", 430)
-				.text("Hover over the circles to get additional information. The tooltip will show up below the chart, over the legend area.")
-				.call(wrapText, 220);
-
-			const beeswarmPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbigamArrowMarker)")
-				.attr("d", "M432,446 Q400,460 400,630");
-
-			beeswarmAnnotationRect.attr("width", beeswarmAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", beeswarmAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
-			});
+			function removeTooltip() {
+				tooltip.style("display", "none").html(null);
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbigamHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};
