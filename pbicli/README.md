@@ -21,7 +21,7 @@ Also, at the top right corner, there is a set of buttons:
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-showfuture="false" data-selectedcountry="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
+```<div id="d3chartcontainerpbicli" data-title="Contribution Trends" data-selectedcountry="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbicli/src/d3chartpbicli.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container 900px wide.
 
@@ -34,13 +34,6 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 There are six parameters:
 
 **`data-title`**: sets the title of the chart. If left empty ("") the chart title defaults to *Contribution Trends*.
-
-**`data-showfuture`**: defines if the contributions for future years are showed when the page loads. The value has to be a string. Accepted values:
-
-- `"true"`: shows contributions (pledge values) for years after the current year.
-- `"false"`: shows only contributions until the current year.
-
-If the value is not an accepted value, it defaults to `"false"`.
 
 **`data-selectedcountry`**: defines the selected country (donor or CBPF) when the page loads, and sets the view for those selected countries (e. g., if the selected country is a CBPF the donor line chart shows all donors that donated to those selected CBPF, and vice versa). For not selecting any country set the value to `"none"`, or just leave it empty:
 

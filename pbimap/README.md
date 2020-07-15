@@ -5,7 +5,8 @@ Data visualisation for the Country-based Pooled Funds (CBPF) allocations in the 
 - A top banner showing the total allocated, the number of beneficiaries, the number of partners and the number of projects for the selected filters;
 - A series of menus allowing the user to select the values (one or more) for the year, CBPF, Partner type, Cluster, Allocation Type and Location Level. A “Reset” button resets all the menus and the map to the initial state;
 - A map with markers depicting allocation values. The markers can be hovered for showing a tooltip with additional information. At the bottom left corner two buttons allow selecting how the markers encode allocations, by size or by color;
-- A breadcrumb below the map helps to visually track the current selection;
+- A breadcrumb trail below the map helps to visually track the current selection;
+- A “Show All Projects” button next to the breadcrumbs, only visible when the location level is “Global”, creates a list with all projects for the selected funds.
 - If selected in the tooltips, a list of the projects will show up below the map area.
 
 Also, at the top right corner, there is a set of buttons:
@@ -19,7 +20,8 @@ Also, at the top right corner, there is a set of buttons:
 
 #### Interactivity:
 
-- When hovering over a marker a tooltip with additional information will be displayed. This tooltip contains a button, “Generate List of Projects”, which will generate a list of projects below the map area.
+- When hovering over a marker a tooltip with additional information will be displayed. This tooltip contains a button, “Show Projects”, which will generate a list of projects below the map area.
+- A similar button (“Show All Projects”) in the lower right corner has a similar functionality, but creates the list for all selected funds. This button is only visible when the location level is “Global”.
 - You can pan and zoom the map by using your mouser or trackpad/touchpad over the map area. Additionally, two buttons at the top left corner allow you to zoom in/out.
 
 
