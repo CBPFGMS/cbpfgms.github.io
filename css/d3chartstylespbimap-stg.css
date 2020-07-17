@@ -34,7 +34,7 @@
 	border: 2px solid #666; 
 	border-radius: 6px;
 	max-width: 290px;
-	z-index: 1100;
+	z-index: 2100;
 }
 
 .pbimapTooltipSvg {
@@ -365,7 +365,7 @@
 
 .pbimapAnnotationMainText {
 	font-family: "Roboto", sans-serif;
-	font-size: 26px;
+	font-size: 18px;
 	font-weight: 700;
 	pointer-events: none;
 }

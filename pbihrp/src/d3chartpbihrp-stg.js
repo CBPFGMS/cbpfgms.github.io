@@ -3181,117 +3181,126 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbihrpOverDivHelp");
 
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbihrpArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Arial")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 280)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbihrpAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 280)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 360 - padding)
-				.attr("y", 68 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
+			const helpData = [{
+				x: 6,
+				y: 16 + topDivHeight,
+				width: 168,
+				height: 30,
+				xTooltip: 6 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 54) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. You can select only one year at a time."
+			}, {
+				x: 4,
+				y: 410 + topDivHeight,
+				width: 880,
+				height: 26,
+				xTooltip: 200 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 444) * (topDivSize.width / width),
+				text: "Click these radio buttons to sort the Funds according to several variables."
+			}, {
+				x: 4,
+				y: 446 + topDivHeight,
+				width: 1080,
+				height: 60,
+				xTooltip: 200 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 390) * (topDivSize.width / width),
+				text: "Hover over the bars to get detailed figures for each Fund."
+			}];
 
-			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbihrpAnnotationText")
-				.attr("x", 360)
-				.attr("y", 68)
-				.text("Use these buttons to select the year. You can select only one year at a time.")
-				.call(wrapText2, 280);
-
-			const yearsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbihrpArrowMarker)")
-				.attr("d", "M356,70 L160,70");
-
-			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
-
-			const sortAnnotationRect = helpSVG.append("rect")
-				.attr("x", 800 - padding)
-				.attr("y", 340 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const sortAnnotation = helpSVG.append("text")
-				.attr("class", "pbihrpAnnotationText")
-				.attr("x", 800)
-				.attr("y", 340)
-				.text("Click these radio buttons to sort the Funds according to several variables.")
-				.call(wrapText2, 220);
-
-			const sortPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbihrpArrowMarker)")
-				.attr("d", "M900,380 Q900,450 840,450");
-
-			sortAnnotationRect.attr("width", sortAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", sortAnnotation.node().getBBox().height + padding * 2);
-
-			const barsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 100 - padding)
-				.attr("y", 340 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const barsAnnotation = helpSVG.append("text")
-				.attr("class", "pbihrpAnnotationText")
-				.attr("x", 100)
-				.attr("y", 340)
-				.text("Hover over the bars to get detailed figures for each Fund.")
-				.call(wrapText2, 220);
-
-			const barsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbihrpArrowMarker)")
-				.attr("d", "M120,365 Q120,445 200,510");
-
-			barsAnnotationRect.attr("width", barsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", barsAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbihrpHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbihrpAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 264)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbihrpHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(null);
+				tooltip.append("div")
+					.style("width", "300px")	
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbihrpHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};
