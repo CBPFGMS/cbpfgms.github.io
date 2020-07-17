@@ -195,7 +195,7 @@
 
 		//END OF POLYFILLS
 
-		const width = 1100,
+		const width = 1110,
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
