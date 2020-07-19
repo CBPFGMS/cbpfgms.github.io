@@ -157,3 +157,4 @@ This unique code is present in the JavaScript file name, in the `<div>` ID name,
 |PFBI: CBPF versus HRP|`pbihrp`|
 |PFBI: Gender with Age Marker|`pbigam`|
 |PFBI: Covid19 map|`covmap`|
+|PFBI: Allocation Flow|`pbinad`|
