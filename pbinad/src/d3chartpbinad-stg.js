@@ -227,7 +227,7 @@
 			formatPercent1dec = d3.format(".1%"),
 			formatPercent = d3.format(".0%"),
 			legendData = ["CBPF", "CERF", "Direct Partners", "Sub-implementing Partners"],
-			chartTitleDefault = "Net Funding Allocations",
+			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
@@ -807,7 +807,7 @@
 
 				const currentDate = new Date();
 
-				const fileName = "NetFunding_" + csvDateFormat(currentDate) + ".csv";
+				const fileName = "AllocationFlow_" + csvDateFormat(currentDate) + ".csv";
 
 				const blob = new Blob([csv], {
 					type: 'text/csv;charset=utf-8;'
@@ -3382,7 +3382,7 @@
 				.enter()
 				.append("div")
 				.attr("class", "pbinadtimelineHeader")
-				.html("Net Funding Timelines");
+				.html("Allocation trends by Partners types");
 
 			const timelineSubtitle = timelineDiv.selectAll(".pbinadtimelineSubtitle")
 				.data([true])
@@ -4375,7 +4375,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "NetFunding_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "AllocationFlow_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -4479,7 +4479,7 @@
 
 					const currentDate = new Date();
 
-					pdf.save("NetFunding_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("AllocationFlow_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
