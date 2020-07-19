@@ -109,6 +109,14 @@ Chart for the Country-based Pooled Funds (CBPF) Gender with Age Marker (GAM) in 
 
 This chart shows the Gender with Age Marker (GAM) for each project in each Fund. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbigam) for more information.
 
+- **PFBI: Allocation Flow, alluvial diagram**
+
+Chart for the Country-based Pooled Funds (CBPF) allocations in the Business Intelligence Portal at the OCHA PFBI.
+
+[<img alt="Allocation Flow" src="https://cbpfgms.github.io/img/thumbnails/pbinad.png" width="450">](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbinad)
+
+This chart shows the allocation flow from donors to direct and sub-implementing partners. See the [chart's page](https://github.com/CBPFGMS/cbpfgms.github.io/tree/master/pbinad) for more information.
+
 - **PFBI: Covid19, map and timeline chart**
 
 Chart for the Country-based Pooled Funds (CBPF) and Central Emergency Response Fund (CERF) Covid19-related Allocations in the Business Inteligence Portal at the OCHA PFBI.
