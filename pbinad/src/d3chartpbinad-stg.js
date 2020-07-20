@@ -558,40 +558,6 @@
 
 			const data = processData(rawData);
 
-			//test
-			// svg.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("width", width)
-			// 	.attr("height", height)
-			// 	.style("opacity", 0.1);
-			// topPanel.main.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("width", topPanel.width)
-			// 	.attr("height", topPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// buttonsPanel.main.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("width", buttonsPanel.width)
-			// 	.attr("height", buttonsPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// sankeyPanel.main.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("width", sankeyPanel.width)
-			// 	.attr("height", sankeyPanel.height)
-			// 	.style("fill", "green")
-			// 	.style("opacity", 0.2);
-			// sankeyPanel.main.append("rect")
-			// 	.attr("pointer-events", "none")
-			// 	.attr("x", sankeyPanel.padding[3])
-			// 	.attr("y", sankeyPanel.padding[0])
-			// 	.attr("width", sankeyPanel.width - sankeyPanel.padding[3] - sankeyPanel.padding[1])
-			// 	.attr("height", sankeyPanel.height - sankeyPanel.padding[0] - sankeyPanel.padding[2])
-			// 	.style("fill", "tomato")
-			// 	.style("opacity", 0.2);
-			//test
-
 			createTitle(rawData);
 
 			createCheckboxes(rawData);
@@ -1343,8 +1309,7 @@
 			});
 
 			buttonsAggregationRects.on("mouseover", mouseOverButtonsAggregationRects)
-				.on("mouseout", mouseOutButtonsAggregationRects)
-				.on("click", clickButtonsAggregationRects);
+				.on("mouseout", mouseOutButtonsAggregationRects);
 
 			if (yearsArray.length > buttonsNumber) {
 
@@ -1560,10 +1525,6 @@
 						return e === d
 					})
 					.style("fill", "#444");
-			};
-
-			function clickButtonsAggregationRects(d) {
-				//chartState.selectedAggregation = d;
 			};
 
 			//end of createButtonsPanel
