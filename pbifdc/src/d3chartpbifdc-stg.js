@@ -3518,7 +3518,7 @@
 			};
 
 			function removeTooltip() {
-				tooltip.style("display", "none");;
+				tooltip.style("display", "none");
 				explanationText.style("opacity", 1);
 				explanationTextRect.style("opacity", 1);
 				helpSVG.selectAll(".pbifdcHelpRectangle").style("opacity", 0.5);

@@ -2097,9 +2097,9 @@
 					obj.cerfrapidresponse += +row.ApprovedRrBudget;
 					obj.cerfunderfunded += +row.ApprovedUnderfundedBudget;
 					obj.cerftotal += (+row.ApprovedRrBudget) + (+row.ApprovedUnderfundedBudget);
-					obj.cerfrapidresponseunderapproval += +row.PipelineRrBudget;;
-					obj.cerfunderfundedunderapproval += +row.PipelineUnderfundedBudget;;
-					obj.cerftotalunderapproval += (+row.PipelineRrBudget) + (+row.PipelineUnderfundedBudget);;
+					obj.cerfrapidresponseunderapproval += +row.PipelineRrBudget;
+					obj.cerfunderfundedunderapproval += +row.PipelineUnderfundedBudget;
+					obj.cerftotalunderapproval += (+row.PipelineRrBudget) + (+row.PipelineUnderfundedBudget);
 				};
 			};
 
