@@ -832,7 +832,7 @@
 				const legendGroup = bottomButtonsGroup.append("g")
 					.attr("class", "pbialpLegendGroup")
 					.attr("transform", "translate(" + (padding[3]) + "," +
-						(height - padding[2] / 2) + ")")
+						(height - padding[2] / 1.5) + ")")
 					.attr("pointer-events", "none");
 
 				const legend = legendGroup.append("text")
@@ -864,6 +864,16 @@
 					.append("tspan")
 					.style("fill", "#666")
 					.text(") indicates the Under Approval amount.")
+
+				const legendNetFunding = legendGroup.append("text")
+					.attr("class", "pbialpLegendText pbialpLegendTextNetFunding")
+					.style("opacity", chartState.netFunding === 1 ? 0 : 1)
+					.attr("y", 16)
+					.style("fill", underApprovalColor)
+					.text("*")
+					.append("tspan")
+					.style("fill", "#666")
+					.text("National Partners includes funding to National NGOs, Government/Others and Private Contractors.");
 
 				//end of createLegend
 			};
@@ -1992,6 +2002,16 @@
 					.selectAll(".tick text")
 					.call(wrapText);
 
+				if (chartState.netFunding !== 1) {
+					groupXAxisParallel.selectAll("tspan")
+						.filter(function() {
+							return this.textContent === "Partners"
+						})
+						.append("tspan")
+						.style("fill", underApprovalColor)
+						.text("*");
+				};
+
 				//end of createParallelPanel
 			};
 
@@ -2065,7 +2085,16 @@
 						.filter(function(d) {
 							return d === "National NGO";
 						})
-						.text(chartState.netFunding === 1 ? "National NGO" : "Nat. Partners");
+						.text(chartState.netFunding === 1 ? "National NGO" : "Nat. Partners")
+						.append("tspan")
+						.style("fill", underApprovalColor)
+						.text(chartState.netFunding === 1 ? "" : "*");
+
+					svg.select(".pbialpParallelPanelTitle")
+						.text(chartState.netFunding === 1 ? "Allocations by Partner Type" : "Allocations by Partner Type (including sub-impl. partners)")
+
+					svg.select(".pbialpLegendTextNetFunding")
+						.style("opacity", chartState.netFunding === 1 ? 0 : 1);
 
 					data = processData(rawData);
 
