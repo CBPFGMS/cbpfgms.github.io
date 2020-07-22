@@ -961,22 +961,18 @@
 				topPanelMainText = topPanelMainText.enter()
 					.append("text")
 					.attr("class", "pbialptopPanelMainText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelMainText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.8)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
-				topPanelMainText.transition()
-					.duration(duration)
-					.style("opacity", 1)
-					.text(function(d) {
-						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-						const valueSI = formatSIFloat(d);
-						const unit = valueSI[valueSI.length - 1];
-						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Allocated in " + yearsText;
-					});
+				topPanelMainText.text(function(d) {
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" Allocated in " + yearsText;
+				});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbialptopPanelSubText")
 					.data([true]);
@@ -984,23 +980,29 @@
 				topPanelSubText = topPanelSubText.enter()
 					.append("text")
 					.attr("class", "pbialptopPanelSubText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.merge(topPanelSubText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
-				topPanelSubText.transition()
-					.duration(duration)
-					.style("opacity", 1)
-					.text(function(d) {
-						return "(" +
-							(chartState.selectedPartner === "total" ? "all partners" :
-								chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
-								chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
-								chartState.selectedPartner) +
-							")";
-					});
+				topPanelSubText.text(function(d) {
+					return "(" +
+						(chartState.selectedPartner === "total" ? "all partners" :
+							chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
+							chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
+							chartState.selectedPartner) +
+						")";
+				});
+
+				if (chartState.selectedPartner === "National NGO" && chartState.netFunding === 2) {
+					topPanelSubText.text("(National Partners")
+						.append("tspan")
+						.style("fill", underApprovalColor)
+						.text("*")
+						.append("tspan")
+						.style("fill", "#888")
+						.text(")");
+				};
 
 				let underApprovalValueGroup = topPanel.main.selectAll(".pbialpunderApprovalValueGroup")
 					.data([true]);
@@ -1050,21 +1052,17 @@
 				topPanelUnderApprovalText = topPanelUnderApprovalText.enter()
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
 					.merge(topPanelUnderApprovalText);
 
-				topPanelUnderApprovalText.transition()
-					.duration(duration)
-					.style("opacity", 1)
-					.text(function(d) {
-						const valueSI = formatSIFloat(d);
-						const unit = valueSI[valueSI.length - 1];
-						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" under Approval";
-					});
+				topPanelUnderApprovalText.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" under Approval";
+				});
 
 				let topPanelUnderApprovalSubText = underApprovalValueGroup.selectAll(".pbialptopPanelUnderApprovalSubText")
 					.data([true]);
@@ -1072,23 +1070,29 @@
 				topPanelUnderApprovalSubText = topPanelUnderApprovalSubText.enter()
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalSubText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.attr("x", topPanel.moneyBagPadding + (topPanel.leftPadding[1] - underApprovalValueTextLength - (topPanel.mainValueHorPadding / 2)))
 					.merge(topPanelUnderApprovalSubText)
 
-				topPanelUnderApprovalSubText.transition()
-					.duration(duration)
-					.style("opacity", 1)
-					.text(function(d) {
-						return "(" +
-							(chartState.selectedPartner === "total" ? "All Partners" :
-								chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
-								chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
-								chartState.selectedPartner) +
-							")";
-					});
+				topPanelUnderApprovalSubText.text(function(d) {
+					return "(" +
+						(chartState.selectedPartner === "total" ? "All Partners" :
+							chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
+							chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
+							chartState.selectedPartner) +
+						")";
+				});
+
+				if (chartState.selectedPartner === "National NGO" && chartState.netFunding === 2) {
+					topPanelUnderApprovalSubText.text("(National Partners")
+						.append("tspan")
+						.style("fill", underApprovalColor)
+						.text("*")
+						.append("tspan")
+						.style("fill", "#888")
+						.text(")");
+				};
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbialptopPanelCbpfsNumber")
 					.data([data.length]);
