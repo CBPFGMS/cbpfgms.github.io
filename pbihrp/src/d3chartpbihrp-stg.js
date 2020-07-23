@@ -179,7 +179,7 @@
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
-			colorsArray = ["#1175BA", "#9BB9DF", "#D0D1D1", "#E9EAEB"],
+			colorsArray = ["#1175BA", "#9BB9DF", "#AFAFAF", "#E9EAEB"],
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
@@ -389,7 +389,7 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [100, 32, 0, 196],
+			padding: [100, 52, 0, 196],
 			get mainAxisPadding() {
 				return this.padding[3] - 104;
 			},
@@ -406,7 +406,7 @@
 			main: svg.append("g")
 				.attr("class", "pbihrpnonHrpPanel"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 32, 0, 196],
+			padding: [70, 52, 0, 196],
 			get mainAxisPadding() {
 				return this.padding[3] - 104;
 			},
@@ -2304,8 +2304,11 @@
 				}, function(d) {
 					return d.key;
 				})
-				.each(function(d, _, n) {
-					if (d.key === "hrpfunding") {
+				.sort(function(a, b) {
+					return a.value - b.value;
+				})
+				.each(function(d, i) {
+					if (i === 1) {
 						const requirementsDatum = d3.select(this.nextSibling).datum();
 						const dummyText = barChartGroup.append("text")
 							.style("opacity", 0)
@@ -2316,7 +2319,7 @@
 						const size = dummyText.node().getBoundingClientRect().width;
 						const move = Math.abs(xScaleBarChart(d.value) - xScaleBarChart(requirementsDatum.value)) < size + 1.5 * barChartLabelPadding;
 						localVariable.set(this, {
-							size: size,
+							size: size * (d.key === "hrpfunding" ? 2.45 : 2.1),
 							move: move
 						});
 						dummyText.remove();
@@ -2324,21 +2327,23 @@
 				})
 				.transition()
 				.duration(duration)
-				.attr("x", function(d) {
-					if (d.key === "hrprequirements" && localVariable.get(this.previousSibling).move) {
+				.attr("x", function(d, i) {
+					if (i === 2 && localVariable.get(this.previousSibling).move) {
 						return xScaleBarChart(d.value) + (2.5 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
-					} else if (d.key === "hrpfunding" && localVariable.get(this).move) {
+					} else if (i === 1 && localVariable.get(this).move) {
 						return xScaleBarChart(d3.select(this.nextSibling).datum().value) + barChartLabelPadding;
 					} else {
 						return xScaleBarChart(d.value) + barChartLabelPadding;
 					};
 				})
-				.tween("text", function(d) {
-					const separator = d.key === "hrpfunding" && localVariable.get(this).move ? "/" : "";
+				.tween("text", function(d, i) {
+					let separator = "";
+					if (i === 1 && localVariable.get(this).move) separator = d.key === "hrpfunding" ? " (fund.)/" : " (req.)/";
+					if (i === 2 && localVariable.get(this.previousSibling).move) separator = d.key === "hrpfunding" ? " (fund.)" : " (req.)";
 					const node = this;
-					const i = d3.interpolate(reverseFormat(node.textContent.replace("/", "")), d.value);
+					const interpolator = d3.interpolate(reverseFormat(node.textContent.replace(separator, "")), d.value);
 					return function(t) {
-						node.textContent = formatSIFloat(i(t)) + separator;
+						node.textContent = formatSIFloat(interpolator(t)) + separator;
 					};
 				});
 
@@ -3291,7 +3296,7 @@
 					.style("display", "block")
 					.html(null);
 				tooltip.append("div")
-					.style("width", "300px")	
+					.style("width", "300px")
 					.html(text);
 			};
 
