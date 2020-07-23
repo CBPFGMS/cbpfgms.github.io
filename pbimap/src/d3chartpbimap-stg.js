@@ -2840,35 +2840,35 @@
 
 			const helpData = [{
 				x: 950,
-				y: 25 + topDivHeight + topSvgHeight + filtersDivHeight + mapHeight,
-				width: 140,
+				y: 22 + topDivHeight + topSvgHeight + filtersDivHeight + mapHeight,
+				width: 148,
 				height: 30,
 				xTooltip: 800 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.89,
+				yTooltip: realHeight * 0.885,
 				text: "Click here to generate a list of projects (below the map) for all selected funds."
 			}, {
 				x: 6,
-				y: topDivHeight + topSvgHeight + 12,
+				y: topDivHeight + topSvgHeight + 10,
 				width: 130,
 				height: filtersDivHeight + 10,
 				xTooltip: 6 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.26,
+				yTooltip: realHeight * 0.25,
 				text: "Use this menu to select one or more years. Greyed-out years were not downloaded yet (please wait some time)."
 			}, {
 				x: 138,
-				y: topDivHeight + topSvgHeight + 12,
+				y: topDivHeight + topSvgHeight + 10,
 				width: 658,
 				height: filtersDivHeight + 10,
 				xTooltip: 350 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.26,
+				yTooltip: realHeight * 0.25,
 				text: "Use these menus to select (one or more) other filters. When “All” is selected, clicking an option will select that given option only. The options in the “Allocation Type” menu change according to the selected options in the other menus."
 			}, {
 				x: 1028,
-				y: topDivHeight + topSvgHeight + 12,
-				width: 62,
+				y: topDivHeight + topSvgHeight + 10,
+				width: 68,
 				height: filtersDivHeight + 10,
 				xTooltip: 900 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.26,
+				yTooltip: realHeight * 0.25,
 				text: "This button resets all menus (and the map) to the initial values."
 			}, {
 				x: 130,
@@ -2876,23 +2876,23 @@
 				width: 410,
 				height: 300,
 				xTooltip: 180 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.26,
+				yTooltip: realHeight * 0.245,
 				text: "In the map area, hover over a marker to get additional information. You can zoom and pan the map."
 			}, {
 				x: 6,
-				y: 327 + topDivHeight + topSvgHeight + filtersDivHeight,
+				y: 325 + topDivHeight + topSvgHeight + filtersDivHeight,
 				width: 100,
 				height: 30,
 				xTooltip: 6 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.63,
+				yTooltip: realHeight * 0.615,
 				text: "Click here to encode allocations by “size” (larger markers indicate bigger allocations) or by “color” (darker markers indicate bigger allocations)."
 			}, {
 				x: 680,
-				y: 325 + topDivHeight + topSvgHeight + filtersDivHeight,
+				y: 330 + topDivHeight + topSvgHeight + filtersDivHeight,
 				width: 160,
 				height: 30,
 				xTooltip: 600 * (topDivSize.width / width),
-				yTooltip: realHeight * 0.62,
+				yTooltip: realHeight * 0.625,
 				text: "When you hover over a marker a tooltip like this shows up. Click “Show Projects” to create a table below the map, with all the projects for that marker."
 			}, {
 				x: 6,
