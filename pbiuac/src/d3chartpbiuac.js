@@ -1807,117 +1807,136 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiuacOverDivHelp");
 
+			tooltip.html(null);
+
+			const innerTooltip = tooltip.append("div")
+				.attr("id", "pbiuacInnerTooltipDiv");
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbiuacArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 260)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 2)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiuacAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 260)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const brushAnnotationRect = helpSVG.append("rect")
-				.attr("x", 50 - padding)
-				.attr("y", 130 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
+			const helpData = [{
+				x: 100,
+				y: 76 + topDivHeight,
+				width: 792,
+				height: 52,
+				xTooltip: 320 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 130) * (topDivSize.width / width),
+				text: "The brush area shows the data for the entire period. Use the two handles to move the selection or click + pan to move the selection. Click outside the selection to select the entire period."
+			}, {
+				x: 100,
+				y: 154 + topDivHeight,
+				width: 792,
+				height: 346,
+				xTooltip: 320 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 16) * (topDivSize.width / width),
+				text: "This area shows the allocations for the selected period. You can pan left/right or zoom (using the mousewheel or the trackpad) to move this area. Hover over the allocations to get more information, and click on “Display Details” to generate the details (below the chart) for the allocation."
+			}, {
+				x: 390,
+				y: 532 + topDivHeight,
+				width: 130,
+				height: 32,
+				xTooltip: 290 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 458) * (topDivSize.width / width),
+				text: "The legend shows the color encoding according to the allocation amount. Hover over the colors to see the corresponding amount."
+			}, {
+				x: 100,
+				y: 532 + topDivHeight,
+				width: 36,
+				height: 32,
+				xTooltip: 10 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 474) * (topDivSize.width / width),
+				text: "Hover for showing only Standard or Reserve allocations."
+			}];
 
-			const brushAnnotation = helpSVG.append("text")
-				.attr("class", "pbiuacAnnotationText")
-				.attr("x", 50)
-				.attr("y", 130)
-				.text("The brush area shows the data for the entire period. Use the two handles to move the selection or click + pan to move the selection. Click outside the selection to select the entire period.")
-				.call(wrapText2, 400);
-
-			const brushPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiuacArrowMarker)")
-				.attr("d", "M440,140 L510,140");
-
-			brushAnnotationRect.attr("width", brushAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", brushAnnotation.node().getBBox().height + padding * 2);
-
-			const mainAreaAnnotationRect = helpSVG.append("rect")
-				.attr("x", 480 - padding)
-				.attr("y", 320 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const mainAreaAnnotation = helpSVG.append("text")
-				.attr("class", "pbiuacAnnotationText")
-				.attr("x", 480)
-				.attr("y", 320)
-				.text("This area shows the allocations for the selected period. You can pan left/right or zoom (using the mousewheel or the trackpad) to move this area. Hover over the allocations to get more information, and click on “Display Details” to generate the details (below the chart) for the allocation.")
-				.call(wrapText2, 400);
-
-			const mainAreaPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiuacArrowMarker)")
-				.attr("d", "M470,350 L430,350");
-
-			mainAreaAnnotationRect.attr("width", mainAreaAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", mainAreaAnnotation.node().getBBox().height + padding * 2);
-
-			const legendsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 300 - padding)
-				.attr("y", 480 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const legendsAnnotation = helpSVG.append("text")
-				.attr("class", "pbiuacAnnotationText")
-				.attr("x", 300)
-				.attr("y", 480)
-				.text("The legend shows the color encoding according to the allocation amount. Hover over the colors to see the corresponding amount.")
-				.call(wrapText2, 400);
-
-			const legendsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiuacArrowMarker)")
-				.attr("d", "M450,520 L450,550");
-
-			legendsAnnotationRect.attr("width", legendsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", legendsAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbiuacHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbiuacAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 264)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbiuacHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block");
+				innerTooltip.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbiuacHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};

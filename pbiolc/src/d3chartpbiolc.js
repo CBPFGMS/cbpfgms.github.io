@@ -2554,222 +2554,176 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiolcOverDivHelp");
 
-			const overDivSize = overDiv.node().getBoundingClientRect();
+			const selectTitleDivSize = selectTitleDiv.node().getBoundingClientRect();
 
-			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+			const titleStyle = window.getComputedStyle(selectTitleDiv.node());
+
+			const selectDivSize = selectDiv.node().getBoundingClientRect();
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
+			const totalSelectHeight = (selectTitleDivSize.height + selectDivSize.height + parseInt(titleStyle["margin-top"]) + parseInt(titleStyle["margin-bottom"])) * (width / topDivSize.width);
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + helpSVGHeight);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbiolcArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 350)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiolcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 350)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const cbpfsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 300 - padding)
-				.attr("y", 40 - padding - 14)
+			const helpData = [{
+				x: 20,
+				y: topDivHeight + ((totalSelectHeight - selectDivSize.height) * (topDivSize.width / width)),
+				width: width - 40,
+				height: selectDivSize.height * (width / topDivSize.width),
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 8) * (topDivSize.width / width),
+				text: "Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year."
+			}, {
+				x: 20,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 420,
+				height: 30,
+				xTooltip: 78 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
+				text: "Use these buttons to select year. You can select more than one year. Double click or press ALT when clicking to select a single year"
+			}, {
+				x: 488,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 212,
+				height: 30,
+				xTooltip: 444 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
+				text: "Use these buttons to select the modality type."
+			}, {
+				x: 750,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 134,
+				height: 30,
+				xTooltip: 720 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 104) * (topDivSize.width / width),
+				text: "Use these buttons to show targeted or actual persons."
+			}, {
+				x: 190,
+				y: 106 + topDivHeight + totalSelectHeight,
+				width: 170,
+				height: 30,
+				xTooltip: 142 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 142) * (topDivSize.width / width),
+				text: "Click here to sort the clusters by allocations."
+			}, {
+				x: 586,
+				y: 106 + topDivHeight + totalSelectHeight,
+				width: 186,
+				height: 30,
+				xTooltip: 520 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 142) * (topDivSize.width / width),
+				text: "Click here to sort the clusters by persons (targeted or affected)."
+			}, {
+				x: 6,
+				y: 152 + topDivHeight + totalSelectHeight,
+				width: 312,
+				height: 334,
+				xTooltip: 326 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
+				text: "This area depicts the amount allocated by cluster. The black triangles, when present, indicate standard allocations."
+			}, {
+				x: 582,
+				y: 152 + topDivHeight + totalSelectHeight,
+				width: 312,
+				height: 334,
+				xTooltip: 268 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
+				text: "This area depicts the number of targeted or affected persons for each cluster. The black triangles, when present, indicate the number of affected persons."
+			}];
+
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbiolcHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
+			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 180 + topDivHeight + totalSelectHeight)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
 				.style("fill", "white")
-				.style("opacity", 0.95);
+				.style("stroke", "#888");
 
-			const cbpfsAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 300)
-				.attr("y", 40)
-				.text("Use these checkboxes to select the CBPF. A disabled checkbox means that the correspondent CBPF has no data for that year.")
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbiolcAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 200 + topDivHeight + totalSelectHeight)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
 				.call(wrapText2, 350);
 
-			const cbpfsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M290,50 Q260,50 260,80");
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbiolcHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
 
-			cbpfsAnnotationRect.attr("width", cbpfsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", cbpfsAnnotation.node().getBBox().height + padding * 2);
-
-			const yearAnnotationRect = helpSVG.append("rect")
-				.attr("x", 10 - padding)
-				.attr("y", 160 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const yearAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 10)
-				.attr("y", 160)
-				.text("Use these buttons to select year. Double click or press ALT when clicking to select a single year")
-				.call(wrapText2, 330);
-
-			const yearPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M335,156 Q355,156 355,172");
-
-			yearAnnotationRect.attr("width", yearAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearAnnotation.node().getBBox().height + padding * 2);
-
-			const modalityAnnotationRect = helpSVG.append("rect")
-				.attr("x", 400 - padding)
-				.attr("y", 160 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const modalityAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 400)
-				.attr("y", 160)
-				.text("Use these buttons to select modality type.")
-				.call(wrapText2, 180);
-
-			const modalityPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M542,156 Q562,156 562,172");
-
-			modalityAnnotationRect.attr("width", modalityAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", modalityAnnotation.node().getBBox().height + padding * 2);
-
-			const beneficiaryAnnotationRect = helpSVG.append("rect")
-				.attr("x", 620 - padding)
-				.attr("y", 160 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const beneficiaryAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 620)
-				.attr("y", 160)
-				.text("Use these buttons to show targeted or actual persons.")
-				.call(wrapText2, 200);
-
-			const beneficiaryPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M812,156 Q832,156 832,172");
-
-			beneficiaryAnnotationRect.attr("width", beneficiaryAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", beneficiaryAnnotation.node().getBBox().height + padding * 2);
-
-			const allocationsSortAnnotationRect = helpSVG.append("rect")
-				.attr("x", 300 - padding)
-				.attr("y", 270 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const allocationsSortAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 300)
-				.attr("y", 270)
-				.text("Click here to sort by allocations.")
-				.call(wrapText2, 180);
-
-			const allocationsSortPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M298,276 Q270,276 270,256");
-
-			allocationsSortAnnotationRect.attr("width", allocationsSortAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", allocationsSortAnnotation.node().getBBox().height + padding * 2);
-
-			const beneficiariesSortAnnotationRect = helpSVG.append("rect")
-				.attr("x", 700 - padding)
-				.attr("y", 270 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const beneficiariesSortAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 700)
-				.attr("y", 270)
-				.text("Click here to sort by beneficiaries.")
-				.call(wrapText2, 180);
-
-			const beneficiariesSortPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiolcArrowMarker)")
-				.attr("d", "M698,276 Q670,276 670,256");
-
-			beneficiariesSortAnnotationRect.attr("width", beneficiariesSortAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", beneficiariesSortAnnotation.node().getBBox().height + padding * 2);
-
-			const allocChartAnnotationRect = helpSVG.append("rect")
-				.attr("x", 120 - padding)
-				.attr("y", 400 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const allocChartAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 120)
-				.attr("y", 400)
-				.text("This area depicts the amount allocated by cluster. The black triangles indicate standard allocations.")
-				.call(wrapText2, 250);
-
-			allocChartAnnotationRect.attr("width", allocChartAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", allocChartAnnotation.node().getBBox().height + padding * 2);
-
-			const benefChartAnnotationRect = helpSVG.append("rect")
-				.attr("x", 580 - padding)
-				.attr("y", 400 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const benefChartAnnotation = helpSVG.append("text")
-				.attr("class", "pbiolcAnnotationText")
-				.attr("x", 580)
-				.attr("y", 400)
-				.text("This area depicts the number of beneficiaries (targeted or actual) for each cluster. The black triangles indicate beneficiaries affected by standard allocations.")
-				.call(wrapText2, 250);
-
-			benefChartAnnotationRect.attr("width", benefChartAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", benefChartAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
-			});
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbiolcHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};

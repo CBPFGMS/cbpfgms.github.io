@@ -43,13 +43,13 @@
 
 .pbiclcTitleDiv {
 	display: flex;
-	flex:0 60%;
+	flex:0 50%;
 	margin-left: 16px;
 }
 
 .pbiclcIconsDiv {
 	display: flex;
-	flex:0 40%;
+	flex:0 50%;
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-right: 16px;
@@ -196,15 +196,8 @@ p#pbiclcd3chartTitle {
 
 .pbiclcAnnotationMainText {
 	font-family: "Roboto", sans-serif;
-	font-size: 26px;
+	font-size: 18px;
 	font-weight: 700;
-	pointer-events: none;
-}
-
-.pbiclcAnnotationText {
-	font-family: "Arial", sans-serif;
-	font-size: 15px;
-	fill: #222;
 	pointer-events: none;
 }
 

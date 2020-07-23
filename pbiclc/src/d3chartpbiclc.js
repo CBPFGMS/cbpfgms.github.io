@@ -3037,140 +3037,139 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiclcOverDivHelp");
 
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbiclcArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 50 - padding)
-				.attr("y", 60 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
+			const helpData = [{
+				x: 96,
+				y: 72 + topDivHeight,
+				width: 480,
+				height: 30,
+				xTooltip: 180 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+			}, {
+				x: 592,
+				y: 72 + topDivHeight,
+				width: 224,
+				height: 30,
+				xTooltip: 550 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "Use these buttons to select the type of contribution: paid, pledged or total (paid plus pledged)."
+			}, {
+				x: 96,
+				y: 10 + topDivHeight,
+				width: 720,
+				height: 57,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 76) * (topDivSize.width / width),
+				text: "This banner shows the total amount of contributions received for the selected year (or years). It also shows the number of donors and CBPFs in that period."
+			}, {
+				x: 6,
+				y: 108 + topDivHeight,
+				width: 440,
+				height: 660,
+				xTooltip: 452 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
+				text: "Hover over the donors to get additional information. Hovering over a donor filters the CBPFs accordingly, so only CBPFs that received from that donor are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+			}, {
+				x: 466,
+				y: 108 + topDivHeight,
+				width: 398,
+				height: 380,
+				xTooltip: 136 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
+				text: "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+			}];
 
-			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 50)
-				.attr("y", 60)
-				.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-				.call(wrapText2, 430);
-
-			const yearsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M480,70 Q510,70 510,95");
-
-			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
-
-			const paidPledgeAnnotationRect = helpSVG.append("rect")
-				.attr("x", 400 - padding)
-				.attr("y", 180 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const paidPledgeAnnotation = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 400)
-				.attr("y", 180)
-				.text("Use these buttons to filter by “paid” or “pledged” values. “Total” shows both paid and pledged.")
-				.call(wrapText2, 220);
-
-			const paidPledgePath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M600,180 Q690,180 690,150");
-
-			paidPledgeAnnotationRect.attr("width", paidPledgeAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", paidPledgeAnnotation.node().getBBox().height + padding * 2);
-
-			const lollipopsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 270 - padding)
-				.attr("y", 390 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const lollipopsAnnotation = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 270)
-				.attr("y", 390)
-				.text("Hover over the donors or CBPFs to get additional information. Hovering over a donor filters the CBPFs accordingly, as well as hovering over a CBPFs filters the donors accordingly. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively.")
-				.call(wrapText2, 350);
-
-			const lollipopsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M260,430 Q200,430 200,370");
-
-			const lollipopsPath2 = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbiclcArrowMarker)")
-				.attr("d", "M630,430 Q690,430 690,370");
-
-			lollipopsAnnotationRect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
-
-			const lollipopsAnnotation2Rect = helpSVG.append("rect")
-				.attr("x", 270 - padding)
-				.attr("y", 520 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const lollipopsAnnotation2 = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationText")
-				.attr("x", 270)
-				.attr("y", 520)
-				.text("You can click a donor or a CBPF to select it, allowing the selection of multiple countries. Click again to deselect it.")
-				.call(wrapText2, 350);
-
-			lollipopsAnnotation2Rect.attr("width", lollipopsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", lollipopsAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbiclcHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbiclcAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 264)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbiclcHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbiclcHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};

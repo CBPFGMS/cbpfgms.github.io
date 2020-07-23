@@ -363,13 +363,6 @@
 	z-index: 1600;
 }
 
-.pbimapAnnotationMainText {
-	font-family: "Roboto", sans-serif;
-	font-size: 18px;
-	font-weight: 700;
-	pointer-events: none;
-}
-
 .pbimapAnnotationText {
 	font-family: "Arial", sans-serif;
 	font-size: 15px;
@@ -588,7 +581,7 @@ svg.leaflet-zoom-animated {
 
 .pbimapAnnotationMainText {
 	font-family: "Roboto", sans-serif;
-	font-size: 24px;
+	font-size: 18px;
 	font-weight: 700;
 	pointer-events: none;
 }

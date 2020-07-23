@@ -195,7 +195,7 @@
 
 		//END OF POLYFILLS
 
-		const width = 1100,
+		const width = 1110,
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
@@ -243,6 +243,7 @@
 			circleGlobalColor = "#418FDE",
 			maxMarkerColor = "#CD3A1F",
 			maxMarkerGlobalColor = "#1F69B3",
+			unBlue = "#1F69B3",
 			circleStroke = "#555",
 			markerStroke = "#555",
 			markerAttribute = "M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z",
@@ -2784,147 +2785,124 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbimapOverDivHelp");
 
-			const overDivSize = overDiv.node().getBoundingClientRect();
+			const topDivSize = topDiv.node().getBoundingClientRect();
 
-			const helpSVGHeight = (width / overDivSize.width) * overDivSize.height;
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
+			const topSvgSize = topSvg.node().getBoundingClientRect();
+
+			const filtersDivSize = filtersDiv.node().getBoundingClientRect();
+
+			const mapSize = mapContainedDiv.node().getBoundingClientRect();
+
+			const breadcrumbsDivSize = breadcrumbsDivContainer.node().getBoundingClientRect();
+
+			const topSvgHeight = topSvgSize.height * (width / topSvgSize.width);
+
+			const filtersDivHeight = filtersDivSize.height * (width / filtersDivSize.width);
+
+			const mapHeight = mapSize.height * (width / mapSize.width);
+
+			const breadcrumbsHeight = breadcrumbsDivSize.height * (width / breadcrumbsDivSize.width);
+
+			const margins = 40;
+
+			const overHeight = topDivHeight + topSvgHeight + filtersDivHeight + mapHeight + breadcrumbsHeight + margins;
+
+			const realHeight = topDivSize.height + topSvgSize.height + filtersDivSize.height + mapSize.height + breadcrumbsDivSize.height;
 
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "6 12 900 " + helpSVGHeight);
+				.attr("viewBox", "0 0 " + width + " " + overHeight);
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbimapArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "24px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 220)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 0)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("height", topDivHeight + 4)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbimapAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 220)
-				.text("CLICK ANYWHERE TO START");
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width)) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
 
-			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 12 - padding)
-				.attr("y", 35 - padding - 10)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 12)
-				.attr("y", 35)
-				.text("Use this menu to select one or more years. Greyed-out years were not downloaded yet (please wait some time).")
-				.call(wrapText2, 260);
-
-			const yearsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M70,70 L70,90");
-
-			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
-
-			const filtersAnnotationRect = helpSVG.append("rect")
-				.attr("x", 300 - padding)
-				.attr("y", 30 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const filtersAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 300)
-				.attr("y", 30)
-				.text("Use these menus to select (one or more) other filters. When “All” is selected, clicking an option will select that given option only. The options in the “Allocation Type” menu change according to the selected options in the other menus.")
-				.call(wrapText2, 400);
-
-			const filtersPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.style("stroke-width", "2px")
-				.attr("pointer-events", "none")
-				.attr("d", "M 790 110 Q 790 90.8 627.5 97.2 T 465 78 M 140 110 Q 140 90.8 302.5 97.2 T 465 78")
-				.attr("transform", "translate(10,24) scale(0.8 0.7)");
-
-			filtersAnnotationRect.attr("width", filtersAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", filtersAnnotation.node().getBBox().height + padding * 2);
-
-			const resetAnnotationRect = helpSVG.append("rect")
-				.attr("x", 750 - padding)
-				.attr("y", 35 - padding - 10)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const resetAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 750)
-				.attr("y", 35)
-				.text("This button resets all menus (and the map) to the initial values.")
-				.call(wrapText2, 140);
-
-			const resetPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M858,70 L858,90");
-
-			resetAnnotationRect.attr("width", resetAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", resetAnnotation.node().getBBox().height + padding * 2);
-
-			const mapAnnotationRect = helpSVG.append("rect")
-				.attr("x", 140 - padding)
-				.attr("y", 170 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const mapAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 140)
-				.attr("y", 170)
-				.text("In the map area, hover over a marker to get additional information. You can zoom and pan the map.")
-				.call(wrapText2, 180);
-
-			mapAnnotationRect.attr("width", mapAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", mapAnnotation.node().getBBox().height + padding * 2);
-
-			const tooltipAnnotationRect = helpSVG.append("rect")
-				.attr("x", 400 - padding)
-				.attr("y", 330 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const tooltipAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 400)
-				.attr("y", 330)
-				.text("When you hover over a marker a tooltip like this shows up. Click “Show Projects” to create a table below the map, with all the projects for that marker.")
-				.call(wrapText2, 220);
+			const helpData = [{
+				x: 950,
+				y: 22 + topDivHeight + topSvgHeight + filtersDivHeight + mapHeight,
+				width: 148,
+				height: 30,
+				xTooltip: 800 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.885,
+				text: "Click here to generate a list of projects (below the map) for all selected funds."
+			}, {
+				x: 6,
+				y: topDivHeight + topSvgHeight + 10,
+				width: 130,
+				height: filtersDivHeight + 10,
+				xTooltip: 6 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.25,
+				text: "Use this menu to select one or more years. Greyed-out years were not downloaded yet (please wait some time)."
+			}, {
+				x: 138,
+				y: topDivHeight + topSvgHeight + 10,
+				width: 658,
+				height: filtersDivHeight + 10,
+				xTooltip: 350 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.25,
+				text: "Use these menus to select (one or more) other filters. When “All” is selected, clicking an option will select that given option only. The options in the “Allocation Type” menu change according to the selected options in the other menus."
+			}, {
+				x: 1028,
+				y: topDivHeight + topSvgHeight + 10,
+				width: 68,
+				height: filtersDivHeight + 10,
+				xTooltip: 900 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.25,
+				text: "This button resets all menus (and the map) to the initial values."
+			}, {
+				x: 130,
+				y: 100 + topDivHeight + topSvgHeight + filtersDivHeight,
+				width: 410,
+				height: 300,
+				xTooltip: 180 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.245,
+				text: "In the map area, hover over a marker to get additional information. You can zoom and pan the map."
+			}, {
+				x: 6,
+				y: 325 + topDivHeight + topSvgHeight + filtersDivHeight,
+				width: 100,
+				height: 30,
+				xTooltip: 6 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.615,
+				text: "Click here to encode allocations by “size” (larger markers indicate bigger allocations) or by “color” (darker markers indicate bigger allocations)."
+			}, {
+				x: 680,
+				y: 330 + topDivHeight + topSvgHeight + filtersDivHeight,
+				width: 160,
+				height: 30,
+				xTooltip: 600 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.625,
+				text: "When you hover over a marker a tooltip like this shows up. Click “Show Projects” to create a table below the map, with all the projects for that marker."
+			}, {
+				x: 6,
+				y: 25 + topDivHeight + topSvgHeight + filtersDivHeight + mapHeight,
+				width: 574,
+				height: 30,
+				xTooltip: 6 * (topDivSize.width / width),
+				yTooltip: realHeight * 0.89,
+				text: "This sequence indicates the current selection for all menus."
+			}];
 
 			const tooltipThumbnail = helpSVG.append("image")
 				.attr("xlink:href", localStorage.getItem("storedImagetooltipThumbnail") ?
@@ -2936,73 +2914,66 @@
 				.attr("y", 240)
 				.style("opacity", 0.6);
 
-			const tooltipPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M500,410 Q500,460 660,460");
-
-			tooltipAnnotationRect.attr("width", tooltipAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", tooltipAnnotation.node().getBBox().height + padding * 2);
-
-			const legendAnnotationRect = helpSVG.append("rect")
-				.attr("x", 80 - padding)
-				.attr("y", 300 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const legendAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 80)
-				.attr("y", 300)
-				.text("Click here to encode allocations by “size” (larger markers indicate bigger allocations) or by “color” (darker markers indicate bigger allocations).")
-				.call(wrapText2, 220);
-
-			const legendEllipse = helpSVG.append("ellipse")
-				.attr("cx", 48)
-				.attr("cy", 392)
-				.attr("rx", 42)
-				.attr("ry", 18)
-				.style("fill", "none")
-				.style("stroke", "#E56A54");
-
-			const legendPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M90,392 Q130,392 130,376");
-
-			legendAnnotationRect.attr("width", legendAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", legendAnnotation.node().getBBox().height + padding * 2);
-
-			const breadcrumbAnnotationRect = helpSVG.append("rect")
-				.attr("x", 200 - padding)
-				.attr("y", 400 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const breadcrumbAnnotation = helpSVG.append("text")
-				.attr("class", "pbimapAnnotationText")
-				.attr("x", 200)
-				.attr("y", 400)
-				.text("This sequence indicates the current selection for all menus.")
-				.call(wrapText2, 180);
-
-			const breadcrumbPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbimapArrowMarker)")
-				.attr("d", "M260,430 L260,465");
-
-			breadcrumbAnnotationRect.attr("width", breadcrumbAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", breadcrumbAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbimapHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
 			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 152)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbimapAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 172)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbimapHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbimapHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};
@@ -3699,7 +3670,7 @@
 
 			} else {
 				wheelGroup = thissvg.append("g")
-					.attr("class", "pbiclcd3chartwheelGroup")
+					.attr("class", "pbimapd3chartwheelGroup")
 					.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
 			};
 

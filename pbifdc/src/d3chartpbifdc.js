@@ -3382,163 +3382,147 @@
 
 		function createAnnotationsDiv() {
 
-			const padding = 6;
-
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbifdcOverDivHelp");
 
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + height);
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const arrowMarker = helpSVG.append("defs")
-				.append("marker")
-				.attr("id", "pbifdcArrowMarker")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 0)
-				.attr("refY", 0)
-				.attr("markerWidth", 12)
-				.attr("markerHeight", 12)
-				.attr("orient", "auto")
-				.append("path")
-				.style("fill", "#E56A54")
-				.attr("d", "M0,-5L10,0L0,5");
-
-			const mainTextWhite = helpSVG.append("text")
-				.attr("font-family", "Roboto")
-				.attr("font-size", "26px")
-				.style("stroke-width", "5px")
-				.attr("font-weight", 700)
-				.style("stroke", "white")
-				.attr("text-anchor", "middle")
-				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
+			const mainTextRect = helpSVG.append("rect")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
+				.attr("y", 4)
+				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
+				.attr("height", topDivHeight)
+				.style("fill", "white")
+				.style("pointer-events", "all")
+				.style("cursor", "pointer")
+				.on("click", function() {
+					overDiv.remove();
+				});
 
 			const mainText = helpSVG.append("text")
 				.attr("class", "pbifdcAnnotationMainText contributionColorFill")
 				.attr("text-anchor", "middle")
+				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
+				.attr("y", 10 + topDivHeight / 2)
+				.text("CLICK HERE TO CLOSE THE HELP");
+
+			const helpData = [{
+				x: 10,
+				y: 72 + topDivHeight,
+				width: 640,
+				height: 30,
+				xTooltip: 180 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+			}, {
+				x: 668,
+				y: 72 + topDivHeight,
+				width: 80,
+				height: 30,
+				xTooltip: 550 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "This checkbox repositions the nodes according to their geographic positions. You can zoom/pan the map."
+			}, {
+				x: 752,
+				y: 72 + topDivHeight,
+				width: 96,
+				height: 30,
+				xTooltip: 600 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "This checkbox shows/hides the nodes labels, which is useful in the “map” view."
+			}, {
+				x: 28,
+				y: 106 + topDivHeight,
+				width: 148,
+				height: 22,
+				xTooltip: 10 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 136) * (topDivSize.width / width),
+				text: "Use these checkboxes to filter the funds by region."
+			}, {
+				x: 28,
+				y: 134 + topDivHeight,
+				width: 640,
+				height: 546,
+				xTooltip: 676 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
+				text: "Hover over the nodes (the countries) and the links (the donations) present in this area to show additional information about the donor, the CBPF or the donation in the Legend area at the right-hand side. When hovering, the values for the donors and funds change accordingly."
+			}, {
+				x: 680,
+				y: 134 + topDivHeight,
+				width: 212,
+				height: 546,
+				xTooltip: 384 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
+				text: "The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element."
+			}];
+
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", "pbifdcHelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
+			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", "pbifdcAnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 320)
-				.text("CLICK ANYWHERE TO START");
-
-			const yearsAnnotationRect = helpSVG.append("rect")
-				.attr("x", 60 - padding)
-				.attr("y", 60 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const yearsAnnotation = helpSVG.append("text")
-				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 60)
-				.attr("y", 60)
-				.text("Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years.")
-				.call(wrapText, 420);
-
-			const yearsPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
+				.attr("y", 264)
 				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbifdcArrowMarker)")
-				.attr("d", "M480,70 Q510,70 510,95");
-
-			yearsAnnotationRect.attr("width", yearsAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", yearsAnnotation.node().getBBox().height + padding * 2);
-
-			const mapAnnotationRect = helpSVG.append("rect")
-				.attr("x", 400 - padding)
-				.attr("y", 170 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const mapAnnotation = helpSVG.append("text")
-				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 400)
-				.attr("y", 170)
-				.text("This checkbox repositions the nodes according to their geographic positions.")
-				.call(wrapText, 220);
-
-			const mapPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbifdcArrowMarker)")
-				.attr("d", "M600,180 Q680,180 680,150");
-
-			mapAnnotationRect.attr("width", mapAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", mapAnnotation.node().getBBox().height + padding * 2);
-
-			const namesAnnotationRect = helpSVG.append("rect")
-				.attr("x", 550 - padding)
-				.attr("y", 60 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const namesAnnotation = helpSVG.append("text")
-				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 550)
-				.attr("y", 60)
-				.text("This checkbox shows/hides the nodes labels.")
-				.call(wrapText, 190);
-
-			const namesPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbifdcArrowMarker)")
-				.attr("d", "M740,60 Q760,60 760,100");
-
-			namesAnnotationRect.attr("width", namesAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", namesAnnotation.node().getBBox().height + padding * 2);
-
-			const forceAnnotationRect = helpSVG.append("rect")
-				.attr("x", 310 - padding)
-				.attr("y", 390 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const forceAnnotation = helpSVG.append("text")
-				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 310)
-				.attr("y", 390)
-				.text("Hover over the nodes (the countries) and the links (the donations) present in this area to show additional information about the donor, the CBPF or the donation in the Legend area at the right hand side.")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
 				.call(wrapText, 350);
 
-			const forcePath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbifdcArrowMarker)")
-				.attr("d", "M300,420 Q290,420 270,440");
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll(".pbifdcHelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
 
-			forceAnnotationRect.attr("width", forceAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", forceAnnotation.node().getBBox().height + padding * 2);
-
-			const legendAnnotationRect = helpSVG.append("rect")
-				.attr("x", 280 - padding)
-				.attr("y", 520 - padding - 14)
-				.style("fill", "white")
-				.style("opacity", 0.95);
-
-			const legendAnnotation = helpSVG.append("text")
-				.attr("class", "pbifdcAnnotationText")
-				.attr("x", 280)
-				.attr("y", 520)
-				.text("The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element.")
-				.call(wrapText, 340);
-
-			const legendPath = helpSVG.append("path")
-				.style("fill", "none")
-				.style("stroke", "#E56A54")
-				.attr("pointer-events", "none")
-				.attr("marker-end", "url(#pbifdcArrowMarker)")
-				.attr("d", "M620,550 Q640,550 660,530");
-
-			legendAnnotationRect.attr("width", legendAnnotation.node().getBBox().width + padding * 2)
-				.attr("height", legendAnnotation.node().getBBox().height + padding * 2);
-
-			helpSVG.on("click", function() {
-				overDiv.remove();
-			});
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll(".pbifdcHelpRectangle").style("opacity", 0.5);
+			};
 
 			//end of createAnnotationsDiv
 		};

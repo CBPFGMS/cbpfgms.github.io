@@ -2335,7 +2335,6 @@
 			return yearNumber;
 		};
 
-
 		function populateSelectedCbpfs(cbpfsString) {
 
 			const cbpfs = [];
