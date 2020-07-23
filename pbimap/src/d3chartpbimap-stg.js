@@ -2937,7 +2937,7 @@
 
 			const explanationTextRect = helpSVG.append("rect")
 				.attr("x", (width / 2) - 180)
-				.attr("y", 158)
+				.attr("y", 152)
 				.attr("width", 360)
 				.attr("height", 50)
 				.attr("pointer-events", "none")
@@ -2951,7 +2951,7 @@
 				.style("fill", "#222")
 				.attr("text-anchor", "middle")
 				.attr("x", width / 2)
-				.attr("y", 178)
+				.attr("y", 172)
 				.attr("pointer-events", "none")
 				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
 				.call(wrapText2, 350);
