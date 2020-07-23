@@ -230,7 +230,7 @@
 				selectedYear: [],
 				selectedPartner: null,
 				selectedCbpfs: [],
-				netFunding: 1
+				netFunding: null
 			};
 
 		let height = padding[0] + padding[2] + topPanelHeight + buttonPanelHeight + parallelPanelHeight + (2 * panelHorizontalPadding),
@@ -266,6 +266,10 @@
 			partnersListObject[queryStringValues.get("partner").toLowerCase()] : Object.keys(partnersListObject).indexOf(containerDiv.node().getAttribute("data-partner").toLowerCase()) > -1 ?
 			partnersListObject[containerDiv.node().getAttribute("data-partner").toLowerCase()] :
 			"total";
+
+		let selectedNetFunding = queryStringValues.has("netfunding") ? +queryStringValues.get("netfunding") : containerDiv.node().getAttribute("data-netfunding") === "true" ? 2 : 1;
+
+		chartState.netFunding = selectedNetFunding;
 
 		if (selectedResponsiveness === "false") {
 			containerDiv.style("width", width + "px")
@@ -1237,6 +1241,13 @@
 							return "All partners"
 						};
 					});
+				buttonsPartnersText.filter(function(d) {
+						return d === "National NGO";
+					})
+					.text(chartState.netFunding === 1 ? "National NGO" : "Nat. Partners")
+					.append("tspan")
+					.style("fill", underApprovalColor)
+					.text(chartState.netFunding === 1 ? "" : "*");
 
 				buttonsPartnersContainer.attr("transform", function(_, i) {
 					if (i) {
@@ -1782,15 +1793,17 @@
 
 				roundToOneHundred(averageData);
 
-				const parallelPanelTitle = parallelPanel.main.selectAll(".pbialpParallelPanelTitle")
-					.data([true])
-					.enter()
+				let parallelPanelTitle = parallelPanel.main.selectAll(".pbialpParallelPanelTitle")
+					.data([true]);
+
+				parallelPanelTitle = parallelPanelTitle.enter()
 					.append("text")
 					.attr("class", "pbialpParallelPanelTitle")
 					.attr("y", parallelPanel.padding[0] - titlePadding)
 					.attr("x", parallelPanel.padding[3] + (parallelPanel.width - parallelPanel.padding[3] - parallelPanel.padding[1]) / 2)
 					.attr("text-anchor", "middle")
-					.text("Allocations by Partner Type");
+					.merge(parallelPanelTitle)
+					.text(chartState.netFunding === 1 ? "Allocations by Partner Type" : "Allocations by Partner Type (including sub-impl. partners)");
 
 				const percentNumbersGroups = parallelPanel.main.selectAll(".pbialpPercentNumbersGroups")
 					.data(partnerList)
@@ -2083,6 +2096,12 @@
 
 					chartState.netFunding = 3 - chartState.netFunding;
 
+					if (queryStringValues.has("netfunding")) {
+						queryStringValues.set("netfunding", chartState.netFunding);
+					} else {
+						queryStringValues.append("netfunding", chartState.netFunding);
+					};
+
 					netFundingInnerCheck.style("stroke", chartState.netFunding === 2 ? "darkslategray" : "white");
 
 					svg.selectAll(".pbialpbuttonsPartnersText")
@@ -2093,9 +2112,6 @@
 						.append("tspan")
 						.style("fill", underApprovalColor)
 						.text(chartState.netFunding === 1 ? "" : "*");
-
-					svg.select(".pbialpParallelPanelTitle")
-						.text(chartState.netFunding === 1 ? "Allocations by Partner Type" : "Allocations by Partner Type (including sub-impl. partners)")
 
 					svg.select(".pbialpLegendTextNetFunding")
 						.style("opacity", chartState.netFunding === 1 ? 0 : 1);

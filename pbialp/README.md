@@ -21,7 +21,7 @@ Also, at the top right corner, there is a set of buttons:
 
 Copy this snippet to the HTML:
 
-```<div id="d3chartcontainerpbialp" data-title="Allocations by Organization Type" data-year="2018" data-partner="total" data-showaverage="true" data-selectedcbpfs="none" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
+```<div id="d3chartcontainerpbialp" data-title="Allocations by Organization Type" data-year="2018" data-partner="total" data-showaverage="true" data-selectedcbpfs="none" data-netfunding="true" data-showhelp="false" data-showlink="true" data-responsive="true" data-lazyload="true"></div><script type="text/javascript" src="https://cbpfgms.github.io/pbialp/src/d3chartpbialp.js"></script>```
 
 The script will create an SVG inside the `<div>` specified in the snippet. For better results, the snippet should be inside a container 900px wide.
 
@@ -31,7 +31,7 @@ The JavaScript code will also reference [D3.js](https://d3js.org) version 5, the
 
 ## Parameters
 
-There are nine parameters:
+There are ten parameters:
 
 **`data-title`**: sets the title of the chart. If left empty the chart title defaults to *Allocations by Organization Type*.
 
@@ -81,6 +81,15 @@ For more than one CBPF separate the values with commas, such as:
 For the accepted values, please refer to the data API.
 
 If the value is not a valid one it defaults to `"none"`. This value defines only the selected CBPFs when the page loads: the CBPFs can be easily selected and deselected by clicking on the lollipops.
+
+**`data-netfunding`**: Shows Net Funding. Accepted values:
+
+- `"true"`: shows Net Funding by default when the page loads.
+- `"false"`: does not show Net Funding. 
+
+The user can easily change this selection by clicking the "Net Funding" checkbox.
+
+If the value is neither `"true" ` nor `"false"`, it defaults to `"false" `.
 
 **`data-showhelp`**: shows the annotations explaining how to use the data visualisation. Accepted values:
 
