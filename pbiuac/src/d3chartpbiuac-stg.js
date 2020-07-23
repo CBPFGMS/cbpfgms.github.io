@@ -1845,35 +1845,35 @@
 
 			const helpData = [{
 				x: 100,
-				y: 76 + topDivHeight,
+				y: 96 + topDivHeight,
 				width: 792,
 				height: 52,
 				xTooltip: 320 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 130) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 150) * (topDivSize.width / width),
 				text: "The brush area shows the data for the entire period. Use the two handles to move the selection or click + pan to move the selection. Click outside the selection to select the entire period."
 			}, {
 				x: 100,
-				y: 154 + topDivHeight,
+				y: 174 + topDivHeight,
 				width: 792,
 				height: 346,
 				xTooltip: 320 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 16) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 36) * (topDivSize.width / width),
 				text: "This area shows the allocations for the selected period. You can pan left/right or zoom (using the mousewheel or the trackpad) to move this area. Hover over the allocations to get more information, and click on “Display Details” to generate the details (below the chart) for the allocation."
 			}, {
 				x: 390,
-				y: 532 + topDivHeight,
+				y: 542 + topDivHeight,
 				width: 130,
 				height: 32,
 				xTooltip: 290 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 458) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 468) * (topDivSize.width / width),
 				text: "The legend shows the color encoding according to the allocation amount. Hover over the colors to see the corresponding amount."
 			}, {
 				x: 100,
-				y: 532 + topDivHeight,
+				y: 542 + topDivHeight,
 				width: 36,
 				height: 32,
 				xTooltip: 10 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 474) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 484) * (topDivSize.width / width),
 				text: "Hover for showing only Standard or Reserve allocations."
 			}];
 

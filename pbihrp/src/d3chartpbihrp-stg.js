@@ -3200,9 +3200,9 @@
 
 			const mainTextRect = helpSVG.append("rect")
 				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 4)
+				.attr("y", 0)
 				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight)
+				.attr("height", topDivHeight + 4)
 				.style("fill", "white")
 				.style("pointer-events", "all")
 				.style("cursor", "pointer")
