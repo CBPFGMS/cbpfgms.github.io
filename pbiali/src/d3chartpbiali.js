@@ -180,6 +180,7 @@
 			labelGroupHeight = 16,
 			labelLinePadding = 4,
 			fadeOpacity = 0.1,
+			unBlue = "#1F69B3",
 			vizNameQueryString = "allocation-trends",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
