@@ -2244,6 +2244,8 @@
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", 1)
+					.call(hideLabels, textCollisionHeight);
 				sankeySubpartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", 1);
@@ -2269,6 +2271,18 @@
 					})
 					.style("display", null);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						})
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.targetLinks.find(function(f) {
 							return f.fund === d.codeId;
 						}) ? 1 : fadeOpacityNodes;
@@ -2327,6 +2341,13 @@
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.codeId === d.codeId
+					})
+					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
@@ -2395,6 +2416,18 @@
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
+						return (e.sourceLinks.find(function(f) {
+							return f.target.id === d.id;
+						})) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return (e.sourceLinks.find(function(f) {
+							return f.target.id === d.id;
+						}));
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						if (chartState.selectedAggregation === "level") {
 							return e.id === d.id ? 1 : fadeOpacityNodes;
@@ -2444,6 +2477,13 @@
 					})
 					.style("display", null);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.id === d.target.id ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.id === d.target.id;
+					})
+					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.id === d.target.id ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
@@ -2506,6 +2546,13 @@
 					})
 					.style("display", null);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.id === d.source.id ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.id === d.source.id;
+					})
+					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.id === d.source.id ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
