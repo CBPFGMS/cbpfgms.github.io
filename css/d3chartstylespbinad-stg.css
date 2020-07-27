@@ -243,13 +243,13 @@ p#pbinadd3chartTitle {
 	fill: #888;
 }
 
-.pbinadlegendText, .pbinadcurlyText, .pbinadtypePercentage {
+.pbinadlegendText, .pbinadcurlyText, .pbinadtypePercentageSubText, .pbinadtypeArrowSpan {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #666;
 }
 
-.pbinadcurlyTspan, .pbinadtypePercentageBold {
+.pbinadtypePercentage, .pbinadcurlyTspan, .pbinadsankeyPartnerValuesLabels {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #444;
