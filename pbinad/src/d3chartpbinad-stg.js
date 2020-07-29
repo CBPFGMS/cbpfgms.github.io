@@ -1857,7 +1857,7 @@
 					return 3 + (d.y0 + d.y1) / 2;
 				});
 
-			let sankeyPartnerValuesLabels = sankeyPanel.main.selectAll(".pbinadsankeyPartnerValuesLabels")
+			let sankeyPartnerValuesLabels = sankeyPanel.main.selectAll(".pbinadsankeyPartnerValuesLabelsGroup")
 				.data(partnerLabelsData, function(d) {
 					return d.codeId;
 				});
@@ -1869,26 +1869,42 @@
 				.remove();
 
 			const sankeyPartnerValuesLabelsEnter = sankeyPartnerValuesLabels.enter()
-				.append("text")
-				.attr("class", "pbinadsankeyPartnerValuesLabels")
-				.attr("x", sankeyAnnotationsScale(1) + (nodeWidth / 2) + sankeyFundLabelsPadding)
-				.attr("y", function(d) {
-					return 3 + (d.y0 + d.y1) / 2;
-				})
+				.append("g")
+				.attr("class", "pbinadsankeyPartnerValuesLabelsGroup")
 				.style("opacity", 0)
+				.attr("transform", function(d) {
+					return "translate(" + (sankeyAnnotationsScale(1) + (nodeWidth / 2) + sankeyFundLabelsPadding) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
+				});
+
+			sankeyPartnerValuesLabelsEnter.append("text")
+				.attr("class", "pbinadsankeyPartnerValuesLabels")
 				.text(function(d) {
 					return "$" + formatSIFloat(d.amount).replace("G", "B");
 				});
 
+			sankeyPartnerValuesLabelsEnter.append("text")
+				.attr("class", "pbinadsankeyPartnerValuesLabelsSubText")
+				.attr("dy", "1.2em")
+				.text(function(d) {
+					localVariable.set(this, d.amount / totalAllocated);
+					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
+				});
+
 			sankeyPartnerValuesLabels = sankeyPartnerValuesLabelsEnter.merge(sankeyPartnerValuesLabels);
 
-			sankeyPartnerValuesLabels.call(hideLabels, textCollisionHeight)
+			sankeyPartnerValuesLabels.call(hideLabels, textCollisionHeight * 3)
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.attr("y", function(d) {
-					return 3 + (d.y0 + d.y1) / 2;
-				})
+				.attr("transform", function(d) {
+					return "translate(" + (sankeyAnnotationsScale(1) + (nodeWidth / 2) + sankeyFundLabelsPadding) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
+				});
+
+			sankeyPartnerValuesLabels.select(".pbinadsankeyPartnerValuesLabels")
+				.transition()
+				.duration(duration)
 				.tween("text", function(d) {
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent.substring(1)) || 0, d.amount);
@@ -1897,9 +1913,22 @@
 					};
 				});
 
+			sankeyPartnerValuesLabels.select(".pbinadsankeyPartnerValuesLabelsSubText")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const oldPercentage = localVariable.get(this);
+					localVariable.set(this, d.amount / totalAllocated);
+					const i = d3.interpolate(oldPercentage, d.amount / totalAllocated);
+					return function(t) {
+						node.textContent = "(" + formatPercent1dec(i(t)) + ")";
+					};
+				});
+
 			let sankeySubpartnerLabels = sankeyPanel.main.selectAll(".pbinadsankeySubpartnerLabels")
 				.data(subpartnerLabelsData, function(d) {
-					return d.codeId;
+					return d.id;
 				});
 
 			const sankeySubpartnerLabelsExit = sankeySubpartnerLabels.exit()
@@ -2153,12 +2182,9 @@
 					return "(" + formatPercent1dec(totalValuesByType[d.partnerType] / (totalValuesByType.partner + totalValuesByType.subpartner)) + ")";
 				});
 
-			const typePercentageData = chartState.selectedAggregation === "level" ? [] :
-				subpartnerLabelsData;
-
 			let typePercentageGroup = sankeyPanel.main.selectAll(".pbinadtypePercentageGroup")
-				.data(typePercentageData, function(d) {
-					return d.name;
+				.data(subpartnerLabelsData, function(d) {
+					return d.id;
 				});
 
 			const typePercentageGroupExit = typePercentageGroup.exit()
@@ -2194,7 +2220,7 @@
 			typePercentageGroup.call(hideLabels, textCollisionHeight * 3)
 				.transition()
 				.duration(duration)
-				.style("opacity", 1)
+				.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
 				.attr("transform", function(d) {
 					return "translate(" + (sankeyPanel.width - sankeyPanel.padding[1] + typePercentagePadding) + "," + ((d.y0 + d.y1) / 2) + ")";
 				});
@@ -2245,11 +2271,12 @@
 				sankeyPartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerValuesLabels.style("opacity", 1)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", 1);
-				typePercentageGroup.style("opacity", 1);
+				typePercentageGroup.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 1);
 			};
 
@@ -2293,7 +2320,7 @@
 						})
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						return e.targetLinks.find(function(f) {
 							return f.fund === d.codeId;
@@ -2305,13 +2332,24 @@
 						})
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.fund === d.codeId;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						})
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight);
 				curlyGroups.style("opacity", 0);
 				createTooltipFunds(d, thisElement);
 			};
@@ -2365,13 +2403,24 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.source.id === d.id;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.source.id === d.id;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.source.id === d.id;
+						});
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 0);
 				createTooltipPartners(d, thisElement);
 			};
@@ -2427,7 +2476,7 @@
 						}));
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						if (chartState.selectedAggregation === "level") {
 							return e.id === d.id ? 1 : fadeOpacityNodes;
@@ -2446,7 +2495,21 @@
 				curlyPathsType.style("opacity", function(e) {
 					return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.id ? 1 : fadeOpacityNodes;
+						} else {
+							return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
+						};
+					})
+					.filter(function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.id;
+						} else {
+							return e.codeId === d.codeId;
+						};
+					})
+					.style("display", null);
 				curlyGroups.style("opacity", 0);
 				if (d.id.split("#")[0] === "partner") {
 					createTooltipPartnersLevel3(d, thisElement);
@@ -2509,13 +2572,32 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return secondLevelLinksData.find(function(f) {
 						return f.target.codeId === e.codeId;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return secondLevelLinksData.find(function(f) {
+							if (chartState.selectedAggregation === "level") {
+								return f.target.id === e.id;
+							} else {
+								return f.target.codeId === e.codeId;
+							};
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return secondLevelLinksData.find(function(f) {
+							if (chartState.selectedAggregation === "level") {
+								return f.target.id === e.id;
+							} else {
+								return f.target.codeId === e.codeId;
+							};
+						});
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 0);
 				createTooltipLinksLevel1(d, thisElement);
 			};
@@ -2577,7 +2659,21 @@
 				curlyPathsType.style("opacity", function(e) {
 					return e.codeId === d.target.codeId ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.target.id ? 1 : fadeOpacityNodes;
+						} else {
+							return e.codeId === d.target.codeId ? 1 : fadeOpacityNodes;
+						};
+					})
+					.filter(function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.target.id;
+						} else {
+							return e.codeId === d.target.codeId;
+						};
+					})
+					.style("display", null);
 				curlyGroups.style("opacity", 0);
 				createTooltipLinksLevel2(d, thisElement);
 			};
