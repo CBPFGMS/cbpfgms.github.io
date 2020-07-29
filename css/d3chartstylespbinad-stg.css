@@ -243,7 +243,7 @@ p#pbinadd3chartTitle {
 	fill: #888;
 }
 
-.pbinadlegendText, .pbinadcurlyText, .pbinadtypePercentageSubText, .pbinadtypeArrowSpan {
+.pbinadlegendText, .pbinadcurlyText, .pbinadtypePercentageSubText, .pbinadtypeArrowSpan, .pbinadsankeyPartnerValuesLabelsSubText {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	fill: #666;
