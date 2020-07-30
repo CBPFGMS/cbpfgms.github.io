@@ -1755,7 +1755,6 @@
 							targetLinks: curr.targetLinks,
 							id: curr.id
 						});
-						return acc;
 					} else {
 						const foundObj = acc.find(function(d) {
 							return d.aggregatedName === curr.aggregatedName;
@@ -1766,6 +1765,9 @@
 							foundObj.amount += curr.amount;
 							foundObj.targetLinks.push.apply(foundObj.targetLinks, curr.targetLinks);
 						} else {
+							const partnerSecondLevel = partnerLabelsData.find(function(e) {
+								return curr.name === e.name;
+							});
 							acc.push({
 								codeId: curr.codeId,
 								name: curr.name,
@@ -1774,15 +1776,18 @@
 								y1: curr.y1,
 								amount: curr.amount,
 								targetLinks: curr.targetLinks,
-								id: curr.id
+								id: curr.id,
+								amountSecondLevel: partnerSecondLevel ? partnerSecondLevel.amount : "n/a"
 							});
 						};
-						return acc;
 					};
-				} else {
-					return acc;
-				}
+				};
+				return acc;
 			}, []);
+
+			const totalAllocated = data.nodes.reduce(function(acc, curr) {
+				return curr.level === 2 ? acc + curr.amount : acc;
+			}, 0);
 
 			let sankeyFundLabels = sankeyPanel.main.selectAll(".pbinadsankeyFundLabels")
 				.data(fundLabelsData, function(d) {
@@ -1852,9 +1857,78 @@
 					return 3 + (d.y0 + d.y1) / 2;
 				});
 
+			let sankeyPartnerValuesLabels = sankeyPanel.main.selectAll(".pbinadsankeyPartnerValuesLabelsGroup")
+				.data(partnerLabelsData, function(d) {
+					return d.codeId;
+				});
+
+			const sankeyPartnerValuesLabelsExit = sankeyPartnerValuesLabels.exit()
+				.transition()
+				.duration(duration)
+				.style("opacity", 0)
+				.remove();
+
+			const sankeyPartnerValuesLabelsEnter = sankeyPartnerValuesLabels.enter()
+				.append("g")
+				.attr("class", "pbinadsankeyPartnerValuesLabelsGroup")
+				.style("opacity", 0)
+				.attr("transform", function(d) {
+					return "translate(" + (sankeyAnnotationsScale(1) + (nodeWidth / 2) + sankeyFundLabelsPadding) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
+				});
+
+			sankeyPartnerValuesLabelsEnter.append("text")
+				.attr("class", "pbinadsankeyPartnerValuesLabels")
+				.text(function(d) {
+					return "$" + formatSIFloat(d.amount).replace("G", "B");
+				});
+
+			sankeyPartnerValuesLabelsEnter.append("text")
+				.attr("class", "pbinadsankeyPartnerValuesLabelsSubText")
+				.attr("dy", "1.2em")
+				.text(function(d) {
+					localVariable.set(this, d.amount / totalAllocated);
+					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
+				});
+
+			sankeyPartnerValuesLabels = sankeyPartnerValuesLabelsEnter.merge(sankeyPartnerValuesLabels);
+
+			sankeyPartnerValuesLabels.call(hideLabels, textCollisionHeight * 3)
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.attr("transform", function(d) {
+					return "translate(" + (sankeyAnnotationsScale(1) + (nodeWidth / 2) + sankeyFundLabelsPadding) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
+				});
+
+			sankeyPartnerValuesLabels.select(".pbinadsankeyPartnerValuesLabels")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(reverseFormat(node.textContent.substring(1)) || 0, d.amount);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat(i(t)).replace("G", "B");
+					};
+				});
+
+			sankeyPartnerValuesLabels.select(".pbinadsankeyPartnerValuesLabelsSubText")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const oldPercentage = localVariable.get(this);
+					localVariable.set(this, d.amount / totalAllocated);
+					const i = d3.interpolate(oldPercentage, d.amount / totalAllocated);
+					return function(t) {
+						node.textContent = "(" + formatPercent1dec(i(t)) + ")";
+					};
+				});
+
 			let sankeySubpartnerLabels = sankeyPanel.main.selectAll(".pbinadsankeySubpartnerLabels")
 				.data(subpartnerLabelsData, function(d) {
-					return d.codeId;
+					return d.id;
 				});
 
 			const sankeySubpartnerLabelsExit = sankeySubpartnerLabels.exit()
@@ -1864,36 +1938,104 @@
 				.remove();
 
 			const sankeySubpartnerLabelsEnter = sankeySubpartnerLabels.enter()
-				.append("text")
+				.append("g")
 				.attr("class", "pbinadsankeySubpartnerLabels")
 				.attr("text-anchor", "end")
-				.attr("x", function(d) {
-					return chartState.selectedAggregation === "level" || partnersListKeys.indexOf(d.codeId) === -1 ? sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding :
-						sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding - (curlyGroupPadding / 2) - curlyBracketWidth
+				.attr("transform", function(d) {
+					return "translate(" + (chartState.selectedAggregation === "level" || partnersListKeys.indexOf(d.codeId) === -1 ? sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding :
+							sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding - (curlyGroupPadding / 2) - curlyBracketWidth) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
 				})
-				.attr("y", function(d) {
-					return 3 + (d.y0 + d.y1) / 2;
-				})
-				.style("opacity", 0)
+				.style("opacity", 0);
+
+			const sankeySubpartnerLabelsEnterText = sankeySubpartnerLabelsEnter.append("text")
+				.attr("class", "pbinadsankeySubpartnerLabelsEnterText")
 				.text(function(d) {
 					return chartState.selectedAggregation === "type" ? d.aggregatedName : d.name;
 				});
 
 			sankeySubpartnerLabels = sankeySubpartnerLabelsEnter.merge(sankeySubpartnerLabels);
 
-			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight)
+			const subpartnerstypeArrowSpan = sankeySubpartnerLabels.selectAll(".pbinadtypeArrowSpan")
+				.data(function(d) {
+					return chartState.selectedAggregation === "level" ? [] : [d];
+				});
+
+			const subpartnerstypeArrowSpanExit = subpartnerstypeArrowSpan.exit().remove();
+
+			const subpartnerstypeArrowSpanEnter = subpartnerstypeArrowSpan.enter()
+				.append("text")
+				.attr("class", "pbinadtypeArrowSpan")
+				.attr("dy", "1.2em")
+				.text("");
+
+			subpartnerstypeArrowSpanEnter.append("tspan")
+				.attr("class", "pbinadtypePercentageBoldPar")
+				.text(function(d) {
+					return d.amountSecondLevel === "n/a" ? "" : "(";
+				});
+
+			subpartnerstypeArrowSpanEnter.append("tspan")
+				.attr("class", "pbinadtypePercentageArrow")
+				.style("fill", function(d) {
+					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
+				})
+				.text(function(d) {
+					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
+				});
+
+			subpartnerstypeArrowSpanEnter.append("tspan")
+				.attr("class", "pbinadtypePercentageBoldNumber")
+				.text(function(d) {
+					if (d.amountSecondLevel === "n/a") {
+						return "";
+					} else {
+						const variation = (d.amount / d.amountSecondLevel) - 1;
+						localVariable.set(this, variation);
+						return formatPercent1dec(Math.abs(variation)) + ")";
+					};
+				});
+
+			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3))
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.attr("x", function(d) {
-					return chartState.selectedAggregation === "level" || partnersListKeys.indexOf(d.codeId) === -1 ? sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding :
-						sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding - (curlyGroupPadding / 2) - curlyBracketWidth
-				})
-				.attr("y", function(d) {
-					return 3 + (d.y0 + d.y1) / 2;
-				})
+				.attr("transform", function(d) {
+					return "translate(" + (chartState.selectedAggregation === "level" || partnersListKeys.indexOf(d.codeId) === -1 ? sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding :
+							sankeyAnnotationsScale(2) - (nodeWidth / 2) - sankeyFundLabelsPadding - (curlyGroupPadding / 2) - curlyBracketWidth) + "," +
+						(3 + (d.y0 + d.y1) / 2) + ")";
+				});
+
+			sankeySubpartnerLabels.select(".pbinadsankeySubpartnerLabelsEnterText")
 				.text(function(d) {
 					return chartState.selectedAggregation === "type" ? d.aggregatedName : d.name;
+				});
+
+			sankeySubpartnerLabels.select(".pbinadtypePercentageBoldPar")
+				.text(function(d) {
+					return d.amountSecondLevel === "n/a" ? "" : "(";
+				});
+
+			sankeySubpartnerLabels.select(".pbinadtypePercentageArrow")
+				.style("fill", function(d) {
+					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
+				})
+				.text(function(d) {
+					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
+				});
+
+			sankeySubpartnerLabels.select(".pbinadtypePercentageBoldNumber")
+				.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const oldVariation = localVariable.get(this)
+					const variation = (d.amount / d.amountSecondLevel) - 1;
+					localVariable.set(this, variation);
+					const i = d3.interpolate(oldVariation, variation)
+					return function(t) {
+						node.textContent = d.amountSecondLevel === "n/a" ? "" : formatPercent1dec(Math.abs(i(t))) + ")";
+					};
 				});
 
 			let curlyPathsType = sankeyPanel.main.selectAll(".pbinadcurlyPathsType")
@@ -2040,18 +2182,9 @@
 					return "(" + formatPercent1dec(totalValuesByType[d.partnerType] / (totalValuesByType.partner + totalValuesByType.subpartner)) + ")";
 				});
 
-			const typePercentageData = chartState.selectedAggregation === "level" ? [] :
-				subpartnerLabelsData.map(function(d) {
-					const partnerSecondLevel = partnerLabelsData.find(function(e) {
-						return d.name === e.name;
-					});
-					d.amountSecondLevel = partnerSecondLevel ? partnerSecondLevel.amount : "n/a";
-					return d;
-				});
-
 			let typePercentageGroup = sankeyPanel.main.selectAll(".pbinadtypePercentageGroup")
-				.data(typePercentageData, function(d) {
-					return d.name;
+				.data(subpartnerLabelsData, function(d) {
+					return d.id;
 				});
 
 			const typePercentageGroupExit = typePercentageGroup.exit()
@@ -2075,35 +2208,11 @@
 				});
 
 			const typePercentageGroupEnterSubText = typePercentageGroupEnter.append("text")
-				.attr("class", "pbinadtypePercentageBold")
+				.attr("class", "pbinadtypePercentageSubText")
 				.attr("dy", "1.2em")
-				.text("");
-
-			typePercentageGroupEnterSubText.append("tspan")
-				.attr("class", "pbinadtypePercentageBoldPar")
 				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : "(";
-				});
-
-			typePercentageGroupEnterSubText.append("tspan")
-				.attr("class", "pbinadtypePercentageArrow fa")
-				.style("fill", function(d) {
-					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
-				})
-				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
-				});
-
-			typePercentageGroupEnterSubText.append("tspan")
-				.attr("class", "pbinadtypePercentageBoldNumber")
-				.text(function(d) {
-					if (d.amountSecondLevel === "n/a") {
-						return "";
-					} else {
-						const variation = (d.amount / d.amountSecondLevel) - 1;
-						localVariable.set(this, variation);
-						return formatPercent1dec(Math.abs(variation)) + ")";
-					};
+					localVariable.set(this, d.amount / totalAllocated);
+					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
 				});
 
 			typePercentageGroup = typePercentageGroupEnter.merge(typePercentageGroup);
@@ -2111,7 +2220,7 @@
 			typePercentageGroup.call(hideLabels, textCollisionHeight * 3)
 				.transition()
 				.duration(duration)
-				.style("opacity", 1)
+				.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
 				.attr("transform", function(d) {
 					return "translate(" + (sankeyPanel.width - sankeyPanel.padding[1] + typePercentagePadding) + "," + ((d.y0 + d.y1) / 2) + ")";
 				});
@@ -2127,30 +2236,16 @@
 					};
 				});
 
-			typePercentageGroup.select(".pbinadtypePercentageBoldPar")
-				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : "(";
-				});
-
-			typePercentageGroup.select(".pbinadtypePercentageArrow")
-				.style("fill", function(d) {
-					return d.amountSecondLevel === "n/a" ? "none" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? redArrowColor : greenArrowColor;
-				})
-				.text(function(d) {
-					return d.amountSecondLevel === "n/a" ? "" : ((d.amount / d.amountSecondLevel) - 1) < 0 ? "\u25BC" : "\u25B2";
-				});
-
-			typePercentageGroup.select(".pbinadtypePercentageBoldNumber")
+			typePercentageGroup.select(".pbinadtypePercentageSubText")
 				.transition()
 				.duration(duration)
 				.tween("text", function(d) {
 					const node = this;
-					const oldVariation = localVariable.get(this)
-					const variation = (d.amount / d.amountSecondLevel) - 1;
-					localVariable.set(this, variation);
-					const i = d3.interpolate(oldVariation, variation)
+					const oldPercentage = localVariable.get(this);
+					localVariable.set(this, d.amount / totalAllocated);
+					const i = d3.interpolate(oldPercentage, d.amount / totalAllocated);
 					return function(t) {
-						node.textContent = d.amountSecondLevel === "n/a" ? "" : formatPercent1dec(Math.abs(i(t))) + ")";
+						node.textContent = "(" + formatPercent1dec(i(t)) + ")";
 					};
 				});
 
@@ -2175,10 +2270,13 @@
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", 1)
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", 1)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", 1);
-				typePercentageGroup.style("opacity", 1);
+				typePercentageGroup.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 1);
 			};
 
@@ -2189,6 +2287,7 @@
 						return f.fund === d.codeId;
 					})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.fund === d.codeId ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2211,6 +2310,18 @@
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						})
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						return e.targetLinks.find(function(f) {
 							return f.fund === d.codeId;
@@ -2222,13 +2333,24 @@
 						})
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.fund === d.codeId;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						})
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight);
 				curlyGroups.style("opacity", 0);
 				createTooltipFunds(d, thisElement);
 			};
@@ -2242,6 +2364,7 @@
 						return f.source.id === d.id;
 					})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.source.id === d.id || e.target.id === d.id ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2264,6 +2387,13 @@
 						return e.codeId === d.codeId
 					})
 					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
+						return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.codeId === d.codeId
+					})
+					.style("display", null);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						return e.targetLinks.find(function(f) {
 							return f.source.id === d.id;
@@ -2275,40 +2405,63 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.source.id === d.id;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.source.id === d.id;
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.targetLinks.find(function(f) {
+							return f.source.id === d.id;
+						});
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 0);
 				createTooltipPartners(d, thisElement);
 			};
 
 			function mouseoverSubpartners(d, thisElement) {
 				currentHoveredElement = thisElement;
-				const thisFistLevelLinks = d.targetLinks.map(function(e) {
-					return e.fund + "_" + e.source.id;
-				});
+				let thisFirstLevelLinks;
+				if (chartState.selectedAggregation === "level") {
+					thisFirstLevelLinks = d.targetLinks.map(function(e) {
+						return e.fund + "_" + e.source.id;
+					});
+				} else {
+					thisFirstLevelLinks = [];
+					sankeyNodes.each(function(e) {
+						if (e.codeId === d.codeId && e.level === 3) {
+							thisFirstLevelLinks.push.apply(thisFirstLevelLinks, e.targetLinks.map(function(f) {
+								return f.fund + "_" + f.source.id;
+							}));
+						};
+					});
+				};
 				sankeyNodes.style("opacity", function(e) {
 					return (e.id === d.id) || (e.sourceLinks.find(function(f) {
-						return f.target.id === d.id;
-					})) || (d.targetLinks.find(function(f) {
-						return f.fund === e.codeId;
+						return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
+					})) || (thisFirstLevelLinks.find(function(f) {
+						return f.split("_")[0] === e.codeId;
 					})) || (chartState.selectedAggregation === "type" && d.codeId === e.codeId) ? 1 : fadeOpacityNodes;
 				});
 				sankeyLinks.style("stroke-opacity", function(e) {
-					return e.target.id === d.id ||
-						(e.sourceLevel === 1 && thisFistLevelLinks.indexOf(e.fund + "_" + e.target.id) > -1) ? linksOpacity : fadeOpacityLinks;
+					return (chartState.selectedAggregation === "level" ? e.target.id === d.id : e.target.codeId === d.codeId) ||
+						(e.sourceLevel === 1 && thisFirstLevelLinks.indexOf(e.fund + "_" + e.target.id) > -1) ? linksOpacity : fadeOpacityLinks;
 				});
 				sankeyFundLabels.style("opacity", function(e) {
-						return (thisFistLevelLinks.find(function(f) {
+						return (thisFirstLevelLinks.find(function(f) {
 							return f.split("_")[0] === e.codeId;
 						})) ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
-						return (thisFistLevelLinks.find(function(f) {
+						return (thisFirstLevelLinks.find(function(f) {
 							return f.split("_")[0] === e.codeId;
 						}));
 					})
@@ -2316,16 +2469,28 @@
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerLabels.style("opacity", function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						})) ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						}));
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
+						return (e.sourceLinks.find(function(f) {
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
+						})) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return (e.sourceLinks.find(function(f) {
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
+						}));
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						if (chartState.selectedAggregation === "level") {
 							return e.id === d.id ? 1 : fadeOpacityNodes;
@@ -2344,7 +2509,21 @@
 				curlyPathsType.style("opacity", function(e) {
 					return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.id ? 1 : fadeOpacityNodes;
+						} else {
+							return e.codeId === d.codeId ? 1 : fadeOpacityNodes;
+						};
+					})
+					.filter(function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.id;
+						} else {
+							return e.codeId === d.codeId;
+						};
+					})
+					.style("display", null);
 				curlyGroups.style("opacity", 0);
 				if (d.id.split("#")[0] === "partner") {
 					createTooltipPartnersLevel3(d, thisElement);
@@ -2364,6 +2543,7 @@
 							return f.target.id === e.id;
 						})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.index === d.index || (e.source.id === d.target.id && e.fund === d.fund) ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2375,6 +2555,13 @@
 					})
 					.style("display", null);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.id === d.target.id ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.id === d.target.id;
+					})
+					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.id === d.target.id ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
@@ -2400,13 +2587,32 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight);
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", function(e) {
 					return secondLevelLinksData.find(function(f) {
 						return f.target.codeId === e.codeId;
 					}) ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						return secondLevelLinksData.find(function(f) {
+							if (chartState.selectedAggregation === "level") {
+								return f.target.id === e.id;
+							} else {
+								return f.target.codeId === e.codeId;
+							};
+						}) ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return secondLevelLinksData.find(function(f) {
+							if (chartState.selectedAggregation === "level") {
+								return f.target.id === e.id;
+							} else {
+								return f.target.codeId === e.codeId;
+							};
+						});
+					})
+					.style("display", null)
+					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 0);
 				createTooltipLinksLevel1(d, thisElement);
 			};
@@ -2422,6 +2628,7 @@
 							return f.source.id === e.id;
 						})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.index === d.index || (e.target.id === d.source.id && e.fund === d.fund) ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2437,6 +2644,13 @@
 					})
 					.style("display", null);
 				sankeyPartnerLabels.style("opacity", function(e) {
+						return e.id === d.source.id ? 1 : fadeOpacityNodes;
+					})
+					.filter(function(e) {
+						return e.id === d.source.id;
+					})
+					.style("display", null);
+				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return e.id === d.source.id ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
@@ -2461,7 +2675,21 @@
 				curlyPathsType.style("opacity", function(e) {
 					return e.codeId === d.target.codeId ? 1 : fadeOpacityNodes;
 				});
-				typePercentageGroup.style("opacity", 0);
+				typePercentageGroup.style("opacity", function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.target.id ? 1 : fadeOpacityNodes;
+						} else {
+							return e.codeId === d.target.codeId ? 1 : fadeOpacityNodes;
+						};
+					})
+					.filter(function(e) {
+						if (chartState.selectedAggregation === "level") {
+							return e.id === d.target.id;
+						} else {
+							return e.codeId === d.target.codeId;
+						};
+					})
+					.style("display", null);
 				curlyGroups.style("opacity", 0);
 				createTooltipLinksLevel2(d, thisElement);
 			};
@@ -3304,6 +3532,18 @@
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
+			};
+
+			function checkThirdLevelOpacity() {
+				const highlighted = [];
+				sankeyNodes.each(function(d) {
+					if (d.level === 3 && this.style.opacity === "1") highlighted.push(d.codeId);
+				});
+				sankeyNodes.each(function(d) {
+					if (d.level === 3 && highlighted.indexOf(d.codeId) > -1 && this.style.opacity !== "1") {
+						d3.select(this).style("opacity", 1);
+					};
+				});
 			};
 
 			buttonsPanel.main.selectAll(".pbinadbuttonsAggregationRects")

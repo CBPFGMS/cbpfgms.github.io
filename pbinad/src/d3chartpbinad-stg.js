@@ -2287,6 +2287,7 @@
 						return f.fund === d.codeId;
 					})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.fund === d.codeId ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2363,6 +2364,7 @@
 						return f.source.id === d.id;
 					})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.source.id === d.id || e.target.id === d.id ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2427,27 +2429,39 @@
 
 			function mouseoverSubpartners(d, thisElement) {
 				currentHoveredElement = thisElement;
-				const thisFistLevelLinks = d.targetLinks.map(function(e) {
-					return e.fund + "_" + e.source.id;
-				});
+				let thisFirstLevelLinks;
+				if (chartState.selectedAggregation === "level") {
+					thisFirstLevelLinks = d.targetLinks.map(function(e) {
+						return e.fund + "_" + e.source.id;
+					});
+				} else {
+					thisFirstLevelLinks = [];
+					sankeyNodes.each(function(e) {
+						if (e.codeId === d.codeId && e.level === 3) {
+							thisFirstLevelLinks.push.apply(thisFirstLevelLinks, e.targetLinks.map(function(f) {
+								return f.fund + "_" + f.source.id;
+							}));
+						};
+					});
+				};
 				sankeyNodes.style("opacity", function(e) {
 					return (e.id === d.id) || (e.sourceLinks.find(function(f) {
-						return f.target.id === d.id;
-					})) || (d.targetLinks.find(function(f) {
-						return f.fund === e.codeId;
+						return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
+					})) || (thisFirstLevelLinks.find(function(f) {
+						return f.split("_")[0] === e.codeId;
 					})) || (chartState.selectedAggregation === "type" && d.codeId === e.codeId) ? 1 : fadeOpacityNodes;
 				});
 				sankeyLinks.style("stroke-opacity", function(e) {
-					return e.target.id === d.id ||
-						(e.sourceLevel === 1 && thisFistLevelLinks.indexOf(e.fund + "_" + e.target.id) > -1) ? linksOpacity : fadeOpacityLinks;
+					return (chartState.selectedAggregation === "level" ? e.target.id === d.id : e.target.codeId === d.codeId) ||
+						(e.sourceLevel === 1 && thisFirstLevelLinks.indexOf(e.fund + "_" + e.target.id) > -1) ? linksOpacity : fadeOpacityLinks;
 				});
 				sankeyFundLabels.style("opacity", function(e) {
-						return (thisFistLevelLinks.find(function(f) {
+						return (thisFirstLevelLinks.find(function(f) {
 							return f.split("_")[0] === e.codeId;
 						})) ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
-						return (thisFistLevelLinks.find(function(f) {
+						return (thisFirstLevelLinks.find(function(f) {
 							return f.split("_")[0] === e.codeId;
 						}));
 					})
@@ -2455,24 +2469,24 @@
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerLabels.style("opacity", function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						})) ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						}));
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerValuesLabels.style("opacity", function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						})) ? 1 : fadeOpacityNodes;
 					})
 					.filter(function(e) {
 						return (e.sourceLinks.find(function(f) {
-							return f.target.id === d.id;
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						}));
 					})
 					.style("display", null)
@@ -2529,6 +2543,7 @@
 							return f.target.id === e.id;
 						})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.index === d.index || (e.source.id === d.target.id && e.fund === d.fund) ? linksOpacity : fadeOpacityLinks;
 				});
@@ -2613,6 +2628,7 @@
 							return f.source.id === e.id;
 						})) ? 1 : fadeOpacityNodes;
 				});
+				if (chartState.selectedAggregation === "type") checkThirdLevelOpacity();
 				sankeyLinks.style("stroke-opacity", function(e) {
 					return e.index === d.index || (e.target.id === d.source.id && e.fund === d.fund) ? linksOpacity : fadeOpacityLinks;
 				});
@@ -3516,6 +3532,18 @@
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
+			};
+
+			function checkThirdLevelOpacity() {
+				const highlighted = [];
+				sankeyNodes.each(function(d) {
+					if (d.level === 3 && this.style.opacity === "1") highlighted.push(d.codeId);
+				});
+				sankeyNodes.each(function(d) {
+					if (d.level === 3 && highlighted.indexOf(d.codeId) > -1 && this.style.opacity !== "1") {
+						d3.select(this).style("opacity", 1);
+					};
+				});
 			};
 
 			buttonsPanel.main.selectAll(".pbinadbuttonsAggregationRects")
