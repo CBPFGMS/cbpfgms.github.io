@@ -433,9 +433,7 @@
 
 		const sankeyGenerator = d3.sankey()
 			.nodeSort(null)
-			.linkSort(function(a, b) {
-				return b.value - a.value;
-			})
+			.linkSort(null)
 			.nodeWidth(nodeWidth)
 			.nodePadding(nodeVerticalPadding)
 			.nodeId(function(d) {
@@ -1631,6 +1629,21 @@
 				} else if (chartState.selectedAggregation === "level" && (a.level === 3 && b.level === 3)) {
 					return (partnersTypeList.indexOf(b.id.split("#")[0]) - partnersTypeList.indexOf(a.id.split("#")[0])) ||
 						b.amount - a.amount;
+				} else {
+					return null;
+				};
+			});
+
+			sankeyGenerator.linkSort(function(a, b) {
+				if (a.sourceLevel === 1 && b.sourceLevel === 1) {
+					return b.value - a.value;
+				} else if (a.sourceLevel === 2 && b.sourceLevel === 2) {
+					return b.source.targetLinks.find(function(e) {
+							return e.fund === b.fund
+						}).value - a.source.targetLinks.find(function(e) {
+							return e.fund === a.fund
+						}).value ||
+						b.value - a.value;
 				} else {
 					return null;
 				};
