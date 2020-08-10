@@ -3307,7 +3307,7 @@
 					innerTooltip.append("div")
 						.style("margin-bottom", "4px")
 						.style("margin-top", "10px")
-						.html("Resources from direct partners:");
+						.html("Funding received:");
 
 					const tooltipSvgHeight = tooltipSvgPadding[0] + tooltipSvgPadding[2] + svgData.length * lollipopSvgGroupHeight;
 
@@ -3498,15 +3498,21 @@
 					.html("$" + formatMoney0Decimals(totalForPartner));
 
 				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("width", "100%")
 					.style("font-size", "12px")
-					.style("margin-left", "auto")
+					.style("justify-content", "flex-end")
+					.style("text-align", "right")
 					.html("(" + formatPercent1dec(totalAllocations ? (totalForPartner / totalAllocations) : 0) + " of total allocation: " + formatSI0decimals(totalAllocations) + ")");
 
 				if (partnersListKeys.indexOf(datum.codeId) > -1) {
 					const increaseOrDecrease = totalForPartner > totalLevel2 ? " increase" : " decrease";
 					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("width", "100%")
 						.style("font-size", "12px")
-						.style("margin-left", "auto")
+						.style("justify-content", "flex-end")
+						.style("text-align", "right")
 						.style("margin-bottom", "8px")
 						.html("(" + formatPercent1dec(Math.abs((totalForPartner / totalLevel2) - 1)) + increaseOrDecrease + " from direct funding: " + formatSI0decimals(totalLevel2) + ")");
 
@@ -3523,9 +3529,12 @@
 						.html("$" + formatMoney0Decimals(totalDirect));
 
 					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("width", "100%")
 						.style("font-size", "12px")
-						.style("margin-left", "auto")
-						.html("(" + formatPercent1dec(totalForPartner ? (totalDirect / totalForPartner) : 0) + " of total " + datum.name + " allocation: " + formatSI0decimals(totalForPartner) + ")");
+						.style("justify-content", "flex-end")
+						.style("text-align", "right")
+						.html("(" + formatPercent1dec(totalForPartner ? (totalDirect / totalForPartner) : 0) + " of total " + (datum.codeId === "O" ? "RC/RCS" : datum.name) + " allocation: " + formatSI0decimals(totalForPartner) + ")");
 				};
 
 				tooltipContainer.append("div")
@@ -3542,10 +3551,13 @@
 					.html("$" + formatMoney0Decimals(totalSubimplementing));
 
 				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("width", "100%")
 					.style("font-size", "12px")
-					.style("margin-left", "auto")
+					.style("justify-content", "flex-end")
+					.style("text-align", "right")
 					.style("margin-bottom", "8px")
-					.html("(" + formatPercent1dec(totalForPartner ? (totalSubimplementing / totalForPartner) : 0) + " of total " + datum.name + " allocation: " + formatSI0decimals(totalForPartner) + ")");
+					.html("(" + formatPercent1dec(totalForPartner ? (totalSubimplementing / totalForPartner) : 0) + " of total " + (datum.codeId === "O" ? "RC/RCS" : datum.name) + " allocation: " + formatSI0decimals(totalForPartner) + ")");
 
 				const svgData = thisPartnerSubimplementing.targetLinks.reduce(function(acc, curr) {
 					if (curr.target.id.split("#")[0] === "subpartner") {
