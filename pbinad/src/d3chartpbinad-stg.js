@@ -2538,10 +2538,14 @@
 					})
 					.style("display", null);
 				curlyGroups.style("opacity", 0);
-				if (d.id.split("#")[0] === "partner") {
-					createTooltipPartnersLevel3(d, thisElement);
+				if (chartState.selectedAggregation === "type") {
+					createTooltipLevel3Aggregated(d, thisElement);
 				} else {
-					createTooltipSubpartners(d, thisElement);
+					if (d.id.split("#")[0] === "partner") {
+						createTooltipPartnersLevel3(d, thisElement);
+					} else {
+						createTooltipSubpartners(d, thisElement);
+					};
 				};
 			};
 
@@ -2742,6 +2746,12 @@
 					return d.value;
 				})];
 
+				const totalForFunds = d3.sum(sankeyData.nodes.filter(function(d) {
+					return d.level === 1;
+				}), function(d) {
+					return d.amount;
+				});
+
 				tooltipData.forEach(function(e, i) {
 					tooltipContainer.append("div")
 						.style("display", "flex")
@@ -2754,14 +2764,16 @@
 						.style("justify-content", "flex-end")
 						.style("align-items", "flex-end")
 						.html("$" + formatMoney0Decimals(e));
-				});
 
-				tooltipContainer.append("div")
-					.style("display", "flex")
-					.style("width", "100%")
-					.style("font-size", "12px")
-					.style("justify-content", "flex-end")
-					.html("(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total)");
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("width", "100%")
+						.style("font-size", "12px")
+						.style("margin-bottom", "6px")
+						.style("justify-content", "flex-end")
+						.html(i ? "(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total fund allocation: " + formatSI0decimals(tooltipData[0]) + ")" :
+							"(" + formatPercent1dec(totalForFunds ? (tooltipData[0] / totalForFunds) : 0) + " of total CBPFs allocation: " + formatSI0decimals(totalForFunds) + ")");
+				});
 
 				const svgData = fundLinks.reduce(function(acc, curr) {
 					if (curr.sourceLevel === 2) {
@@ -2960,6 +2972,12 @@
 					return d.value;
 				})];
 
+				const totalForDirectPartners = d3.sum(sankeyData.nodes.filter(function(d) {
+					return d.level === 2;
+				}), function(d) {
+					return d.amount;
+				});
+
 				tooltipData.forEach(function(e, i) {
 					tooltipContainer.append("div")
 						.style("display", "flex")
@@ -2972,14 +2990,16 @@
 						.style("justify-content", "flex-end")
 						.style("align-items", "flex-end")
 						.html("$" + formatMoney0Decimals(e));
-				});
 
-				tooltipContainer.append("div")
-					.style("display", "flex")
-					.style("width", "100%")
-					.style("font-size", "12px")
-					.style("justify-content", "flex-end")
-					.html("(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total)");
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("width", "100%")
+						.style("font-size", "12px")
+						.style("margin-bottom", "6px")
+						.style("justify-content", "flex-end")
+						.html(i ? "(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total " + datum.name + ": " + formatSI0decimals(tooltipData[0]) + ")" :
+							"(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total direct allocation: " + formatSI0decimals(totalForDirectPartners) + ")");
+				});
 
 				const svgData = datum.sourceLinks.reduce(function(acc, curr) {
 					if (curr.target.id.split("#")[0] === "subpartner") {
@@ -3154,55 +3174,33 @@
 					.style("flex-wrap", "wrap")
 					.style("width", "100%");
 
-				const tooltipData = [d3.sum(sankeyData.nodes.filter(function(e) {
+				const totalForPartner = d3.sum(sankeyData.nodes.filter(function(e) {
 					return e.level === 2 && e.codeId === datum.codeId;
 				}), function(e) {
 					return e.amount;
-				}), datum.amount];
-
-				tooltipData.forEach(function(e, i) {
-					tooltipContainer.append("div")
-						.style("display", "flex")
-						.style("flex", "0 56%")
-						.html(i ? "Amount kept:" : "Total received:");
-
-					tooltipContainer.append("div")
-						.style("display", "flex")
-						.style("flex", "0 44%")
-						.style("justify-content", "flex-end")
-						.style("align-items", "flex-end")
-						.html("$" + formatMoney0Decimals(e));
 				});
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html("Total direct fund kept:");
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.style("align-items", "flex-end")
+					.html("$" + formatMoney0Decimals(datum.amount));
+
+				const increaseOrDecrease = totalForPartner > datum.amount ? formatPercent1dec(Math.abs((datum.amount / totalForPartner) - 1)) + " reduced from " :
+					"the same of ";
 
 				tooltipContainer.append("div")
 					.style("display", "flex")
 					.style("width", "100%")
 					.style("font-size", "12px")
 					.style("justify-content", "flex-end")
-					.html("(" + formatPercent1dec(tooltipData[0] ? (tooltipData[1] / tooltipData[0]) : 0) + " of total)");
-
-				const totalForPartner = d3.sum(sankeyData.nodes.filter(function(e) {
-					return e.codeId === datum.codeId && e.level === 3;
-				}), function(e) {
-					return e.amount;
-				});
-
-				const increaseOrDecrease = totalForPartner > tooltipData[0] ? "increase" : "decrease";
-
-				const spanColor = totalForPartner > tooltipData[0] ? d3.color(greenArrowColor).darker(0.2) : redArrowColor;
-
-				if (totalForPartner === tooltipData[0]) {
-					innerTooltip.append("div")
-						.style("margin-top", "10px")
-						.html("Summing up direct and sub-impl. partners, " +
-							datum.name + " has a total of " + formatMoney0Decimals(totalForPartner) + ", which is neither an increase nor a decrease.");
-				} else {
-					innerTooltip.append("div")
-						.style("margin-top", "10px")
-						.html("Summing up direct and sub-impl. partners, " +
-							datum.name + " has a total of $" + formatMoney0Decimals(totalForPartner) + ", which is " + (increaseOrDecrease === "increase" ? "an" : "a") +
-							" <span style='color:" + spanColor + ";'>" + increaseOrDecrease + "</span> of " + formatPercent1dec(Math.abs((totalForPartner / tooltipData[0]) - 1)) + ".");
-				};
+					.html("(" + increaseOrDecrease + "actual direct funding: " + formatSI0decimals(totalForPartner) + ")");
 
 				const thisBox = thisElement.getBoundingClientRect();
 
@@ -3255,40 +3253,31 @@
 					.style("align-items", "flex-end")
 					.html("$" + formatMoney0Decimals(datum.value));
 
-				const totalForPartner = d3.sum(sankeyData.nodes.filter(function(e) {
-					return e.codeId === datum.codeId && e.level === 3;
+				const totalForSubImplementing = d3.sum(sankeyData.nodes.filter(function(e) {
+					return e.id.split("#")[0] === "subpartner";
 				}), function(e) {
 					return e.amount;
 				});
 
-				const totalLevel2 = d3.sum(sankeyData.nodes.filter(function(e) {
-					return e.level === 2 && e.codeId === datum.codeId;
+				const totalAllocations = d3.sum(sankeyData.nodes.filter(function(e) {
+					return e.level === 3;
 				}), function(e) {
 					return e.amount;
 				});
 
 				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("width", "100%")
 					.style("font-size", "12px")
-					.html("(representing " + formatPercent1dec(totalForPartner ? (datum.value / totalForPartner) : 0) + " of all resources for this partner)");
+					.style("justify-content", "flex-end")
+					.html("(" + formatPercent1dec(totalForSubImplementing ? (datum.value / totalForSubImplementing) : 0) + " of total sub-impl. funding: " + formatSI0decimals(totalForSubImplementing) + ")");
 
-				if (partnersListKeys.indexOf(datum.codeId) > -1) {
-					const increaseOrDecrease = totalForPartner > totalLevel2 ? "increase" : "decrease";
-
-					const spanColor = totalForPartner > totalLevel2 ? d3.color(greenArrowColor).darker(0.2) : redArrowColor;
-
-					if (totalForPartner === totalLevel2) {
-						innerTooltip.append("div")
-							.style("margin-top", "10px")
-							.html("Summing up direct and sub-impl. partners, " +
-								datum.name + " has a total of " + formatMoney0Decimals(totalForPartner) + ", which is neither an increase nor a decrease.");
-					} else {
-						innerTooltip.append("div")
-							.style("margin-top", "10px")
-							.html("Summing up direct and sub-impl. partners, " +
-								datum.name + " has a total of $" + formatMoney0Decimals(totalForPartner) + ", which is " + (increaseOrDecrease === "increase" ? "an" : "a") +
-								" <span style='color:" + spanColor + ";'>" + increaseOrDecrease + "</span> of " + formatPercent1dec(Math.abs((totalForPartner / totalLevel2) - 1)) + ".");
-					};
-				};
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("width", "100%")
+					.style("font-size", "12px")
+					.style("justify-content", "flex-end")
+					.html("(" + formatPercent1dec(totalAllocations ? (datum.value / totalAllocations) : 0) + " of total funding: " + formatSI0decimals(totalAllocations) + ")");
 
 				const svgData = datum.targetLinks.reduce(function(acc, curr) {
 					if (curr.target.id.split("#")[0] === "subpartner") {
@@ -3390,7 +3379,7 @@
 								.attr("y", -stickHeight / 4)
 								.attr("height", stickHeight)
 								.attr("width", 0)
-								.style("fill", partnerColor)
+								.style("fill", subpartnerColor)
 								.transition()
 								.duration(duration)
 								.attr("width", tooltipSvgXScale(d.value) - tooltipSvgPadding[3]);
@@ -3399,7 +3388,7 @@
 								.attr("cx", tooltipSvgPadding[3])
 								.attr("cy", (stickHeight / 4))
 								.attr("r", lollipopRadius)
-								.style("fill", partnerColor)
+								.style("fill", subpartnerColor)
 								.transition()
 								.duration(duration)
 								.attr("cx", tooltipSvgXScale(d.value));
@@ -3435,6 +3424,275 @@
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
+			};
+
+			function createTooltipLevel3Aggregated(datum, thisElement) {
+
+				const thisPartnerSubimplementing = datum.id.split("#")[0] === "subpartner" ? datum :
+					sankeyData.nodes.find(function(e) {
+						return e.codeId === datum.codeId && e.level === 3 && e.id.split("#")[0] === "subpartner";
+					});
+
+				const totalForPartner = d3.sum(sankeyData.nodes.filter(function(e) {
+					return e.codeId === datum.codeId && e.level === 3;
+				}), function(e) {
+					return e.amount;
+				});
+
+				const totalLevel2 = d3.sum(sankeyData.nodes.filter(function(e) {
+					return e.level === 2 && e.codeId === datum.codeId;
+				}), function(e) {
+					return e.amount;
+				});
+
+				const totalAllocations = d3.sum(sankeyData.nodes.filter(function(e) {
+					return e.level === 3;
+				}), function(e) {
+					return e.amount;
+				});
+
+				let totalDirect,
+					totalSubimplementing;
+
+				if (datum.id.split("#")[0] === "partner") {
+					totalDirect = datum.amount;
+					totalSubimplementing = totalForPartner - totalDirect;
+				} else {
+					totalSubimplementing = datum.amount;
+					totalDirect = totalForPartner - totalSubimplementing;
+				};
+
+				tooltip.style("display", "block")
+					.html(null);
+
+				const innerTooltip = tooltip.append("div")
+					.style("margin-bottom", "10px")
+					.style("color", "dimgray")
+					.style("width", "300px");
+
+				innerTooltip.append("div")
+					.append("strong")
+					.html(datum.name);
+
+				innerTooltip.append("div")
+					.style("margin-bottom", "8px")
+					.style("font-size", "12px")
+					.html("(Net funding)");
+
+				const tooltipContainer = innerTooltip.append("div")
+					.style("margin", "0px")
+					.style("display", "flex")
+					.style("flex-wrap", "wrap")
+					.style("width", "100%");
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.html("Total received:");
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.style("align-items", "flex-end")
+					.html("$" + formatMoney0Decimals(totalForPartner));
+
+				tooltipContainer.append("div")
+					.style("font-size", "12px")
+					.style("margin-left", "auto")
+					.html("(" + formatPercent1dec(totalAllocations ? (totalForPartner / totalAllocations) : 0) + " of total allocation: " + formatSI0decimals(totalAllocations) + ")");
+
+				if (partnersListKeys.indexOf(datum.codeId) > -1) {
+					const increaseOrDecrease = totalForPartner > totalLevel2 ? " increase" : " decrease";
+					tooltipContainer.append("div")
+						.style("font-size", "12px")
+						.style("margin-left", "auto")
+						.style("margin-bottom", "8px")
+						.html("(" + formatPercent1dec(Math.abs((totalForPartner / totalLevel2) - 1)) + increaseOrDecrease + " from direct funding: " + formatSI0decimals(totalLevel2) + ")");
+
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 56%")
+						.html("Direct partner funding:");
+
+					tooltipContainer.append("div")
+						.style("display", "flex")
+						.style("flex", "0 44%")
+						.style("justify-content", "flex-end")
+						.style("align-items", "flex-end")
+						.html("$" + formatMoney0Decimals(totalDirect));
+
+					tooltipContainer.append("div")
+						.style("font-size", "12px")
+						.style("margin-left", "auto")
+						.html("(" + formatPercent1dec(totalForPartner ? (totalDirect / totalForPartner) : 0) + " of total " + datum.name + " allocation: " + formatSI0decimals(totalForPartner) + ")");
+				};
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 56%")
+					.style("margin-top", "8px")
+					.html("Sub-impl. funding:");
+
+				tooltipContainer.append("div")
+					.style("display", "flex")
+					.style("flex", "0 44%")
+					.style("justify-content", "flex-end")
+					.style("align-items", "flex-end")
+					.html("$" + formatMoney0Decimals(totalSubimplementing));
+
+				tooltipContainer.append("div")
+					.style("font-size", "12px")
+					.style("margin-left", "auto")
+					.style("margin-bottom", "8px")
+					.html("(" + formatPercent1dec(totalForPartner ? (totalSubimplementing / totalForPartner) : 0) + " of total " + datum.name + " allocation: " + formatSI0decimals(totalForPartner) + ")");
+
+				const svgData = thisPartnerSubimplementing.targetLinks.reduce(function(acc, curr) {
+					if (curr.target.id.split("#")[0] === "subpartner") {
+						const foundPartner = acc.find(function(e) {
+							return e.codeId === curr.source.codeId;
+						});
+						if (foundPartner) {
+							foundPartner.value += curr.value;
+						} else {
+							acc.push({
+								codeId: curr.source.codeId,
+								value: curr.value
+							});
+						};
+					};
+					return acc;
+				}, []);
+
+				if (svgData.length) {
+
+					const tooltipSvgPadding = [12, 36, 2, 70];
+
+					svgData.sort(function(a, b) {
+						return b.value - a.value;
+					});
+
+					innerTooltip.append("div")
+						.style("margin-bottom", "4px")
+						.style("margin-top", "10px")
+						.html("Funding received as sub-impl.:");
+
+					const tooltipSvgHeight = tooltipSvgPadding[0] + tooltipSvgPadding[2] + svgData.length * lollipopSvgGroupHeight;
+
+					const tooltipSvg = tooltip.append("svg")
+						.attr("width", tooltipSvgWidth)
+						.attr("height", tooltipSvgHeight);
+
+					tooltipSvgYScale.range([tooltipSvgPadding[0], tooltipSvgHeight - tooltipSvgPadding[2]])
+						.domain(svgData.map(function(d) {
+							return d.codeId;
+						}))
+						.padding(0.5);
+
+					tooltipSvgXAxis.tickSizeInner(-(tooltipSvgHeight - tooltipSvgPadding[0] - tooltipSvgPadding[2]));
+
+					tooltipSvgYAxis.tickFormat(function(d) {
+						return d === "O" ? "RC/RCS" : subPartnersList[d];
+					});
+
+					const namesLengthArray = []
+
+					const subpartnerNames = invisibleLayer.selectAll(null)
+						.data(tooltipSvgYScale.domain())
+						.enter()
+						.append("text")
+						.style("font-size", "11px")
+						.style("font-family", "Arial")
+						.text(function(d) {
+							return d === "O" ? "RC/RCS" : subPartnersList[d];
+						})
+						.each(function(d) {
+							namesLengthArray.push(this.getComputedTextLength());
+						});
+
+					invisibleLayer.selectAll("*").remove();
+
+					tooltipSvgPadding[3] = d3.max(namesLengthArray) + 6;
+
+					tooltipSvgXScale.range([tooltipSvgPadding[3], tooltipSvgWidth - tooltipSvgPadding[1]])
+						.domain([0, d3.max(svgData, function(d) {
+							return d.value;
+						})]);
+
+					const yAxisGroup = tooltipSvg.append("g")
+						.attr("class", "pbinadTooltipSvgYAxisGroup")
+						.attr("transform", "translate(" + tooltipSvgPadding[3] + ",0)")
+						.call(tooltipSvgYAxis);
+
+					const xAxisGroup = tooltipSvg.append("g")
+						.attr("class", "pbinadTooltipSvgXAxisGroup")
+						.attr("transform", "translate(0," + tooltipSvgPadding[0] + ")")
+						.call(tooltipSvgXAxis)
+						.selectAll(".tick")
+						.filter(function(d) {
+							return d === 0;
+						})
+						.remove();
+
+					const lollipopGroups = tooltipSvg.selectAll(null)
+						.data(svgData)
+						.enter()
+						.append("g")
+						.attr("transform", function(d) {
+							return "translate(0," + tooltipSvgYScale(d.codeId) + ")";
+						})
+						.each(function(d) {
+							d3.select(this).append("rect")
+								.attr("x", tooltipSvgPadding[3])
+								.attr("y", -stickHeight / 4)
+								.attr("height", stickHeight)
+								.attr("width", 0)
+								.style("fill", subpartnerColor)
+								.transition()
+								.duration(duration)
+								.attr("width", tooltipSvgXScale(d.value) - tooltipSvgPadding[3]);
+
+							d3.select(this).append("circle")
+								.attr("cx", tooltipSvgPadding[3])
+								.attr("cy", (stickHeight / 4))
+								.attr("r", lollipopRadius)
+								.style("fill", subpartnerColor)
+								.transition()
+								.duration(duration)
+								.attr("cx", tooltipSvgXScale(d.value));
+
+							d3.select(this).append("text")
+								.attr("class", "pbinadtooltipSvgLabel")
+								.attr("x", tooltipSvgXScale(0))
+								.attr("y", 4)
+								.text(formatNumberSI(0))
+								.transition()
+								.duration(duration)
+								.attr("x", tooltipSvgXScale(d.value) + labelPadding + lollipopRadius)
+								.tween("text", function() {
+									const node = this;
+									const i = d3.interpolate(0, d.value);
+									return function(t) {
+										node.textContent = d3.formatPrefix(".0", i(t))(i(t)).replace("G", "B");
+									};
+								});
+						});
+
+				};
+
+				const thisBox = thisElement.getBoundingClientRect();
+
+				const containerBox = containerDiv.node().getBoundingClientRect();
+
+				const tooltipBox = tooltip.node().getBoundingClientRect();
+
+				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+
+				const thisOffsetLeft = containerBox.width - tooltipBox.width;
+
+				tooltip.style("top", thisOffsetTop + "px")
+					.style("left", thisOffsetLeft + "px");
+
 			};
 
 			function createTooltipLinksLevel1(datum, thisElement) {
@@ -4447,6 +4705,10 @@
 					}
 				}
 			});
+		};
+
+		function formatSI0decimals(value) {
+			return d3.formatPrefix(".0", value)(value);
 		};
 
 		function reverseFormat(s) {
