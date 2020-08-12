@@ -221,6 +221,7 @@
 			localStorageTime = 600000,
 			duration = 1000,
 			localVariable = d3.local(),
+			localVariableOldValue = d3.local(),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -2284,11 +2285,33 @@
 				sankeyPartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight);
 				sankeyPartnerValuesLabels.style("opacity", 1)
+					.each(function(d) {
+						if (localVariableOldValue.get(this)) {
+							d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
+								this.textContent = localVariableOldValue.get(this);
+							});
+							d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
+								this.textContent = localVariableOldValue.get(this);
+							});
+						};
+						localVariableOldValue.set(this, false);
+					})
 					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", 1)
 					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
 				curlyPathsType.style("opacity", 1);
 				typePercentageGroup.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
+					.each(function(d) {
+						if (localVariableOldValue.get(this)) {
+							d3.select(this).select(".pbinadtypePercentage").each(function(f) {
+								this.textContent = localVariableOldValue.get(this);
+							});
+							d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
+								this.textContent = localVariableOldValue.get(this);
+							});
+						};
+						localVariableOldValue.set(this, false);
+					})
 					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 1);
 			};
@@ -2333,6 +2356,20 @@
 							return f.fund === d.codeId;
 						})
 					})
+					.each(function(e) {
+						const amountFromThisFund = e.targetLinks.find(function(f) {
+							return f.fund === d.codeId;
+						}).value;
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+						});
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
+					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight * 3);
 				sankeySubpartnerLabels.style("opacity", function(e) {
@@ -2361,6 +2398,22 @@
 						return e.targetLinks.find(function(f) {
 							return f.fund === d.codeId;
 						})
+					})
+					.each(function(e) {
+						const amountFromThisFund = d3.sum(e.targetLinks.filter(function(f) {
+							return f.fund === d.codeId;
+						}), function(f) {
+							return f.value;
+						});
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+						});
+						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight);
@@ -2434,6 +2487,22 @@
 							return f.source.id === d.id;
 						});
 					})
+					.each(function(e) {
+						const amountFromThisPartner = d3.sum(e.targetLinks.filter(function(f) {
+							return f.source.codeId === d.codeId;
+						}), function(f) {
+							return f.value;
+						});
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+						});
+						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
+					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight * 3);
 				curlyGroups.style("opacity", 0);
@@ -2501,6 +2570,22 @@
 						return (e.sourceLinks.find(function(f) {
 							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
 						}));
+					})
+					.each(function(e) {
+						const amountFromThisPartner = d3.sum(e.sourceLinks.filter(function(f) {
+							return (chartState.selectedAggregation === "level" ? f.target.id === d.id : f.target.codeId === d.codeId);
+						}), function(f) {
+							return f.value;
+						});
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+						});
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
 					})
 					.style("display", null)
 					.call(hideLabels, textCollisionHeight * 3);
@@ -2584,6 +2669,18 @@
 					.filter(function(e) {
 						return e.id === d.target.id;
 					})
+					.each(function(e) {
+						const amountFromThisFund = d.value;
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+						});
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
+					})
 					.style("display", null);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						return secondLevelLinksData.find(function(f) {
@@ -2626,6 +2723,26 @@
 							} else {
 								return f.target.codeId === e.codeId;
 							};
+						});
+					})
+					.each(function(e) {
+						const amountFromThisFund = d3.sum(secondLevelLinksData.filter(function(f) {
+							if (chartState.selectedAggregation === "level") {
+								return f.target.id === e.id;
+							} else {
+								return f.target.codeId === e.codeId;
+							};
+						}), function(f) {
+							return f.value;
+						});
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+						});
+						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
 						});
 					})
 					.style("display", null)
@@ -2673,6 +2790,18 @@
 					.filter(function(e) {
 						return e.id === d.source.id;
 					})
+					.each(function(e) {
+						const amountFromThisPartner = d.value;
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+						});
+						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
+					})
 					.style("display", null);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						if (chartState.selectedAggregation === "level") {
@@ -2705,6 +2834,18 @@
 						} else {
 							return e.codeId === d.target.codeId;
 						};
+					})
+					.each(function(e) {
+						const amountFromThisPartner = d.value;
+						localVariableOldValue.set(this, true);
+						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+						});
+						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
+							localVariableOldValue.set(this, this.textContent);
+							this.textContent = "";
+						});
 					})
 					.style("display", null);
 				curlyGroups.style("opacity", 0);
