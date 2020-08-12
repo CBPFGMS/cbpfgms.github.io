@@ -3916,8 +3916,9 @@
 
 				innerTooltip.append("div")
 					.style("margin-bottom", "8px")
-					.html("To: " + partnersList[datum.target.codeId] + (datum.target.id.split("#")[0] === "partner" ?
-						" (direct partner)" : " (sub-implementing partner)"));
+					.html("To: " + datum.target.id.split("#")[0] === "partner" ?
+						partnersList[datum.target.codeId] + " (direct partner)" :
+						subPartnersList[datum.target.codeId] + " (sub-implementing partner)");
 
 				const tooltipContainer = innerTooltip.append("div")
 					.style("margin", "0px")
