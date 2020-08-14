@@ -198,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["People Reached", "People Targeted"],
+			legendData = ["People Reached*", "People Targeted*"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -942,7 +942,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" People";
+							" People*";
 					});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
@@ -1009,7 +1009,7 @@
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" People";
+							" People*";
 					});
 
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
