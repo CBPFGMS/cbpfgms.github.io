@@ -1825,6 +1825,14 @@
 					});
 				});
 
+				const allDonorsLastCircleData = donorsDataFiltered.filter(function(d) {
+					return d.isoCode === allDonors.isoCode;
+				}).map(function(d) {
+					return d.values.find(function(e) {
+						return +e.year === currentYear;
+					})
+				});
+
 				currentYearGroupDonors.transition()
 					.duration(duration)
 					.attr("transform", "translate(" + xScaleDonors(parseTime(currentYear - 1)) + ",0)");
@@ -1837,6 +1845,54 @@
 					.transition()
 					.duration(duration)
 					.attr("x", (xScaleDonors(parseTime(currentYear)) - xScaleDonors(parseTime(currentYear - 1))) / 2);
+
+				const lastAllDonorsCircle = donorsLinesPanel.main.selectAll(".pbiclilastAllDonorsCircle")
+					.data(allDonorsLastCircleData);
+
+				const lastAllDonorsCircleExit = lastAllDonorsCircle.exit()
+					.interrupt("pulseTransition")
+					.transition()
+					.duration(duration)
+					.style("opacity", 0)
+					.remove();
+
+				const lastAllDonorsCircleEnter = lastAllDonorsCircle.enter()
+					.append("circle")
+					.attr("class", "pbiclilastAllDonorsCircle")
+					.attr("r", 0)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					})
+					.style("fill", "none")
+					.style("stroke-width", "1.5px")
+					.style("stroke", unBlue)
+					.each(function() {
+						const pulseCircle = d3.select(this);
+						repeatPulse();
+
+						function repeatPulse() {
+							pulseCircle.attr("r", 0)
+								.style("opacity", 1)
+								.transition("pulseTransition")
+								.duration(duration * 2)
+								.ease(d3.easeSin)
+								.attr("r", circleRadius * 4)
+								.style("opacity", 0)
+								.on("end", repeatPulse);
+						};
+					});
+
+				lastAllDonorsCircle.transition("positionTransition")
+					.duration(duration)
+					.attr("cx", function(d) {
+						return xScaleDonors(parseTime(d.year))
+					})
+					.attr("cy", function(d) {
+						return yScaleDonors(d.total)
+					});
 
 				const donorsGroup = donorsLinesPanel.main.selectAll(".pbicliDonorsGroup")
 					.data(donorsDataFiltered, function(d) {
@@ -1875,39 +1931,6 @@
 					.duration(duration)
 					.style("stroke-dashoffset", "0");
 
-				const donorsPathCurrentYear = donorsGroupEnter.append("path")
-					.attr("class", "pbicliDonorsPathFuture")
-					.style("stroke", function(d) {
-						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
-					})
-					.attr("d", function(d) {
-						return lineGeneratorDonors(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						}))
-					})
-					.each(function() {
-						localVariable.set(this, this.getTotalLength())
-					});
-
-				donorsPathCurrentYear.style("stroke-dashoffset", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength;
-					})
-					.style("stroke-dasharray", function() {
-						const dashString = "3,3";
-						const dashLength = 6;
-						const thisPathLength = localVariable.get(this);
-						const dashNumber = Math.floor(thisPathLength / dashLength);
-						const dash = d3.range(dashNumber).map(function(d) {
-							return dashString;
-						});
-						return dash + ",0," + thisPathLength;
-					})
-					.transition()
-					.delay(duration)
-					.duration(duration)
-					.style("stroke-dashoffset", "0");
-
 				const circlesEnter = donorsGroupEnter.selectAll(null)
 					.data(function(d) {
 						return d.values;
@@ -1943,16 +1966,6 @@
 					.attr("d", function(d) {
 						return lineGeneratorDonors(d.values.filter(function(e) {
 							return +e.year < currentYear;
-						}))
-					});
-
-				donorsGroup.select("path.pbicliDonorsPathFuture")
-					.transition()
-					.duration(duration)
-					.style("stroke-dasharray", "3,3")
-					.attr("d", function(d) {
-						return lineGeneratorDonors(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
 						}))
 					});
 
@@ -2049,38 +2062,6 @@
 					.duration(duration)
 					.style("stroke-dashoffset", "0");
 
-				const donorsPathLocalCurrentYear = donorsGroupLocalEnter.append("path")
-					.attr("class", "pbicliDonorsPathLocalFuture")
-					.attr("d", function(d) {
-						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						})) : lineGeneratorDonors(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						}));
-					})
-					.each(function() {
-						localVariable.set(this, this.getTotalLength())
-					});
-
-				donorsPathLocalCurrentYear.style("stroke-dasharray", function() {
-						const dashString = "3,3";
-						const dashLength = 6;
-						const thisPathLength = localVariable.get(this);
-						const dashNumber = Math.floor(thisPathLength / dashLength);
-						const dash = d3.range(dashNumber).map(function(d) {
-							return dashString;
-						});
-						return dash + ",0," + thisPathLength;
-					})
-					.style("stroke-dashoffset", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength;
-					})
-					.transition()
-					.delay(duration)
-					.duration(duration)
-					.style("stroke-dashoffset", "0");
-
 				const circlesEnterLocal = donorsGroupLocalEnter.selectAll(null)
 					.data(function(d) {
 						return d.values;
@@ -2118,18 +2099,6 @@
 							return +e.year < currentYear;
 						})) : lineGeneratorDonors(d.values.filter(function(e) {
 							return +e.year < currentYear;
-						}));
-					});
-
-				donorsGroupLocal.select("path.pbicliDonorsPathLocalFuture")
-					.transition()
-					.duration(duration)
-					.style("stroke-dasharray", "3,3")
-					.attr("d", function(d) {
-						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						})) : lineGeneratorDonors(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
 						}));
 					});
 
@@ -2455,39 +2424,6 @@
 					.duration(duration)
 					.style("stroke-dashoffset", "0");
 
-				const cbpfsPathCurrentYear = cbpfsGroupEnter.append("path")
-					.attr("class", "pbicliCbpfsPathFuture")
-					.style("stroke", function(d) {
-						return scaleColorsCbpfs(d.isoCode);
-					})
-					.attr("d", function(d) {
-						return lineGeneratorCbpfs(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						}))
-					})
-					.each(function() {
-						localVariable.set(this, this.getTotalLength())
-					});
-
-				cbpfsPathCurrentYear.style("stroke-dasharray", function() {
-						const dashString = "3,3";
-						const dashLength = 6;
-						const thisPathLength = localVariable.get(this);
-						const dashNumber = Math.floor(thisPathLength / dashLength);
-						const dash = d3.range(dashNumber).map(function(d) {
-							return dashString;
-						});
-						return dash + ",0," + thisPathLength;
-					})
-					.style("stroke-dashoffset", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength;
-					})
-					.transition()
-					.delay(duration)
-					.duration(duration)
-					.style("stroke-dashoffset", "0");
-
 				const circlesEnter = cbpfsGroupEnter.selectAll(null)
 					.data(function(d) {
 						return d.values;
@@ -2524,16 +2460,6 @@
 						return lineGeneratorCbpfs(d.values.filter(function(e) {
 							return +e.year < currentYear;
 						}))
-					});
-
-				cbpfsGroup.select("path.pbicliCbpfsPathFuture")
-					.transition()
-					.duration(duration)
-					.style("stroke-dasharray", "3,3")
-					.attr("d", function(d) {
-						return lineGeneratorCbpfs(d.values.filter(function(e) {
-							return +e.year === currentYear - 1 || +e.year === currentYear;
-						}));
 					});
 
 				const updateCircles = cbpfsGroup.selectAll("circle")
