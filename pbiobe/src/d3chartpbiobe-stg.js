@@ -1027,12 +1027,12 @@
 					.style("opacity", 1)
 					.text(function() {
 						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-						return "Reached in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+						return "Reached in " + yearsText + " (" + formatPercent(percentageValue) + ")";
 					});
 
 				topPanelPersonsTextSubText.text(function() {
 					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-					return "Reached in " + yearsText + " (" + (~~(percentageValue * 100)) + "%)"
+					return "Reached in " + yearsText + " (" + formatPercent(percentageValue) + ")";
 				});
 
 				//end of createTopPanel
