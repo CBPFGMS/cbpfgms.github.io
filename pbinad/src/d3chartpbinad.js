@@ -1735,7 +1735,6 @@
 						return d.target.id.split("#")[0] === "subpartner" ? subpartnerColor : (d.fund === "999" ? cerfColor : cbpfColor);
 					};
 				})
-				.style("mix-blend-mode", "multiply")
 				.style("stroke-opacity", 0)
 				.attr("d", d3.sankeyLinkHorizontal());
 
