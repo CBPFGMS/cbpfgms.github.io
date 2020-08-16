@@ -3888,7 +3888,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisElementRealHeight = thisElement.getBBox().height / (width / containerBox.width);
+
+				const thisOffsetTop = ((thisBox.top + thisBox.bottom) / 2) - (thisElementRealHeight / 2) - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
 
 				const thisOffsetLeft = thisBox.left + (thisBox.width / 2) - containerBox.left - tooltipBox.width / 2;
 
@@ -3950,7 +3952,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisElementRealHeight = thisElement.getBBox().height / (width / containerBox.width);
+
+				const thisOffsetTop = ((thisBox.top + thisBox.bottom) / 2) - (thisElementRealHeight / 2) - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
 
 				const thisOffsetLeft = thisBox.left + (thisBox.width / 2) - containerBox.left - tooltipBox.width / 2;
 

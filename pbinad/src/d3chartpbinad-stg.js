@@ -814,7 +814,7 @@
 				return (cbpfsList[a]).localeCompare(cbpfsList[b]);
 			});
 
-			checkboxData.push("All CBPFs");
+			checkboxData.unshift("All CBPFs");
 
 			const checkboxDivs = selectDiv.selectAll(null)
 				.data(checkboxData)
@@ -834,7 +834,7 @@
 			const input = checkbox.append("input")
 				.attr("type", "checkbox")
 				.property("checked", function(d) {
-					return chartState.selectedCbpfs.indexOf(d) > -1;
+					return chartState.selectedCbpfs.length !== d3.keys(cbpfsDataList).length && chartState.selectedCbpfs.indexOf(d) > -1;
 				})
 				.attr("value", function(d) {
 					return d;
@@ -850,6 +850,9 @@
 				return d === "All CBPFs";
 			}).select("input");
 
+			d3.select(allCbpfs.node().nextSibling)
+				.attr("class", "pbinadCheckboxTextAllCbpfs");
+
 			const cbpfsCheckboxes = checkboxDivs.filter(function(d) {
 				return d !== "All CBPFs";
 			}).select("input");
@@ -859,34 +862,29 @@
 			});
 
 			allCbpfs.property("checked", function() {
-					return chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length;
-				})
-				.property("indeterminate", function() {
-					return chartState.selectedCbpfs.length < d3.keys(cbpfsDataList).length && chartState.selectedCbpfs.length > 0;
-				});
+				return chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length;
+			});
 
 			checkbox.select("input").on("change", function() {
 				if (this.value === "All CBPFs") {
 					if (this.checked) {
-						chartState.selectedCbpfs = d3.keys(cbpfsDataList)
+						chartState.selectedCbpfs = d3.keys(cbpfsDataList);
+						cbpfsCheckboxes.property("checked", false);
 					} else {
 						chartState.selectedCbpfs.length = 0;
 					};
-					checkbox.select("input")
-						.property("checked", this.checked);
 				} else {
 					if (this.checked) {
-						chartState.selectedCbpfs.push(this.value);
+						if (chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length) {
+							chartState.selectedCbpfs = [this.value];
+						} else {
+							chartState.selectedCbpfs.push(this.value);
+						};
 					} else {
 						const thisIndex = chartState.selectedCbpfs.indexOf(this.value);
 						chartState.selectedCbpfs.splice(thisIndex, 1);
 					};
-					allCbpfs.property("checked", function() {
-							return chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length;
-						})
-						.property("indeterminate", function() {
-							return chartState.selectedCbpfs.length < d3.keys(cbpfsDataList).length && chartState.selectedCbpfs.length > 0;
-						});
+					allCbpfs.property("checked", false);
 				};
 
 				if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length) {
@@ -1735,7 +1733,6 @@
 						return d.target.id.split("#")[0] === "subpartner" ? subpartnerColor : (d.fund === "999" ? cerfColor : cbpfColor);
 					};
 				})
-				.style("mix-blend-mode", "multiply")
 				.style("stroke-opacity", 0)
 				.attr("d", d3.sankeyLinkHorizontal());
 
@@ -3889,7 +3886,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisElementRealHeight = thisElement.getBBox().height / (width / containerBox.width);
+
+				const thisOffsetTop = ((thisBox.top + thisBox.bottom) / 2) - (thisElementRealHeight / 2) - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
 
 				const thisOffsetLeft = thisBox.left + (thisBox.width / 2) - containerBox.left - tooltipBox.width / 2;
 
@@ -3951,7 +3950,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisElementRealHeight = thisElement.getBBox().height / (width / containerBox.width);
+
+				const thisOffsetTop = ((thisBox.top + thisBox.bottom) / 2) - (thisElementRealHeight / 2) - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
 
 				const thisOffsetLeft = thisBox.left + (thisBox.width / 2) - containerBox.left - tooltipBox.width / 2;
 
