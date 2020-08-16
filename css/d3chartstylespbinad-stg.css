@@ -207,6 +207,14 @@ p#pbinadd3chartTitle {
 	margin-left: 2px;
 }
 
+.pbinadCheckboxTextAllCbpfs {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 2px;
+	color: #f79a3b;
+}
+
 .pbinadbuttonsText, .pbinadbuttonsAggregationText {
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
