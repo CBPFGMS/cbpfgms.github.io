@@ -942,7 +942,7 @@
 					.append("tspan")
 					.attr("dy", -8)
 					.style("font-size", "0.6em")
-					.text(" (1,2)");
+					.text(" (1)");
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
 					.data([true]);
@@ -1000,7 +1000,7 @@
 					.append("tspan")
 					.attr("dy", -8)
 					.style("font-size", "0.6em")
-					.text(" (1,2)");
+					.text(" (1)");
 
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
 					.data([true]);
