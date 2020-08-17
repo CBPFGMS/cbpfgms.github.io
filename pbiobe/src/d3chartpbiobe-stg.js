@@ -198,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["People Reached*", "People Targeted*"],
+			legendData = ["People Reached", "People Targeted"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -1550,7 +1550,11 @@
 					.attr("y", 10)
 					.text(function(d) {
 						return d;
-					});
+					})
+					.append("tspan")
+					.attr("dy", -4)
+					.style("font-size", "0.8em")
+					.text(" (1)");
 
 				const pictogramLegendGroup = bottomGroup.selectAll(".pbiobePictogramLegendGroup")
 					.data([true])

@@ -198,7 +198,7 @@
 			beneficiariesTypes = ["total", "men", "women", "boys", "girls"],
 			windowHeight = window.innerHeight,
 			duration = 1000,
-			legendData = ["People Reached*", "People Targeted*"],
+			legendData = ["People Reached", "People Targeted"],
 			cbpfsList = {},
 			chartState = {
 				selectedYear: [],
@@ -929,44 +929,35 @@
 				topPanelMainText = topPanelMainText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelMainText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.merge(topPanelMainText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
-					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
-
-				topPanelMainText.transition()
-					.duration(duration)
-					.style("opacity", 1)
+					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
+					.merge(topPanelMainText)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" People*";
-					});
+							" People";
+					})
+					.append("tspan")
+					.attr("dy", -8)
+					.style("font-size", "0.6em")
+					.text(" (1)");
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbiobetopPanelSubText")
 					.data([true]);
 
-				topPanelSubText.enter()
+				topPanelSubText = topPanelSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelSubText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
-					.transition()
-					.duration(duration)
-					.style("opacity", 1)
+					.merge(topPanelSubText)
 					.text(function() {
 						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 						return "Targeted in " + yearsText;
 					});
-
-				topPanelSubText.text(function() {
-					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-					return "Targeted in " + yearsText;
-				});
 
 				let topPanelPersonsActual = mainValueGroup.selectAll(".pbiobetopPanelPersonsActual")
 					.data([actualValue]);
@@ -996,44 +987,35 @@
 				topPanelPersonsText = topPanelPersonsText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelPersonsText")
-					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.merge(topPanelPersonsText)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.1)
 					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
-
-				topPanelPersonsText.transition()
-					.duration(duration)
-					.style("opacity", 1)
+					.merge(topPanelPersonsText)
 					.text(function(d) {
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" People*";
-					});
+							" People";
+					})
+					.append("tspan")
+					.attr("dy", -8)
+					.style("font-size", "0.6em")
+					.text(" (1)");
 
 				let topPanelPersonsTextSubText = mainValueGroup.selectAll(".pbiobetopPanelPersonsTextSubText")
 					.data([true]);
 
-				topPanelPersonsTextSubText.enter()
+				topPanelPersonsTextSubText = topPanelPersonsTextSubText.enter()
 					.append("text")
 					.attr("class", "pbiobetopPanelPersonsTextSubText")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 					.attr("x", topPanel.pictogramPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
 					.attr("text-anchor", "start")
-					.style("opacity", 0)
-					.transition()
-					.duration(duration)
-					.style("opacity", 1)
+					.merge(topPanelPersonsTextSubText)
 					.text(function() {
 						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 						return "Reached in " + yearsText + " (" + formatPercent(percentageValue) + ")";
 					});
-
-				topPanelPersonsTextSubText.text(function() {
-					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
-					return "Reached in " + yearsText + " (" + formatPercent(percentageValue) + ")";
-				});
 
 				//end of createTopPanel
 			}
@@ -1568,7 +1550,11 @@
 					.attr("y", 10)
 					.text(function(d) {
 						return d;
-					});
+					})
+					.append("tspan")
+					.attr("dy", -4)
+					.style("font-size", "0.8em")
+					.text(" (1)");
 
 				const pictogramLegendGroup = bottomGroup.selectAll(".pbiobePictogramLegendGroup")
 					.data([true])
