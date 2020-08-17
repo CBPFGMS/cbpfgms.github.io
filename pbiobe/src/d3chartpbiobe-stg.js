@@ -739,7 +739,7 @@
 
 				const checkboxData = d3.keys(cbpfsList);
 
-				checkboxData.push("All CBPFs");
+				checkboxData.unshift("All CBPFs");
 
 				const checkboxDivs = selectDiv.selectAll(null)
 					.data(checkboxData)
@@ -759,7 +759,7 @@
 				const input = checkbox.append("input")
 					.attr("type", "checkbox")
 					.property("checked", function(d) {
-						return chartState.selectedCbpfs.indexOf(d) > -1;
+						return chartState.selectedCbpfs.length !== d3.keys(cbpfsList).length && chartState.selectedCbpfs.indexOf(d) > -1;
 					})
 					.attr("value", function(d) {
 						return d;
@@ -775,6 +775,9 @@
 					return d === "All CBPFs";
 				}).select("input");
 
+				d3.select(allCbpfs.node().nextSibling)
+					.attr("class", "pbiobeCheckboxTextAllCbpfs");
+
 				const cbpfsCheckboxes = checkboxDivs.filter(function(d) {
 					return d !== "All CBPFs";
 				}).select("input");
@@ -784,34 +787,29 @@
 				});
 
 				allCbpfs.property("checked", function() {
-						return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
-					})
-					.property("indeterminate", function() {
-						return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
-					});
+					return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+				});
 
 				checkbox.select("input").on("change", function() {
 					if (this.value === "All CBPFs") {
 						if (this.checked) {
-							chartState.selectedCbpfs = d3.keys(cbpfsList)
+							chartState.selectedCbpfs = d3.keys(cbpfsList);
+							cbpfsCheckboxes.property("checked", false);
 						} else {
 							chartState.selectedCbpfs.length = 0;
 						};
-						checkbox.select("input")
-							.property("checked", this.checked);
 					} else {
 						if (this.checked) {
-							chartState.selectedCbpfs.push(this.value);
+							if (chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
+								chartState.selectedCbpfs = [this.value];
+							} else {
+								chartState.selectedCbpfs.push(this.value);
+							};
 						} else {
 							const thisIndex = chartState.selectedCbpfs.indexOf(this.value);
 							chartState.selectedCbpfs.splice(thisIndex, 1);
 						};
-						allCbpfs.property("checked", function() {
-								return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
-							})
-							.property("indeterminate", function() {
-								return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
-							});
+						allCbpfs.property("checked", false);
 					};
 
 					if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
