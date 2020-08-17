@@ -184,6 +184,8 @@
 			fadeOpacity2 = 0.05,
 			showMeanPadding = 100,
 			filteredCbpfsStep = 3,
+			totalLabelPadding = 8,
+			totalValueVerticalPadding = 3,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
 			formatPercent = d3.format(".0%"),
@@ -389,7 +391,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: beeswarmGroupHeight,
-			padding: [38, maxRadius + 30, 14, 220],
+			padding: [38, maxRadius + 78, 14, 220],
 			axisVerticalPadding: 16
 		};
 
@@ -1805,6 +1807,97 @@
 				.attr("y", beeswarmPanel.padding[0] - beeswarmPanel.axisVerticalPadding - 3)
 				.attr("text-anchor", "middle")
 				.text("Marker Code");
+
+			let totalLabel = beeswarmPanel.main.selectAll(".pbigamtotalLabel")
+				.data([true]);
+
+			totalLabel = totalLabel.enter()
+				.append("text")
+				.attr("class", "pbigamtotalLabel")
+				.attr("text-anchor", "end")
+				.attr("x", beeswarmPanel.width - totalLabelPadding)
+				.attr("y", beeswarmPanel.padding[0] - beeswarmPanel.axisVerticalPadding - 3)
+				.text("Total")
+				.merge(totalLabel)
+				.transition()
+				.duration(duration)
+				.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0);
+
+			const totalData = chartState.display === "aggregated" ? [{
+				value: d3.sum(data, function(d) {
+					return d.allocations
+				}),
+				marker: aggregatedDomain[0]
+			}] : data.reduce(function(acc, curr) {
+				const foundMarker = acc.find(function(d) {
+					return d.marker === (chartState.gamGroup === "GM" && curr.gamCode === "4" ? "3" : curr.gamCode);
+				});
+				if (foundMarker) {
+					foundMarker.value += curr.allocations;
+				} else {
+					acc.push({
+						value: curr.allocations,
+						marker: (chartState.gamGroup === "GM" && curr.gamCode === "4" ? "3" : curr.gamCode)
+					});
+				};
+				return acc;
+			}, []);
+
+			const totalValue = d3.sum(totalData, function(d) {
+				return d.value;
+			});
+
+			let totalValues = beeswarmPanel.main.selectAll(".pbigamtotalValues")
+				.data(totalData, function(d) {
+					return d.marker
+				});
+
+			const totalValuesExit = totalValues.exit()
+				.transition()
+				.duration(duration)
+				.style("opacity", 0)
+				.remove();
+
+			const totalValuesEnter = totalValues.enter()
+				.append("text")
+				.attr("class", "pbigamtotalValues")
+				.attr("text-anchor", "end")
+				.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0)
+				.attr("x", beeswarmPanel.width - totalLabelPadding)
+				.attr("y", function(d) {
+					return yScale(d.marker);
+				})
+				.text(function(d) {
+					return "$" + formatSIFloat(d.value);
+				});
+
+			totalValuesEnter.append("tspan")
+				.attr("class", "pbigamtotalValuesTspan")
+				.attr("dy", "1.2em")
+				.attr("x", beeswarmPanel.width - totalLabelPadding)
+				.text(function(d) {
+					return "(" + formatPercent1Decimal(d.value / totalValue) + ")";
+				});
+
+			totalValues = totalValuesEnter.merge(totalValues);
+
+			totalValues.transition()
+				.duration(duration)
+				.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0)
+				.attr("y", function(d) {
+					return yScale(d.marker);
+				});
+
+			totalValues.text(function(d) {
+					return "$" + formatSIFloat(d.value);
+				})
+				.append("tspan")
+				.attr("class", "pbigamtotalValuesTspan")
+				.attr("dy", "1.2em")
+				.attr("x", beeswarmPanel.width - totalLabelPadding)
+				.text(function(d) {
+					return "(" + formatPercent1Decimal(d.value / totalValue) + ")";
+				});
 
 			let gamDescriptionData;
 

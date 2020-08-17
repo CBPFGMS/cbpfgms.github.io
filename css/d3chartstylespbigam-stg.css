@@ -156,7 +156,7 @@ p#pbigamd3chartTitle {
 	pointer-events: none;
 }
 
-.pbigamaxisLabelCode {
+.pbigamaxisLabelCode, .pbigamtotalLabel {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	font-weight: 700;
@@ -217,6 +217,20 @@ p#pbigamd3chartTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 12px;
 	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamtotalValues {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamtotalValuesTspan {
+	font-family: "Arial", sans-serif;
+	font-size: 9px;
+	fill: #999;
 	pointer-events: none;
 }
 
