@@ -120,6 +120,14 @@ p#pbigamd3chartTitle {
 	margin-left: 2px;
 }
 
+.pbigamCheckboxTextAllCbpfs {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 2px;
+	color: #f79a3b;
+}
+
 .pbigamtopPanelMainValue, .pbigamtopPanelProjectsNumber, .pbigamtopPanelCbpfsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
