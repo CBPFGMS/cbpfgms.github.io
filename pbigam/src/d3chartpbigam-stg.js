@@ -186,6 +186,8 @@
 			filteredCbpfsStep = 3,
 			totalLabelPadding = 8,
 			totalValueVerticalPadding = 3,
+			tooltipWidthFactor = 0.45,
+			tooltipHeight = 60,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
 			formatPercent = d3.format(".0%"),
@@ -804,7 +806,7 @@
 
 			const checkboxData = d3.keys(cbpfsList);
 
-			checkboxData.push("All CBPFs");
+			checkboxData.unshift("All CBPFs");
 
 			const checkboxDivs = selectDiv.selectAll(null)
 				.data(checkboxData)
@@ -824,7 +826,7 @@
 			const input = checkbox.append("input")
 				.attr("type", "checkbox")
 				.property("checked", function(d) {
-					return chartState.selectedCbpfs.indexOf(d) > -1;
+					return chartState.selectedCbpfs.length !== d3.keys(cbpfsList).length && chartState.selectedCbpfs.indexOf(d) > -1;
 				})
 				.attr("value", function(d) {
 					return d;
@@ -840,6 +842,9 @@
 				return d === "All CBPFs";
 			}).select("input");
 
+			d3.select(allCbpfs.node().nextSibling)
+				.attr("class", "pbigamCheckboxTextAllCbpfs");
+
 			const cbpfsCheckboxes = checkboxDivs.filter(function(d) {
 				return d !== "All CBPFs";
 			}).select("input");
@@ -849,34 +854,29 @@
 			});
 
 			allCbpfs.property("checked", function() {
-					return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
-				})
-				.property("indeterminate", function() {
-					return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
-				});
+				return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+			});
 
 			checkbox.select("input").on("change", function() {
 				if (this.value === "All CBPFs") {
 					if (this.checked) {
-						chartState.selectedCbpfs = d3.keys(cbpfsList)
+						chartState.selectedCbpfs = d3.keys(cbpfsList);
+						cbpfsCheckboxes.property("checked", false);
 					} else {
 						chartState.selectedCbpfs.length = 0;
 					};
-					checkbox.select("input")
-						.property("checked", this.checked);
 				} else {
 					if (this.checked) {
-						chartState.selectedCbpfs.push(this.value);
+						if (chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
+							chartState.selectedCbpfs = [this.value];
+						} else {
+							chartState.selectedCbpfs.push(this.value);
+						};
 					} else {
 						const thisIndex = chartState.selectedCbpfs.indexOf(this.value);
 						chartState.selectedCbpfs.splice(thisIndex, 1);
 					};
-					allCbpfs.property("checked", function() {
-							return chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
-						})
-						.property("indeterminate", function() {
-							return chartState.selectedCbpfs.length < d3.keys(cbpfsList).length && chartState.selectedCbpfs.length > 0;
-						});
+					allCbpfs.property("checked", false);
 				};
 
 				if (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.length === d3.keys(cbpfsList).length) {
@@ -1762,10 +1762,10 @@
 
 					currentHoveredElem = null;
 
-					beeswarmPanel.main.selectAll(".pbigambeeswarmLabel, .pbigambeeswarmLabelBack")
-						.remove();
+					totalLabel.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0);
+					totalValues.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0);
 
-					legendPanel.main.select("#pbigamwhiteRectangle")
+					beeswarmPanel.main.selectAll(".pbigambeeswarmLabel, .pbigambeeswarmLabelBack")
 						.remove();
 
 					beeswarm.style("opacity", 1);
@@ -1818,8 +1818,9 @@
 				.attr("x", beeswarmPanel.width - totalLabelPadding)
 				.attr("y", beeswarmPanel.padding[0] - beeswarmPanel.axisVerticalPadding - 3)
 				.text("Total")
-				.merge(totalLabel)
-				.transition()
+				.merge(totalLabel);
+
+			totalLabel.transition()
 				.duration(duration)
 				.style("opacity", chartState.allocationValue === "allocations" ? 1 : 0);
 
@@ -2024,6 +2025,11 @@
 
 				currentHoveredElem = this;
 
+				const tooltipRightPadding = chartState.allocationValue === "allocations" ? 36 : 24;
+
+				totalLabel.style("opacity", fadeOpacity2);
+				totalValues.style("opacity", fadeOpacity2);
+
 				const labelsData = chartState.allocationValue === "percentageGam" ?
 					JSON.parse(JSON.stringify(data.filter(function(e) {
 						return e.gamCode === d.gamCode;
@@ -2080,41 +2086,53 @@
 				const tooltipContainer = tooltip.append("div")
 					.style("display", "flex")
 					.style("align-items", "center")
-					.style("width", (legendPanel.width - 16) * 0.6 + "px")
-					.style("height", legendPanel.height + panelHorizontalPadding + "px");
+					.style("width", beeswarmPanel.width * tooltipWidthFactor + "px")
+					.style("height", tooltipHeight + "px");
 
 				const leftDiv = tooltipContainer.append("div")
-					.style("padding-right", "10px")
-					.style("text-align", "center")
-					.style("flex", "0 20%");
+					.style("padding", "5px")
+					.style("line-height", 1)
+					.style("display", "flex")
+					.style("justify-content", "center")
+					.style("align-items", "center")
+					.style("height", "100%")
+					.style("border-right", "1px solid #ddd")
+					.style("flex", "0 16%");
 
 				const middleDiv = tooltipContainer.append("div")
-					.style("flex", "0 36%");
+					.style("padding", "5px")
+					.style("font-size", "11px")
+					.style("height", "100%")
+					.style("border-right", "1px solid #ddd")
+					.style("flex", "0 39%");
 
 				const rightDiv = tooltipContainer.append("div")
-					.style("flex", "0 44%");
+					.style("padding", "5px")
+					.style("font-size", "11px")
+					.style("height", "100%")
+					.style("flex", "0 45%");
 
 				const cbpf = leftDiv.append("div")
 					.classed("contributionColorHTMLcolor", true)
-					.style("font-size", "16px")
+					.style("font-size", "13px")
 					.style("font-weight", 700)
-					.text(d.cbpfName);
+					.style("text-align", "center")
+					.html(d.cbpfName);
 
 				const gamMarker = middleDiv.append("div")
-					.text((chartState.gamGroup === "GM" ? "Gender Marker: " : "Gender and Age Marker: ") + d.gamCode);
+					.html((chartState.gamGroup === "GM" ? "&bull; Gender Marker: " : "&bull; Gender and Age Marker: ") + d.gamCode);
 
 				const projects = middleDiv.append("div")
-					.text("Number of projects: " + d.projects);
+					.html("&bull; Number of projects: " + d.projects);
 
 				const allocations = middleDiv.append("div")
-					.html("Allocations: ")
+					.html("&bull; Allocations: ")
 					.append("span")
 					.attr("class", "contributionColorHTMLcolor")
 					.style("font-weight", 700)
 					.html("$" + formatMoney0Decimals(d.allocations));
 
 				const percentages = rightDiv.append("div")
-					.style("font-size", "12px")
 					.style("text-align", "justify")
 					.style("text-justify", "auto")
 					.style("line-height", "110%")
@@ -2122,19 +2140,16 @@
 						"</strong></span> of the total allocations in " + d.cbpfName + ", and they correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
 						"</strong></span> of all CBPF allocations with Marker " + d.gamCode + ")");
 
-				const whiteRectangle = legendPanel.main.append("rect")
-					.raise()
-					.attr("id", "pbigamwhiteRectangle")
-					.attr("width", legendPanel.width)
-					.attr("height", legendPanel.height)
-					.style("fill", "white");
-
 				const containerBoundingRect = containerDiv.node().getBoundingClientRect();
 
-				const legendPanelBoundingRect = legendPanel.main.node().getBoundingClientRect();
+				const thisBoundingRect = this.getBoundingClientRect();
 
-				tooltip.style("top", legendPanelBoundingRect.top - containerBoundingRect.top - (2 * panelHorizontalPadding) + "px")
-					.style("left", padding[3] + ((legendPanel.width - 16) * 0.2) + "px");
+				const tooltipBoundingRect = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("top", ((thisBoundingRect.top + thisBoundingRect.bottom) / 2) - containerBoundingRect.top - (tooltipBoundingRect.height / 2) + "px")
+					.style("left", containerBoundingRect.right - thisBoundingRect.right - tooltipRightPadding < tooltipBoundingRect.width ?
+						thisBoundingRect.left - tooltipBoundingRect.width - containerBoundingRect.left - 4 + "px" :
+						thisBoundingRect.right + tooltipRightPadding - containerBoundingRect.left + "px");
 
 				//end of mouseOverBeeswarm
 			};
