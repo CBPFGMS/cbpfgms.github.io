@@ -186,7 +186,7 @@
 			filteredCbpfsStep = 3,
 			totalLabelPadding = 8,
 			totalValueVerticalPadding = 3,
-			tooltipWidthFactor = 0.45,
+			tooltipWidthFactor = 0.47,
 			tooltipHeight = 60,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
@@ -2097,20 +2097,20 @@
 					.style("align-items", "center")
 					.style("height", "100%")
 					.style("border-right", "1px solid #ddd")
-					.style("flex", "0 16%");
+					.style("flex", "0 18%");
 
 				const middleDiv = tooltipContainer.append("div")
 					.style("padding", "5px")
-					.style("font-size", "11px")
+					.style("font-size", "12px")
 					.style("height", "100%")
 					.style("border-right", "1px solid #ddd")
-					.style("flex", "0 39%");
+					.style("flex", "0 42%");
 
 				const rightDiv = tooltipContainer.append("div")
 					.style("padding", "5px")
 					.style("font-size", "11px")
 					.style("height", "100%")
-					.style("flex", "0 45%");
+					.style("flex", "0 40%");
 
 				const cbpf = leftDiv.append("div")
 					.classed("contributionColorHTMLcolor", true)
@@ -2137,7 +2137,7 @@
 					.style("text-justify", "auto")
 					.style("line-height", "110%")
 					.html("(these allocations correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageCbpf) +
-						"</strong></span> of the total allocations in " + d.cbpfName + ", and they correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
+						"</strong></span> of the total allocations in " + d.cbpfName + " and to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
 						"</strong></span> of all CBPF allocations with Marker " + d.gamCode + ")");
 
 				const containerBoundingRect = containerDiv.node().getBoundingClientRect();
