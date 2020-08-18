@@ -121,6 +121,14 @@ p#pbiolcd3chartTitle {
 	margin-left: 2px;
 }
 
+.pbiolcCheckboxTextAllCbpfs {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 2px;
+	color: #f79a3b;
+}
+
 .pbiolctopPanelMainValue, .pbiolctopPanelPersonsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;

@@ -25,7 +25,6 @@
 	white-space: normal;
 	padding: 8px;
 	line-height: 120%;
-	font-size: 14px;
 	background: #f1f1f1; 
 	border: 1px solid #999; 
 	border-radius: 4px;
@@ -113,11 +112,23 @@ p#pbigamd3chartTitle {
 	cursor: pointer;
 }
 
+.pbigamCheckboxDiv label {
+    margin-bottom: 0 !important
+}
+
 .pbigamCheckboxText {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
 	color: #666;
 	margin-left: 2px;
+}
+
+.pbigamCheckboxTextAllCbpfs {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 2px;
+	color: #f79a3b;
 }
 
 .pbigamtopPanelMainValue, .pbigamtopPanelProjectsNumber, .pbigamtopPanelCbpfsNumber {
@@ -156,7 +167,7 @@ p#pbigamd3chartTitle {
 	pointer-events: none;
 }
 
-.pbigamaxisLabelCode {
+.pbigamaxisLabelCode, .pbigamtotalLabel {
 	font-family: "Arial", sans-serif;
 	font-size: 10px;
 	font-weight: 700;
@@ -217,6 +228,20 @@ p#pbigamd3chartTitle {
 	font-family: "Arial", sans-serif;
 	font-size: 12px;
 	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamtotalValues {
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	fill: #888;
+	pointer-events: none;
+}
+
+.pbigamtotalValuesTspan {
+	font-family: "Arial", sans-serif;
+	font-size: 9px;
+	fill: #999;
 	pointer-events: none;
 }
 

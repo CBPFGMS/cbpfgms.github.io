@@ -112,6 +112,10 @@ p#pbigamd3chartTitle {
 	cursor: pointer;
 }
 
+.pbigamCheckboxDiv label {
+    margin-bottom: 0 !important
+}
+
 .pbigamCheckboxText {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
