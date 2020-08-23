@@ -1641,6 +1641,9 @@
 					return d === "Show All";
 				}).select("input");
 
+				d3.select(allDonors.node().nextSibling)
+					.classed("pbicliCheckboxTextShowAll", true);
+
 				allDonors.property("checked", function() {
 					return currentlyChecked.every(function(d) {
 						return d;
@@ -1753,6 +1756,9 @@
 				const allCbpfs = cbpfsCheckboxes.filter(function(d) {
 					return d === "Show All";
 				}).select("input");
+
+				d3.select(allCbpfs.node().nextSibling)
+					.classed("pbicliCheckboxTextShowAll", true);
 
 				allCbpfs.property("checked", function() {
 					return currentlyChecked.every(function(d) {

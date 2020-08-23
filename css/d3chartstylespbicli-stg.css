@@ -267,10 +267,21 @@
 	line-height: 1 !important;
 }
 
+.pbicliCheckboxDonorsDiv label, .pbicliCheckboxDonorsDiv input, .pbicliCheckboxCbpfsDiv label, .pbicliCheckboxCbpfsDiv input {
+	cursor: pointer;
+}
+
 .pbicliCheckboxText {
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
 	color: #444;
+}
+
+.pbicliCheckboxTextShowAll {
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+	color: #f79a3b;
 }
 
 .pbicliSelectedCbpfsCloseDiv {
