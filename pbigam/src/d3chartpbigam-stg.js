@@ -180,8 +180,7 @@
 			axisDescriptionsLineHeight = 4.5,
 			legendSizeLine = maxRadius + 10,
 			legendColorPadding = 164,
-			fadeOpacity = 0.15,
-			fadeOpacity2 = 0.05,
+			fadeOpacity = 0.2,
 			showMeanPadding = 100,
 			filteredCbpfsStep = 3,
 			totalLabelPadding = 8,
@@ -2027,8 +2026,8 @@
 
 				const tooltipRightPadding = chartState.allocationValue === "allocations" ? 36 : 24;
 
-				totalLabel.style("opacity", fadeOpacity2);
-				totalValues.style("opacity", fadeOpacity2);
+				totalLabel.style("opacity", fadeOpacity);
+				totalValues.style("opacity", fadeOpacity);
 
 				const labelsData = JSON.parse(JSON.stringify(data.filter(function(e) {
 					return chartState.display === "aggregated" || chartState.allocationValue === "percentageGam" ?
@@ -2069,12 +2068,12 @@
 				beeswarm.style("opacity", function(e) {
 					if (chartState.allocationValue !== "percentageGam") {
 						if (chartState.display === "aggregated") {
-							return e.cbpfId === d.cbpfId && e.gamCode === d.gamCode ? 1 : fadeOpacity2;
+							return e.cbpfId === d.cbpfId && e.gamCode === d.gamCode ? 1 : fadeOpacity;
 						} else {
-							return e.cbpfId === d.cbpfId ? 1 : fadeOpacity2;
+							return e.cbpfId === d.cbpfId ? 1 : fadeOpacity;
 						};
 					} else {
-						return this === currentHoveredElem ? 1 : fadeOpacity2;
+						return this === currentHoveredElem ? 1 : fadeOpacity;
 					};
 				});
 
