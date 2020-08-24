@@ -1589,7 +1589,13 @@
 					return d.isoCode
 				});
 
-				donorsData.push("Show All");
+				donorsData.forEach(function(d, i) {
+					if (i > checkboxesLimit) checkedDonors[d] = false;
+				});
+
+				const currentlyChecked = d3.values(checkedDonors);
+
+				donorsData.unshift("Show All");
 
 				donorsLegendDivBottom.selectAll(".pbicliSelectedDonorsDiv").remove();
 
@@ -1626,28 +1632,22 @@
 
 				donorsCheckboxes.select("input")
 					.property("checked", function(d, i) {
-						if (i > checkboxesLimit) {
-							return checkedDonors[d] = false;
-						} else {
-							return checkedDonors[d];
-						};
+						return !currentlyChecked.every(function(e) {
+							return e;
+						}) && checkedDonors[d];
 					});
-
-				const currentlyChecked = d3.values(checkedDonors);
 
 				const allDonors = donorsCheckboxes.filter(function(d) {
 					return d === "Show All";
 				}).select("input");
 
+				d3.select(allDonors.node().nextSibling)
+					.classed("pbicliCheckboxTextShowAll", true);
+
 				allDonors.property("checked", function() {
 					return currentlyChecked.every(function(d) {
 						return d;
 					});
-				}).property("indeterminate", function() {
-					const reduced = currentlyChecked.filter(function(value, index, self) {
-						return self.indexOf(value) === index;
-					});
-					return reduced.length > 1;
 				});
 
 				donorsCheckboxes.selectAll("input").on("change", function() {
@@ -1662,24 +1662,23 @@
 							.filter(function(d) {
 								return d !== "Show All";
 							})
-							.property("checked", this.checked);
+							.property("checked", false);
 
 					} else {
 
+						const newCurrentlyChecked = d3.values(checkedDonors);
+
+						if (newCurrentlyChecked.every(function(e) {
+								return e;
+							})) {
+							donorsData.forEach(function(d) {
+								checkedDonors[d] = false;
+							});
+						};
+
 						checkedDonors[this.value] = this.checked;
 
-						const currentlyChecked = d3.values(checkedDonors);
-
-						allDonors.property("checked", function() {
-							return currentlyChecked.every(function(d) {
-								return d;
-							});
-						}).property("indeterminate", function() {
-							const reduced = currentlyChecked.filter(function(value, index, self) {
-								return self.indexOf(value) === index;
-							});
-							return reduced.length > 1;
-						});
+						allDonors.property("checked", false);
 
 					};
 
@@ -1706,7 +1705,13 @@
 					return d.isoCode
 				});
 
-				cbpfsData.push("Show All");
+				cbpfsData.forEach(function(d, i) {
+					if (i > checkboxesLimit) checkedCbpfs[d] = false;
+				});
+
+				const currentlyChecked = d3.values(checkedCbpfs);
+
+				cbpfsData.unshift("Show All");
 
 				cbpfsLegendDivBottom.selectAll(".pbicliSelectedCbpfsDiv").remove();
 
@@ -1743,28 +1748,22 @@
 
 				cbpfsCheckboxes.select("input")
 					.property("checked", function(d, i) {
-						if (i > checkboxesLimit) {
-							return checkedCbpfs[d] = false;
-						} else {
-							return checkedCbpfs[d];
-						};
+						return !currentlyChecked.every(function(e) {
+							return e;
+						}) && checkedCbpfs[d];
 					});
-
-				const currentlyChecked = d3.values(checkedCbpfs);
 
 				const allCbpfs = cbpfsCheckboxes.filter(function(d) {
 					return d === "Show All";
 				}).select("input");
 
+				d3.select(allCbpfs.node().nextSibling)
+					.classed("pbicliCheckboxTextShowAll", true);
+
 				allCbpfs.property("checked", function() {
 					return currentlyChecked.every(function(d) {
 						return d;
 					});
-				}).property("indeterminate", function() {
-					const reduced = currentlyChecked.filter(function(value, index, self) {
-						return self.indexOf(value) === index;
-					});
-					return reduced.length > 1;
 				});
 
 				cbpfsCheckboxes.selectAll("input").on("change", function() {
@@ -1779,24 +1778,25 @@
 							.filter(function(d) {
 								return d !== "Show All";
 							})
-							.property("checked", this.checked);
+							.property("checked", false);
 
 					} else {
+
+						const newCurrentlyChecked = d3.values(checkedCbpfs);
+
+						if (newCurrentlyChecked.every(function(e) {
+								return e;
+							})) {
+							cbpfsData.forEach(function(d) {
+								checkedCbpfs[d] = false;
+							});
+						};
 
 						checkedCbpfs[this.value] = this.checked;
 
 						const currentlyChecked = d3.values(checkedCbpfs);
 
-						allCbpfs.property("checked", function() {
-							return currentlyChecked.every(function(d) {
-								return d;
-							});
-						}).property("indeterminate", function() {
-							const reduced = currentlyChecked.filter(function(value, index, self) {
-								return self.indexOf(value) === index;
-							});
-							return reduced.length > 1;
-						});
+						allCbpfs.property("checked", false);
 
 					};
 

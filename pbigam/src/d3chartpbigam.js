@@ -180,13 +180,12 @@
 			axisDescriptionsLineHeight = 4.5,
 			legendSizeLine = maxRadius + 10,
 			legendColorPadding = 164,
-			fadeOpacity = 0.15,
-			fadeOpacity2 = 0.05,
+			fadeOpacity = 0.2,
 			showMeanPadding = 100,
 			filteredCbpfsStep = 3,
 			totalLabelPadding = 8,
 			totalValueVerticalPadding = 3,
-			tooltipWidthFactor = 0.47,
+			tooltipWidthFactor = 0.48,
 			tooltipHeight = 60,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
@@ -2027,20 +2026,14 @@
 
 				const tooltipRightPadding = chartState.allocationValue === "allocations" ? 36 : 24;
 
-				totalLabel.style("opacity", fadeOpacity2);
-				totalValues.style("opacity", fadeOpacity2);
+				totalLabel.style("opacity", fadeOpacity);
+				totalValues.style("opacity", fadeOpacity);
 
-				const labelsData = chartState.allocationValue === "percentageGam" ?
-					JSON.parse(JSON.stringify(data.filter(function(e) {
-						return e.gamCode === d.gamCode;
-					}))).sort(function(a, b) {
-						return a.percentageGam - b.percentageGam;
-					}).filter(function(e, i) {
-						return !(i % filteredCbpfsStep) || e.cbpfId === d.cbpfId;
-					}) :
-					JSON.parse(JSON.stringify(data.filter(function(e) {
-						return e.cbpfId === d.cbpfId;
-					})));
+				const labelsData = JSON.parse(JSON.stringify(data.filter(function(e) {
+					return chartState.display === "aggregated" || chartState.allocationValue === "percentageGam" ?
+						e.cbpfId === d.cbpfId && e.gamCode === d.gamCode :
+						e.cbpfId === d.cbpfId;
+				})));
 
 				const beeswarmLabelBack = beeswarmPanel.main.selectAll(null)
 					.data(labelsData)
@@ -2074,9 +2067,13 @@
 
 				beeswarm.style("opacity", function(e) {
 					if (chartState.allocationValue !== "percentageGam") {
-						return e.cbpfId === d.cbpfId ? 1 : fadeOpacity2;
+						if (chartState.display === "aggregated") {
+							return e.cbpfId === d.cbpfId && e.gamCode === d.gamCode ? 1 : fadeOpacity;
+						} else {
+							return e.cbpfId === d.cbpfId ? 1 : fadeOpacity;
+						};
 					} else {
-						return e.gamCode === d.gamCode ? 1 : fadeOpacity2;
+						return this === currentHoveredElem ? 1 : fadeOpacity;
 					};
 				});
 
@@ -2104,12 +2101,19 @@
 					.style("font-size", "12px")
 					.style("height", "100%")
 					.style("border-right", "1px solid #ddd")
-					.style("flex", "0 42%");
+					.style("flex", "0 42%")
+					.style("display", "flex")
+					.style("justify-content", "center")
+					.style("align-items", "center")
+					.append("div");
 
 				const rightDiv = tooltipContainer.append("div")
 					.style("padding", "5px")
 					.style("font-size", "11px")
 					.style("height", "100%")
+					.style("display", "flex")
+					.style("justify-content", "center")
+					.style("align-items", "center")
 					.style("flex", "0 40%");
 
 				const cbpf = leftDiv.append("div")
@@ -2133,8 +2137,6 @@
 					.html("$" + formatMoney0Decimals(d.allocations));
 
 				const percentages = rightDiv.append("div")
-					.style("text-align", "justify")
-					.style("text-justify", "auto")
 					.style("line-height", "110%")
 					.html("(these allocations correspond to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageCbpf) +
 						"</strong></span> of the total allocations in " + d.cbpfName + " and to <span class='contributionColorHTMLcolor'><strong>" + formatPercent1Decimal(d.percentageGam) +
@@ -2146,7 +2148,13 @@
 
 				const tooltipBoundingRect = tooltip.node().getBoundingClientRect();
 
-				tooltip.style("top", ((thisBoundingRect.top + thisBoundingRect.bottom) / 2) - containerBoundingRect.top - (tooltipBoundingRect.height / 2) + "px")
+				const thisTick = yAxisGroup.selectAll(".tick line").filter(function(e) {
+					return e === (chartState.display === "aggregated" ? "aggregated" : d.gamCode);
+				});
+
+				const thisTickBoundingRect = thisTick.node().getBoundingClientRect();
+
+				tooltip.style("top", thisTickBoundingRect.top - containerBoundingRect.top - (tooltipBoundingRect.height / 2) + "px")
 					.style("left", containerBoundingRect.right - thisBoundingRect.right - tooltipRightPadding < tooltipBoundingRect.width ?
 						thisBoundingRect.left - tooltipBoundingRect.width - containerBoundingRect.left - 4 + "px" :
 						thisBoundingRect.right + tooltipRightPadding - containerBoundingRect.left + "px");
