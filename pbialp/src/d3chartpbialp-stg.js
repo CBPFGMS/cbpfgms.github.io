@@ -2060,7 +2060,7 @@
 				const netFundingText = netFundingGroup.append("text")
 					.attr("class", "pbialpAverageTextControl")
 					.attr("x", 10)
-					.text("Net Funding")
+					.text("Net Funding*")
 					.attr("y", 5);
 
 				const showAverageGroup = bottomButtonsGroup.append("g")
