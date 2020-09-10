@@ -2040,7 +2040,7 @@
 				.duration(duration)
 				.tween("text", function(d) {
 					const node = this;
-					const oldVariation = localVariable.get(this)
+					const oldVariation = localVariable.get(this) || 0;
 					const variation = (d.amount / d.amountSecondLevel) - 1;
 					localVariable.set(this, variation);
 					const i = d3.interpolate(oldVariation, variation)
