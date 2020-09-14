@@ -80,14 +80,21 @@
 	margin-bottom: 8px;
 }
 
+.pbinadtimelinesDisclaimer {
+	font-family: "Arial";
+	font-size: 11px;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
 .pbinadtimelineContainer {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: space-between;
 }
 
 .pbinadtimelines {
 	display: flex;
-	margin-right: 4px;
 	margin-bottom: 4px;
 	border-radius: 4px;
 	background-color: #f4f4f4;
@@ -95,7 +102,7 @@
 
 .pbinadtimelinesNameDiv {
 	display: flex;
-	flex:0 35%;
+	flex:0 30%;
 	font-family: "Arial", sans-serif;
 	font-size: 12px;
 	color: #444;
@@ -119,7 +126,7 @@
 
 .pbinadtimelinesChartDiv {
 	display: flex;
-	flex:0 65%;
+	flex:0 70%;
 	flex-wrap: nowrap;
 }
 
@@ -322,9 +329,10 @@ p#pbinadd3chartTitle {
 
 .pbinadAnnotationMainText {
 	font-family: "Arial", sans-serif;
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: 700;
 	pointer-events: none;
+	fill: white;
 }
 
 .pbinadAnnotationText {
