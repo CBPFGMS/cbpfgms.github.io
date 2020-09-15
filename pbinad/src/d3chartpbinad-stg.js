@@ -4193,7 +4193,15 @@
 					return d.values[0] && d.values[3] ? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1)) : "n/a";
 				});
 
-			const timelinesDisclaimer = timelineContainer.append("div")
+			const timelinesDisclaimer = timelineDiv.selectAll(".pbinadtimelinesDisclaimer")
+				.data(timelineData.filter(function(d) {
+					return d.partner === "NGO";
+				}));
+
+			timelinesDisclaimer.exit().remove();
+
+			timelinesDisclaimer.enter()
+				.append("div")
 				.attr("class", "pbinadtimelinesDisclaimer")
 				.append("span")
 				.style("color", subpartnerColor)
@@ -4464,8 +4472,6 @@
 			data.sort(function(a, b) {
 				return b.values[3] - a.values[3];
 			});
-
-			console.log(data); //Change data or creating a new function???
 
 			return data;
 
