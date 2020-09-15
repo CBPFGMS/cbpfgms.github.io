@@ -181,8 +181,10 @@
 			labelLinePadding = 4,
 			fadeOpacity = 0.1,
 			unBlue = "#1F69B3",
+			highlightColor = "#F79A3B",
 			vizNameQueryString = "allocation-trends",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20trends",
 			colorsArray = ["#418FDE", "#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D"],
 			chartTitleDefault = "Allocation Trends",
 			sortButtonsOptions = ["total", "alphabetically"],
@@ -1621,6 +1623,9 @@
 
 		function createAnnotationsDiv() {
 
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbialiOverDivHelp");
 
@@ -1633,24 +1638,51 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + 2));
 
-			const mainTextRect = helpSVG.append("rect")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 4)
-				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight)
-				.style("fill", "white")
-				.style("pointer-events", "all")
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
 				.style("cursor", "pointer")
-				.on("click", function() {
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
 					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			const mainText = helpSVG.append("text")
-				.attr("class", "pbialiAnnotationMainText contributionColorFill")
+			closeRects.append("text")
+				.attr("class", "pbialiAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
-				.attr("y", 10 + topDivHeight / 2)
-				.text("CLICK HERE TO CLOSE THE HELP");
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
 
 			const helpData = [{
 				x: padding[3] + mainPanel.padding[3] + 10,

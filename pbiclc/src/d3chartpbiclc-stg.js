@@ -439,6 +439,7 @@
 			paidColor = "#9063CD",
 			pledgedColor = "#E56A54",
 			unBlue = "#1F69B3",
+			highlightColor = "#F79A3B",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
 			chartTitleDefault = "CBPF Contributions",
@@ -446,6 +447,7 @@
 			countryNames = {},
 			vizNameQueryString = "contributions",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#CBPF_Contributions",
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -3037,6 +3039,9 @@
 
 		function createAnnotationsDiv() {
 
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbiclcOverDivHelp");
 
@@ -3049,24 +3054,51 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const mainTextRect = helpSVG.append("rect")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 4)
-				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight)
-				.style("fill", "white")
-				.style("pointer-events", "all")
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
 				.style("cursor", "pointer")
-				.on("click", function() {
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
 					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			const mainText = helpSVG.append("text")
-				.attr("class", "pbiclcAnnotationMainText contributionColorFill")
+			closeRects.append("text")
+				.attr("class", "pbiclcAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
-				.attr("y", 10 + topDivHeight / 2)
-				.text("CLICK HERE TO CLOSE THE HELP");
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
 
 			const helpData = [{
 				x: 96,

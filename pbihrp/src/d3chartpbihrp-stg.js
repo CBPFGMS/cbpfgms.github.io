@@ -180,6 +180,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			unBlue = "#1F69B3",
 			colorsArray = ["#1175BA", "#9BB9DF", "#AFAFAF", "#E9EAEB"],
+			highlightColor = "#F79A3B",
 			variablesArray = ["cbpffunding", "cbpftarget", "hrpfunding", "hrprequirements"],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
@@ -192,6 +193,7 @@
 			chartTitleDefault = "CBPF Target vs HRP",
 			vizNameQueryString = "cbpfvshrp",
 			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#cbpf%20vs%20hrp",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			sortByValues = {
 				cbpffunding: "CBPF Funding",
@@ -3186,6 +3188,9 @@
 
 		function createAnnotationsDiv() {
 
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
+
 			const overDiv = containerDiv.append("div")
 				.attr("class", "pbihrpOverDivHelp");
 
@@ -3198,24 +3203,51 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
 
-			const mainTextRect = helpSVG.append("rect")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 0)
-				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight + 4)
-				.style("fill", "white")
-				.style("pointer-events", "all")
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
 				.style("cursor", "pointer")
-				.on("click", function() {
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
 					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			const mainText = helpSVG.append("text")
-				.attr("class", "pbihrpAnnotationMainText contributionColorFill")
+			closeRects.append("text")
+				.attr("class", "pbihrpAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
-				.attr("y", 10 + topDivHeight / 2)
-				.text("CLICK HERE TO CLOSE THE HELP");
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
 
 			const helpData = [{
 				x: 6,
