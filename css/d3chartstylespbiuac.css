@@ -81,10 +81,11 @@ p#pbiuacd3chartTitle {
 }
 
 .pbiuacAnnotationMainText {
-	font-family: "Roboto", sans-serif;
-	font-size: 18px;
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
 	font-weight: 700;
 	pointer-events: none;
+	fill: white;
 }
 
 .pbiuacAnnotationText {

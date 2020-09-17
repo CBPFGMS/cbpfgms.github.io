@@ -202,19 +202,20 @@
 			subpartnerColor = "#E56A54",
 			greenArrowColor = "#7FB92F",
 			redArrowColor = "#CD3A1F",
+			highlightColor = "#F79A3B",
 			tooltipSvgWidth = 300,
 			lollipopSvgGroupHeight = 14,
 			stickHeight = 2,
 			lollipopRadius = 4,
 			labelPadding = 2,
-			timelinesWidth = 280,
+			timelinesWidth = 425,
 			timelinesHeight = 50,
-			timelineSvgWidth = 110,
+			timelineSvgWidth = 220,
 			timelineSvgHeight = 50,
-			timelineSvgPadding = [10, 34, 10, 34],
+			timelineSvgPadding = [10, 38, 10, 44],
 			localTimelineScale = d3.local(),
 			localTimelineGenerator = d3.local(),
-			timelineSvgTextPadding = 2,
+			timelineSvgTextPadding = 4,
 			timelineSvgVertTextPadding = 3,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
@@ -227,10 +228,12 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent1dec = d3.format(".1%"),
 			formatPercent = d3.format(".0%"),
+			nationalPartnersName = "National Partners",
 			legendData = ["CBPF", "CERF", "Direct Partners", "Sub-implementing Partners"],
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
 			cbpfsListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
@@ -4048,7 +4051,8 @@
 				.attr("class", "pbinadtimelinesNameDiv")
 				.append("p")
 				.html(function(d) {
-					return aggregationNameRule[d.partner];
+					return d.partner === "NGO" ? nationalPartnersName + "<span style='color: " + subpartnerColor + ";'>*</span>" :
+						aggregationNameRule[d.partner];
 				});
 
 			const timelinesChartDiv = timelinesEnter.append("div")
@@ -4083,7 +4087,7 @@
 
 			const timelineSvgFinalValue = timelinesSvg.append("text")
 				.attr("class", "pbinadtimelineSvgFinalValue")
-				.attr("x", timelineSvgWidth - timelineSvgPadding[3] + timelineSvgTextPadding)
+				.attr("x", timelineSvgWidth - timelineSvgPadding[1] + timelineSvgTextPadding)
 				.attr("y", function(d) {
 					return localTimelineScale.get(this)(d.values[3]) + timelineSvgVertTextPadding;
 				})
@@ -4188,6 +4192,23 @@
 				.html(function(d) {
 					return d.values[0] && d.values[3] ? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1)) : "n/a";
 				});
+
+			const timelinesDisclaimer = timelineDiv.selectAll(".pbinadtimelinesDisclaimer")
+				.data(timelineData.filter(function(d) {
+					return d.partner === "NGO";
+				}));
+
+			timelinesDisclaimer.exit().remove();
+
+			timelinesDisclaimer.enter()
+				.append("div")
+				.attr("class", "pbinadtimelinesDisclaimer")
+				.append("span")
+				.style("color", subpartnerColor)
+				.html("*")
+				.append("span")
+				.style("color", "#666")
+				.html("National Partners includes funding to National NGOs, Government/Others and Private Contractors.");
 
 			//end of createTimeline
 		};
@@ -4414,7 +4435,11 @@
 					});
 
 					const foundTargetPartner = data.find(function(d) {
-						return d.partner === row.target;
+						if (partnersListKeys.indexOf(row.target) === -1) {
+							return d.partner === "NGO";
+						} else {
+							return d.partner === row.target;
+						};
 					});
 
 					if (+row.year < currentYear && +row.year >= (currentYear - 4)) {
@@ -4426,13 +4451,13 @@
 								values: [0, 0, 0, 0]
 							};
 							obj.values[+row.year - (currentYear - 4)] = -row.value;
-							data.push(values);
+							data.push(obj);
 						};
 						if (foundTargetPartner) {
 							foundTargetPartner.values[+row.year - (currentYear - 4)] += +row.value;
 						} else {
 							const obj = {
-								partner: row.target,
+								partner: partnersListKeys.indexOf(row.target) === -1 ? "NGO" : row.target,
 								values: [0, 0, 0, 0]
 							};
 							obj.values[+row.year - (currentYear - 4)] = +row.value;
@@ -4644,26 +4669,51 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
-			const mainTextRect = helpSVG.append("rect")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 4)
-				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight)
-				.style("fill", "white")
-				.style("pointer-events", "all")
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
 				.style("cursor", "pointer")
-				.on("click", function() {
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
 					iconsDiv.style("opacity", 1)
 						.style("pointer-events", "all");
 					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			const mainText = helpSVG.append("text")
-				.attr("class", "pbinadAnnotationMainText contributionColorFill")
+			closeRects.append("text")
+				.attr("class", "pbinadAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
-				.attr("y", 10 + topDivHeight / 2)
-				.text("CLICK HERE TO CLOSE THE HELP");
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
 
 			const helpData = [{
 				x: 4,

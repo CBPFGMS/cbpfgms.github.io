@@ -287,9 +287,10 @@ p#pbigamd3chartTitle {
 
 .pbigamAnnotationMainText {
 	font-family: "Arial", sans-serif;
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: 700;
 	pointer-events: none;
+	fill: white;
 }
 
 .pbigamAnnotationText {

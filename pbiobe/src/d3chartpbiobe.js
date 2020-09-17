@@ -177,6 +177,7 @@
 			formatComma = d3.format(","),
 			formatRoundPeople = d3.format(".1s"),
 			unBlue = "#1F69B3",
+			highlightColor = "#F79A3B",
 			titlePadding = 25,
 			percentageVerPadding = 4,
 			percentageHorPadding = 3,
@@ -190,6 +191,7 @@
 			chartTitleDefault = "Targeted and Reached People Overview",
 			vizNameQueryString = "affected-persons-trends",
 			bookmarkSite = "https://pfbi.unocha.org/bookmark.html?",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#affected%20persons%20trends",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
@@ -1905,26 +1907,51 @@
 			const helpSVG = overDiv.append("svg")
 				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
-			const mainTextRect = helpSVG.append("rect")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width))
-				.attr("y", 4)
-				.attr("width", width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1])
-				.attr("height", topDivHeight)
-				.style("fill", "white")
-				.style("pointer-events", "all")
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
 				.style("cursor", "pointer")
-				.on("click", function() {
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
 					iconsDiv.style("opacity", 1)
 						.style("pointer-events", "all");
 					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			const mainText = helpSVG.append("text")
-				.attr("class", "pbiobeAnnotationMainText contributionColorFill")
+			closeRects.append("text")
+				.attr("class", "pbiobeAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) + (width - (iconsDivSize.left - topDivSize.left) * (width / topDivSize.width) - padding[1]) / 2)
-				.attr("y", 10 + topDivHeight / 2)
-				.text("CLICK HERE TO CLOSE THE HELP");
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
 
 			const helpData = [{
 				x: 60,
