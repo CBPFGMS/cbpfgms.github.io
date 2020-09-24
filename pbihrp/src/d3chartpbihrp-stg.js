@@ -2278,10 +2278,7 @@
 				.append("tspan")
 				.style("font-weight", 400)
 				.text(function(d) {
-					//THIS IS HARDCODED, SHOULD BE REMOVED
-					const thisPercentage = d.cbpfId === "62" || d.cbpfId === "70" ? "7.5%" : targetPercentage;
-
-					return " (" + thisPercentage + " of " + formatSIFloat(d.hrpfunding) + ")"
+					return " (" + targetPercentage + " of " + formatSIFloat(d.hrpfunding) + ")";
 				});
 
 			barChartGroup.select(".pbihrpbarChartPercentageText")
