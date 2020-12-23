@@ -5116,7 +5116,7 @@
 
 					createLetterhead();
 
-					const intro = pdf.splitTextToSize("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", (210 - pdfMargins.left - pdfMargins.right), {
+					const intro = pdf.splitTextToSize("", (210 - pdfMargins.left - pdfMargins.right), {
 						fontSize: 12
 					});
 
