@@ -4998,7 +4998,9 @@
 
 			setSvgStyles(svg.node());
 
-			if (fromContextMenu && currentHoveredElement) setSvgStyles(tooltip.select("svg").node());
+			if (fromContextMenu && currentHoveredElement) {
+				if (tooltip.select("svg").size()) setSvgStyles(tooltip.select("svg").node())
+			};
 
 			containerDiv.selectAll(".pbinadtimelinesChartDiv svg")
 				.each(function() {
