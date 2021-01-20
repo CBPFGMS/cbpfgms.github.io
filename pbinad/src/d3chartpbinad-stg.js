@@ -419,8 +419,7 @@
 			buttonAggregationWidth: 158,
 			buttonsMargin: 4,
 			buttonVerticalPadding: 4,
-			arrowPadding: 18,
-			aggregationPadding: 26
+			arrowPadding: 18
 		};
 
 		const sankeyPanel = {
@@ -1237,10 +1236,7 @@
 					return "Aggregate by Partner " + capitalize(d);
 				});
 
-			const buttonsGroupSize = Math.min(buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsGroup.node().getBoundingClientRect().width,
-				buttonsPanel.padding[3] + buttonsNumber * buttonsPanel.buttonWidth + 2 * buttonsPanel.arrowPadding);
-
-			buttonsAggregationGroup.attr("transform", "translate(" + (buttonsGroupSize + buttonsPanel.aggregationPadding) + ",0)");
+			buttonsAggregationGroup.attr("transform", "translate(" + (buttonsPanel.width - (2 * buttonsPanel.buttonAggregationWidth)) + ",0)");
 
 			const leftArrow = buttonsPanel.main.append("g")
 				.attr("class", "pbinadLeftArrowGroup")
