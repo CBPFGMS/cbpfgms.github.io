@@ -1912,7 +1912,7 @@
 
 			sankeyPartnerValuesLabelsEnter.append("text")
 				.attr("class", "pbinadsankeyPartnerValuesLabelsSubText")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text(function(d) {
 					localVariable.set(this, d.amount / totalAllocated);
 					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
@@ -1993,7 +1993,7 @@
 			const subpartnerstypeArrowSpanEnter = subpartnerstypeArrowSpan.enter()
 				.append("text")
 				.attr("class", "pbinadtypeArrowSpan")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text("");
 
 			subpartnerstypeArrowSpanEnter.append("tspan")
@@ -2023,7 +2023,7 @@
 					};
 				});
 
-			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3))
+			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2))
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
@@ -2236,7 +2236,7 @@
 
 			const typePercentageGroupEnterSubText = typePercentageGroupEnter.append("text")
 				.attr("class", "pbinadtypePercentageSubText")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text(function(d) {
 					localVariable.set(this, d.amount / totalAllocated);
 					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
@@ -2311,7 +2311,7 @@
 					})
 					.call(hideLabels, textCollisionHeight * 2);
 				sankeySubpartnerLabels.style("opacity", 1)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", 1);
 				typePercentageGroup.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
 					.each(function(d) {
@@ -2396,7 +2396,7 @@
 						})
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.fund === d.codeId;
@@ -2484,7 +2484,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.source.id === d.id;
@@ -2714,7 +2714,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return secondLevelLinksData.find(function(f) {
 						return f.target.codeId === e.codeId;
