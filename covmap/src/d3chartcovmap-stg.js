@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescovmap-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js",
@@ -223,7 +223,7 @@
 			timeFormatTickValues = d3.timeFormat("%d/%m/%Y"),
 			timeFormatList = d3.timeFormat("%d %B, %Y"),
 			timeFormatAxis = d3.timeFormat("%d-%b"),
-			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#covid%2019%20allocations",
 			vizNameQueryString = "covid19",
 			allData = "allData",
@@ -2165,8 +2165,14 @@
 			timelineAxisGroup.selectAll(".tick text")
 				.call(removeTicks);
 
+			const daysInMetadata = d3.timeDay.count(timelineScale.domain()[0], timelineScale.domain()[1]);
+
+			timelineMetadata.forEach(function(row, index) {
+				row.lollipopDate = timeFormatTickValues(d3.timeDay.offset(timelineScale.domain()[0], daysInMetadata * 0.1 + ((daysInMetadata * 0.9) / timelineMetadata.length) * index));
+			});
+
 			const keyDatesGroupsTimeline = timelinePanel.main.selectAll(null)
-				.data(timelineMetadata)
+				.data(timelineMetadata.reverse())
 				.enter()
 				.append("g")
 				.attr("class", "keyDatesGroupsTimeline")
@@ -2206,8 +2212,8 @@
 				.style("fill", "none")
 				.attr("points", function(d, i) {
 					return (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
-						" " + (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 || i === 4 ? 4 : 7)) +
-						" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 || i === 4 ? 4 : 7)) + " 0," + timelinePanel.iconRadius;
+						" " + (timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate))) + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (timelinePanel.iconPadding * 0.15 + i * 3)) +
+						" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (timelinePanel.iconPadding * 0.15 + i * 3)) + " 0," + timelinePanel.iconRadius;
 				});
 
 			//Hardcoded name for Korea DPR
@@ -2347,8 +2353,8 @@
 							Math.min(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) + (d3.event.transform.k - 1) * 50) :
 							Math.max(0, ((timelineScale(timeParseMetadata(d.date)) - timelineScale(timeParseMetadata(d.lollipopDate)))) - (d3.event.transform.k - 1) * 50);
 						return xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius) +
-							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 || i === 4 ? 4 : 7)) +
-							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (i === 2 || i === 4 ? 4 : 7)) + " 0," + timelinePanel.iconRadius;
+							" " + xTranslate + "," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (timelinePanel.iconPadding * 0.15 + i * 3)) +
+							" 0," + (timelinePanel.iconPadding + timelinePanel.iconRadius - (timelinePanel.iconPadding * 0.15 + i * 3)) + " 0," + timelinePanel.iconRadius;
 					});
 				timelineHighlightGroup.selectAll(".covmaphighlightRects")
 					.attr("x", function(d) {

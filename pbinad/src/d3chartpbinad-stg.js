@@ -5,7 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -171,14 +171,14 @@
 			panelHorizontalPadding = 4,
 			buttonsPanelHeight = 30,
 			topPanelHeight = 60,
-			sankeyPanelHeight = 480,
+			sankeyPanelHeight = 620,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
 			buttonsNumber = 8,
 			nodeWidth = 16,
-			nodeVerticalPadding = 1,
+			nodeVerticalPadding = 10,
 			sankeyAnnotationsPadding = 4,
 			sankeyAnnotationsSpace = 11,
-			sankeyLegendPadding = 18,
+			sankeyLegendPadding = 26,
 			sankeyLegendSquareSize = 12,
 			sankeyLegendTextPadding = 2,
 			sankeyLegendGroupPadding = 10,
@@ -191,7 +191,7 @@
 			curlyGroupPadding = 4,
 			curlyTextPadding = 12,
 			typePercentagePadding = 3,
-			textCollisionHeight = 14,
+			textCollisionHeight = 10,
 			disabledOpacity = 0.6,
 			tooltipVerticalPadding = 4,
 			windowHeight = window.innerHeight,
@@ -232,7 +232,7 @@
 			legendData = ["CBPF", "CERF", "Direct Partners", "Sub-implementing Partners"],
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
-			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
@@ -428,7 +428,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [36, 80, 38, 86]
+			padding: [36, 80, 44, 86]
 		};
 
 		const invisibleLayer = svg.append("g")
@@ -1649,6 +1649,23 @@
 
 			const sankeyData = data.nodes.length ? sankeyGenerator(data) : data;
 
+			const sankeyDataSecondLevel = sankeyData.nodes.filter(function(e) {
+				return e.level === 2;
+			}).sort(function(a, b) {
+				return a.y0 - b.y0;
+			});
+
+			const sankeyDataThirdLevel = sankeyData.nodes.filter(function(e) {
+				return e.level === 3;
+			}).sort(function(a, b) {
+				return a.y0 - b.y0;
+			});
+
+			justifyNodes(sankeyDataSecondLevel, false);
+			justifyNodes(sankeyDataThirdLevel, chartState.selectedAggregation === "type", flatLevel3order);
+
+			sankeyGenerator.update(sankeyData);
+
 			let sankeyNodes = sankeyPanel.main.selectAll(".pbinadsankeyNodes")
 				.data(sankeyData.nodes, function(d) {
 					return d.id;
@@ -1683,7 +1700,7 @@
 					return d.y0;
 				})
 				.attr("height", function(d) {
-					return d.y1 - d.y0;
+					return Math.max(1, d.y1 - d.y0);
 				})
 				.attr("width", function(d) {
 					return d.x1 - d.x0;
@@ -1701,7 +1718,7 @@
 					return d.y0;
 				})
 				.attr("height", function(d) {
-					return d.y1 - d.y0;
+					return Math.max(1, d.y1 - d.y0);
 				})
 				.attr("width", function(d) {
 					return d.x1 - d.x0;
@@ -1895,7 +1912,7 @@
 
 			sankeyPartnerValuesLabelsEnter.append("text")
 				.attr("class", "pbinadsankeyPartnerValuesLabelsSubText")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text(function(d) {
 					localVariable.set(this, d.amount / totalAllocated);
 					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
@@ -1903,7 +1920,7 @@
 
 			sankeyPartnerValuesLabels = sankeyPartnerValuesLabelsEnter.merge(sankeyPartnerValuesLabels);
 
-			sankeyPartnerValuesLabels.call(hideLabels, textCollisionHeight * 3)
+			sankeyPartnerValuesLabels.call(hideLabels, textCollisionHeight * 2)
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
@@ -1976,7 +1993,7 @@
 			const subpartnerstypeArrowSpanEnter = subpartnerstypeArrowSpan.enter()
 				.append("text")
 				.attr("class", "pbinadtypeArrowSpan")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text("");
 
 			subpartnerstypeArrowSpanEnter.append("tspan")
@@ -2006,7 +2023,7 @@
 					};
 				});
 
-			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3))
+			sankeySubpartnerLabels.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2))
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
@@ -2219,7 +2236,7 @@
 
 			const typePercentageGroupEnterSubText = typePercentageGroupEnter.append("text")
 				.attr("class", "pbinadtypePercentageSubText")
-				.attr("dy", "1.2em")
+				.attr("dy", "1em")
 				.text(function(d) {
 					localVariable.set(this, d.amount / totalAllocated);
 					return "(" + formatPercent1dec(d.amount / totalAllocated) + ")";
@@ -2227,7 +2244,7 @@
 
 			typePercentageGroup = typePercentageGroupEnter.merge(typePercentageGroup);
 
-			typePercentageGroup.call(hideLabels, textCollisionHeight * 3)
+			typePercentageGroup.call(hideLabels, textCollisionHeight * 2)
 				.transition()
 				.duration(duration)
 				.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
@@ -2292,9 +2309,9 @@
 						};
 						localVariableOldValue.set(this, false);
 					})
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				sankeySubpartnerLabels.style("opacity", 1)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", 1);
 				typePercentageGroup.style("opacity", chartState.selectedAggregation === "type" ? 1 : 0)
 					.each(function(d) {
@@ -2308,7 +2325,7 @@
 						};
 						localVariableOldValue.set(this, false);
 					})
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				curlyGroups.style("opacity", 1);
 			};
 
@@ -2367,7 +2384,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						return e.targetLinks.find(function(f) {
 							return f.fund === d.codeId;
@@ -2379,7 +2396,7 @@
 						})
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.fund === d.codeId;
@@ -2467,7 +2484,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return e.targetLinks.find(function(f) {
 						return f.source.id === d.id;
@@ -2500,7 +2517,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				curlyGroups.style("opacity", 0);
 				createTooltipPartners(d, thisElement);
 			};
@@ -2584,7 +2601,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				sankeySubpartnerLabels.style("opacity", function(e) {
 						if (chartState.selectedAggregation === "level") {
 							return e.id === d.id ? 1 : fadeOpacityNodes;
@@ -2697,7 +2714,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 3));
+					.call(hideLabels, textCollisionHeight * (chartState.selectedAggregation === "level" ? 1 : 2));
 				curlyPathsType.style("opacity", function(e) {
 					return secondLevelLinksData.find(function(f) {
 						return f.target.codeId === e.codeId;
@@ -2742,7 +2759,7 @@
 						});
 					})
 					.style("display", null)
-					.call(hideLabels, textCollisionHeight * 3);
+					.call(hideLabels, textCollisionHeight * 2);
 				curlyGroups.style("opacity", 0);
 				createTooltipLinksLevel1(d, thisElement);
 			};
@@ -4638,6 +4655,31 @@
 						if (d3.select(n[i + 1]).datum().y1 - d.y0 < collisionHeight) collision = true;
 					};
 				});
+		};
+
+		function justifyNodes(nodes, isType, partnerOrder) {
+			const usedSpace = nodes.reduce(function(acc, curr) {
+				acc += (curr.y1 - curr.y0) + nodeVerticalPadding;
+				return acc;
+			}, 0);
+			const availableSpace = sankeyPanel.height - sankeyPanel.padding[2] - sankeyPanel.padding[0];
+			const spacer = (availableSpace - usedSpace) / (isType ? partnerOrder.length + 1 : nodes.length + 1);
+			if (isType) {
+				partnerOrder.reverse().forEach(function(partner, i) {
+					const thisPartner = nodes.filter(function(e) {
+						return e.codeId === partner;
+					});
+					thisPartner.forEach(function(node) {
+						node.y0 += (spacer * (i + 1));
+						node.y1 += (spacer * (i + 1));
+					});
+				});
+			} else {
+				nodes.forEach(function(node, i) {
+					node.y0 += (spacer * (i + 1));
+					node.y1 += (spacer * (i + 1));
+				});
+			};
 		};
 
 		function createAnnotationsDiv() {
