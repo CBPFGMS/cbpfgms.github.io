@@ -5,7 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -232,7 +232,7 @@
 			legendData = ["CBPF", "CERF", "Direct Partners", "Sub-implementing Partners"],
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
-			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999

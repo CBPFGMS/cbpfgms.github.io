@@ -5,7 +5,7 @@
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html",
+		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbihrp-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
@@ -192,7 +192,7 @@
 			localVariable = d3.local(),
 			chartTitleDefault = "CBPF Target vs HRP",
 			vizNameQueryString = "cbpfvshrp",
-			bookmarkSite = "https://bi-home.gitlab.io/CBPF-BI-Homepage/bookmark.html?",
+			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#cbpf%20vs%20hrp",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			sortByValues = {
