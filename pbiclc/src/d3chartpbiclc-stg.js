@@ -426,7 +426,7 @@
 			stickHeight = 2,
 			lollipopRadius = 4,
 			fadeOpacity = 0.3,
-			contributionType = ["paid", "pledge", "total"],
+			contributionType = ["pledge", "paid", "total"],
 			formatSIaxes = d3.format("~s"),
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
