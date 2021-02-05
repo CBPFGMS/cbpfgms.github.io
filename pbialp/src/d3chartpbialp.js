@@ -1314,17 +1314,20 @@
 					.on("mouseout", mouseOutButtonsRects)
 					.on("click", function(d) {
 						const self = this;
-						if (d3.event.altKey) clickButtonsRects(d, true);
+						if (d3.event.altKey) {
+							clickButtonsRects(d, false);
+							return;
+						};
 						if (localVariable.get(this) !== "clicked") {
 							localVariable.set(this, "clicked");
 							setTimeout(function() {
 								if (localVariable.get(self) === "clicked") {
-									clickButtonsRects(d, false);
+									clickButtonsRects(d, true);
 								};
 								localVariable.set(self, null);
 							}, 250);
 						} else {
-							clickButtonsRects(d, true);
+							clickButtonsRects(d, false);
 							localVariable.set(this, null);
 						};
 					});
@@ -2229,7 +2232,7 @@
 					height: 30,
 					xTooltip: 25 * (topDivSize.width / width),
 					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-					text: "Use these buttons to select the year. You can select more than one year. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+					text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years. Click the arrows to reveal more years."
 				}, {
 					x: 464,
 					y: 72 + topDivHeight,
@@ -2673,6 +2676,27 @@
 			};
 
 			function mouseOverButtonsRects(d) {
+				tooltip.style("display", "block")
+					.html(null)
+
+				const innerTooltip = tooltip.append("div")
+					.style("max-width", "200px")
+					.attr("id", "pbinadInnerTooltipDiv");
+
+				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonPanel.padding[3] + padding[0] ?
+						buttonPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+
 				d3.select(this).style("fill", unBlue);
 				d3.select(this.parentNode).selectAll("text")
 					.filter(function(e) {
@@ -2682,6 +2706,7 @@
 			};
 
 			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
 				if (chartState.selectedYear.indexOf(d) > -1) return;
 				d3.select(this).style("fill", "#eaeaea");
 				d3.selectAll(".pbialpbuttonsText")

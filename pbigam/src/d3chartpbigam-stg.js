@@ -1371,17 +1371,20 @@
 				.on("mouseout", mouseOutButtonsRects)
 				.on("click", function(d) {
 					const self = this;
-					if (d3.event.altKey) clickButtonsRects(d, true);
+					if (d3.event.altKey) {
+						clickButtonsRects(d, false);
+						return;
+					};
 					if (localVariable.get(this) !== "clicked") {
 						localVariable.set(this, "clicked");
 						setTimeout(function() {
 							if (localVariable.get(self) === "clicked") {
-								clickButtonsRects(d, false);
+								clickButtonsRects(d, true);
 							};
 							localVariable.set(self, null);
 						}, 250);
 					} else {
-						clickButtonsRects(d, true);
+						clickButtonsRects(d, false);
 						localVariable.set(this, null);
 					};
 				});
@@ -1457,6 +1460,27 @@
 			};
 
 			function mouseOverButtonsRects(d) {
+				tooltip.style("display", "block")
+					.html(null)
+
+				const innerTooltip = tooltip.append("div")
+					.style("max-width", "200px")
+					.attr("id", "pbinadInnerTooltipDiv");
+
+				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years (for the same marker system).");
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
+						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+
 				d3.select(this).style("fill", unBlue);
 				buttonsText.filter(function(e) {
 						return e.year === d.year && e.gamGroup === d.gamGroup;
@@ -1465,6 +1489,7 @@
 			};
 
 			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
 				if (chartState.selectedYear.indexOf(d.year) > -1 && chartState.gamGroup === d.gamGroup) return;
 				d3.select(this).style("fill", "#eaeaea");
 				buttonsText.filter(function(e) {

@@ -3302,7 +3302,7 @@
 				height: 30,
 				xTooltip: 40,
 				yTooltip: 94,
-				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select multiple months. Click the arrows to reveal more years."
 			}, {
 				x: 6,
 				y: 108,

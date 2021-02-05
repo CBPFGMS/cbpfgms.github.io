@@ -1506,19 +1506,21 @@
 			buttonsRects.on("mouseover", mouseOverButtonsRects)
 				.on("mouseout", mouseOutButtonsRects)
 				.on("click", function(d) {
-					if (!clickableButtons) return;
 					const self = this;
-					if (d3.event.altKey) clickButtonsRects(d, true);
+					if (d3.event.altKey) {
+						clickButtonsRects(d, false);
+						return;
+					};
 					if (localVariable.get(this) !== "clicked") {
 						localVariable.set(this, "clicked");
 						setTimeout(function() {
 							if (localVariable.get(self) === "clicked") {
-								clickButtonsRects(d, false);
+								clickButtonsRects(d, true);
 							};
 							localVariable.set(self, null);
 						}, 250);
 					} else {
-						clickButtonsRects(d, true);
+						clickButtonsRects(d, false);
 						localVariable.set(this, null);
 					};
 				});
@@ -1624,7 +1626,7 @@
 					.style("max-width", "200px")
 					.attr("id", "covmapInnerTooltipDiv");
 
-				innerTooltip.html("Click for selecting a month. Double-click or ALT + click for selecting a single month.");
+				innerTooltip.html("Click for selecting a single month. Double-click or ALT + click for selecting multiple months.");
 
 				const containerSize = containerDiv.node().getBoundingClientRect();
 
@@ -3659,7 +3661,7 @@
 				height: 30,
 				xTooltip: 40,
 				yTooltip: 94,
-				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select just a single year. Click the arrows to reveal more years."
+				text: "Use these buttons to select the month. You can select more than one month. Double click or press ALT when clicking to select multiple months. Click the arrows to reveal more years."
 			}, {
 				x: 6,
 				y: 108,
