@@ -442,6 +442,7 @@
 			highlightColor = "#F79A3B",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
+			allYearsOption = "all",
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
 			countryNames = {},
@@ -817,7 +818,7 @@
 
 			function clickButtonsRects(d, singleSelection) {
 
-				if (singleSelection) {
+				if (singleSelection || d === allYearsOption || chartState.selectedYear[0] === allYearsOption) {
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -832,9 +833,11 @@
 					};
 				};
 
-				const allYears = chartState.selectedYear.map(function(d) {
-					return d;
-				}).join("|");
+				const allYears = chartState.selectedYear[0] === allYearsOption ?
+					allYearsOption.toLowerCase() :
+					chartState.selectedYear.map(function(d) {
+						return d;
+					}).join("|");
 
 				if (queryStringValues.has("year")) {
 					queryStringValues.set("year", allYears);
@@ -1343,7 +1346,7 @@
 					.duration(duration)
 					.style("opacity", 1)
 					.text(function(d) {
-						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						const yearsText = chartState.selectedYear.length === 1 ? (chartState.selectedYear[0] === allYearsOption ? "all years" : chartState.selectedYear[0]) : "years\u002A";
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
 						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
@@ -1480,6 +1483,8 @@
 
 			function createButtonPanel() {
 
+				yearsArray.push(allYearsOption);
+
 				const clipPath = buttonPanel.main.append("clipPath")
 					.attr("id", "pbiclcclip")
 					.append("rect")
@@ -1527,7 +1532,7 @@
 						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
 					.text(function(d) {
-						return d;
+						return d === allYearsOption ? capitalize(allYearsOption) : d;
 					});
 
 				const buttonsContributionsGroup = buttonPanel.main.append("g")
@@ -2579,7 +2584,7 @@
 					.style("max-width", "200px")
 					.attr("id", "pbinadInnerTooltipDiv");
 
-				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+				innerTooltip.html(d === allYearsOption ? "Click to show all years" : "Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
 
 				const containerSize = containerDiv.node().getBoundingClientRect();
 
@@ -2658,9 +2663,10 @@
 			let tempSetDonors = [],
 				tempSetCbpfs = [];
 
-			const filteredData = rawData.filter(function(d) {
-				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
-			});
+			const filteredData = chartState.selectedYear[0] === allYearsOption ? rawData.slice() :
+				rawData.filter(function(d) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				});
 
 			filteredData.forEach(function(d) {
 
@@ -3615,6 +3621,10 @@
 		};
 
 		function validateYear(yearString) {
+			if (yearString.toLowerCase() === allYearsOption) {
+				chartState.selectedYear.push(allYearsOption);
+				return;
+			};
 			const allYears = yearString.split(",").map(function(d) {
 				return +(d.trim());
 			}).sort(function(a, b) {
