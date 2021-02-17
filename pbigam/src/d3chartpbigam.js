@@ -655,7 +655,6 @@
 						});
 
 					yearButton.dispatch("click");
-					yearButton.dispatch("click");
 
 					const yearWithGamGroupArray = yearsArray.map(function(d) {
 						return d.year + d.gamGroup;

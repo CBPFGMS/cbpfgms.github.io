@@ -691,7 +691,6 @@
 							});
 
 						yearButton.dispatch("click");
-						yearButton.dispatch("click");
 
 						const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
 							0 :

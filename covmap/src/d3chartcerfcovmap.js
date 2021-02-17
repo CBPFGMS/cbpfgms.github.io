@@ -856,7 +856,6 @@
 						});
 
 					yearButton.dispatch("click");
-					yearButton.dispatch("click");
 
 					const firstYearIndex = monthsArray.indexOf(chartState.selectedMonth[0]) < buttonsNumber / 2 ?
 						0 :

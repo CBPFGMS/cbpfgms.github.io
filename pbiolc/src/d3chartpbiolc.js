@@ -654,7 +654,6 @@
 							});
 
 						yearButton.dispatch("click");
-						yearButton.dispatch("click");
 
 						if (yearsArray.length > buttonsNumber) {
 
