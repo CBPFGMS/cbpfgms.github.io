@@ -638,7 +638,7 @@
 					if (d.clicked) {
 						chartState.selectedYear.length = 1;
 						loopButtons();
-						timer = d3.interval(loopButtons, 2 * duration);
+						timer = d3.interval(loopButtons, 3 * duration);
 					} else {
 						timer.stop();
 					};
