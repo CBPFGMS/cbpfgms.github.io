@@ -1680,7 +1680,7 @@
 
 				const innerTooltip = tooltip.append("div")
 					.style("max-width", "200px")
-					.attr("id", "pbinadInnerTooltipDiv");
+					.attr("id", "pbiobeInnerTooltipDiv");
 
 				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
 
