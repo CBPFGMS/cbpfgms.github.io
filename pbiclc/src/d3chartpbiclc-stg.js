@@ -1074,11 +1074,11 @@
 
 						yearButton.dispatch("click");
 
-						const firstYearIndex = chartState.selectedYear[0] < yearsArray[5] ?
+						const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
 							0 :
-							chartState.selectedYear[0] > yearsArray[yearsArray.length - 4] ?
-							yearsArray.length - 8 :
-							yearsArray.indexOf(chartState.selectedYear[0]) - 4;
+							chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] || chartState.selectedYear[0] === allYearsOption ?
+							yearsArray.length - buttonsNumber :
+							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
 
 						const currentTranslate = -(buttonPanel.buttonWidth * firstYearIndex);
 
