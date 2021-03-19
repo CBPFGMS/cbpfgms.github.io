@@ -976,7 +976,7 @@
 			const filterContainerDivsTitles = filterContainerDivs.append("div")
 				.attr("class", "pbimapFilterContainerDivTitles")
 				.html(function(d) {
-					return d;
+					return d === "Cluster" ? "Sector" : d;
 				});
 
 			if (isTouchScreenOnly) {
