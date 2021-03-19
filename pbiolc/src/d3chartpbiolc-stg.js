@@ -197,7 +197,7 @@
 			legendVerticalPadding = 22,
 			unBlue = "#1F69B3",
 			highlightColor = "#F79A3B",
-			chartTitleDefault = "Cluster Overview",
+			chartTitleDefault = "Sector Overview",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
@@ -766,7 +766,7 @@
 
 					const currentDate = new Date();
 
-					const fileName = "ClustersOverview_" + csvDateFormat(currentDate) + ".csv";
+					const fileName = "SectorsOverview_" + csvDateFormat(currentDate) + ".csv";
 
 					const blob = new Blob([csv], {
 						type: 'text/csv;charset=utf-8;'
@@ -2097,7 +2097,7 @@
 
 			function mouseOverTitles(type, self) {
 				tooltip.style("display", "block")
-					.html("<div style='max-width:190px;'>Click here to sort the clusters according to the " + type + "</div>");
+					.html("<div style='max-width:190px;'>Click here to sort the sectors according to the " + type + "</div>");
 
 				const thisBox = self.getBoundingClientRect();
 
@@ -2130,7 +2130,7 @@
 
 				if (d.total !== 0 && d["total" + chartState.selectedBeneficiary] !== 0) {
 
-					tooltip.html("Cluster: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
+					tooltip.html("Sector: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Total Allocated:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" +
 						formatMoney0Decimals(d.total) + "</div></div><div id='pbiolcAllocationsTooltipBar'></div><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" + formatPercent(d.standard / d.total) + "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
@@ -2148,7 +2148,7 @@
 
 				} else if (d.total !== 0) {
 
-					tooltip.html("Cluster: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
+					tooltip.html("Sector: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Total Allocated:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" +
 						formatMoney0Decimals(d.total) + "</div></div><div id='pbiolcAllocationsTooltipBar'></div><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" + formatPercent(d.standard / d.total) + "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
@@ -2160,7 +2160,7 @@
 
 				} else {
 
-					tooltip.html("Cluster: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
+					tooltip.html("Sector: <strong>" + d.cluster + "</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" + tooltipBarWidth +
 						"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Total Allocated:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>No Value Allocated</div></div>");
 
 				};
@@ -2687,7 +2687,7 @@
 				height: 30,
 				xTooltip: 142 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 142) * (topDivSize.width / width),
-				text: "Click here to sort the clusters by allocations."
+				text: "Click here to sort the sectors by allocations."
 			}, {
 				x: 586,
 				y: 106 + topDivHeight + totalSelectHeight,
@@ -2695,7 +2695,7 @@
 				height: 30,
 				xTooltip: 520 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 142) * (topDivSize.width / width),
-				text: "Click here to sort the clusters by persons (targeted or affected)."
+				text: "Click here to sort the sectors by persons (targeted or affected)."
 			}, {
 				x: 6,
 				y: 152 + topDivHeight + totalSelectHeight,
@@ -2703,7 +2703,7 @@
 				height: 334,
 				xTooltip: 326 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
-				text: "This area depicts the amount allocated by cluster. The black triangles, when present, indicate standard allocations."
+				text: "This area depicts the amount allocated by sector. The black triangles, when present, indicate standard allocations."
 			}, {
 				x: 582,
 				y: 152 + topDivHeight + totalSelectHeight,
@@ -2711,7 +2711,7 @@
 				height: 334,
 				xTooltip: 268 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 242) * (topDivSize.width / width),
-				text: "This area depicts the number of targeted or affected persons for each cluster. The black triangles, when present, indicate the number of affected persons."
+				text: "This area depicts the number of targeted or affected persons for each sector. The black triangles, when present, indicate the number of affected persons."
 			}];
 
 			helpData.forEach(function(d) {
@@ -2915,7 +2915,7 @@
 
 			const currentDate = new Date();
 
-			const fileName = "ClustersOverview_" + csvDateFormat(currentDate) + ".png";
+			const fileName = "SectorsOverview_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function(blob) {
 				const url = URL.createObjectURL(blob);
@@ -3009,7 +3009,7 @@
 
 					const currentDate = new Date();
 
-					pdf.save("ClustersOverview_" + csvDateFormat(currentDate) + ".pdf");
+					pdf.save("SectorsOverview_" + csvDateFormat(currentDate) + ".pdf");
 
 					removeProgressWheel();
 
