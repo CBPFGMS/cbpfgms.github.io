@@ -2501,7 +2501,7 @@
 
 			let footerText = "© OCHA CBPF Section " + currentYear;
 
-			const footerLink = " | For more information, please visit <a href='https://pfbi.unocha.org'>pfbi.unocha.org</a>";
+			const footerLink = " | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
 
 			if (showLink) footerText += footerLink;
 

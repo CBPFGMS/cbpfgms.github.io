@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "pfbi.unocha.org",
+		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "pfbi.unocha.org/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc.css", fontAwesomeLink],
@@ -3240,7 +3240,7 @@
 
 			let footerText = "© OCHA CBPF Section " + currentYear;
 
-			const footerLink = " | For more information, please visit <a href='https://pfbi.unocha.org'>pfbi.unocha.org</a>";
+			const footerLink = " | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
 
 			if (showLink) footerText += footerLink;
 
