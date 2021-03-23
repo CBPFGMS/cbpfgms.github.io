@@ -244,12 +244,22 @@
 			var tempSet = new Set();
 
 			allFiles[0].forEach(function(d) {
-				if (!tempSet.has(d.FiscalYear + d.PooledFundName) && d.FiscalYear <= endingYear && d.FiscalYear >= startingYear) {
+				if (!tempSet.has(d.FiscalYear + d.PooledFundName) && d.FiscalYear <= endingYear && d.FiscalYear >= startingYear && +d.PaidAmt > 0) {
 					mergedData.push({
 						year: +d.FiscalYear,
 						pooledFundName: d.PooledFundName
 					});
 					tempSet.add(d.FiscalYear + d.PooledFundName)
+				};
+			});
+
+			allFiles[1].forEach(function(d) {
+				if (!tempSet.has(d.AllocationYear + d.PooledFundName) && d.AllocationYear <= endingYear && d.AllocationYear >= startingYear && +d.ApprovedBudget > 0) {
+					mergedData.push({
+						year: +d.AllocationYear,
+						pooledFundName: d.PooledFundName
+					});
+					tempSet.add(d.AllocationYear + d.PooledFundName)
 				};
 			});
 
@@ -267,7 +277,7 @@
 					d.allocations = +allocationObject.ApprovedBudget;
 				};
 				d.donors = allFiles[0].filter(function(e) {
-					return +e.FiscalYear === d.year && e.PooledFundName === d.pooledFundName & +e.PaidAmt > 0;
+					return +e.FiscalYear === d.year && e.PooledFundName === d.pooledFundName && +e.PaidAmt > 0;
 				});
 				d.donors.forEach(function(e) {
 					e.PaidAmt = +e.PaidAmt;
@@ -971,14 +981,14 @@
 					var donors = d.donors.sort(function(a, b) {
 						return d3.descending(a.PaidAmt, b.PaidAmt)
 					});
-					var donorsTitle = donors.length > 5 ? "Top 5 donors:" : "Donors:";
+					var donorsTitle = donors.length > 5 ? "Top 5 donors:" : donors.length ? "Donors:" : "No donor";
 					donors = donors.slice(0, 5);
 					tooltip.html("Year: <strong>" + d.year + "</strong><br>Pooled Fund: <strong>" +
 							d.pooledFundName + "</strong><br style=\"line-height:170%;\"/>Contributions: <strong><span class=\"contributionColorHTMLcolor\">" +
 							formatComma(d.contributions) + " (USD)</span></strong><br>Allocations: <strong><span class=\"allocationColorHTMLcolor\">" +
 							formatComma(d.allocations) + " (USD)</span></strong><br style=\"line-height:170%;\"/>" + donorsTitle + "<br style=\"line-height:170%;\"/>")
 						.style("display", "block");
-					createTooltipSVG(donors);
+					if (donors.length) createTooltipSVG(donors);
 					var tooltipSize = tooltip.node().getBoundingClientRect();
 					tooltip.style("top", calculateTooltipPosition(d3.event.pageY, mousePos[1], tooltipSize.height) - 22 + "px")
 						.style("left", calculateTooltipHorizontalPosition(d3.event.pageX, mousePos[0], tooltipSize.width, "contributions") + 16 + "px");
@@ -1012,14 +1022,14 @@
 					var donors = d.donors.sort(function(a, b) {
 						return d3.descending(a.PaidAmt, b.PaidAmt)
 					});
-					var donorsTitle = donors.length > 5 ? "Top 5 donors:" : "Donors:";
+					var donorsTitle = donors.length > 5 ? "Top 5 donors:" : donors.length ? "Donors:" : "No donor";
 					donors = donors.slice(0, 5);
 					tooltip.html("Year: <strong>" + d.year + "</strong><br>Pooled Fund: <strong>" +
 							d.pooledFundName + "</strong><br style=\"line-height:170%;\"/>Number of projects funded: <strong><span class=\"contributionColorHTMLcolor\">" +
 							d.projects + "</span></strong><br>Number of partners funded: <strong><span class=\"allocationColorHTMLcolor\">" +
 							d.partners + "</span></strong><br style=\"line-height:170%;\"/>" + donorsTitle + "<br style=\"line-height:170%;\"/>")
 						.style("display", "block");
-					createTooltipSVG(donors);
+					if (donors.length) createTooltipSVG(donors);
 					var tooltipSize = tooltip.node().getBoundingClientRect();
 					tooltip.style("top", calculateTooltipPosition(d3.event.pageY, mousePos[1], tooltipSize.height) - 22 + "px")
 						.style("left", calculateTooltipHorizontalPosition(d3.event.pageX, mousePos[0], tooltipSize.width, "projects") + 16 + "px");
