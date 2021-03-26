@@ -3608,7 +3608,7 @@
 
 					function createLetterhead() {
 
-						const footer = "© OCHA CBPF Section 2019 | For more information, please visit pfbi.unocha.org";
+						const footer = "© OCHA CBPF Section " + currentYear + " | For more information, please visit cbpf.data.unocha.org";
 
 						pdf.setFillColor(65, 143, 222);
 						pdf.rect(0, pdfMargins.top, 210, 15, "F");
