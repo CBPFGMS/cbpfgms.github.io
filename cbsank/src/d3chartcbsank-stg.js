@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescbsank-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylescbsank-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
 		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -300,6 +300,8 @@
 
 		const containerDiv = d3.select("#d3chartcontainer" + classPrefix);
 
+		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
 		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
@@ -555,6 +557,10 @@
 
 			setYearsDescriptionDiv();
 
+			if (!isPfbiSite) createFooterDiv();
+
+			if (showHelp) createAnnotationsDiv();
+
 			//end of draw;
 		};
 
@@ -564,13 +570,12 @@
 				.attr("id", classPrefix + "d3chartTitle")
 				.html(chartTitle);
 
-			//NO HELP ICON FOR NOW
-			// const helpIcon = iconsDiv.append("button")
-			// 	.attr("id", classPrefix + "HelpButton");
+			const helpIcon = iconsDiv.append("button")
+				.attr("id", classPrefix + "HelpButton");
 
-			// helpIcon.html("HELP  ")
-			// 	.append("span")
-			// 	.attr("class", "fa fa-info")
+			helpIcon.html("HELP  ")
+				.append("span")
+				.attr("class", "fa fa-info")
 
 			const downloadIcon = iconsDiv.append("button")
 				.attr("id", classPrefix + "DownloadButton");
@@ -744,7 +749,7 @@
 				snapshotContent.style("display", "none")
 			});
 
-			//helpIcon.on("click", null); //CHANGE THIS
+			helpIcon.on("click", null); //CHANGE THIS
 
 			downloadIcon.on("click", function() {
 
@@ -3141,6 +3146,177 @@
 			return d3.formatPrefix("." + digits, value)(value).replace("G", "B");
 		};
 
+		function createAnnotationsDiv() {
+
+			//change here
+
+			iconsDiv.style("opacity", 0)
+				.style("pointer-events", "none");
+
+			const overDiv = containerDiv.append("div")
+				.attr("class", classPrefix + "OverDivHelp");
+
+			const topDivSize = topDiv.node().getBoundingClientRect();
+
+			const iconsDivSize = iconsDiv.node().getBoundingClientRect();
+
+			const topDivHeight = topDivSize.height * (width / topDivSize.width);
+
+			const helpSVG = overDiv.append("svg")
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
+
+			const helpButtons = [{
+				text: "CLOSE",
+				width: 90
+			}, {
+				text: "GO TO HELP PORTAL",
+				width: 180
+			}];
+
+			const closeRects = helpSVG.selectAll(null)
+				.data(helpButtons)
+				.enter()
+				.append("g");
+
+			closeRects.append("rect")
+				.attr("rx", 4)
+				.attr("ry", 4)
+				.style("stroke", "rgba(0, 0, 0, 0.3)")
+				.style("stroke-width", "1px")
+				.style("fill", highlightColor)
+				.style("cursor", "pointer")
+				.attr("y", 6)
+				.attr("height", 22)
+				.attr("width", function(d) {
+					return d.width;
+				})
+				.attr("x", function(d, i) {
+					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+				})
+				.on("click", function(_, i) {
+					iconsDiv.style("opacity", 1)
+						.style("pointer-events", "all");
+					overDiv.remove();
+					if (i) window.open(helpPortalUrl, "help_portal");
+				});
+
+			closeRects.append("text")
+				.attr("class", classPrefix + "AnnotationMainText")
+				.attr("text-anchor", "middle")
+				.attr("x", function(d, i) {
+					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+				})
+				.attr("y", 22)
+				.text(function(d) {
+					return d.text
+				});
+
+			const helpData = [{
+				x: 96,
+				y: 72 + topDivHeight,
+				width: 480,
+				height: 30,
+				xTooltip: 180 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years. Click the arrows to reveal more years."
+			}, {
+				x: 592,
+				y: 72 + topDivHeight,
+				width: 224,
+				height: 30,
+				xTooltip: 550 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+				text: "Use these buttons to select the type of contribution: paid, pledged or total (paid plus pledged)."
+			}, {
+				x: 96,
+				y: 10 + topDivHeight,
+				width: 720,
+				height: 57,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 76) * (topDivSize.width / width),
+				text: "This banner shows the total amount of contributions received for the selected year (or years). It also shows the number of donors and CBPFs in that period."
+			}, {
+				x: 6,
+				y: 108 + topDivHeight,
+				width: 440,
+				height: 660,
+				xTooltip: 452 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
+				text: "Hover over the donors to get additional information. Hovering over a donor filters the CBPFs accordingly, so only CBPFs that received from that donor are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+			}, {
+				x: 466,
+				y: 108 + topDivHeight,
+				width: 398,
+				height: 380,
+				xTooltip: 136 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
+				text: "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+			}];
+
+			helpData.forEach(function(d) {
+				helpSVG.append("rect")
+					.attr("rx", 4)
+					.attr("ry", 4)
+					.attr("x", d.x)
+					.attr("y", d.y)
+					.attr("width", d.width)
+					.attr("height", d.height)
+					.style("stroke", unBlue)
+					.style("stroke-width", "3px")
+					.style("fill", "none")
+					.style("opacity", 0.5)
+					.attr("class", classPrefix + "HelpRectangle")
+					.attr("pointer-events", "all")
+					.on("mouseover", function() {
+						const self = this;
+						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
+					})
+					.on("mouseout", removeTooltip);
+			});
+
+			const explanationTextRect = helpSVG.append("rect")
+				.attr("x", (width / 2) - 180)
+				.attr("y", 244)
+				.attr("width", 360)
+				.attr("height", 50)
+				.attr("pointer-events", "none")
+				.style("fill", "white")
+				.style("stroke", "#888");
+
+			const explanationText = helpSVG.append("text")
+				.attr("class", classPrefix + "AnnotationExplanationText")
+				.attr("font-family", "Roboto")
+				.attr("font-size", "18px")
+				.style("fill", "#222")
+				.attr("text-anchor", "middle")
+				.attr("x", width / 2)
+				.attr("y", 264)
+				.attr("pointer-events", "none")
+				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.call(wrapText2, 350);
+
+			function createTooltip(xPos, yPos, text, self) {
+				explanationText.style("opacity", 0);
+				explanationTextRect.style("opacity", 0);
+				helpSVG.selectAll("." + classPrefix + "HelpRectangle").style("opacity", 0.1);
+				d3.select(self).style("opacity", 1);
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				tooltip.style("top", yPos + "px")
+					.style("left", xPos + "px")
+					.style("display", "block")
+					.html(text);
+			};
+
+			function removeTooltip() {
+				tooltip.style("display", "none");
+				explanationText.style("opacity", 1);
+				explanationTextRect.style("opacity", 1);
+				helpSVG.selectAll("." + classPrefix + "HelpRectangle").style("opacity", 0.5);
+			};
+
+			//end of createAnnotationsDiv
+		}
+
 		function wrapText(text, width) {
 			text.each(function() {
 				let text = d3.select(this),
@@ -3173,6 +3349,55 @@
 					}
 				}
 			});
+		};
+
+		function wrapText2(text, width) {
+			text.each(function() {
+				let text = d3.select(this),
+					words = text.text().split(/\s+/).reverse(),
+					word,
+					line = [],
+					lineNumber = 0,
+					lineHeight = 1.1,
+					y = text.attr("y"),
+					x = text.attr("x"),
+					dy = 0,
+					tspan = text.text(null)
+					.append("tspan")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("dy", dy + "em");
+				while (word = words.pop()) {
+					line.push(word);
+					tspan.text(line.join(" "));
+					if (tspan.node()
+						.getComputedTextLength() > width) {
+						line.pop();
+						tspan.text(line.join(" "));
+						line = [word];
+						tspan = text.append("tspan")
+							.attr("x", x)
+							.attr("y", y)
+							.attr("dy", ++lineNumber * lineHeight + dy + "em")
+							.text(word);
+					}
+				}
+			});
+		};
+
+		function createFooterDiv() {
+
+			let footerText = "© OCHA CBPF Section " + currentYear;
+
+			const footerLink = " | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
+
+			if (showLink) footerText += footerLink;
+
+			footerDiv.append("div")
+				.attr("class", "d3chartFooterText")
+				.html(footerText);
+
+			//end of createFooterDiv
 		};
 
 		function verticallyCenter(selection) {
