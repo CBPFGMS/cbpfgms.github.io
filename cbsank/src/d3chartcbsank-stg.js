@@ -16,8 +16,6 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	//CHANGE CSS LINK!!!!!!!!!!!!!!
-
 	cssLinks.forEach(function(cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
@@ -3051,7 +3049,7 @@
 				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data, d3.autoType) :
 					JSON.parse(localStorage.getItem(fileName)).data;
-				console.info("CERF BI chart info: " + warningString + " from local storage");
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
 				return Promise.resolve(fetchedData);
 			} else {
 				const fetchMethod = method === "csv" ? d3.csv : d3.json;
@@ -3063,9 +3061,9 @@
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {
-						console.info("CERF BI chart, " + error);
+						console.info(classPrefix + " chart, " + error);
 					};
-					console.info("CERF BI chart info: " + warningString + " from API");
+					console.info(classPrefix + " chart info: " + warningString + " from API");
 					return fetchedData;
 				});
 			};
