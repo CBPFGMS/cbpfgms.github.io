@@ -570,19 +570,28 @@
 
 			const remainingYears = yearsArrayString.filter(function(d) {
 				return chartState.selectedYear.indexOf(+d) === -1;
+			}).sort(function(a, b) {
+				return (+b) - (+a);
 			});
 
-			for (let i = remainingYears.length; i--;) {
-				let remainingPromises = [];
-				apiFiles.forEach(function(file) {
-					remainingPromises.push(d3.csv(file + yearParameter + remainingYears[i] + csvFormatParameter))
+			function loadDataFile(year) {
+				const remainingPromises = apiFiles.map(function(file) {
+					return d3.csv(file + yearParameter + year + csvFormatParameter);
 				});
-				Promise.all(remainingPromises).then(function(rawData) {
+				return Promise.all(remainingPromises).then(function(rawData) {
 					processData(rawData[0], rawData[1]);
-					loadedYears.push(+remainingYears[i]);
+					loadedYears.push(+year);
 					repopulateYearFilter();
 				});
 			};
+
+			async function loadAllDataFiles(yearsArray) {
+				for (const year of yearsArray) {
+					await loadDataFile(year);
+				};
+			};
+
+			loadAllDataFiles(remainingYears);
 
 			//end of Promise.all
 		});
