@@ -1,0 +1,142 @@
+/*Unocha landing page (code: unobbc)*/
+
+#unobbctooltipdiv{    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f1f1f1; 
+	border: 1px solid #999; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	max-width: 290px;
+}
+
+.unobbctopPanelTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 20px;
+	font-weight: 700;
+	fill: #545454;
+}
+
+.unobbctopValueMain {
+	font-family: "Arial", sans-serif;
+	font-size: 60px;
+}
+
+.unobbctopValueUnits {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.unobbcbarsPanelTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 18px;
+	fill: #545454;
+}
+
+.unobbcbarsLabels {
+	fill: darkslategray;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.unobbcbarsContributionsOverText, .unobbcbarsAllocationsOverText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: white;
+}
+
+.unobbcbarsMiddleText {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: #888;
+}
+
+.unobbcgBarsContributionsYAxis, .unobbcgBarsAllocationsYAxis, .unobbcgBarsContributionsXAxis, .unobbcgBarsAllocationsXAxis, .unobbcgBeeswarmXAxis, .unobbcgBeeswarmYAxis {
+	shape-rendering: crispEdges;
+}
+
+.unobbcgBarsContributionsYAxis path, .unobbcgBarsAllocationsYAxis path {
+	stroke: none;
+}
+
+.unobbcgBarsContributionsYAxis line, .unobbcgBarsAllocationsYAxis line {
+	stroke: #888;
+}
+
+.unobbcgBarsContributionsYAxis text, .unobbcgBarsAllocationsYAxis text {
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+	fill: darkslategray;
+	pointer-events: none;
+}
+
+.unobbcgBarsContributionsXAxis path, .unobbcgBarsAllocationsXAxis path {
+	stroke: none;
+}
+
+.unobbcgBarsContributionsXAxis line, .unobbcgBarsAllocationsXAxis line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.unobbcgBarsContributionsXAxis text, .unobbcgBarsAllocationsXAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.unobbcgBeeswarmXAxis path, .unobbcgBeeswarmYAxis path {
+	shape-rendering: crispEdges;
+	stroke: none;
+}
+
+.unobbcgBeeswarmYAxis line {
+	stroke: #eee;
+	stroke-dasharray: 2, 2;
+}
+
+.unobbcgBeeswarmXAxis line {
+	stroke: #ddd;
+}
+
+.unobbcgBeeswarmXAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+}
+
+.unobbcgBeeswarmYAxis text {
+	fill: #888;
+	font-family: "Roboto", sans-serif;
+	font-size: 14px;
+}
+
+.unobbcxAxisTooltip text, .unobbcyAxisTooltip text {
+	fill: #555;
+	font-family: "Arial";
+	font-size: 10px;
+}
+
+.unobbcxAxisTooltip, .unobbcyAxisTooltip {
+	shape-rendering: crispEdges;
+}
+
+.unobbcxAxisTooltip path {
+	stroke: none;
+}
+
+.unobbcyAxisTooltip path {
+	stroke: #ccc;
+}
+
+.unobbcxAxisTooltip line {
+	stroke: #ccc;
+}
