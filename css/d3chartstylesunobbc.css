@@ -1,5 +1,9 @@
 /*Unocha landing page (code: unobbc)*/
 
+#d3chartcontainerunobbc {
+	position: relative;
+}
+
 #unobbctooltipdiv{    
 	position: absolute;
 	text-align: left;
@@ -24,9 +28,15 @@
 	fill: #545454;
 }
 
-.unobbctopValueMain {
+.unobbctopPanelMainValue, .unobbctopPanelDonorsNumber, .unobbctopPanelCbpfsNumber {
 	font-family: "Arial", sans-serif;
-	font-size: 60px;
+	font-size: 48px;
+}
+
+.unobbctopPanelMainText, .unobbctopPanelSubText, .unobbctopPanelDonorsText, .unobbctopPanelCbpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
 }
 
 .unobbctopValueUnits {
@@ -35,13 +45,33 @@
 	fill: #888;
 }
 
-.unobbcbarsPanelTitle {
+.unobbcbuttonsText {
 	font-family: "Roboto", sans-serif;
-	font-size: 18px;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.unobbcleftArrowText, .unobbcrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+.unobbcYearsDescriptionDiv {
+	margin-left: 16px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.unobbcbarsPanelTitleDonors, .unobbcbarsPanelTitleCbpfs, .unobbcbarsPanelTitleBeeswarm {
+	font-family: "Roboto", sans-serif;
+	font-size: 16px;
 	fill: #545454;
 }
 
-.unobbcbarsLabels {
+.unobbcbarsContributionsLabels, .unobbcbarsAllocationsLabels {
 	fill: darkslategray;
 	font-family: "Roboto", sans-serif;
 	font-size: 12px;
@@ -73,7 +103,7 @@
 
 .unobbcgBarsContributionsYAxis text, .unobbcgBarsAllocationsYAxis text {
 	font-family: "Roboto", sans-serif;
-	font-size: 14px;
+	font-size: 12px;
 	fill: darkslategray;
 	pointer-events: none;
 }
@@ -110,7 +140,7 @@
 .unobbcgBeeswarmXAxis text {
 	fill: #888;
 	font-family: "Roboto", sans-serif;
-	font-size: 12px;
+	font-size: 10px;
 }
 
 .unobbcgBeeswarmYAxis text {

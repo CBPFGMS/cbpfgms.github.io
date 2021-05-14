@@ -1,12 +1,13 @@
 (function d3ChartIIFE() {
 
-	var userAgent = window.navigator.userAgent;
-
-	var isInternetExplorer = userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1 ? true : false;
-
-	var cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylescbpfbp.css"];
-
-	const d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js";
+	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
+		hasFetch = window.fetch,
+		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
+		isUnochaSite = window.location.hostname === "cbpf.unocha.org",
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylesunobbc.css"],
+		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js",
+		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -20,18 +21,24 @@
 
 	});
 
-	if (!isD3Loaded(d3URL)) {
-		if (!isInternetExplorer) {
+	if (!isScriptLoaded(d3URL)) {
+		if (hasFetch) {
 			loadScript(d3URL, d3Chart);
 		} else {
-			loadScript("https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js", function() {
-				loadScript("https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js", function() {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, function() {
 					loadScript(d3URL, d3Chart);
 				});
 			});
 		};
 	} else if (typeof d3 !== "undefined") {
-		d3Chart();
+		if (hasFetch) {
+			d3Chart();
+		} else {
+			loadScript(fetchPolyfill1, function() {
+				loadScript(fetchPolyfill2, d3Chart);
+			});
+		};
 	} else {
 		let d3Script;
 		const scripts = document.getElementsByTagName('script');
@@ -59,7 +66,7 @@
 		return false;
 	};
 
-	function isD3Loaded(url) {
+	function isScriptLoaded(url) {
 		const scripts = document.getElementsByTagName('script');
 		for (let i = scripts.length; i--;) {
 			if (scripts[i].src == url) return true;
@@ -69,37 +76,111 @@
 
 	function d3Chart() {
 
-		var width = 743,
-			height = 600,
+		//POLYFILLS
+
+		//Array.prototype.find()
+
+		if (!Array.prototype.find) {
+			Object.defineProperty(Array.prototype, 'find', {
+				value: function(predicate) {
+					if (this == null) {
+						throw new TypeError('"this" is null or not defined');
+					}
+					var o = Object(this);
+					var len = o.length >>> 0;
+					if (typeof predicate !== 'function') {
+						throw new TypeError('predicate must be a function');
+					}
+					var thisArg = arguments[1];
+					var k = 0;
+					while (k < len) {
+						var kValue = o[k];
+						if (predicate.call(thisArg, kValue, k, o)) {
+							return kValue;
+						}
+						k++;
+					}
+					return undefined;
+				},
+				configurable: true,
+				writable: true
+			});
+		};
+
+		//toBlob
+
+		if (!HTMLCanvasElement.prototype.toBlob) {
+			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+				value: function(callback, type, quality) {
+					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					setTimeout(function() {
+
+						var binStr = atob(dataURL),
+							len = binStr.length,
+							arr = new Uint8Array(len);
+
+						for (var i = 0; i < len; i++) {
+							arr[i] = binStr.charCodeAt(i);
+						}
+
+						callback(new Blob([arr], {
+							type: type || 'image/png'
+						}));
+
+					});
+				}
+			});
+		};
+
+		//Math.log10
+
+		Math.log10 = Math.log10 || function(x) {
+			return Math.log(x) * Math.LOG10E;
+		};
+
+		//END OF POLYFILLS
+
+		var width = 1100,
 			padding = [4, 4, 4, 4],
-			topPanelHeightFactor = 0.17,
-			barsPanelHeightFactor = 0.63,
-			beeswarmPanelHeightFactor = 0.2,
+			classPrefix = "unobbc",
+			topPanelHeight = 60,
+			buttonsPanelHeight = 30,
+			barsPanelHeight = 332,
+			beeswarmPanelHeight = 100,
 			panelHorizontalPadding = 6,
+			buttonsNumber = 22,
+			unBlue = "#1F69B3",
+			height = topPanelHeight + buttonsPanelHeight + barsPanelHeight + beeswarmPanelHeight + (3 * panelHorizontalPadding),
 			duration = 1500,
 			shortDuration = 200,
-			formatMoney2Decimals = d3.format(",.2f"),
+			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatSI2Decimals = d3.format(".2s"),
 			formatSIaxes = d3.format("~s"),
 			topPanelGroupWidth = 288,
 			barsDonorsLabelsPadding = 4,
 			localVariable = d3.local(),
-			circleRadius = 4,
+			circleRadius = 3,
+			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
+			yearsArray = [],
+			chartState = {
+				selectedYear: []
+			},
+			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
+				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
+				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
+				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
+			],
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv",
 			beeswarmTransitionEnded = false,
 			flagPadding = 30,
-			yearsArray,
-			barsHeightUnit = ((height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * barsPanelHeightFactor) / 11,
+			barsHeightUnit = barsPanelHeight / 11,
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/";
-
-		var moneyBagd1 = "M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z";
-		var moneyBagd2 = "M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z";
-		var moneyBagd3 = "M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z";
-		var moneyBagd4 = "M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z";
 
 		var windowHeight = window.innerHeight;
 
-		var containerDiv = d3.select("#d3chartcontainercbpfbp");
+		var containerDiv = d3.select("#d3chartcontainer" + classPrefix);
 
 		var selectedResponsiveness = containerDiv.node().getAttribute("data-responsive");
 
@@ -112,13 +193,16 @@
 				.style("height", height + "px");
 		};
 
-		var years = extractYear(containerDiv.node().getAttribute("data-year"));
+		const yearString = containerDiv.node().getAttribute("data-year");
 
 		var lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
 		var svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
+
+		const yearsDescriptionDiv = containerDiv.append("div")
+			.attr("class", classPrefix + "YearsDescriptionDiv");
 
 		var actualSvgSize = svg.node().getBoundingClientRect();
 
@@ -128,27 +212,43 @@
 
 		createProgressWhell();
 
-		var tooltip = d3.select("body").append("div")
-			.attr("id", "cbpfbptooltipdiv")
+		var tooltip = containerDiv.append("div")
+			.attr("id", classPrefix + "tooltipdiv")
 			.style("display", "none");
+
+		const buttonsPanel = {
+			main: svg.append("g")
+				.attr("class", classPrefix + "ButtonsPanel")
+				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+			width: width - padding[1] - padding[3],
+			height: buttonsPanelHeight,
+			padding: [0, 0, 0, 0],
+			buttonWidth: 54,
+			buttonPadding: 4,
+			buttonVerticalPadding: 4,
+			arrowPadding: 18
+		};
 
 		var topPanel = {
 			main: svg.append("g")
-				.attr("class", "cbpfbptopPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr("class", classPrefix + "topPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * topPanelHeightFactor,
-			moneyBagPadding: 70,
-			paidValuePadding: 330
+			height: topPanelHeight,
+			moneyBagPadding: 376,
+			leftPadding: [562, 232, 868],
+			mainValueVerPadding: 12,
+			mainValueHorPadding: 3
 		};
 
 		var barsPanel = {
 			main: svg.append("g")
-				.attr("class", "cbpfbpbarsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+				.attr("class", classPrefix + "barsPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * barsPanelHeightFactor,
-			padding: [22, 32, 20, 32],
+			height: barsPanelHeight,
+			padding: [30, 32, 20, 32],
+			titlePadding: 16,
 			centralSpace: 220 + flagPadding,
 			get barsSpace() {
 				return (this.width - this.centralSpace) / 2;
@@ -157,13 +257,36 @@
 
 		var beeswarmPanel = {
 			main: svg.append("g")
-				.attr("class", "cbpfbpbeeswarmPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + barsPanel.height + (2 * panelHorizontalPadding)) + ")"),
+				.attr("class", classPrefix + "beeswarmPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + barsPanel.height + (3 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
-			height: (height - padding[0] - padding[2] - (2 * panelHorizontalPadding)) * beeswarmPanelHeightFactor,
-			padding: [18, 10, 20, 124],
+			height: beeswarmPanelHeight,
+			padding: [18, 10, 24, 124],
 			titlePadding: 10
 		};
+
+		//tests
+		// buttonsPanel.main.append("rect")
+		// 	.attr("width", buttonsPanel.width)
+		// 	.attr("height", buttonsPanel.height)
+		// 	.style("fill", "tan")
+		// 	.style("opacity", 0.5);
+		// topPanel.main.append("rect")
+		// 	.attr("width", topPanel.width)
+		// 	.attr("height", topPanel.height)
+		// 	.style("fill", "tan")
+		// 	.style("opacity", 0.5);
+		// barsPanel.main.append("rect")
+		// 	.attr("width", barsPanel.width)
+		// 	.attr("height", barsPanel.height)
+		// 	.style("fill", "tan")
+		// 	.style("opacity", 0.5);
+		// beeswarmPanel.main.append("rect")
+		// 	.attr("width", beeswarmPanel.width)
+		// 	.attr("height", beeswarmPanel.height)
+		// 	.style("fill", "tan")
+		// 	.style("opacity", 0.5);
+		//tests
 
 		var barsDonorsYScale = d3.scaleBand()
 			.range([barsPanel.padding[0], barsPanel.height - barsPanel.padding[2]])
@@ -199,7 +322,7 @@
 		var barsCbpfsYAxis = d3.axisLeft(barsCbpfsYScale);
 
 		var barsDonorsXAxis = d3.axisBottom(barsDonorsXScale)
-			.tickPadding(2)
+			.tickPadding(6)
 			.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]))
 			.tickSizeOuter(0)
 			.ticks(3)
@@ -208,7 +331,7 @@
 			});
 
 		var barsCbpfsXAxis = d3.axisBottom(barsCbpfsXScale)
-			.tickPadding(2)
+			.tickPadding(6)
 			.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]))
 			.tickSizeOuter(0)
 			.ticks(3)
@@ -235,134 +358,345 @@
 				return d.y;
 			});
 
-		d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv", filterYear).then(function(rawData) {
+		d3.csv(dataUrl).then(function(rawData) {
 
 			removeProgressWheel();
 
-			var aggregatedDonors = [];
+			preProcessData(rawData);
 
-			var aggregatedCbpfs = [];
-
-			var tempSetDonors = [];
-
-			var tempSetCbpfs = [];
-
-			rawData.forEach(function(d) {
-				if (tempSetDonors.indexOf(d.GMSDonorName) > -1) {
-					var tempObject = aggregatedDonors.filter(function(e) {
-						return e.donor === d.GMSDonorName
-					})[0];
-					var foundDonations = tempObject.donations.filter(function(e) {
-						return e.cbpf === d.PooledFundName
-					})[0];
-					if (foundDonations) {
-						foundDonations.amountPaid += +d.PaidAmt;
-						foundDonations.amountPledge += +d.PledgeAmt;
-						foundDonations.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
-					} else {
-						tempObject.donations.push({
-							cbpf: d.PooledFundName,
-							amountPaid: +d.PaidAmt,
-							amountPledge: +d.PledgeAmt,
-							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-						});
-					}
-					tempObject.totalPaid += +d.PaidAmt;
-					tempObject.totalPledge += +d.PledgeAmt;
-					tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
-				} else {
-					aggregatedDonors.push({
-						donor: d.GMSDonorName,
-						isoCode: d.GMSDonorISO2Code.toLowerCase(),
-						donations: [{
-							cbpf: d.PooledFundName,
-							amountPaid: +d.PaidAmt,
-							amountPledge: +d.PledgeAmt,
-							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-						}],
-						totalPaid: +d.PaidAmt,
-						totalPledge: +d.PledgeAmt,
-						totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-					});
-					tempSetDonors.push(d.GMSDonorName);
-				};
-				if (tempSetCbpfs.indexOf(d.PooledFundName) > -1) {
-					var tempObject = aggregatedCbpfs.filter(function(e) {
-						return e.cbpf === d.PooledFundName
-					})[0];
-					var foundDonor = tempObject.donors.filter(function(e) {
-						return e.donor === d.GMSDonorName
-					})[0];
-					if (foundDonor) {
-						foundDonor.amountPaid += +d.PaidAmt;
-						foundDonor.amountPledge += +d.PledgeAmt;
-						foundDonor.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
-					} else {
-						tempObject.donors.push({
-							donor: d.GMSDonorName,
-							amountPaid: +d.PaidAmt,
-							amountPledge: +d.PledgeAmt,
-							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-						});
-					}
-					tempObject.totalPaid += +d.PaidAmt;
-					tempObject.totalPledge += +d.PledgeAmt;
-					tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
-				} else {
-					aggregatedCbpfs.push({
-						cbpf: d.PooledFundName,
-						isoCode: d.PooledFundISO2Code.toLowerCase(),
-						donors: [{
-							donor: d.GMSDonorName,
-							amountPaid: +d.PaidAmt,
-							amountPledge: +d.PledgeAmt,
-							amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-						}],
-						totalPaid: +d.PaidAmt,
-						totalPledge: +d.PledgeAmt,
-						totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
-					});
-					tempSetCbpfs.push(d.PooledFundName);
-				};
+			yearsArray = yearsArray.filter(function(d) {
+				return d <= currentYear;
+			}).sort(function(a, b) {
+				return a - b;
 			});
 
-			tempSetDonors = [];
+			extractYear(yearString);
 
-			tempSetCbpfs = [];
+			var allDonorFlags = [...new Set(rawData.map(function(d) {
+				return d.GMSDonorISO2Code.toLowerCase();
+			}))];
 
-			aggregatedDonors.sort(function(a, b) {
-				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
-			});
+			saveFlags(allDonorFlags);
 
-			aggregatedCbpfs.sort(function(a, b) {
-				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
-			});
+			createButtonsPanel(rawData);
 
-			var allDonorFlags = aggregatedDonors.map(function(d) {
-				return d.isoCode;
-			});
+			const data = processData(rawData);
 
 			if (!lazyLoad) {
-				draw(aggregatedDonors, aggregatedCbpfs);
+				draw(data.dataDonors, data.dataCbpfs);
 			} else {
-				d3.select(window).on("scroll.cbpfbp", checkPosition);
+				d3.select(window).on("scroll." + classPrefix, checkPosition);
 				checkPosition();
 			};
 
 			function checkPosition() {
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.cbpfbp", null); 
-					draw(aggregatedDonors, aggregatedCbpfs);
+					d3.select(window).on("scroll." + classPrefix, null);
+					draw(data.dataDonors, data.dataCbpfs);
 				};
 			};
 
 			//end of d3.csv
 		});
 
+		function createButtonsPanel(rawData) {
+
+			const clipPathButtons = buttonsPanel.main.append("clipPath")
+				.attr("id", classPrefix + "clipPathButtons")
+				.append("rect")
+				.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
+				.attr("height", buttonsPanel.height);
+
+			const clipPathGroup = buttonsPanel.main.append("g")
+				.attr("class", classPrefix + "ClipPathGroup")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3]) + ",0)")
+				.attr("clip-path", "url(#" + classPrefix + "clipPathButtons)");
+
+			const buttonsGroup = clipPathGroup.append("g")
+				.attr("class", classPrefix + "buttonsGroup")
+				.attr("transform", "translate(0,0)")
+				.style("cursor", "pointer");
+
+			const buttonsRects = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("rect")
+				.attr("rx", "2px")
+				.attr("ry", "2px")
+				.attr("class", classPrefix + "buttonsRects")
+				.attr("width", buttonsPanel.buttonWidth - buttonsPanel.buttonPadding)
+				.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
+				});
+
+			const buttonsText = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("text")
+				.attr("text-anchor", "middle")
+				.attr("class", classPrefix + "buttonsText")
+				.style("user-select", "none")
+				.attr("y", buttonsPanel.height / 1.6)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
+				})
+				.text(function(d) {
+					return d;
+				});
+
+			const leftArrow = buttonsPanel.main.append("g")
+				.attr("class", classPrefix + "LeftArrowGroup")
+				.style("cursor", "pointer")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.attr("transform", "translate(" + buttonsPanel.padding[3] + ",0)");
+
+			const leftArrowRect = leftArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", buttonsPanel.height - buttonsPanel.padding[0] - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding);
+
+			const leftArrowText = leftArrow.append("text")
+				.attr("class", classPrefix + "leftArrowText")
+				.attr("x", 0)
+				.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+				.style("fill", "#666")
+				.text("\u25c4");
+
+			const rightArrow = buttonsPanel.main.append("g")
+				.attr("class", classPrefix + "RightArrowGroup")
+				.style("cursor", "pointer")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding +
+					(buttonsNumber * buttonsPanel.buttonWidth)) + ",0)");
+
+			const rightArrowRect = rightArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", buttonsPanel.height - buttonsPanel.padding[0] - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding);
+
+			const rightArrowText = rightArrow.append("text")
+				.attr("class", classPrefix + "rightArrowText")
+				.attr("x", -1)
+				.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+				.style("fill", "#666")
+				.text("\u25ba");
+
+			if (yearsArray.length > buttonsNumber) {
+
+				clipPathGroup.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding) + ",0)")
+
+				rightArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				leftArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				repositionButtonsGroup();
+
+				checkCurrentTranslate();
+
+				leftArrow.on("click", function() {
+					leftArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
+						.on("end", checkArrows);
+				});
+
+				rightArrow.on("click", function() {
+					rightArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
+								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
+							",0)")
+						.on("end", checkArrows);
+				});
+			};
+
+			buttonsRects.on("mouseover", mouseOverButtonsRects)
+				.on("mouseout", mouseOutButtonsRects)
+				.on("click", function(d) {
+					const self = this;
+					if (d3.event.altKey) {
+						clickButtonsRects(d, false);
+						return;
+					};
+					if (localVariable.get(this) !== "clicked") {
+						localVariable.set(this, "clicked");
+						setTimeout(function() {
+							if (localVariable.get(self) === "clicked") {
+								clickButtonsRects(d, true);
+							};
+							localVariable.set(self, null);
+						}, 250);
+					} else {
+						clickButtonsRects(d, false);
+						localVariable.set(this, null);
+					};
+				});
+
+			function checkArrows() {
+
+				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+				if (currentTranslate === 0) {
+					leftArrow.select("text").style("fill", "#ccc");
+					leftArrow.attr("pointer-events", "none");
+				} else {
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+				};
+
+				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					rightArrow.select("text").style("fill", "#ccc");
+					rightArrow.attr("pointer-events", "none");
+				} else {
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+				}
+
+			};
+
+			function checkCurrentTranslate() {
+
+				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+				if (currentTranslate === 0) {
+					leftArrow.select("text").style("fill", "#ccc")
+					leftArrow.attr("pointer-events", "none");
+				};
+
+				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					rightArrow.select("text").style("fill", "#ccc")
+					rightArrow.attr("pointer-events", "none");
+				};
+
+			};
+
+			function repositionButtonsGroup() {
+
+				const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+					0 :
+					chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
+					yearsArray.length - buttonsNumber :
+					yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+
+				buttonsGroup.attr("transform", "translate(" +
+					(-(buttonsPanel.buttonWidth * firstYearIndex)) +
+					",0)");
+
+			};
+
+			function mouseOverButtonsRects(d) {
+				tooltip.style("display", "block")
+					.html(null)
+
+				const innerTooltip = tooltip.append("div")
+					.style("max-width", "200px")
+					.attr("id", "pbiobeInnerTooltipDiv");
+
+				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
+						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+
+				d3.select(this).style("fill", unBlue);
+				buttonsText.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
+			};
+
+			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
+				if (chartState.selectedYear.indexOf(d) > -1) return;
+				d3.select(this).style("fill", "#eaeaea");
+				buttonsText.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
+			};
+
+			function clickButtonsRects(d, singleSelection) {
+
+				barsPanel.main.selectAll("." + classPrefix + "barsDonorsTooltipRect")
+					.attr("pointer-events", "none");
+				barsPanel.main.selectAll("." + classPrefix + "barsCbpfsTooltipRect")
+					.attr("pointer-events", "none");
+				barsPanel.main.selectAll("." + classPrefix + "links")
+					.attr("pointer-events", "none");
+
+				if (singleSelection) {
+					chartState.selectedYear = [d];
+				} else {
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
+				};
+
+
+				buttonsRects.style("fill", function(e) {
+					return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
+				});
+
+				buttonsText.style("fill", function(e) {
+					return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
+				});
+
+				setYearsDescriptionDiv();
+
+				const data = processData(rawData);
+
+				draw(data.dataDonors, data.dataCbpfs);
+
+				//end of clickButtonsRects
+			};
+
+			//end of createButtonsPanel
+		};
+
 		function draw(dataDonors, dataCbpfs) {
 
-			saveFlags(dataDonors);
+			const syncTransition = d3.transition()
+				.duration(duration);
 
 			var maxBarsNumber = Math.max(dataDonors.length, dataCbpfs.length);
 
@@ -372,7 +706,8 @@
 				beeswarmPanel.main.attr("transform", "translate(" + padding[3] + "," +
 					(padding[0] + topPanel.height + barsPanel.height + (2 * panelHorizontalPadding)) + ")");
 				var newHeight = ~~(padding[3] + padding[0] + topPanel.height + barsPanel.height + beeswarmPanel.height + (2 * panelHorizontalPadding));
-				svg.attr("viewBox", "0 0 " + width + " " + newHeight);
+				svg.transition(syncTransition)
+					.attr("viewBox", "0 0 " + width + " " + newHeight);
 				if (selectedResponsiveness === "false") {
 					containerDiv.style("height", newHeight + "px");
 				};
@@ -525,263 +860,352 @@
 
 			//TOP PANEL
 
-			var topPanelTitle = topPanel.main.append("text")
-				.attr("class", "cbpfbptopPanelTitle")
-				.attr("text-anchor", "middle")
-				.attr("y", 16)
-				.attr("x", topPanel.width / 2)
-				.text(yearsArray.length === 1 ? yearsArray[0] + " Contributions" :
-					yearsArray[0] + " to " + yearsArray[1] + " Contributions");
+			const donorsNumber = dataDonors.length;
 
-			var placeholderText1 = svg.append("text")
-				.style("opacity", "0")
-				.attr("class", "cbpfbptopValueMain")
-				.text(formatSIFloat(totalAmountAllCountries));
+			const cbpfsNumber = dataCbpfs.length;
 
-			var placeholderText2 = svg.append("text")
-				.style("opacity", "0")
-				.attr("class", "cbpfbptopValueUnits")
-				.text("Donated");
+			// const topPanelMoneyBag = topPanel.main.selectAll("." + classPrefix + "topPanelMoneyBag")
+			// 	.data([true]);
 
-			var placeholderWidths = placeholderText1.node().getBBox().width + placeholderText2.node().getBBox().width;
+			// topPanelMoneyBag.enter()
+			// 	.append("g")
+			// 	.attr("class", classPrefix + "topPanelMoneyBag contributionColorFill")
+			// 	.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
+			// 	.each(function(_, i, n) {
+			// 		moneyBagdAttribute.forEach(function(d) {
+			// 			d3.select(n[i]).append("path")
+			// 				.attr("d", d);
+			// 		});
+			// 	});
 
-			placeholderText1.remove();
-			placeholderText2.remove();
+			const previousValue = d3.select("." + classPrefix + "topPanelMainValue").size() !== 0 ? d3.select("." + classPrefix + "topPanelMainValue").datum() : 0;
 
-			var topPanelGroup = topPanel.main.append("g")
-				.attr("transform", "translate(" + (width / 2 - (topPanel.moneyBagPadding + placeholderWidths) / 2) + ",0)")
+			const previousDonors = d3.select("." + classPrefix + "topPanelDonorsNumber").size() !== 0 ? d3.select("." + classPrefix + "topPanelDonorsNumber").datum() : 0;
 
-			var topPanelMoneyBag = topPanelGroup.append("g")
-				.attr("class", "contributionColorFill")
-				.attr("transform", "translate(0,26) scale(0.6)");
+			const previousCbpfs = d3.select("." + classPrefix + "topPanelCbpfsNumber").size() !== 0 ? d3.select("." + classPrefix + "topPanelCbpfsNumber").datum() : 0;
 
-			topPanelMoneyBag.append("path")
-				.attr("d", moneyBagd1);
+			let mainValueGroup = topPanel.main.selectAll("." + classPrefix + "mainValueGroup")
+				.data([true]);
 
-			topPanelMoneyBag.append("path")
-				.attr("d", moneyBagd2);
+			mainValueGroup = mainValueGroup.enter()
+				.append("g")
+				.attr("class", classPrefix + "mainValueGroup")
+				.merge(mainValueGroup);
 
-			topPanelMoneyBag.append("path")
-				.attr("d", moneyBagd3);
+			let topPanelMainValue = mainValueGroup.selectAll("." + classPrefix + "topPanelMainValue")
+				.data([totalAmountAllCountries]);
 
-			topPanelMoneyBag.append("path")
-				.attr("d", moneyBagd4);
+			topPanelMainValue = topPanelMainValue.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelMainValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.attr("x", topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.merge(topPanelMainValue);
 
-			var topValueMain = topPanelGroup.append("text")
-				.attr("class", "cbpfbptopValueMain contributionColorFill")
-				.attr("y", 78)
-				.attr("x", topPanel.moneyBagPadding);
-
-			topValueMain.transition()
-				.duration(duration)
+			topPanelMainValue.transition(syncTransition)
 				.tween("text", function(d) {
-					var node = this;
-					var i = d3.interpolate(0, totalAmountAllCountries);
+					const node = this;
+					const i = d3.interpolate(previousValue, d);
 					return function(t) {
-						var siString = formatSIFloat(i(t))
+						const siString = formatSIFloat(i(t))
 						node.textContent = "$" + siString.substring(0, siString.length - 1);
 					};
-				})
-				.on("end", function(d, i) {
-
-					var finalValue = formatSIFloat(totalAmountAllCountries);
-					var unit = finalValue[finalValue.length - 1]
-					var thisBox = this.getBBox();
-
-					var topValueUnits = d3.select(this.parentNode).append("text")
-						.style("opacity", 0)
-						.attr("pointer-events", "none")
-						.attr("class", "cbpfbptopValueUnits")
-						.attr("y", 54)
-						.attr("x", thisBox.x + thisBox.width + 10);
-
-					topValueUnits.append("tspan")
-						.text(unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "")
-						.append("tspan")
-						.attr("dy", "1.1em")
-						.attr("x", thisBox.x + thisBox.width + 10)
-						.text("Donated");
-
-					topValueUnits.transition()
-						.duration(duration / 2)
-						.style("opacity", 1);
-
 				});
 
-			var topPanelRect = topPanel.main.append("rect")
-				.attr("x", width / 2 - (topPanel.moneyBagPadding + placeholderWidths) / 2)
-				.attr("y", 26)
-				.attr("width", (topPanel.moneyBagPadding + placeholderWidths))
-				.attr("height", topPanel.height - 26)
+			let topPanelMainText = mainValueGroup.selectAll("." + classPrefix + "topPanelMainText")
+				.data([totalAmountAllCountries]);
+
+			topPanelMainText = topPanelMainText.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelMainText")
 				.style("opacity", 0)
-				.on("mousemove", function() {
-					var mouse = d3.mouse(this)[0];
+				.attr("text-anchor", "start")
+				.attr("x", topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+				.merge(topPanelMainText)
+
+			topPanelMainText.transition(syncTransition)
+				.style("opacity", 1)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "";
+				});
+
+			let topPanelSubText = mainValueGroup.selectAll("." + classPrefix + "topPanelSubText")
+				.data([true]);
+
+			topPanelSubText = topPanelSubText.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelSubText")
+				.style("opacity", 0)
+				.attr("text-anchor", "start")
+				.attr("x", topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.1)
+				.merge(topPanelSubText)
+
+			topPanelSubText.transition(syncTransition)
+				.style("opacity", 1)
+				.text("Donated in " + (chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A"));
+
+			let topPanelDonorsNumber = mainValueGroup.selectAll("." + classPrefix + "topPanelDonorsNumber")
+				.data([donorsNumber]);
+
+			topPanelDonorsNumber = topPanelDonorsNumber.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelDonorsNumber contributionColorFill")
+				.attr("text-anchor", "end")
+				.attr("x", topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.merge(topPanelDonorsNumber);
+
+			topPanelDonorsNumber.transition(syncTransition)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousDonors, d);
+					return function(t) {
+						node.textContent = ~~(i(t));
+					};
+				});
+
+			const topPanelDonorsText = mainValueGroup.selectAll("." + classPrefix + "topPanelDonorsText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelDonorsText")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+				.attr("text-anchor", "start")
+				.text("Donors")
+				.attr("x", topPanel.leftPadding[1]);
+
+			let topPanelCbpfsNumber = mainValueGroup.selectAll("." + classPrefix + "topPanelCbpfsNumber")
+				.data([cbpfsNumber]);
+
+			topPanelCbpfsNumber = topPanelCbpfsNumber.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelCbpfsNumber allocationColorFill")
+				.attr("text-anchor", "end")
+				.attr("x", topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.merge(topPanelCbpfsNumber);
+
+			topPanelCbpfsNumber.transition(syncTransition)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousCbpfs, d);
+					return function(t) {
+						node.textContent = ~~(i(t));
+					};
+				});
+
+			const topPanelCbpfsText = mainValueGroup.selectAll("." + classPrefix + "topPanelCbpfsText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", classPrefix + "topPanelCbpfsText")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+				.attr("text-anchor", "start")
+				.text("CBPFs")
+				.attr("x", topPanel.leftPadding[2]);
+
+			const overRectangle = topPanel.main.selectAll("." + classPrefix + "topPanelOverRectangle")
+				.data([true])
+				.enter()
+				.append("rect")
+				.attr("class", classPrefix + "topPanelOverRectangle")
+				.attr("width", topPanel.width)
+				.attr("height", topPanel.height)
+				.style("opacity", 0);
+
+			overRectangle.on("mouseover", function() {
+
+					const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+					const mouseContainer = d3.mouse(containerDiv.node());
+
+					const mouse = d3.mouse(this);
+
 					tooltip.style("display", "block")
-						.html("Paid amount: <span class='contributionColorHTMLcolor'>$" + formatMoney2Decimals(totalPaidAllCountries) +
-							"</span><br>Pledged amount: <span class='contributionColorHTMLcolor'>$" +
-							formatMoney2Decimals(totalPledgeAllCountries) + "</span>");
-					var tooltipSize = tooltip.node().getBoundingClientRect();
-					tooltip.style("top", d3.event.pageY - 26 + "px")
-						.style("left", mouse < topPanel.width - 16 - tooltipSize.width ?
-							d3.event.pageX + 16 + "px" : d3.event.pageX - (tooltipSize.width + 8) + "px");
+						.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(totalAmountAllCountries) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercentCustom(totalPaidAllCountries, totalAmountAllCountries)) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(totalPaidAllCountries) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercentCustom(totalPledgeAllCountries, totalAmountAllCountries)) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(totalPledgeAllCountries) + "</span></div></div>");
+
+					const tooltipSize = tooltip.node().getBoundingClientRect();
+
+					localVariable.set(this, tooltipSize);
+
+					tooltip.style("top", thisOffset + "px")
+						.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
+							mouseContainer[0] + 14 + "px" :
+							mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
+				})
+				.on("mousemove", function() {
+					const thisOffset = this.getBoundingClientRect().top - containerDiv.node().getBoundingClientRect().top;
+
+					const mouseContainer = d3.mouse(containerDiv.node());
+
+					const mouse = d3.mouse(this);
+
+					const tooltipSize = localVariable.get(this);
+
+					tooltip.style("top", thisOffset + "px")
+						.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
+							mouseContainer[0] + 14 + "px" :
+							mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
 				})
 				.on("mouseout", function() {
-					tooltip.style("display", "none");
+					tooltip.html(null)
+						.style("display", "none");
 				});
 
 			//END TOP PANEL
 
 			//BARS PANEL
 
-			var barsDonorsTitle = barsPanel.main.append("text")
+			let barsDonorsTitle = barsPanel.main.selectAll("." + classPrefix + "barsPanelTitleDonors")
+				.data([true]);
+
+			barsDonorsTitle = barsDonorsTitle.enter()
+				.append("text")
 				.attr("text-anchor", "end")
-				.attr("class", "cbpfbpbarsPanelTitle")
-				.attr("y", barsPanel.padding[0] - 7)
+				.attr("class", classPrefix + "barsPanelTitleDonors")
+				.attr("y", barsPanel.titlePadding)
 				.attr("x", barsPanel.barsSpace)
+				.merge(barsDonorsTitle)
 				.text(dataDonors.length > 10 ? "Top 10 Donors" : "Donors");
 
-			var barsCbpfsTitle = barsPanel.main.append("text")
-				.attr("class", "cbpfbpbarsPanelTitle")
-				.attr("y", barsPanel.padding[0] - 7)
+			let barsCbpfsTitle = barsPanel.main.selectAll("." + classPrefix + "barsPanelTitleCbpfs")
+				.data([true]);
+
+			barsCbpfsTitle = barsCbpfsTitle.enter()
+				.append("text")
+				.attr("class", classPrefix + "barsPanelTitleCbpfs")
+				.attr("y", barsPanel.titlePadding)
 				.attr("x", barsPanel.barsSpace + barsPanel.centralSpace)
+				.merge(barsCbpfsTitle)
 				.text(dataCbpfs.length > 10 ? "Top 10 CBPFs" : "CBPFs");
 
-			var barsTransition = d3.transition()
-				.duration(duration);
+			let gBarsDonorsYAxis = barsPanel.main.selectAll("." + classPrefix + "gBarsContributionsYAxis")
+				.data([true]);
 
-			var gBarsDonorsYAxis = barsPanel.main.append("g")
-				.attr("class", "cbpfbpgBarsContributionsYAxis")
+			gBarsDonorsYAxis = gBarsDonorsYAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBarsContributionsYAxis")
 				.attr("transform", "translate(" + barsPanel.barsSpace + ",0)")
 				.style("opacity", 0)
-				.call(barsDonorsYAxis);
+				.merge(gBarsDonorsYAxis);
 
-			gBarsDonorsYAxis.transition(barsTransition)
-				.style("opacity", 1);
+			gBarsDonorsYAxis.transition(syncTransition)
+				.style("opacity", 1)
+				.call(customAxis, barsDonorsYAxis, 1);
 
-			var gBarsCbpfsYAxis = barsPanel.main.append("g")
-				.attr("class", "cbpfbpgBarsAllocationsYAxis")
+			let gBarsCbpfsYAxis = barsPanel.main.selectAll("." + classPrefix + "gBarsAllocationsYAxis")
+				.data([true]);
+
+			gBarsCbpfsYAxis = gBarsCbpfsYAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBarsAllocationsYAxis")
 				.attr("transform", "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + ",0)")
 				.style("opacity", 0)
-				.call(barsCbpfsYAxis);
+				.merge(gBarsCbpfsYAxis);
 
-			gBarsCbpfsYAxis.transition(barsTransition)
-				.style("opacity", 1);
+			gBarsCbpfsYAxis.transition(syncTransition)
+				.style("opacity", 1)
+				.call(customAxis, barsCbpfsYAxis, -1);
 
-			gBarsDonorsYAxis.selectAll(".tick text").each(function(d) {
-				wrapLabels(d, this);
-			});
+			function customAxis(group, axisGenerator, coefficient) {
+				const sel = group.selection ? group.selection() : group;
+				group.call(axisGenerator);
+				sel.selectAll(".tick text")
+					.filter((d, i, n) => d.length > 15)
+					.text(d => d.split(" ")[0])
+					.attr("dy", "0em")
+					.attr("x", coefficient * (axisGenerator.tickPadding() + axisGenerator.tickSize()))
+					.append("tspan")
+					.attr("dy", "0.9em")
+					.attr("x", coefficient * (axisGenerator.tickPadding() + axisGenerator.tickSize()))
+					.text(d => {
+						const strArr = d.split(" ");
+						strArr.shift();
+						return strArr.join(" ");
+					});
+				if (sel !== group) group.selectAll(".tick text")
+					.filter((d, i, n) => d.length > 15)
+					.attrTween("x", null)
+					.tween("text", null);
+			};
 
-			gBarsCbpfsYAxis.selectAll(".tick text").each(function(d) {
-				wrapLabels(d, this);
-			});
+			let gBarsDonorsXAxis = barsPanel.main.selectAll("." + classPrefix + "gBarsContributionsXAxis")
+				.data([true]);
 
-			var gBarsDonorsXAxis = barsPanel.main.append("g")
-				.attr("class", "cbpfbpgBarsContributionsXAxis")
+			gBarsDonorsXAxis = gBarsDonorsXAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBarsContributionsXAxis")
 				.attr("transform", "translate(0, " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.style("opacity", 0)
+				.merge(gBarsDonorsXAxis);
+
+			gBarsDonorsXAxis.transition(syncTransition)
+				.style("opacity", 1)
 				.call(barsDonorsXAxis);
 
-			gBarsDonorsXAxis.transition(barsTransition)
-				.style("opacity", 1);
+			let gBarsCbpfsXAxis = barsPanel.main.selectAll("." + classPrefix + "gBarsAllocationsXAxis")
+				.data([true]);
 
-			var gBarsCbpfsXAxis = barsPanel.main.append("g")
-				.attr("class", "cbpfbpgBarsAllocationsXAxis")
+			gBarsCbpfsXAxis = gBarsCbpfsXAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBarsAllocationsXAxis")
 				.attr("transform", "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + ", " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.style("opacity", 0)
+				.merge(gBarsCbpfsXAxis);
+
+			gBarsCbpfsXAxis.transition(syncTransition)
+				.style("opacity", 1)
 				.call(barsCbpfsXAxis);
 
-			gBarsCbpfsXAxis.transition(barsTransition)
-				.style("opacity", 1);
-
-			d3.selectAll(".cbpfbpgBarsContributionsXAxis, .cbpfbpgBarsAllocationsXAxis")
+			d3.selectAll("." + classPrefix + "gBarsContributionsXAxis, ." + classPrefix + "gBarsAllocationsXAxis")
 				.selectAll(".tick")
 				.filter(function(d) {
 					return d === 0;
 				})
 				.remove();
 
-			var barsDonors = barsPanel.main.selectAll(null)
-				.data(top10Donors)
-				.enter()
+			let barsDonors = barsPanel.main.selectAll("." + classPrefix + "barsDonors")
+				.data(top10Donors, function(d) {
+					return d.donor;
+				});
+
+			const barsDonorsExit = barsDonors.exit()
+				.transition(syncTransition)
+				.style("opacity", 0)
+				.remove();
+
+			const barsDonorsEnter = barsDonors.enter()
 				.append("g")
+				.attr("class", classPrefix + "barsDonors")
 				.attr("transform", function(d) {
 					return "translate(0," + barsDonorsYScale(d.donor) + ")"
 				});
 
-			var barsDonorsRects = barsDonors.append("rect")
-				.attr("class", "cbpfbpbarsContributionsRects")
+			const barsDonorsRects = barsDonorsEnter.append("rect")
+				.attr("class", classPrefix + "barsContributionsRects")
 				.attr("x", barsPanel.barsSpace)
 				.attr("y", 0)
 				.attr("width", 0)
 				.attr("height", barsDonorsYScale.bandwidth())
 				.classed("contributionColorFill", true);
 
-			barsDonorsRects.transition(barsTransition)
-				.attr("x", function(d) {
-					return barsDonorsXScale(d.totalPaidPlusPledge)
-				})
-				.attr("width", function(d) {
-					return barsPanel.barsSpace - barsDonorsXScale(d.totalPaidPlusPledge)
-				});
-
-			var barsCbpfs = barsPanel.main.selectAll(null)
-				.data(top10Cbpfs)
-				.enter()
-				.append("g")
-				.attr("transform", function(d) {
-					return "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + "," + barsCbpfsYScale(d.cbpf) + ")"
-				});
-
-			var barsCbpfsRects = barsCbpfs.append("rect")
-				.attr("class", "cbpfbpbarsAllocationsRects")
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("width", 0)
-				.attr("height", barsCbpfsYScale.bandwidth())
-				.classed("allocationColorFill", true);
-
-			barsCbpfsRects.transition(barsTransition)
-				.attr("width", function(d) {
-					return barsCbpfsXScale(d.totalPaidPlusPledge);
-				});
-
-			var barsDonorsLabels = barsDonors.append("text")
-				.attr("class", "cbpfbpbarsLabels")
+			const barsDonorsLabels = barsDonorsEnter.append("text")
+				.attr("class", classPrefix + "barsContributionsLabels")
 				.attr("text-anchor", "end")
 				.attr("x", barsPanel.barsSpace - barsDonorsLabelsPadding)
 				.attr("y", 4 + barsDonorsYScale.bandwidth() / 2);
 
-			barsDonorsLabels.transition(barsTransition)
-				.attr("x", function(d) {
-					return barsDonorsXScale(d.totalPaidPlusPledge) - barsDonorsLabelsPadding
-				})
-				.tween("text", function(d) {
-					var node = this;
-					var i = d3.interpolate(0, d.totalPaidPlusPledge);
-					return function(t) {
-						node.textContent = "$" + formatSIFloat1decimal(i(t));
-					};
-				});
-
-			var barsCbpfsLabels = barsCbpfs.append("text")
-				.attr("class", "cbpfbpbarsLabels")
-				.attr("x", barsDonorsLabelsPadding)
-				.attr("y", 4 + barsCbpfsYScale.bandwidth() / 2);
-
-			barsCbpfsLabels.transition(barsTransition)
-				.attr("x", function(d) {
-					return barsCbpfsXScale(d.totalPaidPlusPledge) + barsDonorsLabelsPadding;
-				})
-				.tween("text", function(d) {
-					var node = this;
-					var i = d3.interpolate(0, d.totalPaidPlusPledge);
-					return function(t) {
-						node.textContent = "$" + formatSIFloat1decimal(i(t));
-					};
-				});
-
-			var barsDonorsOverRect = barsDonors.append("rect")
-				.attr("class", "cbpfbpbarsContributionsOverRect")
+			const barsDonorsOverRect = barsDonorsEnter.append("rect")
+				.attr("class", classPrefix + "barsContributionsOverRect")
 				.style("opacity", 0)
 				.attr("x", barsPanel.barsSpace)
 				.attr("y", 0)
@@ -789,17 +1213,8 @@
 				.attr("height", barsDonorsYScale.bandwidth())
 				.classed("contributionColorDarkerFill", true);
 
-			var barsCbpfsOverRect = barsCbpfs.append("rect")
-				.attr("class", "cbpfbpbarsAllocationsOverRect")
-				.style("opacity", 0)
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("width", 0)
-				.attr("height", barsCbpfsYScale.bandwidth())
-				.classed("allocationColorDarkerFill", true);
-
-			var barsDonorsOverLine = barsDonors.append("line")
-				.attr("class", "cbpfbpbarsContributionsOverLine")
+			const barsDonorsOverLine = barsDonorsEnter.append("line")
+				.attr("class", classPrefix + "barsContributionsOverLine")
 				.style("opacity", 0)
 				.style("stroke", "white")
 				.style("stroke-width", "1px")
@@ -808,24 +1223,7 @@
 				.attr("y1", 0)
 				.attr("y2", barsDonorsYScale.bandwidth());
 
-			var barsCbpfsOverLine = barsCbpfs.append("line")
-				.attr("class", "cbpfbpbarsAllocationsOverLine")
-				.style("opacity", 0)
-				.style("stroke", "white")
-				.style("stroke-width", "1px")
-				.attr("x1", 0)
-				.attr("x2", 0)
-				.attr("y1", 0)
-				.attr("y2", barsCbpfsYScale.bandwidth());
-
-			var barsMiddleText = barsPanel.main.append("text")
-				.attr("class", "cbpfbpbarsMiddleText")
-				.attr("pointer-events", "none")
-				.attr("x", barsPanel.width / 2 + flagPadding / 2)
-				.attr("y", barsPanel.padding[0] - 26)
-				.attr("text-anchor", "middle");
-
-			var flags = barsDonors.append("image")
+			const flags = barsDonorsEnter.append("image")
 				.attr("width", 24)
 				.attr("height", 24)
 				.attr("y", -3)
@@ -839,72 +1237,8 @@
 				})
 				.style("opacity", 0);
 
-			flags.transition(barsTransition)
-				.style("opacity", 1);
-
-			var linksData = [];
-
-			linksWidthScale.domain([0, totalAmountAllCountries]);
-
-			top10Donors.forEach(function(d) {
-				var counter = -1;
-				var thisBoxDonors = gBarsDonorsYAxis.selectAll(".tick text")
-					.filter(function(e) {
-						return e === d.donor;
-					}).node().getBBox();
-				var numberOfLinks = d.donations.length;
-				linksYPosScale.domain(d3.range(numberOfLinks));
-				d.donations.forEach(function(e) {
-					var donorsNames = e.donorsFromOthers ? e.donorsFromOthers : null;
-					var cbpfName = otherCbpfs && otherCbpfs.cbpfList.indexOf(e.cbpf) > -1 ? "Other CBPFs" : e.cbpf;
-					if (top10CbpfsNames.indexOf(cbpfName) > -1) {
-						counter += 1;
-						var thisBoxCbpfs = gBarsCbpfsYAxis.selectAll(".tick text")
-							.filter(function(f) {
-								return f === cbpfName;
-							}).node().getBBox();
-						linksData.push({
-							source: {
-								valuePaid: e.amountPaid,
-								valuePledge: e.amountPledge,
-								donor: d.donor,
-								donorNames: donorsNames,
-								x: barsPanel.barsSpace + thisBoxDonors.width + barsDonorsYAxis.tickPadding() +
-									barsDonorsYAxis.tickSizeInner() + 4,
-								y: barsDonorsYScale(d.donor) + barsDonorsYScale.bandwidth() / 2 - linksYPosScale(counter)
-							},
-							target: {
-								valuePaid: e.amountPaid,
-								valuePledge: e.amountPledge,
-								cbpf: cbpfName,
-								cbpfNameInOthers: e.cbpf,
-								x: barsPanel.barsSpace + barsPanel.centralSpace - thisBoxCbpfs.width - barsCbpfsYAxis.tickPadding() -
-									barsCbpfsYAxis.tickSizeInner() - 4,
-								y: barsCbpfsYScale(cbpfName) + barsCbpfsYScale.bandwidth() / 2
-							},
-							width: linksWidthScale(e.amountPaid + e.amountPledge)
-						})
-					}
-				})
-			});
-
-			var links = barsPanel.main.selectAll(null)
-				.data(linksData)
-				.enter()
-				.append("path")
-				.style("stroke", "slategray")
-				.style("fill", "none")
-				.style("stroke-width", function(d) {
-					return d.width + "px"
-				})
-				.style("opacity", 0)
-				.attr("pointer-events", "none")
-				.attr("d", linkGenerator);
-
-			links.transition(barsTransition)
-				.style("opacity", 0.1);
-
-			var barsDonorsTooltipRect = barsDonors.append("rect")
+			const barsDonorsTooltipRectEnter = barsDonorsEnter.append("rect")
+				.attr("class", classPrefix + "barsDonorsTooltipRect")
 				.attr("x", 0)
 				.attr("y", 0)
 				.attr("height", barsDonorsYScale.bandwidth())
@@ -919,7 +1253,92 @@
 				.style("opacity", 0)
 				.attr("pointer-events", "none");
 
-			var barsCbpfsTooltipRect = barsCbpfs.append("rect")
+			barsDonors = barsDonorsEnter.merge(barsDonors);
+
+			barsDonors.transition(syncTransition)
+				.attr("transform", function(d) {
+					return "translate(0," + barsDonorsYScale(d.donor) + ")"
+				});
+
+			barsDonors.select("." + classPrefix + "barsContributionsRects")
+				.transition(syncTransition)
+				.attr("x", function(d) {
+					return barsDonorsXScale(d.totalPaidPlusPledge)
+				})
+				.attr("width", function(d) {
+					return barsPanel.barsSpace - barsDonorsXScale(d.totalPaidPlusPledge)
+				});
+
+			barsDonors.select("." + classPrefix + "barsContributionsLabels")
+				.transition(syncTransition)
+				.attr("x", function(d) {
+					return barsDonorsXScale(d.totalPaidPlusPledge) - barsDonorsLabelsPadding
+				})
+				.tween("text", function(d) {
+					var node = this;
+					var i = d3.interpolate(0, d.totalPaidPlusPledge);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat1decimal(i(t));
+					};
+				});
+
+			barsDonors.select("image")
+				.transition(syncTransition)
+				.style("opacity", 1);
+
+			const barsDonorsTooltipRect = barsDonors.select("." + classPrefix + "barsDonorsTooltipRect");
+
+			let barsCbpfs = barsPanel.main.selectAll("." + classPrefix + "barsCbpfs")
+				.data(top10Cbpfs, function(d) {
+					return d.cbpf;
+				});
+
+			const barsCbpfsExit = barsCbpfs.exit()
+				.transition(syncTransition)
+				.style("opacity", 0)
+				.remove();
+
+			const barsCbpfsEnter = barsCbpfs.enter()
+				.append("g")
+				.attr("class", classPrefix + "barsCbpfs")
+				.attr("transform", function(d) {
+					return "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + "," + barsCbpfsYScale(d.cbpf) + ")"
+				});
+
+			const barsCbpfsRects = barsCbpfsEnter.append("rect")
+				.attr("class", classPrefix + "barsAllocationsRects")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("width", 0)
+				.attr("height", barsCbpfsYScale.bandwidth())
+				.classed("allocationColorFill", true);
+
+			const barsCbpfsLabels = barsCbpfsEnter.append("text")
+				.attr("class", classPrefix + "barsAllocationsLabels")
+				.attr("x", barsDonorsLabelsPadding)
+				.attr("y", 4 + barsCbpfsYScale.bandwidth() / 2);
+
+			const barsCbpfsOverRect = barsCbpfsEnter.append("rect")
+				.attr("class", classPrefix + "barsAllocationsOverRect")
+				.style("opacity", 0)
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("width", 0)
+				.attr("height", barsCbpfsYScale.bandwidth())
+				.classed("allocationColorDarkerFill", true);
+
+			const barsCbpfsOverLine = barsCbpfsEnter.append("line")
+				.attr("class", classPrefix + "barsAllocationsOverLine")
+				.style("opacity", 0)
+				.style("stroke", "white")
+				.style("stroke-width", "1px")
+				.attr("x1", 0)
+				.attr("x2", 0)
+				.attr("y1", 0)
+				.attr("y2", barsCbpfsYScale.bandwidth());
+
+			const barsCbpfsTooltipRectEnter = barsCbpfsEnter.append("rect")
+				.attr("class", classPrefix + "barsCbpfsTooltipRect")
 				.attr("y", 0)
 				.attr("height", barsCbpfsYScale.bandwidth())
 				.attr("width", function(d) {
@@ -938,11 +1357,135 @@
 				.style("opacity", 0)
 				.attr("pointer-events", "none");
 
+			barsCbpfs = barsCbpfsEnter.merge(barsCbpfs);
+
+			barsCbpfs.transition(syncTransition)
+				.attr("transform", function(d) {
+					return "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + "," + barsCbpfsYScale(d.cbpf) + ")"
+				});
+
+			barsCbpfs.select("." + classPrefix + "barsAllocationsRects")
+				.transition(syncTransition)
+				.attr("width", function(d) {
+					return barsCbpfsXScale(d.totalPaidPlusPledge);
+				});
+
+			barsCbpfs.select("." + classPrefix + "barsAllocationsLabels")
+				.transition(syncTransition)
+				.attr("x", function(d) {
+					return barsCbpfsXScale(d.totalPaidPlusPledge) + barsDonorsLabelsPadding;
+				})
+				.tween("text", function(d) {
+					var node = this;
+					var i = d3.interpolate(0, d.totalPaidPlusPledge);
+					return function(t) {
+						node.textContent = "$" + formatSIFloat1decimal(i(t));
+					};
+				});
+
+			const barsCbpfsTooltipRect = barsCbpfs.select("." + classPrefix + "barsCbpfsTooltipRect");
+
+			const barsMiddleText = barsPanel.main.selectAll("." + classPrefix + "barsMiddleText")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", classPrefix + "barsMiddleText")
+				.attr("pointer-events", "none")
+				.attr("x", barsPanel.width / 2 + flagPadding / 2)
+				.attr("y", barsPanel.padding[0] - 26)
+				.attr("text-anchor", "middle");
+
+			var linksData = [];
+
+			linksWidthScale.domain([0, totalAmountAllCountries]);
+
+			let links;
+
+			setTimeout(function() {
+
+				top10Donors.forEach(function(d) {
+					var counter = -1;
+					var thisBoxDonors = gBarsDonorsYAxis.selectAll(".tick text")
+						.filter(function(e) {
+							return e === d.donor;
+						}).node().getBBox();
+					var numberOfLinks = d.donations.length;
+					linksYPosScale.domain(d3.range(numberOfLinks));
+					d.donations.forEach(function(e) {
+						var donorsNames = e.donorsFromOthers ? e.donorsFromOthers : null;
+						var cbpfName = otherCbpfs && otherCbpfs.cbpfList.indexOf(e.cbpf) > -1 ? "Other CBPFs" : e.cbpf;
+						if (top10CbpfsNames.indexOf(cbpfName) > -1) {
+							counter += 1;
+							var thisBoxCbpfs = gBarsCbpfsYAxis.selectAll(".tick text")
+								.filter(function(f) {
+									return f === cbpfName;
+								}).node().getBBox();
+							linksData.push({
+								source: {
+									valuePaid: e.amountPaid,
+									valuePledge: e.amountPledge,
+									donor: d.donor,
+									donorNames: donorsNames,
+									x: barsPanel.barsSpace + thisBoxDonors.width + barsDonorsYAxis.tickPadding() +
+										barsDonorsYAxis.tickSizeInner() + 4,
+									y: barsDonorsYScale(d.donor) + barsDonorsYScale.bandwidth() / 2 - linksYPosScale(counter)
+								},
+								target: {
+									valuePaid: e.amountPaid,
+									valuePledge: e.amountPledge,
+									cbpf: cbpfName,
+									cbpfNameInOthers: e.cbpf,
+									x: barsPanel.barsSpace + barsPanel.centralSpace - thisBoxCbpfs.width - barsCbpfsYAxis.tickPadding() -
+										barsCbpfsYAxis.tickSizeInner() - 4,
+									y: barsCbpfsYScale(cbpfName) + barsCbpfsYScale.bandwidth() / 2
+								},
+								width: linksWidthScale(e.amountPaid + e.amountPledge)
+							})
+						}
+					})
+				});
+
+				links = barsPanel.main.selectAll("." + classPrefix + "links")
+					.data(linksData, function(d) {
+						return d.source.donor + d.target.cbpf;
+					});
+
+				const linksExit = links.exit()
+					.transition(syncTransition)
+					.style("opacity", 0)
+					.remove();
+
+				const linksEnter = links.enter()
+					.append("path")
+					.attr("class", classPrefix + "links")
+					.style("stroke", "slategray")
+					.style("fill", "none")
+					.style("stroke-width", function(d) {
+						return d.width + "px"
+					})
+					.style("opacity", 0)
+					.attr("pointer-events", "none");
+
+				links = linksEnter.merge(links);
+
+				links.transition(syncTransition)
+					.style("opacity", 0.1)
+					.style("stroke-width", function(d) {
+						return d.width + "px"
+					})
+					.attr("d", linkGenerator);
+
+				links.on("mouseenter", mouseenterLinks)
+					.on("mousemove", mousemoveLinks)
+					.on("mouseout", mouseoutLinks);
+
+			}, 50);
+
 			d3.timeout(function() {
 				barsDonorsTooltipRect.attr("pointer-events", "all");
 				barsCbpfsTooltipRect.attr("pointer-events", "all");
 				links.attr("pointer-events", "auto");
-			}, duration * 2);
+			}, duration * 1.1);
 
 			barsDonorsTooltipRect.on("mouseenter", mouseenterBarsDonors)
 				.on("mousemove", mousemoveBarsDonors)
@@ -952,38 +1495,49 @@
 				.on("mousemove", mousemoveBarsCbpfs)
 				.on("mouseout", mouseoutBarsCbpfs);
 
-			links.on("mouseenter", mouseenterLinks)
-				.on("mousemove", mousemoveLinks)
-				.on("mouseout", mouseoutLinks);
-
 			//END BARS PANEL
 
 			//BEESWARM PANEL
 
-			circleRadius = dataDonors.length > 100 ? 1 :
-				dataDonors.length > 50 ? 2 :
-				dataDonors.length > 40 ? 2.5 :
-				dataDonors.length > 30 ? 3 :
-				dataDonors.length > 25 ? 3.5 :
-				circleRadius;
-
-			var beeswarmTitle = beeswarmPanel.main.append("text")
-				.attr("class", "cbpfbpbarsPanelTitle")
+			var beeswarmTitle = beeswarmPanel.main.selectAll("." + classPrefix + "barsPanelTitleBeeswarm")
+				.data([true])
+				.enter()
+				.append("text")
+				.style("text-anchor", "middle")
+				.attr("class", classPrefix + "barsPanelTitleBeeswarm")
 				.attr("y", beeswarmPanel.padding[0] - 2)
-				.attr("x", beeswarmPanel.titlePadding)
+				.attr("x", beeswarmPanel.width / 2)
 				.text("All Donors and CBPFs");
 
-			var gBeeswarmXAxis = beeswarmPanel.main.append("g")
-				.attr("class", "cbpfbpgBeeswarmXAxis")
+			let gBeeswarmXAxis = beeswarmPanel.main.selectAll("." + classPrefix + "gBeeswarmXAxis")
+				.data([true]);
+
+			gBeeswarmXAxis = gBeeswarmXAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBeeswarmXAxis")
 				.attr("transform", "translate(0, " + (beeswarmPanel.height - beeswarmPanel.padding[2]) + ")")
+				.merge(gBeeswarmXAxis);
+
+			gBeeswarmXAxis.transition(syncTransition)
 				.call(beeswarmXAxis);
 
-			var gBeeswarmYAxis = beeswarmPanel.main.append("g")
-				.attr("class", "cbpfbpgBeeswarmYAxis")
+			let gBeeswarmYAxis = beeswarmPanel.main.selectAll("." + classPrefix + "gBeeswarmYAxis")
+				.data([true]);
+
+			gBeeswarmYAxis = gBeeswarmYAxis.enter()
+				.append("g")
+				.attr("class", classPrefix + "gBeeswarmYAxis")
 				.attr("transform", "translate(" + beeswarmPanel.padding[3] + ",0)")
+				.merge(gBeeswarmYAxis);
+
+			gBeeswarmYAxis.transition(syncTransition)
 				.call(beeswarmYAxis);
 
-			var verticalLine = beeswarmPanel.main.append("line")
+			const verticalLine = beeswarmPanel.main.selectAll("." + classPrefix + "verticalLine")
+				.data([true])
+				.enter()
+				.append("line")
+				.attr("class", classPrefix + "verticalLine")
 				.style("stroke-width", "1px")
 				.style("stroke-dasharray", "2, 2")
 				.style("stroke", "#ccc")
@@ -1014,18 +1568,27 @@
 
 				for (var i = 0; i < maximumTicks; i++) simulation.tick();
 
-				var circles = beeswarmPanel.main.selectAll(null)
-					.data(beeswarmData)
-					.enter()
+				let circles = beeswarmPanel.main.selectAll("." + classPrefix + "circles" + category)
+					.data(beeswarmData, function(d) {
+						return d.isoCode
+					});
+
+				const circlesExit = circles.exit()
+					.transition(syncTransition)
+					.style("opacity", 0)
+					.remove();
+
+				const circlesEnter = circles.enter()
 					.append("circle")
+					.attr("class", classPrefix + "circles" + category)
+					.classed((category === "Donors" ? "contributionColorFill" : "allocationColorFill"), true)
 					.attr("r", circleRadius)
 					.attr("cx", beeswarmXScale(0))
-					.attr("cy", beeswarmYScale(category))
-					.attr("class", category === "Donors" ? "contributionColorFill" : "allocationColorFill");
+					.attr("cy", beeswarmYScale(category));
 
-				circles.transition()
-					.delay(duration)
-					.duration(duration)
+				circles = circlesEnter.merge(circles);
+
+				circles.transition(syncTransition)
 					.attr("cx", function(d) {
 						return d.x
 					})
@@ -1065,13 +1628,14 @@
 							});
 
 						tooltip.style("display", "block").html("<div style='display:flex;'><span style='margin-top:3px;white-space:pre;'>" + displayName + ": </span><span style='margin-top:3px;white-space:pre;font-weight:bold;' class=" + circleClass + ">" + d[name] + " </span> " + flag + "</div>" +
-							description + ": $" + formatMoney2Decimals(d.totalPaidPlusPledge));
+							description + ": $" + formatMoney0Decimals(d.totalPaidPlusPledge));
 
-						var mouse = d3.mouse(this)[0];
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
 						var tooltipSize = tooltip.node().getBoundingClientRect();
 
-						tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
-							.style("left", mouse > beeswarmPanel.width - (tooltipSize.width / 2) ? d3.event.pageX - (mouse - (beeswarmPanel.width - (tooltipSize.width))) + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+						tooltip.style("top", containerBox.height - tooltipSize.height - 26 + "px")
+							.style("left", thisBox.right - containerBox.left + tooltipSize.width + 8 > beeswarmPanel.width ? thisBox.left - containerBox.left - tooltipSize.width - 8 + "px" : thisBox.left - containerBox.left + circleRadius + 8 + "px");
 
 						var enlargedCircle = d3.select(this).clone(false)
 							.attr("class", "clonedCircle")
@@ -1102,7 +1666,10 @@
 
 				barsPanel.main.selectAll("*").interrupt();
 
-				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
+				const mouseTransition = d3.transition()
+					.duration(shortDuration * 2);
+
+				barsDonors.selectAll("." + classPrefix + "barsContributionsRects, ." + classPrefix + "barsContributionsLabels").style("opacity", function(e) {
 					return e.donor === d.donor ? 1 : 0.05
 				});
 
@@ -1149,7 +1716,7 @@
 						});
 					};
 					if (donorFound === undefined || donorFound.amountPaidPlusPledge === 0) {
-						thisGroup.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+						thisGroup.selectAll("." + classPrefix + "barsAllocationsRects, ." + classPrefix + "barsAllocationsLabels")
 							.style("opacity", 0.05);
 						gBarsCbpfsYAxis.selectAll(".tick").filter(function(f) {
 								return f === e.cbpf;
@@ -1157,27 +1724,23 @@
 							.style("opacity", 0.05);
 					} else {
 
-						thisGroup.select(".cbpfbpbarsAllocationsOverRect")
-							.transition()
-							.duration(shortDuration * 2)
+						thisGroup.select("." + classPrefix + "barsAllocationsOverRect")
+							.transition(mouseTransition)
 							.style("opacity", 1)
 							.attr("width", barsCbpfsXScale(donorFound.amountPaid));
 
-						thisGroup.select(".cbpfbpbarsAllocationsOverLine")
-							.transition()
-							.duration(shortDuration * 2)
+						thisGroup.select("." + classPrefix + "barsAllocationsOverLine")
+							.transition(mouseTransition)
 							.style("opacity", 1)
 							.attr("x1", barsCbpfsXScale(donorFound.amountPaid))
 							.attr("x2", barsCbpfsXScale(donorFound.amountPaid));
 
-						thisGroup.select(".cbpfbpbarsAllocationsRects")
-							.transition()
-							.duration(shortDuration * 2)
+						thisGroup.select("." + classPrefix + "barsAllocationsRects")
+							.transition(mouseTransition)
 							.attr("width", barsCbpfsXScale(donorFound.amountPaidPlusPledge));
 
-						thisGroup.select(".cbpfbpbarsLabels")
-							.transition()
-							.duration(shortDuration * 2)
+						thisGroup.select("." + classPrefix + "barsAllocationsLabels")
+							.transition(mouseTransition)
 							.attr("x", function() {
 								return barsCbpfsXScale(donorFound.amountPaidPlusPledge) + barsDonorsLabelsPadding;
 							})
@@ -1190,7 +1753,7 @@
 								return function(t) {
 									d3.select(node).text("$" + formatSIFloat1decimal(i(t)))
 										.append("tspan")
-										.attr("class", "cbpfbpbarsMiddleText")
+										.attr("class", classPrefix + "barsMiddleText")
 										.attr("dy", "-1px")
 										.text(percentPaid);
 								};
@@ -1213,9 +1776,9 @@
 
 				tooltip.style("display", "block")
 					.html(donorText + "<strong><span class='contributionColorHTMLcolor'>" + donorCountry +
-						"</span></strong><br style='line-height:170%;'/><div id=contributionsTooltipBar></div>Total Paid: <span class='contributionColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPaid) +
+						"</span></strong><br style='line-height:170%;'/><div id=contributionsTooltipBar></div>Total Paid: <span class='contributionColorDarkerHTMLcolor' style='font-weight:700;'>$" + formatMoney0Decimals(d.totalPaid) +
 						" (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
-						")</span><br>Total Pledged: <span class='contributionColorHTMLcolor' style='font-weight:700;'>$" + formatMoney2Decimals(d.totalPledge) +
+						")</span><br>Total Pledged: <span class='contributionColorHTMLcolor' style='font-weight:700;'>$" + formatMoney0Decimals(d.totalPledge) +
 						" (" + (formatPercent(d.totalPledge / d.totalPaidPlusPledge) === "0%" && d.totalPledge !== 0 ? "<1%" : formatPercent(d.totalPledge / d.totalPaidPlusPledge)) + ")</span>" + cbpfsInOthersText);
 
 				createDonorsTooltipBar(d);
@@ -1224,10 +1787,14 @@
 
 				var tooltipSize = tooltip.node().getBoundingClientRect();
 				localVariable.set(tooltip.node(), tooltipSize);
-				var mouse = d3.mouse(this)[0];
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 6 :
+					thisBox.bottom - containerBox.top + 6;
 
-				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 12 + "px" : d3.event.pageY + 20 + "px")
-					.style("left", mouse < (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+				tooltip.style("top", offsetTop + "px")
+					.style("left", thisBox.left - containerBox.left + (thisBox.width - tooltipSize.width) / 2 + "px");
 
 				barsMiddleText.text("Donated to... (darker color indicates")
 					.append("tspan")
@@ -1248,7 +1815,10 @@
 
 				barsPanel.main.selectAll("*").interrupt();
 
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels").style("opacity", function(e) {
+				const mouseTransition = d3.transition()
+					.duration(shortDuration * 2);
+
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsRects, ." + classPrefix + "barsAllocationsLabels").style("opacity", function(e) {
 					return e.cbpf === d.cbpf ? 1 : 0.05
 				});
 
@@ -1290,7 +1860,7 @@
 						});
 					};
 					if (cbpfFound === undefined || cbpfFound.amountPaidPlusPledge === 0) {
-						thisGroup.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+						thisGroup.selectAll("." + classPrefix + "barsContributionsRects, ." + classPrefix + "barsContributionsLabels")
 							.style("opacity", 0.05);
 						gBarsDonorsYAxis.selectAll(".tick").filter(function(f) {
 								return f === e.donor;
@@ -1298,27 +1868,27 @@
 							.style("opacity", 0.05);
 					} else {
 
-						thisGroup.select(".cbpfbpbarsContributionsOverRect")
+						thisGroup.select("." + classPrefix + "barsContributionsOverRect")
 							.transition()
 							.duration(shortDuration * 2)
 							.style("opacity", 1)
 							.attr("x", barsDonorsXScale(cbpfFound.amountPaid))
 							.attr("width", barsPanel.barsSpace - barsDonorsXScale(cbpfFound.amountPaid));
 
-						thisGroup.select(".cbpfbpbarsContributionsOverLine")
+						thisGroup.select("." + classPrefix + "barsContributionsOverLine")
 							.transition()
 							.duration(shortDuration * 2)
 							.style("opacity", 1)
 							.attr("x1", barsDonorsXScale(cbpfFound.amountPaid))
 							.attr("x2", barsDonorsXScale(cbpfFound.amountPaid));
 
-						thisGroup.select(".cbpfbpbarsContributionsRects")
+						thisGroup.select("." + classPrefix + "barsContributionsRects")
 							.transition()
 							.duration(shortDuration * 2)
 							.attr("x", barsDonorsXScale(cbpfFound.amountPaidPlusPledge))
 							.attr("width", barsPanel.barsSpace - barsDonorsXScale(cbpfFound.amountPaidPlusPledge));
 
-						thisGroup.select(".cbpfbpbarsLabels")
+						thisGroup.select("." + classPrefix + "barsContributionsLabels")
 							.transition()
 							.duration(shortDuration * 2)
 							.attr("x", function() {
@@ -1333,11 +1903,11 @@
 								return function(t) {
 									d3.select(node).text("")
 										.append("tspan")
-										.attr("class", "cbpfbpbarsMiddleText")
+										.attr("class", classPrefix + "barsMiddleText")
 										.attr("dy", "-1px")
 										.text(percentPaid)
 										.append("tspan")
-										.attr("class", "cbpfbpbarsLabels")
+										.attr("class", classPrefix + "barsLabels")
 										.text("$" + formatSIFloat1decimal(i(t)));
 								};
 							});
@@ -1380,9 +1950,9 @@
 				tooltip.style("display", "block")
 					.html(cbpfText + ": <strong><span class='allocationColorHTMLcolor'>" + cbpfCountry +
 						"</span></strong><br style=\"line-height:170%;\"/><div id=allocationsTooltipBar></div>Paid donations: <span class='allocationColorDarkerHTMLcolor' style='font-weight:700;'>$" +
-						formatMoney2Decimals(d.totalPaid) + " (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
+						formatMoney0Decimals(d.totalPaid) + " (" + (formatPercent(d.totalPaid / d.totalPaidPlusPledge) === "0%" && d.totalPaid !== 0 ? "<1%" : formatPercent(d.totalPaid / d.totalPaidPlusPledge)) +
 						")</span><br>Pledged donations: <span class='allocationColorHTMLcolor' style='font-weight:700;'>$" +
-						formatMoney2Decimals(d.totalPledge) + " (" + (formatPercent(d.totalPledge / d.totalPaidPlusPledge) === "0%" && d.totalPledge !== 0 ? "<1%" : formatPercent(d.totalPledge / d.totalPaidPlusPledge)) +
+						formatMoney0Decimals(d.totalPledge) + " (" + (formatPercent(d.totalPledge / d.totalPaidPlusPledge) === "0%" && d.totalPledge !== 0 ? "<1%" : formatPercent(d.totalPledge / d.totalPaidPlusPledge)) +
 						")</span>" + donorsInOthersText);
 
 				createCbpfsTooltipBar(d);
@@ -1391,10 +1961,14 @@
 
 				var tooltipSize = tooltip.node().getBoundingClientRect();
 				localVariable.set(tooltip.node(), tooltipSize);
-				var mouse = d3.mouse(this)[0];
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 6 :
+					thisBox.bottom - containerBox.top + 6;
 
-				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
-					.style("left", mouse > barsPanel.width - (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+				tooltip.style("top", offsetTop + "px")
+					.style("left", thisBox.left - containerBox.left + (thisBox.width - tooltipSize.width) / 2 + "px");
 
 				barsMiddleText.text("Received from... (darker color indicates")
 					.append("tspan")
@@ -1441,12 +2015,12 @@
 					return e.cbpf === d.target.cbpf
 				});
 
-				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsRects, ." + classPrefix + "barsContributionsLabels")
 					.style("opacity", function(e) {
 						return e.donor === d.source.donor ? 1 : 0.05;
 					});
 
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsRects, ." + classPrefix + "barsAllocationsLabels")
 					.style("opacity", function(e) {
 						return e.cbpf === d.target.cbpf ? 1 : 0.05;
 					});
@@ -1463,25 +2037,25 @@
 
 				gBarsCbpfsXAxis.selectAll(".tick line, .tick text").style("opacity", 0);
 
-				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsOverRect")
+				thisBarsCbpfsGroup.select("." + classPrefix + "barsAllocationsOverRect")
 					.transition()
 					.duration(shortDuration * 2)
 					.style("opacity", 1)
 					.attr("width", barsCbpfsXScale(d.source.valuePaid));
 
-				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsOverLine")
+				thisBarsCbpfsGroup.select("." + classPrefix + "barsAllocationsOverLine")
 					.transition()
 					.duration(shortDuration * 2)
 					.style("opacity", 1)
 					.attr("x1", barsCbpfsXScale(d.source.valuePaid))
 					.attr("x2", barsCbpfsXScale(d.source.valuePaid));
 
-				thisBarsCbpfsGroup.select(".cbpfbpbarsAllocationsRects")
+				thisBarsCbpfsGroup.select("." + classPrefix + "barsAllocationsRects")
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("width", barsCbpfsXScale((d.source.valuePaid + d.source.valuePledge)));
 
-				thisBarsCbpfsGroup.select(".cbpfbpbarsLabels")
+				thisBarsCbpfsGroup.select("." + classPrefix + "barsAllocationsLabels")
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("x", function() {
@@ -1496,33 +2070,33 @@
 						return function(t) {
 							d3.select(node).text("$" + formatSIFloat1decimal(i(t)))
 								.append("tspan")
-								.attr("class", "cbpfbpbarsMiddleText")
+								.attr("class", classPrefix + "barsMiddleText")
 								.attr("dy", "-1px")
 								.text(percentPaid);
 						};
 					});
 
-				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsOverRect")
+				thisBarsDonorsGroup.select("." + classPrefix + "barsContributionsOverRect")
 					.transition()
 					.duration(shortDuration * 2)
 					.style("opacity", 1)
 					.attr("x", barsDonorsXScale(d.target.valuePaid))
 					.attr("width", barsPanel.barsSpace - barsDonorsXScale(d.target.valuePaid));
 
-				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsOverLine")
+				thisBarsDonorsGroup.select("." + classPrefix + "barsContributionsOverLine")
 					.transition()
 					.duration(shortDuration * 2)
 					.style("opacity", 1)
 					.attr("x1", barsDonorsXScale(d.target.valuePaid))
 					.attr("x2", barsDonorsXScale(d.target.valuePaid));
 
-				thisBarsDonorsGroup.select(".cbpfbpbarsContributionsRects")
+				thisBarsDonorsGroup.select("." + classPrefix + "barsContributionsRects")
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("x", barsDonorsXScale((d.target.valuePaid + d.target.valuePledge)))
 					.attr("width", barsPanel.barsSpace - barsDonorsXScale((d.target.valuePaid + d.target.valuePledge)));
 
-				thisBarsDonorsGroup.select(".cbpfbpbarsLabels")
+				thisBarsDonorsGroup.select("." + classPrefix + "barsContributionsLabels")
 					.transition()
 					.duration(shortDuration * 2)
 					.attr("x", function() {
@@ -1537,11 +2111,11 @@
 						return function(t) {
 							d3.select(node).text("")
 								.append("tspan")
-								.attr("class", "cbpfbpbarsMiddleText")
+								.attr("class", classPrefix + "barsMiddleText")
 								.attr("dy", "-1px")
 								.text(percentPaid)
 								.append("tspan")
-								.attr("class", "cbpfbpbarsLabels")
+								.attr("class", classPrefix + "barsLabels")
 								.text("$" + formatSIFloat1decimal(i(t)));
 						};
 					});
@@ -1552,13 +2126,19 @@
 				tooltip.style("display", "block")
 					.html("Donor: <strong><span class='contributionColorHTMLcolor'>" +
 						thisDonorName + "</span></strong><br>CBPF: <strong><span class='allocationColorHTMLcolor'>" + thisCbpfName + "</span></strong><br style='line-height:230%;'/>Total paid: $" +
-						formatMoney2Decimals(d.source.valuePaid) + "<br>Total pledged: $" + formatMoney2Decimals(d.source.valuePledge));
+						formatMoney0Decimals(d.source.valuePaid) + "<br>Total pledged: $" + formatMoney0Decimals(d.source.valuePledge));
 
 				var tooltipSize = tooltip.node().getBoundingClientRect();
 				localVariable.set(tooltip.node(), tooltipSize);
 
-				tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
-					.style("left", d3.event.pageX - tooltipSize.width / 2 + "px");
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 10 :
+					thisBox.bottom - containerBox.top + 10;
+
+				tooltip.style("top", offsetTop + "px")
+					.style("left", (containerBox.width - tooltipSize.width + flagPadding) / 2 + "px");
 
 				flags.style("opacity", function(e) {
 					return e.donor === thisDonor.donor ? 1 : 0.15;
@@ -1571,22 +2151,38 @@
 
 			function mousemoveBarsDonors(_, barNumber) {
 				var tooltipSize = localVariable.get(tooltip.node());
-				var mouse = d3.mouse(this)[0];
-				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 12 + "px" : d3.event.pageY + 20 + "px")
-					.style("left", mouse < (tooltipSize.width / 2) ? d3.event.pageX - mouse + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 6 :
+					thisBox.bottom - containerBox.top + 6;
+
+				tooltip.style("top", offsetTop + "px")
+					.style("left", thisBox.left - containerBox.left + (thisBox.width - tooltipSize.width) / 2 + "px");
 			};
 
 			function mousemoveBarsCbpfs(_, barNumber) {
 				var tooltipSize = localVariable.get(tooltip.node());
-				var mouse = d3.mouse(this)[0];
-				tooltip.style("top", barNumber > 7 ? d3.event.pageY - tooltipSize.height - 6 + "px" : d3.event.pageY + 20 + "px")
-					.style("left", mouse > barsPanel.barsSpace - (tooltipSize.width / 2) ? d3.event.pageX - (mouse - (barsPanel.barsSpace - (tooltipSize.width))) + "px" : d3.event.pageX - tooltipSize.width / 2 + "px");
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 6 :
+					thisBox.bottom - containerBox.top + 6;
+
+				tooltip.style("top", offsetTop + "px")
+					.style("left", thisBox.left - containerBox.left + (thisBox.width - tooltipSize.width) / 2 + "px");
 			};
 
 			function mousemoveLinks(d) {
 				var tooltipSize = localVariable.get(tooltip.node());
-				tooltip.style("top", d3.event.pageY - tooltipSize.height - 20 + "px")
-					.style("left", d3.event.pageX - tooltipSize.width / 2 + "px");
+				const thisBox = this.getBoundingClientRect();
+				const containerBox = containerDiv.node().getBoundingClientRect();
+				const offsetTop = thisBox.top - containerBox.top + tooltipSize.height + 6 > containerBox.height ?
+					thisBox.top - containerBox.top - tooltipSize.height - 10 :
+					thisBox.bottom - containerBox.top + 10;
+
+				tooltip.style("top", offsetTop + "px")
+					.style("left", (containerBox.width - tooltipSize.width + flagPadding) / 2 + "px");
 			};
 
 			function mouseoutBarsDonors(d) {
@@ -1701,23 +2297,23 @@
 
 				barsCbpfsTooltipRect.attr("pointer-events", "none");
 
-				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsRects, ." + classPrefix + "barsContributionsLabels")
 					.style("opacity", 1);
 				gBarsDonorsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsRects, ." + classPrefix + "barsAllocationsLabels")
 					.style("opacity", 1);
 				gBarsCbpfsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsOverRect")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsOverRect")
 					.style("opacity", 0)
 					.attr("width", 0);
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsOverLine")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsOverLine")
 					.style("opacity", 0)
 					.attr("x1", 0)
 					.attr("x2", 0);
 
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsRects")
 					.transition()
 					.duration(shortDuration)
 					.attr("width", function(d) {
@@ -1727,7 +2323,7 @@
 						barsCbpfsTooltipRect.attr("pointer-events", "all");
 					})
 
-				barsCbpfs.selectAll(".cbpfbpbarsLabels")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsLabels")
 					.transition()
 					.duration(shortDuration)
 					.attr("x", function(d) {
@@ -1752,24 +2348,24 @@
 
 				barsDonorsTooltipRect.attr("pointer-events", "none");
 
-				barsCbpfs.selectAll(".cbpfbpbarsAllocationsRects, .cbpfbpbarsLabels")
+				barsCbpfs.selectAll("." + classPrefix + "barsAllocationsRects, ." + classPrefix + "barsAllocationsLabels")
 					.style("opacity", 1);
 				gBarsCbpfsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsDonors.selectAll(".cbpfbpbarsContributionsRects, .cbpfbpbarsLabels")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsRects, ." + classPrefix + "barsContributionsLabels")
 					.style("opacity", 1);
 				gBarsDonorsYAxis.selectAll(".tick")
 					.style("opacity", 1);
-				barsDonors.selectAll(".cbpfbpbarsContributionsOverRect")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsOverRect")
 					.style("opacity", 0)
 					.attr("x", barsPanel.barsSpace)
 					.attr("width", 0);
-				barsDonors.selectAll(".cbpfbpbarsContributionsOverLine")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsOverLine")
 					.style("opacity", 0)
 					.attr("x1", barsPanel.barsSpace)
 					.attr("x2", barsPanel.barsSpace);
 
-				barsDonors.selectAll(".cbpfbpbarsContributionsRects")
+				barsDonors.selectAll("." + classPrefix + "barsContributionsRects")
 					.transition()
 					.duration(shortDuration)
 					.attr("x", function(d) {
@@ -1782,7 +2378,7 @@
 						barsDonorsTooltipRect.attr("pointer-events", "all");
 					})
 
-				barsDonors.selectAll("text.cbpfbpbarsLabels")
+				barsDonors.selectAll("text." + classPrefix + "barsContributionsLabels")
 					.transition()
 					.duration(shortDuration)
 					.attr("x", function(d) {
@@ -1849,7 +2445,7 @@
 					.data(thisCircle)
 					.enter()
 					.append("circle")
-					.attr("class", "cbpfbpenlargedCircles")
+					.attr("class", classPrefix + "enlargedCircles")
 					.attr("cx", function(d) {
 						return d.x
 					})
@@ -1921,7 +2517,7 @@
 					.data(theseCircles)
 					.enter()
 					.append("circle")
-					.attr("class", "cbpfbpenlargedCircles")
+					.attr("class", classPrefix + "enlargedCircles")
 					.attr("cx", function(d) {
 						return d.x
 					})
@@ -1953,7 +2549,7 @@
 					.attr("y2", beeswarmPanel.height - beeswarmPanel.padding[2])
 					.style("opacity", circleDonor ? 1 : 0);
 
-				secondLine.attr("class", "cbpfbpsecondVerticalLine")
+				secondLine.attr("class", classPrefix + "secondVerticalLine")
 					.attr("x1", circleCBPF.x)
 					.attr("x2", circleCBPF.x)
 					.attr("y1", beeswarmYScale("CBPFs"))
@@ -1970,8 +2566,8 @@
 					.style("opacity", 1);
 				verticalLine.style("opacity", 0);
 				gBeeswarmXAxis.select("path").style("stroke", "none");
-				d3.selectAll(".cbpfbpenlargedCircles").remove();
-				d3.select(".cbpfbpsecondVerticalLine").remove();
+				d3.selectAll("." + classPrefix + "enlargedCircles").remove();
+				d3.select("." + classPrefix + "secondVerticalLine").remove();
 			};
 
 			function generateOtherDonorsList(donorsList) {
@@ -2003,7 +2599,7 @@
 					tooltipPadding = [0, 16, 15, 0],
 					svgTooltipHeight = 15 * othersData.length + tooltipPadding[2];
 
-				var svgTooltip = d3.select("#cbpfbptooltipdiv")
+				var svgTooltip = d3.select("#" + classPrefix + "tooltipdiv")
 					.append("svg")
 					.attr("width", svgTooltipWidth)
 					.attr("height", svgTooltipHeight)
@@ -2022,7 +2618,7 @@
 					.tickSizeInner(0);
 
 				var gY = svgTooltip.append("g")
-					.attr("class", "cbpfbpyAxisTooltip")
+					.attr("class", classPrefix + "yAxisTooltip")
 					.call(yAxisTooltip);
 
 				var axisBox = gY.node().getBBox();
@@ -2067,11 +2663,11 @@
 					});
 
 				var gX = svgTooltip.append("g")
-					.attr("class", "cbpfbpxAxisTooltip")
+					.attr("class", classPrefix + "xAxisTooltip")
 					.attr("transform", "translate(0," + (svgTooltipHeight - tooltipPadding[2]) + ")")
 					.call(xAxisTooltip);
 
-				d3.select(".cbpfbpxAxisTooltip")
+				d3.select("." + classPrefix + "xAxisTooltip")
 					.selectAll(".tick")
 					.filter(function(d) {
 						return d === 0;
@@ -2086,13 +2682,124 @@
 			//end of draw
 		};
 
-		function saveFlags(donors) {
-
-			const donorsList = donors.map(function(d) {
-				return d.isoCode;
-			}).filter(function(value, index, self) {
-				return self.indexOf(value) === index;
+		function preProcessData(rawData) {
+			rawData.forEach(function(d) {
+				if (yearsArray.indexOf(+d.FiscalYear) === -1) yearsArray.push(+d.FiscalYear);
 			});
+		};
+
+		function processData(rawData) {
+
+			var aggregatedDonors = [];
+
+			var aggregatedCbpfs = [];
+
+			var tempSetDonors = [];
+
+			var tempSetCbpfs = [];
+
+			//filter here
+			rawData.forEach(function(d) {
+				if (chartState.selectedYear.indexOf(+d.FiscalYear) > -1) {
+					if (tempSetDonors.indexOf(d.GMSDonorName) > -1) {
+						var tempObject = aggregatedDonors.filter(function(e) {
+							return e.donor === d.GMSDonorName
+						})[0];
+						var foundDonations = tempObject.donations.filter(function(e) {
+							return e.cbpf === d.PooledFundName
+						})[0];
+						if (foundDonations) {
+							foundDonations.amountPaid += +d.PaidAmt;
+							foundDonations.amountPledge += +d.PledgeAmt;
+							foundDonations.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+						} else {
+							tempObject.donations.push({
+								cbpf: d.PooledFundName,
+								amountPaid: +d.PaidAmt,
+								amountPledge: +d.PledgeAmt,
+								amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+							});
+						}
+						tempObject.totalPaid += +d.PaidAmt;
+						tempObject.totalPledge += +d.PledgeAmt;
+						tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+					} else {
+						aggregatedDonors.push({
+							donor: d.GMSDonorName,
+							isoCode: d.GMSDonorISO2Code.toLowerCase(),
+							donations: [{
+								cbpf: d.PooledFundName,
+								amountPaid: +d.PaidAmt,
+								amountPledge: +d.PledgeAmt,
+								amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+							}],
+							totalPaid: +d.PaidAmt,
+							totalPledge: +d.PledgeAmt,
+							totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+						});
+						tempSetDonors.push(d.GMSDonorName);
+					};
+					if (tempSetCbpfs.indexOf(d.PooledFundName) > -1) {
+						var tempObject = aggregatedCbpfs.filter(function(e) {
+							return e.cbpf === d.PooledFundName
+						})[0];
+						var foundDonor = tempObject.donors.filter(function(e) {
+							return e.donor === d.GMSDonorName
+						})[0];
+						if (foundDonor) {
+							foundDonor.amountPaid += +d.PaidAmt;
+							foundDonor.amountPledge += +d.PledgeAmt;
+							foundDonor.amountPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+						} else {
+							tempObject.donors.push({
+								donor: d.GMSDonorName,
+								amountPaid: +d.PaidAmt,
+								amountPledge: +d.PledgeAmt,
+								amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+							});
+						}
+						tempObject.totalPaid += +d.PaidAmt;
+						tempObject.totalPledge += +d.PledgeAmt;
+						tempObject.totalPaidPlusPledge += (+d.PaidAmt) + (+d.PledgeAmt);
+					} else {
+						aggregatedCbpfs.push({
+							cbpf: d.PooledFundName,
+							isoCode: d.PooledFundISO2Code.toLowerCase(),
+							donors: [{
+								donor: d.GMSDonorName,
+								amountPaid: +d.PaidAmt,
+								amountPledge: +d.PledgeAmt,
+								amountPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+							}],
+							totalPaid: +d.PaidAmt,
+							totalPledge: +d.PledgeAmt,
+							totalPaidPlusPledge: (+d.PaidAmt) + (+d.PledgeAmt)
+						});
+						tempSetCbpfs.push(d.PooledFundName);
+					};
+				};
+			});
+
+			tempSetDonors = [];
+
+			tempSetCbpfs = [];
+
+			aggregatedDonors.sort(function(a, b) {
+				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
+			});
+
+			aggregatedCbpfs.sort(function(a, b) {
+				return d3.descending(a.totalPaidPlusPledge, b.totalPaidPlusPledge)
+			});
+
+			return {
+				dataDonors: aggregatedDonors,
+				dataCbpfs: aggregatedCbpfs
+			};
+
+		};
+
+		function saveFlags(donorsList) {
 
 			donorsList.forEach(function(d) {
 				getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
@@ -2136,48 +2843,16 @@
 			//end of saveFlags
 		};
 
-		function extractYear(yearParameter) {
-			yearsArray = yearParameter.split(",").map(function(d) {
-				return +d
+		function extractYear(yearString) {
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
 			});
-			if (yearsArray.length === 1 && yearsArray[0] === yearsArray[0]) {
-				return yearsArray
-			} else if (yearsArray.length === 2 && yearsArray[0] === yearsArray[0] && yearsArray[1] === yearsArray[1]) {
-				yearsArray.sort();
-				return d3.range(yearsArray[0], yearsArray[1] + 1, 1)
-			} else {
-				return yearsArray = [new Date().getFullYear()]
-			}
-		}
-
-		function filterYear(d) {
-			if (years.indexOf(+d.FiscalYear) > -1) {
-				return d
-			};
-		};
-
-		function wrapLabels(label, element) {
-			var splitLabel = label;
-			if (splitLabel.length > 10) {
-				splitLabel = splitLabel.split(" ");
-			} else {
-				splitLabel = splitLabel.split()
-			}
-			if (splitLabel.length > 2) {
-				var middleElement = splitLabel.splice(1, 1);
-				splitLabel[0] = splitLabel[0] + " " + middleElement;
-			}
-			var em = 1;
-			var dy = parseFloat(d3.select(element).attr("dy"));
-			var x = d3.select(element).attr("x");
-			if (splitLabel.length > 1) {
-				d3.select(element).text(splitLabel[0])
-					.attr("dy", dy - (em / 2) + "em")
-					.append("tspan")
-					.attr("x", x)
-					.attr("dy", em + "em")
-					.text(splitLabel[1])
-			}
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
 		};
 
 		function formatSIFloat(value) {
@@ -2194,6 +2869,30 @@
 
 		function formatSIInteger(value) {
 			return d3.formatPrefix(".0", value)(value);
+		};
+
+		function formatPercentCustom(dividend, divisor) {
+			const percentage = formatPercent(dividend / divisor);
+			return +(percentage.split("%")[0]) === 0 && (dividend / divisor) !== 0 ? "<1%" : percentage;
+		};
+
+		function parseTransform(translate) {
+			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			group.setAttributeNS(null, "transform", translate);
+			const matrix = group.transform.baseVal.consolidate().matrix;
+			return [matrix.e, matrix.f];
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function createProgressWhell() {
@@ -2263,43 +2962,6 @@
 		};
 
 		//end of d3Chart
-	}
-
-	//POLYFILLS
-
-	//Array.prototype.find()
-
-	if (!Array.prototype.find) {
-		Object.defineProperty(Array.prototype, 'find', {
-			value: function(predicate) {
-				if (this == null) {
-					throw new TypeError('"this" is null or not defined');
-				}
-				var o = Object(this);
-				var len = o.length >>> 0;
-				if (typeof predicate !== 'function') {
-					throw new TypeError('predicate must be a function');
-				}
-				var thisArg = arguments[1];
-				var k = 0;
-				while (k < len) {
-					var kValue = o[k];
-					if (predicate.call(thisArg, kValue, k, o)) {
-						return kValue;
-					}
-					k++;
-				}
-				return undefined;
-			},
-			configurable: true,
-			writable: true
-		});
-	};
-
-	//Math.log10
-
-	Math.log10 = Math.log10 || function(x) {
-		return Math.log(x) * Math.LOG10E;
 	};
 
 	//end of d3ChartIIFE
