@@ -1176,6 +1176,7 @@
 
 			gBarsDonorsXAxis.transition(syncTransition)
 				.style("opacity", 1)
+				.attr("transform", "translate(0, " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.call(barsDonorsXAxis);
 
 			let gBarsCbpfsXAxis = barsPanel.main.selectAll("." + classPrefix + "gBarsAllocationsXAxis")
@@ -1190,6 +1191,7 @@
 
 			gBarsCbpfsXAxis.transition(syncTransition)
 				.style("opacity", 1)
+				.attr("transform", "translate(" + (barsPanel.barsSpace + barsPanel.centralSpace) + ", " + (barsPanel.height - barsPanel.padding[2]) + ")")
 				.call(barsCbpfsXAxis);
 
 			d3.selectAll("." + classPrefix + "gBarsContributionsXAxis, ." + classPrefix + "gBarsAllocationsXAxis")
