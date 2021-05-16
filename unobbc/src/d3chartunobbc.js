@@ -161,6 +161,7 @@
 			barsDonorsLabelsPadding = 4,
 			localVariable = d3.local(),
 			circleRadius = 3,
+			smallerSvg = false,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			yearsArray = [],
@@ -702,10 +703,12 @@
 
 			if (maxBarsNumber < 11) {
 
+				smallerSvg = true;
 				barsPanel.height = barsHeightUnit * maxBarsNumber;
-				beeswarmPanel.main.attr("transform", "translate(" + padding[3] + "," +
-					(padding[0] + topPanel.height + barsPanel.height + (2 * panelHorizontalPadding)) + ")");
-				var newHeight = ~~(padding[3] + padding[0] + topPanel.height + barsPanel.height + beeswarmPanel.height + (2 * panelHorizontalPadding));
+				beeswarmPanel.main.transition(syncTransition)
+					.attr("transform", "translate(" + padding[3] + "," +
+						(padding[0] + buttonsPanel.height + topPanel.height + barsPanel.height + (3 * panelHorizontalPadding)) + ")");
+				var newHeight = ~~(padding[3] + padding[0] + buttonsPanel.height + topPanel.height + barsPanel.height + beeswarmPanel.height + (3 * panelHorizontalPadding));
 				svg.transition(syncTransition)
 					.attr("viewBox", "0 0 " + width + " " + newHeight);
 				if (selectedResponsiveness === "false") {
@@ -717,12 +720,18 @@
 				barsCbpfsYScale.range([barsPanel.padding[0], (dataCbpfs.length * barsHeightUnit) -
 					(dataCbpfs.length > dataDonors.length ? barsPanel.padding[2] : 0)
 				]);
-				barsDonorsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
-				barsCbpfsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
-
 			};
 
 			if (maxBarsNumber > 10 && (dataDonors.length < 11 || dataCbpfs.length < 11)) {
+				if (smallerSvg) {
+					svg.transition(syncTransition)
+						.attr("viewBox", "0 0 " + width + " " + height);
+					smallerSvg = false;
+				};
+				barsPanel.height = barsPanelHeight;
+				beeswarmPanel.main.transition(syncTransition)
+					.attr("transform", "translate(" + padding[3] + "," +
+						(padding[0] + buttonsPanel.height + topPanel.height + barsPanel.height + (3 * panelHorizontalPadding)) + ")");
 				barsDonorsYScale.range([barsPanel.padding[0], dataDonors.length < 11 ?
 					(dataDonors.length * barsHeightUnit) - barsPanel.padding[2] :
 					barsPanel.height - barsPanel.padding[2]
@@ -732,6 +741,23 @@
 					barsPanel.height - barsPanel.padding[2]
 				]);
 			};
+
+			if (maxBarsNumber > 10 && dataDonors.length >= 11 && dataCbpfs.length >= 11) {
+				if (smallerSvg) {
+					svg.transition(syncTransition)
+						.attr("viewBox", "0 0 " + width + " " + height);
+					smallerSvg = false;
+				};
+				barsPanel.height = barsPanelHeight;
+				beeswarmPanel.main.transition(syncTransition)
+					.attr("transform", "translate(" + padding[3] + "," +
+						(padding[0] + buttonsPanel.height + topPanel.height + barsPanel.height + (3 * panelHorizontalPadding)) + ")");
+				barsDonorsYScale.range([barsPanel.padding[0], barsPanel.height - barsPanel.padding[2]]);
+				barsCbpfsYScale.range([barsPanel.padding[0], barsPanel.height - barsPanel.padding[2]]);
+			};
+
+			barsDonorsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
+			barsCbpfsXAxis.tickSizeInner(-(barsPanel.height - barsPanel.padding[0] - barsPanel.padding[2]));
 
 			var top10Donors = dataDonors.slice(0, 10);
 
