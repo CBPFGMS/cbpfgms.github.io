@@ -148,7 +148,7 @@
 			barsPanelHeight = 332,
 			beeswarmPanelHeight = 100,
 			panelHorizontalPadding = 6,
-			buttonsNumber = 22,
+			buttonsNumber = 20,
 			unBlue = "#1F69B3",
 			height = topPanelHeight + buttonsPanelHeight + barsPanelHeight + beeswarmPanelHeight + (3 * panelHorizontalPadding),
 			duration = 1500,
@@ -411,7 +411,7 @@
 
 			const clipPathGroup = buttonsPanel.main.append("g")
 				.attr("class", classPrefix + "ClipPathGroup")
-				.attr("transform", "translate(" + (buttonsPanel.padding[3]) + ",0)")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + (buttonsPanel.width - (Math.min(yearsArray.length, buttonsNumber) * buttonsPanel.buttonWidth)) / 2) + ",0)")
 				.attr("clip-path", "url(#" + classPrefix + "clipPathButtons)");
 
 			const buttonsGroup = clipPathGroup.append("g")
