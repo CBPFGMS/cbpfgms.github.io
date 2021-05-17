@@ -2014,9 +2014,10 @@
 					return e.donor
 				});
 
-				flags.style("opacity", function(e) {
-					return donorsList.indexOf(e.donor) > -1 ? 1 : 0.05;
-				});
+				barsDonors.selectAll("image")
+					.style("opacity", function(e) {
+						return donorsList.indexOf(e.donor) > -1 ? 1 : 0.05;
+					});
 
 				//end of mouseenterBarsCbpfs
 			};
