@@ -67,6 +67,31 @@
 	width: 98%;
 }
 
+.cbsankOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.cbsankAnnotationMainText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	pointer-events: none;
+	fill: white;
+}
+
+.cbsankAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
 p#cbsankd3chartTitle {
 	font-size: 26px;
 	font-family: "Arial", sans-serif;

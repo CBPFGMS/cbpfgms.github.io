@@ -123,6 +123,7 @@
 			unBlue = "#1F69B3",
 			contributionColor = "#65A8DC",
 			allocationColor = "#FBD45C",
+			highlightColor = "#F79A3B",
 			classPrefix = "cbsank",
 			countryNameMaxLength = 60,
 			maxDonorsNumber = 20,
@@ -152,6 +153,7 @@
 			isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cerf-bi-stag/bookmark.html",
 			bookmarkSite = "https://cbpfgms.github.io/cerf-bi-stag/bookmark.html?",
 			blankFlag = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence",
 			fadeOpacity = 0.2,
 			disabledOpacity = 0.6,
 			tooltipMargin = 8,
@@ -747,7 +749,7 @@
 				snapshotContent.style("display", "none")
 			});
 
-			helpIcon.on("click", null); //CHANGE THIS
+			helpIcon.on("click", createAnnotationsDiv); //CHANGE THIS
 
 			downloadIcon.on("click", function() {
 
@@ -3146,13 +3148,17 @@
 
 		function createAnnotationsDiv() {
 
-			//change here
-
 			iconsDiv.style("opacity", 0)
 				.style("pointer-events", "none");
 
 			const overDiv = containerDiv.append("div")
 				.attr("class", classPrefix + "OverDivHelp");
+
+			const selectTitleDivSize = selectTitleDiv.node().getBoundingClientRect();
+
+			const titleStyle = window.getComputedStyle(selectTitleDiv.node());
+
+			const selectDivSize = selectDiv.node().getBoundingClientRect();
 
 			const topDivSize = topDiv.node().getBoundingClientRect();
 
@@ -3160,8 +3166,10 @@
 
 			const topDivHeight = topDivSize.height * (width / topDivSize.width);
 
+			const totalSelectHeight = (selectTitleDivSize.height + selectDivSize.height + parseInt(titleStyle["margin-top"]) + parseInt(titleStyle["margin-bottom"])) * (width / topDivSize.width);
+
 			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
+				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight + totalSelectHeight));
 
 			const helpButtons = [{
 				text: "CLOSE",
@@ -3210,45 +3218,37 @@
 				});
 
 			const helpData = [{
-				x: 96,
-				y: 72 + topDivHeight,
-				width: 480,
-				height: 30,
-				xTooltip: 180 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-				text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years. Click the arrows to reveal more years."
-			}, {
-				x: 592,
-				y: 72 + topDivHeight,
-				width: 224,
-				height: 30,
-				xTooltip: 550 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-				text: "Use these buttons to select the type of contribution: paid, pledged or total (paid plus pledged)."
-			}, {
-				x: 96,
-				y: 10 + topDivHeight,
-				width: 720,
-				height: 57,
+				x: 4,
+				y: topDivHeight + ((totalSelectHeight - selectDivSize.height) * (topDivSize.width / width)),
+				width: width - 8,
+				height: selectDivSize.height * (width / topDivSize.width),
 				xTooltip: 300 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 76) * (topDivSize.width / width),
-				text: "This banner shows the total amount of contributions received for the selected year (or years). It also shows the number of donors and CBPFs in that period."
+				yTooltip: (topDivHeight + totalSelectHeight + 8) * (topDivSize.width / width),
+				text: "Use these checkboxes to select the CBPFs. A disabled checkbox means that the correspondent CBPF has no data for that year."
 			}, {
-				x: 6,
-				y: 108 + topDivHeight,
-				width: 440,
-				height: 660,
-				xTooltip: 452 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
-				text: "Hover over the donors to get additional information. Hovering over a donor filters the CBPFs accordingly, so only CBPFs that received from that donor are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+				x: 4,
+				y: 14 + topDivHeight + totalSelectHeight,
+				width: 892,
+				height: 30,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 50) * (topDivSize.width / width),
+				text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years"
 			}, {
-				x: 466,
-				y: 108 + topDivHeight,
-				width: 398,
-				height: 380,
-				xTooltip: 136 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 164) * (topDivSize.width / width),
-				text: "Hover over the CBPFs to get additional information. Hovering over a CBPF filters the donors accordingly, so only donors that donated to that CBPF are displayed. When “Total” is selected, the purple triangle indicates the paid amount, and the values between parentheses correspond to paid and pledged values, respectively."
+				x: 4,
+				y: 68 + topDivHeight + totalSelectHeight,
+				width: 892,
+				height: 420,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 250) * (topDivSize.width / width),
+				text: "This area shows selected contributions. Hover over the donors or links to see additional information."
+			}, {
+				x: 4,
+				y: 508 + topDivHeight + totalSelectHeight,
+				width: 892,
+				height: 600,
+				xTooltip: 300 * (topDivSize.width / width),
+				yTooltip: (topDivHeight + totalSelectHeight + 500) * (topDivSize.width / width),
+				text: "This area shows selected allocations. Hover over the partners, clusters or links to see additional information."
 			}];
 
 			helpData.forEach(function(d) {
@@ -3302,6 +3302,9 @@
 				tooltip.style("top", yPos + "px")
 					.style("left", xPos + "px")
 					.style("display", "block")
+					.html(null)
+					.append("div")
+					.style("width", "300px")
 					.html(text);
 			};
 
