@@ -138,8 +138,10 @@
 			donorNamesPadding = 4,
 			namesPadding = 10,
 			valuesPadding = 10,
+			valuesPaddingDonors = 18,
 			collisionPadding = 4,
 			angle = -45,
+			angleValues = 45,
 			minStrokeWidth = 1,
 			minNodeWidth = 1,
 			maxDonorTextLength = 120,
@@ -148,6 +150,7 @@
 			otherFlagsPadding = 4,
 			tooltipWidth = 270,
 			tooltipWidthAllocations = 300,
+			firstYear = 2016,//THIS IS THE HARDCODED FIRST YEAR IN THE VISUALIZATION
 			memberStateString = "Member State",
 			isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 			isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cerf-bi-stag/bookmark.html",
@@ -1420,7 +1423,7 @@
 				.attr("x", contributionsPanel.width / 2)
 				.attr("y", contributionsPanel.height / 3)
 				.style("opacity", 0)
-				.text("No data for contributions")
+				.text("Contribution data not available")
 				.merge(contributionsNoData)
 				.transition()
 				.duration(duration)
@@ -1597,8 +1600,8 @@
 				.attr("class", classPrefix + "sankeyDonorValues")
 				.style("opacity", 0)
 				.attr("x", d => (inverseContributionsScale(d.y1) + inverseContributionsScale(d.y0)) / 2)
-				.attr("y", d => d.x1 + valuesPadding)
-				.attr("dy", "0em")
+				.attr("y", d => d.x1 + valuesPaddingDonors)
+				.attr("transform", d=> `rotate(${angleValues}, ${(inverseContributionsScale(d.y1) + inverseContributionsScale(d.y0)) / 2}, ${d.x1 + valuesPaddingDonors})`)
 				.text(d => "$0");
 
 			sankeyDonorValues = sankeyDonorValuesEnter.merge(sankeyDonorValues);
@@ -1607,22 +1610,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", d => (inverseContributionsScale(d.y1) + inverseContributionsScale(d.y0)) / 2)
-				.attr("dy", (d, i, n) => {
-					if (!n[i + 1]) {
-						return "0em";
-					} else {
-						const previousElement = d3.select(n[i + 1]);
-						const previousElementDatum = previousElement.datum();
-						const nextElement = d3.select(n[i - 1]);
-						const nextDisplaced = n[i - 1] && nextElement.datum().displaced;
-						if (!nextDisplaced && (inverseContributionsScale(previousElementDatum.y1) + inverseContributionsScale(previousElementDatum.y0)) / 2 + collisionPadding + donorValuesMeanLength > (inverseContributionsScale(d.y1) + inverseContributionsScale(d.y0)) / 2) {
-							d.displaced = true;
-							return "1.2em";
-						} else {
-							return "0em";
-						};
-					};
-				})
+				.attr("transform", d=> `rotate(${angleValues}, ${(inverseContributionsScale(d.y1) + inverseContributionsScale(d.y0)) / 2}, ${d.x1 + valuesPaddingDonors})`)
 				.tween("text", (d, i, n) => {
 					const interpolator = d3.interpolate(reverseFormat(n[i].textContent.split("$")[1]) || 0, d.value);
 					return t => n[i].textContent = "$" + formatSIFloat(interpolator(t));
@@ -1835,7 +1823,7 @@
 				.attr("x", allocationsPanel.width / 2)
 				.attr("y", allocationsPanel.height / 2)
 				.style("opacity", 0)
-				.text("No data for allocations")
+				.text("Allocation data not available")
 				.merge(allocationsNoData)
 				.transition()
 				.duration(duration)
@@ -2462,14 +2450,16 @@
 
 		function preProcessData(rawDataAllocations, rawDataContributions) {
 			rawDataAllocations.forEach(row => {
-				if (!yearsArrayAllocations.includes(row.allocationYear)) yearsArrayAllocations.push(row.allocationYear);
-				//REMOVING CERF FROM THE OPTIONS HERE:
+				//SECOND CONDITION IS FOR REMOVING CERF
+				if (!yearsArrayAllocations.includes(row.allocationYear) && row.fundId !== cerfPooledFundId) yearsArrayAllocations.push(row.allocationYear);
+				//SECOND CONDITION IS FOR REMOVING CERF
 				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			rawDataContributions.forEach(row => {
-				if (!yearsArrayContributions.includes(row.contributionYear)) yearsArrayContributions.push(row.contributionYear);
-				//REMOVING CERF FROM THE OPTIONS HERE:
+				//SECOND CONDITION IS FOR REMOVING CERF
+				if (!yearsArrayContributions.includes(row.contributionYear) && row.fundId !== cerfPooledFundId) yearsArrayContributions.push(row.contributionYear);
+				//SECOND CONDITION IS FOR REMOVING CERF
 				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
@@ -2479,7 +2469,8 @@
 			yearsArrayAllocations.sort((a, b) => a - b);
 			yearsArrayContributions.sort((a, b) => a - b);
 			yearsArrayAllocations.forEach(e => {
-				if (yearsArrayContributions.includes(e)) yearsArray.push(e);
+				//THE SECOND CONDITION HIDES ALL YEARS BEFORE FIRSTYEAR
+				if (yearsArrayContributions.includes(e) && e >= firstYear) yearsArray.push(e);
 			});
 		};
 
