@@ -2014,7 +2014,7 @@
 					return e.donor
 				});
 
-				barsDonors.selectAll("image")
+				barsDonors.select("image")
 					.style("opacity", function(e) {
 						return donorsList.indexOf(e.donor) > -1 ? 1 : 0.05;
 					});

@@ -825,7 +825,9 @@
 
 			selectTitleDiv.html("Select CBPF:");
 
-			const checkboxData = lists.fundsInAllYearsKeys.sort(function(a, b) {
+			const checkboxData = lists.fundsInAllYearsKeys.slice();
+
+			checkboxData.sort(function(a, b) {
 				return (lists.fundsInAllYears[a]).localeCompare(lists.fundsInAllYears[b]);
 			});
 
@@ -883,7 +885,7 @@
 			checkbox.select("input").on("change", function() {
 				if (this.value === "All CBPFs") {
 					if (this.checked) {
-						chartState.selectedFund = lists.fundsInAllYearsKeys;
+						chartState.selectedFund = lists.fundsInAllYearsKeys.slice();
 						cbpfsCheckboxes.property("checked", false);
 					} else {
 						chartState.selectedFund.length = 0;
@@ -3095,7 +3097,7 @@
 				return valuesInLowerCase(lists.fundsInAllYearsValues).indexOf(d) === -1
 			});
 
-			if (someInvalidValue) return lists.fundsInAllYearsKeys;
+			if (someInvalidValue) return lists.fundsInAllYearsKeys.slice();
 
 			dataArray.forEach(function(d) {
 				lists.fundsInAllYearsKeys.forEach(key => {
