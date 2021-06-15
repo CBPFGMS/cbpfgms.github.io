@@ -1,0 +1,331 @@
+/*Sankey diagram (code: cbsank)*/
+
+#d3chartcontainercbsank {
+	position: relative;
+}
+
+#cbsankDownloadingDiv {
+	position: absolute;
+	background: #fcfcfc; 
+	border: 1px solid #666; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	z-index: 1500;
+}
+
+#cbsanktooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: #333;
+	font-family: 'Roboto', sans-serif;
+	white-space: normal;	
+	line-height: 120%;
+	font-size: 14px;
+	padding: 8px;
+	background: #f2f4f4; 
+	border: 1px solid #3189c9; 
+	border-radius: 4px;
+	pointer-events: none;
+	cursor: none;
+	z-index: 1500;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.cbsankTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.cbsankTitleDiv {
+	display: flex;
+	flex:0 50%;
+	margin-left: 8px;
+}
+
+.cbsankIconsDiv {
+	display: flex;
+	flex:0 50%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 16px;
+	z-index: 1000;
+}
+
+.cbsankFooterDiv {
+	width: 100%;
+	margin-top: 8px;
+}
+
+.cbsankYearsDescriptionDiv {
+	margin-left: 22px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
+
+.cbsankOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.5);
+	top: 0;
+	left: 0;
+	z-index: 10;
+}
+
+.cbsankAnnotationMainText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	pointer-events: none;
+	fill: white;
+}
+
+.cbsankAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+p#cbsankd3chartTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin: 0px;
+	color: #418fde;
+}
+
+.cbsankbuttonsText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.cbsankleftArrowText, .cbsankrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
+
+#cbsankSnapshotTooltip {
+	z-index: 1600;
+}
+
+.cbsankSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.cbsankSnapshotContent #cbsankSnapshotPdfText, .cbsankSnapshotContent #cbsankSnapshotPngText, .cbsankSnapshotContent #cbsankSnapshotTooltipPdfText, .cbsankSnapshotContent #cbsankSnapshotTooltipPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.cbsankSnapshotContent #cbsankBestVisualizedText, .cbsankSnapshotContent #cbsankTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	width: 202px;
+}
+
+.cbsankSnapshotContent #cbsankSnapshotPdfText:hover, .cbsankSnapshotContent #cbsankSnapshotPngText:hover, .cbsankSnapshotContent #cbsankSnapshotTooltipPdfText:hover, .cbsankSnapshotContent #cbsankSnapshotTooltipPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
+
+.cbsankcentralLine {
+	stroke: white;
+	stroke-width: 3px;
+	stroke-dasharray: 0, 6;
+	stroke-linecap: round;
+}
+
+.cbsankcontributionsValueText, .cbsankcontributionsText, .cbsankcontributionsSubText, .cbsankallocationsValueText, .cbsankallocationsText, .cbsankallocationsSubText {
+	font-family: "Roboto", sans-serif;
+	font-size: 22px;
+	fill: white;
+	font-weight: 300;
+	text-anchor: middle;
+}
+
+.cbsankcontributionsValueTextSpan, .cbsankallocationsValueTextSpan {
+	font-size: 44px;
+	font-weight: 700;
+}
+
+.cbsanksankeyDonorNames, .cbsanksankeyPartnerNames, .cbsanksankeyClusterNames {
+	dominant-baseline: central;
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;
+	font-weight: 400;
+	stroke: white;
+	stroke-width: 2px;
+	paint-order: stroke;
+}
+
+.cbsanksankeyPartnerNames {
+	text-anchor: middle;
+}
+
+.cbsanksankeyDonorValues, .cbsanksankeyPartnerValues, .cbsanksankeyClusterValues {
+	text-anchor: middle;
+	dominant-baseline: central;
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	fill: darkslategray;
+	font-weight: 400;
+	pointer-events: none;
+	stroke: white;
+	stroke-width: 2px;
+	letter-spacing: -0.03em;
+	paint-order: stroke;
+}
+
+#cbsankinnerTooltipDiv{
+  background-color: #f2f4f4;
+  border-radius: 4px;
+}
+
+#cbsankinnerTooltipDiv > div:nth-child(1){
+	padding:8px !important;
+	background-color: #3189c9;
+	color: #fff;
+	border-radius: 2px 2px 0px 0px;
+    line-height: normal;
+	margin-top: -8px;
+    margin-left: -8px;
+    margin-right: -8px;
+} 
+
+.cbsanktooltipTitleDiv {
+  display: flex;
+  align-items: center;
+  white-space: pre-wrap;
+}
+
+.cbsanktooltipTitleNameDiv {
+  display: flex;
+  flex-direction: column;
+}
+
+.cbsanktooltipFooter {
+  width: 100%;
+  margin-top: 4px;
+  font-weight: 300;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.cbsanktooltipKeys {
+	font-weight: 600;
+}
+
+.cbsanktooltipLeader {
+  flex: 0 1 auto;
+  overflow: hidden;
+  color: #ccc;
+}
+
+.cbsanktooltipLeader::before {
+   display: block;
+   overflow: hidden;
+   text-overflow: clip;
+   content: 
+     ". . . . . . . . . . . . . . . . . . . . "
+     ". . . . . . . . . . . . . . . . . . . . "
+     ". . . . . . . . . . . . . . . . . . . . "
+     ". . . . . . . . . . . . . . . . . . . . "
+}
+
+.cbsanktooltipheaderDiv {
+	margin-top: 8px;
+	margin-bottom: 8px;
+	font-size: 12px;
+}
+
+.cbsanktooltipDivOthers {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	letter-spacing: -0.03em;
+}
+
+.cbsankSelectTitleDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 8px;
+	margin-top: 8px;
+	margin-left: 8px;
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+}
+
+.cbsankSelectDiv {
+	display: flex;
+	margin-left: 8px;
+	margin-right: 4px;
+	flex-wrap: wrap;
+}
+
+.cbsankCheckboxDiv {
+	display: flex;
+	margin-right: 12px;
+	align-items: center;
+}
+
+.cbsankCheckboxDiv label, .cbsankCheckboxDiv input {
+	cursor: pointer;
+}
+
+.cbsankCheckboxDiv label{
+	margin-bottom: 0px;
+}
+
+.cbsankCheckboxText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	color: #666;
+	margin-left: 2px;
+}
+
+.cbsankCheckboxTextAllCbpfs {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 2px;
+	color: #f79a3b;
+}
+
+.cbsankselectedFundsText {
+	dominant-baseline: central;
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	fill: darkslategray;
+	font-weight: 400;
+	font-style: italic;
+}
+
+.cbsankcontributionsNoData, .cbsankallocationsNoData {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #666;
+	pointer-events: none;
+	text-anchor: middle;
+}
