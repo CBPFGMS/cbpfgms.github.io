@@ -110,7 +110,7 @@
 				.attr("transform", "translate(" + (padding[3] + controlPanelWidth + lateralPanelPadding) + "," + padding[0] + ")"),
 			width: (width - padding[1] - padding[3] - (2 * lateralPanelPadding) - controlPanel.width) / 2,
 			height: height - padding[0] - padding[2],
-			padding: [20, 8, 14, 80],
+			padding: [20, 8, 14, 100],
 			linePadding: 26
 		};
 
@@ -120,7 +120,7 @@
 				.attr("transform", "translate(" + (padding[3] + controlPanel.width + contributionsPanel.width + (2 * lateralPanelPadding)) + "," + padding[0] + ")"),
 			width: (width - padding[1] - padding[3] - (2 * lateralPanelPadding) - controlPanel.width) / 2,
 			height: height - padding[0] - padding[2],
-			padding: [20, 6, 14, 60],
+			padding: [20, 6, 14, 80],
 			linePadding: 26
 		};
 
