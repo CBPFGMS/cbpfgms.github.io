@@ -175,6 +175,7 @@
 			barChartLabelVertPadding = 10,
 			barChartPercentageLabelPadding = 6,
 			barChartPercentageLabelVertPadding = 8,
+			maxTickLength = 12,
 			formatPercent = d3.format(".0%"),
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -391,7 +392,7 @@
 				.attr("class", "pbihrpbarChartPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topSummaryPanel.height + stackedBarPanel.height + donutsPanel.height + 6 * panelVerticalPadding) + ")"),
 			width: width - padding[1] - padding[3],
-			padding: [100, 52, 0, 196],
+			padding: [100, 52, 0, 226],
 			get mainAxisPadding() {
 				return this.padding[3] - 104;
 			},
@@ -408,7 +409,7 @@
 			main: svg.append("g")
 				.attr("class", "pbihrpnonHrpPanel"),
 			width: width - padding[1] - padding[3],
-			padding: [70, 52, 0, 196],
+			padding: [70, 52, 0, 226],
 			get mainAxisPadding() {
 				return this.padding[3] - 104;
 			},
@@ -2397,18 +2398,18 @@
 				sel.select(".domain").remove();
 				sel.selectAll(".tick text")
 					.filter(function(d) {
-						return d === "Syria Cross border";
+						return d.length > maxTickLength;
 					})
-					.text("Syria Cross")
+					.text(d => d.split(" ").slice(0, Math.ceil(d.split(" ").length / 2)).join(" "))
 					.attr("x", -9)
 					.attr("dy", "-0.4em")
 					.append("tspan")
 					.attr("dy", "1.2em")
 					.attr("x", -9)
-					.text("border");
+					.text(d => d.split(" ").slice(Math.ceil(d.split(" ").length / 2)).join(" "))
 				if (sel !== group) group.selectAll(".tick text")
 					.filter(function(d) {
-						return d === "Syria Cross border";
+						return d.length > maxTickLength;
 					})
 					.attrTween("x", null)
 					.tween("text", null);
