@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylescbsank-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylescbsank-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
 		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -15,6 +15,8 @@
 		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
+
+	//CHANGE CSS LINK!!!!!!!
 
 	cssLinks.forEach(function(cssLink) {
 
@@ -2453,16 +2455,16 @@
 		function preProcessData(rawDataAllocations, rawDataContributions) {
 			rawDataAllocations.forEach(row => {
 				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!yearsArrayAllocations.includes(row.allocationYear) && row.fundId !== cerfPooledFundId) yearsArrayAllocations.push(row.allocationYear);
+				if (!yearsArrayAllocations.includes(row.allocationYear) && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) yearsArrayAllocations.push(row.allocationYear);
 				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
+				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			rawDataContributions.forEach(row => {
 				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!yearsArrayContributions.includes(row.contributionYear) && row.fundId !== cerfPooledFundId) yearsArrayContributions.push(row.contributionYear);
+				if (!yearsArrayContributions.includes(row.contributionYear) && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) yearsArrayContributions.push(row.contributionYear);
 				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
+				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			lists.fundsInAllYearsKeys = Object.keys(lists.fundsInAllYears).map(d => +d);
@@ -2558,7 +2560,7 @@
 					};
 
 				} else {
-					console.warn(`cbsank, data missing numeric fund ID: fund ID ${row.fundId}`)
+					console.warn(`cbsank, allocation data missing numeric fund ID: fund ID ${row.fundId}`)
 				};
 			});
 
@@ -2588,40 +2590,46 @@
 
 			rawDataContributions.forEach(row => {
 
-				if (chartState.selectedYear.includes(row.contributionYear) && lists.fundsInAllYearsKeys.includes(row.fundId) && !chartState.fundsInData.includes(row.fundId)) {
-					chartState.fundsInData.push(row.fundId);
-				};
+				if (+row.fundId === +row.fundId) {
 
-				if (chartState.selectedYear.includes(row.contributionYear) && chartState.selectedFund.includes(row.fundId) && (row.paidAmount + row.pledgedAmount)) {
-
-					const foundSource = data.nodes.find(d => d.level === 1 && d.codeId === row.donorId);
-
-					if (foundSource) {
-						foundSource.value += row.paidAmount + row.pledgedAmount;
-					} else {
-						data.nodes.push({
-							codeId: row.donorId,
-							level: 1,
-							name: lists.donorNames[row.donorId],
-							value: row.paidAmount + row.pledgedAmount,
-							id: "donor#" + row.donorId
-						});
+					if (chartState.selectedYear.includes(row.contributionYear) && lists.fundsInAllYearsKeys.includes(row.fundId) && !chartState.fundsInData.includes(row.fundId)) {
+						chartState.fundsInData.push(row.fundId);
 					};
 
-					const foundLink = data.links.find(d => d.source === "donor#" + row.donorId);
+					if (chartState.selectedYear.includes(row.contributionYear) && chartState.selectedFund.includes(row.fundId) && (row.paidAmount + row.pledgedAmount)) {
 
-					if (foundLink) {
-						foundLink.value += row.paidAmount + row.pledgedAmount;
-					} else {
-						data.links.push({
-							source: "donor#" + row.donorId,
-							target: fundId,
-							value: row.paidAmount + row.pledgedAmount
-						});
+						const foundSource = data.nodes.find(d => d.level === 1 && d.codeId === row.donorId);
+
+						if (foundSource) {
+							foundSource.value += row.paidAmount + row.pledgedAmount;
+						} else {
+							data.nodes.push({
+								codeId: row.donorId,
+								level: 1,
+								name: lists.donorNames[row.donorId],
+								value: row.paidAmount + row.pledgedAmount,
+								id: "donor#" + row.donorId
+							});
+						};
+
+						const foundLink = data.links.find(d => d.source === "donor#" + row.donorId);
+
+						if (foundLink) {
+							foundLink.value += row.paidAmount + row.pledgedAmount;
+						} else {
+							data.links.push({
+								source: "donor#" + row.donorId,
+								target: fundId,
+								value: row.paidAmount + row.pledgedAmount
+							});
+						};
+
+						fundNode.value += row.paidAmount + row.pledgedAmount;
+
 					};
 
-					fundNode.value += row.paidAmount + row.pledgedAmount;
-
+				} else {
+					console.warn(`cbsank, contribution data missing numeric fund ID: fund ID ${row.fundId}`)
 				};
 			});
 
