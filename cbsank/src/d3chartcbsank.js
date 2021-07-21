@@ -1810,6 +1810,13 @@
 
 		function drawSankeyAllocations(dataAllocations) {
 
+			if (dataAllocations.nodes.some(e => e.id === "cluster#16")) {
+				d3.select("." + classPrefix + "covidDisclaimer").style("display", null);
+			} else {
+				d3.select("." + classPrefix + "covidDisclaimer").style("display", "none");
+			};
+
+
 			let allocationsNoData = allocationsPanel.main.selectAll("." + classPrefix + "allocationsNoData")
 				.data(dataAllocations.nodes.length ? [] : [true]);
 
