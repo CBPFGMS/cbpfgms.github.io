@@ -1463,6 +1463,12 @@
 
 			function createLabelsPanel() {
 
+				if (data.some(e => e.cluster === "COVID-19")) {
+					d3.select(".pbiolccovidDisclaimer").style("display", null);
+				} else {
+					d3.select(".pbiolccovidDisclaimer").style("display", "none");
+				};
+
 				let labelGroup = labelsPanel.main.selectAll(".pbiolcLabelGroup")
 					.data(data, function(d) {
 						return d.clusterKey;
