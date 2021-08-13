@@ -4497,29 +4497,44 @@
 
 			const csvData = [];
 
+			chartState.selectedYear.forEach(function(year) {
+				chartState.selectedCbpfs.forEach(function(fund) {
+					for (const key in subPartnersList) {
+						csvData.push({
+							Year: year,
+							Fund: cbpfsList[fund],
+							"Partner type": subPartnersList[key],
+							"Direct funding": 0,
+							"Net funding": 0
+						});
+					};
+				});
+			});
+
 			rawData.forEach(function(row) {
 				if (chartState.selectedYear.indexOf(+row.year) > -1 && chartState.selectedCbpfs.indexOf(row.fund) > -1) {
 
-					if (cbpfsListKeys.indexOf(row.source) > -1) {
-						csvData.push({
-							source: cbpfsList[row.source],
-							"type of source": "fund",
-							target: partnersList[row.target],
-							"type of target": "direct partner",
-							amount: row.value,
-							fund: cbpfsList[row.fund],
-							year: row.year
-						});
+					const foundPartner = csvData.find(function(e) {
+						return e.Year === +row.year && e.Fund === cbpfsList[row.fund] && e["Partner type"] === subPartnersList[row.target];
+					});
+
+					if (foundPartner) {
+						if (cbpfsListKeys.indexOf(row.source) > -1) {
+							foundPartner["Direct funding"] += +row.value;
+							foundPartner["Net funding"] += +row.value;
+						} else {
+							if (row.source !== row.target) {
+								foundPartner["Net funding"] += +row.value;
+								const foundSourcePartner = csvData.find(function(e) {
+									return e.Year === +row.year && e.Fund === cbpfsList[row.fund] && e["Partner type"] === subPartnersList[row.source];
+								});
+								if (foundSourcePartner) foundSourcePartner["Net funding"] -= +row.value;
+							};
+						};
 					} else {
-						csvData.push({
-							source: partnersList[row.source],
-							"type of source": "direct partner",
-							target: subPartnersList[row.target],
-							"type of target": "sub-implementing partner",
-							amount: row.value,
-							fund: cbpfsList[row.fund],
-							year: row.year
-						});
+						console.warn("partner not found:")
+						console.warn(row)
+						console.warn("------------");
 					};
 				};
 			});

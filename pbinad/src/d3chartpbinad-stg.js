@@ -4511,8 +4511,6 @@
 				});
 			});
 
-			console.log(csvData);
-
 			rawData.forEach(function(row) {
 				if (chartState.selectedYear.indexOf(+row.year) > -1 && chartState.selectedCbpfs.indexOf(row.fund) > -1) {
 
