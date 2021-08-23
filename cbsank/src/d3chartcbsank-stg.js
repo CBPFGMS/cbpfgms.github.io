@@ -183,7 +183,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
-			partnerColorsArray = d3.schemeCategory10.reverse(),
+			clusterColorsArray = ["#F15B2C", "#F26222", "#F57F20", "#F9A11B", "#FEC010", "#D5A429", "#AA8C5C", "#5E5FAA", "#3D52A3", "#0073BD", "#71B4D3", "#7AC1BA", "#7FC88F", "#8CCA7B", "#A9D489", "#ADD255", "#C4C070", "#D39A6D", "#D16F5F", "#ED1C24"],
 			allYearsOption = "all",
 			chartTitleDefault = "Sankey diagram",
 			vizNameQueryString = "sankey",
@@ -475,8 +475,7 @@
 				[allocationsPanel.height - allocationsPanel.padding[2], 2 * centralCirclePanel.radius]
 			]);
 
-		const partnerColorsScale = d3.scaleOrdinal()
-			.range(partnerColorsArray);
+		const clusterColorsScale = d3.scaleOrdinal();
 
 		const inverseContributionsScale = d3.scaleLinear()
 			.domain([0, contributionsPanel.width - contributionsPanel.padding[1] - contributionsPanel.padding[3]])
@@ -1849,6 +1848,9 @@
 			spreadNodes(partnerNodes, true);
 			spreadNodes(clusterNodes, false);
 
+			clusterColorsScale.domain(clusterNodes.map(d => d.id).reverse())
+				.range(d3.range(clusterNodes.length).map(d => clusterColorsArray[~~((d / clusterNodes.length) * clusterColorsArray.length)]));
+
 			sankeyGeneratorAllocations.update(sankeyDataAllocations);
 
 			let sankeyNodesAllocations = allocationsPanel.main.selectAll("." + classPrefix + "sankeyNodesAllocations")
@@ -1863,7 +1865,7 @@
 			const sankeyNodesAllocationsEnter = sankeyNodesAllocations.enter()
 				.append("rect")
 				.attr("class", classPrefix + "sankeyNodesAllocations")
-				.style("fill", d => d.level === 2 ? partnerColorsScale(d.id) : contributionColor)
+				.style("fill", d => d.level === 3 ? clusterColorsScale(d.id) : d3.color(allocationColor).darker(0.2))
 				.style("opacity", 0)
 				.attr("y", d => d.x0)
 				.attr("x", d => inverseAllocationsScale(d.y1))
@@ -1875,6 +1877,7 @@
 			sankeyNodesAllocations.transition()
 				.duration(duration)
 				.style("opacity", 1)
+				.style("fill", d => d.level === 3 ? clusterColorsScale(d.id) : d3.color(allocationColor).darker(0.2))
 				.attr("y", d => d.x0)
 				.attr("x", d => inverseAllocationsScale(d.y1))
 				.attr("width", d => Math.max(minNodeWidth, inverseAllocationsScale(d.y0) - inverseAllocationsScale(d.y1)))
@@ -1894,7 +1897,7 @@
 				.attr("class", classPrefix + "sankeyLinksAllocations")
 				.attr("stroke-width", d => Math.max(d.width, minStrokeWidth))
 				.style("fill", "none")
-				.style("stroke", d => d.source.level === 1 ? allocationColor : partnerColorsScale(d.source.id))
+				.style("stroke", d => d.source.level === 1 ? allocationColor : clusterColorsScale(d.target.id))
 				.style("stroke-opacity", 0)
 				.attr("d", drawLinks());
 
@@ -1902,6 +1905,7 @@
 
 			sankeyLinksAllocations.transition()
 				.duration(duration)
+				.style("stroke", d => d.source.level === 1 ? allocationColor : clusterColorsScale(d.target.id))
 				.style("stroke-opacity", linksOpacity)
 				.attr("stroke-width", d => Math.max(d.width, minStrokeWidth))
 				.attr("d", drawLinks());
@@ -2425,7 +2429,7 @@
 
 				const thisOffsetLeft = containerBox.right - thisNodeBox.right > tooltipBox.width + tooltipMargin ?
 					thisNodeBox.left - containerBox.left + thisNodeBox.width + tooltipMargin :
-					thisNodeBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
+					Math.max(0, thisNodeBox.left - containerBox.left - tooltipBox.width - tooltipMargin);
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
