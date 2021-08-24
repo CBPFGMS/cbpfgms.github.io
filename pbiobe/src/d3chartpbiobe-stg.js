@@ -1724,6 +1724,12 @@
 						return e.beneficiary === d.beneficiary ? 1 : fadeOpacity;
 					});
 
+				svg.select(".pbiobegroupYAxisPercentage")
+					.selectAll(".tick text")
+					.style("opacity", function(e) {
+						return e === d.beneficiary ? 1 : fadeOpacity;
+					});
+
 				const percentageText = d.targeted ? "(" + (d.beneficiary === "total" ? "people" : d.beneficiary) + " reached: <strong>" + formatPercent2Decimals(d.actual / d.targeted) + "</strong> of the target)" : "";
 
 				tooltip.style("display", "block")
@@ -1755,6 +1761,9 @@
 				if (isSnapshotTooltipVisible) return;
 				currentHoveredElem = null;
 				svg.selectAll(".pbiobeBeneficiaryGroup, .pbiobePictogramGroupGray, .pbiobePictogramGroupBlue")
+					.style("opacity", 1);
+				svg.select(".pbiobegroupYAxisPercentage")
+					.selectAll(".tick text")
 					.style("opacity", 1);
 				tooltip.style("display", "none");
 			};
