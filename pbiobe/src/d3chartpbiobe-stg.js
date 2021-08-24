@@ -301,6 +301,7 @@
 				isSnapshotTooltipVisible = false;
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
+				if (currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
 			});
 
 		snapshotTooltip.append("p")
