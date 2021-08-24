@@ -2426,7 +2426,7 @@
 
 				const thisOffsetLeft = containerBox.right - thisNodeBox.right > tooltipBox.width + tooltipMargin ?
 					thisNodeBox.left - containerBox.left + thisNodeBox.width + tooltipMargin :
-					thisNodeBox.left - containerBox.left - tooltipBox.width - tooltipMargin;
+					Math.max(0, thisNodeBox.left - containerBox.left - tooltipBox.width - tooltipMargin);
 
 				tooltip.style("top", thisOffsetTop + "px")
 					.style("left", thisOffsetLeft + "px");
