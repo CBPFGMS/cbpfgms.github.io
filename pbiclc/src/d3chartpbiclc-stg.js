@@ -737,8 +737,6 @@
 				return self.indexOf(value) === index;
 			});
 
-			console.log(allDonors);
-
 			if (!isInternetExplorer) saveFlags(allDonors);
 
 			if (!lazyLoad) {
