@@ -2392,7 +2392,7 @@
 
 				const thisRow = locationsData[index];
 
-				if (locationsData[index - 1]) {
+				if (locationsData[index - 1] || locationsData.length === 1) {
 					if (index === locationsData.length - 1 || thisRow.PrjCode !== locationsData[index + 1].PrjCode) {
 						foundSummaryObject = summaryData.find(function(d) {
 							return d.PrjCode === thisRow.PrjCode;
