@@ -400,6 +400,8 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 			chartState.selectedFund = d;
 			fundButtons.classed("active", e => e === chartState.selectedFund);
 			draw(originalData, originalAdminLevel1Data);
+			drawBubbleMap(adminLevel1Data, d3.transition()
+				.duration(duration));
 		});
 
 		//end of draw
@@ -409,8 +411,8 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 
 		radiusScale.domain([0, d3.max(adminLevel1Data, d => d.AdminLocation1Budget) || 0]);
 
-		const adminLevel1DataCerf = adminLevel1Data.filter(d => d.FundType === cerfId);
-		const adminLevel1DataCbpf = adminLevel1Data.filter(d => d.FundType === cbpfId);
+		const adminLevel1DataCerf = chartState.selectedFund !== "cbpf" ? adminLevel1Data.filter(d => d.FundType === cerfId) : [];
+		const adminLevel1DataCbpf = chartState.selectedFund !== "cerf" ? adminLevel1Data.filter(d => d.FundType === cbpfId) : [];
 
 		let markers = markersLayer.selectAll(`.${classPrefix}markers`)
 			.data(adminLevel1DataCerf, d => d.AdminLocation1 + d.AdminLocation1Latitude.toFixed(6) + d.AdminLocation1Longitude.toFixed(6));
