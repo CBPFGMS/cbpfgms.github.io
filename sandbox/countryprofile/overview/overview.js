@@ -875,7 +875,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 			const lateralHeight = type === "cerf" ? cerfDonutsChartHeight : cbpfDonutsChartHeight;
 
 			let lateralDonutGroup = container.selectAll(`.${classPrefix}${type}DonutGroup`)
-				.data(fundData.every(e => e.value) ? [true] : []);
+				.data(fundData.every(e => !e.value) ? [] : [true]);
 
 			const lateralDonutGroupExit = lateralDonutGroup.exit()
 				.transition(syncedTransition)
