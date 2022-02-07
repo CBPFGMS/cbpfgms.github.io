@@ -1,15 +1,16 @@
 //everything external to the module
 const chartState = {
-	selectedYear: 2020, //current year, falling back if there is no data
+	selectedYear: 2020, 
 	selectedFund: "total",
-	selectedCountryProfile: 91
+	selectedCountryProfile: 1
 };
 
 //ALSO:
 //1. year labels skipping 1 year (2012, 2014 etc...)
 //2. DONE: remove redundant "No allocations" on the sides
 //3. SCB map bug
-//4. Top buttons reset year selection
+//4. DONE: Top buttons reset year selection
+//5. DONE: current year, falling back if there is no data
 
 const unBlue = "#65A8DC",
 	cerfColor = "#FBD45C",
