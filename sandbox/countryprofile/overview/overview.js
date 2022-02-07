@@ -1,9 +1,15 @@
 //everything external to the module
 const chartState = {
-	selectedYear: 2020,
+	selectedYear: 2020, //current year, falling back if there is no data
 	selectedFund: "total",
-	selectedCountryProfile: 1
+	selectedCountryProfile: 91
 };
+
+//ALSO:
+//1. year labels skipping 1 year (2012, 2014 etc...)
+//2. DONE: remove redundant "No allocations" on the sides
+//3. SCB map bug
+//4. Top buttons reset year selection
 
 const unBlue = "#65A8DC",
 	cerfColor = "#FBD45C",
@@ -109,11 +115,10 @@ function control(rawData) {
 		return data;
 	};
 
-
 	//here, calling the module createCountryProfileOverview function, which returns draw
 	const callingFunction = createCountryProfileOverview(selections.chartDiv, lists, colorsObject, rawData[0]);
 
-	callingFunction(data, adminLevel1Data);
+	callingFunction(data, adminLevel1Data, true);
 
 };
 
@@ -378,7 +383,9 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 	createMap(mapData, mapLayer, mapDivSize);
 	createFundButtons(buttonsDiv, colors);
 
-	function draw(originalData, originalAdminLevel1Data) {
+	function draw(originalData, originalAdminLevel1Data, resetYear) {
+
+		if (resetYear) setDefaultYear(originalData);
 
 		const data = processData(originalData);
 		const adminLevel1Object = originalAdminLevel1Data.find(e => e.year === chartState.selectedYear);
@@ -399,7 +406,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 		fundButtons.on("click", (event, d) => {
 			chartState.selectedFund = d;
 			fundButtons.classed("active", e => e === chartState.selectedFund);
-			draw(originalData, originalAdminLevel1Data);
+			draw(originalData, originalAdminLevel1Data, true);
 			drawBubbleMap(adminLevel1Data, d3.transition()
 				.duration(duration));
 		});
@@ -625,7 +632,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 
 		barsTooltipRectangles.on("click", (event, d) => {
 			chartState.selectedYear = d.year;
-			draw(originalData, originalAdminLevel1Data);
+			draw(originalData, originalAdminLevel1Data, false);
 		});
 
 		yAxis.tickSizeInner(-(xScale.range()[1] - barChartPadding[3]));
@@ -868,7 +875,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 			const lateralHeight = type === "cerf" ? cerfDonutsChartHeight : cbpfDonutsChartHeight;
 
 			let lateralDonutGroup = container.selectAll(`.${classPrefix}${type}DonutGroup`)
-				.data(fundData.length ? [true] : []);
+				.data(fundData.every(e => e.value) ? [true] : []);
 
 			const lateralDonutGroupExit = lateralDonutGroup.exit()
 				.transition(syncedTransition)
@@ -1016,6 +1023,10 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 
 	function drawTopFigures(data, syncedTransition) {
 
+		topFiguresDiv.select(`.${classPrefix}descriptionDiv`)
+			.select("span")
+			.html(`${chartState.selectedYear}`);
+
 		topFiguresDiv.select(`.${classPrefix}allocationsValue`)
 			.transition(syncedTransition)
 			.call(applyColors, colors)
@@ -1119,7 +1130,9 @@ function createTopFigures(container, colors) {
 
 	const descriptionDiv = container.append("div")
 		.attr("class", classPrefix + "descriptionDiv")
-		.html(`Allocated in ${lists.fundNamesList[chartState.selectedCountryProfile]} in ${chartState.selectedYear}`);
+		.html(`Allocated in ${lists.fundNamesList[chartState.selectedCountryProfile]} in `)
+		.append("span")
+		.html(`${chartState.selectedYear}`);
 
 	const projectsDiv = container.append("div")
 		.attr("class", classPrefix + "projectsDiv");
@@ -1216,6 +1229,17 @@ function processData(originalData) {
 	});
 
 	return data;
+};
+
+function setDefaultYear(originalData) {
+	const years = originalData.map(d => d.year).sort((a, b) => a - b);
+	let index = years.length - 1;
+	while (index >= 0) {
+		if (originalData[index][chartState.selectedFund]) {
+			chartState.selectedYear = years[index];
+			break;
+		};
+	};
 };
 
 function applyColors(selection, colors) {
