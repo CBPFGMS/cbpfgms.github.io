@@ -1,16 +1,17 @@
 //everything external to the module
 const chartState = {
-	selectedYear: 2020, 
+	selectedYear: 2020,
 	selectedFund: "total",
 	selectedCountryProfile: 1
 };
 
 //ALSO:
-//1. year labels skipping 1 year (2012, 2014 etc...)
+//1. DONE: year labels skipping 1 year (2012, 2014 etc...)
 //2. DONE: remove redundant "No allocations" on the sides
 //3. SCB map bug
 //4. DONE: Top buttons reset year selection
 //5. DONE: current year, falling back if there is no data
+//6. DONE: Change year labels style
 
 const unBlue = "#65A8DC",
 	cerfColor = "#FBD45C",
@@ -196,7 +197,8 @@ const topRowPercentage = 0.45,
 	mapPadding = [12, 12, (2 * maxRadius + 12), 12],
 	strokeOpacityValue = 0.8,
 	fillOpacityValue = 0.5,
-	bubbleLegendPadding = 6;
+	bubbleLegendPadding = 6,
+	xAxisTextSize = 12;
 
 let bubbleLegendValue,
 	bubbleLegendGroup;
@@ -324,13 +326,26 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 		.ticks(3)
 		.tickFormat(d => "$" + formatSIaxes(d).replace("G", "B"));
 
+	const yearRectDef = svgBarChart.append("defs")
+		.append("linearGradient")
+		.attr("id", "yearRectGradient")
+		.attr("x2", "100%")
+		.attr("y2", "0%");
+
+	yearRectDef.append("stop")
+		.attr("offset", "50%")
+		.attr("stop-color", colors.cerf);
+
+	yearRectDef.append("stop")
+		.attr("offset", "50%")
+		.attr("stop-color", colors.cbpf);
+
 	const yearRect = svgBarChart.append("rect")
-		.attr("rx", 2)
-		.attr("ry", 2)
+		.attr("rx", 1)
+		.attr("ry", 1)
 		.attr("width", 24)
-		.attr("height", 12)
-		.attr("y", barChartHeight - barChartPadding[2] + xAxis.tickSizeInner())
-		.style("fill", "darkslategray")
+		.attr("height", 2)
+		.attr("y", barChartHeight - barChartPadding[2] + xAxis.tickSizeInner() + xAxisTextSize)
 		.style("opacity", 0);
 
 	const xAxisGroup = svgBarChart.append("g")
@@ -512,7 +527,8 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 		yScale.domain([0, d3.max(data, d => chartState.selectedFund === "cerf/cbpf" ? d.cerf + d.cbpf : d[chartState.selectedFund]) || 0]);
 
 		yearRect.style("opacity", data.length ? 1 : 0)
-			.attr("x", xScale(chartState.selectedYear) - 12 + xScale.bandwidth() / 2);
+			.attr("x", xScale(chartState.selectedYear) - 12 + xScale.bandwidth() / 2)
+			.style("fill", chartState.selectedFund === "cerf/cbpf" ? "url(#yearRectGradient)" : colors[chartState.selectedFund]);
 
 		let legend = svgBarChart.selectAll(`.${classPrefix}barChartLegend`)
 			.data([true]);
@@ -650,9 +666,10 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 			.remove();
 
 		xAxisGroup.selectAll(".tick text")
-			.style("fill", null)
+			.style("font-weight", null)
+			.style("opacity", d => d % 2 === chartState.selectedYear % 2 || d === currentYear ? 1 : 0)
 			.filter(d => d === chartState.selectedYear)
-			.style("fill", "white");
+			.style("font-weight", "700");
 
 		yAxisGroup.selectAll(".tick")
 			.filter(d => d === 0)
@@ -1234,8 +1251,9 @@ function processData(originalData) {
 
 function setDefaultYear(originalData) {
 	const years = originalData.map(d => d.year).sort((a, b) => a - b);
-	let index = years.length - 1;
-	while (index >= 0) {
+	let index = years.length;
+	while (--index >= 0) {
+		const thisFund = chartState.selectedFund === "total" || chartState.selectedFund === "cerf/cbpf" ? "total" : chartState.selectedFund;
 		if (originalData[index][chartState.selectedFund]) {
 			chartState.selectedYear = years[index];
 			break;
