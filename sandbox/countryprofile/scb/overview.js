@@ -304,7 +304,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 		.range([barChartHeight - barChartPadding[2], barChartPadding[0]]);
 
 	const radiusScale = d3.scaleSqrt()
-		.range([0, maxRadius]);
+		.range([1, maxRadius]);
 
 	const stack = d3.stack()
 		.keys(stackKeys)
