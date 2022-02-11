@@ -2,7 +2,7 @@
 const chartState = {
 	selectedYear: 2020,
 	selectedFund: "total",
-	selectedCountryProfile: 1
+	selectedCountryProfile: 91,
 };
 
 const unBlue = "#65A8DC",
@@ -10,6 +10,8 @@ const unBlue = "#65A8DC",
 	cbpfColor = "#F37261",
 	generalClassPrefix = "pfbicpmain",
 	separator = "##",
+	scbCode = 108,
+	titleSpanText = "(Funded by two CBPFs: SHF and SCHF)",
 	localStorageTime = 3600000,
 	currentDate = new Date();
 
@@ -58,7 +60,7 @@ function control(rawData) {
 	function processDataForCountryProfileOverview(rawDataAllocations) {
 		const data = [];
 		rawDataAllocations.forEach(row => {
-			if (+row.PooledFundId === chartState.selectedCountryProfile) {
+			if (+row.PooledFundId === chartState.selectedCountryProfile || +row.PooledFundId === scbCode) {
 				const foundYear = data.find(d => d.year === row.AllocationYear);
 				if (foundYear) {
 					foundYear.allocationsList.push(row);
@@ -87,7 +89,7 @@ function control(rawData) {
 	function processAdminLevel1DataForCountryProfileOverview(rawAdminLevel1Data) {
 		const data = [];
 		rawAdminLevel1Data.forEach(row => {
-			if (+row.PooledFundId === chartState.selectedCountryProfile) {
+			if (+row.PooledFundId === chartState.selectedCountryProfile || +row.PooledFundId === scbCode) {
 				const foundYear = data.find(d => d.year === row.AllocationYear);
 				if (foundYear) {
 					const foundAdminLevel1 = foundYear.adminLevel1List.find(e => e.AdminLocation1 === row.AdminLocation1 &&
@@ -399,7 +401,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 		const adminLevel1Object = originalAdminLevel1Data.find(e => e.year === chartState.selectedYear);
 		const adminLevel1Data = adminLevel1Object ? adminLevel1Object.adminLevel1List : [];
 
-		title.html(`${lists.fundNamesList[chartState.selectedCountryProfile]}, ${chartState.selectedYear}`);
+		title.html(`${lists.fundNamesList[chartState.selectedCountryProfile]}, ${chartState.selectedYear} <span>${titleSpanText}</span>`);
 
 		const syncedTransition = d3.transition()
 			.duration(duration);

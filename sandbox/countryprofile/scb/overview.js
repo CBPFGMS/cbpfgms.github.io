@@ -2,7 +2,8 @@
 const chartState = {
 	selectedYear: 2020,
 	selectedFund: "total",
-	selectedCountryProfile: 1
+	selectedCountryProfile: 108,
+	alternativeSelectedCountryProfile: 91
 };
 
 const unBlue = "#65A8DC",
@@ -1084,7 +1085,7 @@ function createCountryProfileOverview(container, lists, colors, mapData) {
 function createMap(mapData, mapLayer, mapDivSize) {
 
 	const countryFeatures = topojson.feature(mapData, mapData.objects.wrl_polbnda_int_simple_uncs);
-	countryFeatures.features = countryFeatures.features.filter(d => d.properties.ISO_2 === lists.fundIsoCodesList[chartState.selectedCountryProfile]);
+	countryFeatures.features = countryFeatures.features.filter(d => d.properties.ISO_2 === lists.fundIsoCodesList[chartState.alternativeSelectedCountryProfile]);
 
 	mapProjection.fitExtent([
 		[mapPadding[3], mapPadding[0]],

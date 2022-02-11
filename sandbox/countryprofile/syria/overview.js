@@ -2,7 +2,7 @@
 const chartState = {
 	selectedYear: 2020,
 	selectedFund: "total",
-	selectedCountryProfile: 1
+	selectedCountryProfile: 91
 };
 
 const unBlue = "#65A8DC",
