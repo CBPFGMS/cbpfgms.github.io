@@ -971,8 +971,8 @@
 					const node = this;
 					const i = d3.interpolate(previousValue, d);
 					return function(t) {
-						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						const siString = formatSICustom(i(t))
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -992,7 +992,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.text(function(d) {
-					const valueSI = formatSIFloat(d);
+					const valueSI = formatSICustom(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
 						" Allocated in";
@@ -1032,8 +1032,8 @@
 					const node = this;
 					const i = d3.interpolate(previousPartnersValue, d);
 					return function(t) {
-						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						const siString = formatSICustom(i(t))
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -1053,7 +1053,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.text(function(d) {
-					const valueSI = formatSIFloat(d);
+					const valueSI = formatSICustom(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
 						" to direct";
@@ -1095,8 +1095,8 @@
 					const node = this;
 					const i = d3.interpolate(previousSubpartnersValue, d);
 					return function(t) {
-						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						const siString = formatSICustom(i(t))
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -1116,7 +1116,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.text(function(d) {
-					const valueSI = formatSIFloat(d);
+					const valueSI = formatSICustom(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
 						" to sub-impl.";
@@ -1910,7 +1910,7 @@
 			sankeyPartnerValuesLabelsEnter.append("text")
 				.attr("class", "pbinadsankeyPartnerValuesLabels")
 				.text(function(d) {
-					return "$" + formatSIFloat(d.amount).replace("G", "B");
+					return "$" + formatSICustom(d.amount).replace("G", "B");
 				});
 
 			sankeyPartnerValuesLabelsEnter.append("text")
@@ -1939,7 +1939,7 @@
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent.substring(1)) || 0, d.amount);
 					return function(t) {
-						node.textContent = "$" + formatSIFloat(i(t)).replace("G", "B");
+						node.textContent = "$" + formatSICustom(i(t)).replace("G", "B");
 					};
 				});
 
@@ -2234,7 +2234,7 @@
 			typePercentageGroupEnter.append("text")
 				.attr("class", "pbinadtypePercentage")
 				.text(function(d) {
-					return "$" + formatSIFloat(d.amount).replace("G", "B");
+					return "$" + formatSICustom(d.amount).replace("G", "B");
 				});
 
 			const typePercentageGroupEnterSubText = typePercentageGroupEnter.append("text")
@@ -2262,7 +2262,7 @@
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent.substring(1)) || 0, d.amount);
 					return function(t) {
-						node.textContent = "$" + formatSIFloat(i(t)).replace("G", "B");
+						node.textContent = "$" + formatSICustom(i(t)).replace("G", "B");
 					};
 				});
 
@@ -2379,7 +2379,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+							this.textContent = "$" + formatSICustom(amountFromThisFund);
 						});
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2424,7 +2424,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+							this.textContent = "$" + formatSICustom(amountFromThisFund);
 						});
 						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2512,7 +2512,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+							this.textContent = "$" + formatSICustom(amountFromThisPartner);
 						});
 						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2596,7 +2596,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+							this.textContent = "$" + formatSICustom(amountFromThisPartner);
 						});
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2690,7 +2690,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+							this.textContent = "$" + formatSICustom(amountFromThisFund);
 						});
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2754,7 +2754,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisFund);
+							this.textContent = "$" + formatSICustom(amountFromThisFund);
 						});
 						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2811,7 +2811,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabels").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+							this.textContent = "$" + formatSICustom(amountFromThisPartner);
 						});
 						d3.select(this).select(".pbinadsankeyPartnerValuesLabelsSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -2856,7 +2856,7 @@
 						localVariableOldValue.set(this, true);
 						d3.select(this).select(".pbinadtypePercentage").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
-							this.textContent = "$" + formatSIFloat(amountFromThisPartner);
+							this.textContent = "$" + formatSICustom(amountFromThisPartner);
 						});
 						d3.select(this).select(".pbinadtypePercentageSubText").each(function(f) {
 							localVariableOldValue.set(this, this.textContent);
@@ -4098,7 +4098,7 @@
 					return localTimelineScale.get(this)(d.values[0]) + timelineSvgVertTextPadding;
 				})
 				.text(function(d) {
-					return formatSIFloat(d.values[0]).replace("G", "B");
+					return formatSICustom(d.values[0]).replace("G", "B");
 				});
 
 			const timelineSvgFinalValue = timelinesSvg.append("text")
@@ -4108,7 +4108,7 @@
 					return localTimelineScale.get(this)(d.values[3]) + timelineSvgVertTextPadding;
 				})
 				.text(function(d) {
-					return formatSIFloat(d.values[3]).replace("G", "B");
+					return formatSICustom(d.values[3]).replace("G", "B");
 				});
 
 			const timelineSvgPath = timelinesSvg.append("path")
@@ -4171,7 +4171,7 @@
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent) || 0, d.values[0])
 					return function(t) {
-						node.textContent = formatSIFloat(i(t)).replace("G", "B");
+						node.textContent = formatSICustom(i(t)).replace("G", "B");
 					};
 				});
 
@@ -4185,7 +4185,7 @@
 					const node = this;
 					const i = d3.interpolate(reverseFormat(node.textContent) || 0, d.values[3])
 					return function(t) {
-						node.textContent = formatSIFloat(i(t)).replace("G", "B");
+						node.textContent = formatSICustom(i(t)).replace("G", "B");
 					};
 				});
 
@@ -4628,10 +4628,24 @@
 			return str[0].toUpperCase() + str.substring(1)
 		};
 
-		function formatSIFloat(value) {
+		function formatSiFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			return d3.formatPrefix("." + digits, value)(value);
+		};
+
+		function formatSICustom(value) {
+			const units = ["", "k", "M", "B"];
+			const digits = (Math.log10((value ^ (value >> 31)) - (value >> 31)) | 0) + 1;
+			const mod = digits % 3 === 1 ? 2 : digits % 3 === 2 ? 1 : 0;
+			const places = ~~((digits - 1) / 3);
+			let unit = units[places];
+			let number = Math.round((10 ** mod) * value / (10 ** (places * 3))) / (10 ** mod);
+			if (number === 1e3) {
+				number = Math.round(number / 1e3);
+				unit = units[places + 1];
+			};
+			return number + unit;
 		};
 
 		function setYearsDescriptionDiv() {
