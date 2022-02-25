@@ -3716,7 +3716,7 @@
 					.style("margin-bottom", "8px")
 					.html("(" + formatPercent1dec(totalForPartner ? (totalSubimplementing / totalForPartner) : 0) + " of total " + (datum.codeId === "O" ? "RC/RCS" : datum.name) + " allocation: " + formatSI0decimals(totalForPartner) + ")");
 
-				const svgData = thisPartnerSubimplementing.targetLinks.reduce(function(acc, curr) {
+				const svgData = thisPartnerSubimplementing ? thisPartnerSubimplementing.targetLinks.reduce(function(acc, curr) {
 					if (curr.target.id.split("#")[0] === "subpartner") {
 						const foundPartner = acc.find(function(e) {
 							return e.codeId === curr.source.codeId;
@@ -3731,7 +3731,7 @@
 						};
 					};
 					return acc;
-				}, []);
+				}, []) : [];
 
 				if (svgData.length) {
 
