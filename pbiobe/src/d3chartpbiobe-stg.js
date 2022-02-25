@@ -428,7 +428,7 @@
 			console.info("pbiobe: data from local storage");
 			csvCallback(rawData);
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
 				try {
 					localStorage.setItem("pbiobedata", JSON.stringify({
 						data: d3.csvFormat(rawData),

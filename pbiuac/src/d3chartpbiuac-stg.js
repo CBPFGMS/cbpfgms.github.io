@@ -448,7 +448,7 @@
 			console.info("pbiuac: data from local storage");
 			csvCallback(rawData);
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
 				try {
 					localStorage.setItem("pbiuacdata", JSON.stringify({
 						data: d3.csvFormat(rawData),

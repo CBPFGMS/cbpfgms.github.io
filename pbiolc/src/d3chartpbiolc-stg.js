@@ -482,7 +482,7 @@
 			console.info("pbiolc: data from local storage");
 			csvCallback(rawData);
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
 				try {
 					localStorage.setItem("pbiolcdata", JSON.stringify({
 						data: d3.csvFormat(rawData),
