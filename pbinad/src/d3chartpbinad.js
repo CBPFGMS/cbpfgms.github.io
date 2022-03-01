@@ -176,7 +176,7 @@
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 10,
-			sankeyAnnotationsPadding = 4,
+			sankeyAnnotationsPadding = 8,
 			sankeyAnnotationsSpace = 11,
 			sankeyLegendPadding = 26,
 			sankeyLegendSquareSize = 12,
@@ -429,7 +429,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [36, 80, 44, 86]
+			padding: [40, 80, 44, 86]
 		};
 
 		const invisibleLayer = svg.append("g")
@@ -972,7 +972,7 @@
 					const i = d3.interpolate(previousValue, d);
 					return function(t) {
 						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -1033,7 +1033,7 @@
 					const i = d3.interpolate(previousPartnersValue, d);
 					return function(t) {
 						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -1096,7 +1096,7 @@
 					const i = d3.interpolate(previousSubpartnersValue, d);
 					return function(t) {
 						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -4631,7 +4631,8 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			return d3.formatPrefix("." + digits, value)(value);
+			const result = d3.formatPrefix("." + digits + "~", value)(value);
+			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
 		};
 
 		function setYearsDescriptionDiv() {

@@ -2322,7 +2322,8 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			return d3.formatPrefix("." + digits, value)(value);
+			const result = d3.formatPrefix("." + digits + "~", value)(value);
+			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
 		};
 
 		function reverseFormat(s) {

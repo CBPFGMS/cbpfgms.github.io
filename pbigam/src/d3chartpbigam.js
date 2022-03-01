@@ -2685,11 +2685,8 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			let siString = d3.formatPrefix("." + digits, value)(value);
-			if (siString[siString.length - 1] === "G") {
-				siString = siString.slice(0, -1) + "B";
-			};
-			return siString;
+			const result = d3.formatPrefix("." + digits + "~", value)(value).replace("G", "B");
+			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
 		};
 
 		function parseTransform(translate) {

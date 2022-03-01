@@ -176,7 +176,7 @@
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 10,
-			sankeyAnnotationsPadding = 4,
+			sankeyAnnotationsPadding = 8,
 			sankeyAnnotationsSpace = 11,
 			sankeyLegendPadding = 26,
 			sankeyLegendSquareSize = 12,
@@ -429,7 +429,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [36, 80, 44, 86]
+			padding: [40, 80, 44, 86]
 		};
 
 		const invisibleLayer = svg.append("g")
