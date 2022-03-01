@@ -4628,7 +4628,7 @@
 			return str[0].toUpperCase() + str.substring(1)
 		};
 
-		function formatSiFloat(value) {
+		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			const result = d3.formatPrefix("." + digits + "~", value)(value);
