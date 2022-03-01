@@ -3421,7 +3421,7 @@
 				if (temporarySet.indexOf(row.AllocationYear + row.PooledFundName) > -1) {
 
 					const tempObject = aggregatedAllocations.find(function(d) {
-						return d["CBPF Name"] === row.PooledFundName
+						return d["CBPF Name"] === row.PooledFundName && d.Year === row.AllocationYear;
 					});
 
 					tempObject["Total Allocation"] += +row.ApprovedBudget;
