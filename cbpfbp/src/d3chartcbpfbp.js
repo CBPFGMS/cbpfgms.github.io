@@ -352,7 +352,7 @@
 			function checkPosition() {
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
-					d3.select(window).on("scroll.cbpfbp", null); 
+					d3.select(window).on("scroll.cbpfbp", null);
 					draw(aggregatedDonors, aggregatedCbpfs);
 				};
 			};
@@ -2183,7 +2183,8 @@
 		function formatSIFloat(value) {
 			var length = (~~Math.log10(value) + 1) % 3;
 			var digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			return d3.formatPrefix("." + digits, value)(value);
+			const result = d3.formatPrefix("." + digits + "~", value)(value);
+			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
 		};
 
 		function formatSIFloat1decimal(value) {
