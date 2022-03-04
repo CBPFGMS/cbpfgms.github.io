@@ -1665,6 +1665,7 @@
 								"</span></strong><br style='line-height:170%;'/>Partner: <strong>" + (chartState.selectedPartner === "total" ? "All Partners" : chartState.selectedPartner) +
 								"</strong><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 								(lollipopTooltipWidth * 0.75) + "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" + formatMoney0Decimals(datum[thisTotal]) +
+								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" + formatMoney0Decimals(datum[thisUnderApproval]) +
 								"</span></div></div>");
 					};
 
