@@ -339,3 +339,13 @@ p#pbiuacd3chartTitle {
 	background-color: #1F69B3;
 	color: white;
 }
+
+.pbiuactooltipTitleDiv {
+	display: flex;
+	justify-content: space-between;
+}
+
+.pbiuaccloseDiv {
+	margin-left: 6px;
+	cursor: pointer;
+}

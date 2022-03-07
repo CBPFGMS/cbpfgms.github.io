@@ -1067,7 +1067,7 @@
 
 				const thisColor = datum.allocationType === "standard" ? "contributionColorHTMLcolor" : "allocationColorHTMLcolor";
 
-				innerTooltip.html("<div class='" + thisColor + "'><b>" + datum.AllocationTitle + "</b></div><div class='pbiuacSpacer'></div>CBPF: <b>" +
+				innerTooltip.html("<div class='pbiuactooltipTitleDiv'><div class='" + thisColor + "'><b>" + datum.AllocationTitle + "</b></div><div class='pbiuaccloseDiv'><span class='fas fa-times'></span></div></div><div class='pbiuacSpacer'></div>CBPF: <b>" +
 					datum.PooledFundName + "</b><br>Amount: $<b>" + formatMoney0Decimals(datum.TotalUSDPlanned) +
 					"</b><div class='pbiuacSpacer'></div>Start Date: " + timeFormat(datum.PlannedStartDate) + "<br>End Date: " +
 					timeFormat(datum.PlannedEndDate) + "<div class='pbiuacSpacer'></div><div class='pbiuacTooltipButtonDiv' style='height:30px;display:flex;justify-content:center;align-items:center;'><button>Display Details</button></div>");
@@ -1076,6 +1076,12 @@
 					.on("click", function() {
 						tooltip.style("display", "none");
 						generateList(datum);
+					});
+
+				tooltip.select(".pbiuaccloseDiv")
+					.on("click", function() {
+						tooltip.html(null)
+							.style("display", "none")
 					});
 
 				tooltip.style("display", "block");
