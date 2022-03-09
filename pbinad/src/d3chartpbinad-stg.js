@@ -173,6 +173,7 @@
 			topPanelHeight = 60,
 			sankeyPanelHeight = 620,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
+			ongoingWidth = 116,
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 10,
@@ -183,6 +184,7 @@
 			sankeyLegendTextPadding = 2,
 			sankeyLegendGroupPadding = 10,
 			sankeyFundLabelsPadding = 2,
+			ongoingLabelsPadding = 2,
 			linksOpacity = 0.3,
 			fadeOpacityNodes = 0.1,
 			fadeOpacityLinks = 0.02,
@@ -213,6 +215,7 @@
 			timelineSvgWidth = 220,
 			timelineSvgHeight = 50,
 			timelineSvgPadding = [10, 38, 10, 44],
+			ongoingTitlePadding = 18,
 			localTimelineScale = d3.local(),
 			localTimelineGenerator = d3.local(),
 			timelineSvgTextPadding = 4,
@@ -223,6 +226,7 @@
 			duration = 1000,
 			localVariable = d3.local(),
 			localVariableOldValue = d3.local(),
+			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -236,6 +240,7 @@
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?$format=csv&ShowAllPooledFunds=1", //NOTE ON CERF: CERF ID MUST BE 999
+			ongoingAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
 			cbpfsListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			partnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 			subPartnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/SubIPType?$format=csv",
@@ -423,11 +428,20 @@
 			arrowPadding: 18
 		};
 
+		const ongoingPanel = {
+			main: svg.append("g")
+				.attr("class", "pbinadongoingPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
+			width: ongoingWidth,
+			height: sankeyPanelHeight,
+			padding: [40, 4, 44, 4]
+		};
+
 		const sankeyPanel = {
 			main: svg.append("g")
 				.attr("class", "pbinadsankeyPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
-			width: width - padding[1] - padding[3],
+				.attr("transform", "translate(" + (padding[3] + ongoingWidth) + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3] - ongoingWidth,
 			height: sankeyPanelHeight,
 			padding: [40, 80, 44, 86]
 		};
@@ -442,11 +456,12 @@
 			.nodePadding(nodeVerticalPadding)
 			.nodeId(function(d) {
 				return d.id;
-			})
-			.extent([
-				[sankeyPanel.padding[3], sankeyPanel.padding[0]],
-				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
-			]);
+			});
+
+		const yScale = d3.scaleLinear()
+			.range([0, sankeyPanel.height - sankeyPanel.padding[2] - sankeyPanel.padding[0]]);
+
+		const yScaleOngoing = d3.scaleLinear();
 
 		const sankeyAnnotationsScale = d3.scalePoint()
 			.padding(0)
@@ -489,6 +504,9 @@
 				return fetchFile("pbinadsubpartnersList", subPartnersListUrl, previousData, "subPartnersList")
 			})
 			.then(function(previousData) {
+				return fetchFile("pbiuac", ongoingAllocationsDataUrl, previousData, "Ongoning allocations data")
+			})
+			.then(function(previousData) {
 				csvCallback(previousData);
 			});
 
@@ -497,10 +515,17 @@
 				JSON.parse(localStorage.getItem(fileName + "data")).timestamp > (currentDate.getTime() - localStorageTime)) {
 				const fetchedData = d3.csvParse(JSON.parse(localStorage.getItem(fileName + "data")).data);
 				console.info("pbinad: " + warningString + " from local storage");
+				if (fileName === "pbiuac") {
+					fetchedData.forEach(function(d) {
+						d.PlannedStartDate = new Date(d.PlannedStartDate);
+						d.PlannedEndDate = new Date(d.PlannedEndDate);
+					});
+				};
 				previousData.push(fetchedData);
 				return Promise.resolve(previousData);
 			} else {
-				return d3.csv(url).then(function(fetchedData) {
+				const row = fileName === "pbiuac" ? pbiuacRow : null
+				return d3.csv(url, row).then(function(fetchedData) {
 					try {
 						localStorage.setItem(fileName + "data", JSON.stringify({
 							data: d3.csvFormat(fetchedData),
@@ -536,7 +561,7 @@
 			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
-				draw(rawData[0]);
+				draw(rawData[0], rawData[4]);
 			} else {
 				d3.select(window).on("scroll.pbinad", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbinad", function() {
@@ -549,26 +574,32 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbinad", null);
-					draw(rawData[0]);
+					draw(rawData[0], rawData[4]);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData) {
+		function draw(rawData, rawOngoingData) {
 
 			const data = processData(rawData);
 
+			const ongoingData = processOngoingData(rawOngoingData);
+
+			setSankeyExtent(data, ongoingData);
+
 			createTitle(rawData);
 
-			createCheckboxes(rawData);
+			createCheckboxes(rawData, rawOngoingData);
 
 			createTopPanel(data);
 
-			createButtonsPanel(rawData);
+			createButtonsPanel(rawData, rawOngoingData);
 
 			createSankey(data);
+
+			createOngoing(ongoingData);
 
 			setYearsDescriptionDiv();
 
@@ -808,7 +839,7 @@
 			//end of createTitle
 		};
 
-		function createCheckboxes(rawData) {
+		function createCheckboxes(rawData, rawOngoingData) {
 
 			selectTitleDiv.html("Select CBPF:");
 
@@ -904,9 +935,15 @@
 
 				const data = processData(rawData);
 
+				const ongoingData = processOngoingData(rawOngoingData);
+
+				setSankeyExtent(data, ongoingData);
+
 				createTopPanel(data);
 
 				createSankey(data);
+
+				createOngoing(ongoingData);
 
 				createTimeline(rawData);
 
@@ -1144,7 +1181,7 @@
 			//end of createTopPanel
 		};
 
-		function createButtonsPanel(rawData) {
+		function createButtonsPanel(rawData, rawOngoingData) {
 
 			const clipPath = buttonsPanel.main.append("clipPath")
 				.attr("id", "pbinadclip")
@@ -1485,6 +1522,10 @@
 
 				const data = processData(rawData);
 
+				const ongoingData = processOngoingData(rawOngoingData);
+
+				setSankeyExtent(data, ongoingData);
+
 				selectDiv.selectAll(".pbinadCheckboxDiv")
 					.filter(function(d) {
 						return d !== "All CBPFs";
@@ -1505,6 +1546,8 @@
 				createTopPanel(data);
 
 				createSankey(data);
+
+				createOngoing(ongoingData);
 
 				//end of clickButtonsRects
 			};
@@ -1840,7 +1883,15 @@
 				})
 				.style("opacity", 0)
 				.text(function(d) {
-					return d.name;
+					return d.name === "Syria Cross border" ? "Syria Cross" : d.name;
+				})
+				.each(function(d) {
+					if (d.name === "Syria Cross border") {
+						d3.select(this).append("tspan")
+							.attr("x", sankeyPanel.padding[3] - sankeyFundLabelsPadding)
+							.attr("dy", "1.2em")
+							.text("border");
+					};
 				});
 
 			sankeyFundLabels = sankeyFundLabelsEnter.merge(sankeyFundLabels);
@@ -4019,6 +4070,111 @@
 			//end of createSankey
 		};
 
+		function createOngoing(ongoingData) {
+
+			// ongoingPanel.main.append("rect")
+			// 	.attr("width", ongoingPanel.width)
+			// 	.attr("height", ongoingPanel.height)
+			// 	.style("opacity", 0.1);
+
+			ongoingData.forEach(function(row, index, arr) {
+				const previousObj = arr[index - 1];
+				row.yPos = previousObj ? previousObj.yPos + yScaleOngoing(previousObj.amount) + nodeVerticalPadding : 0;
+			});
+
+			const ongoingTitle = ongoingPanel.main.selectAll(".pbinadongoingTitle")
+				.data([true])
+				.enter()
+				.append("text")
+				.attr("class", "pbinadongoingTitle")
+				.attr("x", ongoingPanel.width / 2)
+				.attr("y", ongoingTitlePadding)
+				.text("Ongoing")
+				.append("tspan")
+				.attr("x", ongoingPanel.width / 2)
+				.attr("dy", "1.2em")
+				.text("Allocations");
+
+			let ongoingBars = ongoingPanel.main.selectAll(".pbinadongoingBars")
+				.data(ongoingData, function(d) {
+					return d.fund;
+				});
+
+			const ongoingBarsExit = ongoingBars.exit()
+				.transition()
+				.duration(duration)
+				.style("opacity", 0)
+				.remove();
+
+			const ongoingBarsEnter = ongoingBars.enter()
+				.append("rect")
+				.attr("class", "pbinadongoingBars")
+				.style("fill", cbpfColor)
+				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth)
+				.attr("width", nodeWidth)
+				.attr("y", function(d) {
+					return ongoingPanel.padding[0] + d.yPos;
+				})
+				.attr("height", function(d) {
+					return yScaleOngoing(d.amount)
+				});
+
+			ongoingBars = ongoingBarsEnter.merge(ongoingBars);
+
+			ongoingBars.transition()
+				.duration(duration)
+				.attr("y", function(d) {
+					return ongoingPanel.padding[0] + d.yPos;
+				})
+				.attr("height", function(d) {
+					return yScaleOngoing(d.amount)
+				});
+
+			let ongoingLabels = ongoingPanel.main.selectAll(".pbinadongoingLabels")
+				.data(ongoingData, function(d) {
+					return d.fund;
+				});
+
+			const ongoingLabelsExit = ongoingLabels.exit()
+				.transition()
+				.duration(duration)
+				.style("opacity", 0)
+				.remove();
+
+			const ongoingLabelsEnter = ongoingLabels.enter()
+				.append("text")
+				.attr("class", "pbinadongoingLabels")
+				.attr("text-anchor", "end")
+				.attr("x", ongoingPanel.width - ongoingPanel.padding[1] - nodeWidth - ongoingLabelsPadding)
+				.attr("y", function(d) {
+					return ongoingPanel.padding[0] + 3 + d.yPos + yScaleOngoing(d.amount) / 2;
+				})
+				.style("opacity", 0)
+				.text(function(d) {
+					return cbpfsList[d.fund] === "Syria Cross border" ? "Syria Cross" : cbpfsList[d.fund];
+				})
+				.each(function(d) {
+					if (cbpfsList[d.fund] === "Syria Cross border") {
+						d3.select(this).append("tspan")
+							.attr("x", ongoingPanel.width - ongoingPanel.padding[1] - nodeWidth - ongoingLabelsPadding)
+							.attr("dy", "1.2em")
+							.text("border");
+					};
+				});
+
+			ongoingLabels = ongoingLabelsEnter.merge(ongoingLabels);
+
+			ongoingLabels.call(hideLabels, textCollisionHeight)
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.attr("y", function(d) {
+					return ongoingPanel.padding[0] + 3 + d.yPos + yScaleOngoing(d.amount) / 2;
+				});
+
+			//end of createOngoing
+		};
+
 		function createTimeline(rawData) {
 
 			const timelineData = processTimelineData(rawData);
@@ -4438,6 +4594,33 @@
 			//end of processData
 		};
 
+		function processOngoingData(rawOngoingData) {
+
+			const data = [];
+
+			rawOngoingData.forEach(function(row) {
+
+				if (chartState.selectedYear.indexOf(+row.AllocationYear) > -1 && chartState.selectedCbpfs.indexOf(row.PooledFundId) > -1) {
+					const foundFund = data.find(function(e) { return e.fund === row.PooledFundId });
+					if (foundFund) {
+						foundFund.amount += +row.TotalUSDPlanned;
+					} else {
+						data.push({
+							fund: row.PooledFundId,
+							amount: +row.TotalUSDPlanned
+						});
+					};
+				};
+
+			});
+
+			data.sort(function(a, b) {
+				return b.amount - a.amount;
+			})
+
+			return data;
+		};
+
 		function processTimelineData(rawData) {
 
 			const data = [];
@@ -4681,7 +4864,8 @@
 				acc += (curr.y1 - curr.y0) + nodeVerticalPadding;
 				return acc;
 			}, 0);
-			const availableSpace = sankeyPanel.height - sankeyPanel.padding[2] - sankeyPanel.padding[0];
+			const extent = sankeyGenerator.extent();
+			const availableSpace = extent[1][1] - extent[0][1];
 			const spacer = (availableSpace - usedSpace) / (isType ? partnerOrder.length + 1 : nodes.length + 1);
 			if (isType) {
 				partnerOrder.reverse().forEach(function(partner, i) {
@@ -4699,6 +4883,37 @@
 					node.y1 += (spacer * (i + 1));
 				});
 			};
+		};
+
+		function setSankeyExtent(data, ongoingData) {
+
+			const dataBudget = d3.sum(data.nodes.filter(function(d) {
+				return d.level === 1;
+			}), function(d) {
+				return d.amount;
+			});
+
+			const ongoingDataBudget = d3.sum(ongoingData.map(function(d) {
+				return d.amount
+			}));
+
+			yScale.domain([0, Math.max(dataBudget, ongoingDataBudget)]);
+
+			const extentArray = dataBudget > ongoingDataBudget ?
+				[
+					[sankeyPanel.padding[3], sankeyPanel.padding[0]],
+					[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
+				] :
+				[
+					[sankeyPanel.padding[3], sankeyPanel.padding[0] + (yScale(ongoingDataBudget - dataBudget) / 2)],
+					[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2] - (yScale(ongoingDataBudget - dataBudget) / 2)]
+				];
+
+			sankeyGenerator.extent(extentArray);
+
+			yScaleOngoing.range([0, yScale.range()[1] - yScale.range()[0] - (ongoingData.length - 1) * nodeVerticalPadding])
+				.domain([0, ongoingDataBudget]);
+
 		};
 
 		function createAnnotationsDiv() {
@@ -5006,6 +5221,24 @@
 				}
 			});
 			return returnValue;
+		};
+
+		function pbiuacRow(d) {
+			d.TotalUSDPlanned = +d.TotalUSDPlanned;
+			d.PlannedStartDate = timeParse(d.PlannedStartDate);
+			d.PlannedEndDate = timeParse(d.PlannedEndDate);
+			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
+			if (!d.PlannedStartDate) {
+				d.PlannedStartDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)
+			};
+			if (!d.PlannedEndDate) {
+				d.PlannedEndDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedStartDate, 1) : d3.timeDay.offset(d.PlannedStartDate, 15)
+			};
+			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
+			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
+			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d;
 		};
 
 		function createSnapshot(type, fromContextMenu) {
