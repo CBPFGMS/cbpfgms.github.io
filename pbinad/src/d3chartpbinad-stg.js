@@ -173,7 +173,7 @@
 			topPanelHeight = 60,
 			sankeyPanelHeight = 620,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
-			ongoingWidth = 116,
+			ongoingWidth = 96,
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 10,
@@ -4099,11 +4099,11 @@
 				.enter()
 				.append("text")
 				.attr("class", "pbinadongoingTitle")
-				.attr("x", ongoingPanel.width / 2)
+				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth / 2)
 				.attr("y", ongoingTitlePadding)
 				.text("Ongoing")
 				.append("tspan")
-				.attr("x", ongoingPanel.width / 2)
+				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth / 2)
 				.attr("dy", "1.2em")
 				.text("Allocations");
 
