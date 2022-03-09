@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
 		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -3142,10 +3142,14 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
+
+				const thisOffsetLeft = Math.max(0, thisBox.left - containerBox.left + (thisBox.width / 2) - (tooltipBox.width / 2))
 
 				tooltip.style("top", thisOffsetTop + "px")
-					.style("left", "0px");
+					.style("left", thisOffsetLeft + "px");
 
 			};
 
@@ -3348,7 +3352,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = (thisBox.right - thisBox.width / 2) - (tooltipBox.width / 2) - containerBox.left;
 
@@ -3416,7 +3422,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 
@@ -3626,7 +3634,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 
@@ -3906,7 +3916,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 

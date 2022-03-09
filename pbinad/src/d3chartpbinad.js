@@ -3091,10 +3091,14 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
+
+				const thisOffsetLeft = Math.max(0, thisBox.left - containerBox.left + (thisBox.width / 2) - (tooltipBox.width / 2))
 
 				tooltip.style("top", thisOffsetTop + "px")
-					.style("left", "0px");
+					.style("left", thisOffsetLeft + "px");
 
 			};
 
@@ -3297,7 +3301,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = (thisBox.right - thisBox.width / 2) - (tooltipBox.width / 2) - containerBox.left;
 
@@ -3365,7 +3371,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 
@@ -3575,7 +3583,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 
@@ -3855,7 +3865,9 @@
 
 				const tooltipBox = tooltip.node().getBoundingClientRect();
 
-				const thisOffsetTop = thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding;
+				const thisOffsetTop = thisBox.top - tooltipVerticalPadding > tooltipBox.height ?
+					thisBox.top - containerBox.top - tooltipBox.height - tooltipVerticalPadding :
+					thisBox.top - containerBox.top + thisBox.height + tooltipVerticalPadding;
 
 				const thisOffsetLeft = containerBox.width - tooltipBox.width;
 
