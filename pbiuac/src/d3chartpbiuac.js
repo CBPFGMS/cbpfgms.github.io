@@ -166,7 +166,11 @@
 			barHeightBrush = 1.5,
 			legendRectWidth = 24,
 			legendRectHeight = 6,
-			legendScalePadding = 390,
+			legendScalePadding = 420,
+			buttonsPanelHeight = 30,
+			buttonsNumber = 8,
+			yearsArray = [],
+			allYearsOption = "All",
 			windowHeight = window.innerHeight,
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
@@ -189,8 +193,8 @@
 			unBlue = "#1F69B3",
 			highlightColor = "#F79A3B",
 			todayPadding = 10,
-			offsetStartDefault = 182,
-			offsetEndDefault = 182,
+			offsetStartDefault = 1,
+			offsetEndDefault = 1,
 			formatMoney0Decimals = d3.format(",.0f"),
 			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(1.2), d3.color(rectangleColors[0]).darker(1.2)),
 			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(1.2), d3.color(rectangleColors[1]).darker(1.2)),
@@ -202,7 +206,10 @@
 				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
 			],
 			cbpfsAllocationsTime = {},
-			cbpfsRowList = {};
+			cbpfsRowList = {},
+			chartState = {
+				selectedYear: []
+			};
 
 		let height = 500,
 			mainPanelHeight = 320,
@@ -211,10 +218,12 @@
 			cbpfsList,
 			minDateOffset,
 			maxDateOffset,
-			minAllocationValueStandard = Number.POSITIVE_INFINITY,
-			maxAllocationValueStandard = Number.NEGATIVE_INFINITY,
-			minAllocationValueReserve = Number.POSITIVE_INFINITY,
-			maxAllocationValueReserve = Number.NEGATIVE_INFINITY,
+			offsetStartDate,
+			offsetEndDate,
+			minValueStandard,
+			maxValueStandard,
+			minValueReserve,
+			maxValueReserve,
 			completeData,
 			containerSize,
 			thisSize,
@@ -234,19 +243,7 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
-
-		const offsetStartValue = queryStringValues.has("offsetstart") ? +(queryStringValues.get("offsetstart")) : +(containerDiv.node().getAttribute("data-offsetstart")) * 30;
-
-		const offsetEndValue = queryStringValues.has("offsetend") ? +(queryStringValues.get("offsetend")) : +(containerDiv.node().getAttribute("data-offsetend")) * 30;
-
-		const offsetStart = offsetStartValue === offsetStartValue ? offsetStartValue : offsetStartDefault;
-
-		const offsetEnd = offsetEndValue === offsetEndValue ? offsetEndValue : offsetEndDefault;
-
-		const offsetStartDate = d3.timeDay.offset(currentDate, -offsetStart);
-
-		const offsetEndDate = d3.timeDay.offset(currentDate, offsetEnd);
+		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
 
@@ -273,6 +270,9 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		};
+
+		const yearsDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbiuacYearsDescriptionDiv");
 
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbiuacListContainerDiv");
@@ -341,15 +341,29 @@
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
 			moneyBagPadding: 32,
-			leftPadding: [182, 394, 552, 740],
+			leftPadding: [182, 424, 562, 740],
 			mainValueVerPadding: 10,
 			mainValueHorPadding: 2
+		};
+
+		const buttonsPanel = {
+			main: svg.append("g")
+				.attr("class", "pbiuacbuttonsPanel")
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3],
+			height: buttonsPanelHeight,
+			padding: [0, 0, 0, 102],
+			buttonWidth: 52,
+			buttonAggregationWidth: 158,
+			buttonsMargin: 4,
+			buttonVerticalPadding: 4,
+			arrowPadding: 18
 		};
 
 		const brushPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiuacBrushPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
 			padding: [14, 0, 10, 102]
@@ -358,7 +372,7 @@
 		const mainPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiuacMainPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + (2 * panelHorizontalPadding)) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + (3 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
 			padding: [14, 0, 0, 102]
@@ -367,7 +381,7 @@
 		const legendPanel = {
 			main: svg.append("g")
 				.attr("class", "pbiuacLegendPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + mainPanel.height + (3 * panelHorizontalPadding)) + ")"),
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + mainPanel.height + (4 * panelHorizontalPadding)) + ")"),
 			width: width - padding[1] - padding[3],
 			height: legendPanelHeight,
 			padding: [0, 0, 0, 102]
@@ -448,7 +462,7 @@
 			console.info("pbiuac: data from local storage");
 			csvCallback(rawData);
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv", row).then(function(rawData) {
+			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
 				try {
 					localStorage.setItem("pbiuacdata", JSON.stringify({
 						data: d3.csvFormat(rawData),
@@ -464,11 +478,15 @@
 
 		function csvCallback(rawData) {
 
+			preProcessData(rawData);
+
 			removeProgressWheel();
 
 			const data = processData(rawData);
 
 			calculateHeightandResize();
+
+			validateYear(selectedYearString);
 
 			yScaleMain.domain(cbpfsList)
 				.range(setOrdinalRange(mainPanel, barHeight, outerBarPadding, innerBarPadding));
@@ -476,36 +494,17 @@
 			yScaleBrush.domain(cbpfsList)
 				.range(setOrdinalRange(brushPanel, barHeightBrush, outerBarPaddingBrush, innerBarPaddingBrush));
 
-			if (maxDateOffset < offsetEndDate) maxDateOffset = offsetEndDate;
-
 			xScaleMain.domain([minDateOffset, maxDateOffset]);
 
 			xScaleBrush.domain([minDateOffset, maxDateOffset]);
-
-			const standardDataArray = data.filter(function(d) {
-				return d.AllocationSource === "Standard";
-			}).map(function(d) {
-				return d.TotalUSDPlanned;
-			}).sort(function(a, b) {
-				return a - b;
-			});
-
-			const reserveDataArray = data.filter(function(d) {
-				return d.AllocationSource === "Reserve";
-			}).map(function(d) {
-				return d.TotalUSDPlanned;
-			}).sort(function(a, b) {
-				return a - b;
-			});
-
-			colorScaleStandard.domain(standardDataArray);
-
-			colorScaleReserve.domain(reserveDataArray);
 
 			if (!lazyLoad) {
 				draw(data);
 			} else {
 				d3.select(window).on("scroll.pbiuac", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbiuac", function() {
+					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
+				});
 				checkPosition();
 			};
 
@@ -524,15 +523,25 @@
 
 			completeData = data;
 
+			calculateDomain(data);
+
+			createLegendPanel();
+
+			setColorScale(data);
+
 			createTitle(data);
 
 			createTopPanel(data);
+
+			createButtonsPanel(data);
 
 			createMainPanel(data);
 
 			createBrushPanel(data);
 
-			createLegendPanel();
+			filterAllocations();
+
+			setYearsDescriptionDiv();
 
 			if (!isPfbiSite) createFooterDiv();
 
@@ -543,7 +552,7 @@
 
 			const title = titleDiv.append("p")
 				.attr("id", "pbiuacd3chartTitle")
-				.html(chartTitle + " (since " + (chartYearTitle ? chartYearTitle : minDate.getFullYear()) + ")");
+				.html(chartTitle);
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "pbiuacHelpButton");
@@ -585,6 +594,52 @@
 				.on("click", function() {
 					createSnapshot("png", false);
 				});
+
+			const playIcon = iconsDiv.append("button")
+				.datum({
+					clicked: false
+				})
+				.attr("id", "pbiuacPlayButton");
+
+			playIcon.html("PLAY  ")
+				.append("span")
+				.attr("class", "fas fa-play");
+
+			playIcon.on("click", function(d) {
+				d.clicked = !d.clicked;
+
+				playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+					.append("span")
+					.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+
+				if (d.clicked) {
+					chartState.selectedYear.length = 1;
+					loopButtons();
+					timer = d3.interval(loopButtons, 3 * duration);
+				} else {
+					timer.stop();
+				};
+
+				function loopButtons() {
+					const index = yearsArray.indexOf(chartState.selectedYear[0]);
+
+					chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+
+					const yearButton = d3.selectAll(".pbiuacbuttonsRects")
+						.filter(function(d) {
+							return d === chartState.selectedYear[0]
+						});
+
+					yearButton.dispatch("click");
+
+					const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
+						0 :
+						chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] || chartState.selectedYear[0] === allYearsOption ?
+						yearsArray.length - buttonsNumber :
+						yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+				};
+
+			});
 
 			if (!isBookmarkPage) {
 
@@ -697,7 +752,8 @@
 		function createTopPanel(completeData) {
 
 			const data = completeData.filter(function(d) {
-				return d.PlannedStartDateTimestamp < xScaleMain.domain()[1].getTime() && d.PlannedEndDateTimestamp > xScaleMain.domain()[0].getTime();
+				return d.PlannedStartDateTimestamp < xScaleMain.domain()[1].getTime() && d.PlannedEndDateTimestamp > xScaleMain.domain()[0].getTime() &&
+					(chartState.selectedYear[0] === allYearsOption ? true : chartState.selectedYear.indexOf(+d.AllocationYear) > -1);
 			});
 
 			const mainValue = d3.sum(data, function(d) {
@@ -763,7 +819,7 @@
 					const i = d3.interpolate(previousValue, d);
 					return function(t) {
 						const siString = formatSIFloat(i(t))
-						node.textContent = "$" + siString.substring(0, siString.length - 1);
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 					};
 				});
 
@@ -785,7 +841,7 @@
 				.text(function(d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in";
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in launched";
 				});
 
 			let topPanelSubText = mainValueGroup.selectAll(".pbiuactopPanelSubText")
@@ -803,7 +859,7 @@
 			topPanelSubText.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text("Allocations");
+				.text("Allocations in " + (chartState.selectedYear.length === 1 ? (chartState.selectedYear[0] === allYearsOption ? "all years" : chartState.selectedYear[0]) : "years\u002A"));
 
 			let topPanelUpcomingNumber = mainValueGroup.selectAll(".pbiuactopPanelUpcomingNumber")
 				.data([upcomingValue]);
@@ -941,6 +997,323 @@
 				.text(pastValue > 1 ? "Allocations" : "Allocation");
 
 			//end of createTopPanel
+		};
+
+		function createButtonsPanel(data) {
+
+			const clipPath = buttonsPanel.main.append("clipPath")
+				.attr("id", "pbiuacclipButtons")
+				.append("rect")
+				.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
+				.attr("height", buttonsPanel.height);
+
+			const extraPadding = yearsArray.length > buttonsNumber ? buttonsPanel.arrowPadding : -2;
+
+			const clipPathGroup = buttonsPanel.main.append("g")
+				.attr("class", "pbiuacClipPathGroup")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + extraPadding) + ",0)")
+				.attr("clip-path", "url(#pbiuacclipButtons)");
+
+			const buttonsGroup = clipPathGroup.append("g")
+				.attr("class", "pbiuacbuttonsGroup")
+				.attr("transform", "translate(0,0)")
+				.style("cursor", "pointer");
+
+			const buttonsRects = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("rect")
+				.attr("rx", "2px")
+				.attr("ry", "2px")
+				.attr("class", "pbiuacbuttonsRects")
+				.attr("width", buttonsPanel.buttonWidth - buttonsPanel.buttonsMargin)
+				.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
+				.attr("y", buttonsPanel.buttonVerticalPadding)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonsMargin / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
+				});
+
+			const buttonsText = buttonsGroup.selectAll(null)
+				.data(yearsArray)
+				.enter()
+				.append("text")
+				.attr("text-anchor", "middle")
+				.attr("class", "pbiuacbuttonsText")
+				.attr("y", buttonsPanel.height / 1.6)
+				.attr("x", function(_, i) {
+					return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
+				})
+				.style("fill", function(d) {
+					return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
+				})
+				.text(function(d) {
+					return d;
+				});
+
+			const leftArrow = buttonsPanel.main.append("g")
+				.attr("class", "pbiuacLeftArrowGroup")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.style("cursor", "pointer")
+				.attr("transform", "translate(" + buttonsPanel.padding[3] + ",0)");
+
+			const leftArrowRect = leftArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", buttonsPanel.height);
+
+			const leftArrowText = leftArrow.append("text")
+				.attr("class", "pbiuacleftArrowText")
+				.attr("x", 0)
+				.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+				.style("fill", "#666")
+				.text("\u25c4");
+
+			const rightArrow = buttonsPanel.main.append("g")
+				.attr("class", "pbiuacRightArrowGroup")
+				.style("opacity", 0)
+				.attr("pointer-events", "none")
+				.style("cursor", "pointer")
+				.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding +
+					(buttonsNumber * buttonsPanel.buttonWidth)) + ",0)");
+
+			const rightArrowRect = rightArrow.append("rect")
+				.style("fill", "white")
+				.attr("width", buttonsPanel.arrowPadding)
+				.attr("height", buttonsPanel.height);
+
+			const rightArrowText = rightArrow.append("text")
+				.attr("class", "pbiuacrightArrowText")
+				.attr("x", -1)
+				.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+				.style("fill", "#666")
+				.text("\u25ba");
+
+			buttonsRects.on("mouseover", mouseOverButtonsRects)
+				.on("mouseout", mouseOutButtonsRects)
+				.on("click", function(d) {
+					const self = this;
+					if (d3.event.altKey) {
+						clickButtonsRects(d, false);
+						return;
+					};
+					if (localVariable.get(this) !== "clicked") {
+						localVariable.set(this, "clicked");
+						setTimeout(function() {
+							if (localVariable.get(self) === "clicked") {
+								clickButtonsRects(d, true);
+							};
+							localVariable.set(self, null);
+						}, 250);
+					} else {
+						clickButtonsRects(d, false);
+						localVariable.set(this, null);
+					};
+				});
+
+			d3.select("body").on("d3ChartsYear.pbiuac", function() {
+				clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
+				if (yearsArray.length > buttonsNumber) {
+					repositionButtonsGroup();
+					checkArrows();
+				};
+			});
+
+			if (yearsArray.length > buttonsNumber) {
+
+				rightArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				leftArrow.style("opacity", 1)
+					.attr("pointer-events", "all");
+
+				repositionButtonsGroup();
+
+				checkCurrentTranslate();
+
+				leftArrow.on("click", function() {
+					leftArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
+						.on("end", checkArrows);
+				});
+
+				rightArrow.on("click", function() {
+					rightArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+					buttonsGroup.transition()
+						.duration(duration)
+						.attr("transform", "translate(" +
+							Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
+								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
+							",0)")
+						.on("end", checkArrows);
+				});
+
+			};
+
+			function checkArrows() {
+
+				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+				if (currentTranslate === 0) {
+					leftArrow.select("text").style("fill", "#ccc");
+					leftArrow.attr("pointer-events", "none");
+				} else {
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+				};
+
+				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					rightArrow.select("text").style("fill", "#ccc");
+					rightArrow.attr("pointer-events", "none");
+				} else {
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+				}
+
+			};
+
+			function checkCurrentTranslate() {
+
+				const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+
+				if (currentTranslate === 0) {
+					leftArrow.select("text").style("fill", "#ccc")
+					leftArrow.attr("pointer-events", "none");
+				};
+
+				if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					rightArrow.select("text").style("fill", "#ccc")
+					rightArrow.attr("pointer-events", "none");
+				};
+
+			};
+
+			function repositionButtonsGroup() {
+
+				const firstYearIndex = yearsArray.indexOf(chartState.selectedYear[0]) < buttonsNumber / 2 ?
+					0 :
+					yearsArray.indexOf(chartState.selectedYear[0]) > yearsArray.length - (buttonsNumber / 2) ?
+					Math.max(yearsArray.length - buttonsNumber, 0) :
+					yearsArray.indexOf(yearsArray.indexOf(chartState.selectedYear[0])) - (buttonsNumber / 2);
+
+				buttonsGroup.attr("transform", "translate(" +
+					(-(buttonsPanel.buttonWidth * firstYearIndex)) +
+					",0)");
+
+			};
+
+			function mouseOverButtonsRects(d) {
+
+				tooltip.style("display", "block")
+					.html(null)
+
+				const innerTooltip = tooltip.append("div")
+					.style("max-width", "200px")
+					.attr("id", "pbiuacInnerTooltipDiv");
+
+				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+
+				const containerSize = containerDiv.node().getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + padding[0] ?
+						padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
+						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+
+				d3.select(this).style("fill", unBlue);
+				buttonsText.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "white");
+			};
+
+			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
+				if (chartState.selectedYear.indexOf(d) > -1) return;
+				d3.select(this).style("fill", "#eaeaea");
+				buttonsText.filter(function(e) {
+						return e === d
+					})
+					.style("fill", "#444");
+			};
+
+			function clickButtonsRects(d, singleSelection) {
+
+				tooltip.style("display", "none");
+
+				if (singleSelection || d === allYearsOption || chartState.selectedYear[0] === allYearsOption) {
+					chartState.selectedYear = [d];
+				} else {
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					};
+				};
+
+				const allYears = chartState.selectedYear[0] === allYearsOption ?
+					allYearsOption :
+					chartState.selectedYear.map(function(d) {
+						return d;
+					}).join("|");
+
+				if (queryStringValues.has("year")) {
+					queryStringValues.set("year", allYears);
+				} else {
+					queryStringValues.append("year", allYears);
+				};
+
+				d3.selectAll(".pbiuacbuttonsRects")
+					.style("fill", function(e) {
+						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
+					});
+
+				d3.selectAll(".pbiuacbuttonsText")
+					.style("fill", function(e) {
+						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
+					});
+
+				setYearsDescriptionDiv();
+
+				calculateDomain(data);
+
+				createTopPanel(data);
+
+				setColorScale(data);
+
+				filterAllocations();
+
+				xScaleMain.domain([offsetStartDate, offsetEndDate]);
+
+				brushPanel.main.select(".pbiuacBrushGroup")
+					.call(brush.move, [xScaleBrush(offsetStartDate), xScaleBrush(offsetEndDate)]);
+
+				//end of clickButtonsRects
+			};
+
+			//end of createButtonsPanel
 		};
 
 		function createMainPanel(data) {
@@ -1159,6 +1532,7 @@
 				.data(data)
 				.enter()
 				.append("rect")
+				.attr("class", "pbiuacAllocationsBrush")
 				.attr("rx", 1)
 				.attr("ry", 1)
 				.attr("x", function(d) {
@@ -1220,6 +1594,34 @@
 				.style("stroke-linecap", "round");
 
 			//end of createBrushPanel
+		};
+
+		function filterAllocations(data) {
+
+			mainPanel.main.selectAll(".pbiuacAllocationsMain")
+				.style("fill", function(d) {
+					if (d.allocationType === "standard") {
+						return colorScaleStandard(d.TotalUSDPlanned);
+					} else {
+						return colorScaleReserve(d.TotalUSDPlanned);
+					};
+				})
+				.style("display", function(d) {
+					return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 || chartState.selectedYear[0] === allYearsOption ? null : "none";
+				});
+
+			brushPanel.main.selectAll(".pbiuacAllocationsBrush")
+				.style("fill", function(d) {
+					if (d.allocationType === "standard") {
+						return colorScaleStandard(d.TotalUSDPlanned);
+					} else {
+						return colorScaleReserve(d.TotalUSDPlanned);
+					};
+				})
+				.style("display", function(d) {
+					return chartState.selectedYear.indexOf(+d.AllocationYear) > -1 || chartState.selectedYear[0] === allYearsOption ? null : "none";
+				});
+
 		};
 
 		function createLegendPanel() {
@@ -1298,33 +1700,29 @@
 				})
 				.on("mouseout", mouseOutLegend);
 
-			const minValueStandard = legendPanel.main.append("text")
+			minValueStandard = legendPanel.main.append("text")
 				.attr("class", "pbiuacLegendMainText2")
 				.attr("y", legendVerticalScale("standard") + 3)
 				.attr("x", legendScalePadding - 4)
-				.attr("text-anchor", "end")
-				.text("Minimum Amount: $" + formatMoney0Decimals(minAllocationValueStandard));
+				.attr("text-anchor", "end");
 
-			const maxValueStandard = legendPanel.main.append("text")
+			maxValueStandard = legendPanel.main.append("text")
 				.attr("class", "pbiuacLegendMainText2")
 				.attr("y", legendVerticalScale("standard") + 3)
 				.attr("x", legendScalePadding + colorsStandard.length * legendRectWidth + 4)
-				.attr("text-anchor", "start")
-				.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueStandard));
+				.attr("text-anchor", "start");
 
-			const minValueReserve = legendPanel.main.append("text")
+			minValueReserve = legendPanel.main.append("text")
 				.attr("class", "pbiuacLegendMainText2")
 				.attr("y", legendVerticalScale("reserve") + 3)
 				.attr("x", legendScalePadding - 4)
-				.attr("text-anchor", "end")
-				.text("Minimum Amount: $" + formatMoney0Decimals(minAllocationValueReserve));
+				.attr("text-anchor", "end");
 
-			const maxValueReserve = legendPanel.main.append("text")
+			maxValueReserve = legendPanel.main.append("text")
 				.attr("class", "pbiuacLegendMainText2")
 				.attr("y", legendVerticalScale("reserve") + 3)
 				.attr("x", legendScalePadding + colorsReserve.length * legendRectWidth + 4)
-				.attr("text-anchor", "start")
-				.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueReserve));
+				.attr("text-anchor", "start");
 
 			legendGroups.on("mouseover", function(d) {
 				mainPanel.main.selectAll(".pbiuacAllocationsMain")
@@ -1447,6 +1845,77 @@
 			brushPanel.main.select(".pbiuacBrushGroup").call(brush.move, xScaleMain.range().map(t.invertX, t));
 		};
 
+		function preProcessData(rawData) {
+
+			rawData.forEach(function(row) {
+				if (yearsArray.indexOf(+row.AllocationYear) === -1) yearsArray.push(+row.AllocationYear);
+			});
+
+			yearsArray.sort(function(a, b) {
+				return a - b;
+			});
+
+			yearsArray.push(allYearsOption);
+
+		};
+
+		function calculateDomain(data) {
+			if (chartState.selectedYear[0] === allYearsOption) {
+				offsetStartDate = minDateOffset;
+				offsetEndDate = maxDateOffset;
+			} else {
+				let thisMinDate = maxDateOffset;
+				let thisMaxDate = minDateOffset;
+				data.forEach(function(row) {
+					if (chartState.selectedYear.indexOf(+row.AllocationYear) > -1) {
+						if (thisMinDate.getTime() > row.PlannedStartDateTimestamp) thisMinDate = row.PlannedStartDate;
+						if (thisMaxDate.getTime() < row.PlannedEndDateTimestamp) thisMaxDate = row.PlannedEndDate;
+					};
+				});
+				offsetStartDate = d3.timeMonth.offset(thisMinDate, -(offsetStartDefault));
+				offsetEndDate = d3.timeMonth.offset(thisMaxDate, offsetEndDefault);
+			};
+		};
+
+		function setColorScale(data) {
+
+			let minAllocationValueStandard = Number.POSITIVE_INFINITY,
+				maxAllocationValueStandard = Number.NEGATIVE_INFINITY,
+				minAllocationValueReserve = Number.POSITIVE_INFINITY,
+				maxAllocationValueReserve = Number.NEGATIVE_INFINITY;
+
+			const colorArray = data.reduce(function(acc, curr) {
+				if (chartState.selectedYear[0] === allYearsOption || chartState.selectedYear.indexOf(+curr.AllocationYear) > -1) {
+					acc[curr.AllocationSource.toLowerCase()].push(+curr.TotalUSDPlanned);
+					if (curr.allocationType === "standard") {
+						if (+curr.TotalUSDPlanned < minAllocationValueStandard) minAllocationValueStandard = +curr.TotalUSDPlanned;
+						if (+curr.TotalUSDPlanned > maxAllocationValueStandard) maxAllocationValueStandard = +curr.TotalUSDPlanned;
+					} else {
+						if (+curr.TotalUSDPlanned < minAllocationValueReserve) minAllocationValueReserve = +curr.TotalUSDPlanned;
+						if (+curr.TotalUSDPlanned > maxAllocationValueReserve) maxAllocationValueReserve = +curr.TotalUSDPlanned;
+					};
+				};
+				return acc;
+			}, { standard: [], reserve: [] });
+
+			colorArray.standard.sort(function(a, b) {
+				return a - b;
+			});
+
+			colorArray.reserve.sort(function(a, b) {
+				return a - b;
+			});
+
+			colorScaleStandard.domain(colorArray.standard);
+			colorScaleReserve.domain(colorArray.reserve);
+
+			minValueStandard.text("Minimum Amount: $" + formatMoney0Decimals(minAllocationValueStandard));
+			maxValueStandard.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueStandard));
+			minValueReserve.text("Minimum Amount: $" + formatMoney0Decimals(minAllocationValueReserve));
+			maxValueReserve.text("Maximum Amount: $" + formatMoney0Decimals(maxAllocationValueReserve));
+
+		};
+
 		function processData(rawData) {
 
 			rawData.forEach(function(row) {
@@ -1466,14 +1935,6 @@
 
 				if (minDate.getTime() > row.PlannedStartDateTimestamp) minDate = row.PlannedStartDate;
 				if (maxDate.getTime() < row.PlannedEndDateTimestamp) maxDate = row.PlannedEndDate;
-
-				if (row.allocationType === "standard") {
-					if (row.TotalUSDPlanned < minAllocationValueStandard) minAllocationValueStandard = row.TotalUSDPlanned;
-					if (row.TotalUSDPlanned > maxAllocationValueStandard) maxAllocationValueStandard = row.TotalUSDPlanned;
-				} else {
-					if (row.TotalUSDPlanned < minAllocationValueReserve) minAllocationValueReserve = row.TotalUSDPlanned;
-					if (row.TotalUSDPlanned > maxAllocationValueReserve) maxAllocationValueReserve = row.TotalUSDPlanned;
-				};
 
 			});
 
@@ -1507,8 +1968,8 @@
 				calculateCollisions(thisCbpf, d)
 			})
 
-			minDateOffset = d3.timeMonth.offset(minDate, -2);
-			maxDateOffset = d3.timeMonth.offset(maxDate, 2);
+			minDateOffset = d3.timeMonth.offset(minDate, -(offsetStartDefault));
+			maxDateOffset = d3.timeMonth.offset(maxDate, offsetEndDefault);
 
 			return rawData
 
@@ -1570,7 +2031,7 @@
 
 			brushPanel.height = brushPanelHeight;
 
-			height = padding[0] + padding[2] + topPanel.height + brushPanel.height + mainPanel.height + legendPanel.height + (3 * panelHorizontalPadding);
+			height = padding[0] + padding[2] + topPanel.height + buttonsPanel.height + brushPanel.height + mainPanel.height + legendPanel.height + (4 * panelHorizontalPadding);
 
 			if (selectedResponsiveness === false) {
 				containerDiv.style("height", height + "px");
@@ -1583,10 +2044,10 @@
 			};
 
 			mainPanel.main
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + (2 * panelHorizontalPadding)) + ")");
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + (3 * panelHorizontalPadding)) + ")");
 
 			legendPanel.main
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + brushPanel.height + mainPanel.height + (3 * panelHorizontalPadding)) + ")");
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + mainPanel.height + (4 * panelHorizontalPadding)) + ")");
 
 			xAxisMain.tickSizeInner(-(mainPanel.height - mainPanel.padding[0] - mainPanel.padding[2]));
 
@@ -2330,6 +2791,44 @@
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			const result = d3.formatPrefix("." + digits + "~", value)(value);
 			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
+		};
+
+		function validateYear(yearString) {
+			if (yearString.toLowerCase() === allYearsOption || yearString === allYearsOption) {
+				chartState.selectedYear.push(allYearsOption);
+				return;
+			};
+			const allYears = yearString.split(",").map(function(d) {
+				return +(d.trim());
+			}).sort(function(a, b) {
+				return a - b;
+			});
+			allYears.forEach(function(d) {
+				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+		};
+
+		function validateCustomEventYear(yearNumber) {
+			if (yearsArray.indexOf(yearNumber) > -1) {
+				return yearNumber;
+			};
+			while (yearsArray.indexOf(yearNumber) === -1) {
+				yearNumber = yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			};
+			return yearNumber;
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function reverseFormat(s) {
