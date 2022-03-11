@@ -838,7 +838,7 @@
 				.text(function(d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in Allocations";
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in launched";
 				});
 
 			let topPanelSubText = mainValueGroup.selectAll(".pbiuactopPanelSubText")
@@ -856,7 +856,7 @@
 			topPanelSubText.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text("launched in " + (chartState.selectedYear.length === 1 ? (chartState.selectedYear[0] === allYearsOption ? "all years" : chartState.selectedYear[0]) : "years\u002A"));
+				.text("Allocations in " + (chartState.selectedYear.length === 1 ? (chartState.selectedYear[0] === allYearsOption ? "all years" : chartState.selectedYear[0]) : "years\u002A"));
 
 			let topPanelUpcomingNumber = mainValueGroup.selectAll(".pbiuactopPanelUpcomingNumber")
 				.data([upcomingValue]);
