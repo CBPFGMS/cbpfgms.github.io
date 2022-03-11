@@ -349,3 +349,9 @@ p#pbiuacd3chartTitle {
 	margin-left: 6px;
 	cursor: pointer;
 }
+
+.pbiuacbuttonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
