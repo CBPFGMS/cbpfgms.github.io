@@ -502,6 +502,9 @@
 				draw(data);
 			} else {
 				d3.select(window).on("scroll.pbiuac", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbinad", function() {
+					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
+				});
 				checkPosition();
 			};
 
@@ -2804,6 +2807,16 @@
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+		};
+
+		function validateCustomEventYear(yearNumber) {
+			if (yearsArray.indexOf(yearNumber) > -1) {
+				return yearNumber;
+			};
+			while (yearsArray.indexOf(yearNumber) === -1) {
+				yearNumber = yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			};
+			return yearNumber;
 		};
 
 		function setYearsDescriptionDiv() {

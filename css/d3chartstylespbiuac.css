@@ -349,3 +349,17 @@ p#pbiuacd3chartTitle {
 	margin-left: 6px;
 	cursor: pointer;
 }
+
+.pbiuacbuttonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 12px;
+	pointer-events: none;
+}
+
+.pbiuacYearsDescriptionDiv {
+	margin-left: 12px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
