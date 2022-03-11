@@ -193,8 +193,8 @@
 			unBlue = "#1F69B3",
 			highlightColor = "#F79A3B",
 			todayPadding = 10,
-			offsetStartDefault = 2,
-			offsetEndDefault = 2,
+			offsetStartDefault = 1,
+			offsetEndDefault = 1,
 			formatMoney0Decimals = d3.format(",.0f"),
 			colorInterpolatorStandard = d3.interpolateRgb(d3.color(rectangleColors[0]).brighter(1.2), d3.color(rectangleColors[0]).darker(1.2)),
 			colorInterpolatorReserve = d3.interpolateRgb(d3.color(rectangleColors[1]).brighter(1.2), d3.color(rectangleColors[1]).darker(1.2)),
@@ -243,8 +243,6 @@
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
-		const chartYearTitle = queryStringValues.has("yeartitle") ? queryStringValues.get("yeartitle") : containerDiv.node().getAttribute("data-yeartitle");
-
 		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
 
 		const selectedResponsiveness = (containerDiv.node().getAttribute("data-responsive") === "true");
@@ -272,6 +270,9 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		};
+
+		const yearsDescriptionDiv = containerDiv.append("div")
+			.attr("class", "pbiuacYearsDescriptionDiv");
 
 		const listDiv = containerDiv.append("div")
 			.attr("class", "pbiuacListContainerDiv");
@@ -537,6 +538,8 @@
 
 			filterAllocations();
 
+			setYearsDescriptionDiv();
+
 			if (!isPfbiSite) createFooterDiv();
 
 			//end of draw
@@ -546,7 +549,7 @@
 
 			const title = titleDiv.append("p")
 				.attr("id", "pbiuacd3chartTitle")
-				.html(chartTitle + " (since " + (chartYearTitle ? chartYearTitle : minDate.getFullYear()) + ")");
+				.html(chartTitle);
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "pbiuacHelpButton");
@@ -835,7 +838,7 @@
 				.text(function(d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in";
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") + " in Allocations";
 				});
 
 			let topPanelSubText = mainValueGroup.selectAll(".pbiuactopPanelSubText")
@@ -853,7 +856,7 @@
 			topPanelSubText.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text("Allocations");
+				.text("launched in " + (chartState.selectedYear.length === 1 ? (chartState.selectedYear[0] === allYearsOption ? "all years" : chartState.selectedYear[0]) : "years\u002A"));
 
 			let topPanelUpcomingNumber = mainValueGroup.selectAll(".pbiuactopPanelUpcomingNumber")
 				.data([upcomingValue]);
@@ -1288,6 +1291,8 @@
 					.style("fill", function(e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
+
+				setYearsDescriptionDiv();
 
 				calculateDomain(data);
 
@@ -2799,6 +2804,18 @@
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+		};
+
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function() {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).reduce(function(acc, curr, index) {
+					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
 		};
 
 		function reverseFormat(s) {

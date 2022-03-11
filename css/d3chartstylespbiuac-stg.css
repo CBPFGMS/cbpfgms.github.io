@@ -355,3 +355,11 @@ p#pbiuacd3chartTitle {
 	font-size: 12px;
 	pointer-events: none;
 }
+
+.pbiuacYearsDescriptionDiv {
+	margin-left: 12px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	width: 98%;
+}
