@@ -502,7 +502,7 @@
 				draw(data);
 			} else {
 				d3.select(window).on("scroll.pbiuac", checkPosition);
-				d3.select("body").on("d3ChartsYear.pbinad", function() {
+				d3.select("body").on("d3ChartsYear.pbiuac", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
 				});
 				checkPosition();
