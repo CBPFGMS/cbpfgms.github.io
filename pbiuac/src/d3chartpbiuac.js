@@ -1785,16 +1785,6 @@
 			xScaleMain.domain(s.map(xScaleBrush.invert, xScaleBrush));
 			const queryStartDate = d3.timeDay.count(currentDate, xScaleMain.domain()[0]) * -1;
 			const queryEndDate = d3.timeDay.count(currentDate, xScaleMain.domain()[1]);
-			if (queryStringValues.has("offsetstart")) {
-				queryStringValues.set("offsetstart", queryStartDate);
-			} else {
-				queryStringValues.append("offsetstart", queryStartDate);
-			};
-			if (queryStringValues.has("offsetend")) {
-				queryStringValues.set("offsetend", queryEndDate);
-			} else {
-				queryStringValues.append("offsetend", queryEndDate);
-			};
 			mainPanel.main.selectAll(".pbiuacAllocationsMain")
 				.attr("x", function(d) {
 					return xScaleMain(d.PlannedStartDate);
@@ -1819,16 +1809,6 @@
 			xScaleMain.domain(t.rescaleX(xScaleBrush).domain());
 			const queryStartDate = d3.timeDay.count(currentDate, xScaleMain.domain()[0]) * -1;
 			const queryEndDate = d3.timeDay.count(currentDate, xScaleMain.domain()[1]);
-			if (queryStringValues.has("offsetstart")) {
-				queryStringValues.set("offsetstart", queryStartDate);
-			} else {
-				queryStringValues.append("offsetstart", queryStartDate);
-			};
-			if (queryStringValues.has("offsetend")) {
-				queryStringValues.set("offsetend", queryEndDate);
-			} else {
-				queryStringValues.append("offsetend", queryEndDate);
-			};
 			mainPanel.main.selectAll(".pbiuacAllocationsMain")
 				.attr("x", function(d) {
 					return xScaleMain(d.PlannedStartDate);
