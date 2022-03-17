@@ -2324,36 +2324,44 @@
 
 
 			const helpData = [{
-				x: 100,
-				y: 96 + topDivHeight,
-				width: 792,
-				height: 52,
-				xTooltip: 320 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 150) * (topDivSize.width / width),
+				x: padding[3] + buttonsPanel.padding[3] - 4,
+				y: (padding[0] + topPanel.height + panelHorizontalPadding) + topDivHeight,
+				width: yearsArray.length * buttonsPanel.buttonWidth + 4,
+				height: buttonsPanelHeight + 8,
+				xTooltip: (padding[3] + buttonsPanel.padding[3] - 4) * (topDivSize.width / width),
+				yTooltip: (padding[0] + topPanel.height + panelHorizontalPadding) + topDivHeight + buttonsPanelHeight + 8,
+				text: "Use these buttons to select (filter by) year. Double click or press ALT when clicking to select multiple years. If you want to see all allocations, click 'All'."
+			}, {
+				x: padding[3] + brushPanel.padding[3] - 4,
+				y: (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + topDivHeight,
+				width: brushPanel.width - brushPanel.padding[3] + 8,
+				height: brushPanel.height,
+				xTooltip: (width / 2 - 150) * (topDivSize.width / width),
+				yTooltip: ((padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + topDivHeight + brushPanel.height) * (topDivSize.width / width),
 				text: "The brush area shows the data for the entire period. Use the two handles to move the selection or click + pan to move the selection. Click outside the selection to select the entire period."
 			}, {
-				x: 100,
-				y: 174 + topDivHeight,
-				width: 792,
-				height: 346,
-				xTooltip: 320 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 36) * (topDivSize.width / width),
+				x: padding[3] + mainPanel.padding[3] - 4,
+				y: (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + (3 * panelHorizontalPadding)) + topDivHeight,
+				width: mainPanel.width - mainPanel.padding[3] + 8,
+				height: mainPanel.height,
+				xTooltip: (width / 2 - 150) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + 50) * (topDivSize.width / width),
 				text: "This area shows the allocations for the selected period. You can pan left/right or zoom (using the mousewheel or the trackpad) to move this area. Hover over the allocations to get more information, and click on “Display Details” to generate the details (below the chart) for the allocation."
 			}, {
-				x: 390,
-				y: 542 + topDivHeight,
-				width: 130,
-				height: 32,
-				xTooltip: 290 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 468) * (topDivSize.width / width),
+				x: (width / 2) - 100,
+				y: (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + mainPanel.height + (4 * panelHorizontalPadding)) + topDivHeight,
+				width: 200,
+				height: 44,
+				xTooltip: (width / 2 - 150) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + height - legendPanel.height - padding[2] - 90) * (topDivSize.width / width),
 				text: "The legend shows the color encoding according to the allocation amount. Hover over the colors to see the corresponding amount."
 			}, {
-				x: 100,
-				y: 542 + topDivHeight,
+				x: padding[3] + legendPanel.padding[3] - 4,
+				y: (padding[0] + topPanel.height + buttonsPanel.height + brushPanel.height + mainPanel.height + (4 * panelHorizontalPadding)) + topDivHeight,
 				width: 36,
-				height: 32,
-				xTooltip: 10 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 484) * (topDivSize.width / width),
+				height: 44,
+				xTooltip: (padding[3] + legendPanel.padding[3] - 4) * (topDivSize.width / width),
+				yTooltip: (topDivHeight + height - legendPanel.height - padding[2] - 70) * (topDivSize.width / width),
 				text: "Hover for showing only Standard or Reserve allocations."
 			}];
 
