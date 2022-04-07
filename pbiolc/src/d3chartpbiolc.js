@@ -1044,7 +1044,7 @@
 						const i = d3.interpolate(previousValue, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
-							node.textContent = "$" + siString.substring(0, siString.length - 1);
+							node.textContent = "$" + (i(t) < 1e3 ? ~~(i(t)) : siString.substring(0, siString.length - 1));
 						};
 					});
 
@@ -1106,7 +1106,7 @@
 						const i = d3.interpolate(previousPersons, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
-							node.textContent = siString.substring(0, siString.length - 1);
+							node.textContent = i(t) < 1e3 ? ~~(i(t)) : siString.substring(0, siString.length - 1);
 						};
 					});
 
@@ -1369,7 +1369,9 @@
 						return capitalize(buttonName);
 					});
 
-				buttonsRects.on("mouseover", mouseOverButtonsRects)
+				buttonsRects.on("mouseover", function(d) {
+						mouseOverButtonsRects(d, this, "year")
+					})
 					.on("mouseout", mouseOutButtonsRects)
 					.on("click", function(d) {
 						const self = this;
@@ -1399,11 +1401,15 @@
 					};
 				});
 
-				buttonsModalitiesRects.on("mouseover", mouseOverButtonsRects)
+				buttonsModalitiesRects.on("mouseover", function(d) {
+						mouseOverButtonsRects(d, this, "modality")
+					})
 					.on("mouseout", mouseOutButtonsModalitiesRects)
 					.on("click", clickButtonsModalitiesRects);
 
-				buttonsBeneficiariesRects.on("mouseover", mouseOverButtonsRects)
+				buttonsBeneficiariesRects.on("mouseover", function(d) {
+						mouseOverButtonsRects(d, this, "beneficiary")
+					})
 					.on("mouseout", mouseOutButtonsBeneficiariesRects)
 					.on("click", clickButtonsBeneficiariesRects);
 
@@ -2001,9 +2007,9 @@
 					sortData(data);
 				};
 
-				xScaleBeneficiaries.domain([0, d3.max(data, function(d) {
+				xScaleBeneficiaries.domain([0, Math.max(1e3, d3.max(data, function(d) {
 					return d["total" + chartState.selectedBeneficiary];
-				}) * xScaleDomainMargin]);
+				})) * xScaleDomainMargin]);
 
 				createTopPanel()
 
@@ -2041,30 +2047,32 @@
 				createBeneficiariesPanel();
 			});
 
-			function mouseOverButtonsRects(d) {
-				tooltip.style("display", "block")
-					.html(null)
+			function mouseOverButtonsRects(d, thisElement, type) {
+				if (type === "year") {
+					tooltip.style("display", "block")
+						.html(null)
 
-				const innerTooltip = tooltip.append("div")
-					.style("max-width", "200px")
-					.attr("id", "pbiolcInnerTooltipDiv");
+					const innerTooltip = tooltip.append("div")
+						.style("max-width", "200px")
+						.attr("id", "pbiolcInnerTooltipDiv");
 
-				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+					innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
 
-				const containerSize = containerDiv.node().getBoundingClientRect();
+					const containerSize = containerDiv.node().getBoundingClientRect();
 
-				const thisSize = this.getBoundingClientRect();
+					const thisSize = thisElement.getBoundingClientRect();
 
-				tooltipSize = tooltip.node().getBoundingClientRect();
+					tooltipSize = tooltip.node().getBoundingClientRect();
 
-				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
-						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
-						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
-					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
-						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+					tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
+							containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
+							buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
+						.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
+							thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+				};
 
-				d3.select(this).style("fill", unBlue);
-				d3.select(this.parentNode).selectAll("text")
+				d3.select(thisElement).style("fill", unBlue);
+				d3.select(thisElement.parentNode).selectAll("text")
 					.filter(function(e) {
 						return e === d
 					})
@@ -2334,13 +2342,13 @@
 
 		function setxScaleDomains(data) {
 
-			xScaleAllocations.domain([0, d3.max(data, function(d) {
+			xScaleAllocations.domain([0, Math.max(1e3, d3.max(data, function(d) {
 				return d.total;
-			}) * xScaleDomainMargin]);
+			})) * xScaleDomainMargin]);
 
-			xScaleBeneficiaries.domain([0, d3.max(data, function(d) {
+			xScaleBeneficiaries.domain([0, Math.max(1e3, d3.max(data, function(d) {
 				return d["total" + chartState.selectedBeneficiary];
-			}) * xScaleDomainMargin]);
+			})) * xScaleDomainMargin]);
 
 		};
 
