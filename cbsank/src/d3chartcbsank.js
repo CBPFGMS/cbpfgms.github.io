@@ -347,6 +347,10 @@
 		const footerDiv = containerDiv.append("div")
 			.attr("class", classPrefix + "FooterDiv");
 
+		footerDiv.append("div")
+			.attr("class", "d3chartFooterText")
+			.html("*Only Paid Contributions.");
+
 		const snapshotTooltip = containerDiv.append("div")
 			.attr("id", classPrefix + "SnapshotTooltip")
 			.attr("class", classPrefix + "SnapshotContent")
@@ -1318,7 +1322,7 @@
 				.append("text")
 				.attr("class", classPrefix + "contributionsText")
 				.attr("y", -centralCirclePanel.radius * 0.24)
-				.text("Contributions");
+				.text("Contributions*");
 
 			let contributionsSubText = centralCirclePanel.main.selectAll("." + classPrefix + "contributionsSubText")
 				.data([true]);
@@ -2604,18 +2608,18 @@
 						chartState.fundsInData.push(row.fundId);
 					};
 
-					if (chartState.selectedYear.includes(row.contributionYear) && chartState.selectedFund.includes(row.fundId) && (row.paidAmount + row.pledgedAmount)) {
+					if (chartState.selectedYear.includes(row.contributionYear) && chartState.selectedFund.includes(row.fundId) && row.paidAmount) {
 
 						const foundSource = data.nodes.find(d => d.level === 1 && d.codeId === row.donorId);
 
 						if (foundSource) {
-							foundSource.value += row.paidAmount + row.pledgedAmount;
+							foundSource.value += row.paidAmount;
 						} else {
 							data.nodes.push({
 								codeId: row.donorId,
 								level: 1,
 								name: lists.donorNames[row.donorId],
-								value: row.paidAmount + row.pledgedAmount,
+								value: row.paidAmount,
 								id: "donor#" + row.donorId
 							});
 						};
@@ -2623,16 +2627,16 @@
 						const foundLink = data.links.find(d => d.source === "donor#" + row.donorId);
 
 						if (foundLink) {
-							foundLink.value += row.paidAmount + row.pledgedAmount;
+							foundLink.value += row.paidAmount;
 						} else {
 							data.links.push({
 								source: "donor#" + row.donorId,
 								target: fundId,
-								value: row.paidAmount + row.pledgedAmount
+								value: row.paidAmount
 							});
 						};
 
-						fundNode.value += row.paidAmount + row.pledgedAmount;
+						fundNode.value += row.paidAmount;
 
 					};
 
