@@ -349,6 +349,8 @@
 
 		footerDiv.append("div")
 			.attr("class", "d3chartFooterText")
+			.style("text-align", "left")
+			.style("padding-left", "2%")
 			.html("*Only Paid Contributions.");
 
 		const snapshotTooltip = containerDiv.append("div")
