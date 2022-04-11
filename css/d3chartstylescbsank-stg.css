@@ -156,11 +156,19 @@ p#cbsankd3chartTitle {
 	stroke-linecap: round;
 }
 
-.cbsankcontributionsValueText, .cbsankcontributionsText, .cbsankcontributionsSubText, .cbsankallocationsValueText, .cbsanklaunchedAllocationsValueText, .cbsankallocationsText, .cbsanklaunchedAllocationsText, .cbsankallocationsSubText {
+.cbsankcontributionsValueText, .cbsankcontributionsText, .cbsankcontributionsSubText, .cbsanklaunchedAllocationsValueText, .cbsankallocationsText, .cbsanklaunchedAllocationsText, .cbsankallocationsSubText {
 	font-family: "Roboto", sans-serif;
 	font-size: 22px;
 	fill: white;
 	font-weight: 300;
+	text-anchor: middle;
+}
+
+.cbsankallocationsValueText {
+	font-family: "Roboto", sans-serif;
+	font-size: 22px;
+	fill: white;
+	font-weight: 400;
 	text-anchor: middle;
 }
 
