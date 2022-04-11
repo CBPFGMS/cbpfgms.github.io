@@ -189,6 +189,7 @@
 			vizNameQueryString = "sankey",
 			allocationsDataUrl = "https://cbpfgms.github.io/pfbi-data/allocationSummarySankey.csv",
 			contributionsDataUrl = "https://cbpfgms.github.io/pfbi-data/contributionSummarySankey.csv",
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
 			masterDonorsUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstDonor.json",
 			masterFundsUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 			masterAllocationTypesUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",
@@ -498,6 +499,7 @@
 				fetchFile(classPrefix + "MasterPartnerTypes", masterPartnersUrl, "master table for partner types", "json"),
 				fetchFile(classPrefix + "MasterClusterTypes", masterClustersUrl, "master table for cluster types", "json"),
 				fetchFile(classPrefix + "AllocationsData", allocationsDataUrl, "allocations data", "csv"),
+				fetchFile("pbiuacdata", launchedAllocationsDataUrl, "launched allocations data", "csv"),
 				fetchFile(classPrefix + "contributionsData", contributionsDataUrl, "contributions data", "csv"),
 				fetchFile(classPrefix + "flags", flagsUrl, "flags images", "json")
 			])
@@ -510,6 +512,7 @@
 			masterPartners,
 			masterClusters,
 			rawDataAllocations,
+			rawDataLaunchedAllocations,
 			rawDataContributions,
 			flagsData
 		]) {
@@ -527,7 +530,7 @@
 			validateYear(selectedYearString);
 
 			if (!lazyLoad) {
-				draw(rawDataAllocations, rawDataContributions, flagsData);
+				draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
 			} else {
 				d3.select(window).on("scroll." + classPrefix, checkPosition);
 				d3.select("body").on("d3ChartsYear." + classPrefix, () => chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]);
@@ -538,24 +541,24 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll." + classPrefix, null);
-					draw(rawDataAllocations, rawDataContributions, flagsData);
+					draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
 				};
 			};
 
 			//end of fetchCallback
 		};
 
-		function draw(rawDataAllocations, rawDataContributions, flagsData) {
+		function draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
 
-			const dataAllocations = processDataAllocations(rawDataAllocations);
+			const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
 
 			const dataContributions = processDataContributions(rawDataContributions);
 
 			createTitle(rawDataAllocations, rawDataContributions);
 
-			createCheckboxes(rawDataAllocations, rawDataContributions, flagsData);
+			createCheckboxes(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
 
-			createButtonsPanel(rawDataAllocations, rawDataContributions, flagsData);
+			createButtonsPanel(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
 
 			drawCentralCircle(dataContributions, dataAllocations);
 
@@ -826,7 +829,7 @@
 			//end of createTitle
 		};
 
-		function createCheckboxes(rawDataAllocations, rawDataContributions, flagsData) {
+		function createCheckboxes(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
 
 			selectTitleDiv.html("Select CBPF:");
 
@@ -924,7 +927,7 @@
 
 				chartState.fundsInData.length = 0;
 
-				const dataAllocations = processDataAllocations(rawDataAllocations);
+				const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
 
 				const dataContributions = processDataContributions(rawDataContributions);
 
@@ -939,7 +942,7 @@
 			//end of createCheckboxes
 		};
 
-		function createButtonsPanel(rawDataAllocations, rawDataContributions, flagsData) {
+		function createButtonsPanel(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
 
 			const clipPath = buttonsPanel.main.append("clipPath")
 				.attr("id", classPrefix + "clip")
@@ -1231,7 +1234,7 @@
 
 				chartState.fundsInData.length = 0;
 
-				const dataAllocations = processDataAllocations(rawDataAllocations);
+				const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
 
 				const dataContributions = processDataContributions(rawDataContributions);
 
@@ -1342,16 +1345,16 @@
 					return "for " + yearsList;
 				});
 
-			let allocationsValueText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsValueText")
-				.data([allocationsValue]);
+			let launchedAllocationsValueText = centralCirclePanel.main.selectAll("." + classPrefix + "launchedAllocationsValueText")
+				.data([dataAllocations.launchedAllocations]);
 
-			const allocationsValueTextEnter = allocationsValueText.enter()
+			const launchedAllocationsValueTextEnter = launchedAllocationsValueText.enter()
 				.append("text")
-				.attr("class", classPrefix + "allocationsValueText")
+				.attr("class", classPrefix + "launchedAllocationsValueText")
 				.attr("y", centralCirclePanel.radius * 0.3)
 				.text("$")
 				.append("tspan")
-				.attr("class", classPrefix + "allocationsValueTextSpan")
+				.attr("class", classPrefix + "launchedAllocationsValueTextSpan")
 				.transition()
 				.duration(duration)
 				.tween("text", (d, i, n) => {
@@ -1359,7 +1362,7 @@
 					return t => n[i].textContent = d ? formatSIFloat(interpolator(t)) : 0;
 				});
 
-			allocationsValueText.select("tspan")
+			launchedAllocationsValueText.select("tspan")
 				.transition()
 				.duration(duration)
 				.tween("text", (d, i, n) => {
@@ -1367,13 +1370,28 @@
 					return t => n[i].textContent = d ? formatSIFloat(interpolator(t)) : 0;
 				});
 
-			const allocationsText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsText")
+			const launchedAllocationsText = centralCirclePanel.main.selectAll("." + classPrefix + "launchedAllocationsText")
 				.data([true])
 				.enter()
 				.append("text")
-				.attr("class", classPrefix + "allocationsText")
+				.attr("class", classPrefix + "launchedAllocationsText")
 				.attr("y", centralCirclePanel.radius * 0.46)
-				.text("Allocations");
+				.text("Allocations Launched");
+
+			let allocationsValueText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsValueText")
+				.data([allocationsValue]);
+
+			allocationsValueText = allocationsValueText.enter()
+				.append("text")
+				.attr("class", classPrefix + "allocationsValueText")
+				.attr("y", centralCirclePanel.radius * 0.7)
+				.merge(allocationsValueText)
+				.transition()
+				.duration(duration)
+				.tween("text", (d, i, n) => {
+					const interpolator = d3.interpolate(reverseFormat(n[i].textContent.split(" ")[0].replace("$", "")) || 0, d);
+					return t => n[i].textContent = d ? "$" + formatSIFloat(interpolator(t)) + " Allocated" : 0;
+				});
 
 			let allocationsSubText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsSubText")
 				.data([true]);
@@ -1381,7 +1399,7 @@
 			allocationsSubText = allocationsSubText.enter()
 				.append("text")
 				.attr("class", classPrefix + "allocationsSubText")
-				.attr("y", centralCirclePanel.radius * 0.60)
+				.attr("y", centralCirclePanel.radius * 0.84)
 				.merge(allocationsSubText)
 				.text(() => {
 					if (chartState.selectedYear.length === 1) return "in " + chartState.selectedYear[0];
@@ -2492,11 +2510,12 @@
 			});
 		};
 
-		function processDataAllocations(rawDataAllocations) {
+		function processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations) {
 
 			const data = {
 				nodes: [],
-				links: []
+				links: [],
+				launchedAllocations: 0
 			};
 
 			const fundNode = {
@@ -2506,6 +2525,15 @@
 				value: 0,
 				id: fundId
 			};
+
+			const abbreviatedNamesKeys = Object.keys(lists.fundAbbreviatedNames);
+
+			rawDataLaunchedAllocations.forEach(row => {
+				const thisId = abbreviatedNamesKeys.find(e => lists.fundAbbreviatedNames[e] === row.PooledFundName);
+				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(+thisId) && row.TotalUSDPlanned) {
+					data.launchedAllocations += row.TotalUSDPlanned;
+				};
+			});
 
 			rawDataAllocations.forEach(row => {
 
