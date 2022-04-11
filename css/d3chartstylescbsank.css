@@ -156,7 +156,7 @@ p#cbsankd3chartTitle {
 	stroke-linecap: round;
 }
 
-.cbsankcontributionsValueText, .cbsankcontributionsText, .cbsankcontributionsSubText, .cbsankallocationsValueText, .cbsankallocationsText, .cbsankallocationsSubText {
+.cbsankcontributionsValueText, .cbsankcontributionsText, .cbsankcontributionsSubText, .cbsanklaunchedAllocationsValueText, .cbsankallocationsText, .cbsanklaunchedAllocationsText, .cbsankallocationsSubText {
 	font-family: "Roboto", sans-serif;
 	font-size: 22px;
 	fill: white;
@@ -164,7 +164,15 @@ p#cbsankd3chartTitle {
 	text-anchor: middle;
 }
 
-.cbsankcontributionsValueTextSpan, .cbsankallocationsValueTextSpan {
+.cbsankallocationsValueText {
+	font-family: "Roboto", sans-serif;
+	font-size: 22px;
+	fill: white;
+	font-weight: 400;
+	text-anchor: middle;
+}
+
+.cbsankcontributionsValueTextSpan, .cbsanklaunchedAllocationsValueTextSpan {
 	font-size: 44px;
 	font-weight: 700;
 }
