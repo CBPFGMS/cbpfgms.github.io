@@ -478,6 +478,8 @@
 
 		function csvCallback(rawData) {
 
+			console.log(rawData)
+
 			preProcessData(rawData);
 
 			removeProgressWheel();
