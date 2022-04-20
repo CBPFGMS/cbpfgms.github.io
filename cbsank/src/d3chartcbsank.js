@@ -1390,7 +1390,7 @@
 				.duration(duration)
 				.tween("text", (d, i, n) => {
 					const interpolator = d3.interpolate(reverseFormat(n[i].textContent.split(" ")[0].replace("$", "")) || 0, d);
-					return t => n[i].textContent = d ? "$" + formatSIFloat(interpolator(t)) + " Allocated" : 0;
+					return t => n[i].textContent = d >= d ? "$" + formatSIFloat(interpolator(t)) + " Allocated" : 0;
 				});
 
 			let allocationsSubText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsSubText")
