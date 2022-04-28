@@ -460,7 +460,6 @@
 				d.PlannedEndDate = new Date(d.PlannedEndDate);
 			});
 			console.info("pbiuac: data from local storage");
-			console.log(rawData)
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
