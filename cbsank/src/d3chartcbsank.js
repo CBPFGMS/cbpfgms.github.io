@@ -2531,7 +2531,7 @@
 
 			rawDataLaunchedAllocations.forEach(row => {
 				const thisId = abbreviatedNamesKeys.find(e => lists.fundAbbreviatedNames[e] === row.PooledFundName);
-				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(+thisId) && row.TotalUSDPlanned) {
+				if (chartState.selectedYear.includes(+row.AllocationYear) && chartState.selectedFund.includes(+thisId) && row.TotalUSDPlanned) {
 					data.launchedAllocations += row.TotalUSDPlanned;
 				};
 			});
