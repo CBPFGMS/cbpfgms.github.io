@@ -183,6 +183,7 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
+			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
 			clusterColorsArray = ["#F15B2C", "#F26222", "#F57F20", "#F9A11B", "#FEC010", "#D5A429", "#AA8C5C", "#5E5FAA", "#3D52A3", "#0073BD", "#71B4D3", "#7AC1BA", "#7FC88F", "#8CCA7B", "#A9D489", "#ADD255", "#C4C070", "#D39A6D", "#D16F5F", "#ED1C24"],
 			allYearsOption = "all",
 			chartTitleDefault = "Sankey diagram",
@@ -3104,7 +3105,7 @@
 				return Promise.resolve(fetchedData);
 			} else {
 				const fetchMethod = method === "csv" ? d3.csv : d3.json;
-				const rowFunction = method === "csv" ? d3.autoType : null;
+				const rowFunction = method === "csv" ? (fileName === "pbiuacdata" ? pbiuacRow : d3.autoType) : null;
 				return fetchMethod(url, rowFunction).then(fetchedData => {
 					try {
 						localStorage.setItem(fileName, JSON.stringify({
@@ -3118,6 +3119,24 @@
 					return fetchedData;
 				});
 			};
+		};
+
+		function pbiuacRow(d) {
+			d.TotalUSDPlanned = +d.TotalUSDPlanned;
+			d.PlannedStartDate = timeParse(d.PlannedStartDate);
+			d.PlannedEndDate = timeParse(d.PlannedEndDate);
+			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
+			if (!d.PlannedStartDate) {
+				d.PlannedStartDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)
+			};
+			if (!d.PlannedEndDate) {
+				d.PlannedEndDate = d.AllocationSource === "Standard" ?
+					d3.timeMonth.offset(d.PlannedStartDate, 1) : d3.timeDay.offset(d.PlannedStartDate, 15)
+			};
+			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
+			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
+			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d;
 		};
 
 		function validateYear(yearString) {
