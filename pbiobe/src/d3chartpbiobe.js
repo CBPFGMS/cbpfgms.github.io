@@ -977,7 +977,7 @@
 						const i = d3.interpolate(previousActual, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
-							node.textContent = siString.substring(0, siString.length - 1);
+							node.textContent = (d < 1e3 ? siString : siString.substring(0, siString.length - 1));
 						};
 					});
 
