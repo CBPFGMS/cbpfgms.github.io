@@ -185,7 +185,6 @@
 			allYearsOption = "all",
 			chartTitleDefault = "Sankey diagram",
 			vizNameQueryString = "sankey",
-			allocationsDataUrl = "https://cbpfgms.github.io/pfbi-data/allocationSummary.csv",
 			contributionsDataUrl = "https://cbpfgms.github.io/pfbi-data/contributionSummarySankey.csv",
 			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
 			masterDonorsUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstDonor.json",
@@ -206,7 +205,9 @@
 				fundIsoCodes: {},
 				fundIsoCodes3: {},
 				allocationTypes: {},
+				allocationTypesReversed: {},
 				fundsInAllYears: {},
+				cbpfIds: {},
 				fundsInAllYearsKeys: null,
 				fundsInAllYearsValues: null
 			},
@@ -419,7 +420,6 @@
 				fetchFile(classPrefix + "MasterDonors", masterDonorsUrl, "master table for donors", "json"),
 				fetchFile(classPrefix + "MasterFunds", masterFundsUrl, "master table for funds", "json"),
 				fetchFile(classPrefix + "MasterAllocationTypes", masterAllocationTypesUrl, "master table for allocation types", "json"),
-				fetchFile(classPrefix + "allocationsData", allocationsDataUrl, "allocations data", "csv"),
 				fetchFile("pbiuacdata", launchedAllocationsDataUrl, "launched allocations data", "csv"),
 				fetchFile(classPrefix + "contributionsData", contributionsDataUrl, "contributions data", "csv"),
 				fetchFile(classPrefix + "flags", flagsUrl, "flags images", "json")
@@ -430,7 +430,6 @@
 			masterDonors,
 			masterFunds,
 			masterAllocationTypes,
-			rawDataAllocations,
 			rawDataLaunchedAllocations,
 			rawDataContributions,
 			flagsData
@@ -438,16 +437,17 @@
 
 			createDonorNamesList(masterDonors);
 			createFundNamesList(masterFunds);
+			createCbpfIdsList(masterFunds);
 			createAllocationTypesList(masterAllocationTypes);
 
-			preProcessData(rawDataAllocations, rawDataContributions);
+			preProcessData(rawDataLaunchedAllocations, rawDataContributions);
 
 			chartState.selectedFund = populateSelectedFunds(selectedFundsString);
 
 			validateYear(selectedYearString);
 
 			if (!lazyLoad) {
-				draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
+				draw(rawDataLaunchedAllocations, rawDataContributions, flagsData);
 			} else {
 				d3.select(window).on("scroll." + classPrefix, checkPosition);
 				d3.select("body").on("d3ChartsYear." + classPrefix, () => chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]);
@@ -458,24 +458,24 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll." + classPrefix, null);
-					draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
+					draw(rawDataLaunchedAllocations, rawDataContributions, flagsData);
 				};
 			};
 
 			//end of fetchCallback
 		};
 
-		function draw(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
+		function draw(rawDataLaunchedAllocations, rawDataContributions, flagsData) {
 
-			const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
+			const dataAllocations = processDataAllocations(rawDataLaunchedAllocations);
 
 			const dataContributions = processDataContributions(rawDataContributions);
 
-			createTitle(rawDataAllocations, rawDataContributions);
+			createTitle(rawDataLaunchedAllocations, rawDataContributions);
 
-			createCheckboxes(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
+			createCheckboxes(rawDataLaunchedAllocations, rawDataContributions, flagsData);
 
-			createButtonsPanel(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData);
+			createButtonsPanel(rawDataLaunchedAllocations, rawDataContributions, flagsData);
 
 			drawCentralCircle(dataContributions, dataAllocations);
 
@@ -492,7 +492,7 @@
 			//end of draw;
 		};
 
-		function createTitle(rawDataAllocations, rawDataContributions) {
+		function createTitle(rawDataLaunchedAllocations, rawDataContributions) {
 
 			const title = titleDiv.append("p")
 				.attr("id", classPrefix + "d3chartTitle")
@@ -681,7 +681,7 @@
 
 			downloadIcon.on("click", function() {
 
-				const csvAllocations = createCsvAllocations(rawDataAllocations);
+				const csvAllocations = createCsvAllocations(rawDataLaunchedAllocations);
 
 				const csvContributions = createCsvContributions(rawDataContributions);
 
@@ -746,7 +746,7 @@
 			//end of createTitle
 		};
 
-		function createCheckboxes(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
+		function createCheckboxes(rawDataLaunchedAllocations, rawDataContributions, flagsData) {
 
 			selectTitleDiv.html("Select CBPF:");
 
@@ -844,7 +844,7 @@
 
 				chartState.fundsInData.length = 0;
 
-				const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
+				const dataAllocations = processDataAllocations(rawDataLaunchedAllocations);
 
 				const dataContributions = processDataContributions(rawDataContributions);
 
@@ -859,7 +859,7 @@
 			//end of createCheckboxes
 		};
 
-		function createButtonsPanel(rawDataAllocations, rawDataContributions, rawDataLaunchedAllocations, flagsData) {
+		function createButtonsPanel(rawDataLaunchedAllocations, rawDataContributions, flagsData) {
 
 			const clipPath = buttonsPanel.main.append("clipPath")
 				.attr("id", classPrefix + "clip")
@@ -1151,7 +1151,7 @@
 
 				chartState.fundsInData.length = 0;
 
-				const dataAllocations = processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations);
+				const dataAllocations = processDataAllocations(rawDataLaunchedAllocations);
 
 				const dataContributions = processDataContributions(rawDataContributions);
 
@@ -1287,44 +1287,20 @@
 					return t => n[i].textContent = d ? formatSIFloat(interpolator(t)) : 0;
 				});
 
-			const launchedAllocationsText = centralCirclePanel.main.selectAll("." + classPrefix + "launchedAllocationsText")
-				.data([true])
-				.enter()
-				.append("text")
-				.attr("class", classPrefix + "launchedAllocationsText")
-				.attr("y", centralCirclePanel.radius * 0.46)
-				.text("Allocations Launched");
-
-			let allocationsValueText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsValueText")
-				.data([allocationsValue]);
-
-			allocationsValueText = allocationsValueText.enter()
-				.append("text")
-				.attr("class", classPrefix + "allocationsValueText")
-				.attr("y", centralCirclePanel.radius * 0.7)
-				.merge(allocationsValueText)
-				.transition()
-				.duration(duration)
-				.tween("text", (d, i, n) => {
-					const interpolator = d3.interpolate(reverseFormat(n[i].textContent.split(" ")[0].replace("$", "")) || 0, d);
-					return t => n[i].textContent = d >= d ? "$" + formatSIFloat(interpolator(t)) + " Allocated" : 0;
-				});
-
-			let allocationsSubText = centralCirclePanel.main.selectAll("." + classPrefix + "allocationsSubText")
+			let launchedAllocationsText = centralCirclePanel.main.selectAll("." + classPrefix + "launchedAllocationsText")
 				.data([true]);
 
-			allocationsSubText = allocationsSubText.enter()
+			launchedAllocationsText = launchedAllocationsText.enter()
 				.append("text")
-				.attr("class", classPrefix + "allocationsSubText")
-				.attr("y", centralCirclePanel.radius * 0.84)
-				.merge(allocationsSubText)
-				.text(() => {
-					if (chartState.selectedYear.length === 1) return "in " + chartState.selectedYear[0];
-					if (chartState.selectedYear.length > maxYearsListNumber) return "in selected years\u002A";
-					const yearsList = chartState.selectedYear.sort((a, b) => a - b)
-						.reduce((acc, curr, index) => acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", "), "");
-					return "in " + yearsList;
-				});
+				.attr("class", classPrefix + "launchedAllocationsText")
+				.attr("y", centralCirclePanel.radius * 0.5)
+				.merge(launchedAllocationsText)
+				.text("Allocations");
+
+			launchedAllocationsText.append("tspan")
+				.attr("dy", "1em")
+				.attr("x", 0)
+				.text("Launched"); //IMPORTANT: CHECK UNDER APPROVAL VALUES FOR CHANGING THIS TEXT!!!
 
 			let selectedFundsText = centralCirclePanel.main.selectAll("." + classPrefix + "selectedFundsText")
 				.data([true]);
@@ -1941,7 +1917,8 @@
 				.attr("class", classPrefix + "sankeyClusterValues")
 				.style("opacity", 0)
 				.attr("x", d => (inverseAllocationsScale(d.y1) + inverseAllocationsScale(d.y0)) / 2)
-				.attr("y", d => d.x1 + valuesPadding)
+				.attr("y", d => d.x1 + valuesPaddingDonors)
+				.attr("transform", d => `rotate(${angleValues}, ${(inverseAllocationsScale(d.y1) + inverseAllocationsScale(d.y0)) / 2}, ${d.x1 + valuesPaddingDonors})`)
 				.text(d => "$0");
 
 			sankeyClusterValues = sankeyClusterValuesEnter.merge(sankeyClusterValues);
@@ -1950,6 +1927,7 @@
 				.duration(duration)
 				.style("opacity", 1)
 				.attr("x", d => (inverseAllocationsScale(d.y1) + inverseAllocationsScale(d.y0)) / 2)
+				.attr("transform", d => `rotate(${angleValues}, ${(inverseAllocationsScale(d.y1) + inverseAllocationsScale(d.y0)) / 2}, ${d.x1 + valuesPaddingDonors})`)
 				.tween("text", (d, i, n) => {
 					const interpolator = d3.interpolate(reverseFormat(n[i].textContent.split("$")[1]) || 0, d.value);
 					return t => n[i].textContent = "$" + formatSIFloat(interpolator(t));
@@ -2347,12 +2325,11 @@
 			//end of drawSankeyAllocations
 		};
 
-		function preProcessData(rawDataAllocations, rawDataContributions) {
-			rawDataAllocations.forEach(row => {
-				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!yearsArrayAllocations.includes(row.AllocationYear) && row.FundId !== 1 && (+row.PooledFundId === +row.PooledFundId)) yearsArrayAllocations.push(row.AllocationYear);
-				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!lists.fundsInAllYears[row.PooledFundId] && row.FundId !== 1 && (+row.PooledFundId === +row.PooledFundId)) lists.fundsInAllYears[row.PooledFundId] = lists.fundAbbreviatedNames[row.PooledFundId];
+		function preProcessData(rawDataLaunchedAllocations, rawDataContributions) {
+			rawDataLaunchedAllocations.forEach(row => {
+				row.fundId = lists.cbpfIds[row.PooledFundId];
+				if (!yearsArrayAllocations.includes(row.AllocationYear) && (+row.fundId === +row.fundId)) yearsArrayAllocations.push(row.AllocationYear);
+				if (!lists.fundsInAllYears[row.fundId] && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			rawDataContributions.forEach(row => {
@@ -2373,20 +2350,23 @@
 			});
 		};
 
-		function processDataAllocations(rawDataAllocations, rawDataLaunchedAllocations) {
+		function processDataAllocations(rawDataLaunchedAllocations) {
 
 			//object:
 			// {
-			// 	"AllocationYear": 2006,
-			// 	"PooledFundId": 1,
-			// 	"OrganizatinonId": 3,
-			// 	"ClusterId": 6,
-			// 	"FundId": 1,
-			// 	"AllocationSurceId": 3,
-			// 	"ProjList": "14##97##299",
-			// 	"OrgList": "5##2",
-			// 	"NumbofProj": 3,
-			// 	"ClusterBudget": 28901568
+			// 	"AllocationTitle": "2018 1st Reserve Allocation - WVI",
+			// 	"AllocationSummary": "2018 1st Reserve Allocation - WVI",
+			// 	"AllocationSource": "Reserve",
+			// 	"TotalUSDPlanned": 400000,
+			// 	"PlannedStartDate": "2018-03-18T14:00:00.000Z",
+			// 	"PlannedEndDate": "2018-04-01T14:00:00.000Z",
+			// 	"Documents": "afg_2018_humanitarian_response_plan_0.pdf##8216149##Allocation Type##https://cbpf.unocha.org/pubdocs/Allocationsdocs/AFG-AllocDocs_2018_27_13.pdf##",
+			// 	"PooledFundId": 23,
+			// 	"PooledFundName": "Afghanistan",
+			// 	"AllocationYear": 2018,
+			// 	"HRPPlans": "Afghanistan 2018##2018",
+			// 	"PlannedStartDateTimestamp": 1521381600000,
+			// 	"PlannedEndDateTimestamp": 1522591200000
 			// }
 
 			const data = {
@@ -2403,79 +2383,72 @@
 				id: fundId
 			};
 
-			const abbreviatedNamesKeys = Object.keys(lists.fundAbbreviatedNames);
-
 			rawDataLaunchedAllocations.forEach(row => {
-				const thisId = abbreviatedNamesKeys.find(e => lists.fundAbbreviatedNames[e] === row.PooledFundName);
-				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(+thisId) && row.TotalUSDPlanned) {
-					data.launchedAllocations += row.TotalUSDPlanned;
-				};
-			});
-
-			rawDataAllocations.forEach(row => {
 
 				//REMOVING CERF
 				if (row.FundId !== 1) {
 
-					if (chartState.selectedYear.includes(row.AllocationYear) && lists.fundsInAllYearsKeys.includes(row.PooledFundId) && !chartState.fundsInData.includes(row.PooledFundId)) {
-						chartState.fundsInData.push(row.PooledFundId);
+					if (chartState.selectedYear.includes(row.AllocationYear) && lists.fundsInAllYearsKeys.includes(row.fundId) && !chartState.fundsInData.includes(row.fundId)) {
+						chartState.fundsInData.push(row.fundId);
 					};
 
-					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.PooledFundId) && row.ClusterBudget) {
+					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId) && row.TotalUSDPlanned) {
 
-						const foundType = data.nodes.find(d => d.level === 2 && d.codeId === row.AllocationSurceId);
+						data.launchedAllocations += row.TotalUSDPlanned;
 
-						const foundFund = data.nodes.find(d => d.level === 3 && d.codeId === row.PooledFundId);
+						const foundType = data.nodes.find(d => d.level === 2 && d.codeId === lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]);
+
+						const foundFund = data.nodes.find(d => d.level === 3 && d.codeId === row.fundId);
 
 						if (foundType) {
-							foundType.value += row.ClusterBudget;
+							foundType.value += row.TotalUSDPlanned;
 						} else {
 							data.nodes.push({
-								codeId: row.AllocationSurceId,
+								codeId: lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
 								level: 2,
-								name: lists.allocationTypes[row.AllocationSurceId],
-								value: row.ClusterBudget,
-								id: "alloctype#" + row.AllocationSurceId
+								name: row.AllocationSource,
+								value: row.TotalUSDPlanned,
+								id: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]
 							});
 						};
 
 						if (foundFund) {
-							foundFund.value += row.ClusterBudget;
+							foundFund.value += row.TotalUSDPlanned;
 						} else {
 							data.nodes.push({
-								codeId: row.PooledFundId,
+								codeId: row.fundId,
 								level: 3,
-								name: lists.fundAbbreviatedNames[row.PooledFundId],
-								value: row.ClusterBudget,
-								id: "fund#" + row.PooledFundId
+								name: lists.fundAbbreviatedNames[row.fundId],
+								value: row.TotalUSDPlanned,
+								id: "fund#" + row.fundId
 							});
 						};
 
-						const foundLinkToType = data.links.find(d => d.target === "alloctype#" + row.AllocationSurceId);
+						const foundLinkToType = data.links.find(d => d.target === "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]);
 
-						const foundLinkToFund = data.links.find(d => d.source === "alloctype#" + row.AllocationSurceId && d.target === "fund#" + row.PooledFundId);
+						const foundLinkToFund = data.links.find(d => d.source === "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()] && d.target === "fund#" + row.fundId);
 
 						if (foundLinkToType) {
-							foundLinkToType.value += row.ClusterBudget;
+							foundLinkToType.value += row.TotalUSDPlanned;
 						} else {
 							data.links.push({
 								source: fundId,
-								target: "alloctype#" + row.AllocationSurceId,
-								value: row.ClusterBudget
+								target: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
+								value: row.TotalUSDPlanned
 							});
 						};
 
 						if (foundLinkToFund) {
-							foundLinkToFund.value += row.ClusterBudget;
+							foundLinkToFund.value += row.TotalUSDPlanned;
 						} else {
 							data.links.push({
-								source: "alloctype#" + row.AllocationSurceId,
-								target: "fund#" + row.PooledFundId,
-								value: row.ClusterBudget
+								source: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
+								target: "fund#" + row.fundId,
+								value: row.TotalUSDPlanned
 							});
 						};
 
-						fundNode.value += row.ClusterBudget;
+						fundNode.value += row.TotalUSDPlanned;
 
 					};
 
@@ -2600,17 +2573,17 @@
 			//end of processDataContributions;
 		};
 
-		function createCsvAllocations(rawDataAllocations) {
+		function createCsvAllocations(rawDataLaunchedAllocations) {
 
 			const csvData = [];
 
-			rawDataAllocations.forEach(function(row) {
+			rawDataLaunchedAllocations.forEach(function(row) {
 				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId)) {
 					csvData.push({
 						Year: row.AllocationYear,
 						PooledFund: lists.fundAbbreviatedNames[row.PooledFundId],
 						AllocationType: lists.allocationTypes[row.AllocationSurceId],
-						Budget: row.ClusterBudget
+						Budget: row.TotalUSDPlanned
 					});
 				};
 			});
@@ -2952,9 +2925,16 @@
 			});
 		};
 
+		function createCbpfIdsList(fundsData) {
+			fundsData.forEach(row => {
+				lists.cbpfIds[row.CBPFId + ""] = row.id;
+			});
+		};
+
 		function createAllocationTypesList(allocationTypesData) {
 			allocationTypesData.forEach(row => {
 				lists.allocationTypes[row.id + ""] = row.AllocationName;
+				lists.allocationTypesReversed[row.AllocationName.toLowerCase()] = row.id;
 			});
 		};
 
