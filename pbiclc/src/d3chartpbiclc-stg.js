@@ -436,8 +436,8 @@
 			paidSymbolSize = 16,
 			localVariable = d3.local(),
 			legendPadding = 6,
-			paidColor = "#9063CD",
-			pledgedColor = "#E56A54",
+			paidColor = "#5091CD",
+			pledgedColor = "#9AB9E1",
 			unBlue = "#1F69B3",
 			highlightColor = "#F79A3B",
 			buttonsNumber = 8,
@@ -610,7 +610,7 @@
 				.attr("class", "pbiclcDonorsPanel")
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 56, 4, 0],
+			padding: [44, 62, 4, 0],
 			labelPadding: 6
 		};
 
@@ -620,7 +620,7 @@
 				.attr("transform", "translate(" + (padding[3] + donorsPanel.width + panelVerticalPadding) + "," +
 					(padding[0] + topPanel.height + buttonPanel.height + (2 * panelHorizontalPadding)) + ")"),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 56, 4, 0],
+			padding: [44, 62, 4, 0],
 			labelPadding: 6
 		};
 
@@ -648,14 +648,14 @@
 
 		const xAxisDonors = d3.axisTop(xScaleDonors)
 			.tickSizeOuter(0)
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
 		const xAxisCbpfs = d3.axisTop(xScaleCbpfs)
 			.tickSizeOuter(0)
-			.ticks(5)
+			.ticks(3)
 			.tickFormat(function(d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
