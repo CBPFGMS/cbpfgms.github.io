@@ -117,7 +117,7 @@
 			buttonsPanelHeight = 30,
 			buttonsNumber = 18,
 			contributionsPanelHeight = 446,
-			allocationsPanelHeight = 614,
+			allocationsPanelHeight = 514,
 			height = padding[0] + padding[2] + buttonsPanelHeight + panelHorizontalPadding + contributionsPanelHeight + allocationsPanelHeight,
 			centralCircleRadiusRate = 0.18,
 			unBlue = "#1F69B3",
@@ -2156,7 +2156,7 @@
 
 				const headerDiv = tooltipContainer.append("div")
 					.attr("class", classPrefix + "tooltipheaderDiv")
-					.html("List of sectors");
+					.html("List of funds");
 
 				clustersData.forEach(row => {
 					const rowDivOthers = tooltipContainer.append("div")
@@ -2168,7 +2168,7 @@
 
 					rowDivOthers.append("span")
 						.attr("class", classPrefix + "tooltipKeys")
-						.html(lists.clusterNames[row.codeId]);
+						.html(lists.fundAbbreviatedNames[row.codeId]);
 
 					rowDivOthers.append("span")
 						.attr("class", classPrefix + "tooltipLeader");
@@ -2211,7 +2211,7 @@
 
 				titleNameDiv.append("strong")
 					.style("font-size", "16px")
-					.html(type === "node" ? lists.clusterNames[datum.codeId] : lists.clusterNames[datum.target.codeId]);
+					.html(type === "node" ? lists.fundAbbreviatedNames[datum.codeId] : lists.fundAbbreviatedNames[datum.target.codeId]);
 
 				if (type === "link") {
 					titleNameDiv.append("div")
@@ -2581,8 +2581,8 @@
 				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId)) {
 					csvData.push({
 						Year: row.AllocationYear,
-						PooledFund: lists.fundAbbreviatedNames[row.PooledFundId],
-						AllocationType: lists.allocationTypes[row.AllocationSurceId],
+						PooledFund: lists.fundAbbreviatedNames[row.fundId],
+						AllocationType: row.AllocationSource.toLowerCase(),
 						Budget: row.TotalUSDPlanned
 					});
 				};
