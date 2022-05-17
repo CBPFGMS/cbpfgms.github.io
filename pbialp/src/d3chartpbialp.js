@@ -3165,6 +3165,9 @@
 				.duration(shortDuration)
 				.attr("viewBox", "0 0 " + width + " " + height);
 
+			svg.select(".pbialpLegendGroup")
+				.attr("transform", "translate(" + (padding[3]) + "," + (height - padding[2] / 1.5) + ")");
+
 			//end of resizeSvg
 		};
 
@@ -3893,9 +3896,7 @@
 		function wrapText(text, width) {
 			text.each(function() {
 				let text = d3.select(this),
-					words = text.text() === "Red Cross/Crescent Movement" ?
-					["Red Cross/", "Crescent Movement"] : text.text() === "National NGO" && chartState.netFunding === 2 ?
-					["National", "Partners"] : text.text().split(" "),
+					words = text.text() === "Red Cross/Crescent Movement" ? ["Red Cross/", "Crescent Movement"] : text.text() === "National NGO" && chartState.netFunding === 2 ? ["National", "Partners"] : text.text().split(" "),
 					lineNumber = 0,
 					lineHeight = 1.1,
 					y = text.attr("y"),
