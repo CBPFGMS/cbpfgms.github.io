@@ -1422,14 +1422,12 @@
 			colorScale.domain(allValues)
 				.range(chartState.selectedAdminLevel ? colorsQuantile : colorsQuantileGlobal);
 
-			const extentLatitude = chartState.selectedAdminLevel === 0 && data.length === 1 ?
-				[countryBoundingBoxes[data[0].locationName].sw.lat, countryBoundingBoxes[data[0].locationName].ne.lat] :
+			const extentLatitude = chartState.selectedAdminLevel === 0 && data.length === 1 ? [countryBoundingBoxes[data[0].locationName].sw.lat, countryBoundingBoxes[data[0].locationName].ne.lat] :
 				d3.extent(data, function(d) {
 					return +d.latitude;
 				});
 
-			const extentLongitude = chartState.selectedAdminLevel === 0 && data.length === 1 ?
-				[countryBoundingBoxes[data[0].locationName].sw.lng, countryBoundingBoxes[data[0].locationName].ne.lng] :
+			const extentLongitude = chartState.selectedAdminLevel === 0 && data.length === 1 ? [countryBoundingBoxes[data[0].locationName].sw.lng, countryBoundingBoxes[data[0].locationName].ne.lng] :
 				d3.extent(data, function(d) {
 					return +d.longitude;
 				});
@@ -3097,7 +3095,12 @@
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			const result = d3.formatPrefix("." + digits + "~", value)(value);
-			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
+			if (parseInt(result) === 1000) {
+				const lastDigit = result[result.length - 1];
+				const units = { k: "M", M: "B" };
+				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
+			};
+			return result;
 		};
 
 		function capitalizeEvery(str) {

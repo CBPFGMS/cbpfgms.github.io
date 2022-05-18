@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
 		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -241,6 +241,7 @@
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?$format=csv&ShowAllPooledFunds=1", //NOTE ON CERF: CERF ID MUST BE 999
 			ongoingAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
+			underApprovalDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?&ShowAllPooledFunds=1&FundingType=3&$format=csv",
 			cbpfsListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			partnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 			subPartnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/SubIPType?$format=csv",
@@ -507,6 +508,9 @@
 				return fetchFile("pbiuac", ongoingAllocationsDataUrl, previousData, "Ongoning allocations data")
 			})
 			.then(function(previousData) {
+				return fetchFile("pbialp", underApprovalDataUrl, previousData, "Under approval allocations data")
+			})
+			.then(function(previousData) {
 				csvCallback(previousData);
 			});
 
@@ -561,7 +565,7 @@
 			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
-				draw(rawData[0], rawData[4]);
+				draw(rawData[0], rawData[4], rawData[5]);
 			} else {
 				d3.select(window).on("scroll.pbinad", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbinad", function() {
@@ -574,18 +578,20 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbinad", null);
-					draw(rawData[0], rawData[4]);
+					draw(rawData[0], rawData[4], rawData[5]);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData, rawOngoingData) {
+		function draw(rawData, rawOngoingData, rawUnderApprovalData) {
 
 			const data = processData(rawData);
 
 			const ongoingData = processOngoingData(rawOngoingData);
+
+			const underApprovalData = processUnderApprovalData(rawUnderApprovalData);
 
 			setSankeyExtent(data, ongoingData);
 
@@ -4633,6 +4639,17 @@
 			return data;
 		};
 
+		function processUnderApproval(rawUnderApprovalData) {
+
+			const data = [];
+
+			console.log(data);
+			//CONTINUE HERE
+
+			return data;
+
+		};
+
 		function processTimelineData(rawData) {
 
 			const data = [];
@@ -4827,7 +4844,12 @@
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			const result = d3.formatPrefix("." + digits + "~", value)(value);
-			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
+			if (parseInt(result) === 1000) {
+				const lastDigit = result[result.length - 1];
+				const units = { k: "M", M: "B" };
+				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
+			};
+			return result;
 		};
 
 		function setYearsDescriptionDiv() {
@@ -4911,15 +4933,13 @@
 
 			yScale.domain([0, Math.max(dataBudget, ongoingDataBudget)]);
 
-			const extentArray = dataBudget > ongoingDataBudget ?
-				[
-					[sankeyPanel.padding[3], sankeyPanel.padding[0]],
-					[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
-				] :
-				[
-					[sankeyPanel.padding[3], sankeyPanel.padding[0] + (yScale(ongoingDataBudget - dataBudget) / 2)],
-					[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2] - (yScale(ongoingDataBudget - dataBudget) / 2)]
-				];
+			const extentArray = dataBudget > ongoingDataBudget ? [
+				[sankeyPanel.padding[3], sankeyPanel.padding[0]],
+				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
+			] : [
+				[sankeyPanel.padding[3], sankeyPanel.padding[0] + (yScale(ongoingDataBudget - dataBudget) / 2)],
+				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2] - (yScale(ongoingDataBudget - dataBudget) / 2)]
+			];
 
 			sankeyGenerator.extent(extentArray);
 

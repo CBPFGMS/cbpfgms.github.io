@@ -3055,7 +3055,12 @@
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 			const result = d3.formatPrefix("." + digits + "~", value)(value).replace("G", "B");
-			return parseInt(result) === 1000 ? formatSIFloat(--value) : result;
+			if (parseInt(result) === 1000) {
+				const lastDigit = result[result.length - 1];
+				const units = { k: "M", M: "B" };
+				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
+			};
+			return result;
 		};
 
 		function createAnnotationsDiv() {
