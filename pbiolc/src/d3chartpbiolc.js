@@ -179,7 +179,8 @@
 				"Early Recovery",
 				"Emergency Telecommunications",
 				"Multi-Sector",
-				"COVID-19"
+				"COVID-19",
+				"Multi-purpose CASH"
 			],
 			numberOfClusters = clusters.length,
 			lollipopGroupHeight = 24,
