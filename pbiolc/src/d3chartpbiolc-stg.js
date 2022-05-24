@@ -2294,20 +2294,22 @@
 					return e.cluster === d.Cluster;
 				});
 
-				if (d.AllocationSourceName === "Standard") {
-					foundCluster.standard += +d.BudgetByCluster;
-					foundCluster.total += +d.BudgetByCluster;
-					foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
-					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
-				} else {
-					foundCluster.reserve += +d.BudgetByCluster;
-					foundCluster.total += +d.BudgetByCluster;
-					foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
-					foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
-					foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+				if (foundCluster) {
+					if (d.AllocationSourceName === "Standard") {
+						foundCluster.standard += +d.BudgetByCluster;
+						foundCluster.total += +d.BudgetByCluster;
+						foundCluster.standardactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.standardtargeted += ~~(+d.BeneficiariesPlannedTotal);
+						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+					} else {
+						foundCluster.reserve += +d.BudgetByCluster;
+						foundCluster.total += +d.BudgetByCluster;
+						foundCluster.reserveactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.totalactual += ~~(+d.BeneficiariesActualTotal);
+						foundCluster.reservetargeted += ~~(+d.BeneficiariesPlannedTotal);
+						foundCluster.totaltargeted += ~~(+d.BeneficiariesPlannedTotal);
+					};
 				};
 
 			});
