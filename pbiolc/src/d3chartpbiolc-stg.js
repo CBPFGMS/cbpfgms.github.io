@@ -2294,8 +2294,6 @@
 					return e.cluster === d.Cluster;
 				});
 
-				console.log(foundCluster, d.Cluster)
-
 				if (d.AllocationSourceName === "Standard") {
 					foundCluster.standard += +d.BudgetByCluster;
 					foundCluster.total += +d.BudgetByCluster;
