@@ -220,6 +220,7 @@
 
 		let isSnapshotTooltipVisible = false,
 			cerfPooledFundId,
+			underApprovalInData,
 			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -229,6 +230,8 @@
 		const containerDiv = d3.select("#d3chartcontainer" + classPrefix);
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
 
@@ -1295,12 +1298,12 @@
 				.attr("class", classPrefix + "launchedAllocationsText")
 				.attr("y", centralCirclePanel.radius * 0.5)
 				.merge(launchedAllocationsText)
-				.text("Allocations");
+				.text(underApprovalInData > minimumUnderApprovalValue ? "Allocations" : "Allocated");
 
 			launchedAllocationsText.append("tspan")
 				.attr("dy", "1em")
 				.attr("x", 0)
-				.text("Launched"); //IMPORTANT: CHECK UNDER APPROVAL VALUES FOR CHANGING THIS TEXT!!!
+				.text(underApprovalInData > minimumUnderApprovalValue ? "Launched" : "");
 
 			let selectedFundsText = centralCirclePanel.main.selectAll("." + classPrefix + "selectedFundsText")
 				.data([true]);
@@ -2365,9 +2368,17 @@
 			// 	"PooledFundName": "Afghanistan",
 			// 	"AllocationYear": 2018,
 			// 	"HRPPlans": "Afghanistan 2018##2018",
+			// 	"AllocationHCLastProjectApprovalDate": "4/2/2018 12:00:00 AM",
+			// 	"TotalProjectsunderApproval": 0,
+			// 	"TotalUnderApprovalBudget": 0,
+			// 	"TotalProjectsApproved": 1,
+			// 	"TotalApprovedBudget": 367000,
 			// 	"PlannedStartDateTimestamp": 1521381600000,
-			// 	"PlannedEndDateTimestamp": 1522591200000
+			// 	"PlannedEndDateTimestamp": 1522591200000,
+			// 	"fundId": 1
 			// }
+
+			underApprovalInData = 0;
 
 			const data = {
 				nodes: [],
@@ -2395,6 +2406,8 @@
 					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId) && row.TotalUSDPlanned) {
 
 						data.launchedAllocations += row.TotalUSDPlanned;
+
+						underApprovalInData += row.TotalUnderApprovalBudget;
 
 						const foundType = data.nodes.find(d => d.level === 2 && d.codeId === lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]);
 
