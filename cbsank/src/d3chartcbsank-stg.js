@@ -2979,6 +2979,7 @@
 		function pbiuacRow(d) {
 			d.AllocationYear = +d.AllocationYear;
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
+			d.TotalUnderApprovalBudget = +d.TotalUnderApprovalBudget;
 			d.PlannedStartDate = timeParse(d.PlannedStartDate);
 			d.PlannedEndDate = timeParse(d.PlannedEndDate);
 			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
