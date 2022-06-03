@@ -193,6 +193,7 @@
 			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			yearsArray = [],
+			yearsWithUnderApprovalAboveMin = {},
 			yearsArrayAllocations = [],
 			yearsArrayContributions = [],
 			lists = {
@@ -220,7 +221,6 @@
 
 		let isSnapshotTooltipVisible = false,
 			cerfPooledFundId,
-			underApprovalInData,
 			currentHoveredElement;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -1298,12 +1298,12 @@
 				.attr("class", classPrefix + "launchedAllocationsText")
 				.attr("y", centralCirclePanel.radius * 0.5)
 				.merge(launchedAllocationsText)
-				.text(underApprovalInData > minimumUnderApprovalValue ? "Allocations" : "Allocated");
+				.text(chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "Allocations" : "Allocated");
 
 			launchedAllocationsText.append("tspan")
 				.attr("dy", "1em")
 				.attr("x", 0)
-				.text(underApprovalInData > minimumUnderApprovalValue ? "Launched" : "");
+				.text(chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "Launched" : "");
 
 			let selectedFundsText = centralCirclePanel.main.selectAll("." + classPrefix + "selectedFundsText")
 				.data([true]);
@@ -2330,6 +2330,7 @@
 
 		function preProcessData(rawDataLaunchedAllocations, rawDataContributions) {
 			rawDataLaunchedAllocations.forEach(row => {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 				row.fundId = lists.cbpfIds[row.PooledFundId];
 				if (!yearsArrayAllocations.includes(row.AllocationYear) && (+row.fundId === +row.fundId)) yearsArrayAllocations.push(row.AllocationYear);
 				if (!lists.fundsInAllYears[row.fundId] && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
@@ -2351,6 +2352,12 @@
 				//THE SECOND CONDITION HIDES ALL YEARS BEFORE FIRSTYEAR
 				if (yearsArrayContributions.includes(e) && e >= firstYear) yearsArray.push(e);
 			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
+
+			console.log(yearsWithUnderApprovalAboveMin)
 		};
 
 		function processDataAllocations(rawDataLaunchedAllocations) {
@@ -2378,8 +2385,6 @@
 			// 	"fundId": 1
 			// }
 
-			underApprovalInData = 0;
-
 			const data = {
 				nodes: [],
 				links: [],
@@ -2394,6 +2399,8 @@
 				id: fundId
 			};
 
+			const valueColumn = chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "TotalUSDPlanned" : "TotalApprovedBudget";
+
 			rawDataLaunchedAllocations.forEach(row => {
 
 				//REMOVING CERF
@@ -2405,34 +2412,32 @@
 
 					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId) && row.TotalUSDPlanned) {
 
-						data.launchedAllocations += row.TotalUSDPlanned;
-
-						underApprovalInData += row.TotalUnderApprovalBudget;
+						data.launchedAllocations += row[valueColumn];
 
 						const foundType = data.nodes.find(d => d.level === 2 && d.codeId === lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]);
 
 						const foundFund = data.nodes.find(d => d.level === 3 && d.codeId === row.fundId);
 
 						if (foundType) {
-							foundType.value += row.TotalUSDPlanned;
+							foundType.value += row[valueColumn];
 						} else {
 							data.nodes.push({
 								codeId: lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
 								level: 2,
 								name: row.AllocationSource,
-								value: row.TotalUSDPlanned,
+								value: row[valueColumn],
 								id: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()]
 							});
 						};
 
 						if (foundFund) {
-							foundFund.value += row.TotalUSDPlanned;
+							foundFund.value += row[valueColumn];
 						} else {
 							data.nodes.push({
 								codeId: row.fundId,
 								level: 3,
 								name: lists.fundAbbreviatedNames[row.fundId],
-								value: row.TotalUSDPlanned,
+								value: row[valueColumn],
 								id: "fund#" + row.fundId
 							});
 						};
@@ -2442,26 +2447,26 @@
 						const foundLinkToFund = data.links.find(d => d.source === "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()] && d.target === "fund#" + row.fundId);
 
 						if (foundLinkToType) {
-							foundLinkToType.value += row.TotalUSDPlanned;
+							foundLinkToType.value += row[valueColumn];
 						} else {
 							data.links.push({
 								source: fundId,
 								target: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
-								value: row.TotalUSDPlanned
+								value: row[valueColumn]
 							});
 						};
 
 						if (foundLinkToFund) {
-							foundLinkToFund.value += row.TotalUSDPlanned;
+							foundLinkToFund.value += row[valueColumn];
 						} else {
 							data.links.push({
 								source: "alloctype#" + lists.allocationTypesReversed[row.AllocationSource.toLowerCase()],
 								target: "fund#" + row.fundId,
-								value: row.TotalUSDPlanned
+								value: row[valueColumn]
 							});
 						};
 
-						fundNode.value += row.TotalUSDPlanned;
+						fundNode.value += row[valueColumn];
 
 					};
 
@@ -2980,8 +2985,10 @@
 			d.AllocationYear = +d.AllocationYear;
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
 			d.TotalUnderApprovalBudget = +d.TotalUnderApprovalBudget;
+			d.TotalApprovedBudget = +d.TotalApprovedBudget;
 			d.PlannedStartDate = timeParse(d.PlannedStartDate);
 			d.PlannedEndDate = timeParse(d.PlannedEndDate);
+			d.AllocationHCLastProjectApprovalDate = timeParse(d.AllocationHCLastProjectApprovalDate);
 			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
 			if (!d.PlannedStartDate) {
 				d.PlannedStartDate = d.AllocationSource === "Standard" ?
