@@ -2399,8 +2399,6 @@
 				id: fundId
 			};
 
-			const valueColumn = chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "TotalUSDPlanned" : "TotalApprovedBudget";
-
 			rawDataLaunchedAllocations.forEach(row => {
 
 				//REMOVING CERF
@@ -2410,7 +2408,9 @@
 						chartState.fundsInData.push(row.fundId);
 					};
 
-					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId) && row.TotalUSDPlanned) {
+					if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId)) {
+
+						const valueColumn = yearsWithUnderApprovalAboveMin[row.AllocationYear] ? "TotalUSDPlanned" : "TotalApprovedBudget";
 
 						data.launchedAllocations += row[valueColumn];
 
