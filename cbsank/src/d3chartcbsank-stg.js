@@ -423,7 +423,7 @@
 				fetchFile(classPrefix + "MasterDonors", masterDonorsUrl, "master table for donors", "json"),
 				fetchFile(classPrefix + "MasterFunds", masterFundsUrl, "master table for funds", "json"),
 				fetchFile(classPrefix + "MasterAllocationTypes", masterAllocationTypesUrl, "master table for allocation types", "json"),
-				fetchFile("pbiuacdata", launchedAllocationsDataUrl, "launched allocations data", "csv"),
+				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv"),
 				fetchFile(classPrefix + "contributionsData", contributionsDataUrl, "contributions data", "csv"),
 				fetchFile(classPrefix + "flags", flagsUrl, "flags images", "json")
 			])
@@ -2357,7 +2357,6 @@
 				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
 			};
 
-			console.log(yearsWithUnderApprovalAboveMin)
 		};
 
 		function processDataAllocations(rawDataLaunchedAllocations) {
@@ -2965,7 +2964,7 @@
 				return Promise.resolve(fetchedData);
 			} else {
 				const fetchMethod = method === "csv" ? d3.csv : d3.json;
-				const rowFunction = method === "csv" ? (fileName === "pbiuacdata" ? pbiuacRow : d3.autoType) : null;
+				const rowFunction = method === "csv" ? d3.autoType : null;
 				return fetchMethod(url, rowFunction).then(fetchedData => {
 					try {
 						localStorage.setItem(fileName, JSON.stringify({
@@ -2979,28 +2978,6 @@
 					return fetchedData;
 				});
 			};
-		};
-
-		function pbiuacRow(d) {
-			d.AllocationYear = +d.AllocationYear;
-			d.TotalUSDPlanned = +d.TotalUSDPlanned;
-			d.TotalUnderApprovalBudget = +d.TotalUnderApprovalBudget;
-			d.TotalApprovedBudget = +d.TotalApprovedBudget;
-			d.PlannedStartDate = timeParse(d.PlannedStartDate);
-			d.PlannedEndDate = timeParse(d.PlannedEndDate);
-			d.AllocationHCLastProjectApprovalDate = timeParse(d.AllocationHCLastProjectApprovalDate);
-			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
-			if (!d.PlannedStartDate) {
-				d.PlannedStartDate = d.AllocationSource === "Standard" ?
-					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)
-			};
-			if (!d.PlannedEndDate) {
-				d.PlannedEndDate = d.AllocationSource === "Standard" ?
-					d3.timeMonth.offset(d.PlannedStartDate, 1) : d3.timeDay.offset(d.PlannedStartDate, 15)
-			};
-			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
-			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
-			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d;
 		};
 
 		function validateYear(yearString) {

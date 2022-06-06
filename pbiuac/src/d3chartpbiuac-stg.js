@@ -452,19 +452,15 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiuacdata") &&
-			JSON.parse(localStorage.getItem("pbiuacdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiuacdata")).data);
-			rawData.forEach(function(d) {
-				d.PlannedStartDate = new Date(d.PlannedStartDate);
-				d.PlannedEndDate = new Date(d.PlannedEndDate);
-			});
+		if (localStorage.getItem("launchedAllocationsData") &&
+			JSON.parse(localStorage.getItem("launchedAllocationsData")).timestamp > (currentDate.getTime() - localStorageTime)) {
+			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("launchedAllocationsData")).data, row);
 			console.info("pbiuac: data from local storage");
 			csvCallback(rawData);
 		} else {
 			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
 				try {
-					localStorage.setItem("pbiuacdata", JSON.stringify({
+					localStorage.setItem("launchedAllocationsData", JSON.stringify({
 						data: d3.csvFormat(rawData),
 						timestamp: currentDate.getTime()
 					}));
@@ -2084,8 +2080,8 @@
 
 		function row(d) {
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
-			d.PlannedStartDate = timeParse(d.PlannedStartDate);
-			d.PlannedEndDate = timeParse(d.PlannedEndDate);
+			d.PlannedStartDate = timeParse(d.PlannedStartDate) || new Date(d.PlannedStartDate);
+			d.PlannedEndDate = timeParse(d.PlannedEndDate) || new Date(d.PlannedEndDate);
 			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
 			if (!d.PlannedStartDate) {
 				d.PlannedStartDate = d.AllocationSource === "Standard" ?

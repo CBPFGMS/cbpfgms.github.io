@@ -7,7 +7,7 @@
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "../../OCHA GitHub Repo/cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
+		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
 		d3SankeyUrl = "https://unpkg.com/d3-sankey@0",
 		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
@@ -173,7 +173,6 @@
 			topPanelHeight = 60,
 			sankeyPanelHeight = 620,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + sankeyPanelHeight + (2 * panelHorizontalPadding),
-			ongoingWidth = 96,
 			buttonsNumber = 8,
 			nodeWidth = 16,
 			nodeVerticalPadding = 10,
@@ -184,7 +183,6 @@
 			sankeyLegendTextPadding = 2,
 			sankeyLegendGroupPadding = 10,
 			sankeyFundLabelsPadding = 2,
-			ongoingLabelsPadding = 2,
 			linksOpacity = 0.3,
 			fadeOpacityNodes = 0.1,
 			fadeOpacityLinks = 0.02,
@@ -215,7 +213,6 @@
 			timelineSvgWidth = 220,
 			timelineSvgHeight = 50,
 			timelineSvgPadding = [10, 38, 10, 44],
-			ongoingTitlePadding = 18,
 			localTimelineScale = d3.local(),
 			localTimelineGenerator = d3.local(),
 			timelineSvgTextPadding = 4,
@@ -226,7 +223,6 @@
 			duration = 1000,
 			localVariable = d3.local(),
 			localVariableOldValue = d3.local(),
-			timeParse = d3.timeParse("%m/%d/%Y %H:%M:%S %p"),
 			formatSIaxes = d3.format("~s"),
 			formatNumberSI = d3.format(".3s"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -239,9 +235,8 @@
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
-			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?$format=csv&ShowAllPooledFunds=1", //NOTE ON CERF: CERF ID MUST BE 999
-			ongoingAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
-			underApprovalDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?&ShowAllPooledFunds=1&FundingType=3&$format=csv",
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
 			cbpfsListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			partnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 			subPartnersListUrl = "https://cbpfapi.unocha.org/vo2/odata/SubIPType?$format=csv",
@@ -275,6 +270,8 @@
 			partnersTypeList = ["subpartner", "partner"],
 			yearsArray = [],
 			cbpfsDataList = {},
+			yearsWithUnderApprovalAboveMin = {},
+			topValuesLaunchedData = {},
 			aggregationMode = ["level", "type"],
 			chartState = {
 				selectedYear: [],
@@ -296,6 +293,8 @@
 		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
 		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
@@ -409,7 +408,7 @@
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
 			moneyBagPadding: 4,
-			leftPadding: [180, 496, 742],
+			leftPadding: [180, 412, 638],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8
@@ -429,20 +428,11 @@
 			arrowPadding: 18
 		};
 
-		const ongoingPanel = {
-			main: svg.append("g")
-				.attr("class", "pbinadongoingPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
-			width: ongoingWidth,
-			height: sankeyPanelHeight,
-			padding: [40, 4, 44, 4]
-		};
-
 		const sankeyPanel = {
 			main: svg.append("g")
 				.attr("class", "pbinadsankeyPanel")
-				.attr("transform", "translate(" + (padding[3] + ongoingWidth) + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
-			width: width - padding[1] - padding[3] - ongoingWidth,
+				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
+			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
 			padding: [40, 80, 44, 86]
 		};
@@ -457,12 +447,11 @@
 			.nodePadding(nodeVerticalPadding)
 			.nodeId(function(d) {
 				return d.id;
-			});
-
-		const yScale = d3.scaleLinear()
-			.range([0, sankeyPanel.height - sankeyPanel.padding[2] - sankeyPanel.padding[0]]);
-
-		const yScaleOngoing = d3.scaleLinear();
+			})
+			.extent([
+				[sankeyPanel.padding[3], sankeyPanel.padding[0]],
+				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
+			]);
 
 		const sankeyAnnotationsScale = d3.scalePoint()
 			.padding(0)
@@ -505,33 +494,24 @@
 				return fetchFile("pbinadsubpartnersList", subPartnersListUrl, previousData, "subPartnersList")
 			})
 			.then(function(previousData) {
-				return fetchFile("pbiuac", ongoingAllocationsDataUrl, previousData, "Ongoning allocations data")
-			})
-			.then(function(previousData) {
-				return fetchFile("pbialp", underApprovalDataUrl, previousData, "Under approval allocations data")
+				return fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, previousData, "launched allocations data")
 			})
 			.then(function(previousData) {
 				csvCallback(previousData);
 			});
 
 		function fetchFile(fileName, url, previousData, warningString) {
-			if (localStorage.getItem(fileName + "data") &&
-				JSON.parse(localStorage.getItem(fileName + "data")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const fetchedData = d3.csvParse(JSON.parse(localStorage.getItem(fileName + "data")).data);
+			const rowFunction = fileName === "launchedAllocationsData" ? d3.autoType : null;
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data, rowFunction);
 				console.info("pbinad: " + warningString + " from local storage");
-				if (fileName === "pbiuac") {
-					fetchedData.forEach(function(d) {
-						d.PlannedStartDate = new Date(d.PlannedStartDate);
-						d.PlannedEndDate = new Date(d.PlannedEndDate);
-					});
-				};
 				previousData.push(fetchedData);
 				return Promise.resolve(previousData);
 			} else {
-				const row = fileName === "pbiuac" ? pbiuacRow : null
-				return d3.csv(url, row).then(function(fetchedData) {
+				return d3.csv(url, rowFunction).then(function(fetchedData) {
 					try {
-						localStorage.setItem(fileName + "data", JSON.stringify({
+						localStorage.setItem(fileName, JSON.stringify({
 							data: d3.csvFormat(fetchedData),
 							timestamp: currentDate.getTime()
 						}));
@@ -558,14 +538,14 @@
 
 			createSubPartnersList(rawData[3]);
 
-			preProcessData(rawData[0]);
+			preProcessData(rawData[0], rawData[4]);
 
 			validateYear(selectedYearString);
 
 			chartState.selectedCbpfs = populateSelectedCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
-				draw(rawData[0], rawData[4], rawData[5]);
+				draw(rawData[0], rawData[4]);
 			} else {
 				d3.select(window).on("scroll.pbinad", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbinad", function() {
@@ -578,34 +558,26 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbinad", null);
-					draw(rawData[0], rawData[4], rawData[5]);
+					draw(rawData[0], rawData[4]);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData, rawOngoingData, rawUnderApprovalData) {
+		function draw(rawData, rawLaunchedAllocationsData) {
 
-			const data = processData(rawData);
-
-			const ongoingData = processOngoingData(rawOngoingData);
-
-			const underApprovalData = processUnderApprovalData(rawUnderApprovalData);
-
-			setSankeyExtent(data, ongoingData);
+			const data = processData(rawData, rawLaunchedAllocationsData);
 
 			createTitle(rawData);
 
-			createCheckboxes(rawData, rawOngoingData);
+			createCheckboxes(rawData, rawLaunchedAllocationsData);
 
 			createTopPanel(data);
 
-			createButtonsPanel(rawData, rawOngoingData);
+			createButtonsPanel(rawData, rawLaunchedAllocationsData);
 
 			createSankey(data);
-
-			createOngoing(ongoingData);
 
 			setYearsDescriptionDiv();
 
@@ -845,7 +817,7 @@
 			//end of createTitle
 		};
 
-		function createCheckboxes(rawData, rawOngoingData) {
+		function createCheckboxes(rawData, rawLaunchedAllocationsData) {
 
 			selectTitleDiv.html("Select CBPF:");
 
@@ -939,17 +911,11 @@
 					};
 				};
 
-				const data = processData(rawData);
-
-				const ongoingData = processOngoingData(rawOngoingData);
-
-				setSankeyExtent(data, ongoingData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				createTopPanel(data);
 
 				createSankey(data);
-
-				createOngoing(ongoingData);
 
 				createTimeline(rawData);
 
@@ -960,11 +926,15 @@
 
 		function createTopPanel(data) {
 
-			const mainValue = d3.sum(data.nodes.filter(function(d) {
+			const totalLaunched = topValuesLaunchedData.launched;
+
+			const totalAllocated = d3.sum(data.nodes.filter(function(d) {
 				return d.level === 1;
 			}), function(d) {
 				return d.amount;
 			});
+
+			const mainValue = chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? totalLaunched : totalAllocated;
 
 			const partnersValue = d3.sum(data.nodes.filter(function(d) {
 				return d.level === 3 && d.id.split("#")[0] === "partner";
@@ -977,6 +947,8 @@
 			}), function(d) {
 				return d.amount;
 			});
+
+			const underApprovalValue = topValuesLaunchedData.underApproval;
 
 			const topPanelMoneyBag = topPanel.main.selectAll(".pbinadtopPanelMoneyBag")
 				.data([true])
@@ -992,9 +964,9 @@
 				});
 
 			const previousValue = d3.select(".pbinadtopPanelMainValue").size() !== 0 ? d3.select(".pbinadtopPanelMainValue").datum() : 0;
-
+			const previousAllocatedValue = d3.select(".pbinadtopPanelAllocatedValue").size() !== 0 ? d3.select(".pbinadtopPanelAllocatedValue").datum() : 0;
+			const previousUnderApprovalValue = d3.select(".pbinadtopPanelUnderApprovalValue").size() !== 0 ? d3.select(".pbinadtopPanelUnderApprovalValue").datum() : 0;
 			const previousPartnersValue = d3.select(".pbinadtopPanelPartnersValue").size() !== 0 ? d3.select(".pbinadtopPanelPartnersValue").datum() : 0;
-
 			const previousSubpartnersValue = d3.select(".pbinadtopPanelSubpartnersValue").size() !== 0 ? d3.select(".pbinadtopPanelSubpartnersValue").datum() : 0;
 
 			let topPanelMainValue = topPanel.main.selectAll(".pbinadtopPanelMainValue")
@@ -1038,7 +1010,7 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" Allocated in";
+						(chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? " in Allocations" : " Allocated in");
 				});
 
 			let topPanelSubText = topPanel.main.selectAll(".pbinadtopPanelSubText")
@@ -1056,7 +1028,97 @@
 			topPanelSubText.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text((chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A") + " (all partners)");
+				.text((chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "Launched in " : "") + (chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A"));
+
+			let topPanelAllocatedValue = topPanel.main.selectAll(".pbinadtopPanelAllocatedValue")
+				.data([totalAllocated]);
+
+			topPanelAllocatedValue = topPanelAllocatedValue.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelAllocatedValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.style("opacity", 0)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+				.merge(topPanelAllocatedValue);
+
+			topPanelAllocatedValue.transition()
+				.duration(duration)
+				.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousPartnersValue, d);
+					return function(t) {
+						const siString = formatSIFloat(i(t))
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
+					};
+				});
+
+			let topPanelAllocatedText = topPanel.main.selectAll(".pbinadtopPanelAllocatedText")
+				.data([totalAllocated]);
+
+			topPanelAllocatedText = topPanelAllocatedText.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelAllocatedText")
+				.style("opacity", 0)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+				.merge(topPanelAllocatedText);
+
+			topPanelAllocatedText.transition()
+				.duration(duration)
+				.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" Allocated";
+				});
+
+			let topPanelUnderApprovalValue = topPanel.main.selectAll(".pbinadtopPanelUnderApprovalValue")
+				.data([underApprovalValue]);
+
+			topPanelUnderApprovalValue = topPanelUnderApprovalValue.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelUnderApprovalValue contributionColorFill")
+				.attr("text-anchor", "end")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+				.merge(topPanelUnderApprovalValue);
+
+			topPanelUnderApprovalValue.transition()
+				.duration(duration)
+				.tween("text", function(d) {
+					const node = this;
+					const i = d3.interpolate(previousSubpartnersValue, d);
+					return function(t) {
+						const siString = formatSIFloat(i(t))
+						node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
+					};
+				});
+
+			let topPanelUnderApprovalText = topPanel.main.selectAll(".pbinadtopPanelUnderApprovalText")
+				.data([underApprovalValue]);
+
+			topPanelUnderApprovalText = topPanelUnderApprovalText.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelUnderApprovalText")
+				.style("opacity", 0)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+				.merge(topPanelUnderApprovalText);
+
+			topPanelUnderApprovalText.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.text(function(d) {
+					const valueSI = formatSIFloat(d);
+					const unit = valueSI[valueSI.length - 1];
+					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+						" Under Approval";
+				});
 
 			let topPanelPartnersValue = topPanel.main.selectAll(".pbinadtopPanelPartnersValue")
 				.data([partnersValue]);
@@ -1065,8 +1127,8 @@
 				.append("text")
 				.attr("class", "pbinadtopPanelPartnersValue contributionColorFill")
 				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
 				.merge(topPanelPartnersValue);
 
 			topPanelPartnersValue.transition()
@@ -1088,8 +1150,8 @@
 				.attr("class", "pbinadtopPanelPartnersText")
 				.style("opacity", 0)
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
-				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 				.merge(topPanelPartnersText);
 
 			topPanelPartnersText.transition()
@@ -1099,26 +1161,7 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" to direct";
-				});
-
-			let topPanelPartnersSubText = topPanel.main.selectAll(".pbinadtopPanelPartnersSubText")
-				.data([partnersValue]);
-
-			topPanelPartnersSubText = topPanelPartnersSubText.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelPartnersSubText")
-				.style("opacity", 0)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.4)
-				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding)
-				.merge(topPanelPartnersSubText);
-
-			topPanelPartnersSubText.transition()
-				.duration(duration)
-				.style("opacity", 1)
-				.text(function(d) {
-					return "partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
+						" to direct partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
 				});
 
 			let topPanelSubpartnersValue = topPanel.main.selectAll(".pbinadtopPanelSubpartnersValue")
@@ -1151,7 +1194,7 @@
 				.attr("class", "pbinadtopPanelSubpartnersText")
 				.style("opacity", 0)
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
 				.merge(topPanelSubpartnersText);
 
@@ -1162,32 +1205,13 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" to sub-impl.";
-				});
-
-			let topPanelSubpartnersSubText = topPanel.main.selectAll(".pbinadtopPanelSubpartnersSubText")
-				.data([subpartnersValue]);
-
-			topPanelSubpartnersSubText = topPanelSubpartnersSubText.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelSubpartnersSubText")
-				.style("opacity", 0)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.4)
-				.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] + topPanel.mainValueHorPadding)
-				.merge(topPanelSubpartnersSubText);
-
-			topPanelSubpartnersSubText.transition()
-				.duration(duration)
-				.style("opacity", 1)
-				.text(function(d) {
-					return "partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
+						" to sub-impl. partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
 				});
 
 			//end of createTopPanel
 		};
 
-		function createButtonsPanel(rawData, rawOngoingData) {
+		function createButtonsPanel(rawData, rawLaunchedAllocationsData) {
 
 			const clipPath = buttonsPanel.main.append("clipPath")
 				.attr("id", "pbinadclip")
@@ -1526,11 +1550,7 @@
 
 				setYearsDescriptionDiv();
 
-				const data = processData(rawData);
-
-				const ongoingData = processOngoingData(rawOngoingData);
-
-				setSankeyExtent(data, ongoingData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				selectDiv.selectAll(".pbinadCheckboxDiv")
 					.filter(function(d) {
@@ -1552,8 +1572,6 @@
 				createTopPanel(data);
 
 				createSankey(data);
-
-				createOngoing(ongoingData);
 
 				//end of clickButtonsRects
 			};
@@ -1889,15 +1907,7 @@
 				})
 				.style("opacity", 0)
 				.text(function(d) {
-					return d.name === "Syria Cross border" ? "Syria Cross" : d.name;
-				})
-				.each(function(d) {
-					if (d.name === "Syria Cross border") {
-						d3.select(this).append("tspan")
-							.attr("x", sankeyPanel.padding[3] - sankeyFundLabelsPadding)
-							.attr("dy", "1.2em")
-							.text("border");
-					};
+					return d.name;
 				});
 
 			sankeyFundLabels = sankeyFundLabelsEnter.merge(sankeyFundLabels);
@@ -4088,111 +4098,6 @@
 			//end of createSankey
 		};
 
-		function createOngoing(ongoingData) {
-
-			// ongoingPanel.main.append("rect")
-			// 	.attr("width", ongoingPanel.width)
-			// 	.attr("height", ongoingPanel.height)
-			// 	.style("opacity", 0.1);
-
-			ongoingData.forEach(function(row, index, arr) {
-				const previousObj = arr[index - 1];
-				row.yPos = previousObj ? previousObj.yPos + yScaleOngoing(previousObj.amount) + nodeVerticalPadding : 0;
-			});
-
-			const ongoingTitle = ongoingPanel.main.selectAll(".pbinadongoingTitle")
-				.data([true])
-				.enter()
-				.append("text")
-				.attr("class", "pbinadongoingTitle")
-				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth / 2)
-				.attr("y", ongoingTitlePadding)
-				.text("Ongoing")
-				.append("tspan")
-				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth / 2)
-				.attr("dy", "1.2em")
-				.text("Allocations");
-
-			let ongoingBars = ongoingPanel.main.selectAll(".pbinadongoingBars")
-				.data(ongoingData, function(d) {
-					return d.fund;
-				});
-
-			const ongoingBarsExit = ongoingBars.exit()
-				.transition()
-				.duration(duration)
-				.style("opacity", 0)
-				.remove();
-
-			const ongoingBarsEnter = ongoingBars.enter()
-				.append("rect")
-				.attr("class", "pbinadongoingBars")
-				.style("fill", cbpfColor)
-				.attr("x", ongoingWidth - ongoingPanel.padding[1] - nodeWidth)
-				.attr("width", nodeWidth)
-				.attr("y", function(d) {
-					return ongoingPanel.padding[0] + d.yPos;
-				})
-				.attr("height", function(d) {
-					return yScaleOngoing(d.amount)
-				});
-
-			ongoingBars = ongoingBarsEnter.merge(ongoingBars);
-
-			ongoingBars.transition()
-				.duration(duration)
-				.attr("y", function(d) {
-					return ongoingPanel.padding[0] + d.yPos;
-				})
-				.attr("height", function(d) {
-					return yScaleOngoing(d.amount)
-				});
-
-			let ongoingLabels = ongoingPanel.main.selectAll(".pbinadongoingLabels")
-				.data(ongoingData, function(d) {
-					return d.fund;
-				});
-
-			const ongoingLabelsExit = ongoingLabels.exit()
-				.transition()
-				.duration(duration)
-				.style("opacity", 0)
-				.remove();
-
-			const ongoingLabelsEnter = ongoingLabels.enter()
-				.append("text")
-				.attr("class", "pbinadongoingLabels")
-				.attr("text-anchor", "end")
-				.attr("x", ongoingPanel.width - ongoingPanel.padding[1] - nodeWidth - ongoingLabelsPadding)
-				.attr("y", function(d) {
-					return ongoingPanel.padding[0] + 3 + d.yPos + yScaleOngoing(d.amount) / 2;
-				})
-				.style("opacity", 0)
-				.text(function(d) {
-					return cbpfsList[d.fund] === "Syria Cross border" ? "Syria Cross" : cbpfsList[d.fund];
-				})
-				.each(function(d) {
-					if (cbpfsList[d.fund] === "Syria Cross border") {
-						d3.select(this).append("tspan")
-							.attr("x", ongoingPanel.width - ongoingPanel.padding[1] - nodeWidth - ongoingLabelsPadding)
-							.attr("dy", "1.2em")
-							.text("border");
-					};
-				});
-
-			ongoingLabels = ongoingLabelsEnter.merge(ongoingLabels);
-
-			ongoingLabels.call(hideLabels, textCollisionHeight)
-				.transition()
-				.duration(duration)
-				.style("opacity", 1)
-				.attr("y", function(d) {
-					return ongoingPanel.padding[0] + 3 + d.yPos + yScaleOngoing(d.amount) / 2;
-				});
-
-			//end of createOngoing
-		};
-
 		function createTimeline(rawData) {
 
 			const timelineData = processTimelineData(rawData);
@@ -4403,7 +4308,7 @@
 			//end of createTimeline
 		};
 
-		function preProcessData(rawData) {
+		function preProcessData(rawData, rawLaunchedAllocationsData) {
 
 			rawData.forEach(function(row) {
 				if (yearsArray.indexOf(+row.year) === -1) yearsArray.push(+row.year);
@@ -4411,22 +4316,40 @@
 				if (row.fund === "999") cerfInData = true;
 			});
 
+			rawLaunchedAllocationsData.forEach(row => {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
+
 			yearsArray.sort(function(a, b) {
 				return a - b;
 			});
 
 		};
 
-		function processData(rawData) {
+		function processData(rawData, rawLaunchedAllocationsData) {
 
 			const data = {
 				nodes: [],
 				links: []
 			};
 
+			topValuesLaunchedData.launched = 0;
+			topValuesLaunchedData.underApproval = 0;
+
 			level3order.length = 0;
 
 			chartState.cbpfsInData.length = 0;
+
+			rawLaunchedAllocationsData.forEach(function(row) {
+				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedCbpfs.includes(row.PooledFundId + "")) {
+					topValuesLaunchedData.launched += row.TotalUSDPlanned;
+					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+				};
+			});
 
 			rawData.forEach(function(row) {
 
@@ -4610,44 +4533,6 @@
 			return data;
 
 			//end of processData
-		};
-
-		function processOngoingData(rawOngoingData) {
-
-			const data = [];
-
-			rawOngoingData.forEach(function(row) {
-
-				if (chartState.selectedYear.indexOf(+row.AllocationYear) > -1 && chartState.selectedCbpfs.indexOf(row.PooledFundId) > -1) {
-					const foundFund = data.find(function(e) { return e.fund === row.PooledFundId });
-					if (foundFund) {
-						foundFund.amount += +row.TotalUSDPlanned;
-					} else {
-						data.push({
-							fund: row.PooledFundId,
-							amount: +row.TotalUSDPlanned
-						});
-					};
-				};
-
-			});
-
-			data.sort(function(a, b) {
-				return b.amount - a.amount;
-			})
-
-			return data;
-		};
-
-		function processUnderApproval(rawUnderApprovalData) {
-
-			const data = [];
-
-			console.log(data);
-			//CONTINUE HERE
-
-			return data;
-
 		};
 
 		function processTimelineData(rawData) {
@@ -4898,8 +4783,7 @@
 				acc += (curr.y1 - curr.y0) + nodeVerticalPadding;
 				return acc;
 			}, 0);
-			const extent = sankeyGenerator.extent();
-			const availableSpace = extent[1][1] - extent[0][1];
+			const availableSpace = sankeyPanel.height - sankeyPanel.padding[2] - sankeyPanel.padding[0];
 			const spacer = (availableSpace - usedSpace) / (isType ? partnerOrder.length + 1 : nodes.length + 1);
 			if (isType) {
 				partnerOrder.reverse().forEach(function(partner, i) {
@@ -4917,35 +4801,6 @@
 					node.y1 += (spacer * (i + 1));
 				});
 			};
-		};
-
-		function setSankeyExtent(data, ongoingData) {
-
-			const dataBudget = d3.sum(data.nodes.filter(function(d) {
-				return d.level === 1;
-			}), function(d) {
-				return d.amount;
-			});
-
-			const ongoingDataBudget = d3.sum(ongoingData.map(function(d) {
-				return d.amount
-			}));
-
-			yScale.domain([0, Math.max(dataBudget, ongoingDataBudget)]);
-
-			const extentArray = dataBudget > ongoingDataBudget ? [
-				[sankeyPanel.padding[3], sankeyPanel.padding[0]],
-				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2]]
-			] : [
-				[sankeyPanel.padding[3], sankeyPanel.padding[0] + (yScale(ongoingDataBudget - dataBudget) / 2)],
-				[sankeyPanel.width - sankeyPanel.padding[1], sankeyPanel.height - sankeyPanel.padding[2] - (yScale(ongoingDataBudget - dataBudget) / 2)]
-			];
-
-			sankeyGenerator.extent(extentArray);
-
-			yScaleOngoing.range([0, yScale.range()[1] - yScale.range()[0] - (ongoingData.length - 1) * nodeVerticalPadding])
-				.domain([0, ongoingDataBudget]);
-
 		};
 
 		function createAnnotationsDiv() {
@@ -5253,24 +5108,6 @@
 				}
 			});
 			return returnValue;
-		};
-
-		function pbiuacRow(d) {
-			d.TotalUSDPlanned = +d.TotalUSDPlanned;
-			d.PlannedStartDate = timeParse(d.PlannedStartDate);
-			d.PlannedEndDate = timeParse(d.PlannedEndDate);
-			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
-			if (!d.PlannedStartDate) {
-				d.PlannedStartDate = d.AllocationSource === "Standard" ?
-					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)
-			};
-			if (!d.PlannedEndDate) {
-				d.PlannedEndDate = d.AllocationSource === "Standard" ?
-					d3.timeMonth.offset(d.PlannedStartDate, 1) : d3.timeDay.offset(d.PlannedStartDate, 15)
-			};
-			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
-			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
-			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp) return d;
 		};
 
 		function createSnapshot(type, fromContextMenu) {
