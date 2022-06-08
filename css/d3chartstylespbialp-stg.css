@@ -105,7 +105,7 @@ p#pbialpd3chartTitle {
 	font-size: 48px;
 }
 
-.pbialptopPanelUnderApprovalValue {
+.pbialptopPanelUnderApprovalValue, .pbialptopPanelAllocatedValue {
 	font-family: "Arial", sans-serif;
 	font-size: 22px;
 }
@@ -116,7 +116,7 @@ p#pbialpd3chartTitle {
 	fill: #888;
 }
 
-.pbialptopPanelUnderApprovalText, .pbialptopPanelUnderApprovalSubText {
+.pbialptopPanelUnderApprovalText, .pbialptopPanelAllocatedText {
 	font-family: "Arial", sans-serif;
 	font-size: 15px;
 	fill: #888;
