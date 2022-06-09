@@ -1787,6 +1787,16 @@
 							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
+					topValuesLaunchedData.launched = 0;
+					topValuesLaunchedData.underApproval = 0;
+
+					rawLaunchedAllocationsData.forEach(function(row) {
+						if (chartState.selectedYear.includes(row.AllocationYear) && (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.includes(row.PooledFundName))) {
+							topValuesLaunchedData.launched += row.TotalUSDPlanned;
+							topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+						};
+					});
+
 					createTopPanel(data);
 
 					populateSelectedCbpfsDescriptionDiv();
