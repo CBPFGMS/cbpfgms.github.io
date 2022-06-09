@@ -2138,6 +2138,11 @@
 				.append("p")
 				.html("(" + datum.AllocationSource + ")");
 
+			const allocationValue = listDiv.append("div")
+				.attr("class", "pbiuacAllocationStart")
+				.append("p")
+				.html("<span class='" + thisColorClass + "'>Allocation value: </span>$" + formatMoney0Decimals(datum.TotalUSDPlanned));
+
 			const allocationStart = listDiv.append("div")
 				.attr("class", "pbiuacAllocationStart")
 				.append("p")
@@ -2153,7 +2158,7 @@
 			const allocationSummary = listDiv.append("div")
 				.attr("class", "pbiuacAllocationEnd")
 				.append("p")
-				.html("<span class='" + thisColorClass + "'>Allocation Summary: </span>" + thisSummary);
+				.html("<span class='" + thisColorClass + "'>Allocation Statement: </span>" + thisSummary);
 
 			const hrList = datum.HRPPlans ? datum.HRPPlans.split("##").join("; ") + "." : "n/a.";
 
