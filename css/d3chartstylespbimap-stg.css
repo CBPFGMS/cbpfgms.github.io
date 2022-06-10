@@ -639,4 +639,5 @@ svg.leaflet-zoom-animated {
 	font-size: 16px;
 	color: #666;
 	padding-left: 52px;
+	margin-bottom: 0px !important;
 }
