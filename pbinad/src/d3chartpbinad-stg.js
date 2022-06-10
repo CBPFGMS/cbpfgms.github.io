@@ -4344,8 +4344,10 @@
 
 			chartState.cbpfsInData.length = 0;
 
+			const allCbpfsSelected = chartState.selectedCbpfs.length === d3.keys(cbpfsDataList).length;
+
 			rawLaunchedAllocationsData.forEach(function(row) {
-				if (chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedCbpfs.includes(row.PooledFundId + "")) {
+				if (chartState.selectedYear.includes(row.AllocationYear) && (allCbpfsSelected || chartState.selectedCbpfs.includes(row.PooledFundId + ""))) {
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
 				};

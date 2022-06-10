@@ -275,6 +275,7 @@
 			clustersListFile = "https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 			partnersListFile = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 			modalitiesListFile = "https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
+			launchedAllocationsDataFile = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
 			promises = [],
 			filterTitles = ["Year", "CBPF", "Partner Type", "Cluster", "Allocation Type", "Location Level"],
 			filterColorsArray = ["#E8F5D6", "#F1E9DA", "#E4D8F3", "#E6E6E6", "#F8D8D3", "#D4E5F7"],
@@ -300,10 +301,13 @@
 			cbpfsInCompleteData = {},
 			lowercaseAllocationsTypeList = [],
 			countriesCoordinates = {},
+			launchedAllocationsData = [],
+			yearsWithUnderApprovalAboveMin = {},
 			completeData = [];
 
 		let initialChartState,
 			timer,
+			launchedValue,
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
@@ -326,6 +330,8 @@
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year") : containerDiv.node().getAttribute("data-year");
 
@@ -526,6 +532,7 @@
 		promises.push(d3.csv(clustersListFile));
 		promises.push(d3.csv(partnersListFile));
 		promises.push(d3.csv(modalitiesListFile));
+		promises.push(d3.csv(launchedAllocationsDataFile));
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
@@ -534,6 +541,15 @@
 		Promise.all(promises).then(function(rawData) {
 
 			removeProgressWheel();
+
+			rawData[6].forEach(function(row) {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + (+row.TotalUnderApprovalBudget);
+				launchedAllocationsData.push(row);
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
 
 			createCbpfsList(rawData[2]);
 
@@ -630,6 +646,9 @@
 			const title = titleDiv.append("p")
 				.attr("class", "pbimapTitle contributionColorHTMLcolor")
 				.html(chartTitle);
+
+			launchedValue = titleDiv.append("p")
+				.attr("class", "pbimaplaunchedValue");
 
 			const helpIcon = iconsDiv.append("button")
 				.attr("id", "pbimapHelpButton");
@@ -783,6 +802,18 @@
 		};
 
 		function createTopSvg(data) {
+
+			const yearsList = chartState.selectedYear.sort(function(a, b) {
+				return a - b;
+			}).reduce(function(acc, curr, index) {
+				return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+			}, "");
+
+			launchedValue.html("Launched Allocations in " + yearsList + ": ");
+
+			launchedValue.append("span")
+				.classed("contributionColorHTMLcolor", true)
+				.html("$" + formatSIFloat(data.launchedAllocations).replace("k", " Thousand").replace("M", " Million").replace("G", " Billion"));
 
 			const previousAllocations = d3.select(".pbimapTopSvgAllocations").size() ? d3.select(".pbimapTopSvgAllocations").datum() : 0;
 			const previousBeneficiaries = d3.select(".pbimapTopSvgBeneficiaries").size() ? d3.select(".pbimapTopSvgBeneficiaries").datum() : 0;
@@ -2518,7 +2549,9 @@
 				totalAllocations: 0,
 				totalBeneficiaries: 0,
 				totalProjects: 0,
-				totalPartners: 0
+				totalPartners: 0,
+				launchedAllocations: 0,
+				underApprovalAllocations: 0
 			};
 
 			let nestedData;
@@ -2686,6 +2719,13 @@
 				topSvgObject.totalProjects += totalNumberOfProjects.length;
 
 			};
+
+			launchedAllocationsData.forEach(function(row) {
+				if (filterYear(row.AllocationYear) && yearsWithUnderApprovalAboveMin[row.AllocationYear]) {
+					topSvgObject.launchedAllocations += (+row.TotalUSDPlanned);
+					topSvgObject.underApprovalAllocations += (+row.TotalUnderApprovalBudget);
+				};
+			});
 
 			return {
 				topSvgObject: topSvgObject,

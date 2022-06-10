@@ -2676,7 +2676,7 @@
 					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:270px;'><div style='display:flex;flex:0 54%;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total) +
 						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval <span style='color: #888;'>(" + (formatPercent(partnersUnderApproval.total / (partnersTotals.total + partnersUnderApproval.total))) +
 						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersUnderApproval.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total + partnersUnderApproval.total) + "</span></div></div>");
+						"</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
