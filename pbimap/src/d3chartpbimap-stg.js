@@ -803,13 +803,19 @@
 
 		function createTopSvg(data) {
 
-			const yearsList = chartState.selectedYear.sort(function(a, b) {
+			const yearsListOriginal = chartState.selectedYear.sort(function(a, b) {
 				return a - b;
-			}).reduce(function(acc, curr, index) {
-				return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+			}).filter(function(d) {
+				return yearsWithUnderApprovalAboveMin[d];
+			});
+
+			const yearsList = yearsListOriginal.reduce(function(acc, curr, index) {
+				return acc + (index >= yearsListOriginal.length - 2 ? index > yearsListOriginal.length - 2 ? curr : curr + " and " : curr + ", ");
 			}, "");
 
-			launchedValue.html("Launched Allocations in " + yearsList + ": ");
+			launchedValue
+				.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+				.html("Launched Allocations in " + yearsList + ": ");
 
 			launchedValue.append("span")
 				.classed("contributionColorHTMLcolor", true)
