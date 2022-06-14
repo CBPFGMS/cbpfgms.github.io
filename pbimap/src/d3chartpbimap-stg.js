@@ -308,6 +308,7 @@
 		let initialChartState,
 			timer,
 			launchedValue,
+			launchedValuePadding,
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem;
 
@@ -848,6 +849,12 @@
 						const siString = formatSIFloat(i(t));
 						node.textContent = "$" + (+unit !== +unit ? siString.substring(0, siString.length - 1) : siString);
 					};
+				})
+				.on("end", function() {
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const thisLeftPadding = thisBox.left - containerBox.left;
+					launchedValue.style("padding-left", thisLeftPadding - 28 + "px", "important"); //28px is the cumulative margins
 				});
 
 			let topSvgAllocationsText = topSvg.selectAll(".pbimapTopSvgAllocationsText")
