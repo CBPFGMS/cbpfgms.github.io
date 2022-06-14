@@ -281,6 +281,8 @@
 			.style("padding-left", "2%")
 			.html("*Only Paid Contributions.");
 
+		createProgressWheel(svg, width, height, "Loading visualisation...");
+
 		const snapshotTooltip = containerDiv.append("div")
 			.attr("id", classPrefix + "SnapshotTooltip")
 			.attr("class", classPrefix + "SnapshotContent")
@@ -437,6 +439,8 @@
 			rawDataContributions,
 			flagsData
 		]) {
+
+			removeProgressWheel();
 
 			createDonorNamesList(masterDonors);
 			createFundNamesList(masterFunds);
