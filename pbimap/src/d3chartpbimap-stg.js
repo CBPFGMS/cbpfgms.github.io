@@ -854,7 +854,7 @@
 					const thisBox = this.getBoundingClientRect();
 					const containerBox = containerDiv.node().getBoundingClientRect();
 					const thisLeftPadding = thisBox.left - containerBox.left;
-					launchedValue.style("padding-left", thisLeftPadding - 28 + "px", "important"); //28px is the cumulative margins
+					launchedValue.style("padding-left", thisLeftPadding + "px", "important");
 				});
 
 			let topSvgAllocationsText = topSvg.selectAll(".pbimapTopSvgAllocationsText")
