@@ -234,9 +234,14 @@ p#pbinadd3chartTitle {
 	pointer-events: none;
 }
 
-.pbinadtopPanelMainValue, .pbinadtopPanelPartnersValue, .pbinadtopPanelSubpartnersValue {
+.pbinadtopPanelMainValue {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
+}
+
+.pbinadtopPanelPartnersValue, .pbinadtopPanelSubpartnersValue, .pbinadtopPanelAllocatedValue, .pbinadtopPanelUnderApprovalValue {
+	font-family: "Arial", sans-serif;
+	font-size: 22px;
 }
 
 .pbinadtopPanelMainText, .pbinadtopPanelSubText {
@@ -245,7 +250,7 @@ p#pbinadd3chartTitle {
 	fill: #888;
 }
 
-.pbinadtopPanelPartnersText, .pbinadtopPanelPartnersSubText, .pbinadtopPanelSubpartnersText, .pbinadtopPanelSubpartnersSubText {
+.pbinadtopPanelPartnersText, .pbinadtopPanelPartnersSubText, .pbinadtopPanelSubpartnersText, .pbinadtopPanelAllocatedText, .pbinadtopPanelUnderApprovalText {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
 	fill: #888;
@@ -276,7 +281,7 @@ p#pbinadd3chartTitle {
 	font-weight: 700;
 }
 
-.pbinadsankeyFundLabels, .pbinadsankeyPartnerLabels, .pbinadsankeySubpartnerLabels {
+.pbinadsankeyFundLabels, .pbinadsankeyPartnerLabels, .pbinadsankeySubpartnerLabels, .pbinadongoingLabels {
 	font-family: "Roboto", sans-serif;
 	font-size: 10px;
 	fill: #222;
@@ -378,4 +383,13 @@ p#pbinadd3chartTitle {
 .pbinadSnapshotContent #pbinadSnapshotPdfText:hover, .pbinadSnapshotContent #pbinadSnapshotPngText:hover, .pbinadSnapshotContent #pbinadSnapshotTooltipPdfText:hover, .pbinadSnapshotContent #pbinadSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
+}
+
+.pbinadongoingTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: #444;
+	pointer-events: none;
+	text-anchor: middle;
+	font-weight: bold;
 }

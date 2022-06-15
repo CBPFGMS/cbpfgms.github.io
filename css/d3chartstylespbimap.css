@@ -269,6 +269,7 @@
 	display: flex;
 	width: 100%;
 	margin-bottom: 12px;
+	margin-top: 12px;
 }
 
 .pbimapTitleDiv, .pbimapListTitleDiv {
@@ -631,4 +632,12 @@ svg.leaflet-zoom-animated {
 .pbimapSnapshotContent #pbimapSnapshotPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotPngText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText:hover {
 	background-color: #1F69B3;
 	color: white;
+}
+
+.pbimaplaunchedValue {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+	padding-left: 68px;
+	margin-bottom: 0px !important;
 }

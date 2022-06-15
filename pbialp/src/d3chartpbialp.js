@@ -194,6 +194,7 @@
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
+			classPrefix = "pbialp",
 			vizNameQueryString = "allocations",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#CBPF_Allocations",
@@ -217,6 +218,7 @@
 			buttonsNumber = 8,
 			chartTitleDefault = "Allocations by Organization Type",
 			file = "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&FundingType=3&$format=csv",
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
@@ -227,6 +229,8 @@
 			titlePadding = 26,
 			partnersTotals = {},
 			partnersUnderApproval = {},
+			yearsWithUnderApprovalAboveMin = {},
+			topValuesLaunchedData = {},
 			cbpfsCompleteList = [],
 			chartState = {
 				selectedYear: [],
@@ -253,6 +257,8 @@
 		const lazyLoad = (containerDiv.node().getAttribute("data-lazyload") === "true");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
@@ -362,7 +368,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			moneyBagPadding: 50,
-			leftPadding: [180, 468, 110],
+			leftPadding: [180, 434, 110],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 4
 		};
@@ -497,27 +503,38 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbialpdata") &&
-			JSON.parse(localStorage.getItem("pbialpdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbialpdata")).data);
-			console.info("pbialp: data from local storage");
-			csvCallback(rawData);
-		} else {
-			d3.csv(file).then(function(rawData) {
-				try {
-					localStorage.setItem("pbialpdata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbialp, " + error);
-				};
-				console.info("pbialp: data from API");
-				csvCallback(rawData);
-			});
+		Promise.all([
+				fetchFile(classPrefix + "data", file, "allocations data", "csv"),
+				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+			])
+			.then(allData => csvCallback(allData));
+
+		function fetchFile(fileName, url, warningString, method) {
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data, d3.autoType) :
+					JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+				return Promise.resolve(fetchedData);
+			} else {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				const rowFunction = method === "csv" ? d3.autoType : null;
+				return fetchMethod(url, rowFunction).then(fetchedData => {
+					try {
+						localStorage.setItem(fileName, JSON.stringify({
+							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info(classPrefix + " chart, " + error);
+					};
+					console.info(classPrefix + " chart info: " + warningString + " from API");
+					return fetchedData;
+				});
+			};
 		};
 
-		function csvCallback(rawData) {
+		function csvCallback([rawData, rawLaunchedAllocationsData]) {
 
 			removeProgressWheel();
 
@@ -528,12 +545,20 @@
 				return self.indexOf(value) === index;
 			}).sort();
 
+			rawLaunchedAllocationsData.forEach(row => {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
+
 			validateYear(selectedYearString);
 
 			validateCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
-				draw(rawData);
+				draw(rawData, rawLaunchedAllocationsData);
 			} else {
 				d3.select(window).on("scroll.pbialp", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbialp", function() {
@@ -546,16 +571,16 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbialp", null);
-					draw(rawData);
+					draw(rawData, rawLaunchedAllocationsData);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData) {
+		function draw(rawData, rawLaunchedAllocationsData) {
 
-			let data = processData(rawData);
+			let data = processData(rawData, rawLaunchedAllocationsData);
 
 			const allCbpfs = [];
 
@@ -901,7 +926,11 @@
 					});
 				});
 
-				const mainValue = partnersTotals[chartState.selectedPartner];
+				const totalLaunched = topValuesLaunchedData.launched;
+
+				const totalAllocated = partnersTotals[chartState.selectedPartner];
+
+				const mainValue = chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? totalLaunched : totalAllocated;
 
 				partnerListWithTotal.forEach(function(d) {
 					partnersUnderApproval[d] = d3.sum(data, function(e) {
@@ -925,6 +954,8 @@
 					});
 
 				const previousMainValue = d3.select(".pbialptopPanelMainValue").size() !== 0 ? d3.select(".pbialptopPanelMainValue").datum() : 0;
+
+				const previousAllocatedValue = d3.select(".pbialptopPanelAllocatedValue").size() !== 0 ? d3.select(".pbialptopPanelAllocatedValue").datum() : 0;
 
 				const previousUnderApprovalValue = d3.select(".pbialptopPanelUnderApprovalValue").size() !== 0 ? d3.select(".pbialptopPanelUnderApprovalValue").datum() : 0;
 
@@ -956,7 +987,7 @@
 						const i = d3.interpolate(previousMainValue, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
-							node.textContent = "$" + siString.substring(0, siString.length - 1);
+							node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 						};
 					});
 
@@ -972,11 +1003,10 @@
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelMainText.text(function(d) {
-					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" Allocated in " + yearsText;
+						(chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? " in Allocations" : " Allocated");
 				});
 
 				let topPanelSubText = mainValueGroup.selectAll(".pbialptopPanelSubText")
@@ -991,23 +1021,59 @@
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding);
 
 				topPanelSubText.text(function(d) {
-					return "(" +
-						(chartState.selectedPartner === "total" ? "all partners" :
-							chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
-							chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
-							chartState.selectedPartner) +
-						")";
+					const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+					return (chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? "Launched in " : "in ") + yearsText;
 				});
 
-				if (chartState.selectedPartner === "National NGO" && chartState.netFunding === 2) {
-					topPanelSubText.text("(National Partners")
-						.append("tspan")
-						.style("fill", underApprovalColor)
-						.text("*")
-						.append("tspan")
-						.style("fill", "#888")
-						.text(")");
-				};
+				let allocatedValueGroup = topPanel.main.selectAll(".pbialpallocatedValueGroup")
+					.data([true]);
+
+				allocatedValueGroup = allocatedValueGroup.enter()
+					.append("g")
+					.attr("class", "pbialpallocatedValueGroup")
+					.merge(allocatedValueGroup);
+
+				let topPanelAllocatedValue = allocatedValueGroup.selectAll(".pbialptopPanelAllocatedValue")
+					.data([totalAllocated]);
+
+				topPanelAllocatedValue = topPanelAllocatedValue.enter()
+					.append("text")
+					.attr("class", "pbialptopPanelAllocatedValue contributionColorFill")
+					.attr("text-anchor", "end")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding / 2)
+					.merge(topPanelAllocatedValue);
+
+				topPanelAllocatedValue.transition()
+					.duration(duration)
+					.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+					.tween("text", function(d) {
+						const node = this;
+						const i = d3.interpolate(previousUnderApprovalValue, d);
+						return function(t) {
+							const siString = formatSIFloat(i(t))
+							node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
+						};
+					});
+
+				let topPanelAllocatedText = allocatedValueGroup.selectAll(".pbialptopPanelAllocatedText")
+					.data([valueUnderApproval]);
+
+				topPanelAllocatedText = topPanelAllocatedText.enter()
+					.append("text")
+					.attr("class", "pbialptopPanelAllocatedText")
+					.attr("text-anchor", "start")
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.2)
+					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
+					.merge(topPanelAllocatedText);
+
+				topPanelAllocatedText.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+					.text(function(d) {
+						const valueSI = formatSIFloat(d);
+						const unit = valueSI[valueSI.length - 1];
+						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
+							" Allocated";
+					});
 
 				let underApprovalValueGroup = topPanel.main.selectAll(".pbialpunderApprovalValueGroup")
 					.data([true]);
@@ -1024,21 +1090,9 @@
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalValue contributionColorFill")
 					.attr("text-anchor", "end")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding / 2)
 					.merge(topPanelUnderApprovalValue);
-
-				const fakeUnderApprovalValue = topPanel.main.append("text")
-					.attr("class", "pbialptopPanelUnderApprovalValue")
-					.style("opacity", 0)
-					.text(function() {
-						const siString = formatSIFloat(valueUnderApproval);
-						return "$" + siString.substring(0, siString.length - 1);
-					});
-
-				const underApprovalValueTextLength = ~~(fakeUnderApprovalValue.node().getComputedTextLength());
-
-				fakeUnderApprovalValue.remove();
 
 				topPanelUnderApprovalValue.transition()
 					.duration(duration)
@@ -1047,7 +1101,7 @@
 						const i = d3.interpolate(previousUnderApprovalValue, d);
 						return function(t) {
 							const siString = formatSIFloat(i(t))
-							node.textContent = "$" + siString.substring(0, siString.length - 1);
+							node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 						};
 					});
 
@@ -1058,7 +1112,7 @@
 					.append("text")
 					.attr("class", "pbialptopPanelUnderApprovalText")
 					.attr("text-anchor", "start")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.6)
+					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] + topPanel.mainValueHorPadding / 2)
 					.merge(topPanelUnderApprovalText);
 
@@ -1066,38 +1120,8 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" under Approval";
+						" Under Approval";
 				});
-
-				let topPanelUnderApprovalSubText = underApprovalValueGroup.selectAll(".pbialptopPanelUnderApprovalSubText")
-					.data([true]);
-
-				topPanelUnderApprovalSubText = topPanelUnderApprovalSubText.enter()
-					.append("text")
-					.attr("class", "pbialptopPanelUnderApprovalSubText")
-					.attr("text-anchor", "start")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
-					.attr("x", topPanel.moneyBagPadding + (topPanel.leftPadding[1] - underApprovalValueTextLength - (topPanel.mainValueHorPadding / 2)))
-					.merge(topPanelUnderApprovalSubText)
-
-				topPanelUnderApprovalSubText.text(function(d) {
-					return "(" +
-						(chartState.selectedPartner === "total" ? "All Partners" :
-							chartState.selectedPartner === "Red Cross/Crescent Movement" ? "Red Cross/Cres. Mov." :
-							chartState.selectedPartner === "National NGO" && chartState.netFunding === 2 ? "National Partners" :
-							chartState.selectedPartner) +
-						")";
-				});
-
-				if (chartState.selectedPartner === "National NGO" && chartState.netFunding === 2) {
-					topPanelUnderApprovalSubText.text("(National Partners")
-						.append("tspan")
-						.style("fill", underApprovalColor)
-						.text("*")
-						.append("tspan")
-						.style("fill", "#888")
-						.text(")");
-				};
 
 				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbialptopPanelCbpfsNumber")
 					.data([data.length]);
@@ -1763,6 +1787,16 @@
 							.classed("contributionColorDarkerFill", d.clicked);
 					});
 
+					topValuesLaunchedData.launched = 0;
+					topValuesLaunchedData.underApproval = 0;
+
+					rawLaunchedAllocationsData.forEach(function(row) {
+						if (chartState.selectedYear.includes(row.AllocationYear) && (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.includes(row.PooledFundName))) {
+							topValuesLaunchedData.launched += row.TotalUSDPlanned;
+							topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+						};
+					});
+
 					createTopPanel(data);
 
 					populateSelectedCbpfsDescriptionDiv();
@@ -2121,7 +2155,7 @@
 					svg.select(".pbialpLegendTextNetFunding")
 						.style("opacity", chartState.netFunding === 1 ? 0 : 1);
 
-					data = processData(rawData);
+					data = processData(rawData, rawLaunchedAllocationsData);
 
 					data.forEach(function(d) {
 						if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
@@ -2570,7 +2604,7 @@
 
 				setYearsDescriptionDiv();
 
-				data = processData(rawData);
+				data = processData(rawData, rawLaunchedAllocationsData);
 
 				const allCbpfs = data.map(function(d) {
 					return d.cbpf
@@ -2642,7 +2676,7 @@
 					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:270px;'><div style='display:flex;flex:0 54%;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total) +
 						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval <span style='color: #888;'>(" + (formatPercent(partnersUnderApproval.total / (partnersTotals.total + partnersUnderApproval.total))) +
 						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersUnderApproval.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(partnersTotals.total + partnersUnderApproval.total) + "</span></div></div>");
+						"</span></div></div>");
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
@@ -3251,7 +3285,17 @@
 			});
 		};
 
-		function processData(rawData) {
+		function processData(rawData, rawLaunchedAllocationsData) {
+
+			topValuesLaunchedData.launched = 0;
+			topValuesLaunchedData.underApproval = 0;
+
+			rawLaunchedAllocationsData.forEach(function(row) {
+				if (chartState.selectedYear.includes(row.AllocationYear) && (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.includes(row.PooledFundName))) {
+					topValuesLaunchedData.launched += row.TotalUSDPlanned;
+					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+				};
+			});
 
 			const aggregatedAllocations = [];
 
