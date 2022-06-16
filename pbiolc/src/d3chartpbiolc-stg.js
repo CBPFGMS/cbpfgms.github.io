@@ -261,8 +261,6 @@
 
 		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
-		console.log(minimumUnderApprovalValue);
-
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
