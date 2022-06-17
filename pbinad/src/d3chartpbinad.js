@@ -1161,7 +1161,7 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" to direct partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
+						" to direct partners (" + formatPercent1dec((d / totalAllocated) || 0) + ")";
 				});
 
 			let topPanelSubpartnersValue = topPanel.main.selectAll(".pbinadtopPanelSubpartnersValue")
@@ -1205,7 +1205,7 @@
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
 					return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-						" to sub-impl. partners (" + formatPercent1dec((d / mainValue) || 0) + ")";
+						" to sub-impl. partners (" + formatPercent1dec((d / totalAllocated) || 0) + ")";
 				});
 
 			//end of createTopPanel
