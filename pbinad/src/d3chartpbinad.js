@@ -4781,6 +4781,15 @@
 		};
 
 		function justifyNodes(nodes, isType, partnerOrder) {
+			nodes.forEach(function(node, i, arr) {
+				if (i < arr.length - 1) {
+					if (arr[i + 1].y0 > node.y1 + nodeVerticalPadding) {
+						const difference = arr[i + 1].y0 - node.y1;
+						arr[i + 1].y0 -= difference - nodeVerticalPadding;
+						arr[i + 1].y1 -= difference - nodeVerticalPadding;
+					};
+				};
+			});
 			const usedSpace = nodes.reduce(function(acc, curr) {
 				acc += (curr.y1 - curr.y0) + nodeVerticalPadding;
 				return acc;
