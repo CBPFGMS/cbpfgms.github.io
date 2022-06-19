@@ -220,6 +220,9 @@
 			localVariable = d3.local(),
 			tooltipBarWidth = 288,
 			vizNameQueryString = "clusters",
+			classPrefix = "pbiolc",
+			dataFileUrl = "https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv",
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#clusters",
 			modalities = ["total", "standard", "reserve"],
@@ -231,6 +234,8 @@
 				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
 			],
 			cbpfsList = {},
+			yearsWithUnderApprovalAboveMin = {},
+			topValuesLaunchedData = {},
 			chartState = {
 				selectedYear: [],
 				selectedModality: null,
@@ -243,6 +248,7 @@
 		let yearsArray,
 			isSnapshotTooltipVisible = false,
 			timer,
+			launchedValuePadding,
 			currentHoveredElem;
 
 		const queryStringValues = new URLSearchParams(location.search);
@@ -252,6 +258,8 @@
 		const containerDiv = d3.select("#d3chartcontainerpbiolc");
 
 		const showHelp = (containerDiv.node().getAttribute("data-showhelp") === "true");
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const showLink = (containerDiv.node().getAttribute("data-showlink") === "true");
 
@@ -292,6 +300,12 @@
 
 		const selectDiv = containerDiv.append("div")
 			.attr("class", "pbiolcSelectDiv");
+
+		const launchedValueDiv = containerDiv.append("div")
+			.attr("class", "pbiolclaunchedValueDiv");
+
+		const launchedValue = launchedValueDiv.append("p")
+			.attr("class", "pbiolclaunchedValue");
 
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -477,27 +491,38 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiolcdata") &&
-			JSON.parse(localStorage.getItem("pbiolcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiolcdata")).data);
-			console.info("pbiolc: data from local storage");
-			csvCallback(rawData);
-		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv").then(function(rawData) {
-				try {
-					localStorage.setItem("pbiolcdata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbiolc, " + error);
-				};
-				console.info("pbiolc: data from API");
-				csvCallback(rawData);
-			});
+		Promise.all([
+				fetchFile(classPrefix + "data", dataFileUrl, "sectors data", "csv"),
+				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+			])
+			.then(allData => csvCallback(allData));
+
+		function fetchFile(fileName, url, warningString, method) {
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data, d3.autoType) :
+					JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+				return Promise.resolve(fetchedData);
+			} else {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				const rowFunction = method === "csv" ? d3.autoType : null;
+				return fetchMethod(url, rowFunction).then(fetchedData => {
+					try {
+						localStorage.setItem(fileName, JSON.stringify({
+							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info(classPrefix + " chart, " + error);
+					};
+					console.info(classPrefix + " chart info: " + warningString + " from API");
+					return fetchedData;
+				});
+			};
 		};
 
-		function csvCallback(rawData) {
+		function csvCallback([rawData, rawLaunchedAllocationsData]) {
 
 			removeProgressWheel();
 
@@ -512,6 +537,14 @@
 				return a - b;
 			});
 
+			rawLaunchedAllocationsData.forEach(row => {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
+
 			validateYear(selectedYearString);
 
 			chartState.selectedModality = selectedModality;
@@ -523,7 +556,7 @@
 			if (!isInternetExplorer) saveFlags(clusters);
 
 			if (!lazyLoad) {
-				draw(rawData);
+				draw(rawData, rawLaunchedAllocationsData);
 			} else {
 				d3.select(window).on("scroll.pbiolc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiolc", function() {
@@ -536,16 +569,16 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbiolc", null);
-					draw(rawData);
+					draw(rawData, rawLaunchedAllocationsData);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData) {
+		function draw(rawData, rawLaunchedAllocationsData) {
 
-			let data = processData(rawData);
+			let data = processData(rawData, rawLaunchedAllocationsData);
 
 			setxScaleDomains(data);
 
@@ -973,7 +1006,7 @@
 						};
 					};
 
-					data = processData(rawData);
+					data = processData(rawData, rawLaunchedAllocationsData);
 
 					setxScaleDomains(data);
 
@@ -993,6 +1026,24 @@
 			};
 
 			function createTopPanel() {
+
+				const yearsListOriginal = chartState.selectedYear.sort(function(a, b) {
+					return a - b;
+				}).filter(function(d) {
+					return yearsWithUnderApprovalAboveMin[d];
+				});
+
+				const yearsList = yearsListOriginal.reduce(function(acc, curr, index) {
+					return acc + (index >= yearsListOriginal.length - 2 ? index > yearsListOriginal.length - 2 ? curr : curr + " and " : curr + ", ");
+				}, "");
+
+				launchedValue
+					.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+					.html("Launched Allocations in " + yearsList + ": ");
+
+				launchedValue.append("span")
+					.classed("contributionColorHTMLcolor", true)
+					.html("$" + formatSIFloat(topValuesLaunchedData.launched).replace("k", " Thousand").replace("M", " Million").replace("G", " Billion"));
 
 				const mainValue = d3.sum(data, function(d) {
 					return d[chartState.selectedModality];
@@ -1047,6 +1098,12 @@
 							const siString = formatSIFloat(i(t))
 							node.textContent = "$" + (i(t) < 1e3 ? ~~(i(t)) : siString.substring(0, siString.length - 1));
 						};
+					})
+					.on("end", function() {
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const thisLeftPadding = thisBox.left - containerBox.left;
+						launchedValue.style("padding-left", thisLeftPadding + "px", "important");
 					});
 
 				let topPanelMainText = mainValueGroup.selectAll(".pbiolctopPanelMainText")
@@ -1912,7 +1969,7 @@
 
 				setYearsDescriptionDiv();
 
-				data = processData(rawData);
+				data = processData(rawData, rawLaunchedAllocationsData);
 
 				selectDiv.selectAll(".pbiolcCheckboxDiv")
 					.filter(function(d) {
@@ -2253,7 +2310,19 @@
 			//end of draw
 		};
 
-		function processData(rawData) {
+		function processData(rawData, rawLaunchedAllocationsData) {
+
+			topValuesLaunchedData.launched = 0;
+			topValuesLaunchedData.underApproval = 0;
+
+			const allCbpfsSelected = chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+
+			rawLaunchedAllocationsData.forEach(function(row) {
+				if (chartState.selectedYear.includes(row.AllocationYear) && (allCbpfsSelected || chartState.selectedCbpfs.includes("id" + row.PooledFundId))) {
+					topValuesLaunchedData.launched += row.TotalUSDPlanned;
+					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+				};
+			});
 
 			chartState.cbpfsInData.length = 0;
 

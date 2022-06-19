@@ -104,6 +104,18 @@ p#pbiolcd3chartTitle {
 	flex-wrap: wrap;
 }
 
+.pbiolclaunchedValueDiv {
+	width: 100%;
+	margin-top: 1em;
+}
+
+.pbiolclaunchedValue {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+	padding-left: 98px;
+}
+
 .pbiolcCheckboxDiv {
 	display: flex;
 	margin-right: 12px;

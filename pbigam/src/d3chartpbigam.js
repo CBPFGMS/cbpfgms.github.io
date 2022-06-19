@@ -200,6 +200,7 @@
 			highlightColor = "#F79A3B",
 			chartTitleDefault = "Gender with Age Marker (GAM)",
 			vizNameQueryString = "gam",
+			classPrefix = "pbigam",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#GAM",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
@@ -210,6 +211,7 @@
 			],
 			dataFile = "https://cbpfapi.unocha.org/vo2/odata/ProjectGAMSummary?PoolfundCodeAbbrv=&$format=csv",
 			metadataFile = "https://cbpfapi.unocha.org/vo2/odata/GenderMarker?$format=csv",
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			displayTypes = ["marker", "aggregated"],
 			allocationValueTypes = {
 				budget: "allocations",
@@ -229,6 +231,8 @@
 			colorsRange = ["#418FDE", "#A4D65E", "#E2E868", "#ECA154", "#E56A54"],
 			yearsArray = [],
 			cbpfsList = {},
+			yearsWithUnderApprovalAboveMin = {},
+			topValuesLaunchedData = {},
 			chartState = {
 				selectedYear: [],
 				selectedCbpfs: [],
@@ -241,6 +245,7 @@
 
 		let isSnapshotTooltipVisible = false,
 			firstTime = true,
+			launchedValuePadding,
 			height = padding[0] + padding[2] + topPanelHeight + buttonsPanelHeight + beeswarmGroupHeight + legendPanelHeight + (3 * panelHorizontalPadding),
 			currentHoveredElem;
 
@@ -253,6 +258,8 @@
 		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
 
 		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
+
+		const minimumUnderApprovalValue = +containerDiv.node().getAttribute("data-minvalue") || 0;
 
 		const chartTitle = containerDiv.node().getAttribute("data-title") ? containerDiv.node().getAttribute("data-title") : chartTitleDefault;
 
@@ -293,6 +300,12 @@
 
 		const selectDiv = containerDiv.append("div")
 			.attr("class", "pbigamSelectDiv");
+
+		const launchedValueDiv = containerDiv.append("div")
+			.attr("class", "pbigamlaunchedValueDiv");
+
+		const launchedValue = launchedValueDiv.append("p")
+			.attr("class", "pbigamlaunchedValue");
 
 		const svg = containerDiv.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -453,49 +466,39 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbigammetadata") &&
-			JSON.parse(localStorage.getItem("pbigammetadata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const metaData = d3.csvParse(JSON.parse(localStorage.getItem("pbigammetadata")).data);
-			console.info("pbigam: metadata from local storage");
-			getData(metaData);
-		} else {
-			d3.csv(metadataFile).then(function(metaData) {
-				try {
-					localStorage.setItem("pbigammetadata", JSON.stringify({
-						data: d3.csvFormat(metaData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbigam, " + error);
-				};
-				console.info("pbigam: metadata from API");
-				getData(metaData);
-			});
-		};
+		Promise.all([
+				fetchFile(classPrefix + "data", dataFile, "data", "csv"),
+				fetchFile(classPrefix + "metadata", metadataFile, "metadata", "csv"),
+				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+			])
+			.then(allData => csvCallback(allData));
 
-		function getData(metaData) {
-			if (localStorage.getItem("pbigamdata") &&
-				JSON.parse(localStorage.getItem("pbigamdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbigamdata")).data);
-				console.info("pbigam: data from local storage");
-				csvCallback(rawData, metaData);
+		function fetchFile(fileName, url, warningString, method) {
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data, d3.autoType) :
+					JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+				return Promise.resolve(fetchedData);
 			} else {
-				d3.csv(dataFile).then(function(rawData) {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				const rowFunction = method === "csv" ? d3.autoType : null;
+				return fetchMethod(url, rowFunction).then(fetchedData => {
 					try {
-						localStorage.setItem("pbigamdata", JSON.stringify({
-							data: d3.csvFormat(rawData),
+						localStorage.setItem(fileName, JSON.stringify({
+							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {
-						console.info("D3 chart pbigam, " + error);
+						console.info(classPrefix + " chart, " + error);
 					};
-					console.info("pbigam: data from API");
-					csvCallback(rawData, metaData);
+					console.info(classPrefix + " chart info: " + warningString + " from API");
+					return fetchedData;
 				});
 			};
 		};
 
-		function csvCallback(rawData, metaData) {
+		function csvCallback([rawData, metaData, rawLaunchedAllocationsData]) {
 
 			removeProgressWheel();
 
@@ -511,8 +514,16 @@
 				return chartState.selectedYear.indexOf(d.year) > -1 && d.year !== yearWithMixedGroups;
 			})[0].gamGroup);
 
+			rawLaunchedAllocationsData.forEach(row => {
+				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
+
 			if (!lazyLoad) {
-				draw(rawData);
+				draw(rawData, rawLaunchedAllocationsData);
 			} else {
 				d3.select(window).on("scroll.pbigam", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
@@ -528,24 +539,24 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbigam", null);
-					draw(rawData);
+					draw(rawData, rawLaunchedAllocationsData);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData) {
+		function draw(rawData, rawLaunchedAllocationsData) {
 
-			const data = processData(rawData);
+			const data = processData(rawData, rawLaunchedAllocationsData);
 
 			createTitle(rawData);
 
-			createCheckboxes(rawData);
+			createCheckboxes(rawData, rawLaunchedAllocationsData);
 
 			createTopPanel(data);
 
-			createButtonsPanel(rawData);
+			createButtonsPanel(rawData, rawLaunchedAllocationsData);
 
 			setYearsDescriptionDiv();
 
@@ -801,7 +812,7 @@
 			//end of createTitle
 		};
 
-		function createCheckboxes(rawData) {
+		function createCheckboxes(rawData, rawLaunchedAllocationsData) {
 
 			selectTitleDiv.html("Select CBPF:");
 
@@ -893,7 +904,7 @@
 					};
 				};
 
-				const data = processData(rawData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				createTopPanel(data);
 				createBeeswarm(data);
@@ -905,6 +916,24 @@
 		};
 
 		function createTopPanel(data) {
+
+			const yearsListOriginal = chartState.selectedYear.sort(function(a, b) {
+				return a - b;
+			}).filter(function(d) {
+				return yearsWithUnderApprovalAboveMin[d];
+			});
+
+			const yearsList = yearsListOriginal.reduce(function(acc, curr, index) {
+				return acc + (index >= yearsListOriginal.length - 2 ? index > yearsListOriginal.length - 2 ? curr : curr + " and " : curr + ", ");
+			}, "");
+
+			launchedValue
+				.style("opacity", chartState.selectedYear.some(e => yearsWithUnderApprovalAboveMin[e]) ? 1 : 0)
+				.html("Launched Allocations in " + yearsList + ": ");
+
+			launchedValue.append("span")
+				.classed("contributionColorHTMLcolor", true)
+				.html("$" + formatSIFloat(topValuesLaunchedData.launched).replace("k", " Thousand").replace("M", " Million").replace("G", " Billion"));
 
 			const mainValue = d3.sum(data, function(d) {
 				return d.allocations;
@@ -967,6 +996,12 @@
 						const siString = formatSIFloat(i(t))
 						node.textContent = "$" + (+siString === +siString ? siString : siString.substring(0, siString.length - 1));
 					};
+				})
+				.on("end", function() {
+					const thisBox = this.getBoundingClientRect();
+					const containerBox = containerDiv.node().getBoundingClientRect();
+					const thisLeftPadding = thisBox.left - containerBox.left;
+					launchedValue.style("padding-left", thisLeftPadding + "px", "important");
 				});
 
 			let topPanelMainText = mainValueGroup.selectAll(".pbigamtopPanelMainText")
@@ -1082,7 +1117,7 @@
 			//end of createTopPanel
 		};
 
-		function createButtonsPanel(rawData) {
+		function createButtonsPanel(rawData, rawLaunchedAllocationsData) {
 
 			const buttonsLegendGroup = buttonsPanel.main.selectAll(".pbigambuttonsLegendGroup")
 				.data(gamGroupsArray)
@@ -1542,7 +1577,7 @@
 
 				setYearsDescriptionDiv();
 
-				const data = processData(rawData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				selectDiv.selectAll(".pbigamCheckboxDiv")
 					.filter(function(d) {
@@ -1654,7 +1689,7 @@
 					return chartState.display === e ? "white" : "#444";
 				});
 
-				const data = processData(rawData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				resizeSVG();
 				setScales();
@@ -1691,7 +1726,7 @@
 					return chartState.allocationValue === allocationValueTypes[e] ? "white" : "#444";
 				});
 
-				const data = processData(rawData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 
 				createBeeswarm(data);
 				createLegend(data);
@@ -2457,15 +2492,17 @@
 		function processRawData(rawData, metaData) {
 
 			metaData.forEach(function(d) {
+				d.GenderMarkerCode = d.GenderMarkerCode + "";
 				gamDescriptions.push({
 					gamGroup: d.GenderMarkerGroup,
-					gamCode: d.GenderMarkerCode,
+					gamCode: d.GenderMarkerCode + "",
 					gamFullDescription: d.GenderMarkerDescription,
 					gamDescription: d.GenderMarkerDescription.split("-")[1].trim()
 				});
 			});
 
 			rawData.forEach(function(row) {
+				row.GenderMarkerCode = row.GenderMarkerCode + "";
 				if (!cbpfsList["id" + row.PooledFundId]) {
 					cbpfsList["id" + row.PooledFundId] = row.PooledFundName;
 				};
@@ -2496,7 +2533,21 @@
 			//end of processRawData
 		};
 
-		function processData(rawData) {
+		function processData(rawData, rawLaunchedAllocationsData) {
+
+			topValuesLaunchedData.launched = 0;
+			topValuesLaunchedData.underApproval = 0;
+
+			const allCbpfsSelected = chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
+
+			rawLaunchedAllocationsData.forEach(function(row) {
+				if (chartState.selectedYear.includes(row.AllocationYear) && (allCbpfsSelected || chartState.selectedCbpfs.includes("id" + row.PooledFundId))) {
+					topValuesLaunchedData.launched += row.TotalUSDPlanned;
+					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
+				};
+			});
+
+			console.log(topValuesLaunchedData);
 
 			const data = [];
 
