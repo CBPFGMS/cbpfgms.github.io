@@ -190,7 +190,7 @@
 			vizNameQueryString = "sankey",
 			allocationsDataUrl = "https://cbpfgms.github.io/pfbi-data/allocationSummarySankey.csv",
 			contributionsDataUrl = "https://cbpfgms.github.io/pfbi-data/contributionSummarySankey.csv",
-			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
+			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			masterDonorsUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstDonor.json",
 			masterFundsUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 			masterAllocationTypesUrl = "https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",

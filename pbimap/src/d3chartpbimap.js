@@ -275,7 +275,7 @@
 			clustersListFile = "https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 			partnersListFile = "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 			modalitiesListFile = "https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
-			launchedAllocationsDataFile = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=%20&$format=csv",
+			launchedAllocationsDataFile = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			promises = [],
 			filterTitles = ["Year", "CBPF", "Partner Type", "Cluster", "Allocation Type", "Location Level"],
 			filterColorsArray = ["#E8F5D6", "#F1E9DA", "#E4D8F3", "#E6E6E6", "#F8D8D3", "#D4E5F7"],
