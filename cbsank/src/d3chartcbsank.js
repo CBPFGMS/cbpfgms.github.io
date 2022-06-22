@@ -2266,7 +2266,7 @@
 
 					const headerDiv = tooltipContainer.append("div")
 						.attr("class", classPrefix + "tooltipheaderDiv")
-						.html("List of Agencies");
+						.html("List of Allocation Types");
 
 					partnersData.forEach(row => {
 						const rowDivOthers = tooltipContainer.append("div")
@@ -3164,10 +3164,10 @@
 				x: 4,
 				y: 508 + topDivHeight + totalSelectHeight,
 				width: 892,
-				height: 600,
+				height: 500,
 				xTooltip: 300 * (topDivSize.width / width),
 				yTooltip: (topDivHeight + totalSelectHeight + 500) * (topDivSize.width / width),
-				text: "This area shows selected allocations. Hover over the partners, clusters or links to see additional information."
+				text: "This area shows selected allocations. Hover over the allocation types, funds or links to see additional information."
 			}];
 
 			helpData.forEach(function(d) {
