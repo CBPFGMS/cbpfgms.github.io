@@ -2266,7 +2266,7 @@
 
 					const headerDiv = tooltipContainer.append("div")
 						.attr("class", classPrefix + "tooltipheaderDiv")
-						.html("List of Allocation Types");
+						.html("Allocation Types");
 
 					partnersData.forEach(row => {
 						const rowDivOthers = tooltipContainer.append("div")
