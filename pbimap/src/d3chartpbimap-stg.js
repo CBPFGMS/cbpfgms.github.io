@@ -230,7 +230,7 @@
 			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocations%20overview",
+			helpPortalUrl = "https://gms.unocha.org/content/allocations-overview",
 			formatMoney0Decimals = d3.format(",.0f"),
 			zoomSnap = 0.25,
 			zoomDelta = 0.5,

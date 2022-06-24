@@ -233,7 +233,7 @@
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20flow",
+			helpPortalUrl = "https://gms.unocha.org/content/allocation-flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
 			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",

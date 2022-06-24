@@ -194,7 +194,7 @@
 			chartTitleDefault = "CBPF Target vs HRP",
 			vizNameQueryString = "cbpfvshrp",
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#cbpf%20vs%20hrp",
+			helpPortalUrl = "https://gms.unocha.org/content/cbpf-vs-hrp-cbpf-funding-target-and-hrp-funding",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			sortByValues = {
 				cbpffunding: "CBPF Funding",

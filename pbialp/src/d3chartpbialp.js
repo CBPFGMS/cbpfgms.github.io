@@ -197,7 +197,7 @@
 			classPrefix = "pbialp",
 			vizNameQueryString = "allocations",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#CBPF_Allocations",
+			helpPortalUrl = "https://gms.unocha.org/content/allocations",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			partnerList = ["International NGO", "National NGO", "Red Cross/Crescent Movement", "UN Agency"],
 			partnerListWithTotal = partnerList.concat("total"),

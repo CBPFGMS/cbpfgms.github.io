@@ -203,7 +203,7 @@
 			contributionsTotals = {},
 			vizNameQueryString = "funding-overview",
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#funding%20overview",
+			helpPortalUrl = "https://gms.unocha.org/content/funding-overview",
 			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/",
 			flagSize = 24,
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",

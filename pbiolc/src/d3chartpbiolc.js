@@ -224,7 +224,7 @@
 			dataFileUrl = "https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?$format=csv",
 			launchedAllocationsDataUrl = "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#clusters",
+			helpPortalUrl = "https://gms.unocha.org/content/sectors",
 			modalities = ["total", "standard", "reserve"],
 			beneficiaries = ["targeted", "actual"],
 			clusterIconsPath = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/",

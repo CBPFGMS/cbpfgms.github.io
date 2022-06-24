@@ -191,7 +191,7 @@
 			chartTitleDefault = "Targeted and Reached People Overview",
 			vizNameQueryString = "affected-persons-trends",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#affected%20persons%20trends",
+			helpPortalUrl = "https://gms.unocha.org/content/targeted-and-reached-people",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,

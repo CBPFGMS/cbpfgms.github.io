@@ -183,7 +183,7 @@
 			chartTitleDefault = "Allocations Timeline",
 			vizNameQueryString = "allocations-timeline",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#allocation%20timeline",
+			helpPortalUrl = "https://gms.unocha.org/content/allocations-timeline",
 			panelHorizontalPadding = 12,
 			duration = 1000,
 			axisHighlightColor = "#E56A54",

@@ -224,7 +224,7 @@
 			timeFormatList = d3.timeFormat("%d %B, %Y"),
 			timeFormatAxis = d3.timeFormat("%d-%b"),
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
-			helpPortalUrl = "https://gms.unocha.org/content/business-intelligence#covid%2019%20allocations",
+			helpPortalUrl = "https://gms.unocha.org/content/covid-19-allocations",
 			vizNameQueryString = "covid19",
 			allData = "allData",
 			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ExtendedAllocationDetails?PoolfundCodeAbbrv=&$format=csv",
