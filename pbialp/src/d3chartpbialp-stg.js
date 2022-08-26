@@ -1057,7 +1057,7 @@
 					});
 
 				let topPanelAllocatedText = allocatedValueGroup.selectAll(".pbialptopPanelAllocatedText")
-					.data([valueUnderApproval]);
+					.data([totalAllocated]);
 
 				topPanelAllocatedText = topPanelAllocatedText.enter()
 					.append("text")
