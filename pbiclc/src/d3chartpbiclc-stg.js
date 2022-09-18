@@ -721,6 +721,8 @@
 			yearsArray = rawData.map(function(d) {
 				if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
 				if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
+				if (d.PaidAmt < 0) d.PaidAmt = 0;
+				if (d.PledgeAmt < 0) d.PledgeAmt = 0;
 				return +d.FiscalYear
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
