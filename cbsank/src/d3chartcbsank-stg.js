@@ -2947,7 +2947,6 @@
 		};
 
 		function createCbpfIdsList(fundsData) {
-			console.log(fundsData)
 			fundsData.forEach(row => {
 				if (row.CBPFId && !row.PooledFundName.includes("Closed")) lists.cbpfIds[row.CBPFId + ""] = row.id;
 			});
