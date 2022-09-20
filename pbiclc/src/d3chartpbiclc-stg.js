@@ -1967,7 +1967,7 @@
 						};
 					})
 					.on("end", function(d) {
-						if (chartState.selectedContribution !== "pledge" && d[chartState.selectedContribution] === 0) d3.select(this).text("<1k");
+						if (d[chartState.selectedContribution] > 0 && d[chartState.selectedContribution] < 1000) d3.select(this).text("<1k");
 					});
 
 				donorGroup.selectAll("rect, circle")
