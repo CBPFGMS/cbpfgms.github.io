@@ -150,7 +150,7 @@
 			otherFlagsPadding = 4,
 			tooltipWidth = 270,
 			tooltipWidthAllocations = 300,
-			firstYear = 2016, //THIS IS THE HARDCODED FIRST YEAR IN THE VISUALIZATION
+			firstYear = 2018, //THIS IS THE HARDCODED FIRST YEAR IN THE VISUALIZATION
 			memberStateString = "Member State",
 			isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
 			isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cerf-bi-stag/bookmark.html",
@@ -2337,14 +2337,14 @@
 				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 				row.fundId = lists.cbpfIds[row.PooledFundId];
 				if (!yearsArrayAllocations.includes(row.AllocationYear) && (+row.fundId === +row.fundId)) yearsArrayAllocations.push(row.AllocationYear);
-				if (!lists.fundsInAllYears[row.fundId] && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
+				if (!lists.fundsInAllYears[row.fundId] && (+row.fundId === +row.fundId) && (+row.AllocationYear >= firstYear)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			rawDataContributions.forEach(row => {
 				//SECOND CONDITION IS FOR REMOVING CERF
 				if (!yearsArrayContributions.includes(row.contributionYear) && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) yearsArrayContributions.push(row.contributionYear);
 				//SECOND CONDITION IS FOR REMOVING CERF
-				if (!lists.fundsInAllYears[row.fundId] && row.fundId !== cerfPooledFundId && (+row.fundId === +row.fundId)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
+				if (!lists.fundsInAllYears[row.fundId] && (row.fundId !== cerfPooledFundId) && (+row.fundId === +row.fundId) && (+row.contributionYear >= firstYear)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
 			});
 
 			lists.fundsInAllYearsKeys = Object.keys(lists.fundsInAllYears).map(d => +d);
