@@ -2804,11 +2804,11 @@
 
 			const filteredDataRaw = rawData.filter(function(d) {
 				if (!chartState.selectedDonors.length && !chartState.selectedCbpfs.length) {
-					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+					return (chartState.selectedYear.indexOf(+d.FiscalYear) > -1 || chartState.selectedYear[0] === allYearsOption);
 				} else if (chartState.selectedDonors.length) {
-					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedDonors.indexOf(d.GMSDonorISO2Code.toLowerCase()) > -1;
+					return (chartState.selectedYear.indexOf(+d.FiscalYear) > -1 || chartState.selectedYear[0] === allYearsOption) && chartState.selectedDonors.indexOf(d.GMSDonorISO2Code.toLowerCase()) > -1;
 				} else {
-					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && chartState.selectedCbpfs.indexOf(d.PooledFundISO2Code.toLowerCase()) > -1;
+					return (chartState.selectedYear.indexOf(+d.FiscalYear) > -1 || chartState.selectedYear[0] === allYearsOption) && chartState.selectedCbpfs.indexOf(d.PooledFundISO2Code.toLowerCase()) > -1;
 				};
 			}).sort(function(a, b) {
 				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
