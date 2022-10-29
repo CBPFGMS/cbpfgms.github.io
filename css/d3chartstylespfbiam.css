@@ -10,6 +10,18 @@ body{font-family: 'Roboto', sans-serif; color:#333; background: #fff; padding: 0
   left: 0;
   z-index: 1030;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; // 1
+}
+
+#d3chartcontainerpfbiam {
+  width: 100%;
+  height: 100%;
+}
+
 #layoutSidenav {display: flex;}
 #layoutSidenav #layoutSidenav_nav {
   flex-basis: 225px;
@@ -485,12 +497,12 @@ a.video-tutorial{color:#333;}
 
 @media (max-width: 575.98px) { 
 	#sidebarToggle{display:block !important;}
-	.pfbialtopButtonsDiv .cbpf-link, .pfbicctopButtonsDiv .cbpf-link {padding: 3px 7px !important; font-size: 0.7em; line-height: normal; text-align: center;}
-	.pfbialtopButtonsDiv .cbpf-link .icon-chart, .pfbicctopButtonsDiv .cbpf-link .icon-chart{display: none !important;}
-	.pfbialtopButtonsDiv .cerf-link, .pfbicctopButtonsDiv .cerf-link {padding: 3px 7px !important; font-size: 0.7em; line-height: normal; text-align: center;}
-	.pfbialtopButtonsDiv .cerf-link .icon-chart, .pfbicctopButtonsDiv .cerf-link .icon-chart{display: none !important;}	
+	.pfbiamtopButtonsDiv .cbpf-link, .pfbicctopButtonsDiv .cbpf-link {padding: 3px 7px !important; font-size: 0.7em; line-height: normal; text-align: center;}
+	.pfbiamtopButtonsDiv .cbpf-link .icon-chart, .pfbicctopButtonsDiv .cbpf-link .icon-chart{display: none !important;}
+	.pfbiamtopButtonsDiv .cerf-link, .pfbicctopButtonsDiv .cerf-link {padding: 3px 7px !important; font-size: 0.7em; line-height: normal; text-align: center;}
+	.pfbiamtopButtonsDiv .cerf-link .icon-chart, .pfbicctopButtonsDiv .cerf-link .icon-chart{display: none !important;}	
 	.link-sidenav{left: 0;}
-	.pfbialtopButtonsDiv svg, .pfbicctopButtonsDiv svg, .pfbicdtopButtonsDiv svg, .pfcpmaintopButtonsDiv svg{display:none;}
+	.pfbiamtopButtonsDiv svg, .pfbicctopButtonsDiv svg, .pfbicdtopButtonsDiv svg, .pfcpmaintopButtonsDiv svg{display:none;}
 	.pfbihpbreadcrumbDiv{padding: 0 15px 0 60px !important;}
 	footer{width: 100% !important;}
 	.mobile-menu{margin-top:7px !important;}	
@@ -609,7 +621,7 @@ a.video-tutorial{color:#333;}
   margin-top: 30vh;
 }
 
-.pfbialcontainerDiv {
+.pfbiamcontainerDiv {
   width: 100%;
   height: 100%;
   display: flex;
@@ -619,7 +631,7 @@ a.video-tutorial{color:#333;}
 
 /*tooltip styles*/
 
-#pfbialtooltipDivMap, #pfbialtooltipDivBarChart, #pfbicctooltipDiv, #pfbicdtooltipDiv, #pfbihptopTooltipDiv, #pfcpmaintooltipDiv {    
+#pfbiamtooltipDivMap, #pfbiamtooltipDivBarChart, #pfbicctooltipDiv, #pfbicdtooltipDiv, #pfbihptopTooltipDiv, #pfcpmaintooltipDiv {    
   position: absolute;
   text-align: left;
   color: darkslategray;
@@ -637,7 +649,7 @@ a.video-tutorial{color:#333;}
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-#pfbialtooltipDivMap, #pfbialtooltipDivBarChart {
+#pfbiamtooltipDivMap, #pfbiamtooltipDivBarChart {
   pointer-events: all;
   cursor: default;
 }
@@ -665,11 +677,11 @@ a.video-tutorial{color:#333;}
 #pfbicctooltipDiv{
 	padding: 8px !important;
 }
-#pfbialinnerTooltipDiv {max-width: 308px !important;}
-#pfbialinnerTooltipDiv > div:nth-child(2){padding:8px !important;}
+#pfbiaminnerTooltipDiv {max-width: 308px !important;}
+#pfbiaminnerTooltipDiv > div:nth-child(2){padding:8px !important;}
 
 
-.pfbialcerfLink {
+.pfbiamcerfLink {
   font-size: 0.8em;
   width: 100%;
   overflow-wrap: break-word;
@@ -680,7 +692,7 @@ a.video-tutorial{color:#333;}
   padding-bottom: 8px !important;
 }
 
-.pfbialtooltipTitleDiv, .pfbicdtooltipTitleDiv, .pfbicpoverviewtooltipTitleDiv, .pfbicpbypartnertooltipTitleDiv, .pfbicpbysectortooltipTitleDiv, .pfbicppstooltipTitleDiv, .pfbicpcontrtooltipTitleDiv {
+.pfbiamtooltipTitleDiv, .pfbicdtooltipTitleDiv, .pfbicpoverviewtooltipTitleDiv, .pfbicpbypartnertooltipTitleDiv, .pfbicpbysectortooltipTitleDiv, .pfbicppstooltipTitleDiv, .pfbicpcontrtooltipTitleDiv {
 	margin-bottom: 3px !important;
     background-color: #3189c9;
     padding: 8px 8px;
@@ -693,11 +705,11 @@ a.video-tutorial{color:#333;}
   font-size: 1em;
 }
 
-.pfbialtooltipTitleDiv strong, .pfbicdtooltipTitleDiv strong{
+.pfbiamtooltipTitleDiv strong, .pfbicdtooltipTitleDiv strong{
 	font-size: 15px !important;
 }
 
-.pfbialtooltipTotalValue{
+.pfbiamtooltipTotalValue{
 	display: flex;
     align-items: center;
     width: 100%;
@@ -712,7 +724,7 @@ a.video-tutorial{color:#333;}
   white-space: pre-wrap;
 }
 
-.pfbialtooltipRank {
+.pfbiamtooltipRank {
 	font-size: 12px;
     color: #c1dff6;
 }
@@ -732,7 +744,7 @@ a.video-tutorial{color:#333;}
   padding: 8px;
 }
 
-.pfbialtooltipCerfValue .pfbialtooltipKeys {
+.pfbiamtooltipCerfValue .pfbiamtooltipKeys {
 	font-weight: 600 !important;
     border-radius: 15px;
     border: 2px solid #e8c760;
@@ -740,7 +752,7 @@ a.video-tutorial{color:#333;}
     font-size: 12px;
 } 
 
-.pfbialtooltipCbpfValue .pfbialtooltipKeys {
+.pfbiamtooltipCbpfValue .pfbiamtooltipKeys {
 	font-weight: 600 !important;
     border-radius: 15px;
     border: 2px solid #e17165;
@@ -748,29 +760,29 @@ a.video-tutorial{color:#333;}
     font-size: 12px;
 }
 
-.pfbialtooltipZeroValueCerf, .pfbialtooltipZeroValueCbpf {
+.pfbiamtooltipZeroValueCerf, .pfbiamtooltipZeroValueCbpf {
 
 }
 
-.pfbialtooltipProjectsTotal, .pfbialtooltipProjectsCerf, .pfbialtooltipProjectsCbpf {
+.pfbiamtooltipProjectsTotal, .pfbiamtooltipProjectsCerf, .pfbiamtooltipProjectsCbpf {
 	font-weight: 600;
 }
 
-.pfbialtooltipValues, .pfbialtooltipKeys, .pfbicctooltipValues, .pfbicctooltipYears, .pfbicpbypartnertooltipKeys, .pfbicpbypartnertooltipValues, .pfbicppstooltipKeys, .pfbicppstooltipValues {
+.pfbiamtooltipValues, .pfbiamtooltipKeys, .pfbicctooltipValues, .pfbicctooltipYears, .pfbicpbypartnertooltipKeys, .pfbicpbypartnertooltipValues, .pfbicppstooltipKeys, .pfbicppstooltipValues {
   flex: 1 0 auto;
 }
 
-.pfbialtooltipKeys{
+.pfbiamtooltipKeys{
 	font-weight: 600;
 }
 
-.pfbialtooltipLeader, .pfbicctooltipLeader, .pfbicpbypartnertooltipLeader, .pfbicppstooltipLeader {
+.pfbiamtooltipLeader, .pfbicctooltipLeader, .pfbicpbypartnertooltipLeader, .pfbicppstooltipLeader {
   flex: 0 1 auto;
   overflow: hidden;
   color: #ccc;
 }
 
-.pfbialtooltipLeader::before, .pfbicctooltipLeader::before, .pfbicpbypartnertooltipLeader:before, .pfbicppstooltipLeader:before {
+.pfbiamtooltipLeader::before, .pfbicctooltipLeader::before, .pfbicpbypartnertooltipLeader:before, .pfbicppstooltipLeader:before {
    display: block;
    overflow: hidden;
    text-overflow: clip;
@@ -805,7 +817,7 @@ a.video-tutorial{color:#333;}
   white-space: pre;
 }
 
-.pfbialmapDiv {
+.pfbiammapDiv {
   display: flex;
   width: 100%;
   height: 100%;
@@ -814,12 +826,12 @@ a.video-tutorial{color:#333;}
   position: relative;
 }
 
-.pfbialmapInnerDiv {
+.pfbiammapInnerDiv {
   width: 100%;
   height: 100%;
 }
 
-.pfbialbarChartDivOuter {
+.pfbiambarChartDivOuter {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -828,14 +840,14 @@ a.video-tutorial{color:#333;}
   background-color: rgb(255,255,255,0.6);
 }
 
-.pfbialbarChartDivTitle {
+.pfbiambarChartDivTitle {
   width:100%;
   display: flex;
   height: 26px;
   flex-direction: row;
 }
 
-.pfbialbarChartDivTitleText {
+.pfbiambarChartDivTitleText {
   flex-basis: auto;
   display: flex;
   justify-content: center;
@@ -846,7 +858,7 @@ a.video-tutorial{color:#333;}
   padding-top: 2px;
 }
 
-.pfbialbarChartDiv {
+.pfbiambarChartDiv {
   width: 100%;
   height: 100%;
   display: flex;
@@ -870,22 +882,22 @@ a.video-tutorial{color:#333;}
   position: relative;
 }
 
-.pfbialzoomPath {
+.pfbiamzoomPath {
   fill: white;
 }
 
-.pfbialzoomPath:hover {
+.pfbiamzoomPath:hover {
   fill: #f4f4f4;
 }
 
-.pfbialzoomText {
+.pfbiamzoomText {
   font-family: "Arial", sans-serif;
   font-size: 20px;
   fill: #222;
   pointer-events: none; 
 }
 
-.pfbialbuttonsDiv {
+.pfbiambuttonsDiv {
   position: absolute;
   top: 1.2vh;
   width: 50%;
@@ -895,7 +907,7 @@ a.video-tutorial{color:#333;}
   padding-right: 1rem;
 }
 
-.pfbialgroupName {
+.pfbiamgroupName {
   font-family: "Arial", sans-serif;
   font-size: 12px;
   pointer-events: none;
@@ -905,29 +917,29 @@ a.video-tutorial{color:#333;}
   paint-order: stroke;
 }
 
-.pfbialmapContainer {
+.pfbiammapContainer {
   pointer-events: none;
 }
 
-.pfbiallegendCirclesText {
+.pfbiamlegendCirclesText {
   font-family: "Arial", sans-serif;
   font-size: 10px;
   fill: darkslategray;  
 }
 
-.pfbiallegendColors text {
+.pfbiamlegendColors text {
   font-family: "Arial", sans-serif;
   font-size: 11px;
   fill: darkslategray;  
 }
 
-.pfbialshowNamesText {
+.pfbiamshowNamesText {
   font-family: "Arial", sans-serif;
   font-size: 11px;
   fill: darkslategray;
 }
 
-.pfbialbarTitle {
+.pfbiambarTitle {
   font-family: "Roboto", sans-serif;
   font-size: 16px;
   fill: #666;
@@ -940,21 +952,21 @@ a.video-tutorial{color:#333;}
   font-weight: 300;
 }
 
-.pfbialbarTitleSpan, .pfbiccbarTitleSpan {
+.pfbiambarTitleSpan, .pfbiccbarTitleSpan {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   fill: #666;
 }
 
-.pfbialxAxisGroup line, .pfbiccxAxisGroupBarChart line, .pfbicdxAxisGroupTooltip line, .pfbicdcurrentYearTick, .pfbicdyAxisGroupColumn line, .pfbiccyAxisGroupColumn line, .pfbialyAxisGroupColumnByCountry line, .pfbialyAxisGroupColumnBySector line, .pfbialyAxisGroupColumnByTypeCerf line, .pfbialyAxisGroupColumnByTypeCbpf line, .pfbicpbysectoryAxisGroup line {
+.pfbiamxAxisGroup line, .pfbiccxAxisGroupBarChart line, .pfbicdxAxisGroupTooltip line, .pfbicdcurrentYearTick, .pfbicdyAxisGroupColumn line, .pfbiccyAxisGroupColumn line, .pfbiamyAxisGroupColumnByCountry line, .pfbiamyAxisGroupColumnBySector line, .pfbiamyAxisGroupColumnByTypeCerf line, .pfbiamyAxisGroupColumnByTypeCbpf line, .pfbicpbysectoryAxisGroup line {
   stroke: darkslategray;
 }
 
-.pfbialxAxisGroup path, .pfbiccxAxisGroupBarChart path, .pfbicdyAxisGroupTooltip path, .pfbicdxAxisGroupTooltip path, .pfbicdxAxisGroupColumn path, .pfbiccxAxisGroupColumn path, .pfbialxAxisGroupColumnByCountry path, .pfbialxAxisGroupColumnBySector path, .pfbialxAxisGroupColumnByType path, .pfbialyAxisGroup path, .pfbiccyAxisGroupBarChart path, .pfbicdyAxisGroupColumn path, .pfbiccyAxisGroupColumn path, .pfbialyAxisGroupColumnByCountry path, .pfbialyAxisGroupColumnBySector path, .pfbialyAxisGroupColumnByTypeCerf path, .pfbialyAxisGroupColumnByTypeCbpf path, .pfbicpbysectoryAxisGroup path {
+.pfbiamxAxisGroup path, .pfbiccxAxisGroupBarChart path, .pfbicdyAxisGroupTooltip path, .pfbicdxAxisGroupTooltip path, .pfbicdxAxisGroupColumn path, .pfbiccxAxisGroupColumn path, .pfbiamxAxisGroupColumnByCountry path, .pfbiamxAxisGroupColumnBySector path, .pfbiamxAxisGroupColumnByType path, .pfbiamyAxisGroup path, .pfbiccyAxisGroupBarChart path, .pfbicdyAxisGroupColumn path, .pfbiccyAxisGroupColumn path, .pfbiamyAxisGroupColumnByCountry path, .pfbiamyAxisGroupColumnBySector path, .pfbiamyAxisGroupColumnByTypeCerf path, .pfbiamyAxisGroupColumnByTypeCbpf path, .pfbicpbysectoryAxisGroup path {
   stroke: none;
 }
 
-.pfbialxAxisGroup text {
+.pfbiamxAxisGroup text {
   font-family: "Roboto", sans-serif;
   font-size: 9px;
   text-anchor: end;
@@ -972,20 +984,20 @@ a.video-tutorial{color:#333;}
   fill: #666;
 }
 
-.pfbialcountryRanking {
+.pfbiamcountryRanking {
   font-weight: 700;
   font-size: 10px;
   text-anchor: middle;
 }
 
-.pfbialyAxisGroup text, .pfbiccyAxisGroupBarChart text {
+.pfbiamyAxisGroup text, .pfbiccyAxisGroupBarChart text {
   font-family: "Roboto", sans-serif;
   font-size: 10px;
   fill: #999;
   pointer-events: none;
 }
 
-.pfbicdlabelsColumn, .pfbicclabelsColumn, .pfbiallabelsColumnByCountry, .pfbiallabelsColumnBySector, .pfbiallabelsColumnByTypeCerf, .pfbiallabelsColumnByTypeCbpf {
+.pfbicdlabelsColumn, .pfbicclabelsColumn, .pfbiamlabelsColumnByCountry, .pfbiamlabelsColumnBySector, .pfbiamlabelsColumnByTypeCerf, .pfbiamlabelsColumnByTypeCbpf {
   font-family: "Roboto", sans-serif;
   font-size: 9px;
   fill: #333;
@@ -994,7 +1006,7 @@ a.video-tutorial{color:#333;}
   dominant-baseline: central;
 } 
 
-.pfbicdxAxisGroupColumn text, .pfbicdyAxisGroupTooltip text, .pfbiccxAxisGroupColumn text, .pfbialxAxisGroupColumnByCountry text, .pfbialxAxisGroupColumnBySector text, .pfbialxAxisGroupColumnByType text {
+.pfbicdxAxisGroupColumn text, .pfbicdyAxisGroupTooltip text, .pfbiccxAxisGroupColumn text, .pfbiamxAxisGroupColumnByCountry text, .pfbiamxAxisGroupColumnBySector text, .pfbiamxAxisGroupColumnByType text {
   font-family: "Roboto", sans-serif;
   font-size: 10px;
   fill: #888;
@@ -1008,7 +1020,7 @@ a.video-tutorial{color:#333;}
   pointer-events: none;
 }
 
-.pfbicdyAxisGroupColumn text, .pfbiccyAxisGroupColumn text, .pfbialyAxisGroupColumnByCountry text, .pfbialyAxisGroupColumnBySector text, .pfbialyAxisGroupColumnByTypeCerf text, .pfbialyAxisGroupColumnByTypeCbpf text {
+.pfbicdyAxisGroupColumn text, .pfbiccyAxisGroupColumn text, .pfbiamyAxisGroupColumnByCountry text, .pfbiamyAxisGroupColumnBySector text, .pfbiamyAxisGroupColumnByTypeCerf text, .pfbiamyAxisGroupColumnByTypeCbpf text {
   font-family: "Roboto", sans-serif;
   font-size: 10px;
   fill: #888;
@@ -1016,17 +1028,17 @@ a.video-tutorial{color:#333;}
   letter-spacing: -0.25px;
 }
 
-.pfbialdarkTick {
+.pfbiamdarkTick {
   fill: black !important;
   font-weight: 500;
 }
   
-.pfbicdxAxisGroupColumn line, .pfbicdyAxisGroupTooltip line, .pfbiccxAxisGroupColumn line, .pfbialxAxisGroupColumnByCountry line, .pfbialxAxisGroupColumnBySector line, .pfbialxAxisGroupColumnByType line, .pfbicpbysectorxAxisGroup line {
+.pfbicdxAxisGroupColumn line, .pfbicdyAxisGroupTooltip line, .pfbiccxAxisGroupColumn line, .pfbiamxAxisGroupColumnByCountry line, .pfbiamxAxisGroupColumnBySector line, .pfbiamxAxisGroupColumnByType line, .pfbicpbysectorxAxisGroup line {
   stroke: #ddd;
   stroke-dasharray: 2, 2;
 }
 
-.pfbialyAxisGroup line, .pfbiccyAxisGroupBarChart line {
+.pfbiamyAxisGroup line, .pfbiccyAxisGroupBarChart line {
   stroke: #ddd;
   stroke-dasharray: 2, 2;
 }
@@ -1047,7 +1059,7 @@ a.video-tutorial{color:#333;}
   letter-spacing: -1px;
 }
 
-.pfbialpiesNoData {
+.pfbiampiesNoData {
   font-family: "Roboto", sans-serif;
   font-size: 22px;
   fill: #666;
@@ -1055,7 +1067,7 @@ a.video-tutorial{color:#333;}
   text-anchor: middle;
 }
 
-.pfbialbuttonsDiv button, .pfbicdbuttonsDiv button {
+.pfbiambuttonsDiv button, .pfbicdbuttonsDiv button {
   margin: 0px 0px 0px 8px;
   display: inline-flex;
   align-items: center; 
@@ -1071,7 +1083,7 @@ a.video-tutorial{color:#333;}
   outline: 0;
 }
 
-.pfbialbuttonsDiv button .icon-circle, .pfbicdbuttonsDiv button .icon-circle{
+.pfbiambuttonsDiv button .icon-circle, .pfbicdbuttonsDiv button .icon-circle{
   background-color: #fff;
   padding: 5px;
   display: inline-flex;
@@ -1079,8 +1091,8 @@ a.video-tutorial{color:#333;}
   border-radius: 3px 0 0 3px;
 }
 
-.pfbialbuttonsDiv button:hover{background-color: #3289C9; color:#fff; border-color:#3289C9;}
-.pfbialbuttonsDiv button.active{background-color: #3289C9; color:#fff; border-color:#3289C9;}
+.pfbiambuttonsDiv button:hover{background-color: #3289C9; color:#fff; border-color:#3289C9;}
+.pfbiambuttonsDiv button.active{background-color: #3289C9; color:#fff; border-color:#3289C9;}
 
 .pfbicdbuttonsDiv button:hover{background-color: #3289C9; color:#fff; border-color:#3289C9;}
 .pfbicdbuttonsDiv button.active{background-color: #3289C9; color:#fff; border-color:#3289C9;}
@@ -1091,7 +1103,7 @@ a.video-tutorial{color:#333;}
   border-radius: 50%;
 }
 
-.pfbialbarsLabels {
+.pfbiambarsLabels {
   text-anchor: middle;
   font-family: "Roboto", sans-serif;
   font-size: 9px;
@@ -1439,7 +1451,7 @@ a.video-tutorial{color:#333;}
   font-size: 14px;
 } 
 
-.pfbialouterDiv, .pfbiccouterDiv, .pfbicdouterDiv, .pfcpmainouterDiv {
+.pfbiamouterDiv, .pfbiccouterDiv, .pfbicdouterDiv, .pfcpmainouterDiv {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -1659,14 +1671,14 @@ a.video-tutorial{color:#333;}
   align-items: center;
 }
 
-.pfbialtopButtonsDiv, .pfbicctopButtonsDiv, .pfbicdtopButtonsDiv, .pfcpmaintopButtonsDiv {
+.pfbiamtopButtonsDiv, .pfbicctopButtonsDiv, .pfbicdtopButtonsDiv, .pfcpmaintopButtonsDiv {
   display: flex;
   flex:0 50%;
   justify-content: flex-start;
   flex-direction: row-reverse;
 }
 
-.pfbialtopButtonsDiv button, .pfbicdtopButtonsDiv button, .pfbicctopButtonsDiv button, .pfcpmaintopButtonsDiv button{
+.pfbiamtopButtonsDiv button, .pfbicdtopButtonsDiv button, .pfbicctopButtonsDiv button, .pfcpmaintopButtonsDiv button{
 	border: 1px solid #3289c9;
   border-radius: 3px;
   font-size: 0.7em;
@@ -1679,8 +1691,8 @@ a.video-tutorial{color:#333;}
 	vertical-align: top;
 }
 
-.pfbialtopButtonsDiv .pfbihpSnapshotDiv, .pfbicctopButtonsDiv .pfbihpSnapshotDiv, .pfbicdtopButtonsDiv .pfbihpSnapshotDiv, .pfcpmaintopButtonsDiv .pfbihpSnapshotDiv {line-height: normal;}
-.pfbialtopButtonsDiv button:hover, .pfbicctopButtonsDiv button:hover, .pfbicdtopButtonsDiv button:hover, .pfcpmaintopButtonsDiv button:hover {background-color: #3289c9; color:#fff;}
+.pfbiamtopButtonsDiv .pfbihpSnapshotDiv, .pfbicctopButtonsDiv .pfbihpSnapshotDiv, .pfbicdtopButtonsDiv .pfbihpSnapshotDiv, .pfcpmaintopButtonsDiv .pfbihpSnapshotDiv {line-height: normal;}
+.pfbiamtopButtonsDiv button:hover, .pfbicctopButtonsDiv button:hover, .pfbicdtopButtonsDiv button:hover, .pfcpmaintopButtonsDiv button:hover {background-color: #3289c9; color:#fff;}
 
 .pfbihpSnapshotContent {
   position: absolute;
@@ -1751,7 +1763,7 @@ a.video-tutorial{color:#333;}
   paint-order: stroke;
 }
 
-.pfbialtwoColorsBorder {
+.pfbiamtwoColorsBorder {
   border-image: linear-gradient(to right, #FBD45C 45%, #F37261 55%, #F37261 100%); 
   border-image-slice: 1;
 }
@@ -1955,7 +1967,7 @@ a.video-tutorial{color:#333;}
   right: initial;
 }
 
-#pfbialyearNumberText {
+#pfbiamyearNumberText {
   fill: #dadcdf;
   font-size: 20em;
   font-weight: 500;
@@ -2009,7 +2021,7 @@ a.video-tutorial{color:#333;}
   fill: crimson;
 }
 
-.pfbialcovidDisclaimer {
+.pfbiamcovidDisclaimer {
   position: absolute;
   top: 5%;
   left: 1%;
@@ -2028,7 +2040,7 @@ a.video-tutorial{color:#333;}
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.pfbialcovidDisclaimerTopDiv {
+.pfbiamcovidDisclaimerTopDiv {
   width: 100%;
   display: flex;
   margin-bottom: 6px;
@@ -2041,32 +2053,32 @@ a.video-tutorial{color:#333;}
   height: 30px;
 }
 
-.pfbialcovidDisclaimerTopDiv b {
+.pfbiamcovidDisclaimerTopDiv b {
   font-size: 1rem !important;
   color: #fff !important;
 }
 
-.pfbialcovidDisclaimerTopDivMain {
+.pfbiamcovidDisclaimerTopDivMain {
   flex: 0 80%;
 }
 
-.pfbialcovidDisclaimerTopDivClose {
+.pfbiamcovidDisclaimerTopDivClose {
   flex: 0 20%;
   font-size: 25px;
   text-align: right;
 }
 
-.pfbialcovidDisclaimerTopDivClose svg{
+.pfbiamcovidDisclaimerTopDivClose svg{
   color: #b2d3ed !important;
     font-weight: normal !important;
     width: 20px !important;
 }
 
-.pfbialcovidDisclaimerDivMain {
+.pfbiamcovidDisclaimerDivMain {
   padding: 8px; 
 }
 
-.pfbialcovidDisclaimerDivMain p {
+.pfbiamcovidDisclaimerDivMain p {
   margin-bottom: 0px !important;
 }
 
@@ -3243,7 +3255,7 @@ a.video-tutorial{color:#333;}
   pointer-events: none;
 }
 
-.pfbialvenezuelaDisclaimerDiv {
+.pfbiamvenezuelaDisclaimerDiv {
   position: absolute;
   bottom: 100%;
   right: 2%;
@@ -3262,7 +3274,7 @@ a.video-tutorial{color:#333;}
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-.pfbialcloseButton {
+.pfbiamcloseButton {
   float: right;
   margin-left: 6px;
   cursor: pointer;

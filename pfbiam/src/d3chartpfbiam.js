@@ -70,9 +70,8 @@ const yearsArrayAllocations = [],
 	donorNamesListKeys = [];
 
 //|constants
-const classPrefix = "pfbial",
-	mapPercentage = 0.68,
-	barChartPercentage = 1 - mapPercentage,
+const classPrefix = "pfbiam",
+	mapPercentage = 1,
 	mapAspectRatio = 2.225,
 	legendPanelHeight = 132,
 	legendPanelWidth = 110,
@@ -102,7 +101,10 @@ const classPrefix = "pfbial",
 	formatPercent = d3.format("%"),
 	formatSIaxes = d3.format("~s"),
 	innerTooltipDivWidth = 290,
+	svgColumnChartWidth = 195,
 	svgMapPadding = [0, 10, 0, 10],
+	svgColumnChartPaddingByType = [16, 26, 4, 66],
+	svgColumnChartTypeHeight = svgColumnChartPaddingByType[0] + svgColumnChartPaddingByType[2] + maxColumnRectHeight + 4 * maxColumnRectHeight,
 	VenezuelaRegionalRefugeeAbbr = "Venezuela Refugee...",
 	VenezuelaRegionalRefugeeDisclaimer = "*Venezuela RRMC - Venezuela Regional Refugee and Migration Crisis: A regional CERF Underfunded Emergencies allocation supported responses to the Venezuelan Refugee and Migrant Crisis in Brazil, Colombia, Ecuador and Peru.",
 	buttonsList = ["total", "cerf/cbpf", "cerf", "cbpf"],
@@ -142,9 +144,6 @@ const hardcodedAllocations = [{
 }];
 
 const chartContainerDiv = d3.select("#d3chartcontainerpfbiam");
-
-chartContainerDiv.style("width", "100%")
-	.style("height", "500px");//FIX THIS
 
 const showClosedFunds = chartContainerDiv.node().getAttribute("data-showclosedfunds") === "true";
 
@@ -332,6 +331,21 @@ function createAllocations(colors, mapData, lists) {
 	const pieGenerator = d3.pie()
 		.value(d => d.value)
 		.sort(null);
+
+	const yScaleColumnByTypeCerf = d3.scaleBand()
+		.range([svgColumnChartPaddingByType[0], svgColumnChartTypeHeight - svgColumnChartPaddingByType[2]])
+		.domain(cerfAllocationTypes.map(e => lists.allocationTypesList[e]))
+		.paddingInner(0.5)
+		.paddingOuter(0.5);
+
+	const yScaleColumnByTypeCbpf = d3.scaleBand()
+		.range([svgColumnChartPaddingByType[0], svgColumnChartTypeHeight - svgColumnChartPaddingByType[2]])
+		.domain(cbpfAllocationTypes.map(e => lists.allocationTypesList[e]))
+		.paddingInner(0.5)
+		.paddingOuter(0.5);
+
+	const xScaleColumnByType = d3.scaleLinear()
+		.range([svgColumnChartPaddingByType[3], svgColumnChartWidth - svgColumnChartPaddingByType[1]]);
 
 	const stack = d3.stack()
 		.keys(stackKeys)
@@ -879,46 +893,16 @@ function createAllocations(colors, mapData, lists) {
 			if (hoveredCountry === datum.country) return;
 			hoveredCountry = datum.country;
 
-			tooltipDivBarChart.style("display", "none")
-				.html(null);
-
-			let thisRank,
-				thisOrdinal;
-
 			chartState.currentTooltip = tooltipDivMap;
 
 			pieGroup.style("opacity", d => d.country === datum.country ? 1 : fadeOpacity);
 
 			pieGroupTexts.style("opacity", d => d.country === datum.country ? 1 : fadeOpacity);
 
-			barChartPanel.main.selectAll("." + classPrefix + "bars")
-				.style("opacity", d => d.data.country === datum.country ? 1 : fadeOpacity);
-
-			barChartPanel.main.selectAll("." + classPrefix + "barsLabels")
-				.style("opacity", (d, i) => d.country === datum.country ? 1 : !(i % 4) ? fadeOpacity : 0);
-
-			xAxisGroup.selectAll(".tick")
-				.style("opacity", d => d === datum.country ? 1 : fadeOpacity)
-				.each((d, i, n) => {
-					if (d === datum.country) {
-						thisRank = i + 1;
-						thisOrdinal = makeOrdinal(thisRank);
-						d3.select(n[i]).select("text")
-							.append("tspan")
-							.attr("class", classPrefix + "countryRanking")
-							.attr("dy", "1.2em")
-							.attr("x", (_, j, m) => -(m[j].parentNode.getComputedTextLength() / 2))
-							.text("(" + thisRank + thisOrdinal + ")");
-					} else {
-						d3.select(n[i]).select(`.${classPrefix}countryRanking`)
-							.remove();
-					};
-				});
-
 			tooltipDivMap.style("display", "block")
 				.html(null);
 
-			createTooltip(datum, thisRank, thisOrdinal, tooltipDivMap);
+			createTooltip(datum, tooltipDivMap);
 
 			const thisBox = event.currentTarget.getBoundingClientRect();
 
@@ -953,17 +937,6 @@ function createAllocations(colors, mapData, lists) {
 			pieGroup.style("opacity", 1);
 
 			pieGroupTexts.style("opacity", 1);
-
-			barChartPanel.main.selectAll("." + classPrefix + "bars")
-				.style("opacity", 1);
-
-			barChartPanel.main.selectAll("." + classPrefix + "barsLabels")
-				.style("opacity", (_, i) => !(i % 4) ? 1 : 0);
-
-			xAxisGroup.selectAll(".tick")
-				.style("opacity", 1)
-				.selectAll("." + classPrefix + "countryRanking")
-				.remove();
 
 			tooltipDivMap.html(null)
 				.style("display", "none");
@@ -1135,7 +1108,7 @@ function createAllocations(colors, mapData, lists) {
 		//end of drawLegend
 	};
 
-	function createTooltip(datum, rank, ordinal, container) {
+	function createTooltip(datum, container) {
 
 		const projectsTotal = new Set(),
 			projectsCerf = new Set(),
@@ -1163,7 +1136,7 @@ function createAllocations(colors, mapData, lists) {
 				});
 				tooltipTotal += row.ClusterBudget;
 				tooltipCerf += row.ClusterBudget;
-				typesData[row.AllocationSurceId] += row.ClusterBudget;
+				typesData[row.AllocationSourceId] += row.ClusterBudget;
 				clusterDataCerf[row.ClusterId] = (clusterDataCerf[row.ClusterId] || 0) + row.ClusterBudget;
 			};
 			if (row.FundId === cbpfId) {
@@ -1173,7 +1146,7 @@ function createAllocations(colors, mapData, lists) {
 				});
 				tooltipTotal += row.ClusterBudget;
 				tooltipCbpf += row.ClusterBudget;
-				typesData[row.AllocationSurceId] += row.ClusterBudget;
+				typesData[row.AllocationSourceId] += row.ClusterBudget;
 				clusterDataCbpf[row.ClusterId] = (clusterDataCbpf[row.ClusterId] || 0) + row.ClusterBudget;
 			};
 		});
@@ -1192,10 +1165,6 @@ function createAllocations(colors, mapData, lists) {
 		titleDiv.append("strong")
 			.style("font-size", "16px")
 			.html((!tooltipCerf && tooltipCbpf) || chartState.selectedFund === "cbpf" ? datum.countryNameCbpf : datum.countryName);
-
-		titleDiv.append("span")
-			.attr("class", classPrefix + "tooltipRank")
-			.html(` (rank: ${rank}<sup>${ordinal}</sup>)`);
 
 		const closeButton = titleDiv.append("div")
 			.attr("class", classPrefix + "closeButton")
@@ -1471,82 +1440,6 @@ function createAllocations(colors, mapData, lists) {
 	//end of createAllocations
 };
 
-function preProcessData(rawAllocationsData, rawContributionsData) {
-
-	const yearsSetAllocations = new Set();
-	const yearsSetAllocationsCbpf = new Set();
-	const yearsSetAllocationsCerf = new Set();
-	const yearsSetContributions = new Set();
-	const yearsSetContributionsCbpf = new Set();
-	const yearsSetContributionsCerf = new Set();
-
-	//Temporary fix for non-numerical IDs in the allocations data
-	let allocIndex = rawAllocationsData.length - 1;
-	while (allocIndex) {
-		if (!+rawAllocationsData[allocIndex].PooledFundId) {
-			console.warn("Non-numeric PooledFundId in allocations data: " + JSON.stringify(rawAllocationsData[allocIndex]));
-			rawAllocationsData.splice(allocIndex, 1)
-		};
-		allocIndex -= 1;
-	};
-
-	//Temporary fix for non-numerical IDs in the contributions data
-	let contrIndex = rawContributionsData.length - 1;
-	while (contrIndex) {
-		if (!+rawContributionsData[contrIndex].PooledFundId) {
-			console.warn("Non-numeric PooledFundId in contributions data: " + JSON.stringify(rawContributionsData[contrIndex]));
-			rawContributionsData.splice(contrIndex, 1)
-		};
-		if (!+rawContributionsData[contrIndex].DonorId) {
-			console.warn("Non-numeric DonorId in contributions data: " + JSON.stringify(rawContributionsData[contrIndex]));
-			rawContributionsData.splice(contrIndex, 1)
-		};
-		contrIndex -= 1;
-	};
-
-	rawAllocationsData.forEach(row => {
-		row.AllocationSurceId = row.AllocationSourceId; //REMOVE THIS: TEMPORARY FIX
-		yearsSetAllocations.add(+row.AllocationYear);
-		if (fundTypesList[row.FundId] === "cerf") {
-			yearsSetAllocationsCerf.add(+row.AllocationYear);
-		} else {
-			yearsSetAllocationsCbpf.add(+row.AllocationYear);
-		};
-	});
-
-	rawContributionsData.forEach(row => {
-		yearsSetContributions.add(+row.FiscalYear);
-		if (row.PooledFundId === cerfPooledFundId) {
-			if (defaultValues.cerfFirstYear) {
-				if (+row.FiscalYear >= defaultValues.cerfFirstYear) yearsSetContributionsCerf.add(+row.FiscalYear);
-			} else {
-				yearsSetContributionsCerf.add(+row.FiscalYear);
-			};
-		} else {
-			if (defaultValues.cbpfFirstYear) {
-				if (+row.FiscalYear >= defaultValues.cbpfFirstYear) yearsSetContributionsCbpf.add(+row.FiscalYear);
-			} else {
-				yearsSetContributionsCbpf.add(+row.FiscalYear);
-			};
-		};
-	});
-
-	yearsArrayAllocations.push(...yearsSetAllocations);
-	yearsArrayAllocations.sort((a, b) => a - b);
-	yearsArrayAllocationsCbpf.push(...yearsSetAllocationsCbpf);
-	yearsArrayAllocationsCbpf.sort((a, b) => a - b);
-	yearsArrayAllocationsCerf.push(...yearsSetAllocationsCerf);
-	yearsArrayAllocationsCerf.sort((a, b) => a - b);
-
-	yearsArrayContributions.push(...yearsSetContributions);
-	yearsArrayContributions.sort((a, b) => a - b);
-	yearsArrayContributionsCbpf.push(...yearsSetContributionsCbpf);
-	yearsArrayContributionsCbpf.sort((a, b) => a - b);
-	yearsArrayContributionsCerf.push(...yearsSetContributionsCerf);
-	yearsArrayContributionsCerf.sort((a, b) => a - b);
-
-};
-
 function processDataAllocations(rawAllocationsData) {
 
 	const data = [];
@@ -1601,15 +1494,15 @@ function pushCbpfOrCerf(obj, row) {
 	if (fundTypesList[row.FundId] === "cbpf") {
 		obj.cbpf += budget;
 		obj[`cluster${separator}${row.ClusterId}${separator}cbpf`] += budget;
-		obj[`type${separator}${row.AllocationSurceId}${separator}cbpf`] += budget;
+		obj[`type${separator}${row.AllocationSourceId}${separator}cbpf`] += budget;
 	} else if (fundTypesList[row.FundId] === "cerf") {
 		obj.cerf += budget;
 		obj[`cluster${separator}${row.ClusterId}${separator}cerf`] += budget;
-		obj[`type${separator}${row.AllocationSurceId}${separator}cerf`] += budget;
+		obj[`type${separator}${row.AllocationSourceId}${separator}cerf`] += budget;
 	};
 	obj.total += budget;
 	obj[`cluster${separator}${row.ClusterId}${separator}total`] += budget;
-	obj[`type${separator}${row.AllocationSurceId}${separator}total`] += budget;
+	obj[`type${separator}${row.AllocationSourceId}${separator}total`] += budget;
 };
 
 function fetchFile(fileName, url, warningString, method) {
