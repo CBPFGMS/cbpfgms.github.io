@@ -14,7 +14,7 @@ body{font-family: 'Roboto', sans-serif; color:#333; background: #fff; padding: 0
 *,
 *::before,
 *::after {
-  box-sizing: border-box; // 1
+  box-sizing: border-box;
 }
 
 #d3chartcontainerpfbiam {
