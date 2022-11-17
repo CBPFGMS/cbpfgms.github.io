@@ -244,8 +244,7 @@ function createAllocations(colors, mapData, lists) {
 	const mapDivSize = mapDiv.node().getBoundingClientRect();
 	const svgMapHeight = mapDivSize.height;
 	const svgMapWidth = mapDivSize.width;
-	const svgMapPanelWidth = svgMapWidth / svgMapHeight < mapAspectRatio ? svgMapWidth - svgMapPadding[1] - svgMapPadding[3] :
-		(svgMapHeight * mapAspectRatio) - svgMapPadding[1] - svgMapPadding[3];
+	const svgMapPanelWidth = svgMapWidth;
 
 	const mapInnerDiv = mapDiv.append("div")
 		.attr("class", classPrefix + "mapInnerDiv");
