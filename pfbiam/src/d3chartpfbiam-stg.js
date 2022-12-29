@@ -147,7 +147,7 @@ const chartContainerDiv = d3.select("#d3chartcontainerpfbiam");
 
 const showClosedFunds = chartContainerDiv.node().getAttribute("data-showclosedfunds") === "true";
 
-chartState.selectedYear = +(chartContainerDiv.node().getAttribute("data-year"));
+chartState.selectedYear = +(chartContainerDiv.node().getAttribute("data-year")) || currentYear;
 
 chartState.selectedFund = chartContainerDiv.node().getAttribute("data-fund");
 
@@ -277,7 +277,9 @@ function createAllocations(colors, mapData, lists) {
 			.attr("transform", "translate(" + (svgMapPadding[3] + legendPanelHorPadding) + "," + (svgMapPadding[0] + mapPanel.height - legendPanelHeight - legendPanelVertPadding) + ")"),
 		width: legendPanelWidth,
 		height: legendPanelHeight,
-		padding: [30, 0, 20, 4]
+		titleHorizontalPadding: 2,
+		titleVerticalPadding: 16,
+		padding: [40, 0, 20, 4]
 	};
 
 	const mapZoomButtonPanel = {
@@ -994,11 +996,22 @@ function createAllocations(colors, mapData, lists) {
 		backgroundRectangle = backgroundRectangle.enter()
 			.append("rect")
 			.attr("class", classPrefix + "backgroundRectangle")
-			.merge(backgroundRectangle)
 			.style("fill", "#fff")
 			.style("opacity", 0.6)
 			.attr("width", legendPanel.width)
-			.attr("height", legendPanel.height);
+			.attr("height", legendPanel.height)
+			.merge(backgroundRectangle);
+
+		let yearTitle = legendPanel.main.selectAll("." + classPrefix + "yearTitle")
+			.data([true]);
+
+		yearTitle = yearTitle.enter()
+			.append("text")
+			.attr("class", classPrefix + "yearTitle")
+			.attr("x", legendPanel.titleHorizontalPadding)
+			.attr("y", legendPanel.titleVerticalPadding)
+			.text(`Year: ${chartState.selectedYear}`)
+			.merge(yearTitle);
 
 		let legendSizeGroups = legendPanel.main.selectAll("." + classPrefix + "legendSizeGroups")
 			.data([true]);
