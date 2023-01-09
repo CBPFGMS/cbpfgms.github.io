@@ -747,7 +747,6 @@
 				d3.select(window).on("scroll.pbiclc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)];
-					console.log(chartState.selectedYear);
 					if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
 				});
 				checkPosition();
@@ -1641,6 +1640,7 @@
 
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
+					if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
 					repositionButtonsGroup();
 					checkArrows();
 				});
