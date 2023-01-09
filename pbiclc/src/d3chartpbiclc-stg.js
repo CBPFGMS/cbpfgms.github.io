@@ -1641,6 +1641,7 @@
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
 					if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
+					console.log(chartState.selectedContribution)
 					repositionButtonsGroup();
 					checkArrows();
 				});
