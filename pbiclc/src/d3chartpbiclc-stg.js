@@ -747,7 +747,7 @@
 				d3.select(window).on("scroll.pbiclc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
-					//if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
+					if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
 				});
 				checkPosition();
 			};
