@@ -747,6 +747,7 @@
 				d3.select(window).on("scroll.pbiclc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiclc", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
+					if (chartState.selectedYear > currentYear) chartState.selectedContribution = "total";
 				});
 				checkPosition();
 			};
@@ -1325,8 +1326,8 @@
 						const node = this;
 						const i = d3.interpolate(previousValue, d);
 						return function(t) {
-							const siString = formatSIFloat(i(t))
-							node.textContent = "$" + siString.substring(0, siString.length - 1);
+							const siString = formatSIFloat(i(t));
+							node.textContent = "$" + (d < 1e3 ? d : siString.substring(0, siString.length - 1));
 						};
 					});
 
@@ -1807,6 +1808,7 @@
 				donorsPanelTitle = donorsPanelTitle.enter()
 					.append("text")
 					.attr("class", "pbiclcDonorsPanelTitle")
+					.attr("x", donorsPanel.padding[3])
 					.attr("y", donorsPanel.padding[0] - titlePadding)
 					.merge(donorsPanelTitle)
 					.text("Donors");
@@ -2217,6 +2219,7 @@
 				cbpfsPanelTitle = cbpfsPanelTitle.enter()
 					.append("text")
 					.attr("class", "pbiclcCbpfsPanelTitle")
+					.attr("x", cbpfsPanel.padding[3])
 					.attr("y", cbpfsPanel.padding[0] - titlePadding)
 					.merge(cbpfsPanelTitle)
 					.text("CBPFs");
