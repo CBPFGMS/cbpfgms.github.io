@@ -536,7 +536,7 @@
 			var placeholderText1 = svg.append("text")
 				.style("opacity", "0")
 				.attr("class", "cbpfbptopValueMain")
-				.text(formatSIFloat(totalAmountAllCountries));
+				.text(formatSIFloat(totalPaidAllCountries));
 
 			var placeholderText2 = svg.append("text")
 				.style("opacity", "0")
@@ -576,7 +576,7 @@
 				.duration(duration)
 				.tween("text", function(d) {
 					var node = this;
-					var i = d3.interpolate(0, totalAmountAllCountries);
+					var i = d3.interpolate(0, totalPaidAllCountries);
 					return function(t) {
 						var siString = formatSIFloat(i(t))
 						node.textContent = "$" + siString.substring(0, siString.length - 1);
@@ -584,7 +584,7 @@
 				})
 				.on("end", function(d, i) {
 
-					var finalValue = formatSIFloat(totalAmountAllCountries);
+					var finalValue = formatSIFloat(totalPaidAllCountries);
 					var unit = finalValue[finalValue.length - 1]
 					var thisBox = this.getBBox();
 
