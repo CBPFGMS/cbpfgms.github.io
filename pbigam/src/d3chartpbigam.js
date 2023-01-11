@@ -526,7 +526,7 @@
 				draw(rawData, rawLaunchedAllocationsData);
 			} else {
 				d3.select(window).on("scroll.pbigam", checkPosition);
-				d3.select("body").on("d3ChartsYear.pbiclc", function() {
+				d3.select("body").on("d3ChartsYear.pbigam", function() {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail).year];
 					chartState.gamGroup = yearsArray.find(function(d) {
 						return d.year === chartState.selectedYear[0];
@@ -1424,7 +1424,7 @@
 					};
 				});
 
-			d3.select("body").on("d3ChartsYear.pbiclc", function() {
+			d3.select("body").on("d3ChartsYear.pbigam", function() {
 				clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
 				repositionButtonsGroup();
 				checkArrows();
