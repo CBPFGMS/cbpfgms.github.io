@@ -2434,6 +2434,19 @@
 
 				const thisRow = locationsData[index];
 
+				//TEMPORARY CODE FOR FILTERING OUT A DATA ISSUE WITH '|||'
+				const numberOfPipes = [];
+				for (let key in thisRow) {
+					if (thisRow[key].indexOf("|||") > -1) {
+						numberOfPipes.push(thisRow[key].split("|||").length)
+					};
+				};
+				if (!numberOfPipes.every((e, _, arr) => e === arr[0])) {
+					console.warn("Data row with mismatching pipes:", thisRow);
+					continue;
+				};
+				//END OF FILTER
+
 				if (locationsData[index - 1] || locationsData.length === 1) {
 					if (index === locationsData.length - 1 || thisRow.PrjCode !== locationsData[index + 1].PrjCode) {
 						foundSummaryObject = summaryData.find(function(d) {
