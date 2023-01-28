@@ -1825,12 +1825,12 @@
 					averageData.push({
 						total: total,
 						partner: d,
-						percentage: total / totalAllocations,
-						roundPercentage: Math.round((total / totalAllocations) * 100)
+						percentage: (total / totalAllocations) || 0,
+						roundPercentage: Math.round(((total / totalAllocations) || 0) * 100)
 					});
 				});
 
-				roundToOneHundred(averageData);
+				if (totalAllocations) roundToOneHundred(averageData);
 
 				let parallelPanelTitle = parallelPanel.main.selectAll(".pbialpParallelPanelTitle")
 					.data([true]);
@@ -3241,7 +3241,7 @@
 				return d[property]
 			});
 
-			xScaleLollipop.domain([0, Math.floor(maxXValue * xScaleLollipopMargin)]);
+			xScaleLollipop.domain([0, Math.floor(maxXValue * xScaleLollipopMargin) || 1e3]);
 
 		};
 
