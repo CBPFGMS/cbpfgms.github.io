@@ -2433,7 +2433,7 @@
 			allYears.forEach(function(d) {
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
-			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(yearsArray[yearsArray.length - 1]);
 		};
 
 		function validateCustomEventYear(yearNumber) {

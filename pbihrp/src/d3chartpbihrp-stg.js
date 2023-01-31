@@ -3117,7 +3117,7 @@
 		};
 
 		function validateYear(yearString) {
-			chartState.selectedYear = yearsArray.indexOf(+yearString) > -1 ? +yearString : currentYear;
+			chartState.selectedYear = yearsArray.indexOf(+yearString) > -1 ? +yearString : yearsArray[yearsArray.length - 1];
 		};
 
 		function parseTransform(translate) {

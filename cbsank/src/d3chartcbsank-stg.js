@@ -1333,8 +1333,10 @@
 
 		function drawSankeyContributions(dataContributions, flagsData) {
 
+			const nonZeroData = dataContributions.nodes.length && d3.sum(dataContributions.nodes, d => d.value);
+
 			let contributionsNoData = contributionsPanel.main.selectAll("." + classPrefix + "contributionsNoData")
-				.data(dataContributions.nodes.length ? [] : [true]);
+				.data(nonZeroData ? [] : [true]);
 
 			const contributionsNoDataExit = contributionsNoData.exit()
 				.transition()
@@ -1354,9 +1356,14 @@
 				.duration(duration)
 				.style("opacity", 1);
 
+			if (!nonZeroData) {
+				contributionsPanel.main.selectAll("*:not(." + classPrefix + "contributionsNoData)").remove();
+				return;
+			};
+
 			dataContributions.nodes.reverse();
 
-			const sankeyDataContributions = dataContributions.nodes.length ? sankeyGeneratorContributions(dataContributions) : dataContributions;
+			const sankeyDataContributions = sankeyGeneratorContributions(dataContributions);
 
 			const donorNodes = sankeyDataContributions.nodes.filter(e => e.level === 1);
 			const fundNode = sankeyDataContributions.nodes.filter(e => e.level === 2);
@@ -1733,8 +1740,10 @@
 
 		function drawSankeyAllocations(dataAllocations) {
 
+			const nonZeroData = dataAllocations.nodes.length && d3.sum(dataAllocations.nodes, d => d.value);
+
 			let allocationsNoData = allocationsPanel.main.selectAll("." + classPrefix + "allocationsNoData")
-				.data(dataAllocations.nodes.length ? [] : [true]);
+				.data(nonZeroData ? [] : [true]);
 
 			const allocationsNoDataExit = allocationsNoData.exit()
 				.transition()
@@ -1754,9 +1763,14 @@
 				.duration(duration)
 				.style("opacity", 1);
 
+			if (!nonZeroData) {
+				allocationsPanel.main.selectAll("*:not(." + classPrefix + "allocationsNoData)").remove();
+				return;
+			};
+
 			dataAllocations.nodes.reverse();
 
-			const sankeyDataAllocations = dataAllocations.nodes.length ? sankeyGeneratorAllocations(dataAllocations) : dataAllocations;
+			const sankeyDataAllocations = sankeyGeneratorAllocations(dataAllocations);
 
 			const fundNode = sankeyDataAllocations.nodes.filter(e => e.level === 1);
 			const typesNodes = sankeyDataAllocations.nodes.filter(e => e.level === 2);
@@ -2504,7 +2518,8 @@
 
 				if (+row.fundId === +row.fundId) {
 
-					if (chartState.selectedYear.includes(row.contributionYear) && lists.fundsInAllYearsKeys.includes(row.fundId) && !chartState.fundsInData.includes(row.fundId)) {
+					//removing funds without paid amounts
+					if (chartState.selectedYear.includes(row.contributionYear) && lists.fundsInAllYearsKeys.includes(row.fundId) && !chartState.fundsInData.includes(row.fundId) && row.paidAmount) {
 						chartState.fundsInData.push(row.fundId);
 					};
 
