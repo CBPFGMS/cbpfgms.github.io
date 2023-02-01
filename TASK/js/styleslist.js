@@ -2,13 +2,13 @@ const stylesList = {
 	nodes: {
 		start: {
 			fill: null,
-			stroke: null
+			stroke: null,
 			textColor: "purple",
 			textStyle: "italics"
 		},
 		end: {
 			fill: null,
-			stroke: null
+			stroke: null,
 			textColor: "purple",
 			textStyle: "italics"
 		},
@@ -43,4 +43,4 @@ const stylesList = {
 	}
 };
 
-export stylesList;
+export { stylesList };

@@ -1,1 +1,7 @@
 /*TASK flow chart styles*/
+
+#chartContainer {
+	width: 100%;
+	aspect-ratio: 1.5;
+	background-color: purple;
+}
