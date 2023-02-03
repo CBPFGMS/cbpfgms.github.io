@@ -2311,7 +2311,7 @@
 					return xScaleBarChart(d.cbpftarget) + barChartPercentageLabelPadding;
 				});
 
-			barChartGroup.selectAll(".pbihrpbarChartsLabels")
+			const updateLabelsSelection = barChartGroup.selectAll(".pbihrpbarChartsLabels")
 				.data(function(d) {
 					return [{
 						key: "cbpffunding",
@@ -2328,9 +2328,27 @@
 				})
 				.sort(function(a, b) {
 					return a.value - b.value;
+				});
+
+			const updateCbpfLabelsSelection = updateLabelsSelection.filter(d => d.key === "cbpffunding");
+
+			const updateHrpLabelsSelection = updateLabelsSelection.filter(d => d.key !== "cbpffunding");
+
+			updateCbpfLabelsSelection.transition()
+				.duration(duration)
+				.attr("x", function(d, i) {
+					return xScaleBarChart(d.value) + barChartLabelPadding;
 				})
-				.each(function(d, i) {
-					if (i === 1) {
+				.tween("text", function(d, i) {
+					const node = this;
+					const interpolator = d3.interpolate(reverseFormat(node.textContent), d.value);
+					return function(t) {
+						node.textContent = formatSIFloat(interpolator(t));
+					};
+				});
+
+			updateHrpLabelsSelection.each(function(d, i) {
+					if (i === 0) {
 						const requirementsDatum = d3.select(this.nextSibling).datum();
 						const dummyText = barChartGroup.append("text")
 							.style("opacity", 0)
@@ -2350,9 +2368,9 @@
 				.transition()
 				.duration(duration)
 				.attr("x", function(d, i) {
-					if (i === 2 && localVariable.get(this.previousSibling).move) {
-						return xScaleBarChart(d.value) + (2.5 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
-					} else if (i === 1 && localVariable.get(this).move) {
+					if (i === 1 && localVariable.get(this.previousSibling).move) {
+						return xScaleBarChart(d.value) + (1.5 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
+					} else if (i === 0 && localVariable.get(this).move) {
 						return xScaleBarChart(d3.select(this.nextSibling).datum().value) + barChartLabelPadding;
 					} else {
 						return xScaleBarChart(d.value) + barChartLabelPadding;
@@ -2360,8 +2378,8 @@
 				})
 				.tween("text", function(d, i) {
 					let separator = "";
-					if (i === 1 && localVariable.get(this).move) separator = d.key === "hrpfunding" ? " (fund.)/" : " (req.)/";
-					if (i === 2 && localVariable.get(this.previousSibling).move) separator = d.key === "hrpfunding" ? " (fund.)" : " (req.)";
+					if (i === 0 && localVariable.get(this).move) separator = d.key === "hrpfunding" ? " (fund.)/" : " (req.)/";
+					if (i === 1 && localVariable.get(this.previousSibling).move) separator = d.key === "hrpfunding" ? " (fund.)" : " (req.)";
 					const node = this;
 					const interpolator = d3.interpolate(reverseFormat(node.textContent.replace(separator, "")), d.value);
 					return function(t) {

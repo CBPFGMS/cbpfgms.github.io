@@ -3528,6 +3528,7 @@
 			let sum = d3.sum(dataArray, function(d) {
 				return d.roundPercentage;
 			});
+			if (!sum) return;
 			while (sum !== 100) {
 				if (sum > 100) {
 					const intNGOObject = dataArray.find(function(d) {

@@ -2547,8 +2547,6 @@
 				};
 			});
 
-			console.log(topValuesLaunchedData);
-
 			const data = [];
 
 			const gamCounter = gamDescriptions.filter(function(d) {
@@ -2672,14 +2670,14 @@
 			});
 
 			if (gamGroups.length > 1) {
-				chartState.selectedYear.push(new Date().getFullYear());
+				chartState.selectedYear.push(yearsArray[yearsArray.length - 1].year);
 			} else {
 				allYears.forEach(function(d) {
 					chartState.selectedYear.push(d);
 				});
 			};
 
-			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
+			if (!chartState.selectedYear.length) chartState.selectedYear.push(yearsArray[yearsArray.length - 1].year);
 
 		};
 
