@@ -1,7 +1,120 @@
 /*TASK flow chart styles*/
 
 #chartContainer {
-	width: 100%;
-	aspect-ratio: 1.5;
-	background-color: purple;
+	display: flex;
+	flex-direction: row;
+	width: 100%;	
 }
+
+.taskflowChartDiv {
+	flex: 0 75%;
+	border-right: 1px solid #ddd;
+}
+
+.tasksideDiv {
+	flex: 0 25%;
+	padding-left: 0.8%;
+	padding-right: 0.8%;
+/*	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;*/
+}
+
+.tasksideDivTitle {
+	position: relative;
+	min-height: 48px;
+/*	flex: 0 10%;*/
+}
+
+.tasknodeText {
+	font-family: "Roboto", sans-serif;
+	font-size: 15px;
+	text-anchor: middle;
+/*	letter-spacing: 10px;*/
+	dominant-baseline: middle;
+}
+
+details {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 0.5em 0.5em 0;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+}
+
+summary {
+    font-weight: bold;
+    margin: -0.5em -0.5em 0;
+    padding: 0.5em;
+}
+
+summary span {
+	padding-left: 0.5em;
+}
+
+details[open] {
+    padding: 0.5em;
+}
+
+details[open] summary {
+    border-bottom: 1px solid #aaa;
+    margin-bottom: 0.5em;
+}
+
+.tasksideDivContainer {
+	width: 100%;
+/*	flex: 0 90%;*/
+}
+
+.tasklistRows {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 4px;
+}
+
+.tasklistRowsNumber {
+	display: flex;
+  	justify-content: center;
+  	align-content: center;
+  	flex-wrap: wrap;
+	border-radius: 50%;
+	width: 34px;
+	height: 34px;
+	background: rgba(255,255,255,0.5);
+	border: 3px solid currentColor;
+	font-size: 16px;
+}
+
+.tasklistRowsNumber span {
+	color: #000;
+}
+
+.tasklistRowsText {
+	flex: 0 90%;
+	margin-left: 8px;
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	color: darkslategray;
+}
+
+.taskstageDiv {
+	width: 100%;
+	border-radius: 8px;
+	margin-bottom: 4px;
+	margin-top: 4px;
+	padding: 8px;
+}
+
+.taskstageText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #222;
+}
+
+
+
+
+

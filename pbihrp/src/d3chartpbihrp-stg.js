@@ -242,6 +242,10 @@
 			sortByArray.indexOf(containerDiv.node().getAttribute("data-sortby").replace(" ", "").toLowerCase()) > -1 ? containerDiv.node().getAttribute("data-sortby").replace(" ", "").toLowerCase() :
 			"cbpffunding";
 
+		const firstDataYear = +containerDiv.node().getAttribute("data-firstyear");
+
+		const lastDataYear = +containerDiv.node().getAttribute("data-lastyear");
+
 		if (chartState.sortBy === "cbpftarget") chartState.sortBy = "hrpfunding";
 
 		if (!selectedResponsiveness) {
@@ -3070,62 +3074,64 @@
 			const completeData = [];
 
 			rawData.forEach(function(row) {
-				if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
+				if (!firstDataYear || !lastDataYear || (+row.TargYr >= firstDataYear && +row.TargYr <= lastDataYear)) {
+					if (row.ClstNm === "xxx" || row.ClstNm === "yyy") {
 
-					if (allFunds.indexOf(row.PFId) === -1) allFunds.push(row.PFId);
+						if (allFunds.indexOf(row.PFId) === -1) allFunds.push(row.PFId);
 
-					const thisValues = {
-						cbpfName: row.PFNm,
-						cbpfId: row.PFId,
-						cbpffunding: +row.PFFunded,
-						cbpftarget: +row.PFHRPTarget,
-						cbpfpercentage: +row.PFHRPTarget === 0 ? 0 : (+row.PFFunded) / (+row.PFHRPTarget),
-						cbpftotalpercentage: +row.HRPClstFunded === 0 ? 0 : (+row.PFFunded) / (+row.HRPClstFunded),
-						hrpfunding: +row.HRPClstFunded,
-						hrprequirements: +row.HRPClstReq
+						const thisValues = {
+							cbpfName: row.PFNm,
+							cbpfId: row.PFId,
+							cbpffunding: +row.PFFunded,
+							cbpftarget: +row.PFHRPTarget,
+							cbpfpercentage: +row.PFHRPTarget === 0 ? 0 : (+row.PFFunded) / (+row.PFHRPTarget),
+							cbpftotalpercentage: +row.HRPClstFunded === 0 ? 0 : (+row.PFFunded) / (+row.HRPClstFunded),
+							hrpfunding: +row.HRPClstFunded,
+							hrprequirements: +row.HRPClstReq
+						};
+						const foundYear = completeData.find(function(d) {
+							return d.year === +row.TargYr
+						});
+						if (foundYear) {
+							foundYear.totalData.cbpffunding += +row.PFFunded;
+							foundYear.totalData.cbpftarget += +row.PFHRPTarget;
+							foundYear.totalData.hrpfunding += +row.HRPClstFunded;
+							foundYear.totalData.hrprequirements += +row.HRPClstReq;
+							if (row.ClstNm === "xxx") {
+								foundYear.hrpData.push(thisValues);
+							} else {
+								foundYear.nonHrpData.push(thisValues);
+							};
+						} else {
+							if (row.ClstNm === "xxx") {
+								completeData.push({
+									year: +row.TargYr,
+									hrpYear: +row.HRPYr,
+									totalData: {
+										cbpffunding: +row.PFFunded,
+										cbpftarget: +row.PFHRPTarget,
+										hrpfunding: +row.HRPClstFunded,
+										hrprequirements: +row.HRPClstReq
+									},
+									hrpData: [thisValues],
+									nonHrpData: []
+								});
+							} else {
+								completeData.push({
+									year: +row.TargYr,
+									hrpYear: +row.HRPYr,
+									totalData: {
+										cbpffunding: +row.PFFunded,
+										cbpftarget: +row.PFHRPTarget,
+										hrpfunding: +row.HRPClstFunded,
+										hrprequirements: +row.HRPClstReq
+									},
+									hrpData: [],
+									nonHrpData: [thisValues]
+								});
+							};
+						}
 					};
-					const foundYear = completeData.find(function(d) {
-						return d.year === +row.TargYr
-					});
-					if (foundYear) {
-						foundYear.totalData.cbpffunding += +row.PFFunded;
-						foundYear.totalData.cbpftarget += +row.PFHRPTarget;
-						foundYear.totalData.hrpfunding += +row.HRPClstFunded;
-						foundYear.totalData.hrprequirements += +row.HRPClstReq;
-						if (row.ClstNm === "xxx") {
-							foundYear.hrpData.push(thisValues);
-						} else {
-							foundYear.nonHrpData.push(thisValues);
-						};
-					} else {
-						if (row.ClstNm === "xxx") {
-							completeData.push({
-								year: +row.TargYr,
-								hrpYear: +row.HRPYr,
-								totalData: {
-									cbpffunding: +row.PFFunded,
-									cbpftarget: +row.PFHRPTarget,
-									hrpfunding: +row.HRPClstFunded,
-									hrprequirements: +row.HRPClstReq
-								},
-								hrpData: [thisValues],
-								nonHrpData: []
-							});
-						} else {
-							completeData.push({
-								year: +row.TargYr,
-								hrpYear: +row.HRPYr,
-								totalData: {
-									cbpffunding: +row.PFFunded,
-									cbpftarget: +row.PFHRPTarget,
-									hrpfunding: +row.HRPClstFunded,
-									hrprequirements: +row.HRPClstReq
-								},
-								hrpData: [],
-								nonHrpData: [thisValues]
-							});
-						};
-					}
 				};
 			});
 
