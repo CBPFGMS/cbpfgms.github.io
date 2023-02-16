@@ -28,6 +28,8 @@ function flowNodesGenerator({ dataNodesOriginal, width, numberOfColumns, svg }) 
 		numberOfRows = Math.ceil(dataLength / numberOfColumns);
 
 	variables.height = (numberOfRows * (rowHeight + (numberOfColumns - 1) * rowHeightIncrement)) + padding[0] + padding[2];
+	variables.numberOfRows = numberOfRows;
+	variables.numberOfColumns = numberOfColumns;
 
 	xScale.range([padding[3], width - padding[1]])
 		.domain(d3.range(numberOfColumns))
@@ -107,24 +109,6 @@ function flowNodesGenerator({ dataNodesOriginal, width, numberOfColumns, svg }) 
 
 };
 
-function flowLinksGenerator() {
-
-
-};
-
-function calculateFreeRowsAndColumns(nodes) {
-
-	const data = {
-		rows: [],
-		columns: []
-	};
-
-	console.log(nodes)
-
-	return data;
-
-};
-
 function chopText(fakeText, maxTextSize) {
 	const ellipsis = "...",
 		words = fakeText.text().split(/\s+/);
@@ -151,4 +135,4 @@ function breakStringInTwo(str) {
 	return [left, right];
 };
 
-export { flowNodesGenerator, flowLinksGenerator, calculateFreeRowsAndColumns };
+export { flowNodesGenerator };

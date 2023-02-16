@@ -17,7 +17,10 @@ const constants = {
 	nodesTextSpacing: 12,
 	xScale: d3.scalePoint(),
 	yScale: d3.scalePoint(),
-	minLinkDistanceFromNodes: 4
+	minLinkDistanceFromNodes: 4,
+	connectionPositions: ["top", "right", "bottom", "left"],
+	linkPaddingFromNode: 4,
+	lineGenerator: d3.line().x(d => d.x).y(d => d.y)
 };
 
 const variables = {

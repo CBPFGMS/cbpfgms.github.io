@@ -1,8 +1,10 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import { flowNodesGenerator, flowLinksGenerator, calculateFreeRowsAndColumns } from "./flowgenerator.js";
+import { flowNodesGenerator } from "./flownodesgenerator.js";
+import { flowLinksGenerator } from "./flowlinksgenerator.js";
 import { stylesList } from "./styleslist.js";
 import { constants, variables } from "./constants.js";
 import { drawNodes } from "./drawnodes.js";
+import { drawLinks } from "./drawlinks.js";
 import { drawLinksList } from "./drawlinkslist.js";
 
 const {
@@ -51,9 +53,11 @@ function createFlowChart(data) {
 
 	const dataNodes = flowNodesGenerator({ dataNodesOriginal, width, numberOfColumns, svg });
 
-	const freeRowsAndColumns = calculateFreeRowsAndColumns(dataNodes);
+	const dataLinks = flowLinksGenerator({ dataLinksOriginal, dataNodes });
 
 	svg.attr("height", variables.height);
+
+	drawLinks({ dataLinks, svg });
 
 	drawNodes({ dataNodes, svg });
 

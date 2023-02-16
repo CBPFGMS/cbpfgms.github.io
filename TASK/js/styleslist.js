@@ -66,13 +66,41 @@ const stylesList = {
 		}
 	},
 	links: {
-		primary: {
-			"stroke-dasharray": null,
-			stroke: "blue"
+		paths: {
+			primary: {
+				"stroke-dasharray": null,
+				stroke: "#666",
+				"stroke-width": 2
+			},
+			secondary: {
+				"stroke-dasharray": "2-2",
+				stroke: "#666",
+				"stroke-width": 2
+			}
 		},
-		secondary: {
-			"stroke-dasharray": "2-2",
-			stroke: "blue"
+		backPaths: {
+			primary: {
+				"stroke-dasharray": null,
+				stroke: "#fff",
+				"stroke-width": 6
+			},
+			secondary: {
+				"stroke-dasharray": "2-2",
+				stroke: "#fff",
+				"stroke-width": 6
+			}
+		},
+		texts: {
+			primary: {
+				fill: "black",
+				"font-style": null,
+				"font-weight": null
+			},
+			secondary: {
+				fill: "black",
+				"font-style": null,
+				"font-weight": null
+			}
 		}
 	}
 };
