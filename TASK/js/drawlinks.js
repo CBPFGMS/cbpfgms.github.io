@@ -52,20 +52,21 @@ function drawLinks({ dataLinks, svg }) {
 	const linksGroup = svg.selectAll(null)
 		.data(dataLinks)
 		.enter()
-		.append("g");
+		.append("g")
+		.attr("class", classPrefix + "linksGroup");
 
 	const backLinks = linksGroup.append("path")
 		.attr("d", d => {
-			const lineData = [d.sourcePos, d.targetPos];
+			const lineData = d.waypoints ? [d.sourcePos, ...d.waypoints, d.targetPos] : [d.sourcePos, d.targetPos];
 			return lineGenerator(lineData);
 		});
 
 	const links = linksGroup.append("path")
 		.attr("d", d => {
-			const lineData = [d.sourcePos, d.targetPos];
+			const lineData = d.waypoints ? [d.sourcePos, ...d.waypoints, d.targetPos] : [d.sourcePos, d.targetPos];
 			return lineGenerator(lineData);
 		})
-		.attr("marker-end", d=> `url(#arrow${d.data.type})`);
+		.attr("marker-end", d => `url(#arrow${d.data.type})`);
 
 	//append textPaths
 	backLinks.call(applyStyles, stylesList.links.backPaths);

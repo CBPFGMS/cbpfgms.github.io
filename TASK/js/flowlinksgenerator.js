@@ -28,6 +28,8 @@ function flowLinksGenerator({ dataLinksOriginal, dataNodes }) {
 
 	const freeRowsAndColumns = calculateFreeRowsAndColumns(dataNodes);
 
+	calculateWaypoints(links, freeRowsAndColumns);
+
 	return links;
 
 };
@@ -35,6 +37,31 @@ function flowLinksGenerator({ dataLinksOriginal, dataNodes }) {
 function calculateRange(node, position) {
 	if (position === "top" || position === "bottom") return [node.boundaries.left, node.boundaries.right];
 	if (position === "right" || position === "left") return [node.boundaries.top, node.boundaries.bottom];
+};
+
+function calculateWaypoints(links, freeRowsAndColumns) {
+	console.log(links)
+	console.log(freeRowsAndColumns);
+	links.forEach(link => {
+		if (link.needWaypoints) {
+			link.waypoints = [];
+			//IDEA: try an alternative with while
+			// link.needMoreWayPoints = true;
+			// while(link.needMoreWayPoints){
+			// };
+			const firstWaypoint = {
+				x: link.positions.sourcePosition === "top" || link.positions.sourcePosition === "bottom" ?
+					link.sourcePos.x : link.positions.sourcePosition === "left" ?
+					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn]) :
+					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn + 1]),
+				y: link.positions.sourcePosition === "left" || link.positions.sourcePosition === "right" ?
+					link.sourcePos.y : link.positions.sourcePosition === "top" ?
+					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow]) :
+					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow + 1]),
+			};
+			link.waypoints.push(firstWaypoint)
+		};
+	});
 };
 
 function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
@@ -47,22 +74,24 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 		const { column: sourceColumn, row: sourceRow } = nodeSource;
 		const { column: targetColumn, row: targetRow } = nodeTarget;
 
-		const [sourcePosition, targetPosition] = setPositions({ sourceRow, sourceColumn, targetRow, targetColumn });
+		const [sourcePosition, targetPosition, needWaypoints] = setPositions({ sourceRow, sourceColumn, targetRow, targetColumn });
 
 		nodeConnectionSource[sourcePosition].count += 1;
 		nodeConnectionTarget[targetPosition].count += 1;
 		nodeConnectionSource[sourcePosition].linkIds.push(link.id);
 		nodeConnectionTarget[targetPosition].linkIds.push(link.id);
 
-		// const sourcePos = calculateCoordinates(nodeSource, sourcePosition);
-		// const targetPos = calculateCoordinates(nodeTarget, targetPosition);
-
 		links[index] = {
 			data: link,
 			positions: {
 				sourcePosition,
-				targetPosition
-			}
+				targetPosition,
+				sourceRow,
+				targetRow,
+				sourceColumn,
+				targetColumn
+			},
+			needWaypoints
 		};
 	});
 
@@ -113,16 +142,18 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 	};
 
 	function setPositions({ sourceRow, sourceColumn, targetRow, targetColumn }) {
-		let sourcePosition, targetPosition;
+		let sourcePosition, targetPosition, needWaypoints = true;
 
 		//test all possible combinations
 		if (sourceRow === targetRow) {
 			if (sourceColumn === targetColumn - 1) {
 				sourcePosition = "right";
 				targetPosition = "left";
+				needWaypoints = false;
 			} else if (sourceColumn === targetColumn + 1) {
 				sourcePosition = "left";
 				targetPosition = "right";
+				needWaypoints = false;
 			} else {
 				if (sourceRow < variables.numberOfRows / 2) {
 					sourcePosition = "top";
@@ -138,9 +169,11 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 			if (sourceRow === targetRow - 1) {
 				sourcePosition = "bottom";
 				targetPosition = "top";
+				needWaypoints = false;
 			} else if (sourceRow === targetRow + 1) {
 				sourcePosition = "top";
 				targetPosition = "bottom";
+				needWaypoints = false;
 			} else {
 				if (sourceColumn < variables.numberOfColumns / 2) {
 					sourcePosition = "left";
@@ -162,7 +195,7 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 			targetPosition = "bottom";
 		};
 
-		return [sourcePosition, targetPosition];
+		return [sourcePosition, targetPosition, needWaypoints];
 	};
 
 };
