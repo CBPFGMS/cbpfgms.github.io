@@ -56,16 +56,10 @@ function drawLinks({ dataLinks, svg }) {
 		.attr("class", classPrefix + "linksGroup");
 
 	const backLinks = linksGroup.append("path")
-		.attr("d", d => {
-			const lineData = d.waypoints ? [d.sourcePos, ...d.waypoints, d.targetPos] : [d.sourcePos, d.targetPos];
-			return lineGenerator(lineData);
-		});
+		.attr("d", d => lineGenerator(d.waypoints));
 
 	const links = linksGroup.append("path")
-		.attr("d", d => {
-			const lineData = d.waypoints ? [d.sourcePos, ...d.waypoints, d.targetPos] : [d.sourcePos, d.targetPos];
-			return lineGenerator(lineData);
-		})
+		.attr("d", d => lineGenerator(d.waypoints))
 		.attr("marker-end", d => `url(#arrow${d.data.type})`);
 
 	//append textPaths

@@ -6,7 +6,8 @@ const {
 	connectionPositions,
 	xScale,
 	yScale,
-	linkPaddingFromNode
+	linkPaddingFromNode,
+	cornerRadius
 } = constants;
 
 
@@ -30,6 +31,8 @@ function flowLinksGenerator({ dataLinksOriginal, dataNodes }) {
 
 	calculateWaypoints(links, freeRowsAndColumns);
 
+	addCornerWaypoints(links);
+
 	return links;
 
 };
@@ -40,11 +43,8 @@ function calculateRange(node, position) {
 };
 
 function calculateWaypoints(links, freeRowsAndColumns) {
-	console.log(links)
-	console.log(freeRowsAndColumns);
 	links.forEach(link => {
 		if (link.needWaypoints) {
-			link.waypoints = [];
 			//IDEA: try an alternative with while
 			// link.needMoreWayPoints = true;
 			// while(link.needMoreWayPoints){
@@ -52,14 +52,69 @@ function calculateWaypoints(links, freeRowsAndColumns) {
 			const firstWaypoint = {
 				x: link.positions.sourcePosition === "top" || link.positions.sourcePosition === "bottom" ?
 					link.sourcePos.x : link.positions.sourcePosition === "left" ?
-					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn]) :
-					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn + 1]),
+					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn]) : d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn + 1]),
 				y: link.positions.sourcePosition === "left" || link.positions.sourcePosition === "right" ?
 					link.sourcePos.y : link.positions.sourcePosition === "top" ?
-					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow]) :
-					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow + 1]),
+					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow]) : d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow + 1]),
 			};
-			link.waypoints.push(firstWaypoint)
+			const lastWaypoint = {
+				x: link.positions.targetPosition === "top" || link.positions.targetPosition === "bottom" ?
+					link.targetPos.x : link.positions.targetPosition === "left" ?
+					d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]) : d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn + 1]),
+				y: link.positions.targetPosition === "left" || link.positions.targetPosition === "right" ?
+					link.targetPos.y : link.positions.targetPosition === "top" ?
+					d3.mean(freeRowsAndColumns.rows[link.positions.targetRow]) : d3.mean(freeRowsAndColumns.rows[link.positions.targetRow + 1]),
+			};
+
+			link.waypoints.unshift(firstWaypoint);
+			link.waypoints.push(lastWaypoint);
+
+			if (firstWaypoint.x !== lastWaypoint.x && firstWaypoint.y !== lastWaypoint.y) {
+				const middleWaypoint1 = {
+					x: d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]),
+					y: firstWaypoint.y
+				};
+				const middleWaypoint2 = {
+					x: d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]),
+					y: lastWaypoint.y
+				};
+				link.waypoints.splice(1, 0, middleWaypoint1, middleWaypoint2);
+			};
+		};
+		link.waypoints.unshift(link.sourcePos);
+		link.waypoints.push(link.targetPos);
+	});
+};
+
+function addCornerWaypoints(links) {
+	links.forEach(link => {
+		if (link.needWaypoints) {
+			const tempArray = [];
+			link.waypoints.forEach((waypoint, index) => {
+				if (!index || index === link.waypoints.length - 1) {
+					tempArray.push(waypoint);
+					return;
+				};
+				const { x: xPrevious, y: yPrevious } = link.waypoints[index - 1];
+				const { x: xNext, y: yNext } = link.waypoints[index + 1];
+				if (xPrevious === waypoint.x) {
+					tempArray.push({
+						x: xPrevious,
+						y: waypoint.y + (Math.sign(yPrevious - waypoint.y) * cornerRadius)
+					});
+					waypoint.x += Math.sign(xNext - waypoint.x) * cornerRadius;
+					tempArray.push(waypoint);
+				};
+				if (yPrevious === waypoint.y) {
+					tempArray.push({
+						x: waypoint.x + (Math.sign(xPrevious - waypoint.x) * cornerRadius),
+						y: yPrevious
+					});
+					waypoint.y += Math.sign(yNext - waypoint.y) * cornerRadius;
+					tempArray.push(waypoint);
+				};
+			});
+			link.waypoints = structuredClone(tempArray);
 		};
 	});
 };
@@ -91,7 +146,8 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 				sourceColumn,
 				targetColumn
 			},
-			needWaypoints
+			needWaypoints,
+			waypoints: []
 		};
 	});
 

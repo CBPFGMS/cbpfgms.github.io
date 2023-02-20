@@ -19,8 +19,9 @@ const constants = {
 	yScale: d3.scalePoint(),
 	minLinkDistanceFromNodes: 4,
 	connectionPositions: ["top", "right", "bottom", "left"],
+	cornerRadius: 4,
 	linkPaddingFromNode: 4,
-	lineGenerator: d3.line().x(d => d.x).y(d => d.y)
+	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
 };
 
 const variables = {
