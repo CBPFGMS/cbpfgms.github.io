@@ -30,25 +30,6 @@ function drawLinks({ dataLinks, svg }) {
 
 	});
 
-	//REMOVE
-	const sourceCircles = svg.selectAll(null)
-		.data(dataLinks.map(d => d.sourcePos))
-		.enter()
-		.append("circle")
-		.attr("r", 8)
-		.attr("cx", d => d.x)
-		.attr("cy", d => d.y)
-		.style("fill", "red");
-	const targetCircles = svg.selectAll(null)
-		.data(dataLinks.map(d => d.targetPos))
-		.enter()
-		.append("circle")
-		.attr("r", 8)
-		.attr("cx", d => d.x)
-		.attr("cy", d => d.y)
-		.style("fill", "blue");
-	//REMOVE
-
 	const linksGroup = svg.selectAll(null)
 		.data(dataLinks)
 		.enter()
