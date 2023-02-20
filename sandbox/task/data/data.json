@@ -1,0 +1,196 @@
+{
+    "nodes": [
+        {
+            "id": 1,
+            "type": "start",
+            "text": "Allocation created",
+            "tooltipText": "The text for the tooltip, if any, goes here"
+        },
+        {
+            "id": 2,
+            "type": "primary",
+            "text": "New",
+            "tooltipText": ""
+        },
+        {
+            "id": 3,
+            "type": "secondary",
+            "text": "Initial Strategy Draft (Country)",
+            "tooltipText": ""
+        },
+        {
+            "id": 4,
+            "type": "primary",
+            "text": "Full Application Form",
+            "tooltipText": ""
+        },
+        {
+            "id": 5,
+            "type": "secondary",
+            "text": "Initial Strategy: CERF Review",
+            "tooltipText": ""
+        },
+        {
+            "id": 6,
+            "type": "secondary",
+            "text": "Full Application Draft (Country)",
+            "tooltipText": ""
+        },
+        {
+            "id": 7,
+            "type": "secondary",
+            "text": "Initial Strategy Redraft (Country)",
+            "tooltipText": ""
+        },
+        {
+            "id": 8,
+            "type": "secondary",
+            "text": "Full Application Draft: Proposals Open (Country)",
+            "tooltipText": ""
+        },
+        {
+            "id": 9,
+            "type": "primary",
+            "text": "CERF Initial Application Review",
+            "tooltipText": ""
+        },
+        {
+            "id": 10,
+            "type": "primary",
+            "text": "CERF Application Review",
+            "tooltipText": ""
+        },
+        {
+            "id": 11,
+            "type": "primary",
+            "text": "ERC Summary Preparation",
+            "tooltipText": ""
+        },
+        {
+            "id": 12,
+            "type": "primary",
+            "text": "ERC Summary (OUSG)",
+            "tooltipText": ""
+        },
+        {
+            "id": 13,
+            "type": "primary",
+            "text": "Under Implementation",
+            "tooltipText": ""
+        },
+        {
+            "id": 14,
+            "type": "rejected",
+            "text": "Rejected / Withdrawn",
+            "tooltipText": ""
+        }
+    ],
+    "links": [
+        {
+            "source": 1,
+            "target": 2,
+            "id": 1,
+            "type": "primary",
+            "text": ""
+        },
+        {
+            "source": 2,
+            "target": 3,
+            "id": 2,
+            "type": "primary",
+            "text": "Send Initial Strategy form AW1-E, or AW1/1-A (Review Initial Strategy Email)"
+        },
+        {
+            "source": 2,
+            "target": 4,
+            "id": 3,
+            "type": "primary",
+            "text": "Move to Full Application (AW1-F)"
+        },
+        {
+            "source": 3,
+            "target": 5,
+            "id": 4,
+            "type": "primary",
+            "text": "Country Office Submits to CERF (AW2-A)"
+        },
+        {
+            "source": 5,
+            "target": 4,
+            "id": 5,
+            "type": "primary",
+            "text": "Move to Full Application (AW3-A)"
+        },
+        {
+            "source": 4,
+            "target": 6,
+            "id": 6,
+            "type": "primary",
+            "text": "Send Full Application Email (AW5/2-A or AW5/1-A) or Open Application (AW5-B)"
+        },
+        {
+            "source": 5,
+            "target": 7,
+            "id": 7,
+            "type": "primary",
+            "text": "CERF requests redraft (AW3-B)"
+        },
+        {
+            "source": 7,
+            "target": 5,
+            "id": 8,
+            "type": "primary",
+            "text": "Resubmit to CERF (AW3/1-A)"
+        },
+        {
+            "source": 6,
+            "target": 8,
+            "id": 9,
+            "type": "primary",
+            "text": "Open Proposals (AW6-A) or (AW5-C)"
+        },
+        {
+            "source": 8,
+            "target": 9,
+            "id": 10,
+            "type": "primary",
+            "text": "Submit to CERF (AW6-C)"
+        },
+        {
+            "source": 4,
+            "target": 9,
+            "id": 11,
+            "type": "secondary",
+            "text": "Skip to Application Review (AW5-E)"
+        },
+        {
+            "source": 10,
+            "target": 11,
+            "id": 12,
+            "type": "primary",
+            "text": "Complete Task (AW7-I)"
+        },
+        {
+            "source": 11,
+            "target": 12,
+            "id": 13,
+            "type": "primary",
+            "text": "Prepare ERC Summary (AW14-B)"
+        },
+        {
+            "source": 12,
+            "target": 13,
+            "id": 14,
+            "type": "primary",
+            "text": "Prepare ERC Summary (AW15-B)"
+        },
+        {
+            "source": 9,
+            "target": 10,
+            "id": 15,
+            "type": "primary",
+            "text": ""
+        }
+    ],
+    "numberOfColumns": 3
+}
