@@ -43,6 +43,28 @@ function calculateRange(node, position) {
 };
 
 function calculateWaypoints(links, freeRowsAndColumns) {
+	//first pass, set the scales
+	links.forEach(link => {
+		if (link.needWaypoints) {
+			if (link.positions.sourcePosition === "left") freeRowsAndColumns.columns[link.positions.sourceColumn].linkIds.add(link.data.id);
+			if (link.positions.sourcePosition === "right") freeRowsAndColumns.columns[link.positions.sourceColumn + 1].linkIds.add(link.data.id);
+			if (link.positions.sourcePosition === "top") freeRowsAndColumns.rows[link.positions.sourceRow].linkIds.add(link.data.id);
+			if (link.positions.sourcePosition === "bottom") freeRowsAndColumns.rows[link.positions.sourceRow + 1].linkIds.add(link.data.id);
+			if (link.positions.targetPosition === "left") freeRowsAndColumns.columns[link.positions.targetColumn].linkIds.add(link.data.id);
+			if (link.positions.targetPosition === "right") freeRowsAndColumns.columns[link.positions.targetColumn + 1].linkIds.add(link.data.id);
+			if (link.positions.targetPosition === "top") freeRowsAndColumns.rows[link.positions.targetRow].linkIds.add(link.data.id);
+			if (link.positions.targetPosition === "bottom") freeRowsAndColumns.rows[link.positions.targetRow + 1].linkIds.add(link.data.id);
+			if(link.positions.sourceRow !== link.positions.targetRow && link.positions.sourceColumn !== link.positions.targetColumn) freeRowsAndColumns.columns[link.positions.targetColumn].linkIds.add(link.data.id);
+		};
+	});
+
+	["rows", "columns"].forEach(type => {
+		for (let key in freeRowsAndColumns[type]) {
+			console.log(freeRowsAndColumns[type][key])
+			freeRowsAndColumns[type][key].scale.domain([...freeRowsAndColumns[type][key].linkIds]);
+		};
+	});
+
 	links.forEach(link => {
 		if (link.needWaypoints) {
 			//IDEA: try an alternative with while
@@ -52,18 +74,18 @@ function calculateWaypoints(links, freeRowsAndColumns) {
 			const firstWaypoint = {
 				x: link.positions.sourcePosition === "top" || link.positions.sourcePosition === "bottom" ?
 					link.sourcePos.x : link.positions.sourcePosition === "left" ?
-					d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn]) : d3.mean(freeRowsAndColumns.columns[link.positions.sourceColumn + 1]),
+					freeRowsAndColumns.columns[link.positions.sourceColumn].scale(link.data.id) : freeRowsAndColumns.columns[link.positions.sourceColumn + 1].scale(link.data.id),
 				y: link.positions.sourcePosition === "left" || link.positions.sourcePosition === "right" ?
 					link.sourcePos.y : link.positions.sourcePosition === "top" ?
-					d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow]) : d3.mean(freeRowsAndColumns.rows[link.positions.sourceRow + 1]),
+					freeRowsAndColumns.rows[link.positions.sourceRow].scale(link.data.id) : freeRowsAndColumns.rows[link.positions.sourceRow + 1].scale(link.data.id),
 			};
 			const lastWaypoint = {
 				x: link.positions.targetPosition === "top" || link.positions.targetPosition === "bottom" ?
 					link.targetPos.x : link.positions.targetPosition === "left" ?
-					d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]) : d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn + 1]),
+					freeRowsAndColumns.columns[link.positions.targetColumn].scale(link.data.id) : freeRowsAndColumns.columns[link.positions.targetColumn + 1].scale(link.data.id),
 				y: link.positions.targetPosition === "left" || link.positions.targetPosition === "right" ?
 					link.targetPos.y : link.positions.targetPosition === "top" ?
-					d3.mean(freeRowsAndColumns.rows[link.positions.targetRow]) : d3.mean(freeRowsAndColumns.rows[link.positions.targetRow + 1]),
+					freeRowsAndColumns.rows[link.positions.targetRow].scale(link.data.id) : freeRowsAndColumns.rows[link.positions.targetRow + 1].scale(link.data.id),
 			};
 
 			link.waypoints.unshift(firstWaypoint);
@@ -71,11 +93,11 @@ function calculateWaypoints(links, freeRowsAndColumns) {
 
 			if (firstWaypoint.x !== lastWaypoint.x && firstWaypoint.y !== lastWaypoint.y) {
 				const middleWaypoint1 = {
-					x: d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]),
+					x: freeRowsAndColumns.columns[link.positions.targetColumn].scale(link.data.id),
 					y: firstWaypoint.y
 				};
 				const middleWaypoint2 = {
-					x: d3.mean(freeRowsAndColumns.columns[link.positions.targetColumn]),
+					x: freeRowsAndColumns.columns[link.positions.targetColumn].scale(link.data.id),
 					y: lastWaypoint.y
 				};
 				link.waypoints.splice(1, 0, middleWaypoint1, middleWaypoint2);
@@ -290,6 +312,18 @@ function calculateFreeRowsAndColumns(nodes) {
 		const nodesList = nodes.filter(d => d.column === column);
 		data.columns[column][1] = d3.min(nodesList, d => d.boundaries.left - linkPaddingFromNode);
 		data.columns[column + 1][0] = d3.max(nodesList, d => d.boundaries.right + linkPaddingFromNode);
+	});
+
+	["rows", "columns"].forEach(type => {
+		for (let key in data[type]) {
+			data[type][key] = {
+				values: data[type][key],
+				count: 0,
+				linkIds: new Set,
+				scale: d3.scalePoint().padding(1)
+					.range(data[type][key])
+			};
+		};
 	});
 
 	return data;
