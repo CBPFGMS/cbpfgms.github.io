@@ -4316,14 +4316,6 @@
 				if (row.fund === "999") cerfInData = true;
 			});
 
-			rawLaunchedAllocationsData.forEach(row => {
-				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
-			});
-
-			for (const year in yearsWithUnderApprovalAboveMin) {
-				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
-			};
-
 			yearsArray.sort(function(a, b) {
 				return a - b;
 			});
@@ -4337,6 +4329,8 @@
 				links: []
 			};
 
+			for (const key in yearsWithUnderApprovalAboveMin) delete yearsWithUnderApprovalAboveMin[key];
+
 			topValuesLaunchedData.launched = 0;
 			topValuesLaunchedData.underApproval = 0;
 
@@ -4348,10 +4342,15 @@
 
 			rawLaunchedAllocationsData.forEach(function(row) {
 				if (chartState.selectedYear.includes(row.AllocationYear) && (allCbpfsSelected || chartState.selectedCbpfs.includes(row.PooledFundId + ""))) {
+					yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
 				};
 			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
 
 			rawData.forEach(function(row) {
 
