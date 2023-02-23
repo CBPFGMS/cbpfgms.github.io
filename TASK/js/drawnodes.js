@@ -39,6 +39,8 @@ function drawNodes({ dataNodes, svg }) {
 	rectangles.call(applyStyles, stylesList.nodes.rects);
 	texts.call(applyStyles, stylesList.nodes.texts);
 
+	return nodesGroup;
+
 };
 
 function applyStyles(selection, styles) {

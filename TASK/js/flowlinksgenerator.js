@@ -54,13 +54,12 @@ function calculateWaypoints(links, freeRowsAndColumns) {
 			if (link.positions.targetPosition === "right") freeRowsAndColumns.columns[link.positions.targetColumn + 1].linkIds.add(link.data.id);
 			if (link.positions.targetPosition === "top") freeRowsAndColumns.rows[link.positions.targetRow].linkIds.add(link.data.id);
 			if (link.positions.targetPosition === "bottom") freeRowsAndColumns.rows[link.positions.targetRow + 1].linkIds.add(link.data.id);
-			if(link.positions.sourceRow !== link.positions.targetRow && link.positions.sourceColumn !== link.positions.targetColumn) freeRowsAndColumns.columns[link.positions.targetColumn].linkIds.add(link.data.id);
+			if (link.positions.sourceRow !== link.positions.targetRow && link.positions.sourceColumn !== link.positions.targetColumn) freeRowsAndColumns.columns[Math.ceil((link.positions.sourceColumn + link.positions.targetColumn) / 2)].linkIds.add(link.data.id);
 		};
 	});
 
 	["rows", "columns"].forEach(type => {
 		for (let key in freeRowsAndColumns[type]) {
-			console.log(freeRowsAndColumns[type][key])
 			freeRowsAndColumns[type][key].scale.domain([...freeRowsAndColumns[type][key].linkIds]);
 		};
 	});
@@ -93,11 +92,11 @@ function calculateWaypoints(links, freeRowsAndColumns) {
 
 			if (firstWaypoint.x !== lastWaypoint.x && firstWaypoint.y !== lastWaypoint.y) {
 				const middleWaypoint1 = {
-					x: freeRowsAndColumns.columns[link.positions.targetColumn].scale(link.data.id),
+					x: freeRowsAndColumns.columns[Math.ceil((link.positions.sourceColumn + link.positions.targetColumn) / 2)].scale(link.data.id),
 					y: firstWaypoint.y
 				};
 				const middleWaypoint2 = {
-					x: freeRowsAndColumns.columns[link.positions.targetColumn].scale(link.data.id),
+					x: freeRowsAndColumns.columns[Math.ceil((link.positions.sourceColumn + link.positions.targetColumn) / 2)].scale(link.data.id),
 					y: lastWaypoint.y
 				};
 				link.waypoints.splice(1, 0, middleWaypoint1, middleWaypoint2);

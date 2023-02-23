@@ -101,6 +101,18 @@ const stylesList = {
 				"font-style": null,
 				"font-weight": null
 			}
+		},
+		circles: {
+			primary: {
+				fill: "white",
+				"stroke": "#666",
+				"stroke-width": 2
+			},
+			secondary: {
+				fill: "white",
+				"stroke": "#666",
+				"stroke-width": 2
+			}
 		}
 	}
 };

@@ -6,6 +6,7 @@ import { constants, variables } from "./constants.js";
 import { drawNodes } from "./drawnodes.js";
 import { drawLinks } from "./drawlinks.js";
 import { drawLinksList } from "./drawlinkslist.js";
+import { highlight } from "./highlight.js";
 
 const {
 	classPrefix,
@@ -57,10 +58,12 @@ function createFlowChart(data) {
 
 	svg.attr("height", variables.height);
 
-	drawLinks({ dataLinks, svg });
+	const { linksGroup, labelsGroup } = drawLinks({ dataLinks, svg });
 
-	drawNodes({ dataNodes, svg });
+	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	drawLinksList({ dataLinksOriginal, sideDivContainer });
+	const linksList = drawLinksList({ dataLinksOriginal, sideDivContainer });
+
+	highlight({nodesGroup, linksGroup, labelsGroup, linksList});
 
 };

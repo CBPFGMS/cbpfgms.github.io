@@ -30,7 +30,6 @@
 	font-family: "Roboto", sans-serif;
 	font-size: 15px;
 	text-anchor: middle;
-/*	letter-spacing: 10px;*/
 	dominant-baseline: middle;
 }
 
@@ -118,4 +117,10 @@ details[open] summary {
 	fill: none;
 }
 
+.tasklabelsGroupText {
+	dominant-baseline: central;
+	text-anchor: middle;
+	font-size: 16px;
+	font-family: "Arial", sans-serif;
+}
 

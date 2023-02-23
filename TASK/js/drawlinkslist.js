@@ -59,6 +59,10 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			.html(d => d.text);
 	});
 
+	const rows = stages.selectAll(`.${classPrefix}listRows`);
+
+	return rows;
+
 };
 
 function applyStyles(selection, styles) {

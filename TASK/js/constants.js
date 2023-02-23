@@ -21,6 +21,11 @@ const constants = {
 	connectionPositions: ["top", "right", "bottom", "left"],
 	cornerRadius: 4,
 	linkPaddingFromNode: 4,
+	labelCircleRadius: 15,
+	fadeOpacityNodes: 0.1,
+	fadeOpacityLinks: 0.1,
+	fadeOpacityLinkLabels: 0.1,
+	fadeOpacityLinkList: 0.1,
 	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
 };
 
