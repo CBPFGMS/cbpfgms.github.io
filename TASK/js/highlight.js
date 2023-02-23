@@ -12,7 +12,13 @@ const {
 function highlight({ nodesGroup, linksGroup, labelsGroup, linksList }) {
 
 	nodesGroup.on("mouseenter", mouseoverNodesGroup)
-		.on("mouseleave", mouseoutNodesGroup);
+		.on("mouseleave", mouseout);
+
+	linksGroup.on("mouseenter", mouseoverLinks)
+		.on("mouseleave", mouseout);
+
+	labelsGroup.on("mouseenter", mouseoverLinks)
+		.on("mouseleave", mouseout);
 
 	function mouseoverNodesGroup(event, d) {
 		const linkedNodes = [];
@@ -27,7 +33,13 @@ function highlight({ nodesGroup, linksGroup, labelsGroup, linksList }) {
 		nodesGroup.style("opacity", e => e.data.id === d.data.id || linkedNodes.includes(e.data.id) ? 1 : fadeOpacityNodes);
 	};
 
-	function mouseoutNodesGroup() {
+	function mouseoverLinks(event, d) {
+		linksGroup.style("opacity", e => e.data.id === d.data.id ? 1 : fadeOpacityLinks);
+		labelsGroup.style("opacity", e => e.data.id === d.data.id ? 1 : fadeOpacityLinks);
+		nodesGroup.style("opacity", e => e.data.id === d.data.source || e.data.id === d.data.target ? 1 : fadeOpacityNodes);
+	};
+
+	function mouseout() {
 		nodesGroup.style("opacity", 1);
 		linksGroup.style("opacity", 1);
 		labelsGroup.style("opacity", 1);
