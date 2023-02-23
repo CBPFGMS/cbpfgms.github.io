@@ -11,7 +11,7 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 
 	const colors = ['#1b9e77', '#d95f02', '#7570b3'];
 
-	const dataList = dataLinksOriginal.map(({ id, text }) => ({ id, text }))
+	const dataList = dataLinksOriginal.map(({ id, text, source, target }) => ({ id, text, source, target }))
 		.sort((a, b) => a.id - b.id)
 		.filter(({ text }) => text);
 
@@ -19,27 +19,27 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 		dataListBar = dataList.slice(4, 9),
 		dataListBaz = dataList.slice(9);
 
-	const stages = sideDivContainer.selectAll(null)
-		.data(d3.range(3))
-		.enter()
-		.append("div")
-		.style("color", d => colors[d])
-		.style("background-color", d => {
-			const { r, g, b } = d3.color(colors[d])
-			return `rgba(${r},${g},${b}, 0.1)`
-		})
-		.attr("class", classPrefix + "stageDiv");
-
-	stages.append("p")
-		.attr("class", classPrefix + "stageText")
-		.html(d => `Stage: ${!d ? "foo" : d === 1 ? "bar" : "baz"}...`);
-
 	// const stages = sideDivContainer.selectAll(null)
 	// 	.data(d3.range(3))
 	// 	.enter()
 	// 	.append("div")
 	// 	.style("color", d => colors[d])
+	// 	.style("background-color", d => {
+	// 		const { r, g, b } = d3.color(colors[d])
+	// 		return `rgba(${r},${g},${b}, 0.1)`
+	// 	})
 	// 	.attr("class", classPrefix + "stageDiv");
+
+	// stages.append("p")
+	// 	.attr("class", classPrefix + "stageText")
+	// 	.html(d => `Stage: ${!d ? "foo" : d === 1 ? "bar" : "baz"}...`);
+
+	const stages = sideDivContainer.selectAll(null)
+		.data(d3.range(3))
+		.enter()
+		.append("div")
+		.style("color", d => colors[d])
+		.attr("class", classPrefix + "stageDiv");
 
 	stages.each((d, i, n) => {
 		const thisData = !d ? dataListFoo : d === 1 ? dataListBar : dataListBaz;
@@ -59,7 +59,7 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			.html(d => d.text);
 	});
 
-	const rows = stages.selectAll(`.${classPrefix}listRows`);
+	const rows = sideDivContainer.selectAll(`.${classPrefix}listRows`);
 
 	return rows;
 
