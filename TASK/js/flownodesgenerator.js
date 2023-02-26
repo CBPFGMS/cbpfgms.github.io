@@ -76,10 +76,11 @@ function flowNodesGenerator({ dataNodesOriginal, width, numberOfColumns, svg }) 
 				.attr("y", -nodesTextSpacing)
 				.attr("x", 0)
 				.text(textArray[0]);
-			fakeTextTwoLines.append("tspan")
+			const fakeTextTwoLinesSpan = fakeTextTwoLines.append("tspan")
 				.attr("y", nodesTextSpacing)
 				.attr("x", 0)
 				.text(textArray[1]);
+			textArray[1] = chopText(fakeTextTwoLinesSpan, maxRectWidth);
 			textBox = fakeTextTwoLines.node().getBBox();
 		};
 
@@ -115,7 +116,7 @@ function chopText(fakeText, maxTextSize) {
 	while (fakeText.node().getComputedTextLength() > maxTextSize) {
 		words.pop();
 		fakeText.text(words.join(" ") + ellipsis);
-	}
+	};
 	return fakeText.text();
 };
 
