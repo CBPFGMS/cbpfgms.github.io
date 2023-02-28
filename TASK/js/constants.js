@@ -26,6 +26,9 @@ const constants = {
 	fadeOpacityLinks: 0.1,
 	fadeOpacityLinkLabels: 0.1,
 	fadeOpacityLinkList: 0.1,
+	currentStatusFillColor: "lightskyblue",
+	previousStepsColor: "#1a9850",
+	nextStepsColor: "#d73027",
 	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
 };
 

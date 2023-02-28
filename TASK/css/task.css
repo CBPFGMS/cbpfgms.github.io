@@ -6,9 +6,30 @@
 	width: 100%;	
 }
 
-.taskflowChartDiv {
+.taskflowChartDivContainer {
 	flex: 0 75%;
 	border-right: 1px solid #ddd;
+	display: flex;
+	flex-direction: column;
+}
+
+.taskflowChartCurrentStatusDiv {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	font-family: "Roboto", sans-serif;
+	font-size: 1.2em;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	white-space: pre;
+}
+
+.taskcurrentStatusValueSpan {
+	font-weight: 500;
+}
+
+.taskflowChartDiv {
+	width: 100%;
 }
 
 .tasksideDiv {

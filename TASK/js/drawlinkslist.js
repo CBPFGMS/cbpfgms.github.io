@@ -4,47 +4,45 @@ import { constants, variables } from "./constants.js";
 
 const {
 	classPrefix,
-	nodesTextSpacing
+	nodesTextSpacing,
+	previousStepsColor,
+	nextStepsColor
 } = constants;
 
-function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
-
-	const colors = ['#1b9e77', '#d95f02', '#7570b3'];
+function drawLinksList({ dataLinksOriginal, sideDivContainer, previousLinks }) {
 
 	const dataList = dataLinksOriginal.map(({ id, text, source, target }) => ({ id, text, source, target }))
 		.sort((a, b) => a.id - b.id)
 		.filter(({ text }) => text);
 
-	const dataListFoo = dataList.slice(0, 4),
-		dataListBar = dataList.slice(4, 9),
-		dataListBaz = dataList.slice(9);
+	const dataListPrevious = dataList.filter(d => previousLinks.includes(d.id)),
+		dataListNext = dataList.filter(d => !previousLinks.includes(d.id));
+
+	const stages = sideDivContainer.selectAll(null)
+		.data([dataListPrevious, dataListNext])
+		.enter()
+		.append("div")
+		.style("color", (_, i) => i ? nextStepsColor : previousStepsColor)
+		.style("background-color", (_, i) => {
+			const { r, g, b } = d3.color(i ? nextStepsColor : previousStepsColor);
+			return `rgba(${r},${g},${b}, 0.1)`
+		})
+		.attr("class", classPrefix + "stageDiv");
+
+	stages.append("p")
+		.attr("class", classPrefix + "stageText")
+		.html((_,i) => `Stage: ${i ? "to be completed" : "already completed"}`);
 
 	// const stages = sideDivContainer.selectAll(null)
 	// 	.data(d3.range(3))
 	// 	.enter()
 	// 	.append("div")
 	// 	.style("color", d => colors[d])
-	// 	.style("background-color", d => {
-	// 		const { r, g, b } = d3.color(colors[d])
-	// 		return `rgba(${r},${g},${b}, 0.1)`
-	// 	})
 	// 	.attr("class", classPrefix + "stageDiv");
 
-	// stages.append("p")
-	// 	.attr("class", classPrefix + "stageText")
-	// 	.html(d => `Stage: ${!d ? "foo" : d === 1 ? "bar" : "baz"}...`);
-
-	const stages = sideDivContainer.selectAll(null)
-		.data(d3.range(3))
-		.enter()
-		.append("div")
-		.style("color", d => colors[d])
-		.attr("class", classPrefix + "stageDiv");
-
 	stages.each((d, i, n) => {
-		const thisData = !d ? dataListFoo : d === 1 ? dataListBar : dataListBaz;
 		const listRows = d3.select(n[i]).selectAll(null)
-			.data(thisData)
+			.data(d)
 			.enter()
 			.append("div")
 			.attr("class", classPrefix + "listRows");

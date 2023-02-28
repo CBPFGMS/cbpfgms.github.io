@@ -40,9 +40,11 @@ function drawLinks({ dataLinks, svg }) {
 		.attr("class", classPrefix + "linksGroup");
 
 	const backLinks = linksGroup.append("path")
+		.attr("class", classPrefix + "backLinks")
 		.attr("d", d => lineGenerator(d.waypoints));
 
 	const links = linksGroup.append("path")
+		.attr("class", classPrefix + "links")
 		.attr("d", d => lineGenerator(d.waypoints))
 		.attr("marker-end", d => `url(#arrow${d.data.type})`);
 

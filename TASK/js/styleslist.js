@@ -16,7 +16,7 @@ const stylesList = {
 				ry: null
 			},
 			primary: {
-				fill: "powderblue",
+				fill: "lightcyan",
 				stroke: "#888",
 				"stroke-width": 2,
 				rx: 4,
