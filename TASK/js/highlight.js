@@ -6,10 +6,11 @@ const {
 	fadeOpacityNodes,
 	fadeOpacityLinks,
 	fadeOpacityLinkLabels,
-	fadeOpacityLinkList
+	fadeOpacityLinkList,
+	defaultHoverText
 } = constants;
 
-function highlight({ nodesGroup, linksGroup, labelsGroup, linksList }) {
+function highlight({ nodesGroup, linksGroup, labelsGroup, linksList, flowChartHoveredSpan }) {
 
 	const labelsText = labelsGroup.select("text"),
 		labelsCircle = labelsGroup.select("circle");
@@ -37,6 +38,7 @@ function highlight({ nodesGroup, linksGroup, labelsGroup, linksList }) {
 		labelsCircle.style("stroke-opacity", e => e.data.source === d.data.id || e.data.target === d.data.id ? 1 : fadeOpacityLinkLabels);
 		linksList.style("opacity", e => e.source === d.data.id || e.target === d.data.id ? 1 : fadeOpacityLinkLabels);
 		nodesGroup.style("opacity", e => e.data.id === d.data.id || linkedNodes.includes(e.data.id) ? 1 : fadeOpacityNodes);
+		if (d.data.tooltipText) flowChartHoveredSpan.style("font-style", "normal").html(d.data.tooltipText);
 	};
 
 	function mouseoverLinks(event, d) {
@@ -61,6 +63,7 @@ function highlight({ nodesGroup, linksGroup, labelsGroup, linksList }) {
 		labelsText.style("opacity", 1);
 		labelsCircle.style("stroke-opacity", 1);
 		linksList.style("opacity", 1);
+		flowChartHoveredSpan.style("font-style", null).html(defaultHoverText);
 	};
 
 };

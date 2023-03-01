@@ -14,39 +14,25 @@ const {
 	chartContainer,
 	defaultNumberOfColumns,
 	yScale,
-	currentStatusFillColor
+	currentStatusFillColor,
+	defaultHoverText
 } = constants;
 
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
-const flowChartDivContainer = chartContainer.append("div")
-	.attr("class", classPrefix + "flowChartDivContainer");
-
-const sideDiv = chartContainer.append("div")
-	.attr("class", classPrefix + "sideDiv");
-
-const flowChartCurrentStatusDiv = flowChartDivContainer.append("div")
-	.attr("class", classPrefix + "flowChartCurrentStatusDiv");
-
-const currentStatusBullet = flowChartCurrentStatusDiv.append("span")
-	.html("&#11045 ");
-
-const currentStatusText = flowChartCurrentStatusDiv.append("span")
-	.html("Allocation current status: ");
-
-const currentStatusValueSpan = flowChartCurrentStatusDiv.append("span")
-	.attr("class", classPrefix + "currentStatusValueSpan");
-
-const flowChartDiv = flowChartDivContainer.append("div")
-	.attr("class", classPrefix + "flowChartDiv");
-
-const sideDivTitle = sideDiv.append("div")
-	.attr("class", classPrefix + "sideDivTitle");
-
-const sideDivContainer = sideDiv.append("div")
-	.attr("class", classPrefix + "sideDivContainer");
-
-const details = sideDivTitle.append("div").append("details");
+const flowChartDivContainer = chartContainer.append("div").attr("class", classPrefix + "flowChartDivContainer"),
+	sideDiv = chartContainer.append("div").attr("class", classPrefix + "sideDiv"),
+	flowChartTopDiv = flowChartDivContainer.append("div").attr("class", classPrefix + "flowChartTopDiv"),
+	flowChartCurrentStatusDiv = flowChartTopDiv.append("div").attr("class", classPrefix + "flowChartCurrentStatusDiv"),
+	flowChartHoveredDiv = flowChartTopDiv.append("div").attr("class", classPrefix + "flowChartHoveredDiv"),
+	flowChartHoveredSpan = flowChartHoveredDiv.append("span").attr("class", classPrefix + "flowChartHoveredSpan").html(defaultHoverText),
+	currentStatusBullet = flowChartCurrentStatusDiv.append("span").html("&#11045 "),
+	currentStatusText = flowChartCurrentStatusDiv.append("span").html("Allocation current status: "),
+	currentStatusValueSpan = flowChartCurrentStatusDiv.append("span").attr("class", classPrefix + "currentStatusValueSpan"),
+	flowChartDiv = flowChartDivContainer.append("div").attr("class", classPrefix + "flowChartDiv"),
+	sideDivTitle = sideDiv.append("div").attr("class", classPrefix + "sideDivTitle"),
+	sideDivContainer = sideDiv.append("div").attr("class", classPrefix + "sideDivContainer"),
+	details = sideDivTitle.append("div").append("details");
 
 details.append("summary")
 	.append("span")
@@ -80,7 +66,8 @@ function createFlowChart(data) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	flowChartCurrentStatusDiv.style("padding-left", yScale(0) + "px");
+	flowChartTopDiv.style("margin-left", yScale(0) + "px")
+		.style("margin-right", yScale(0) + "px");
 
 	currentStatusBullet.style("color", d3.color(currentStatusFillColor).darker(0.5));
 
@@ -93,6 +80,6 @@ function createFlowChart(data) {
 
 	const linksList = drawLinksList({ dataLinksOriginal, sideDivContainer, previousLinks });
 
-	highlight({ nodesGroup, linksGroup, labelsGroup, linksList });
+	highlight({ nodesGroup, linksGroup, labelsGroup, linksList, flowChartHoveredSpan });
 
 };

@@ -29,6 +29,7 @@ const constants = {
 	currentStatusFillColor: "lightskyblue",
 	previousStepsColor: "#1a9850",
 	nextStepsColor: "#d73027",
+	defaultHoverText: "Hover over the nodes for additional information",
 	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
 };
 
