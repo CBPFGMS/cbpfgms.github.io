@@ -27,21 +27,21 @@
 	white-space: pre;
 	flex: 0 50%;
 	border: 1px solid #aaa;
-    border-radius: 4px;
-    padding: 0.5em;
-    height: 100%;
+	border-radius: 4px;
+	padding: 0.5em;
+	height: 100%;
 }
 
 .taskflowChartHoveredDiv {
 	flex: 0 50%;
 	border: 1px solid #aaa;
-    border-radius: 4px;
-    padding: 0.5em;
-    font-style: italic;
-    font-size: 0.8em;
-    height: 100%;
-    display: flex;
-    align-items: center;
+	border-radius: 4px;
+	padding: 0.5em;
+	font-style: italic;
+	font-size: 0.8em;
+	height: 100%;
+	display: flex;
+	align-items: center;
 }
 
 .taskcurrentStatusValueSpan {
@@ -75,18 +75,18 @@
 }
 
 details {
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    padding: 0.5em 0.5em 0;
-    position: absolute;
-    width: 100%;
-    background-color: white;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 0.5em 0.5em 0;
+	position: absolute;
+	width: 100%;
+	background-color: white;
 }
 
 summary {
-    font-weight: bold;
-    margin: -0.5em -0.5em 0;
-    padding: 0.5em;
+	font-weight: bold;
+	margin: -0.5em -0.5em 0;
+	padding: 0.5em;
 }
 
 summary span {
@@ -94,12 +94,12 @@ summary span {
 }
 
 details[open] {
-    padding: 0.5em;
+	padding: 0.5em;
 }
 
 details[open] summary {
-    border-bottom: 1px solid #aaa;
-    margin-bottom: 0.5em;
+	border-bottom: 1px solid #aaa;
+	margin-bottom: 0.5em;
 }
 
 .tasksideDivContainer {
@@ -117,9 +117,9 @@ details[open] summary {
 
 .tasklistRowsNumber {
 	display: flex;
-  	justify-content: center;
-  	align-content: center;
-  	flex-wrap: wrap;
+	justify-content: center;
+	align-content: center;
+	flex-wrap: wrap;
 	border-radius: 50%;
 	width: 34px;
 	height: 34px;

@@ -73,7 +73,7 @@ const stylesList = {
 				"stroke-width": 2
 			},
 			secondary: {
-				"stroke-dasharray": "2-2",
+				"stroke-dasharray": "4 4",
 				stroke: "#666",
 				"stroke-width": 2
 			}
@@ -85,7 +85,7 @@ const stylesList = {
 				"stroke-width": 6
 			},
 			secondary: {
-				"stroke-dasharray": "2-2",
+				"stroke-dasharray": "4 4",
 				stroke: "#fff",
 				"stroke-width": 6
 			}
