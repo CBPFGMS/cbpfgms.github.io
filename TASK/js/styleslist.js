@@ -70,12 +70,12 @@ const stylesList = {
 			primary: {
 				"stroke-dasharray": null,
 				stroke: "#666",
-				"stroke-width": 2
+				"stroke-width": 1
 			},
 			secondary: {
 				"stroke-dasharray": "4 4",
 				stroke: "#666",
-				"stroke-width": 2
+				"stroke-width": 1
 			}
 		},
 		backPaths: {
@@ -106,12 +106,12 @@ const stylesList = {
 			primary: {
 				fill: "white",
 				"stroke": "#666",
-				"stroke-width": 2
+				"stroke-width": 1
 			},
 			secondary: {
 				fill: "white",
 				"stroke": "#666",
-				"stroke-width": 2
+				"stroke-width": 1
 			}
 		}
 	}

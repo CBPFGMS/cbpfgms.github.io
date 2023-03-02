@@ -18,15 +18,15 @@ function showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNo
 
 	const { previousNodes, previousLinks } = populatePreviousNodesAndLinks(dataLinks, currentStatus);
 
-	nodesGroup.style("filter", d => d.data.id === currentStatus || d.data.type === "start" ? null : previousNodes.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
-		`drop-shadow(0px 0px 4px ${nextStepsColor})`);
-	linksGroup.select(`.${classPrefix}links`).style("filter", d => previousLinks.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
-		`drop-shadow(0px 0px 4px ${nextStepsColor})`);
+	// nodesGroup.style("filter", d => d.data.id === currentStatus || d.data.type === "start" ? null : previousNodes.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
+	// 	`drop-shadow(0px 0px 4px ${nextStepsColor})`);
+	// linksGroup.select(`.${classPrefix}links`).style("filter", d => previousLinks.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
+	// 	`drop-shadow(0px 0px 4px ${nextStepsColor})`);
 
-	// nodesGroup.filter(d => d.data.id !== currentStatus && d.data.type !== "start")
-	// 	.select("rect")
-	// 	.style("stroke", d => previousNodes.includes(d.data.id) ? previousStepsColor : nextStepsColor);
-	// linksGroup.select(`.${classPrefix}links`).style("stroke", d => previousLinks.includes(d.data.id) ? previousStepsColor : nextStepsColor);
+	nodesGroup.filter(d => d.data.id !== currentStatus && d.data.type !== "start")
+		.select("rect")
+		.style("stroke", d => previousNodes.includes(d.data.id) ? previousStepsColor : nextStepsColor);
+	linksGroup.select(`.${classPrefix}links`).style("stroke", d => previousLinks.includes(d.data.id) ? previousStepsColor : nextStepsColor);
 
 	return { previousNodes, previousLinks };
 
