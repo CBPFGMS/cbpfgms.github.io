@@ -208,6 +208,8 @@
 			sortByArray = Object.keys(sortByValues),
 			dataFile = "https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary?PoolfundCodeAbbrv=&$format=csv",
 			allFunds = [],
+			hardcodedFundIdsTooltipText = ["70", "81", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
+			tooltipHRPAdditionalText = " (*50% out of total HRP funding)",
 			totalValues = {},
 			chartState = {
 				selectedYear: null,
@@ -2373,7 +2375,7 @@
 				.duration(duration)
 				.attr("x", function(d, i) {
 					if (i === 1 && localVariable.get(this.previousSibling).move) {
-						return xScaleBarChart(d.value) + (1.5 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
+						return xScaleBarChart(d.value) + (2 * barChartLabelPadding) + localVariable.get(this.previousSibling).size;
 					} else if (i === 0 && localVariable.get(this).move) {
 						return xScaleBarChart(d3.select(this.nextSibling).datum().value) + barChartLabelPadding;
 					} else {
@@ -2465,7 +2467,7 @@
 					title: "HRP Requirements",
 					property: "hrprequirements"
 				}, {
-					title: "HRP Funding",
+					title: `HRP Funding${hardcodedFundIdsTooltipText.includes(d.cbpfId) ? tooltipHRPAdditionalText : ""}`,
 					property: "hrpfunding"
 				}, {
 					title: "CBPF Target",
@@ -2486,17 +2488,17 @@
 					.style("margin", "0px")
 					.style("display", "flex")
 					.style("flex-wrap", "wrap")
-					.style("width", "300px");
+					.style("width", hardcodedFundIdsTooltipText.includes(d.cbpfId) ? "400px" : "300px");
 
 				tooltipData.forEach(function(e) {
 					tooltipContainer.append("div")
 						.style("display", "flex")
-						.style("flex", "0 56%")
+						.style("flex", "0 75%")
 						.html(e.title + ":");
 
 					tooltipContainer.append("div")
 						.style("display", "flex")
-						.style("flex", "0 44%")
+						.style("flex", "0 25%")
 						.style("justify-content", "flex-end")
 						.attr("class", "contributionColorHTMLcolor")
 						.html("$" + d3.formatPrefix(".2", d[e.property])(d[e.property]).replace("G", "B"));
@@ -2512,16 +2514,16 @@
 					.style("margin-top", "8px")
 					.style("display", "flex")
 					.style("flex-wrap", "wrap")
-					.style("width", "300px");
+					.style("width", hardcodedFundIdsTooltipText.includes(d.cbpfId) ? "400px" : "300px");
 
 				tooltipContainer2.append("div")
 					.style("display", "flex")
-					.style("flex", "0 56%")
+					.style("flex", "0 75%")
 					.html("Remaining for the target:");
 
 				tooltipContainer2.append("div")
 					.style("display", "flex")
-					.style("flex", "0 44%")
+					.style("flex", "0 25%")
 					.style("justify-content", "flex-end")
 					.attr("class", "contributionColorHTMLcolor")
 					.html("$" + (d.cbpftarget - d.cbpffunding > 0 ? d3.formatPrefix(".2", (d.cbpftarget - d.cbpffunding))((d.cbpftarget - d.cbpffunding)).replace("G", "B") : "0.00"));
