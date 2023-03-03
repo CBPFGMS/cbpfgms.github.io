@@ -2348,7 +2348,6 @@
 
 		function preProcessData(rawDataLaunchedAllocations, rawDataContributions) {
 			rawDataLaunchedAllocations.forEach(row => {
-				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 				row.fundId = lists.cbpfIds[row.PooledFundId];
 				if (!yearsArrayAllocations.includes(row.AllocationYear) && (+row.fundId === +row.fundId)) yearsArrayAllocations.push(row.AllocationYear);
 				if (!lists.fundsInAllYears[row.fundId] && (+row.fundId === +row.fundId) && (+row.AllocationYear >= firstYear)) lists.fundsInAllYears[row.fundId] = lists.fundAbbreviatedNames[row.fundId];
@@ -2370,10 +2369,6 @@
 				//THE SECOND CONDITION HIDES ALL YEARS BEFORE FIRSTYEAR
 				if (yearsArrayContributions.includes(e) && e >= firstYear) yearsArray.push(e);
 			});
-
-			for (const year in yearsWithUnderApprovalAboveMin) {
-				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
-			};
 
 		};
 
@@ -2414,6 +2409,18 @@
 				name: null,
 				value: 0,
 				id: fundId
+			};
+
+			for (const key in yearsWithUnderApprovalAboveMin) delete yearsWithUnderApprovalAboveMin[key];
+
+			rawDataLaunchedAllocations.forEach(row => {
+				if (row.FundId !== 1 && chartState.selectedYear.includes(row.AllocationYear) && chartState.selectedFund.includes(row.fundId)) {
+					yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
+				};
+			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
 			};
 
 			rawDataLaunchedAllocations.forEach(row => {

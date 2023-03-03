@@ -537,14 +537,6 @@
 				return a - b;
 			});
 
-			rawLaunchedAllocationsData.forEach(row => {
-				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
-			});
-
-			for (const year in yearsWithUnderApprovalAboveMin) {
-				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
-			};
-
 			validateYear(selectedYearString);
 
 			chartState.selectedModality = selectedModality;
@@ -2315,14 +2307,21 @@
 			topValuesLaunchedData.launched = 0;
 			topValuesLaunchedData.underApproval = 0;
 
+			for (const key in yearsWithUnderApprovalAboveMin) delete yearsWithUnderApprovalAboveMin[key];
+
 			const allCbpfsSelected = chartState.selectedCbpfs.length === d3.keys(cbpfsList).length;
 
 			rawLaunchedAllocationsData.forEach(function(row) {
 				if (chartState.selectedYear.includes(row.AllocationYear) && (allCbpfsSelected || chartState.selectedCbpfs.includes("id" + row.PooledFundId))) {
+					yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
 				};
 			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
 
 			chartState.cbpfsInData.length = 0;
 
