@@ -58,11 +58,11 @@ function highlight({ nodesGroup, linksGroup, labelsGroup, linksList, flowChartHo
 	};
 
 	function mouseout() {
-		nodesGroup.style("opacity", 1);
-		linksGroup.style("opacity", 1);
-		labelsText.style("opacity", 1);
-		labelsCircle.style("stroke-opacity", 1);
-		linksList.style("opacity", 1);
+		nodesGroup.style("opacity", d => d.setOpacity);
+		linksGroup.style("opacity", d => d.setOpacity);
+		labelsText.style("opacity", d => d.setOpacity);
+		labelsCircle.style("stroke-opacity", d => d.setOpacity);
+		linksList.style("opacity", d => d.setOpacity);
 		flowChartHoveredSpan.style("font-style", null).html(defaultHoverText);
 	};
 

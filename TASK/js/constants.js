@@ -21,14 +21,16 @@ const constants = {
 	connectionPositions: ["top", "right", "bottom", "left"],
 	cornerRadius: 4,
 	linkPaddingFromNode: 4,
-	labelCircleRadius: 15,
+	labelCircleRadius: 12,
 	fadeOpacityNodes: 0.1,
 	fadeOpacityLinks: 0.1,
 	fadeOpacityLinkLabels: 0.1,
 	fadeOpacityLinkList: 0.1,
 	currentStatusFillColor: "lightskyblue",
 	previousStepsColor: "#1a9850",
-	nextStepsColor: "#d73027",
+	nextStepsColor: "#ccc",
+	previousStepsStroke: 2,
+	nextStepsOpacity: 0.25,
 	defaultHoverText: "Hover over the nodes for additional information",
 	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
 };

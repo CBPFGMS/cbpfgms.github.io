@@ -9,14 +9,14 @@ const {
 	nextStepsColor
 } = constants;
 
-function drawLinksList({ dataLinksOriginal, sideDivContainer, previousLinks }) {
+function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 
 	const dataList = dataLinksOriginal.map(({ id, text, source, target }) => ({ id, text, source, target }))
 		.sort((a, b) => a.id - b.id)
 		.filter(({ text }) => text);
 
-	const dataListPrevious = dataList.filter(d => previousLinks.includes(d.id)),
-		dataListNext = dataList.filter(d => !previousLinks.includes(d.id));
+	const dataListPrevious = dataList.filter(d => currentLinks.includes(d.id)),
+		dataListNext = dataList.filter(d => !currentLinks.includes(d.id));
 
 	const stages = sideDivContainer.selectAll(null)
 		.data([dataListPrevious, dataListNext])
@@ -31,7 +31,7 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer, previousLinks }) {
 
 	stages.append("p")
 		.attr("class", classPrefix + "stageText")
-		.html((_,i) => `Stage: ${i ? "to be completed" : "already completed"}`);
+		.html((_,i) => i ? "Other steps" : "Steps already completed");
 
 	// const stages = sideDivContainer.selectAll(null)
 	// 	.data(d3.range(3))

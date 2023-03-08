@@ -52,7 +52,7 @@ d3.json("./data/data.json").then(createFlowChart);
 
 function createFlowChart(data) {
 
-	const { nodes: dataNodesOriginal, links: dataLinksOriginal, currentStatus } = data;
+	const { nodes: dataNodesOriginal, links: dataLinksOriginal, currentStatus, currentSequence } = data;
 
 	const numberOfColumns = data.numberOfColumns ?? numberOfColumnsDataset ?? defaultNumberOfColumns;
 
@@ -76,9 +76,9 @@ function createFlowChart(data) {
 		.style("text-underline-offset", "0.3em")
 		.style("text-decoration-color", currentStatusFillColor);
 
-	const { previousNodes, previousLinks } = showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNodes, dataLinks, currentStatusValueSpan });
+	const currentLinks = showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNodes, dataLinks, currentStatusValueSpan, currentSequence });
 
-	const linksList = drawLinksList({ dataLinksOriginal, sideDivContainer, previousLinks });
+	const linksList = drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks });
 
 	highlight({ nodesGroup, linksGroup, labelsGroup, linksList, flowChartHoveredSpan });
 
