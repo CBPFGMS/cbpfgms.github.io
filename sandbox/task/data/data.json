@@ -10,79 +10,79 @@
             "id": 2,
             "type": "primary",
             "text": "New",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 3,
             "type": "secondary",
             "text": "Initial Strategy Draft (Country)",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 4,
             "type": "primary",
             "text": "Full Application Form",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 5,
             "type": "secondary",
             "text": "Initial Strategy: CERF Review",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 6,
             "type": "secondary",
             "text": "Full Application Draft (Country)",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 7,
             "type": "secondary",
             "text": "Initial Strategy Redraft (Country)",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 8,
             "type": "secondary",
             "text": "Full Application Draft: Proposals Open (Country)",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 9,
             "type": "primary",
             "text": "CERF Initial Application Review",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 10,
             "type": "primary",
             "text": "CERF Application Review",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 11,
             "type": "primary",
             "text": "ERC Summary Preparation",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 12,
             "type": "primary",
             "text": "ERC Summary (OUSG)",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 13,
             "type": "primary",
             "text": "Under Implementation",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         },
         {
             "id": 14,
             "type": "rejected",
             "text": "Rejected / Withdrawn",
-            "tooltipText": ""
+            "tooltipText": "The text for the tooltip, if any, goes here"
         }
     ],
     "links": [
@@ -192,5 +192,7 @@
             "text": ""
         }
     ],
-    "numberOfColumns": 3
+    "numberOfColumns": 3,
+    "currentStatus": 6,
+    "currentSequence": [1, 2, 4, 6]
 }
