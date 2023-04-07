@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbinad-stg.css", fontAwesomeLink],
@@ -483,22 +483,33 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		fetchFile("pbinad", dataUrl, [], "data")
-			.then(function(previousData) {
-				return fetchFile("pbinadcbpfList", cbpfsListUrl, previousData, "cbpfList")
-			})
-			.then(function(previousData) {
-				return fetchFile("pbinadpartnersList", partnersListUrl, previousData, "partnersList")
-			})
-			.then(function(previousData) {
-				return fetchFile("pbinadsubpartnersList", subPartnersListUrl, previousData, "subPartnersList")
-			})
-			.then(function(previousData) {
-				return fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, previousData, "launched allocations data")
-			})
-			.then(function(previousData) {
-				csvCallback(previousData);
-			});
+		if (isPfbiSite) {
+			Promise.all([
+					window.cbpfbiDataObject.allocationFlowData,
+					window.cbpfbiDataObject.masterPooledFunds,
+					window.cbpfbiDataObject.masterPartners,
+					window.cbpfbiDataObject.masterSubPartners,
+					window.cbpfbiDataObject.launchedAllocationsData
+				])
+			.then(csvCallback);
+		} else {
+			fetchFile("pbinad", dataUrl, [], "data")
+				.then(function(previousData) {
+					return fetchFile("pbinadcbpfList", cbpfsListUrl, previousData, "cbpfList")
+				})
+				.then(function(previousData) {
+					return fetchFile("pbinadpartnersList", partnersListUrl, previousData, "partnersList")
+				})
+				.then(function(previousData) {
+					return fetchFile("pbinadsubpartnersList", subPartnersListUrl, previousData, "subPartnersList")
+				})
+				.then(function(previousData) {
+					return fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, previousData, "launched allocations data")
+				})
+				.then(function(previousData) {
+					csvCallback(previousData);
+				});
+		};
 
 		function fetchFile(fileName, url, previousData, warningString) {
 			const rowFunction = fileName === "launchedAllocationsData" ? d3.autoType : null;
