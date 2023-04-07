@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		isPfbiSite = window.location.hostname === "localhost",//CHANGE!!!!!!!!!!!!!!!
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiclc-stg.css", fontAwesomeLink],
@@ -694,24 +694,29 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-			console.info("pbiclc: data from local storage");
-			csvCallback(rawData);
+		if (isPfbiSite) {
+			window.cbpfbiDataObject.contributionsTotalData.then(rawData => csvCallback(rawData))
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
-				try {
-					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbiclc, " + error);
-				};
-				console.info("pbiclc: data from API");
+			console.log("this is working!")
+			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
+				console.info("pbiclc: data from local storage");
 				csvCallback(rawData);
-			});
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
+					try {
+						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbiclc, " + error);
+					};
+					console.info("pbiclc: data from API");
+					csvCallback(rawData);
+				});
+			};
 		};
 
 		function csvCallback(rawData) {
@@ -719,8 +724,8 @@
 			removeProgressWheel();
 
 			yearsArray = rawData.map(function(d) {
-				if (!countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
-				if (!countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
+				if (d.GMSDonorISO2Code && !countryNames[d.GMSDonorISO2Code.toLowerCase()]) countryNames[d.GMSDonorISO2Code.toLowerCase()] = d.GMSDonorName;
+				if (d.PooledFundISO2Code && !countryNames[d.PooledFundISO2Code.toLowerCase()]) countryNames[d.PooledFundISO2Code.toLowerCase()] = d.PooledFundName;
 				if (d.PaidAmt < 0) d.PaidAmt = 0;
 				if (d.PledgeAmt < 0) d.PledgeAmt = 0;
 				return +d.FiscalYear
@@ -733,7 +738,7 @@
 			chartState.selectedContribution = selectedContribution;
 
 			const allDonors = rawData.map(function(d) {
-				if (d.GMSDonorISO2Code === "") d.GMSDonorISO2Code = "UN";
+				if (!d.GMSDonorISO2Code) d.GMSDonorISO2Code = "UN";
 				return d.GMSDonorISO2Code.toLowerCase();
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
