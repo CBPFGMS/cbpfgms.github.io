@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiuac-stg.css", fontAwesomeLink],
@@ -452,24 +452,37 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("launchedAllocationsData") &&
-			JSON.parse(localStorage.getItem("launchedAllocationsData")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("launchedAllocationsData")).data, row);
-			console.info("pbiuac: data from local storage");
-			csvCallback(rawData);
-		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
-				try {
-					localStorage.setItem("launchedAllocationsData", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbiuac, " + error);
-				};
-				console.info("pbiuac: data from API");
-				csvCallback(rawData);
+		if (isPfbiSite) {
+			window.cbpfbiDataObject.launchedAllocationsData.then(rawData => {
+				const filteredRawData = rawData.reduce((acc, curr) => {
+					if (curr.PlannedStartDate && curr.PlannedEndDate) {
+						const newRow = row(curr);
+						if (newRow) acc.push(newRow);
+					};
+					return acc;
+				}, []);
+				csvCallback(filteredRawData);
 			});
+		} else {
+			if (localStorage.getItem("launchedAllocationsData") &&
+				JSON.parse(localStorage.getItem("launchedAllocationsData")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("launchedAllocationsData")).data, row);
+				console.info("pbiuac: data from local storage");
+				csvCallback(rawData);
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1", row).then(function(rawData) {
+					try {
+						localStorage.setItem("launchedAllocationsData", JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbiuac, " + error);
+					};
+					console.info("pbiuac: data from API");
+					csvCallback(rawData);
+				});
+			};
 		};
 
 		function csvCallback(rawData) {
@@ -2082,7 +2095,6 @@
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
 			d.PlannedStartDate = timeParse(d.PlannedStartDate) || new Date(d.PlannedStartDate);
 			d.PlannedEndDate = timeParse(d.PlannedEndDate) || new Date(d.PlannedEndDate);
-			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
 			if (!d.PlannedStartDate) {
 				d.PlannedStartDate = d.AllocationSource === "Standard" ?
 					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)

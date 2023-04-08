@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbiobe-stg.css", fontAwesomeLink],
@@ -422,24 +422,28 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiobedata") &&
-			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
-			console.info("pbiobe: data from local storage");
-			csvCallback(rawData);
+		if (isPfbiSite) {
+			window.cbpfbiDataObject.targetedPersonsDetailsData.then(rawData => csvCallback(rawData));
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
-				try {
-					localStorage.setItem("pbiobedata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbiobe, " + error);
-				};
-				console.info("pbiobe: data from API");
+			if (localStorage.getItem("pbiobedata") &&
+				JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
+				console.info("pbiobe: data from local storage");
 				csvCallback(rawData);
-			});
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
+					try {
+						localStorage.setItem("pbiobedata", JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbiobe, " + error);
+					};
+					console.info("pbiobe: data from API");
+					csvCallback(rawData);
+				});
+			};
 		};
 
 		function csvCallback(rawData) {

@@ -4,7 +4,7 @@
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
 		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
 		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles-stg.css", "https://cbpfgms.github.io/css/d3chartstylespbigam-stg.css", fontAwesomeLink],
@@ -466,12 +466,21 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all([
-				fetchFile(classPrefix + "data", dataFile, "data", "csv"),
-				fetchFile(classPrefix + "metadata", metadataFile, "metadata", "csv"),
-				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
-			])
-			.then(allData => csvCallback(allData));
+		if (isPfbiSite) {
+			Promise.all([
+					window.cbpfbiDataObject.dataGam,
+					window.cbpfbiDataObject.masterGam,
+					window.cbpfbiDataObject.launchedAllocationsData
+				])
+				.then(allData => csvCallback(allData));
+		} else {
+			Promise.all([
+					fetchFile(classPrefix + "data", dataFile, "data", "csv"),
+					fetchFile(classPrefix + "metadata", metadataFile, "metadata", "csv"),
+					fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+				])
+				.then(allData => csvCallback(allData));
+		};
 
 		function fetchFile(fileName, url, warningString, method) {
 			if (localStorage.getItem(fileName) &&

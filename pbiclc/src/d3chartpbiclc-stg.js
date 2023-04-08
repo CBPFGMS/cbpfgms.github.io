@@ -695,7 +695,7 @@
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		if (isPfbiSite) {
-			window.cbpfbiDataObject.contributionsTotalData.then(rawData => csvCallback(rawData))
+			window.cbpfbiDataObject.contributionsTotalData.then(rawData => csvCallback(rawData));
 		} else {
 			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
 				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
