@@ -2095,6 +2095,7 @@
 			d.TotalUSDPlanned = +d.TotalUSDPlanned;
 			d.PlannedStartDate = timeParse(d.PlannedStartDate) || new Date(d.PlannedStartDate);
 			d.PlannedEndDate = timeParse(d.PlannedEndDate) || new Date(d.PlannedEndDate);
+			if (!d.PlannedStartDate && !d.PlannedEndDate) return;
 			if (!d.PlannedStartDate) {
 				d.PlannedStartDate = d.AllocationSource === "Standard" ?
 					d3.timeMonth.offset(d.PlannedEndDate, -1) : d3.timeDay.offset(d.PlannedEndDate, -15)

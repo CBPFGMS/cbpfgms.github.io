@@ -422,24 +422,28 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiobedata") &&
-			JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
-			console.info("pbiobe: data from local storage");
-			csvCallback(rawData);
+		if (isPfbiSite) {
+			window.cbpfbiDataObject.targetedPersonsDetailsData.then(rawData => csvCallback(rawData));
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv").then(function(rawData) {
-				try {
-					localStorage.setItem("pbiobedata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbiobe, " + error);
-				};
-				console.info("pbiobe: data from API");
+			if (localStorage.getItem("pbiobedata") &&
+				JSON.parse(localStorage.getItem("pbiobedata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiobedata")).data);
+				console.info("pbiobe: data from local storage");
 				csvCallback(rawData);
-			});
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
+					try {
+						localStorage.setItem("pbiobedata", JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbiobe, " + error);
+					};
+					console.info("pbiobe: data from API");
+					csvCallback(rawData);
+				});
+			};
 		};
 
 		function csvCallback(rawData) {

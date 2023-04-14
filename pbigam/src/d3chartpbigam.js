@@ -466,12 +466,21 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all([
-				fetchFile(classPrefix + "data", dataFile, "data", "csv"),
-				fetchFile(classPrefix + "metadata", metadataFile, "metadata", "csv"),
-				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
-			])
-			.then(allData => csvCallback(allData));
+		if (isPfbiSite) {
+			Promise.all([
+					window.cbpfbiDataObject.dataGam,
+					window.cbpfbiDataObject.masterGam,
+					window.cbpfbiDataObject.launchedAllocationsData
+				])
+				.then(allData => csvCallback(allData));
+		} else {
+			Promise.all([
+					fetchFile(classPrefix + "data", dataFile, "data", "csv"),
+					fetchFile(classPrefix + "metadata", metadataFile, "metadata", "csv"),
+					fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+				])
+				.then(allData => csvCallback(allData));
+		};
 
 		function fetchFile(fileName, url, warningString, method) {
 			if (localStorage.getItem(fileName) &&

@@ -499,41 +499,48 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbifdcmap")) {
-			const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
-			console.info("pbifdc: map from local storage");
-			getData(mapData);
+		if (isPfbiSite) {
+			Promise.all([
+				window.cbpfbiDataObject.contributionsTotalData,
+				window.cbpfbiDataObject.worldMap
+			]).then(rawData => csvCallback(rawData));
 		} else {
-			d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
-				try {
-					localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
-				} catch (error) {
-					console.info("D3 chart pbifdc map, " + error);
-				};
-				console.info("pbifdc: map from API");
+			if (localStorage.getItem("pbifdcmap")) {
+				const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
+				console.info("pbifdc: map from local storage");
 				getData(mapData);
-			});
-		};
-
-		function getData(mapData) {
-			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const apiData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-				console.info("pbifdc: data from local storage");
-				csvCallback([apiData, mapData]);
 			} else {
-				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(apiData) {
+				d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
 					try {
-						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-							data: d3.csvFormat(apiData),
-							timestamp: currentDate.getTime()
-						}));
+						localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
 					} catch (error) {
-						console.info("D3 chart pbifdc data, " + error);
+						console.info("D3 chart pbifdc map, " + error);
 					};
-					console.info("pbifdc: data from API");
-					csvCallback([apiData, mapData]);
+					console.info("pbifdc: map from API");
+					getData(mapData);
 				});
+			};
+
+			function getData(mapData) {
+				if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+					JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+					const apiData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
+					console.info("pbifdc: data from local storage");
+					csvCallback([apiData, mapData]);
+				} else {
+					d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(apiData) {
+						try {
+							localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+								data: d3.csvFormat(apiData),
+								timestamp: currentDate.getTime()
+							}));
+						} catch (error) {
+							console.info("D3 chart pbifdc data, " + error);
+						};
+						console.info("pbifdc: data from API");
+						csvCallback([apiData, mapData]);
+					});
+				};
 			};
 		};
 

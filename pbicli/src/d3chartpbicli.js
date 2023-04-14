@@ -723,24 +723,28 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-			JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-			console.info("pbicli: data from local storage");
-			csvCallback(rawData);
+		if (isPfbiSite) {
+			window.cbpfbiDataObject.contributionsTotalData.then(rawData => csvCallback(rawData));
 		} else {
-			d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv").then(function(rawData) {
-				try {
-					localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-						data: d3.csvFormat(rawData),
-						timestamp: currentDate.getTime()
-					}));
-				} catch (error) {
-					console.info("D3 chart pbicli, " + error);
-				};
-				console.info("pbicli: data from API");
+			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
+				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
+				console.info("pbicli: data from local storage");
 				csvCallback(rawData);
-			});
+			} else {
+				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
+					try {
+						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info("D3 chart pbicli, " + error);
+					};
+					console.info("pbicli: data from API");
+					csvCallback(rawData);
+				});
+			};
 		};
 
 		function csvCallback(rawData) {
@@ -2830,8 +2834,7 @@
 
 		function changeDonorsDropdown(donorsArray, all) {
 
-			const dropdownData = all ? ["Select an option", "All Donors", "Top 5 donors"].concat(donorsArray) :
-				["Select an option"].concat(donorsArray);
+			const dropdownData = all ? ["Select an option", "All Donors", "Top 5 donors"].concat(donorsArray) : ["Select an option"].concat(donorsArray);
 
 			const select = donorsSelectionDiv.select("select");
 

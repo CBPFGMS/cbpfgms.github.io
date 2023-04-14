@@ -491,7 +491,7 @@
 					window.cbpfbiDataObject.masterSubPartners,
 					window.cbpfbiDataObject.launchedAllocationsData
 				])
-			.then(csvCallback);
+				.then(csvCallback);
 		} else {
 			fetchFile("pbinad", dataUrl, [], "data")
 				.then(function(previousData) {

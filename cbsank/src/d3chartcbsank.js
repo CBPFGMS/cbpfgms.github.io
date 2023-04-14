@@ -421,15 +421,27 @@
 			.domain([0, allocationsPanel.width - allocationsPanel.padding[1] - allocationsPanel.padding[3]])
 			.range([allocationsPanel.width - allocationsPanel.padding[1] - allocationsPanel.padding[3], 0]);
 
-		Promise.all([
-				fetchFile(classPrefix + "MasterDonors", masterDonorsUrl, "master table for donors", "json"),
-				fetchFile(classPrefix + "MasterFunds", masterFundsUrl, "master table for funds", "json"),
-				fetchFile(classPrefix + "MasterAllocationTypes", masterAllocationTypesUrl, "master table for allocation types", "json"),
-				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv"),
-				fetchFile(classPrefix + "contributionsData", contributionsDataUrl, "contributions data", "csv"),
-				fetchFile(classPrefix + "flags", flagsUrl, "flags images", "json")
-			])
-			.then(allData => fetchCallback(allData));
+		if (isPfbiSite) {
+			Promise.all([
+					window.cbpfbiDataObject.masterDonors,
+					window.cbpfbiDataObject.masterFunds,
+					window.cbpfbiDataObject.masterAllocationTypes,
+					window.cbpfbiDataObject.launchedAllocationsData,
+					window.cbpfbiDataObject.contributionsData,
+					window.cbpfbiDataObject.flags
+				])
+				.then(allData => fetchCallback(allData));
+		} else {
+			Promise.all([
+					fetchFile(classPrefix + "MasterDonors", masterDonorsUrl, "master table for donors", "json"),
+					fetchFile(classPrefix + "MasterFunds", masterFundsUrl, "master table for funds", "json"),
+					fetchFile(classPrefix + "MasterAllocationTypes", masterAllocationTypesUrl, "master table for allocation types", "json"),
+					fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv"),
+					fetchFile(classPrefix + "contributionsData", contributionsDataUrl, "contributions data", "csv"),
+					fetchFile(classPrefix + "flags", flagsUrl, "flags images", "json")
+				])
+				.then(allData => fetchCallback(allData));
+		};
 
 		function fetchCallback([
 			masterDonors,

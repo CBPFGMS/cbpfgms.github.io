@@ -503,11 +503,19 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all([
-				fetchFile(classPrefix + "data", file, "allocations data", "csv"),
-				fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
-			])
-			.then(allData => csvCallback(allData));
+		if (isPfbiSite) {
+			Promise.all([
+					window.cbpfbiDataObject.allocationsData,
+					window.cbpfbiDataObject.launchedAllocationsData
+				])
+				.then(allData => csvCallback(allData));
+		} else {
+			Promise.all([
+					fetchFile(classPrefix + "data", file, "allocations data", "csv"),
+					fetchFile("launchedAllocationsData", launchedAllocationsDataUrl, "launched allocations data", "csv")
+				])
+				.then(allData => csvCallback(allData));
+		};
 
 		function fetchFile(fileName, url, warningString, method) {
 			if (localStorage.getItem(fileName) &&
@@ -544,14 +552,6 @@
 			}).filter(function(value, index, self) {
 				return self.indexOf(value) === index;
 			}).sort();
-
-			rawLaunchedAllocationsData.forEach(row => {
-				yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
-			});
-
-			for (const year in yearsWithUnderApprovalAboveMin) {
-				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
-			};
 
 			validateYear(selectedYearString);
 
@@ -3290,12 +3290,19 @@
 			topValuesLaunchedData.launched = 0;
 			topValuesLaunchedData.underApproval = 0;
 
+			for (const key in yearsWithUnderApprovalAboveMin) delete yearsWithUnderApprovalAboveMin[key];
+
 			rawLaunchedAllocationsData.forEach(function(row) {
 				if (chartState.selectedYear.includes(row.AllocationYear) && (!chartState.selectedCbpfs.length || chartState.selectedCbpfs.includes(row.PooledFundName))) {
+					yearsWithUnderApprovalAboveMin[row.AllocationYear] = (yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) + row.TotalUnderApprovalBudget;
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval += row.TotalUnderApprovalBudget;
 				};
 			});
+
+			for (const year in yearsWithUnderApprovalAboveMin) {
+				yearsWithUnderApprovalAboveMin[year] = yearsWithUnderApprovalAboveMin[year] > minimumUnderApprovalValue;
+			};
 
 			const aggregatedAllocations = [];
 
