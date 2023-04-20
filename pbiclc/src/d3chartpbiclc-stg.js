@@ -704,28 +704,9 @@
 			]).then(allData => csvCallback(allData));
 		} else {
 			Promise.all([
-				fetchFile("pbiclcpbiclipbifdcdata", dataUrl, "contributions data", "csv"),
+				fetchFile(classPrefix + "data", dataUrl, "contributions data", "csv"),
 				fetchFile("flags", flagsUrl, "flags data", "json")
 			]).then(allData => csvCallback(allData));
-			// if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-			// 	JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-			// 	const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-			// 	console.info("pbiclc: data from local storage");
-			// 	csvCallback(rawData);
-			// } else {
-			// 	d3.csv().then(function (rawData) {
-			// 		try {
-			// 			localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-			// 				data: d3.csvFormat(rawData),
-			// 				timestamp: currentDate.getTime()
-			// 			}));
-			// 		} catch (error) {
-			// 			console.info("D3 chart pbiclc, " + error);
-			// 		};
-			// 		console.info("pbiclc: data from API");
-			// 		csvCallback(rawData);
-			// 	});
-			// };
 		};
 
 		function fetchFile(fileName, url, warningString, method) {
@@ -1903,10 +1884,6 @@
 						if (d.isoCode && !flagsData[d.isoCode.toLowerCase()]) console.warn("Missing flag: " + d.name, d);
 						return flagsData[d.isoCode.toLowerCase()] || blankFlag;
 					});
-				// .attr("xlink:href", function (d) {
-				// 	return localStorage.getItem("storedFlag" + d.isoCode) ? localStorage.getItem("storedFlag" + d.isoCode) :
-				// 		flagsDirectory + d.isoCode + ".png";
-				// });
 
 				const donorPaidIndicatorEnter = donorGroupEnter.append("path")
 					.attr("class", "pbiclcDonorPaidIndicator")

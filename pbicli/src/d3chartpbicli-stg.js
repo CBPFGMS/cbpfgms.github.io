@@ -15,7 +15,7 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	cssLinks.forEach(function(cssLink) {
+	cssLinks.forEach(function (cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
 			const externalCSS = document.createElement("link");
@@ -35,13 +35,13 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript(URLSearchParamsPolyfill, function() {
+			loadScript(URLSearchParamsPolyfill, function () {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
-			loadScript(fetchPolyfill1, function() {
-				loadScript(fetchPolyfill2, function() {
-					loadScript(URLSearchParamsPolyfill, function() {
+			loadScript(fetchPolyfill1, function () {
+				loadScript(fetchPolyfill2, function () {
+					loadScript(URLSearchParamsPolyfill, function () {
 						loadScript(d3URL, d3Chart);
 					});
 				});
@@ -53,8 +53,8 @@
 		} else if (hasFetch && !hasURLSearchParams) {
 			loadScript(URLSearchParamsPolyfill, d3Chart);
 		} else {
-			loadScript(fetchPolyfill1, function() {
-				loadScript(fetchPolyfill2, function() {
+			loadScript(fetchPolyfill1, function () {
+				loadScript(fetchPolyfill2, function () {
 					loadScript(URLSearchParamsPolyfill, d3Chart);
 				});
 			});
@@ -102,7 +102,7 @@
 
 		if (!Array.prototype.find) {
 			Object.defineProperty(Array.prototype, 'find', {
-				value: function(predicate) {
+				value: function (predicate) {
 					if (this == null) {
 						throw new TypeError('"this" is null or not defined');
 					}
@@ -131,9 +131,9 @@
 
 		if (!HTMLCanvasElement.prototype.toBlob) {
 			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-				value: function(callback, type, quality) {
+				value: function (callback, type, quality) {
 					var dataURL = this.toDataURL(type, quality).split(',')[1];
-					setTimeout(function() {
+					setTimeout(function () {
 
 						var binStr = atob(dataURL),
 							len = binStr.length,
@@ -408,6 +408,7 @@
 
 		const width = 900,
 			padding = [4, 4, 4, 4],
+			classPrefix = "pbicli",
 			height = 360,
 			panelVerticalPadding = 12,
 			flagSize = 16,
@@ -440,7 +441,9 @@
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/contribution-trends",
 			colorsArray = ["#A4D65E", "#E56A54", "#E2E868", "#999999", "#ECA154", "#71DBD4", "#9063CD", "#D3BC8D", "#a6cee3", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#b15928"],
-			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags16/",
+			blankFlag = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
 			chartState = {
 				selectedDonors: [],
 				selectedCbpfs: [],
@@ -574,7 +577,7 @@
 			.attr("id", "pbicliSnapshotTooltip")
 			.attr("class", "pbicliSnapshotContent")
 			.style("display", "none")
-			.on("mouseleave", function() {
+			.on("mouseleave", function () {
 				isSnapshotTooltipVisible = false;
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
@@ -583,7 +586,7 @@
 		snapshotTooltip.append("p")
 			.attr("id", "pbicliSnapshotTooltipPdfText")
 			.html("Download PDF")
-			.on("click", function() {
+			.on("click", function () {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("pdf", true);
 			});
@@ -591,7 +594,7 @@
 		snapshotTooltip.append("p")
 			.attr("id", "pbicliSnapshotTooltipPngText")
 			.html("Download Image (PNG)")
-			.on("click", function() {
+			.on("click", function () {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("png", true);
 			});
@@ -610,7 +613,7 @@
 			.attr("id", "pbiclitooltipdiv")
 			.style("display", "none");
 
-		containerDiv.on("contextmenu", function() {
+		containerDiv.on("contextmenu", function () {
 			d3.event.preventDefault();
 			const thisMouse = d3.mouse(this);
 			isSnapshotTooltipVisible = true;
@@ -659,28 +662,28 @@
 			.range(colorsArray);
 
 		const lineGeneratorDonors = d3.line()
-			.x(function(d) {
+			.x(function (d) {
 				return xScaleDonors(parseTime(d.year))
 			})
-			.y(function(d) {
+			.y(function (d) {
 				return yScaleDonors(d.total)
 			})
 			.curve(d3.curveCatmullRom)
 
 		const lineGeneratorCbpfs = d3.line()
-			.x(function(d) {
+			.x(function (d) {
 				return xScaleCbpfs(parseTime(d.year))
 			})
-			.y(function(d) {
+			.y(function (d) {
 				return yScaleCbpfs(d.total)
 			})
 			.curve(d3.curveCatmullRom)
 
 		const lineGeneratorDonorsLocalCurrency = d3.line()
-			.x(function(d) {
+			.x(function (d) {
 				return xScaleDonors(parseTime(d.year))
 			})
-			.y(function(d) {
+			.y(function (d) {
 				return yScaleDonorsLocalCurrency(d.localTotal)
 			})
 			.curve(d3.curveCatmullRom)
@@ -699,7 +702,7 @@
 			.tickSizeInner(-(donorsLinesPanel.width - donorsLinesPanel.padding[3] - donorsLinesPanel.padding[1]))
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(function(d) {
+			.tickFormat(function (d) {
 				return formatSIaxes(d).replace("G", "B");
 			});
 
@@ -707,7 +710,7 @@
 			.tickSizeInner(-(cbpfsLinesPanel.width - cbpfsLinesPanel.padding[3] - cbpfsLinesPanel.padding[1]))
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(function(d) {
+			.tickFormat(function (d) {
 				return formatSIaxes(d).replace("G", "B");
 			});
 
@@ -715,7 +718,7 @@
 			.tickSizeInner(3)
 			.tickSizeOuter(0)
 			.ticks(5)
-			.tickFormat(function(d) {
+			.tickFormat(function (d) {
 				return formatSIaxes(d).replace("G", "B");
 			});
 
@@ -724,38 +727,50 @@
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		if (isPfbiSite) {
-			window.cbpfbiDataObject.contributionsTotalData.then(rawData => csvCallback(rawData));
+			Promise.all([
+				window.cbpfbiDataObject.contributionsTotalData,
+				window.cbpfbiDataObject.flags
+			]).then(allData => csvCallback(allData));
 		} else {
-			if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-				JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const rawData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-				console.info("pbicli: data from local storage");
-				csvCallback(rawData);
+			Promise.all([
+				fetchFile(classPrefix + "data", dataUrl, "contributions data", "csv"),
+				fetchFile("flags", flagsUrl, "flags data", "json")
+			]).then(allData => csvCallback(allData));
+		};
+
+		function fetchFile(fileName, url, warningString, method) {
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data) :
+					JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+				return Promise.resolve(fetchedData);
 			} else {
-				d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(rawData) {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				return fetchMethod(url).then(fetchedData => {
 					try {
-						localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-							data: d3.csvFormat(rawData),
+						localStorage.setItem(fileName, JSON.stringify({
+							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
 							timestamp: currentDate.getTime()
 						}));
 					} catch (error) {
-						console.info("D3 chart pbicli, " + error);
+						console.info(classPrefix + " chart, " + error);
 					};
-					console.info("pbicli: data from API");
-					csvCallback(rawData);
+					console.info(classPrefix + " chart info: " + warningString + " from API");
+					return fetchedData;
 				});
 			};
 		};
 
-		function csvCallback(rawData) {
+		function csvCallback([rawData, flagsData]) {
 
 			removeProgressWheel();
 
-			rawData.sort(function(a, b) {
+			rawData.sort(function (a, b) {
 				return (+a.FiscalYear) - (+b.FiscalYear);
 			});
 
-			rawData = rawData.filter(function(d) {
+			rawData = rawData.filter(function (d) {
 				return d.GMSDonorName !== "" && d.GMSDonorISO2Code !== "";
 			});
 
@@ -776,10 +791,8 @@
 				chartState.selectedDonors.push("alldonors");
 			};
 
-			if (!isInternetExplorer) saveFlags(list.donorsArray);
-
 			if (!lazyLoad) {
-				draw(rawData, list);
+				draw(rawData, list, flagsData);
 			} else {
 				d3.select(window).on("scroll.pbicli", checkPosition);
 				checkPosition();
@@ -789,14 +802,14 @@
 				const containerPosition = containerDiv.node().getBoundingClientRect();
 				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
 					d3.select(window).on("scroll.pbicli", null);
-					draw(rawData, list);
+					draw(rawData, list, flagsData);
 				};
 			};
 
 			//end of csvCallback
 		};
 
-		function draw(rawData, list) {
+		function draw(rawData, list, flagsData) {
 
 			createTitle();
 
@@ -907,13 +920,13 @@
 			groupYAxisDonorsLocalCurrency.call(yAxisDonorsLocalCurrency);
 
 			groupYAxisDonors.selectAll(".tick")
-				.filter(function(d) {
+				.filter(function (d) {
 					return d === 0;
 				})
 				.remove();
 
 			groupYAxisDonorsLocalCurrency.selectAll(".tick")
-				.filter(function(d) {
+				.filter(function (d) {
 					return d === 0;
 				})
 				.remove();
@@ -935,7 +948,7 @@
 			groupYAxisCbpfs.call(yAxisCbpfs);
 
 			groupYAxisCbpfs.selectAll(".tick")
-				.filter(function(d) {
+				.filter(function (d) {
 					return d === 0;
 				})
 				.remove();
@@ -966,7 +979,7 @@
 
 			if (showHelp) createAnnotationsDiv();
 
-			containerDiv.select("#pbicliDonorsDropdown").on("change", function() {
+			containerDiv.select("#pbicliDonorsDropdown").on("change", function () {
 
 				let thisIsoCode;
 
@@ -1012,7 +1025,7 @@
 							return
 						};
 					} else {
-						d3.select(this).selectAll("option").each(function(d) {
+						d3.select(this).selectAll("option").each(function (d) {
 							if (iso2Names[d] === value) selected = d;
 						});
 						if (chartState.selectedDonors.indexOf(selected) === -1) {
@@ -1022,7 +1035,7 @@
 						};
 					};
 
-					const allCountries = chartState.selectedDonors.map(function(d) {
+					const allCountries = chartState.selectedDonors.map(function (d) {
 						return list.cbpfsArray.indexOf(d) > -1 ? iso2Names[d] + "@donor" : iso2Names[d];
 					}).join("|");
 
@@ -1036,12 +1049,12 @@
 						.property("selected", true);
 
 					containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
-						.property("disabled", function(d, i) {
+						.property("disabled", function (d, i) {
 							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 						});
 
 					containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
-						.property("disabled", function(d, i) {
+						.property("disabled", function (d, i) {
 							return !i || (d === "All Donors" ? chartState.selectedDonors.indexOf("alldonors") > -1 :
 								chartState.selectedDonors.indexOf(d) > -1);
 						});
@@ -1068,7 +1081,7 @@
 
 			});
 
-			containerDiv.select("#pbicliCbpfsDropdown").on("change", function() {
+			containerDiv.select("#pbicliCbpfsDropdown").on("change", function () {
 
 				chartState.selectedDonors = [];
 
@@ -1081,7 +1094,7 @@
 					changeDonorsDropdown(list.donorsArray, true);
 					containerDiv.select("#pbicliCurrencyDropdown")
 						.selectAll("option")
-						.property("selected", function(_, i) {
+						.property("selected", function (_, i) {
 							return !i;
 						});
 					chartState.showLocal = false;
@@ -1103,7 +1116,7 @@
 					selected = list.cbpfsArray.slice(0, 5);
 					chartState.selectedCbpfs = selected;
 				} else {
-					d3.select(this).selectAll("option").each(function(d) {
+					d3.select(this).selectAll("option").each(function (d) {
 						if (iso2Names[d] === value) selected = d;
 					});
 					if (chartState.selectedCbpfs.indexOf(selected) === -1) {
@@ -1113,7 +1126,7 @@
 					};
 				};
 
-				const allCountries = chartState.selectedCbpfs.map(function(d) {
+				const allCountries = chartState.selectedCbpfs.map(function (d) {
 					return list.donorsArray.indexOf(d) > -1 ? iso2Names[d] + "@fund" : iso2Names[d];
 				}).join("|");
 
@@ -1127,12 +1140,12 @@
 					.property("selected", true);
 
 				containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
-					.property("disabled", function(d, i) {
+					.property("disabled", function (d, i) {
 						return !i || chartState.selectedDonors.indexOf(d) > -1;
 					});
 
 				containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
-					.property("disabled", function(d, i) {
+					.property("disabled", function (d, i) {
 						return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 					});
 
@@ -1156,7 +1169,7 @@
 
 			});
 
-			containerDiv.select("#pbicliCurrencyDropdown").on("change", function() {
+			containerDiv.select("#pbicliCurrencyDropdown").on("change", function () {
 
 				chartState.selectedCbpfs = [];
 
@@ -1211,13 +1224,13 @@
 
 			});
 
-			filtersDiv.selectAll(".pbicliRadioButtons input").on("change", function() {
+			filtersDiv.selectAll(".pbicliRadioButtons input").on("change", function () {
 
 				const value = this.value;
 
-				const allCurrencies = chartState.selectedDonors.map(function(d) {
+				const allCurrencies = chartState.selectedDonors.map(function (d) {
 					return currencyByCountry[d];
-				}).filter(function(value, index, self) {
+				}).filter(function (value, index, self) {
 					return self.indexOf(value) === index;
 				});
 
@@ -1225,7 +1238,7 @@
 
 					createCurrencyOverDiv();
 
-					d3.selectAll(".pbiclialertyesorno").on("click", function(d) {
+					d3.selectAll(".pbiclialertyesorno").on("click", function (d) {
 						if (d === "YES") {
 
 							d3.select(".pbicliOverDiv").remove();
@@ -1238,7 +1251,7 @@
 								.property("selected", true);
 
 							containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
-								.property("disabled", function(d, i) {
+								.property("disabled", function (d, i) {
 									return !i || chartState.selectedDonors.indexOf(d) > -1;
 								});
 
@@ -1329,14 +1342,14 @@
 				const pdfSpan = snapshotContent.append("p")
 					.attr("id", "pbicliSnapshotPdfText")
 					.html("Download PDF")
-					.on("click", function() {
+					.on("click", function () {
 						createSnapshot("pdf", false);
 					});
 
 				const pngSpan = snapshotContent.append("p")
 					.attr("id", "pbicliSnapshotPngText")
 					.html("Download Image (PNG)")
-					.on("click", function() {
+					.on("click", function () {
 						createSnapshot("png", false);
 					});
 
@@ -1353,20 +1366,20 @@
 						.attr("class", "d3chartShareDiv")
 						.style("display", "none");
 
-					shareIcon.on("mouseover", function() {
-							shareDiv.html("Click to copy")
-								.style("display", "block");
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("top", thisOffsetTop + "px")
-								.style("left", thisOffsetLeft + "20px");
-						}).on("mouseout", function() {
-							shareDiv.style("display", "none");
-						})
-						.on("click", function() {
+					shareIcon.on("mouseover", function () {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function () {
+						shareDiv.style("display", "none");
+					})
+						.on("click", function () {
 
 							const newURL = bookmarkSite + queryStringValues.toString();
 
@@ -1400,15 +1413,15 @@
 						.style("cursor", "default");
 				};
 
-				snapshotDiv.on("mouseover", function() {
+				snapshotDiv.on("mouseover", function () {
 					snapshotContent.style("display", "block")
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					snapshotContent.style("display", "none")
 				});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
-				downloadIcon.on("click", function() {
+				downloadIcon.on("click", function () {
 					if (chartState.controlledBy === null) return;
 					const data = populateData(rawData);
 					downloadData(data, rawData);
@@ -1422,7 +1435,7 @@
 				donorsLegendDivBottom.selectAll(".pbicliCheckboxDonorsDiv").remove();
 
 				const selectedDonors = donorsLegendDivBottom.selectAll(".pbicliSelectedDonorsDiv")
-					.data(chartState.selectedDonors, function(d) {
+					.data(chartState.selectedDonors, function (d) {
 						return d;
 					});
 
@@ -1434,22 +1447,23 @@
 
 				const textDiv = selectedDonorsEnter.append("div")
 					.attr("class", "pbicliSelectedDonorsDivText")
-					.html(function(d) {
+					.html(function (d) {
 						return "<span style='color:" + (d === "alldonors" ? unBlue : scaleColorsDonors(d)) + ";'>&#9679; </span>" +
 							(d === "alldonors" ? "All Donors&nbsp;" : iso2Names[d])
 					});
 
-				const flagDiv = selectedDonorsEnter.filter(function(d) {
-						return d !== "alldonors";
-					})
+				const flagDiv = selectedDonorsEnter.filter(function (d) {
+					return d !== "alldonors";
+				})
 					.append("div")
 					.attr("class", "pbicliSelectedDonorsFlagDiv")
 					.append("img")
 					.attr("width", flagSize)
 					.attr("height", flagSize)
-					.attr("src", function(d) {
-						return localStorage.getItem("storedFlag" + d) ? localStorage.getItem("storedFlag" + d) :
-							flagsDirectory + d + ".png";
+					.attr("src", function (d) {
+						if (!d) return blankFlag;
+						if (d && !flagsData[d.toLowerCase()]) console.warn("Missing flag: " + d.name, d);
+						return flagsData[d.toLowerCase()] || blankFlag;
 					});
 
 				const closeDiv = selectedDonorsEnter.append("div")
@@ -1458,9 +1472,9 @@
 				closeDiv.append("span")
 					.attr("class", "fas fa-times");
 
-				closeDiv.on("click", function(d) {
+				closeDiv.on("click", function (d) {
 
-					chartState.selectedDonors = chartState.selectedDonors.filter(function(e) {
+					chartState.selectedDonors = chartState.selectedDonors.filter(function (e) {
 						return e !== d;
 					});
 
@@ -1474,13 +1488,13 @@
 					};
 
 					containerDiv.select("#pbicliDonorsDropdown").selectAll("option")
-						.property("disabled", function(d, i) {
+						.property("disabled", function (d, i) {
 							return !i || chartState.selectedDonors.indexOf(d) > -1;
 						});
 
 					if (!chartState.selectedDonors.length) chartState.selectedLocalCurrency = null;
 
-					const allCountries = chartState.selectedDonors.map(function(d) {
+					const allCountries = chartState.selectedDonors.map(function (d) {
 						return list.cbpfsArray.indexOf(d) > -1 ? iso2Names[d] + "@donor" : iso2Names[d];
 					}).join("|");
 
@@ -1514,7 +1528,7 @@
 				cbpfsLegendDivBottom.selectAll(".pbicliCheckboxCbpfsDiv").remove();
 
 				const selectedCbpfs = cbpfsLegendDivBottom.selectAll(".pbicliSelectedCbpfsDiv")
-					.data(chartState.selectedCbpfs, function(d) {
+					.data(chartState.selectedCbpfs, function (d) {
 						return d;
 					});
 
@@ -1526,7 +1540,7 @@
 
 				const textDiv = selectedCbpfsEnter.append("div")
 					.attr("class", "pbicliSelectedCbpfsDivText")
-					.html(function(d) {
+					.html(function (d) {
 						return "<span style='color:" + scaleColorsCbpfs(d) + ";'>&#9679; </span>" + iso2Names[d]
 					});
 
@@ -1536,9 +1550,9 @@
 				closeDiv.append("span")
 					.attr("class", "fas fa-times");
 
-				closeDiv.on("click", function(d) {
+				closeDiv.on("click", function (d) {
 
-					chartState.selectedCbpfs = chartState.selectedCbpfs.filter(function(e) {
+					chartState.selectedCbpfs = chartState.selectedCbpfs.filter(function (e) {
 						return e !== d;
 					});
 
@@ -1552,11 +1566,11 @@
 					};
 
 					containerDiv.select("#pbicliCbpfsDropdown").selectAll("option")
-						.property("disabled", function(d, i) {
+						.property("disabled", function (d, i) {
 							return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 						});
 
-					const allCountries = chartState.selectedCbpfs.map(function(d) {
+					const allCountries = chartState.selectedCbpfs.map(function (d) {
 						return list.donorsArray.indexOf(d) > -1 ? iso2Names[d] + "@fund" : iso2Names[d];
 					}).join("|");
 
@@ -1587,15 +1601,15 @@
 
 			function createDonorsCheckboxes(donorsDataOriginal) {
 
-				donorsDataOriginal.sort(function(a, b) {
+				donorsDataOriginal.sort(function (a, b) {
 					return b.total - a.total;
 				});
 
-				const donorsData = donorsDataOriginal.map(function(d) {
+				const donorsData = donorsDataOriginal.map(function (d) {
 					return d.isoCode
 				});
 
-				donorsData.forEach(function(d, i) {
+				donorsData.forEach(function (d, i) {
 					if (i > checkboxesLimit) checkedDonors[d] = false;
 				});
 
@@ -1606,7 +1620,7 @@
 				donorsLegendDivBottom.selectAll(".pbicliSelectedDonorsDiv").remove();
 
 				let donorsCheckboxes = donorsLegendDivBottom.selectAll(".pbicliCheckboxDonorsDiv")
-					.data(donorsData, function(d) {
+					.data(donorsData, function (d) {
 						return d;
 					});
 
@@ -1620,43 +1634,43 @@
 
 				const input = checkbox.append("input")
 					.attr("type", "checkbox")
-					.attr("value", function(d) {
+					.attr("value", function (d) {
 						return d;
 					});
 
 				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
-					.html(function(d) {
+					.html(function (d) {
 						return iso2Names[d] ? "<span style='color:" + scaleColorsDonors(d) + ";'>&#9679; </span>" + iso2Names[d] : d;
 					});
 
 				donorsCheckboxes = donorsCheckboxesEnter.merge(donorsCheckboxes);
 
-				donorsCheckboxes = donorsCheckboxes.sort(function(a, b) {
+				donorsCheckboxes = donorsCheckboxes.sort(function (a, b) {
 					return donorsData.indexOf(a) - donorsData.indexOf(b);
 				});
 
 				donorsCheckboxes.select("input")
-					.property("checked", function(d, i) {
-						return !currentlyChecked.every(function(e) {
+					.property("checked", function (d, i) {
+						return !currentlyChecked.every(function (e) {
 							return e;
 						}) && checkedDonors[d];
 					});
 
-				const allDonors = donorsCheckboxes.filter(function(d) {
+				const allDonors = donorsCheckboxes.filter(function (d) {
 					return d === "Show All";
 				}).select("input");
 
 				d3.select(allDonors.node().nextSibling)
 					.classed("pbicliCheckboxTextShowAll", true);
 
-				allDonors.property("checked", function() {
-					return currentlyChecked.every(function(d) {
+				allDonors.property("checked", function () {
+					return currentlyChecked.every(function (d) {
 						return d;
 					});
 				});
 
-				donorsCheckboxes.selectAll("input").on("change", function() {
+				donorsCheckboxes.selectAll("input").on("change", function () {
 
 					if (this.value === "Show All") {
 
@@ -1665,7 +1679,7 @@
 						};
 
 						donorsCheckboxes.selectAll("input")
-							.filter(function(d) {
+							.filter(function (d) {
 								return d !== "Show All";
 							})
 							.property("checked", false);
@@ -1674,10 +1688,10 @@
 
 						const newCurrentlyChecked = d3.values(checkedDonors);
 
-						if (newCurrentlyChecked.every(function(e) {
-								return e;
-							})) {
-							donorsData.forEach(function(d) {
+						if (newCurrentlyChecked.every(function (e) {
+							return e;
+						})) {
+							donorsData.forEach(function (d) {
 								checkedDonors[d] = false;
 							});
 						};
@@ -1703,15 +1717,15 @@
 
 			function createCbpfCheckboxes(cbpfsDataOriginal) {
 
-				cbpfsDataOriginal.sort(function(a, b) {
+				cbpfsDataOriginal.sort(function (a, b) {
 					return b.total - a.total;
 				});
 
-				const cbpfsData = cbpfsDataOriginal.map(function(d) {
+				const cbpfsData = cbpfsDataOriginal.map(function (d) {
 					return d.isoCode
 				});
 
-				cbpfsData.forEach(function(d, i) {
+				cbpfsData.forEach(function (d, i) {
 					if (i > checkboxesLimit) checkedCbpfs[d] = false;
 				});
 
@@ -1722,7 +1736,7 @@
 				cbpfsLegendDivBottom.selectAll(".pbicliSelectedCbpfsDiv").remove();
 
 				let cbpfsCheckboxes = cbpfsLegendDivBottom.selectAll(".pbicliCheckboxCbpfsDiv")
-					.data(cbpfsData, function(d) {
+					.data(cbpfsData, function (d) {
 						return d;
 					});
 
@@ -1736,43 +1750,43 @@
 
 				const input = checkbox.append("input")
 					.attr("type", "checkbox")
-					.attr("value", function(d) {
+					.attr("value", function (d) {
 						return d;
 					});
 
 				const span = checkbox.append("span")
 					.attr("class", "pbicliCheckboxText")
-					.html(function(d) {
+					.html(function (d) {
 						return iso2Names[d] ? "<span style='color:" + scaleColorsCbpfs(d) + ";'>&#9679; </span>" + iso2Names[d] : d;
 					});
 
 				cbpfsCheckboxes = cbpfsCheckboxesEnter.merge(cbpfsCheckboxes);
 
-				cbpfsCheckboxes = cbpfsCheckboxes.sort(function(a, b) {
+				cbpfsCheckboxes = cbpfsCheckboxes.sort(function (a, b) {
 					return cbpfsData.indexOf(a) - cbpfsData.indexOf(b);
 				});
 
 				cbpfsCheckboxes.select("input")
-					.property("checked", function(d, i) {
-						return !currentlyChecked.every(function(e) {
+					.property("checked", function (d, i) {
+						return !currentlyChecked.every(function (e) {
 							return e;
 						}) && checkedCbpfs[d];
 					});
 
-				const allCbpfs = cbpfsCheckboxes.filter(function(d) {
+				const allCbpfs = cbpfsCheckboxes.filter(function (d) {
 					return d === "Show All";
 				}).select("input");
 
 				d3.select(allCbpfs.node().nextSibling)
 					.classed("pbicliCheckboxTextShowAll", true);
 
-				allCbpfs.property("checked", function() {
-					return currentlyChecked.every(function(d) {
+				allCbpfs.property("checked", function () {
+					return currentlyChecked.every(function (d) {
 						return d;
 					});
 				});
 
-				cbpfsCheckboxes.selectAll("input").on("change", function() {
+				cbpfsCheckboxes.selectAll("input").on("change", function () {
 
 					if (this.value === "Show All") {
 
@@ -1781,7 +1795,7 @@
 						};
 
 						cbpfsCheckboxes.selectAll("input")
-							.filter(function(d) {
+							.filter(function (d) {
 								return d !== "Show All";
 							})
 							.property("checked", false);
@@ -1790,10 +1804,10 @@
 
 						const newCurrentlyChecked = d3.values(checkedCbpfs);
 
-						if (newCurrentlyChecked.every(function(e) {
-								return e;
-							})) {
-							cbpfsData.forEach(function(d) {
+						if (newCurrentlyChecked.every(function (e) {
+							return e;
+						})) {
+							cbpfsData.forEach(function (d) {
 								checkedCbpfs[d] = false;
 							});
 						};
@@ -1819,22 +1833,22 @@
 
 			function createDonorsLines(donorsDataOriginal) {
 
-				const donorsData = donorsDataOriginal.filter(function(d) {
+				const donorsData = donorsDataOriginal.filter(function (d) {
 					return checkedDonors[d.isoCode];
 				});
 
 				const donorsDataFiltered = JSON.parse(JSON.stringify(donorsData));
 
-				donorsDataFiltered.forEach(function(d) {
-					d.values = d.values.filter(function(e) {
+				donorsDataFiltered.forEach(function (d) {
+					d.values = d.values.filter(function (e) {
 						return +e.year <= currentYear;
 					});
 				});
 
-				const allDonorsLastCircleData = donorsDataFiltered.filter(function(d) {
+				const allDonorsLastCircleData = donorsDataFiltered.filter(function (d) {
 					return d.isoCode === allDonors.isoCode;
-				}).map(function(d) {
-					return d.values.find(function(e) {
+				}).map(function (d) {
+					return d.values.find(function (e) {
 						return +e.year === currentYear;
 					})
 				});
@@ -1866,16 +1880,16 @@
 					.append("circle")
 					.attr("class", "pbiclilastAllDonorsCircle")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleDonors(d.total)
 					})
 					.style("fill", "none")
 					.style("stroke-width", "1.5px")
 					.style("stroke", unBlue)
-					.each(function() {
+					.each(function () {
 						const pulseCircle = d3.select(this);
 						repeatPulse();
 
@@ -1893,15 +1907,15 @@
 
 				lastAllDonorsCircle.transition("positionTransition")
 					.duration(duration)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleDonors(d.total)
 					});
 
 				const donorsGroup = donorsLinesPanel.main.selectAll(".pbicliDonorsGroup")
-					.data(donorsDataFiltered, function(d) {
+					.data(donorsDataFiltered, function (d) {
 						return d.isoCode
 					});
 
@@ -1913,23 +1927,23 @@
 
 				const donorsPath = donorsGroupEnter.append("path")
 					.attr("class", "pbicliDonorsPath")
-					.style("stroke", function(d) {
+					.style("stroke", function (d) {
 						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
-					.attr("d", function(d) {
-						return lineGeneratorDonors(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return lineGeneratorDonors(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}))
 					})
-					.each(function() {
+					.each(function () {
 						localVariable.set(this, this.getTotalLength())
 					});
 
-				donorsPath.style("stroke-dasharray", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength + " " + thisPathLength;
-					})
-					.style("stroke-dashoffset", function() {
+				donorsPath.style("stroke-dasharray", function () {
+					const thisPathLength = localVariable.get(this);
+					return thisPathLength + " " + thisPathLength;
+				})
+					.style("stroke-dashoffset", function () {
 						const thisPathLength = localVariable.get(this);
 						return thisPathLength;
 					})
@@ -1938,28 +1952,28 @@
 					.style("stroke-dashoffset", "0");
 
 				const circlesEnter = donorsGroupEnter.selectAll(null)
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					})
 					.enter()
 					.append("circle")
 					.attr("class", "pbicliDonorsCircles")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleDonors(d.total)
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -1969,14 +1983,14 @@
 					.transition()
 					.duration(duration)
 					.style("stroke-dasharray", null)
-					.attr("d", function(d) {
-						return lineGeneratorDonors(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return lineGeneratorDonors(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}))
 					});
 
 				const updateCircles = donorsGroup.selectAll("circle")
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					});
 
@@ -1986,21 +2000,21 @@
 					.append("circle")
 					.attr("class", "pbicliDonorsCircles")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleDonors(d.total)
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return d.isoCode === "alldonors" ? unBlue : scaleColorsDonors(d.isoCode);
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -2008,31 +2022,31 @@
 
 				updateCircles.transition()
 					.duration(duration)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleDonors(d.total)
 					});
 
-				const donorsDataLocal = JSON.parse(JSON.stringify(donorsData)).filter(function(d) {
+				const donorsDataLocal = JSON.parse(JSON.stringify(donorsData)).filter(function (d) {
 					return d.localCurrency && d.localCurrency !== "USD";
 				});
 
-				donorsDataLocal.forEach(function(d) {
+				donorsDataLocal.forEach(function (d) {
 					d.localData = true;
 				});
 
 				const donorsDataLocalFiltered = JSON.parse(JSON.stringify(donorsDataLocal));
 
-				donorsDataLocalFiltered.forEach(function(d) {
-					d.values = d.values.filter(function(e) {
+				donorsDataLocalFiltered.forEach(function (d) {
+					d.values = d.values.filter(function (e) {
 						return +e.year <= currentYear;
 					});
 				});
 
 				const donorsGroupLocal = donorsLinesPanel.main.selectAll(".pbicliDonorsGroupLocal")
-					.data(donorsDataLocalFiltered, function(d) {
+					.data(donorsDataLocalFiltered, function (d) {
 						return d.isoCode
 					});
 
@@ -2045,22 +2059,22 @@
 
 				const donorsPathLocal = donorsGroupLocalEnter.append("path")
 					.attr("class", "pbicliDonorsPathLocal")
-					.attr("d", function(d) {
-						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function (e) {
 							return +e.year < currentYear;
-						})) : lineGeneratorDonors(d.values.filter(function(e) {
+						})) : lineGeneratorDonors(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}));
 					})
-					.each(function() {
+					.each(function () {
 						localVariable.set(this, this.getTotalLength())
 					});
 
-				donorsPathLocal.style("stroke-dasharray", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength + " " + thisPathLength;
-					})
-					.style("stroke-dashoffset", function() {
+				donorsPathLocal.style("stroke-dasharray", function () {
+					const thisPathLength = localVariable.get(this);
+					return thisPathLength + " " + thisPathLength;
+				})
+					.style("stroke-dashoffset", function () {
 						const thisPathLength = localVariable.get(this);
 						return thisPathLength;
 					})
@@ -2069,24 +2083,24 @@
 					.style("stroke-dashoffset", "0");
 
 				const circlesEnterLocal = donorsGroupLocalEnter.selectAll(null)
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					})
 					.enter()
 					.append("circle")
 					.attr("class", "pbicliDonorsCirclesLocal")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -2100,16 +2114,16 @@
 					.transition()
 					.duration(duration)
 					.style("stroke-dasharray", null)
-					.attr("d", function(d) {
-						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return chartState.showLocal ? lineGeneratorDonorsLocalCurrency(d.values.filter(function (e) {
 							return +e.year < currentYear;
-						})) : lineGeneratorDonors(d.values.filter(function(e) {
+						})) : lineGeneratorDonors(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}));
 					});
 
 				const updateCirclesLocal = donorsGroupLocal.selectAll("circle")
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					});
 
@@ -2119,17 +2133,17 @@
 					.append("circle")
 					.attr("class", "pbicliDonorsCirclesLocal")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -2137,15 +2151,15 @@
 
 				updateCirclesLocal.transition()
 					.duration(duration)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleDonors(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return chartState.showLocal ? yScaleDonorsLocalCurrency(d.localTotal) : yScaleDonors(d.total);
 					});
 
-				let labelsData = donorsData.map(function(d) {
-					const filteredValue = d.values.filter(function(e) {
+				let labelsData = donorsData.map(function (d) {
+					const filteredValue = d.values.filter(function (e) {
 						return e.year <= currentYear.toString();
 					});
 					const thisDatum = filteredValue[filteredValue.length - 1];
@@ -2158,9 +2172,9 @@
 					}
 				});
 
-				const labelsDataLocal = donorsDataLocal.map(function(d) {
+				const labelsDataLocal = donorsDataLocal.map(function (d) {
 
-					const filteredValue = d.values.filter(function(e) {
+					const filteredValue = d.values.filter(function (e) {
 						return e.year <= currentYear.toString();
 					});
 					const thisDatum = filteredValue[filteredValue.length - 1];
@@ -2175,7 +2189,7 @@
 				if (chartState.showLocal) labelsData = labelsData.concat(labelsDataLocal);
 
 				let labelsGroupDonors = donorsLinesPanel.main.selectAll(".pbicliLabelsGroupDonors")
-					.data(labelsData, function(d) {
+					.data(labelsData, function (d) {
 						return d.isoCode + d.currency;
 					});
 
@@ -2186,7 +2200,7 @@
 					.attr("class", "pbicliLabelsGroupDonors")
 					.style("opacity", 0);
 
-				labelsGroupDonorsEnter.attr("transform", function(d) {
+				labelsGroupDonorsEnter.attr("transform", function (d) {
 					return "translate(" + (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + "," +
 						d.yPos + ")";
 				});
@@ -2196,16 +2210,16 @@
 					.attr("height", flagSize)
 					.attr("y", -flagSize / 2)
 					.attr("x", 0)
-					.attr("xlink:href", function(d) {
-						return d.isoCode === "alldonors" ? null : localStorage.getItem("storedFlag" + d.isoCode) ? localStorage.getItem("storedFlag" + d.isoCode) :
-							flagsDirectory + d.isoCode + ".png";
+					.attr("href", function (d) {
+						if (!d.isoCode) return blankFlag;
+						return flagsData[d.isoCode.toLowerCase()] || blankFlag;
 					});
 
 				const labelLineDonors = labelsGroupDonorsEnter.append("polyline")
 					.style("stroke-width", "1px")
 					.style("stroke", "#e2e2e2")
 					.style("fill", "none")
-					.attr("points", function(d) {
+					.attr("points", function (d) {
 						return (xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
 							(xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
 							(xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
@@ -2214,21 +2228,21 @@
 
 				const labelsText = labelsGroupDonorsEnter.append("text")
 					.attr("class", "pbicliLabelTextSmall")
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						return d.isoCode === "alldonors" ? 2 : 2 + flagSize;
 					})
 					.attr("y", 2)
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return d.currency === "USD" ? "#666" : "darkslategray";
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return d.isoCode === "alldonors" ? "ALL" : "(" + d.currency + ")";
 					});
 
 				labelsGroupDonors = labelsGroupDonorsEnter.merge(labelsGroupDonors);
 
 				labelsGroupDonors.select("text")
-					.style("opacity", function(d) {
+					.style("opacity", function (d) {
 						if (d.isoCode === "alldonors") {
 							return 1;
 						} else if (!chartState.showLocal) {
@@ -2238,9 +2252,9 @@
 						};
 					});
 
-				labelsGroupDonors.filter(function(d) {
-						return d.isoCode === "alldonors";
-					})
+				labelsGroupDonors.filter(function (d) {
+					return d.isoCode === "alldonors";
+				})
 					.select("text")
 					.style("font-size", "10px");
 
@@ -2248,14 +2262,14 @@
 
 				collideLabels(labelsGroupDonors.data(), donorsLinesPanel.height - donorsLinesPanel.padding[2]);
 
-				labelsGroupDonors = labelsGroupDonors.sort(function(a, b) {
+				labelsGroupDonors = labelsGroupDonors.sort(function (a, b) {
 					return b.yPos - a.yPos;
 				});
 
 				labelsGroupDonors.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.attr("transform", function(d) {
+					.attr("transform", function (d) {
 						return "translate(" + (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding) + "," +
 							d.yPos + ")";
 					});
@@ -2264,7 +2278,7 @@
 					.style("opacity", 0)
 					.transition()
 					.duration(0)
-					.attr("points", function(d, i, n) {
+					.attr("points", function (d, i, n) {
 						const step = ((donorsLinesPanel.width - donorsLinesPanel.padding[1]) - xScaleDonors(parseTime(d.datum.year))) / n.length;
 						if (d.currency === "USD") {
 							return (xScaleDonors(parseTime(d.datum.year)) - (donorsLinesPanel.width - donorsLinesPanel.padding[1] + labelPadding / 2)) +
@@ -2280,24 +2294,24 @@
 								-labelDistance + "," + 0;
 						};
 					})
-					.on("end", function() {
+					.on("end", function () {
 						d3.select(this).style("opacity", 1);
 					});
 
-				labelsGroupDonors.on("mouseover", function(d) {
-						currentHoveredElem = this;
-						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors" :
-							".pbicliDonorsGroup, .pbicliLabelsGroupDonors";
-						donorsLinesPanel.main.selectAll(selectedGroups)
-							.filter(function(e) {
-								return d.isoCode !== e.isoCode;
-							})
-							.style("opacity", fadeOpacity)
-							.attr("filter", "url(#pbicliGrayFilter)");
-						d3.select(this).select("polyline")
-							.style("stroke", "#888");
-					})
-					.on("mouseout", function() {
+				labelsGroupDonors.on("mouseover", function (d) {
+					currentHoveredElem = this;
+					const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors" :
+						".pbicliDonorsGroup, .pbicliLabelsGroupDonors";
+					donorsLinesPanel.main.selectAll(selectedGroups)
+						.filter(function (e) {
+							return d.isoCode !== e.isoCode;
+						})
+						.style("opacity", fadeOpacity)
+						.attr("filter", "url(#pbicliGrayFilter)");
+					d3.select(this).select("polyline")
+						.style("stroke", "#888");
+				})
+					.on("mouseout", function () {
 						if (isSnapshotTooltipVisible) return;
 						currentHoveredElem = null;
 						const selectedGroups = chartState.showLocal ? ".pbicliDonorsGroup, .pbicliDonorsGroupLocal, .pbicliLabelsGroupDonors" :
@@ -2323,13 +2337,13 @@
 				yAxisLabelDonorsLocalCurrency.text(chartState.showLocal ? chartState.selectedLocalCurrency : "");
 
 				groupYAxisDonors.selectAll(".tick")
-					.filter(function(d) {
+					.filter(function (d) {
 						return d === 0;
 					})
 					.remove();
 
 				groupYAxisDonorsLocalCurrency.selectAll(".tick")
-					.filter(function(d) {
+					.filter(function (d) {
 						return d === 0;
 					})
 					.remove();
@@ -2347,7 +2361,7 @@
 					.style("fill", "none")
 					.attr("pointer-events", "all")
 					.merge(rectOverlayDonors)
-					.on("mousemove", function() {
+					.on("mousemove", function () {
 						currentHoveredElem = this;
 						if (chartState.showLocal) {
 							mouseMoveRectOverlay("donor", donorsLinesPanel, donorsData.concat(donorsDataLocal), xScaleDonors, yScaleDonors);
@@ -2355,7 +2369,7 @@
 							mouseMoveRectOverlay("donor", donorsLinesPanel, donorsData, xScaleDonors, yScaleDonors);
 						};
 					})
-					.on("mouseout", function() {
+					.on("mouseout", function () {
 						if (isSnapshotTooltipVisible) return;
 						currentHoveredElem = null;
 						mouseOutRectOverlay(donorsLinesPanel);
@@ -2368,14 +2382,14 @@
 
 			function createCbpfsLines(cbpfsDataOriginal) {
 
-				const cbpfsData = cbpfsDataOriginal.filter(function(d) {
+				const cbpfsData = cbpfsDataOriginal.filter(function (d) {
 					return checkedCbpfs[d.isoCode];
 				});
 
 				const cbpfsDataFiltered = JSON.parse(JSON.stringify(cbpfsData));
 
-				cbpfsDataFiltered.forEach(function(d) {
-					d.values = d.values.filter(function(e) {
+				cbpfsDataFiltered.forEach(function (d) {
+					d.values = d.values.filter(function (e) {
 						return +e.year <= currentYear;
 					});
 				});
@@ -2394,7 +2408,7 @@
 					.attr("x", (xScaleCbpfs(parseTime(currentYear)) - xScaleCbpfs(parseTime(currentYear - 1))) / 2);
 
 				const cbpfsGroup = cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup")
-					.data(cbpfsDataFiltered, function(d) {
+					.data(cbpfsDataFiltered, function (d) {
 						return d.isoCode
 					});
 
@@ -2406,23 +2420,23 @@
 
 				const cbpfsPath = cbpfsGroupEnter.append("path")
 					.attr("class", "pbicliCbpfsPath")
-					.style("stroke", function(d) {
+					.style("stroke", function (d) {
 						return scaleColorsCbpfs(d.isoCode);
 					})
-					.attr("d", function(d) {
-						return lineGeneratorCbpfs(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return lineGeneratorCbpfs(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}))
 					})
-					.each(function() {
+					.each(function () {
 						localVariable.set(this, this.getTotalLength())
 					});
 
-				cbpfsPath.style("stroke-dasharray", function() {
-						const thisPathLength = localVariable.get(this);
-						return thisPathLength + " " + thisPathLength;
-					})
-					.style("stroke-dashoffset", function() {
+				cbpfsPath.style("stroke-dasharray", function () {
+					const thisPathLength = localVariable.get(this);
+					return thisPathLength + " " + thisPathLength;
+				})
+					.style("stroke-dashoffset", function () {
 						const thisPathLength = localVariable.get(this);
 						return thisPathLength;
 					})
@@ -2431,28 +2445,28 @@
 					.style("stroke-dashoffset", "0");
 
 				const circlesEnter = cbpfsGroupEnter.selectAll(null)
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					})
 					.enter()
 					.append("circle")
 					.attr("class", "pbicliCbpfsCircles")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleCbpfs(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleCbpfs(d.total)
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -2462,14 +2476,14 @@
 					.transition()
 					.duration(duration)
 					.style("stroke-dasharray", null)
-					.attr("d", function(d) {
-						return lineGeneratorCbpfs(d.values.filter(function(e) {
+					.attr("d", function (d) {
+						return lineGeneratorCbpfs(d.values.filter(function (e) {
 							return +e.year < currentYear;
 						}))
 					});
 
 				const updateCircles = cbpfsGroup.selectAll("circle")
-					.data(function(d) {
+					.data(function (d) {
 						return d.values;
 					});
 
@@ -2479,21 +2493,21 @@
 					.append("circle")
 					.attr("class", "pbicliCbpfsCircles")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleCbpfs(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleCbpfs(d.total)
 					})
-					.each(function(d) {
+					.each(function (d) {
 						d.donor = d3.select(this.parentNode).datum().donor;
 						d.isoCode = d3.select(this.parentNode).datum().isoCode;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return scaleColorsCbpfs(d.isoCode);
 					})
 					.transition()
-					.delay(function(_, i, n) {
+					.delay(function (_, i, n) {
 						return i * (duration / n.length);
 					})
 					.duration(duration / 4)
@@ -2501,15 +2515,15 @@
 
 				updateCircles.transition()
 					.duration(duration)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleCbpfs(parseTime(d.year))
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return yScaleCbpfs(d.total)
 					});
 
-				const labelsData = cbpfsData.map(function(d) {
-					const filteredValue = d.values.filter(function(e) {
+				const labelsData = cbpfsData.map(function (d) {
+					const filteredValue = d.values.filter(function (e) {
 						return e.year <= currentYear.toString();
 					});
 					const thisDatum = filteredValue[filteredValue.length - 1];
@@ -2522,7 +2536,7 @@
 				});
 
 				let labelsGroupCbpfs = cbpfsLinesPanel.main.selectAll(".pbicliLabelsGroupCbpfs")
-					.data(labelsData, function(d) {
+					.data(labelsData, function (d) {
 						return d.name;
 					});
 
@@ -2533,7 +2547,7 @@
 					.attr("class", "pbicliLabelsGroupCbpfs")
 					.style("opacity", 0);
 
-				labelsGroupCbpfsEnter.attr("transform", function(d) {
+				labelsGroupCbpfsEnter.attr("transform", function (d) {
 					return "translate(" + (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + "," +
 						d.yPos + ")";
 				});
@@ -2541,7 +2555,7 @@
 				labelsGroupCbpfsEnter.append("text")
 					.attr("class", "pbicliLabelText")
 					.attr("y", 4)
-					.text(function(d) {
+					.text(function (d) {
 						return d.name;
 					});
 
@@ -2549,7 +2563,7 @@
 					.style("stroke-width", "1px")
 					.style("stroke", "#e2e2e2")
 					.style("fill", "none")
-					.attr("points", function(d) {
+					.attr("points", function (d) {
 						return (xScaleCbpfs(parseTime(d.datum.year)) - (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
 							(xScaleCbpfs(parseTime(d.datum.year)) - (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
 							(xScaleCbpfs(parseTime(d.datum.year)) - (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + 5) + ",0 " +
@@ -2562,14 +2576,14 @@
 
 				labelsGroupCbpfs.raise();
 
-				labelsGroupCbpfs = labelsGroupCbpfs.sort(function(a, b) {
+				labelsGroupCbpfs = labelsGroupCbpfs.sort(function (a, b) {
 					return b.yPos - a.yPos;
 				});
 
 				labelsGroupCbpfs.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.attr("transform", function(d) {
+					.attr("transform", function (d) {
 						return "translate(" + (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding) + "," +
 							d.yPos + ")";
 					});
@@ -2578,7 +2592,7 @@
 					.style("opacity", 0)
 					.transition()
 					.duration(0)
-					.attr("points", function(d, i, n) {
+					.attr("points", function (d, i, n) {
 						const step = ((cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1]) - xScaleCbpfs(parseTime(d.datum.year))) / n.length;
 						return (xScaleCbpfs(parseTime(d.datum.year)) - (cbpfsLinesPanel.width - cbpfsLinesPanel.padding[1] + labelPadding / 2)) +
 							"," + (yScaleCbpfs(d.datum.total) - d.yPos) + " " +
@@ -2586,22 +2600,22 @@
 							-(i * step + (labelPadding / 2)) + "," + 0 + " " +
 							-labelDistance + "," + 0;
 					})
-					.on("end", function() {
+					.on("end", function () {
 						d3.select(this).style("opacity", 1);
 					});
 
-				labelsGroupCbpfs.on("mouseover", function(d, i) {
-						currentHoveredElem = this;
-						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs")
-							.filter(function(e) {
-								return d.isoCode !== e.isoCode;
-							})
-							.style("opacity", fadeOpacity)
-							.attr("filter", "url(#pbicliGrayFilter)");
-						d3.select(this).select("polyline")
-							.style("stroke", "#888");
-					})
-					.on("mouseout", function() {
+				labelsGroupCbpfs.on("mouseover", function (d, i) {
+					currentHoveredElem = this;
+					cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs")
+						.filter(function (e) {
+							return d.isoCode !== e.isoCode;
+						})
+						.style("opacity", fadeOpacity)
+						.attr("filter", "url(#pbicliGrayFilter)");
+					d3.select(this).select("polyline")
+						.style("stroke", "#888");
+				})
+					.on("mouseout", function () {
 						if (isSnapshotTooltipVisible) return;
 						currentHoveredElem = null;
 						cbpfsLinesPanel.main.selectAll(".pbicliCbpfsGroup, .pbicliLabelsGroupCbpfs")
@@ -2618,7 +2632,7 @@
 				groupYAxisCbpfs.select(".domain").raise();
 
 				groupYAxisCbpfs.selectAll(".tick")
-					.filter(function(d) {
+					.filter(function (d) {
 						return d === 0;
 					})
 					.remove();
@@ -2636,11 +2650,11 @@
 					.style("fill", "none")
 					.attr("pointer-events", "all")
 					.merge(rectOverlayCbpfs)
-					.on("mousemove", function() {
+					.on("mousemove", function () {
 						currentHoveredElem = this;
 						mouseMoveRectOverlay("cbpf", cbpfsLinesPanel, cbpfsData, xScaleCbpfs, yScaleCbpfs);
 					})
-					.on("mouseout", function() {
+					.on("mouseout", function () {
 						if (isSnapshotTooltipVisible) return;
 						currentHoveredElem = null;
 						mouseOutRectOverlay(cbpfsLinesPanel);
@@ -2671,10 +2685,10 @@
 
 				const thisColorScale = type === "donor" ? scaleColorsDonors : scaleColorsCbpfs;
 
-				thisOriginalData.forEach(function(country) {
+				thisOriginalData.forEach(function (country) {
 					const localCurrency = country.localCurrency === undefined ? false : country.localData ? country.localCurrency : "USD";
 					const localData = !!country.localData;
-					const thisYear = country.values.find(function(e) {
+					const thisYear = country.values.find(function (e) {
 						return e.year === mouseYear;
 					});
 					if (thisYear && thisYear.total > 0) {
@@ -2689,7 +2703,7 @@
 					};
 				});
 
-				thisData.sort(function(a, b) {
+				thisData.sort(function (a, b) {
 					if (+a.total && +b.total) {
 						return b.total - a.total;
 					} else if (+a.total !== +a.total && +b.total === +b.total) {
@@ -2737,19 +2751,19 @@
 						.style("stroke-width", "1px")
 						.style("stroke", "#ccc")
 						.merge(lines)
-						.attr("x1", function(d) {
+						.attr("x1", function (d) {
 							return xScale(parseTime(mouseYear));
 						})
-						.attr("x2", function(d) {
+						.attr("x2", function (d) {
 							return xScale(parseTime(mouseYear));
 						})
 						.attr("y1", thisPanel.padding[0])
 						.attr("y2", thisPanel.height - thisPanel.padding[2]);
 
 					const circles = tooltipGroup.selectAll(".pbicliTooltipCircles")
-						.data(thisData.filter(function(d) {
+						.data(thisData.filter(function (d) {
 							return d.total !== "n/a";
-						}), function(d) {
+						}), function (d) {
 							return d.name
 						});
 
@@ -2760,7 +2774,7 @@
 						.attr("class", "pbicliTooltipCircles")
 						.attr("r", circleRadius + 2)
 						.style("fill", "none")
-						.style("stroke", function(d) {
+						.style("stroke", function (d) {
 							if (type === "cbpf") {
 								return scaleColorsCbpfs(d.name);
 							} else {
@@ -2768,10 +2782,10 @@
 							};
 						})
 						.merge(circles)
-						.attr("cx", function(d) {
+						.attr("cx", function (d) {
 							return xScale(parseTime(d.year))
 						})
-						.attr("cy", function(d) {
+						.attr("cy", function (d) {
 							return d.local ? yScaleDonorsLocalCurrency(d.total) : yScale(d.total);
 						});
 
@@ -2819,13 +2833,13 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(d, i) {
+				.property("disabled", function (d, i) {
 					return !i || chartState.selectedDonors.indexOf(d) > -1;
 				})
-				.property("selected", function(d, i) {
+				.property("selected", function (d, i) {
 					return chartState.selectedDonors.length ? d === chartState.selectedDonors[chartState.selectedDonors.length - 1] : !i;
 				})
-				.html(function(d, i) {
+				.html(function (d, i) {
 					return i < 3 ? d : iso2Names[d];
 				});
 
@@ -2844,14 +2858,14 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(d, i) {
+				.property("disabled", function (d, i) {
 					return !i || (d === "All Donors" ? chartState.selectedDonors.indexOf("alldonors") > -1 :
 						chartState.selectedDonors.indexOf(d) > -1);
 				})
-				.property("selected", function(_, i) {
+				.property("selected", function (_, i) {
 					return !i;
 				})
-				.html(function(d, i) {
+				.html(function (d, i) {
 					return all ? i < 3 ? d : iso2Names[d] : !i ? d : iso2Names[d];
 				});
 
@@ -2871,10 +2885,10 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("selected", function(_, i) {
+				.property("selected", function (_, i) {
 					return !i;
 				})
-				.html(function(d) {
+				.html(function (d) {
 					return d === "USD" ? "USD (all donors)" : d;
 				});
 
@@ -2896,13 +2910,13 @@
 				.data(dropdownData)
 				.enter()
 				.append("option")
-				.property("disabled", function(d, i) {
+				.property("disabled", function (d, i) {
 					return !i || chartState.selectedCbpfs.indexOf(d) > -1;
 				})
-				.property("selected", function(d, i) {
+				.property("selected", function (d, i) {
 					return chartState.selectedCbpfs.length ? d === chartState.selectedCbpfs[chartState.selectedCbpfs.length - 1] : !i;
 				})
-				.html(function(d, i) {
+				.html(function (d, i) {
 					return i < 2 ? d : iso2Names[d];
 				});
 
@@ -2923,16 +2937,16 @@
 			radio.append("input")
 				.attr("type", "radio")
 				.attr("name", "pbicliradiobutton")
-				.attr("value", function(_, i) {
+				.attr("value", function (_, i) {
 					return i ? "local" : "usd";
 				})
-				.property("checked", function(_, i) {
+				.property("checked", function (_, i) {
 					return !i;
 				});
 
 			radio.append("span")
 				.attr("class", "pbicliRadioLabel")
-				.text(function(d) {
+				.text(function (d) {
 					return d;
 				});
 
@@ -3016,7 +3030,7 @@
 
 			const dataKeys = Object.keys(data);
 
-			rawData.forEach(function(row) {
+			rawData.forEach(function (row) {
 
 				populateAllDonors(row);
 
@@ -3024,7 +3038,7 @@
 
 				row.PooledFundISO2Code = row.PooledFundISO2Code.toLowerCase();
 
-				dataKeys.forEach(function(key) {
+				dataKeys.forEach(function (key) {
 					if (data[key].indexOf(row[dataColumns[key]].trim()) === -1) {
 						if (row[dataColumns[key]] !== "") data[key].push(row[dataColumns[key]].trim());
 					};
@@ -3056,7 +3070,7 @@
 
 			iso2Names.mk = "Macedonia";
 
-			data.yearsArray.sort(function(a, b) {
+			data.yearsArray.sort(function (a, b) {
 				return +a - +b;
 			});
 
@@ -3068,11 +3082,11 @@
 
 			data.currenciesArray.unshift("USD");
 
-			data.donorsArray.sort(function(a, b) {
+			data.donorsArray.sort(function (a, b) {
 				return totals.donorsTotals[b] - totals.donorsTotals[a];
 			});
 
-			data.cbpfsArray.sort(function(a, b) {
+			data.cbpfsArray.sort(function (a, b) {
 				return totals.cbpfsTotals[b] - totals.cbpfsTotals[a];
 			});
 
@@ -3092,21 +3106,21 @@
 
 			const selectionList = chartState.controlledBy === "donor" ? chartState.selectedDonors : chartState.selectedCbpfs;
 
-			rawData.forEach(function(row) {
+			rawData.forEach(function (row) {
 
 				if (selectionList.indexOf(row[target]) > -1) {
 
-					const foundDonor = data.donors.find(function(e) {
+					const foundDonor = data.donors.find(function (e) {
 						return e.donor === row.GMSDonorName;
 					});
 
-					const foundCbpf = data.cbpfs.find(function(e) {
+					const foundCbpf = data.cbpfs.find(function (e) {
 						return e.cbpf === row.PooledFundName;
 					});
 
 					if (foundDonor) {
 
-						const foundValue = foundDonor.values.find(function(e) {
+						const foundValue = foundDonor.values.find(function (e) {
 							return e.year === row.FiscalYear;
 						});
 
@@ -3153,7 +3167,7 @@
 
 					if (foundCbpf) {
 
-						const foundValue = foundCbpf.values.find(function(e) {
+						const foundValue = foundCbpf.values.find(function (e) {
 							return e.year === row.FiscalYear;
 						});
 
@@ -3205,14 +3219,14 @@
 				data.donors.push(allDonors);
 				data.cbpfs.length = 0;
 				data.cbpfs = [];
-				rawData.forEach(function(row) {
-					const foundCbpf = data.cbpfs.find(function(e) {
+				rawData.forEach(function (row) {
+					const foundCbpf = data.cbpfs.find(function (e) {
 						return e.cbpf === row.PooledFundName;
 					});
 
 					if (foundCbpf) {
 
-						const foundValue = foundCbpf.values.find(function(e) {
+						const foundValue = foundCbpf.values.find(function (e) {
 							return e.year === row.FiscalYear;
 						});
 
@@ -3257,18 +3271,18 @@
 				})
 			};
 
-			data.donors.forEach(function(donor) {
+			data.donors.forEach(function (donor) {
 				fillZeros(donor.values);
 			});
 
-			data.cbpfs.forEach(function(cbpf) {
+			data.cbpfs.forEach(function (cbpf) {
 				fillZeros(cbpf.values);
 			});
 
 			function fillZeros(valuesArray) {
 				if (valuesArray.length === 1) {
 					const onlyYear = +valuesArray[0].year;
-					[onlyYear - 1, onlyYear + 1].forEach(function(year) {
+					[onlyYear - 1, onlyYear + 1].forEach(function (year) {
 						valuesArray.push({
 							year: year.toString(),
 							paid: 0,
@@ -3279,15 +3293,15 @@
 							localTotal: 0
 						})
 					});
-					valuesArray.sort(function(a, b) {
+					valuesArray.sort(function (a, b) {
 						return (+a.year) - (+b.year);
 					});
 				} else {
 					const firstYear = valuesArray[0].year;
 					const lastYear = valuesArray[valuesArray.length - 1].year;
 					const thisRange = d3.range(+firstYear, +lastYear, 1);
-					thisRange.forEach(function(rangeYear) {
-						const foundYear = valuesArray.find(function(e) {
+					thisRange.forEach(function (rangeYear) {
+						const foundYear = valuesArray.find(function (e) {
 							return e.year === rangeYear.toString();
 						});
 						if (!foundYear) {
@@ -3302,7 +3316,7 @@
 							});
 						};
 					});
-					valuesArray.sort(function(a, b) {
+					valuesArray.sort(function (a, b) {
 						return (+a.year) - (+b.year);
 					});
 				};
@@ -3317,7 +3331,7 @@
 
 			allDonors.total += (+row.PaidAmt) + (+row.PledgeAmt);
 
-			const foundValueAllDonors = allDonors.values.find(function(d) {
+			const foundValueAllDonors = allDonors.values.find(function (d) {
 				return d.year === row.FiscalYear;
 			});
 
@@ -3341,7 +3355,7 @@
 
 			if (dataArray.length < 2) return;
 
-			dataArray.sort(function(a, b) {
+			dataArray.sort(function (a, b) {
 				return b.yPos - a.yPos;
 			});
 
@@ -3357,7 +3371,7 @@
 				};
 			};
 
-			dataArray.forEach(function(_, i, arr) {
+			dataArray.forEach(function (_, i, arr) {
 				if (arr[i + 1]) {
 					if (arr[i + 1].yPos > arr[i].yPos - labelGroupHeight) {
 						collideLabels(dataArray, maxValue, minValue);
@@ -3375,11 +3389,11 @@
 
 		function setTimeExtent(yearsArray) {
 
-			yearsArray = yearsArray.filter(function(d) {
+			yearsArray = yearsArray.filter(function (d) {
 				return d <= currentYear;
 			});
 
-			const timeExtent = d3.extent(yearsArray.map(function(d) {
+			const timeExtent = d3.extent(yearsArray.map(function (d) {
 				return parseTime(d);
 			}));
 
@@ -3394,8 +3408,8 @@
 
 		function setYDomain(donors, cbpfs) {
 
-			const maxDonors = d3.max(donors, function(donor) {
-				return d3.max(donor.values, function(d) {
+			const maxDonors = d3.max(donors, function (donor) {
+				return d3.max(donor.values, function (d) {
 					if (+d.year > +currentYear) {
 						return 0;
 					} else {
@@ -3404,8 +3418,8 @@
 				});
 			});
 
-			const maxCbpfs = d3.max(cbpfs, function(cbpf) {
-				return d3.max(cbpf.values, function(d) {
+			const maxCbpfs = d3.max(cbpfs, function (cbpf) {
+				return d3.max(cbpf.values, function (d) {
 					if (+d.year > +currentYear) {
 						return 0;
 					} else {
@@ -3423,8 +3437,8 @@
 
 		function setYDomainLocalCurrency(donors) {
 
-			const maxDonors = d3.max(donors, function(donor) {
-				return d3.max(donor.values, function(d) {
+			const maxDonors = d3.max(donors, function (donor) {
+				return d3.max(donor.values, function (d) {
 					if (+d.year > +currentYear) {
 						return 0;
 					} else {
@@ -3440,17 +3454,17 @@
 
 		function validateCountries(countriesString, donorsList, cbpfsList) {
 			if (!countriesString || countriesString.toLowerCase() === "none") return;
-			const namesArray = countriesString.split(",").map(function(d) {
+			const namesArray = countriesString.split(",").map(function (d) {
 				return d.trim().toLowerCase();
 			});
 			const countryCodes = Object.keys(iso2Names);
-			namesArray.forEach(function(d) {
+			namesArray.forEach(function (d) {
 				const nameSplit = d.split("@");
 				if (nameSplit.length === 1) {
-					const foundDonor = countryCodes.find(function(e) {
+					const foundDonor = countryCodes.find(function (e) {
 						return iso2Names[e].toLowerCase() === nameSplit[0] && donorsList.indexOf(e) > -1;
 					});
-					const foundCbpf = countryCodes.find(function(e) {
+					const foundCbpf = countryCodes.find(function (e) {
 						return iso2Names[e].toLowerCase() === nameSplit[0] && cbpfsList.indexOf(e) > -1;
 					});
 					if (nameSplit[0] === "all donors") chartState.selectedDonors.push("alldonors");
@@ -3458,12 +3472,12 @@
 					if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
 				} else {
 					if (nameSplit[1] === "donor") {
-						const foundDonor = countryCodes.find(function(e) {
+						const foundDonor = countryCodes.find(function (e) {
 							return iso2Names[e].toLowerCase() === nameSplit[0] && donorsList.indexOf(e) > -1;
 						});
 						if (foundDonor) chartState.selectedDonors.push(foundDonor);
 					} else if (nameSplit[1] === "fund") {
-						const foundCbpf = countryCodes.find(function(e) {
+						const foundCbpf = countryCodes.find(function (e) {
 							return iso2Names[e].toLowerCase() === nameSplit[0] && cbpfsList.indexOf(e) > -1;
 						});
 						if (foundCbpf) chartState.selectedCbpfs.push(foundCbpf);
@@ -3495,7 +3509,7 @@
 				.enter()
 				.append("div")
 				.attr("class", "pbiclialertyesorno")
-				.html(function(d) {
+				.html(function (d) {
 					return d;
 				});
 
@@ -3513,7 +3527,7 @@
 			alertDiv.append("div")
 				.html("Please select a donor with the same local currency of the previously selected donors<br><br>(click anywhere to close)");
 
-			overDiv.on("click", function() {
+			overDiv.on("click", function () {
 				overDiv.remove();
 			});
 
@@ -3563,13 +3577,13 @@
 				.style("cursor", "pointer")
 				.attr("y", 6)
 				.attr("height", 22)
-				.attr("width", function(d) {
+				.attr("width", function (d) {
 					return d.width;
 				})
-				.attr("x", function(d, i) {
+				.attr("x", function (d, i) {
 					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
 				})
-				.on("click", function(_, i) {
+				.on("click", function (_, i) {
 					iconsDiv.style("opacity", 1)
 						.style("pointer-events", "all");
 					overDiv.remove();
@@ -3579,11 +3593,11 @@
 			closeRects.append("text")
 				.attr("class", "pbicliAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", function(d, i) {
+				.attr("x", function (d, i) {
 					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
 				})
 				.attr("y", 22)
-				.text(function(d) {
+				.text(function (d) {
 					return d.text
 				});
 
@@ -3641,7 +3655,7 @@
 				text: chartState.controlledBy === "donor" ? nonSelectedText : selectedText
 			}];
 
-			helpData.forEach(function(d) {
+			helpData.forEach(function (d) {
 				helpSVG.append("rect")
 					.attr("rx", 4)
 					.attr("ry", 4)
@@ -3655,7 +3669,7 @@
 					.style("opacity", 0.5)
 					.attr("class", "pbicliHelpRectangle")
 					.attr("pointer-events", "all")
-					.on("mouseover", function() {
+					.on("mouseover", function () {
 						const self = this;
 						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
 					})
@@ -3762,20 +3776,20 @@
 			};
 
 			const selectedDonorsList = chartState.controlledBy === "donor" ?
-				sourceData.donors.map(function(d) {
+				sourceData.donors.map(function (d) {
 					return d.isoCode;
 				}) : checkedDonorsList;
 
 			const selectedCbpfsList = chartState.controlledBy === "cbpf" ?
-				sourceData.cbpfs.map(function(d) {
+				sourceData.cbpfs.map(function (d) {
 					return d.isoCode;
 				}) : checkedCbpfsList;
 
 			const allDonorsData = [];
 
 			if (selectedDonorsList.indexOf("alldonors") > -1) {
-				rawData.forEach(function(d) {
-					const found = allDonorsData.find(function(e) {
+				rawData.forEach(function (d) {
+					const found = allDonorsData.find(function (e) {
 						return e["CBPF Name"] === d.PooledFundName && e.Year === +d.FiscalYear;
 					});
 					if (found) {
@@ -3800,13 +3814,13 @@
 				});
 			};
 
-			const filteredDataRaw = rawData.filter(function(row) {
+			const filteredDataRaw = rawData.filter(function (row) {
 				return selectedDonorsList.indexOf(row.GMSDonorISO2Code.toLowerCase()) > -1 && selectedCbpfsList.indexOf(row.PooledFundISO2Code.toLowerCase()) > -1;
 			});
 
 			let filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
 
-			filteredData.forEach(function(d) {
+			filteredData.forEach(function (d) {
 				d.Year = +d.FiscalYear;
 				d["Donor Name"] = d.GMSDonorName;
 				d["CBPF Name"] = d.PooledFundName;
@@ -3837,20 +3851,20 @@
 
 			if (selectedDonorsList.indexOf("alldonors") > -1) filteredData = allDonorsData.concat(filteredData);
 
-			filteredData.sort(function(a, b) {
+			filteredData.sort(function (a, b) {
 				return (+b.Year) - (+a.Year) || (a["Donor Name"].toLowerCase() < b["Donor Name"].toLowerCase() ? -1 :
 					a["Donor Name"].toLowerCase() > b["Donor Name"].toLowerCase() ? 1 : 0) || (a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase() ? -1 :
-					a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
+						a["CBPF Name"].toLowerCase() > b["CBPF Name"].toLowerCase() ? 1 : 0);
 			});
 
 			const header = Object.keys(filteredData[0]);
 
-			const replacer = function(key, value) {
+			const replacer = function (key, value) {
 				return value === null ? '' : value
 			};
 
-			let rows = filteredData.map(function(row) {
-				return header.map(function(fieldName) {
+			let rows = filteredData.map(function (row) {
+				return header.map(function (fieldName) {
 					return JSON.stringify(row[fieldName], replacer)
 				}).join(',')
 			});
@@ -3862,58 +3876,8 @@
 			//end of createCsv
 		};
 
-		function saveFlags(donors) {
-
-			const donorsList = donors.map(function(d) {
-				return d;
-			});
-
-			donorsList.forEach(function(d) {
-				if (!localStorage.getItem("storedFlag" + d)) {
-					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags16/" + d + ".png", setLocal, null, d);
-				};
-			});
-
-			function getBase64FromImage(url, onSuccess, onError, isoCode) {
-				const xhr = new XMLHttpRequest();
-
-				xhr.responseType = "arraybuffer";
-				xhr.open("GET", url);
-
-				xhr.onload = function() {
-					let base64, binary, bytes, mediaType;
-
-					bytes = new Uint8Array(xhr.response);
-
-					binary = [].map.call(bytes, function(byte) {
-						return String.fromCharCode(byte);
-					}).join('');
-
-					mediaType = xhr.getResponseHeader('content-type');
-
-					base64 = [
-						'data:',
-						mediaType ? mediaType + ';' : '',
-						'base64,',
-						btoa(binary)
-					].join('');
-					onSuccess(isoCode, base64);
-				};
-
-				xhr.onerror = onError;
-
-				xhr.send();
-			};
-
-			function setLocal(isoCode, base64) {
-				localStorage.setItem("storedFlag" + isoCode, base64);
-			};
-
-			//end of saveFlags
-		};
-
 		function wrapText2(text, width) {
-			text.each(function() {
+			text.each(function () {
 				let text = d3.select(this),
 					words = text.text().split(/\s+/).reverse(),
 					word,
@@ -3924,10 +3888,10 @@
 					x = text.attr("x"),
 					dy = 0,
 					tspan = text.text(null)
-					.append("tspan")
-					.attr("x", x)
-					.attr("y", y)
-					.attr("dy", dy + "em");
+						.append("tspan")
+						.attr("x", x)
+						.attr("y", y)
+						.attr("dy", dy + "em");
 				while (word = words.pop()) {
 					line.push(word);
 					tspan.text(line.join(" "));
@@ -4001,7 +3965,7 @@
 
 			snapshotTooltip.style("display", "none");
 
-			html2canvas(imageDiv).then(function(canvas) {
+			html2canvas(imageDiv).then(function (canvas) {
 
 				svg.attr("width", null)
 					.attr("height", null);
@@ -4046,7 +4010,7 @@
 
 			const fileName = "ContributionTrends_" + csvDateFormat(currentDate) + ".png";
 
-			source.toBlob(function(blob) {
+			source.toBlob(function (blob) {
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement("a");
 				if (link.download !== undefined) {
@@ -4077,7 +4041,7 @@
 			};
 
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
-				.then(function(logo) {
+				.then(function (logo) {
 
 					let pdfTextPosition;
 
@@ -4112,9 +4076,9 @@
 						pdfCountries.split("-")[1] + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Currency : <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						(chartState.selectedLocalCurrency ? chartState.selectedLocalCurrency : "USD") + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Period : <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						yearsExtent[0] + " to " + currentYear + "</span></div>", pdfMargins.left, 77, {
-							width: 210 - pdfMargins.left - pdfMargins.right
-						},
-						function(position) {
+						width: 210 - pdfMargins.left - pdfMargins.right
+					},
+						function (position) {
 							pdfTextPosition = position;
 						});
 
@@ -4164,14 +4128,14 @@
 						const selection = chartState.controlledBy === "donor" ? "selectedDonors" : "selectedCbpfs";
 						const type = chartState.controlledBy === "donor" ? "Donor" : "CBPF";
 						const plural = chartState[selection].length === 1 ? "" : "s";
-						const countryList = chartState[selection].map(function(d) {
-								return iso2Names[d];
-							})
-							.sort(function(a, b) {
+						const countryList = chartState[selection].map(function (d) {
+							return iso2Names[d];
+						})
+							.sort(function (a, b) {
 								return a.toLowerCase() < b.toLowerCase() ? -1 :
 									a.toLowerCase() > b.toLowerCase() ? 1 : 0;
 							})
-							.reduce(function(acc, curr, index) {
+							.reduce(function (acc, curr, index) {
 								return acc + (index >= chartState[selection].length - 2 ? index > chartState[selection].length - 2 ? curr : curr + " and " : curr + ", ");
 							}, "");
 						return "Selected " + type + plural + "-" + countryList;
@@ -4213,9 +4177,9 @@
 			function transitionIn() {
 				wheel.transition()
 					.duration(1000)
-					.attrTween("d", function(d) {
+					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function(t) {
+						return function (t) {
 							d.endAngle = interpolate(t);
 							return arc(d)
 						}
@@ -4226,14 +4190,14 @@
 			function transitionOut() {
 				wheel.transition()
 					.duration(1000)
-					.attrTween("d", function(d) {
+					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function(t) {
+						return function (t) {
 							d.startAngle = interpolate(t);
 							return arc(d)
 						}
 					})
-					.on("end", function(d) {
+					.on("end", function (d) {
 						d.startAngle = 0;
 						transitionIn()
 					})
