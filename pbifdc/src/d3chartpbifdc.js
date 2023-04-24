@@ -15,7 +15,7 @@
 		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
 		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
-	cssLinks.forEach(function(cssLink) {
+	cssLinks.forEach(function (cssLink) {
 
 		if (!isStyleLoaded(cssLink)) {
 			const externalCSS = document.createElement("link");
@@ -35,13 +35,13 @@
 		if (hasFetch && hasURLSearchParams) {
 			loadScript(d3URL, d3Chart);
 		} else if (hasFetch && !hasURLSearchParams) {
-			loadScript(URLSearchParamsPolyfill, function() {
+			loadScript(URLSearchParamsPolyfill, function () {
 				loadScript(d3URL, d3Chart);
 			});
 		} else {
-			loadScript(fetchPolyfill1, function() {
-				loadScript(fetchPolyfill2, function() {
-					loadScript(URLSearchParamsPolyfill, function() {
+			loadScript(fetchPolyfill1, function () {
+				loadScript(fetchPolyfill2, function () {
+					loadScript(URLSearchParamsPolyfill, function () {
 						loadScript(d3URL, d3Chart);
 					});
 				});
@@ -53,8 +53,8 @@
 		} else if (hasFetch && !hasURLSearchParams) {
 			loadScript(URLSearchParamsPolyfill, d3Chart);
 		} else {
-			loadScript(fetchPolyfill1, function() {
-				loadScript(fetchPolyfill2, function() {
+			loadScript(fetchPolyfill1, function () {
+				loadScript(fetchPolyfill2, function () {
 					loadScript(URLSearchParamsPolyfill, d3Chart);
 				});
 			});
@@ -102,7 +102,7 @@
 
 		if (!Array.prototype.find) {
 			Object.defineProperty(Array.prototype, 'find', {
-				value: function(predicate) {
+				value: function (predicate) {
 					if (this == null) {
 						throw new TypeError('"this" is null or not defined');
 					}
@@ -129,7 +129,7 @@
 
 		//Math.log10
 
-		Math.log10 = Math.log10 || function(x) {
+		Math.log10 = Math.log10 || function (x) {
 			return Math.log(x) * Math.LOG10E;
 		};
 
@@ -137,9 +137,9 @@
 
 		if (!HTMLCanvasElement.prototype.toBlob) {
 			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-				value: function(callback, type, quality) {
+				value: function (callback, type, quality) {
 					var dataURL = this.toDataURL(type, quality).split(',')[1];
-					setTimeout(function() {
+					setTimeout(function () {
 
 						var binStr = atob(dataURL),
 							len = binStr.length,
@@ -162,6 +162,7 @@
 
 		const width = 900,
 			padding = [4, 6, 4, 6],
+			classPrefix = "pbifdc",
 			topPanelHeight = 60,
 			nodesPanelHeight = 580,
 			buttonsPanelHeight = 30,
@@ -204,7 +205,10 @@
 			vizNameQueryString = "funding-overview",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/funding-overview",
-			flagsDirectory = "https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/flags/",
+			blankFlag = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
+			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
+			worldMapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json",
 			flagSize = 24,
 			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -252,9 +256,9 @@
 		let selectedRegion = selectedRegionString.toLowerCase() === "all" ? "All" :
 			selectedRegionString.split(",");
 
-		if (selectedRegion !== "All" && selectedRegion.some(function(d) {
-				return d3.keys(geoRegions).indexOf(d) === -1;
-			})) {
+		if (selectedRegion !== "All" && selectedRegion.some(function (d) {
+			return d3.keys(geoRegions).indexOf(d) === -1;
+		})) {
 			selectedRegion = "All"
 		};
 
@@ -308,7 +312,7 @@
 			.attr("id", "pbifdcSnapshotTooltip")
 			.attr("class", "pbifdcSnapshotContent")
 			.style("display", "none")
-			.on("mouseleave", function() {
+			.on("mouseleave", function () {
 				isSnapshotTooltipVisible = false;
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
@@ -318,7 +322,7 @@
 		snapshotTooltip.append("p")
 			.attr("id", "pbifdcSnapshotTooltipPdfText")
 			.html("Download PDF")
-			.on("click", function() {
+			.on("click", function () {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("pdf", true);
 			});
@@ -326,7 +330,7 @@
 		snapshotTooltip.append("p")
 			.attr("id", "pbifdcSnapshotTooltipPngText")
 			.html("Download Image (PNG)")
-			.on("click", function() {
+			.on("click", function () {
 				isSnapshotTooltipVisible = false;
 				createSnapshot("png", true);
 			});
@@ -345,7 +349,7 @@
 			.attr("id", "pbifdctooltipdiv")
 			.style("display", "none");
 
-		containerDiv.on("contextmenu", function() {
+		containerDiv.on("contextmenu", function () {
 			d3.event.preventDefault();
 			const thisMouse = d3.mouse(this);
 			isSnapshotTooltipVisible = true;
@@ -456,7 +460,7 @@
 		const mapProjection = d3.geoMercator()
 			.scale((nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]) / (2 * Math.PI))
 			.translate([(nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]) / 2,
-				(nodesPanel.height - nodesPanel.padding[0] - nodesPanel.padding[2]) / 1.53
+			(nodesPanel.height - nodesPanel.padding[0] - nodesPanel.padding[2]) / 1.53
 			]);
 
 		const mapPath = d3.geoPath()
@@ -486,7 +490,7 @@
 			.tickSizeOuter(0)
 			.ticks(2)
 			.tickPadding(4)
-			.tickFormat(function(d) {
+			.tickFormat(function (d) {
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
@@ -502,45 +506,38 @@
 		if (isPfbiSite) {
 			Promise.all([
 				window.cbpfbiDataObject.contributionsTotalData,
-				window.cbpfbiDataObject.worldMap
+				window.cbpfbiDataObject.worldMap,
+				window.cbpfbiDataObject.flags
 			]).then(rawData => csvCallback(rawData));
 		} else {
-			if (localStorage.getItem("pbifdcmap")) {
-				const mapData = JSON.parse(localStorage.getItem("pbifdcmap"));
-				console.info("pbifdc: map from local storage");
-				getData(mapData);
-			} else {
-				d3.json("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json").then(function(mapData) {
-					try {
-						localStorage.setItem("pbifdcmap", JSON.stringify(mapData));
-					} catch (error) {
-						console.info("D3 chart pbifdc map, " + error);
-					};
-					console.info("pbifdc: map from API");
-					getData(mapData);
-				});
-			};
+			Promise.all([
+				fetchFile(classPrefix + "data", dataUrl, "contributions data", "csv"),
+				fetchFile(classPrefix + "map", worldMapUrl, "map data", "json"),
+				fetchFile("flags", flagsUrl, "flags data", "json")
+			]).then(rawData => csvCallback(rawData));
+		};
 
-			function getData(mapData) {
-				if (localStorage.getItem("pbiclcpbiclipbifdcdata") &&
-					JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).timestamp > (currentDate.getTime() - localStorageTime)) {
-					const apiData = d3.csvParse(JSON.parse(localStorage.getItem("pbiclcpbiclipbifdcdata")).data);
-					console.info("pbifdc: data from local storage");
-					csvCallback([apiData, mapData]);
-				} else {
-					d3.csv("https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1").then(function(apiData) {
-						try {
-							localStorage.setItem("pbiclcpbiclipbifdcdata", JSON.stringify({
-								data: d3.csvFormat(apiData),
-								timestamp: currentDate.getTime()
-							}));
-						} catch (error) {
-							console.info("D3 chart pbifdc data, " + error);
-						};
-						console.info("pbifdc: data from API");
-						csvCallback([apiData, mapData]);
-					});
-				};
+		function fetchFile(fileName, url, warningString, method) {
+			if (localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
+				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data) :
+					JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+				return Promise.resolve(fetchedData);
+			} else {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				return fetchMethod(url).then(fetchedData => {
+					try {
+						localStorage.setItem(fileName, JSON.stringify({
+							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
+							timestamp: currentDate.getTime()
+						}));
+					} catch (error) {
+						console.info(classPrefix + " chart, " + error);
+					};
+					console.info(classPrefix + " chart info: " + warningString + " from API");
+					return fetchedData;
+				});
 			};
 		};
 
@@ -548,9 +545,9 @@
 
 			removeProgressWheel();
 
-			yearsArray = rawData[0].map(function(d) {
+			yearsArray = rawData[0].map(function (d) {
 				return +d.FiscalYear
-			}).filter(function(value, index, self) {
+			}).filter(function (value, index, self) {
 				return self.indexOf(value) === index;
 			}).sort();
 
@@ -564,7 +561,7 @@
 				draw(rawData);
 			} else {
 				d3.select(window).on("scroll.pbifdc", checkPosition);
-				d3.select("body").on("d3ChartsYear.pbifdc", function() {
+				d3.select("body").on("d3ChartsYear.pbifdc", function () {
 					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
 				});
 				checkPosition();
@@ -583,6 +580,8 @@
 
 		function draw(rawData) {
 
+			const flagsData = rawData[2];
+
 			createTitle();
 
 			if (!isPfbiSite) createFooterDiv();
@@ -595,7 +594,7 @@
 
 			mapLayer.transition()
 				.duration(duration)
-				.style("opacity", function() {
+				.style("opacity", function () {
 					return chartState.showMap ? 1 : 0;
 				});
 
@@ -612,8 +611,6 @@
 			createGeoMenu();
 
 			setYearsDescriptionDiv();
-
-			if (!isInternetExplorer) saveFlags(dataObject.nodes);
 
 			if (showHelp) createAnnotationsDiv();
 
@@ -653,14 +650,14 @@
 				const pdfSpan = snapshotContent.append("p")
 					.attr("id", "pbifdcSnapshotPdfText")
 					.html("Download PDF")
-					.on("click", function() {
+					.on("click", function () {
 						createSnapshot("pdf", false);
 					});
 
 				const pngSpan = snapshotContent.append("p")
 					.attr("id", "pbifdcSnapshotPngText")
 					.html("Download Image (PNG)")
-					.on("click", function() {
+					.on("click", function () {
 						createSnapshot("png", false);
 					});
 
@@ -674,7 +671,7 @@
 					.append("span")
 					.attr("class", "fas fa-play");
 
-				playIcon.on("click", function(d) {
+				playIcon.on("click", function (d) {
 					d.clicked = !d.clicked;
 
 					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
@@ -695,7 +692,7 @@
 						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
 
 						const yearButton = d3.selectAll(".pbifdcbuttonsRects")
-							.filter(function(d) {
+							.filter(function (d) {
 								return d === chartState.selectedYear[0]
 							});
 
@@ -704,8 +701,8 @@
 						const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
 							0 :
 							chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-							yearsArray.length - buttonsNumber :
-							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+								yearsArray.length - buttonsNumber :
+								yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
 
 						const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
 
@@ -727,7 +724,7 @@
 
 						svg.select(".pbifdcbuttonsGroup").transition()
 							.duration(duration)
-							.attrTween("transform", function() {
+							.attrTween("transform", function () {
 								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
 							});
 					};
@@ -746,20 +743,20 @@
 						.attr("class", "d3chartShareDiv")
 						.style("display", "none");
 
-					shareIcon.on("mouseover", function() {
-							shareDiv.html("Click to copy")
-								.style("display", "block");
-							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-							shareDiv.style("top", thisOffsetTop + "px")
-								.style("left", thisOffsetLeft + "20px");
-						}).on("mouseout", function() {
-							shareDiv.style("display", "none");
-						})
-						.on("click", function() {
+					shareIcon.on("mouseover", function () {
+						shareDiv.html("Click to copy")
+							.style("display", "block");
+						const thisBox = this.getBoundingClientRect();
+						const containerBox = containerDiv.node().getBoundingClientRect();
+						const shareBox = shareDiv.node().getBoundingClientRect();
+						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
+						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+						shareDiv.style("top", thisOffsetTop + "px")
+							.style("left", thisOffsetLeft + "20px");
+					}).on("mouseout", function () {
+						shareDiv.style("display", "none");
+					})
+						.on("click", function () {
 
 							const newURL = bookmarkSite + queryStringValues.toString();
 
@@ -793,15 +790,15 @@
 						.style("cursor", "default");
 				};
 
-				snapshotDiv.on("mouseover", function() {
+				snapshotDiv.on("mouseover", function () {
 					snapshotContent.style("display", "block")
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					snapshotContent.style("display", "none")
 				});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
-				downloadIcon.on("click", function() {
+				downloadIcon.on("click", function () {
 
 					const csv = createCsv(rawData[0]);
 
@@ -843,7 +840,7 @@
 
 			function createMap(dataMap) {
 
-				dataMap.features.forEach(function(d) {
+				dataMap.features.forEach(function (d) {
 					centroids[d.properties.iso_a2] = {
 						x: mapPath.centroid(d.geometry)[0],
 						y: mapPath.centroid(d.geometry)[1]
@@ -870,11 +867,11 @@
 
 			function createTopPanel(data) {
 
-				const donors = data.filter(function(d) {
+				const donors = data.filter(function (d) {
 					return d.category === "Donor";
 				});
 
-				const mainValue = d3.sum(donors, function(d) {
+				const mainValue = d3.sum(donors, function (d) {
 					return d.total
 				});
 
@@ -882,8 +879,8 @@
 
 				cbpfsNumber = data.length - donors.length;
 
-				contributionType.forEach(function(d) {
-					contributionsTotals[d] = d3.sum(donors, function(e) {
+				contributionType.forEach(function (d) {
+					contributionsTotals[d] = d3.sum(donors, function (e) {
 						return e[d]
 					});
 				});
@@ -895,8 +892,8 @@
 					.append("g")
 					.attr("class", "pbifdctopPanelMoneyBag contributionColorFill")
 					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
-					.each(function(_, i, n) {
-						moneyBagdAttribute.forEach(function(d) {
+					.each(function (_, i, n) {
+						moneyBagdAttribute.forEach(function (d) {
 							d3.select(n[i]).append("path")
 								.attr("d", d);
 						});
@@ -929,10 +926,10 @@
 
 				topPanelMainValue.transition()
 					.duration(duration)
-					.tween("text", function(d) {
+					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousValue, d);
-						return function(t) {
+						return function (t) {
 							const siString = formatSIFloat(i(t))
 							node.textContent = "$" + siString.substring(0, siString.length - 1);
 						};
@@ -953,7 +950,7 @@
 				topPanelMainText.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text(function(d) {
+					.text(function (d) {
 						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
@@ -991,10 +988,10 @@
 
 				topPanelDonorsNumber.transition()
 					.duration(duration)
-					.tween("text", function(d) {
+					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousDonors, d);
-						return function(t) {
+						return function (t) {
 							node.textContent = ~~(i(t));
 						};
 					});
@@ -1022,10 +1019,10 @@
 
 				topPanelCbpfsNumber.transition()
 					.duration(duration)
-					.tween("text", function(d) {
+					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousCbpfs, d);
-						return function(t) {
+						return function (t) {
 							node.textContent = ~~(i(t));
 						};
 					});
@@ -1084,10 +1081,10 @@
 					.attr("width", buttonsPanel.buttonWidth - buttonsPanel.buttonPadding)
 					.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
 					.attr("y", buttonsPanel.buttonVerticalPadding)
-					.attr("x", function(_, i) {
+					.attr("x", function (_, i) {
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
 					});
 
@@ -1098,13 +1095,13 @@
 					.attr("text-anchor", "middle")
 					.attr("class", "pbifdcbuttonsText")
 					.attr("y", buttonsPanel.height / 1.6)
-					.attr("x", function(_, i) {
+					.attr("x", function (_, i) {
 						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
 					})
-					.style("fill", function(d) {
+					.style("fill", function (d) {
 						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return d;
 					});
 
@@ -1239,7 +1236,7 @@
 
 				buttonsRects.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
-					.on("click", function(d) {
+					.on("click", function (d) {
 						const self = this;
 						if (d3.event.altKey) {
 							clickButtonsRects(d, false);
@@ -1247,7 +1244,7 @@
 						};
 						if (localVariable.get(this) !== "clicked") {
 							localVariable.set(this, "clicked");
-							setTimeout(function() {
+							setTimeout(function () {
 								if (localVariable.get(self) === "clicked") {
 									clickButtonsRects(d, true);
 								};
@@ -1259,7 +1256,7 @@
 						};
 					});
 
-				d3.select("body").on("d3ChartsYear.pbifdc", function() {
+				d3.select("body").on("d3ChartsYear.pbifdc", function () {
 					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
 					repositionButtonsGroup();
 					checkArrows();
@@ -1269,7 +1266,7 @@
 
 				checkCurrentTranslate();
 
-				leftArrow.on("click", function() {
+				leftArrow.on("click", function () {
 					leftArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					rightArrow.select("text").style("fill", "#666");
@@ -1281,7 +1278,7 @@
 						.on("end", checkArrows);
 				});
 
-				rightArrow.on("click", function() {
+				rightArrow.on("click", function () {
 					rightArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
 					leftArrow.select("text").style("fill", "#666");
@@ -1295,20 +1292,20 @@
 						.on("end", checkArrows);
 				});
 
-				showMapGroup.on("mouseover", function() {
+				showMapGroup.on("mouseover", function () {
 					currentHoveredElem = this;
 					showMapGroupLegend.transition()
 						.duration(duration)
 						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + ",-36)")
 						.style("opacity", 1);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					showMapGroupLegend.interrupt()
 						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + "," +
 							(buttonsPanel.height * 0.6) + ")")
 						.style("opacity", 0);
-				}).on("click", function() {
+				}).on("click", function () {
 
 					chartState.showMap = !chartState.showMap;
 
@@ -1323,7 +1320,7 @@
 					showMapGroupLegend.interrupt()
 						.style("opacity", 0);
 
-					mapLayer.style("opacity", function() {
+					mapLayer.style("opacity", function () {
 						return chartState.showMap ? 1 : 0;
 					});
 
@@ -1333,20 +1330,20 @@
 
 				});
 
-				showNamesGroup.on("mouseover", function() {
+				showNamesGroup.on("mouseover", function () {
 					currentHoveredElem = this;
 					showNamesGroupLegend.transition()
 						.duration(duration)
 						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + ",-36)")
 						.style("opacity", 1);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					showNamesGroupLegend.interrupt()
 						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + "," +
 							(buttonsPanel.height * 0.6) + ")")
 						.style("opacity", 0);
-				}).on("click", function() {
+				}).on("click", function () {
 
 					chartState.showNames = !chartState.showNames;
 
@@ -1412,8 +1409,8 @@
 					const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
 						0 :
 						chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-						yearsArray.length - buttonsNumber :
-						yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+							yearsArray.length - buttonsNumber :
+							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
 
 					buttonsGroup.attr("transform", "translate(" +
 						(-(buttonsPanel.buttonWidth * firstYearIndex)) +
@@ -1437,17 +1434,17 @@
 
 				const simulationTypes = {
 					geoSimulation: d3.forceSimulation()
-						.force("link", d3.forceLink().id(function(d) {
+						.force("link", d3.forceLink().id(function (d) {
 							return d.uniqueId;
 						}).strength(0))
-						.force("x", d3.forceX(function(d) {
+						.force("x", d3.forceX(function (d) {
 							if (centroids[d.isoCode] && centroids[d.isoCode].x === centroids[d.isoCode].x) {
 								return centroids[d.isoCode].x;
 							} else {
 								return centroids.CH.x;
 							}
 						}).strength(1))
-						.force("y", d3.forceY(function(d) {
+						.force("y", d3.forceY(function (d) {
 							if (centroids[d.isoCode] && centroids[d.isoCode].y === centroids[d.isoCode].y) {
 								return centroids[d.isoCode].y;
 							} else {
@@ -1455,12 +1452,12 @@
 							}
 						}).strength(1)),
 					naturalSimulation: d3.forceSimulation()
-						.force("link", d3.forceLink().id(function(d) {
+						.force("link", d3.forceLink().id(function (d) {
 							return d.uniqueId;
 						}))
 						.force("charge", d3.forceManyBody())
 						.force("center", d3.forceCenter(nodesPanel.width / 2, nodesPanel.height / 2))
-						.force("collide", d3.forceCollide(function(d) {
+						.force("collide", d3.forceCollide(function (d) {
 							return minNodeCollide + nodeSizeScale(d.total) * collideMargin;
 						}))
 						.force("boundary", forceBoundary(nodesPanel.padding[3] + maxNodeSize, nodesPanel.padding[0] + maxNodeSize,
@@ -1473,15 +1470,15 @@
 
 				const thisLinkScale = chartState.showMap ? linksWidthMapScale : linksWidthScale;
 
-				thisNodeScale.domain([0, d3.max(dataNodes, function(d) {
+				thisNodeScale.domain([0, d3.max(dataNodes, function (d) {
 					return d.total;
 				})]);
 
-				thisLinkScale.domain([0, d3.max(dataLinks, function(d) {
+				thisLinkScale.domain([0, d3.max(dataLinks, function (d) {
 					return d.total;
 				})]);
 
-				strokeOpacityScale.domain([0, d3.max(dataLinks, function(d) {
+				strokeOpacityScale.domain([0, d3.max(dataLinks, function (d) {
 					return d.total;
 				})]);
 
@@ -1495,7 +1492,7 @@
 				for (let i = 0; i < simulationsNumber; ++i) simulation.tick();
 
 				let links = linksLayer.selectAll(".pbifdcLinks")
-					.data(dataLinks, function(d) {
+					.data(dataLinks, function (d) {
 						return d.source.uniqueId + d.target.uniqueId;
 					});
 
@@ -1512,7 +1509,7 @@
 					.style("stroke", "#ccc")
 					.attr("stroke-width", 0)
 					.attr("class", "pbifdcLinks")
-					.attr("d", function(d) {
+					.attr("d", function (d) {
 						const sweepFlag = (~~(Math.random() * 2));
 						localVariable.set(this, sweepFlag);
 						const dx = d.target.x - d.source.x,
@@ -1521,7 +1518,7 @@
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
 							d.target.x + "," + d.target.y;
 					})
-					.attr("transform", function() {
+					.attr("transform", function () {
 						if (!chartState.showMap) {
 							return "translate(0,0) scale(1)";
 						} else {
@@ -1533,17 +1530,17 @@
 
 				links.transition()
 					.duration(duration)
-					.style("opacity", function(d) {
+					.style("opacity", function (d) {
 						return strokeOpacityScale(d.total)
 					})
-					.attr("stroke-width", function(d) {
+					.attr("stroke-width", function (d) {
 						if (!chartState.showMap) {
 							return thisLinkScale(d.total)
 						} else {
 							return thisLinkScale(d.total) / currentTransform.k;
 						};
 					})
-					.attr("d", function(d) {
+					.attr("d", function (d) {
 						const sweepFlag = localVariable.get(this);
 						const dx = d.target.x - d.source.x,
 							dy = d.target.y - d.source.y,
@@ -1551,7 +1548,7 @@
 						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
 							d.target.x + "," + d.target.y;
 					})
-					.attr("transform", function() {
+					.attr("transform", function () {
 						if (!chartState.showMap) {
 							return "translate(0,0) scale(1)";
 						} else {
@@ -1560,7 +1557,7 @@
 					});
 
 				let nodeCircle = nodesLayer.selectAll(".pbifdcNodeCircle")
-					.data(dataNodes, function(d) {
+					.data(dataNodes, function (d) {
 						return d.uniqueId;
 					});
 
@@ -1573,21 +1570,21 @@
 				const nodeCircleEnter = nodeCircle.enter()
 					.append("circle")
 					.attr("r", 0)
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.attr("class", function(d) {
+					.attr("class", function (d) {
 						return d.category === "Donor" ? "pbifdcNodeCircle contributionColorFill" :
 							"pbifdcNodeCircle allocationColorFill"
 					})
@@ -1598,7 +1595,7 @@
 
 				if (chartState.showMap) {
 
-					nodeCircle.sort(function(a, b) {
+					nodeCircle.sort(function (a, b) {
 						return b.total - a.total;
 					});
 
@@ -1606,29 +1603,29 @@
 
 				nodeCircle.transition()
 					.duration(duration)
-					.attr("r", function(d) {
+					.attr("r", function (d) {
 						return thisNodeScale(d.total);
 					})
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.on("end", function() {
+					.on("end", function () {
 						if (chartState.showMap) callZoom();
 					});
 
 				let nodesLabelGroup = nodesLabelLayer.selectAll(".pbifdcNodesLabelGroup")
-					.data(dataNodes, function(d) {
+					.data(dataNodes, function (d) {
 						return d.uniqueId;
 					});
 
@@ -1646,30 +1643,30 @@
 
 				const nodesLabelBack = nodesLabelGroupEnter.append("text")
 					.attr("class", "pbifdcNodesLabelBack")
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.attr("dx", function(d) {
+					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
-					.text(function(d) {
+					.text(function (d) {
 						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
 							d.labelText[0];
 					})
-					.each(function(d) {
+					.each(function (d) {
 						if (d.labelText.length > 1) {
 							d3.select(this).append("tspan")
 								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
@@ -1682,30 +1679,30 @@
 
 				const nodesLabel = nodesLabelGroupEnter.append("text")
 					.attr("class", "pbifdcNodesLabel")
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.attr("dx", function(d) {
+					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
 					.style("opacity", chartState.showNames ? 1 : 0)
 					.attr("pointer-events", chartState.showNames ? "all" : "none")
-					.text(function(d) {
+					.text(function (d) {
 						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
 							d.labelText[0];
 					})
-					.each(function(d) {
+					.each(function (d) {
 						if (d.labelText.length > 1) {
 							d3.select(this).append("tspan")
 								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
@@ -1725,49 +1722,49 @@
 				nodesLabelGroup.select("text.pbifdcNodesLabelBack")
 					.transition()
 					.duration(duration)
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.attr("dx", function(d) {
+					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
 
 				nodesLabelGroup.select("text.pbifdcNodesLabel")
 					.transition()
 					.duration(duration)
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
 							return d.x * currentTransform.k + currentTransform.x;
 						};
 					})
-					.attr("y", function(d) {
+					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
 							return d.y * currentTransform.k + currentTransform.y;
 						};
 					})
-					.attr("dx", function(d) {
+					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
 
 				nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
 					.transition()
 					.duration(duration)
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x + thisNodeScale(d.total) + labelPadding;
 						} else {
@@ -1778,7 +1775,7 @@
 				nodesLabelGroup.select(".pbifdcNodesLabel tspan")
 					.transition()
 					.duration(duration)
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x + thisNodeScale(d.total) + labelPadding;
 						} else {
@@ -1795,7 +1792,7 @@
 				links.on("mouseover", null)
 					.on("mouseout", null);
 
-				d3.timeout(function() {
+				d3.timeout(function () {
 					nodeCircle.on("mouseover", nodeMouseOver)
 						.on("mouseout", nodeLinkMouseOut);
 
@@ -1831,41 +1828,41 @@
 						mapContainer.select("path")
 							.attr("stroke-width", 1 / d3.event.transform.k + "px");
 
-						nodeCircle.attr("cx", function(d) {
-								return d.x * d3.event.transform.k + d3.event.transform.x;
-							})
-							.attr("cy", function(d) {
+						nodeCircle.attr("cx", function (d) {
+							return d.x * d3.event.transform.k + d3.event.transform.x;
+						})
+							.attr("cy", function (d) {
 								return d.y * d3.event.transform.k + d3.event.transform.y;
 							});
 
 						nodesLabelGroup.select("text.pbifdcNodesLabelBack")
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								return d.x * d3.event.transform.k + d3.event.transform.x;
 							})
-							.attr("y", function(d) {
+							.attr("y", function (d) {
 								return d.y * d3.event.transform.k + d3.event.transform.y;
 							});
 
 						nodesLabelGroup.select("text.pbifdcNodesLabel")
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								return d.x * d3.event.transform.k + d3.event.transform.x;
 							})
-							.attr("y", function(d) {
+							.attr("y", function (d) {
 								return d.y * d3.event.transform.k + d3.event.transform.y;
 							});
 
 						nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
 							});
 
 						nodesLabelGroup.select(".pbifdcNodesLabel tspan")
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
 							});
 
 						links.attr("transform", d3.event.transform)
-							.attr("stroke-width", function(d) {
+							.attr("stroke-width", function (d) {
 								return thisLinkScale(d.total) / d3.event.transform.k;
 							});
 
@@ -1883,29 +1880,29 @@
 						currentTransform = d3.zoomTransform(nodesPanel.main.node());
 					};
 
-					const connections = datum.connections.map(function(d) {
+					const connections = datum.connections.map(function (d) {
 						return d.uniqueId;
 					});
 
-					const connectedNodes = nodeCircle.filter(function(d) {
+					const connectedNodes = nodeCircle.filter(function (d) {
 						return connections.indexOf(d.uniqueId) > -1;
 					});
 
-					const connectedLabels = nodesLabelGroup.filter(function(d) {
+					const connectedLabels = nodesLabelGroup.filter(function (d) {
 						return connections.indexOf(d.uniqueId) > -1;
 					});
 
 					connections.push(datum.uniqueId);
 
-					nodeCircle.style("opacity", function(d) {
+					nodeCircle.style("opacity", function (d) {
 						return connections.indexOf(d.uniqueId) > -1 ? 1 : 0;
 					});
 
-					nodesLabelGroup.style("opacity", function(d) {
+					nodesLabelGroup.style("opacity", function (d) {
 						return connections.indexOf(d.uniqueId) > -1 ? 1 : 0;
 					});
 
-					links.style("opacity", function(d) {
+					links.style("opacity", function (d) {
 						return d.source.uniqueId === datum.uniqueId || d.target.uniqueId === datum.uniqueId ?
 							strokeOpacityScale(d.total) : 0;
 					});
@@ -1914,8 +1911,8 @@
 
 					connectedNodes.transition()
 						.duration(duration / 2)
-						.attr("r", function(d) {
-							const thisDatum = datum.connections.find(function(e) {
+						.attr("r", function (d) {
+							const thisDatum = datum.connections.find(function (e) {
 								return d.uniqueId === e.uniqueId;
 							});
 							return thisNodeScale(thisDatum.total);
@@ -1924,8 +1921,8 @@
 					connectedLabels.select("text.pbifdcNodesLabelBack")
 						.transition()
 						.duration(duration / 2)
-						.attr("dx", function(d) {
-							const thisDatum = datum.connections.find(function(e) {
+						.attr("dx", function (d) {
+							const thisDatum = datum.connections.find(function (e) {
 								return d.uniqueId === e.uniqueId;
 							});
 							localVariable.set(this.parentNode, thisDatum);
@@ -1935,7 +1932,7 @@
 					connectedLabels.select("text.pbifdcNodesLabel")
 						.transition()
 						.duration(duration / 2)
-						.attr("dx", function(d) {
+						.attr("dx", function (d) {
 							const thisDatum = localVariable.get(this);
 							return thisNodeScale(thisDatum.total) + labelPadding;
 						});
@@ -1943,7 +1940,7 @@
 					connectedLabels.select(".pbifdcNodesLabelBack tspan")
 						.transition()
 						.duration(duration / 2)
-						.attr("x", function(d) {
+						.attr("x", function (d) {
 							const thisDatum = localVariable.get(this);
 							if (!chartState.showMap) {
 								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
@@ -1955,7 +1952,7 @@
 					connectedLabels.select(".pbifdcNodesLabel tspan")
 						.transition()
 						.duration(duration / 2)
-						.attr("x", function(d) {
+						.attr("x", function (d) {
 							const thisDatum = localVariable.get(this);
 							if (!chartState.showMap) {
 								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
@@ -1975,57 +1972,57 @@
 						currentTransform = d3.zoomTransform(nodesPanel.main.node());
 					};
 
-					nodeCircle.style("opacity", function(d) {
+					nodeCircle.style("opacity", function (d) {
 						return d.uniqueId === datum.source.uniqueId || d.uniqueId === datum.target.uniqueId ?
 							1 : 0;
 					});
 
-					nodesLabelGroup.style("opacity", function(d) {
+					nodesLabelGroup.style("opacity", function (d) {
 						return d.uniqueId === datum.source.uniqueId || d.uniqueId === datum.target.uniqueId ?
 							1 : 0;
 					});
 
 					links.style("opacity", 0);
 
-					d3.select(this).style("opacity", function(d) {
+					d3.select(this).style("opacity", function (d) {
 						return strokeOpacityScale(d.total);
 					});
 
-					const thisValue = datum.source.connections.find(function(d) {
+					const thisValue = datum.source.connections.find(function (d) {
 						return d.uniqueId === datum.target.uniqueId;
 					}).total;
 
-					[datum.source, datum.target].forEach(function(thisDatum) {
+					[datum.source, datum.target].forEach(function (thisDatum) {
 
-						nodeCircle.filter(function(d) {
-								return d.uniqueId === thisDatum.uniqueId;
-							})
+						nodeCircle.filter(function (d) {
+							return d.uniqueId === thisDatum.uniqueId;
+						})
 							.transition()
 							.duration(duration / 2)
 							.attr("r", thisNodeScale(thisValue));
 
-						const connectedLabels = nodesLabelGroup.filter(function(d) {
+						const connectedLabels = nodesLabelGroup.filter(function (d) {
 							return d.uniqueId === thisDatum.uniqueId;
 						});
 
 						connectedLabels.select("text.pbifdcNodesLabelBack")
 							.transition()
 							.duration(duration / 2)
-							.attr("dx", function(d) {
+							.attr("dx", function (d) {
 								return thisNodeScale(thisValue) + labelPadding;
 							});
 
 						connectedLabels.select("text.pbifdcNodesLabel")
 							.transition()
 							.duration(duration / 2)
-							.attr("dx", function(d) {
+							.attr("dx", function (d) {
 								return thisNodeScale(thisValue) + labelPadding;
 							});
 
 						connectedLabels.select(".pbifdcNodesLabelBack tspan")
 							.transition()
 							.duration(duration / 2)
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								if (!chartState.showMap) {
 									return d.x + thisNodeScale(thisValue) + labelPadding;
 								} else {
@@ -2036,7 +2033,7 @@
 						connectedLabels.select(".pbifdcNodesLabel tspan")
 							.transition()
 							.duration(duration / 2)
-							.attr("x", function(d) {
+							.attr("x", function (d) {
 								if (!chartState.showMap) {
 									return d.x + thisNodeScale(thisValue) + labelPadding;
 								} else {
@@ -2061,24 +2058,24 @@
 					nodesLabelGroup.selectAll("*").interrupt();
 
 					nodeCircle.style("opacity", 1)
-						.attr("r", function(d) {
+						.attr("r", function (d) {
 							return thisNodeScale(d.total);
 						});
 
 					nodesLabelGroup.style("opacity", 1);
 
 					nodesLabelGroup.select("text.pbifdcNodesLabelBack")
-						.attr("dx", function(d) {
+						.attr("dx", function (d) {
 							return thisNodeScale(d.total) + labelPadding;
 						});
 
 					nodesLabelGroup.select("text.pbifdcNodesLabel")
-						.attr("dx", function(d) {
+						.attr("dx", function (d) {
 							return thisNodeScale(d.total) + labelPadding;
 						});
 
 					nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
-						.attr("x", function(d) {
+						.attr("x", function (d) {
 							if (!chartState.showMap) {
 								return d.x + thisNodeScale(d.total) + labelPadding;
 							} else {
@@ -2087,7 +2084,7 @@
 						});
 
 					nodesLabelGroup.select(".pbifdcNodesLabel tspan")
-						.attr("x", function(d) {
+						.attr("x", function (d) {
 							if (!chartState.showMap) {
 								return d.x + thisNodeScale(d.total) + labelPadding;
 							} else {
@@ -2095,7 +2092,7 @@
 							};
 						});
 
-					links.style("opacity", function(d) {
+					links.style("opacity", function (d) {
 						return strokeOpacityScale(d.total);
 					});
 
@@ -2164,7 +2161,7 @@
 					.data(["Donor", "CBPF"])
 					.enter()
 					.append("g")
-					.attr("transform", function(_, i) {
+					.attr("transform", function (_, i) {
 						return "translate(" + legendPanel.padding[3] + "," + (legendPanel.padding[0] + 76 + i * 20) + ")";
 					});
 
@@ -2174,7 +2171,7 @@
 					.attr("rx", 2)
 					.attr("ry", 2)
 					.style("stroke", "darkslategray")
-					.attr("class", function(_, i) {
+					.attr("class", function (_, i) {
 						return i ? "allocationColorFill" : "contributionColorFill";
 					});
 
@@ -2183,7 +2180,7 @@
 					.attr("y", 12)
 					.style("cursor", "default")
 					.attr("class", "pbifdcLegendTextSmall")
-					.text(function(_, i) {
+					.text(function (_, i) {
 						return i ? "CBPF" : "Donor";
 					});
 
@@ -2211,10 +2208,10 @@
 					.attr("height", 80)
 					.style("opacity", 0);
 
-				const nodeSizeData = d3.extent(dataNodes, function(d) {
+				const nodeSizeData = d3.extent(dataNodes, function (d) {
 					return d.total;
-				}).map(function(d) {
-					return dataNodes.find(function(e) {
+				}).map(function (d) {
+					return dataNodes.find(function (e) {
 						return e.total === d;
 					});
 				}).reverse();
@@ -2228,10 +2225,10 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", function(_, i) {
+					.attr("y", function (_, i) {
 						return i ? legendPanel.padding[0] + 216 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 216;
 					})
-					.text(function(_, i) {
+					.text(function (_, i) {
 						return i ? "Smallest node:" : "Biggest node:"
 					});
 
@@ -2239,20 +2236,20 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", function(_, i) {
+					.attr("y", function (_, i) {
 						return i ? legendPanel.padding[0] + 232 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 232;
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return d.name + " (" + d.category + "): $" + formatMoney0Decimals(d.total);
 					})
-					.each(function(d) {
+					.each(function (d) {
 						let currentFontSize = parseInt(d3.style(this, "font-size"));
 						while (this.getComputedTextLength() > legendPanel.width - legendPanel.padding[3]) {
 							d3.select(this).style("font-size", --currentFontSize);
 						};
 					});
 
-				const maxNodeValue = d3.max(dataNodes, function(d) {
+				const maxNodeValue = d3.max(dataNodes, function (d) {
 					return d.total;
 				});
 
@@ -2266,11 +2263,11 @@
 				const nodeSizeLines = nodeSizeCircleGroup.append("line")
 					.attr("x1", legendPanel.padding[3] + thisNodeScale.range()[1])
 					.attr("x2", legendPanel.padding[3] + thisNodeScale.range()[1] + 70)
-					.attr("y1", function(d) {
+					.attr("y1", function (d) {
 						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
 							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
 					})
-					.attr("y2", function(d) {
+					.attr("y2", function (d) {
 						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
 							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
 					})
@@ -2280,10 +2277,10 @@
 
 				const nodeSizeCircles = nodeSizeCircleGroup.append("circle")
 					.attr("cx", legendPanel.padding[3] + thisNodeScale.range()[1])
-					.attr("cy", function(d) {
+					.attr("cy", function (d) {
 						return legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d);
 					})
-					.attr("r", function(d) {
+					.attr("r", function (d) {
 						return !d ? 0 : thisNodeScale(d);
 					})
 					.style("fill", "none")
@@ -2292,17 +2289,17 @@
 				const nodeSizeCirclesText = nodeSizeCircleGroup.append("text")
 					.attr("class", "pbifdcLegendTextSmall3")
 					.attr("x", legendPanel.padding[3] + thisNodeScale.range()[1] + 74)
-					.attr("y", function(d, i) {
+					.attr("y", function (d, i) {
 						if (chartState.showMap) {
 							return i === 1 ? legendPanel.padding[0] + 255 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
 								!i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) :
-								legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2;
+									legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2;
 						} else {
 							return i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
 								legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2);
 						}
 					})
-					.text(function(d) {
+					.text(function (d) {
 						if (!d) {
 							return "0"
 						} else {
@@ -2337,10 +2334,10 @@
 					.attr("height", 80)
 					.style("opacity", 0);
 
-				const linkWidthData = d3.extent(dataLinks, function(d) {
+				const linkWidthData = d3.extent(dataLinks, function (d) {
 					return d.total;
-				}).map(function(d) {
-					return dataLinks.find(function(e) {
+				}).map(function (d) {
+					return dataLinks.find(function (e) {
 						return e.total === d;
 					});
 				}).reverse();
@@ -2354,10 +2351,10 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", function(_, i) {
+					.attr("y", function (_, i) {
 						return legendPanel.padding[0] + 391 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
-					.text(function(_, i) {
+					.text(function (_, i) {
 						return i ? "Smallest individual donation:" : "Biggest individual donation:"
 					});
 
@@ -2365,22 +2362,22 @@
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3] + 50)
-					.attr("y", function(_, i) {
+					.attr("y", function (_, i) {
 						return legendPanel.padding[0] + 407 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return d.source.name + " to " + d.target.name + ",";
 					})
 					.append("tspan")
 					.attr("x", legendPanel.padding[3] + 50)
-					.attr("y", function(_, i) {
+					.attr("y", function (_, i) {
 						return legendPanel.padding[0] + 423 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return "$" + formatMoney0Decimals(d.total)
 					});
 
-				linkWidthSubText.each(function() {
+				linkWidthSubText.each(function () {
 					let elementFontSize = parseInt(d3.style(this.parentNode, "font-size"));
 					while (this.parentNode.getBoundingClientRect().width > (legendPanel.width - legendPanel.padding[3] - legendPanel.padding[1] - 50)) {
 						d3.select(this.parentNode).style("font-size", --elementFontSize);
@@ -2390,64 +2387,64 @@
 				const linkWidthLinks = linkWidthGroup.append("line")
 					.attr("x1", legendPanel.padding[3])
 					.attr("x2", legendPanel.padding[3] + 40)
-					.attr("y1", function(d, i) {
+					.attr("y1", function (d, i) {
 						return legendPanel.padding[0] + 411 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
-					.attr("y2", function(d, i) {
+					.attr("y2", function (d, i) {
 						return legendPanel.padding[0] + 411 + (thisNodeScale.range()[1] * 2) + (i * 53);
 					})
 					.style("stroke", "#ccc")
 					.style("opacity", 0.5)
-					.attr("stroke-width", function(d) {
+					.attr("stroke-width", function (d) {
 						return thisLinkScale(d.total)
 					});
 
-				legendColorGroups.on("mouseover", function(d) {
+				legendColorGroups.on("mouseover", function (d) {
 					currentHoveredElem = this;
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function(e) {
+						.style("opacity", function (e) {
 							return e.category === d ? 1 : 0;
 						});
 					nodesPanel.main.selectAll(".pbifdcLinks")
 						.style("opacity", 0);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					restoreNodesPanel();
 				});
 
-				nodeSizeGroup.on("mouseover", function(d) {
+				nodeSizeGroup.on("mouseover", function (d) {
 					currentHoveredElem = this;
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function(e) {
+						.style("opacity", function (e) {
 							return e.uniqueId === d.uniqueId ? 1 : 0;
 						});
 					nodesPanel.main.selectAll(".pbifdcLinks")
 						.style("opacity", 0);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					nodeSizeCircles.style("opacity", 1);
 					restoreNodesPanel();
 				});
 
-				linkWidthGroup.on("mouseover", function(d) {
+				linkWidthGroup.on("mouseover", function (d) {
 					currentHoveredElem = this;
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function(e) {
+						.style("opacity", function (e) {
 							return e.uniqueId === d.source.uniqueId || e.uniqueId === d.target.uniqueId ? 1 : 0;
 						});
 					nodesPanel.main.selectAll(".pbifdcLinks")
-						.style("opacity", function(e) {
+						.style("opacity", function (e) {
 							return e.source.uniqueId === d.source.uniqueId && e.target.uniqueId === d.target.uniqueId ? 1 : 0;
 						});
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					restoreNodesPanel();
 				});
 
-				sizeRectangle.on("mouseover", function() {
+				sizeRectangle.on("mouseover", function () {
 					currentHoveredElem = this;
 					sizeTitle.transition()
 						.duration(duration)
@@ -2458,7 +2455,7 @@
 					sizeText.transition()
 						.duration(duration)
 						.style("opacity", 1);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					sizeTitle.interrupt()
@@ -2469,7 +2466,7 @@
 						.style("opacity", 0);
 				});
 
-				linkRectangle.on("mouseover", function() {
+				linkRectangle.on("mouseover", function () {
 					currentHoveredElem = this;
 					linkTitle.transition()
 						.duration(duration)
@@ -2480,7 +2477,7 @@
 					linkText.transition()
 						.duration(duration)
 						.style("opacity", 1);
-				}).on("mouseout", function() {
+				}).on("mouseout", function () {
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 					linkTitle.interrupt()
@@ -2495,7 +2492,7 @@
 					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
 						.style("opacity", 1);
 					nodesPanel.main.selectAll(".pbifdcLinks")
-						.style("opacity", function(d) {
+						.style("opacity", function (d) {
 							return strokeOpacityScale(d.total);
 						});
 				};
@@ -2537,9 +2534,7 @@
 						.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 						.attr("width", flagSize)
 						.attr("height", flagSize)
-						.attr("xlink:href", localStorage.getItem("storedFlag" + datum.isoCode.toLowerCase()) ?
-							localStorage.getItem("storedFlag" + datum.isoCode.toLowerCase()) :
-							flagsDirectory + datum.isoCode.toLowerCase() + ".png");
+						.attr("href", !datum.isoCode || !flagsData[datum.isoCode.toLowerCase()] ? blankFlag : flagsData[datum.isoCode.toLowerCase()]);
 
 				};
 
@@ -2593,7 +2588,7 @@
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 152)
 					.text(datum.category === "Donor" ? "Donated to: " + (datum.connections.length === 1 ?
-							datum.connections.length + " CBPF" : datum.connections.length + " CBPFs") :
+						datum.connections.length + " CBPF" : datum.connections.length + " CBPFs") :
 						"Received from: " + (datum.connections.length === 1 ? datum.connections.length + " donor" :
 							datum.connections.length + " donors"));
 
@@ -2611,12 +2606,12 @@
 					lollipopGroupHeight -= 0.2;
 				};
 
-				datum.connections.sort(function(a, b) {
+				datum.connections.sort(function (a, b) {
 					return b.total - a.total;
 				});
 
 				yScaleLegend.range([230, 230 + datum.connections.length * lollipopGroupHeight])
-					.domain(datum.connections.map(function(d) {
+					.domain(datum.connections.map(function (d) {
 						return d.name;
 					}));
 
@@ -2626,15 +2621,15 @@
 
 				let biggestLabel = 0;
 
-				yAxisLegendGroup.selectAll("text").each(function(d) {
+				yAxisLegendGroup.selectAll("text").each(function (d) {
 					const thisLenght = this.getComputedTextLength();
 					biggestLabel = thisLenght > biggestLabel ? thisLenght : biggestLabel;
 				});
 
 				xScaleLegend.range([legendPanel.padding[3] + (~~biggestLabel) + yAxisLegend.tickPadding(),
-						legendPanel.width - legendPanel.padding[1] - 40
-					])
-					.domain([0, d3.max(datum.connections, function(d) {
+				legendPanel.width - legendPanel.padding[1] - 40
+				])
+					.domain([0, d3.max(datum.connections, function (d) {
 						return d.total;
 					})]);
 
@@ -2648,7 +2643,7 @@
 					.call(xAxisLegend);
 
 				xAxisLegendGroup.selectAll(".tick")
-					.filter(function(d) {
+					.filter(function (d) {
 						return d === 0;
 					})
 					.remove();
@@ -2657,10 +2652,10 @@
 
 				function separateTicks(selection) {
 					if (selection.size() < 2) return;
-					const firstTick = selection.filter(function(_, i) {
+					const firstTick = selection.filter(function (_, i) {
 						return !i
 					}).select("text");
-					const secondTick = selection.filter(function(_, i) {
+					const secondTick = selection.filter(function (_, i) {
 						return i
 					}).select("text");
 					const minimumSeparation = 6;
@@ -2677,7 +2672,7 @@
 					.data(datum.connections)
 					.enter()
 					.append("g")
-					.attr("transform", function(d) {
+					.attr("transform", function (d) {
 						return "translate(0," + yScaleLegend(d.name) + ")";
 					});
 
@@ -2685,13 +2680,13 @@
 					.attr("x", xScaleLegend(0))
 					.attr("y", -(stickHeight / 2 - (stickHeight / 4)))
 					.attr("height", stickHeight)
-					.attr("width", function(d) {
+					.attr("width", function (d) {
 						return xScaleLegend(d.total) - xScaleLegend(0);
 					})
 					.classed(lollipopClass, true);
 
 				const lollipop = lollipopGroups.append("circle")
-					.attr("cx", function(d) {
+					.attr("cx", function (d) {
 						return xScaleLegend(d.total);
 					})
 					.attr("cy", (stickHeight / 4))
@@ -2701,10 +2696,10 @@
 				const legendLabel = lollipopGroups.append("text")
 					.attr("class", "pbifdcLegendLabel")
 					.attr("y", verticalLabelPadding)
-					.attr("x", function(d) {
+					.attr("x", function (d) {
 						return xScaleLegend(d.total) + legendLabelPadding;
 					})
-					.text(function(d) {
+					.text(function (d) {
 						return formatNumberSI(d.total).replace("G", "B");
 					});
 
@@ -2743,9 +2738,7 @@
 					.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 					.attr("width", flagSize)
 					.attr("height", flagSize)
-					.attr("xlink:href", localStorage.getItem("storedFlag" + datum.source.isoCode.toLowerCase()) ?
-						localStorage.getItem("storedFlag" + datum.source.isoCode.toLowerCase()) :
-						flagsDirectory + datum.source.isoCode.toLowerCase() + ".png");
+					.attr("href", !datum.isoCode || !flagsData[datum.isoCode.toLowerCase()] ? blankFlag : flagsData[datum.isoCode.toLowerCase()]);
 
 				const legendTitleCategoryCbpf = linkLegendGroup.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
@@ -2846,18 +2839,18 @@
 					.append("g")
 					.attr("class", "pbifdcGeoMenuGroups")
 					.attr("pointer-events", "none")
-					.attr("transform", function(_, i) {
+					.attr("transform", function (_, i) {
 						return "translate(" + geoMenuPanel.padding[3] + "," + (geoMenuPanel.padding[0] + 22 * i) + ")";
 					});
 
 				const geoMenuText = geoMenuGroups.append("text")
 					.attr("class", "pbifdcGeoMenuText")
 					.attr("x", 0)
-					.text(function(d) {
+					.text(function (d) {
 						return d;
 					});
 
-				geoMenuGroups.each(function(d) {
+				geoMenuGroups.each(function (d) {
 					if (d !== "All") {
 						d3.select(this).append("rect")
 							.attr("width", 14)
@@ -2895,13 +2888,13 @@
 				if (chartState.selectedRegion === "All") {
 					geoMenuInnerCircle.style("fill", "darkslategray")
 				} else {
-					geoMenuCheckmarks.filter(function(d) {
-							return chartState.selectedRegion.indexOf(d) > -1
-						})
+					geoMenuCheckmarks.filter(function (d) {
+						return chartState.selectedRegion.indexOf(d) > -1
+					})
 						.style("stroke", "darkslategray");
 				};
 
-				geoMenuContainer.on("mouseover", function() {
+				geoMenuContainer.on("mouseover", function () {
 
 					currentHoveredElem = this;
 
@@ -2921,7 +2914,7 @@
 
 					geoMenuGroups.attr("pointer-events", "all");
 
-				}).on("mouseleave", function() {
+				}).on("mouseleave", function () {
 
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
@@ -2941,7 +2934,7 @@
 
 				});
 
-				geoMenuGroups.on("click", function(d) {
+				geoMenuGroups.on("click", function (d) {
 					if (d === "All") {
 						chartState.selectedRegion = "All";
 						geoMenuCheckmarks.style("stroke", "none");
@@ -2974,13 +2967,13 @@
 							};
 						};
 						geoMenuInnerCircle.style("fill", "none");
-						geoMenuCheckmarks.style("stroke", function(e) {
+						geoMenuCheckmarks.style("stroke", function (e) {
 							return chartState.selectedRegion.indexOf(e) > -1 ? "darkslategray" : "none";
 						});
 					};
 
 					const allRegions = chartState.selectedRegion === "All" ? "All" :
-						chartState.selectedRegion.map(function(d) {
+						chartState.selectedRegion.map(function (d) {
 							return d;
 						}).join("|");
 
@@ -3020,7 +3013,7 @@
 					};
 				};
 
-				const allYears = chartState.selectedYear.map(function(d) {
+				const allYears = chartState.selectedYear.map(function (d) {
 					return d;
 				}).join("|");
 
@@ -3031,12 +3024,12 @@
 				};
 
 				d3.selectAll(".pbifdcbuttonsRects")
-					.style("fill", function(e) {
+					.style("fill", function (e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
 					});
 
 				d3.selectAll(".pbifdcbuttonsText")
-					.style("fill", function(e) {
+					.style("fill", function (e) {
 						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
 					});
 
@@ -3121,14 +3114,14 @@
 				tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
-						containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
+					containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
 						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
 					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
 						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
 
 				d3.select(this).style("fill", unBlue);
 				d3.select(this.parentNode).selectAll("text")
-					.filter(function(e) {
+					.filter(function (e) {
 						return e === d
 					})
 					.style("fill", "white");
@@ -3139,7 +3132,7 @@
 				if (chartState.selectedYear.indexOf(d) > -1) return;
 				d3.select(this).style("fill", "#eaeaea");
 				d3.selectAll(".pbifdcbuttonsText")
-					.filter(function(e) {
+					.filter(function (e) {
 						return e === d
 					})
 					.style("fill", "#444");
@@ -3153,21 +3146,21 @@
 			let filteredData;
 
 			if (chartState.selectedRegion === "All") {
-				filteredData = rawData.filter(function(d) {
+				filteredData = rawData.filter(function (d) {
 					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && d.GMSDonorISO2Code !== "";
 				});
 			} else {
-				const CBPFlist = chartState.selectedRegion.reduce(function(acc, curr) {
+				const CBPFlist = chartState.selectedRegion.reduce(function (acc, curr) {
 					return acc.concat(geoRegions[curr]);
 				}, []);
-				filteredData = rawData.filter(function(d) {
+				filteredData = rawData.filter(function (d) {
 					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 &&
 						CBPFlist.indexOf(d.PooledFundISO2Code) > -1 &&
 						d.GMSDonorISO2Code !== "";
 				});
 			};
 
-			filteredData.forEach(function(d) {
+			filteredData.forEach(function (d) {
 				if (d.GMSDonorName.indexOf("Macedonia") > -1) {
 					d.GMSDonorName = "Macedonia";
 				};
@@ -3178,11 +3171,11 @@
 				links: []
 			};
 
-			filteredData.forEach(function(d) {
-				const foundDonor = data.nodes.find(function(e) {
+			filteredData.forEach(function (d) {
+				const foundDonor = data.nodes.find(function (e) {
 					return e.uniqueId === "donor" + d.GMSDonorISO2Code;
 				});
-				const foundCBPF = data.nodes.find(function(e) {
+				const foundCBPF = data.nodes.find(function (e) {
 					return e.uniqueId === "cbpf" + d.PooledFundISO2Code;
 				});
 				if (!foundDonor) {
@@ -3207,7 +3200,7 @@
 					foundDonor.total += (+d.PaidAmt) + (+d.PledgeAmt);
 					foundDonor.paid += +d.PaidAmt;
 					foundDonor.pledge += +d.PledgeAmt;
-					const foundDonorConnection = foundDonor.connections.find(function(e) {
+					const foundDonorConnection = foundDonor.connections.find(function (e) {
 						return e.uniqueId === "cbpf" + d.PooledFundISO2Code;
 					});
 					if (foundDonorConnection) {
@@ -3246,7 +3239,7 @@
 					foundCBPF.total += (+d.PaidAmt) + (+d.PledgeAmt);
 					foundCBPF.paid += +d.PaidAmt;
 					foundCBPF.pledge += +d.PledgeAmt;
-					const foundCBPFConnections = foundCBPF.connections.find(function(e) {
+					const foundCBPFConnections = foundCBPF.connections.find(function (e) {
 						return e.uniqueId === "donor" + d.GMSDonorISO2Code;
 					});
 					if (foundCBPFConnections) {
@@ -3263,7 +3256,7 @@
 						});
 					};
 				};
-				const foundLink = data.links.find(function(e) {
+				const foundLink = data.links.find(function (e) {
 					return e.source === "donor" + d.GMSDonorISO2Code && e.target === "cbpf" + d.PooledFundISO2Code;
 				});
 				if (foundLink) {
@@ -3288,17 +3281,17 @@
 
 		function createCsv(rawData) {
 
-			const filteredDataRaw = rawData.filter(function(d) {
+			const filteredDataRaw = rawData.filter(function (d) {
 				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1
-			}).sort(function(a, b) {
+			}).sort(function (a, b) {
 				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
 					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
-					a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
+						a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
 			});
 
 			const filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
 
-			filteredData.forEach(function(d) {
+			filteredData.forEach(function (d) {
 				d.Year = +d.FiscalYear;
 				d["Donor Name"] = d.GMSDonorName;
 				d["CBPF Name"] = d.PooledFundName;
@@ -3328,12 +3321,12 @@
 
 			const header = d3.keys(filteredData[0]);
 
-			const replacer = function(key, value) {
+			const replacer = function (key, value) {
 				return value === null ? '' : value
 			};
 
-			let rows = filteredData.map(function(row) {
-				return header.map(function(fieldName) {
+			let rows = filteredData.map(function (row) {
+				return header.map(function (fieldName) {
 					return JSON.stringify(row[fieldName], replacer)
 				}).join(',')
 			});
@@ -3343,60 +3336,6 @@
 			return rows.join('\r\n');
 
 			//end of createCsv
-		};
-
-		function saveFlags(nodes) {
-
-			const donorsList = nodes.filter(function(d) {
-				return d.category === "Donor";
-			}).map(function(d) {
-				return d.isoCode.toLowerCase();
-			}).filter(function(value, index, self) {
-				return self.indexOf(value) === index;
-			});
-
-			donorsList.forEach(function(d) {
-				if (!localStorage.getItem("storedFlag" + d)) {
-					getBase64FromImage("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/flags/" + d + ".png", setLocal, null, d);
-				};
-			});
-
-			function getBase64FromImage(url, onSuccess, onError, isoCode) {
-				const xhr = new XMLHttpRequest();
-
-				xhr.responseType = "arraybuffer";
-				xhr.open("GET", url);
-
-				xhr.onload = function() {
-					let base64, binary, bytes, mediaType;
-
-					bytes = new Uint8Array(xhr.response);
-
-					binary = [].map.call(bytes, function(byte) {
-						return String.fromCharCode(byte);
-					}).join('');
-
-					mediaType = xhr.getResponseHeader('content-type');
-
-					base64 = [
-						'data:',
-						mediaType ? mediaType + ';' : '',
-						'base64,',
-						btoa(binary)
-					].join('');
-					onSuccess(isoCode, base64);
-				};
-
-				xhr.onerror = onError;
-
-				xhr.send();
-			};
-
-			function setLocal(isoCode, base64) {
-				localStorage.setItem("storedFlag" + isoCode, base64);
-			};
-
-			//end of saveFlags
 		};
 
 		function createFooterDiv() {
@@ -3453,13 +3392,13 @@
 				.style("cursor", "pointer")
 				.attr("y", 6)
 				.attr("height", 22)
-				.attr("width", function(d) {
+				.attr("width", function (d) {
 					return d.width;
 				})
-				.attr("x", function(d, i) {
+				.attr("x", function (d, i) {
 					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
 				})
-				.on("click", function(_, i) {
+				.on("click", function (_, i) {
 					iconsDiv.style("opacity", 1)
 						.style("pointer-events", "all");
 					overDiv.remove();
@@ -3469,11 +3408,11 @@
 			closeRects.append("text")
 				.attr("class", "pbifdcAnnotationMainText")
 				.attr("text-anchor", "middle")
-				.attr("x", function(d, i) {
+				.attr("x", function (d, i) {
 					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
 				})
 				.attr("y", 22)
-				.text(function(d) {
+				.text(function (d) {
 					return d.text
 				});
 
@@ -3527,7 +3466,7 @@
 				text: "The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element."
 			}];
 
-			helpData.forEach(function(d) {
+			helpData.forEach(function (d) {
 				helpSVG.append("rect")
 					.attr("rx", 4)
 					.attr("ry", 4)
@@ -3541,7 +3480,7 @@
 					.style("opacity", 0.5)
 					.attr("class", "pbifdcHelpRectangle")
 					.attr("pointer-events", "all")
-					.on("mouseover", function() {
+					.on("mouseover", function () {
 						const self = this;
 						createTooltip(d.xTooltip, d.yTooltip, d.text, self);
 					})
@@ -3592,12 +3531,12 @@
 		};
 
 		function validateYear(yearString) {
-			const allYears = yearString.split(",").map(function(d) {
+			const allYears = yearString.split(",").map(function (d) {
 				return +(d.trim());
-			}).sort(function(a, b) {
+			}).sort(function (a, b) {
 				return a - b;
 			});
-			allYears.forEach(function(d) {
+			allYears.forEach(function (d) {
 				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
 			});
 			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
@@ -3637,11 +3576,11 @@
 		};
 
 		function setYearsDescriptionDiv() {
-			yearsDescriptionDiv.html(function() {
+			yearsDescriptionDiv.html(function () {
 				if (chartState.selectedYear.length === 1) return null;
-				const yearsList = chartState.selectedYear.sort(function(a, b) {
+				const yearsList = chartState.selectedYear.sort(function (a, b) {
 					return a - b;
-				}).reduce(function(acc, curr, index) {
+				}).reduce(function (acc, curr, index) {
 					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
 				}, "");
 				return "\u002ASelected years: " + yearsList;
@@ -3649,7 +3588,7 @@
 		};
 
 		function wrapText(text, width) {
-			text.each(function() {
+			text.each(function () {
 				let text = d3.select(this),
 					words = text.text().split(/\s+/).reverse(),
 					word,
@@ -3660,10 +3599,10 @@
 					x = text.attr("x"),
 					dy = 0,
 					tspan = text.text(null)
-					.append("tspan")
-					.attr("x", x)
-					.attr("y", y)
-					.attr("dy", dy + "em");
+						.append("tspan")
+						.attr("x", x)
+						.attr("y", y)
+						.attr("dy", dy + "em");
 				while (word = words.pop()) {
 					line.push(word);
 					tspan.text(line.join(" "));
@@ -3739,7 +3678,7 @@
 
 			snapshotTooltip.style("display", "none");
 
-			html2canvas(imageDiv).then(function(canvas) {
+			html2canvas(imageDiv).then(function (canvas) {
 
 				svg.attr("width", null)
 					.attr("height", null);
@@ -3784,7 +3723,7 @@
 
 			const fileName = "ContributionsFlow_" + csvDateFormat(currentDate) + ".png";
 
-			source.toBlob(function(blob) {
+			source.toBlob(function (blob) {
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement("a");
 				if (link.download !== undefined) {
@@ -3815,7 +3754,7 @@
 			};
 
 			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
-				.then(function(logo) {
+				.then(function (logo) {
 
 					let pdfTextPosition;
 
@@ -3843,9 +3782,9 @@
 
 					pdf.setFontSize(12);
 
-					const yearsList = chartState.selectedYear.sort(function(a, b) {
+					const yearsList = chartState.selectedYear.sort(function (a, b) {
 						return a - b;
-					}).reduce(function(acc, curr, index) {
+					}).reduce(function (acc, curr, index) {
 						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
 					}, "");
 
@@ -3859,9 +3798,9 @@
 						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + regionsText + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						selectedRegions + "</span></div>", pdfMargins.left, 77, {
-							width: 210 - pdfMargins.left - pdfMargins.right
-						},
-						function(position) {
+						width: 210 - pdfMargins.left - pdfMargins.right
+					},
+						function (position) {
 							pdfTextPosition = position;
 						});
 
@@ -3943,9 +3882,9 @@
 			function transitionIn() {
 				wheel.transition()
 					.duration(1000)
-					.attrTween("d", function(d) {
+					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function(t) {
+						return function (t) {
 							d.endAngle = interpolate(t);
 							return arc(d)
 						}
@@ -3956,14 +3895,14 @@
 			function transitionOut() {
 				wheel.transition()
 					.duration(1000)
-					.attrTween("d", function(d) {
+					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function(t) {
+						return function (t) {
 							d.startAngle = interpolate(t);
 							return arc(d)
 						}
 					})
-					.on("end", function(d) {
+					.on("end", function (d) {
 						d.startAngle = 0;
 						transitionIn()
 					})
@@ -3985,8 +3924,8 @@
 
 	function forceBoundary(x0, y0, x1, y1) {
 
-		var constant = function(x) {
-			return function() {
+		var constant = function (x) {
+			return function () {
 				return x;
 			};
 		};
@@ -4058,36 +3997,36 @@
 			}
 		}
 
-		force.initialize = function(_) {
+		force.initialize = function (_) {
 			nodes = _;
 			initialize();
 		};
 
-		force.x0 = function(_) {
+		force.x0 = function (_) {
 			return arguments.length ? (x0 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : x0;
 		};
 
-		force.x1 = function(_) {
+		force.x1 = function (_) {
 			return arguments.length ? (x1 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : x1;
 		};
 
-		force.y0 = function(_) {
+		force.y0 = function (_) {
 			return arguments.length ? (y0 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : y0;
 		};
 
-		force.y1 = function(_) {
+		force.y1 = function (_) {
 			return arguments.length ? (y1 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : y1;
 		};
 
-		force.strength = function(_) {
+		force.strength = function (_) {
 			return arguments.length ? (strength = typeof _ === "function" ? _ : constant(+_), initialize(), force) : strength;
 		};
 
-		force.border = function(_) {
+		force.border = function (_) {
 			return arguments.length ? (border = typeof _ === "function" ? _ : constant(+_), initialize(), force) : border;
 		};
 
-		force.hardBoundary = function(_) {
+		force.hardBoundary = function (_) {
 			return arguments.length ? (hardBoundary = _, force) : hardBoundary;
 		};
 

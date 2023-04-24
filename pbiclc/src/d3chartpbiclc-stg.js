@@ -1881,7 +1881,7 @@
 					.attr("y", -flagSize / 2 + 1)
 					.attr("href", d => {
 						if (!d.isoCode) return blankFlag;
-						if (d.isoCode && !flagsData[d.isoCode.toLowerCase()]) console.warn("Missing flag: " + d.name, d);
+						if (d.isoCode && !flagsData[d.isoCode.toLowerCase()] && !isPfbiSite) console.warn("Missing flag: " + d.name, d);
 						return flagsData[d.isoCode.toLowerCase()] || blankFlag;
 					});
 

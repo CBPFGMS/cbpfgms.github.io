@@ -1462,7 +1462,7 @@
 					.attr("height", flagSize)
 					.attr("src", function (d) {
 						if (!d) return blankFlag;
-						if (d && !flagsData[d.toLowerCase()]) console.warn("Missing flag: " + d.name, d);
+						if (d && !flagsData[d.toLowerCase()] && !isPfbiSite) console.warn("Missing flag: " + d.name, d);
 						return flagsData[d.toLowerCase()] || blankFlag;
 					});
 
