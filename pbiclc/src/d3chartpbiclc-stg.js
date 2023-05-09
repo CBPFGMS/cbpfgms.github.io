@@ -2436,7 +2436,7 @@
 					groupYAxisCbpfs.selectAll(".tick")
 						.style("opacity", function (d) {
 							const isoCode = Object.keys(countryNames).find(function (e) {
-								return countryNames[e] === d;
+								return countryNames[e].includes(d);
 							});
 							return chartState.selectedCbpfs.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
 						});
@@ -2544,7 +2544,7 @@
 						groupYAxisCbpfs.selectAll(".tick")
 							.style("opacity", function (d) {
 								const isoCode = Object.keys(countryNames).find(function (e) {
-									return countryNames[e] === d;
+									return countryNames[e].includes(d);
 								});
 								return chartState.selectedCbpfs.indexOf(isoCode) > -1 ? 1 : fadeOpacity;
 							});
