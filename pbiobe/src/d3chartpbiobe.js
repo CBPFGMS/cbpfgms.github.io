@@ -422,7 +422,7 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
+		if (isPfbiSite && !isBookmarkPage) {
 			window.cbpfbiDataObject.targetedPersonsDetailsData.then(rawData => csvCallback(rawData));
 		} else {
 			if (localStorage.getItem("pbiobedata") &&

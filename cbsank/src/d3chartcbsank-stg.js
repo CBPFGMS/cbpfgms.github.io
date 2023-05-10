@@ -421,7 +421,7 @@
 			.domain([0, allocationsPanel.width - allocationsPanel.padding[1] - allocationsPanel.padding[3]])
 			.range([allocationsPanel.width - allocationsPanel.padding[1] - allocationsPanel.padding[3], 0]);
 
-		if (isPfbiSite) {
+		if (isPfbiSite && !isBookmarkPage) {
 			Promise.all([
 					window.cbpfbiDataObject.masterDonors,
 					window.cbpfbiDataObject.masterFunds,

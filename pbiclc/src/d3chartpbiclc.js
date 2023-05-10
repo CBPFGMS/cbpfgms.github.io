@@ -697,7 +697,7 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
+		if (isPfbiSite && !isBookmarkPage) {
 			Promise.all([
 				window.cbpfbiDataObject.contributionsTotalData,
 				window.cbpfbiDataObject.flags

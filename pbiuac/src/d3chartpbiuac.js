@@ -452,7 +452,7 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
+		if (isPfbiSite && !isBookmarkPage) {
 			window.cbpfbiDataObject.launchedAllocationsData.then(rawData => {
 				const filteredRawData = rawData.reduce((acc, curr) => {
 					if (curr.PlannedStartDate && curr.PlannedEndDate) {
