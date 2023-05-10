@@ -153,7 +153,6 @@
 			firstYear = 2016, //THIS IS THE HARDCODED FIRST YEAR IN THE VISUALIZATION
 			memberStateString = "Member State",
 			isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
-			isBookmarkPage = window.location.hostname + window.location.pathname === "cbpfgms.github.io/cerf-bi-stag/bookmark.html",
 			bookmarkSite = "https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			blankFlag = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 			helpPortalUrl = "https://gms.unocha.org/content/cbpf-data-hub#cbpf_by_year",
