@@ -4,6 +4,7 @@ import { constants, variables } from "./constants.js";
 const {
 	classPrefix,
 	currentStatusFillColor,
+	currentStatusTextFillColor,
 	previousStepsColor,
 	nextStepsColor,
 	previousStepsStroke,
@@ -28,6 +29,7 @@ function showStatus({
 	);
 
 	currentStatusNode.select("rect").style("fill", currentStatusFillColor);
+	currentStatusNode.select("text").style("fill", currentStatusTextFillColor);
 
 	currentStatusValueSpan.html(currentStatusNode.datum().data.text);
 

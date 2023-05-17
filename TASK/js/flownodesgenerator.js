@@ -6,8 +6,6 @@ const {
 	yScale,
 	classPrefix,
 	padding,
-	maxNodeCharactersNumber,
-	maxLinkCharacterNumber,
 	rowHeight,
 	rowHeightIncrement,
 	xScalePadding,
@@ -16,7 +14,6 @@ const {
 	nodesTextPaddingVertical,
 	nodesTextPaddingHorizontal,
 	nodesTextSpacing,
-	minLinkDistanceFromNodes,
 } = constants;
 
 function flowNodesGenerator({
@@ -25,7 +22,7 @@ function flowNodesGenerator({
 	numberOfColumns,
 	svg,
 }) {
-	dataNodesOriginal.sort((a, b) => a.id - b.id);
+	dataNodesOriginal.sort((a, b) => a.flowId - b.flowId);
 
 	const dataLength = dataNodesOriginal.length,
 		nodes = new Array(dataLength),

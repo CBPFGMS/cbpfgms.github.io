@@ -1,7 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { flowNodesGenerator } from "./flownodesgenerator.js";
 import { flowLinksGenerator } from "./flowlinksgenerator.js";
-import { stylesList } from "./styleslist.js";
 import { constants, variables } from "./constants.js";
 import { drawNodes } from "./drawnodes.js";
 import { drawLinks } from "./drawlinks.js";
@@ -43,6 +42,7 @@ const flowChartDivContainer = chartContainer
 	currentStatusBullet = flowChartCurrentStatusDiv
 		.append("span")
 		.html("&#11045 "),
+	// eslint-disable-next-line no-unused-vars
 	currentStatusText = flowChartCurrentStatusDiv
 		.append("span")
 		.html("Allocation current status: "),
@@ -74,9 +74,12 @@ const { width } = flowChartDivSize;
 
 const svg = flowChartDiv.append("svg").attr("width", width);
 
-d3.json("./data/data.json").then(createFlowChart);
+d3.json("./data/master.json").then(createFlowChart);
 
-function createFlowChart(data) {
+function createFlowChart(rawData) {
+
+	const data = processData(rawData);
+
 	const {
 		nodes: dataNodesOriginal,
 		links: dataLinksOriginal,
@@ -143,4 +146,4 @@ function createFlowChart(data) {
 		linksList,
 		flowChartHoveredSpan,
 	});
-};
+}

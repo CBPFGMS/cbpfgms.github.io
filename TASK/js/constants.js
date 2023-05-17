@@ -26,11 +26,13 @@ const constants = {
 	fadeOpacityLinks: 0.1,
 	fadeOpacityLinkLabels: 0.1,
 	fadeOpacityLinkList: 0.1,
-	currentStatusFillColor: "lightskyblue",
+	backgroundColor: "#f0f2f5",
+	currentStatusFillColor: "#5392cb",
+	currentStatusTextFillColor: "white",
 	previousStepsColor: "#1a9850",
 	nextStepsColor: "#ccc",
 	previousStepsStroke: 2,
-	nextStepsOpacity: 0.25,
+	nextStepsOpacity: 1,//keep at 1 while testing other alternatives
 	defaultHoverText: "Hover over the nodes for additional information",
 	lineGenerator: d3
 		.line()

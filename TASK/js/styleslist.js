@@ -4,35 +4,37 @@ const stylesList = {
 			start: {
 				fill: "none",
 				stroke: "none",
-				"stroke-width": 2,
+				"stroke-width": 0,
 				rx: null,
 				ry: null,
 			},
 			end: {
 				fill: "none",
 				stroke: "none",
-				"stroke-width": 2,
+				"stroke-width": 0,
 				rx: null,
 				ry: null,
 			},
 			primary: {
-				fill: "lightcyan",
-				stroke: "#888",
-				"stroke-width": 2,
+				fill: "#deeaff",
+				stroke: "none",
+				"stroke-width": 0,
 				rx: 4,
 				ry: 4,
+				filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.3))",
 			},
 			secondary: {
 				fill: "white",
-				stroke: "#888",
-				"stroke-width": 2,
+				stroke: "none",
+				"stroke-width": 0,
 				rx: 4,
 				ry: 4,
+				filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.3))",
 			},
-			rejected: {
+			reject: {
 				fill: "#ddd",
-				stroke: "#888",
-				"stroke-width": 2,
+				stroke: "none",
+				"stroke-width": 0,
 				rx: 4,
 				ry: 4,
 			},
@@ -58,7 +60,7 @@ const stylesList = {
 				"font-style": null,
 				"font-weight": null,
 			},
-			rejected: {
+			reject: {
 				fill: "black",
 				"font-style": null,
 				"font-weight": 600,
@@ -67,48 +69,48 @@ const stylesList = {
 	},
 	links: {
 		paths: {
-			primary: {
+			direct: {
 				"stroke-dasharray": null,
-				stroke: "#666",
+				stroke: "#888",
 				"stroke-width": 1,
 			},
-			secondary: {
+			indirect: {
 				"stroke-dasharray": "4 4",
-				stroke: "#666",
+				stroke: "#888",
 				"stroke-width": 1,
 			},
 		},
 		backPaths: {
-			primary: {
+			direct: {
 				"stroke-dasharray": null,
-				stroke: "#fff",
+				stroke: "#f0f2f5",
 				"stroke-width": 6,
 			},
-			secondary: {
+			indirect: {
 				"stroke-dasharray": "4 4",
-				stroke: "#fff",
+				stroke: "#f0f2f5",
 				"stroke-width": 6,
 			},
 		},
 		texts: {
-			primary: {
+			direct: {
 				fill: "black",
 				"font-style": null,
 				"font-weight": null,
 			},
-			secondary: {
+			indirect: {
 				fill: "black",
 				"font-style": null,
 				"font-weight": null,
 			},
 		},
 		circles: {
-			primary: {
+			direct: {
 				fill: "white",
 				stroke: "#666",
 				"stroke-width": 1,
 			},
-			secondary: {
+			indirect: {
 				fill: "white",
 				stroke: "#666",
 				"stroke-width": 1,

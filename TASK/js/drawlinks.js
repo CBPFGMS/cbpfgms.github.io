@@ -1,6 +1,6 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { stylesList } from "./styleslist.js";
-import { constants, variables } from "./constants.js";
+import { constants } from "./constants.js";
 
 const { classPrefix, lineGenerator, labelCircleRadius } = constants;
 
@@ -10,8 +10,7 @@ function drawLinks({ dataLinks, svg }) {
 	const defs = svg.append("defs");
 
 	Object.keys(stylesList.links.paths).forEach(type => {
-		const marker = defs
-			.append("marker")
+		defs.append("marker")
 			.attr("id", `arrow${type}`)
 			.attr("viewBox", "0 -4 10 10")
 			.attr("refX", 9)
