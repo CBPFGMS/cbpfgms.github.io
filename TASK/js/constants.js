@@ -32,23 +32,27 @@ const constants = {
 	previousStepsStroke: 2,
 	nextStepsOpacity: 0.25,
 	defaultHoverText: "Hover over the nodes for additional information",
-	lineGenerator: d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis)
+	lineGenerator: d3
+		.line()
+		.x(d => d.x)
+		.y(d => d.y)
+		.curve(d3.curveBasis),
 };
 
 const variables = {
-	heightValue: null
+	heightValue: null,
 };
 
 for (const key in variables) {
 	const actualKey = key.replace("Value", "");
 	Object.defineProperty(variables, actualKey, {
 		get() {
-			return this[key]
+			return this[key];
 		},
 		set(value) {
-			this[key] = value
-		}
+			this[key] = value;
+		},
 	});
-};
+}
 
 export { constants, variables };

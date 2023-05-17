@@ -7,15 +7,25 @@ const {
 	previousStepsColor,
 	nextStepsColor,
 	previousStepsStroke,
-	nextStepsOpacity
+	nextStepsOpacity,
 } = constants;
 
-function showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNodes, dataLinks, currentStatusValueSpan, currentSequence }) {
-
+function showStatus({
+	nodesGroup,
+	linksGroup,
+	labelsGroup,
+	currentStatus,
+	dataNodes,
+	dataLinks,
+	currentStatusValueSpan,
+	currentSequence,
+}) {
 	const labelsText = labelsGroup.select("text"),
 		labelsCircle = labelsGroup.select("circle");
 
-	const currentStatusNode = nodesGroup.filter(d => d.data.id === currentStatus);
+	const currentStatusNode = nodesGroup.filter(
+		d => d.data.id === currentStatus
+	);
 
 	currentStatusNode.select("rect").style("fill", currentStatusFillColor);
 
@@ -30,38 +40,49 @@ function showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNo
 	// linksGroup.select(`.${classPrefix}links`).style("filter", d => previousLinks.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
 	// 	`drop-shadow(0px 0px 4px ${nextStepsColor})`);
 
-	nodesGroup.filter(d => d.data.type !== "start" && currentSequence.includes(d.data.id))
+	nodesGroup
+		.filter(
+			d => d.data.type !== "start" && currentSequence.includes(d.data.id)
+		)
 		.select("rect")
 		.style("filter", `drop-shadow(0px 0px 4px ${previousStepsColor})`)
 		.style("stroke", previousStepsColor);
-	linksGroup.filter(d => currentLinks.includes(d.data.id))
+	linksGroup
+		.filter(d => currentLinks.includes(d.data.id))
 		.select(`.${classPrefix}links`)
 		.style("stroke-width", previousStepsStroke)
 		.style("stroke", previousStepsColor);
 
-	nodesGroup.filter(d => !currentSequence.includes(d.data.id))
-		.style("opacity", d => d.setOpacity = nextStepsOpacity);
+	nodesGroup
+		.filter(d => !currentSequence.includes(d.data.id))
+		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
-	linksGroup.filter(d => !currentLinks.includes(d.data.id))
-		.style("opacity", d => d.setOpacity = nextStepsOpacity);
+	linksGroup
+		.filter(d => !currentLinks.includes(d.data.id))
+		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
-	labelsText.filter(d => !currentLinks.includes(d.data.id))
-		.style("opacity", d => d.setOpacity = nextStepsOpacity);
+	labelsText
+		.filter(d => !currentLinks.includes(d.data.id))
+		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
-	labelsCircle.filter(d => !currentLinks.includes(d.data.id))
-		.style("stroke-opacity", d => d.setOpacity = nextStepsOpacity);
+	labelsCircle
+		.filter(d => !currentLinks.includes(d.data.id))
+		.style("stroke-opacity", d => (d.setOpacity = nextStepsOpacity));
 
 	return currentLinks;
-
-};
+}
 
 function populatePastLinks(currentSequence, dataLinks) {
 	const linksArray = dataLinks.reduce((acc, curr) => {
-		if (currentSequence.includes(curr.data.source) && currentSequence.includes(curr.data.target)) acc.push(curr.data.id);
+		if (
+			currentSequence.includes(curr.data.source) &&
+			currentSequence.includes(curr.data.target)
+		)
+			acc.push(curr.data.id);
 		return acc;
 	}, []);
 	return linksArray;
-};
+}
 
 // function populatePreviousNodesAndLinks(dataLinks, currentStatus) {
 // 	const previousNodes = [],

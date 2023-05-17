@@ -8,6 +8,7 @@ import { drawLinks } from "./drawlinks.js";
 import { drawLinksList } from "./drawlinkslist.js";
 import { highlight } from "./highlight.js";
 import { showStatus } from "./showstatus.js";
+import { processData } from "./processdata.js";
 
 const {
 	classPrefix,
@@ -15,48 +16,85 @@ const {
 	defaultNumberOfColumns,
 	yScale,
 	currentStatusFillColor,
-	defaultHoverText
+	defaultHoverText,
 } = constants;
 
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
-const flowChartDivContainer = chartContainer.append("div").attr("class", classPrefix + "flowChartDivContainer"),
-	sideDiv = chartContainer.append("div").attr("class", classPrefix + "sideDiv"),
-	flowChartTopDiv = flowChartDivContainer.append("div").attr("class", classPrefix + "flowChartTopDiv"),
-	flowChartCurrentStatusDiv = flowChartTopDiv.append("div").attr("class", classPrefix + "flowChartCurrentStatusDiv"),
-	flowChartHoveredDiv = flowChartTopDiv.append("div").attr("class", classPrefix + "flowChartHoveredDiv"),
-	flowChartHoveredSpan = flowChartHoveredDiv.append("span").attr("class", classPrefix + "flowChartHoveredSpan").html(defaultHoverText),
-	currentStatusBullet = flowChartCurrentStatusDiv.append("span").html("&#11045 "),
-	currentStatusText = flowChartCurrentStatusDiv.append("span").html("Allocation current status: "),
-	currentStatusValueSpan = flowChartCurrentStatusDiv.append("span").attr("class", classPrefix + "currentStatusValueSpan"),
-	flowChartDiv = flowChartDivContainer.append("div").attr("class", classPrefix + "flowChartDiv"),
-	sideDivTitle = sideDiv.append("div").attr("class", classPrefix + "sideDivTitle"),
-	sideDivContainer = sideDiv.append("div").attr("class", classPrefix + "sideDivContainer"),
+const flowChartDivContainer = chartContainer
+		.append("div")
+		.attr("class", classPrefix + "flowChartDivContainer"),
+	sideDiv = chartContainer
+		.append("div")
+		.attr("class", classPrefix + "sideDiv"),
+	flowChartTopDiv = flowChartDivContainer
+		.append("div")
+		.attr("class", classPrefix + "flowChartTopDiv"),
+	flowChartCurrentStatusDiv = flowChartTopDiv
+		.append("div")
+		.attr("class", classPrefix + "flowChartCurrentStatusDiv"),
+	flowChartHoveredDiv = flowChartTopDiv
+		.append("div")
+		.attr("class", classPrefix + "flowChartHoveredDiv"),
+	flowChartHoveredSpan = flowChartHoveredDiv
+		.append("span")
+		.attr("class", classPrefix + "flowChartHoveredSpan")
+		.html(defaultHoverText),
+	currentStatusBullet = flowChartCurrentStatusDiv
+		.append("span")
+		.html("&#11045 "),
+	currentStatusText = flowChartCurrentStatusDiv
+		.append("span")
+		.html("Allocation current status: "),
+	currentStatusValueSpan = flowChartCurrentStatusDiv
+		.append("span")
+		.attr("class", classPrefix + "currentStatusValueSpan"),
+	flowChartDiv = flowChartDivContainer
+		.append("div")
+		.attr("class", classPrefix + "flowChartDiv"),
+	sideDivTitle = sideDiv
+		.append("div")
+		.attr("class", classPrefix + "sideDivTitle"),
+	sideDivContainer = sideDiv
+		.append("div")
+		.attr("class", classPrefix + "sideDivContainer"),
 	details = sideDivTitle.append("div").append("details");
 
-details.append("summary")
-	.append("span")
-	.html("Links description");
+details.append("summary").append("span").html("Links description");
 
-details.append("p")
-	.html("This is a list of the links. Hover over the links below or the numbers on the left to highlight the nodes.");
+details
+	.append("p")
+	.html(
+		"This is a list of the links. Hover over the links below or the numbers on the left to highlight the nodes."
+	);
 
 const flowChartDivSize = flowChartDiv.node().getBoundingClientRect();
 
 const { width } = flowChartDivSize;
 
-const svg = flowChartDiv.append("svg")
-	.attr("width", width);
+const svg = flowChartDiv.append("svg").attr("width", width);
 
 d3.json("./data/data.json").then(createFlowChart);
 
 function createFlowChart(data) {
+	const {
+		nodes: dataNodesOriginal,
+		links: dataLinksOriginal,
+		currentStatus,
+		currentSequence,
+	} = data;
 
-	const { nodes: dataNodesOriginal, links: dataLinksOriginal, currentStatus, currentSequence } = data;
+	const numberOfColumns =
+		data.numberOfColumns ??
+		numberOfColumnsDataset ??
+		defaultNumberOfColumns;
 
-	const numberOfColumns = data.numberOfColumns ?? numberOfColumnsDataset ?? defaultNumberOfColumns;
-
-	const dataNodes = flowNodesGenerator({ dataNodesOriginal, width, numberOfColumns, svg });
+	const dataNodes = flowNodesGenerator({
+		dataNodesOriginal,
+		width,
+		numberOfColumns,
+		svg,
+	});
 
 	const dataLinks = flowLinksGenerator({ dataLinksOriginal, dataNodes });
 
@@ -66,20 +104,43 @@ function createFlowChart(data) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	flowChartTopDiv.style("margin-left", yScale(0) + "px")
+	flowChartTopDiv
+		.style("margin-left", yScale(0) + "px")
 		.style("margin-right", yScale(0) + "px");
 
-	currentStatusBullet.style("color", d3.color(currentStatusFillColor).darker(0.5));
+	currentStatusBullet.style(
+		"color",
+		d3.color(currentStatusFillColor).darker(0.5)
+	);
 
-	currentStatusValueSpan.style("text-decoration", "underline")
+	currentStatusValueSpan
+		.style("text-decoration", "underline")
 		.style("text-decoration-thickness", "3px")
 		.style("text-underline-offset", "0.3em")
 		.style("text-decoration-color", currentStatusFillColor);
 
-	const currentLinks = showStatus({ nodesGroup, linksGroup, labelsGroup, currentStatus, dataNodes, dataLinks, currentStatusValueSpan, currentSequence });
+	const currentLinks = showStatus({
+		nodesGroup,
+		linksGroup,
+		labelsGroup,
+		currentStatus,
+		dataNodes,
+		dataLinks,
+		currentStatusValueSpan,
+		currentSequence,
+	});
 
-	const linksList = drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks });
+	const linksList = drawLinksList({
+		dataLinksOriginal,
+		sideDivContainer,
+		currentLinks,
+	});
 
-	highlight({ nodesGroup, linksGroup, labelsGroup, linksList, flowChartHoveredSpan });
-
+	highlight({
+		nodesGroup,
+		linksGroup,
+		labelsGroup,
+		linksList,
+		flowChartHoveredSpan,
+	});
 };
