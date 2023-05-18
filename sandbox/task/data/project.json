@@ -1,0 +1,874 @@
+{
+  "TrackingLogs": [
+    {
+      "CurrentStatusId": 4171,
+      "NextStatusId": 4172,
+      "RowId": 1,
+      "TaskRowId": 1,
+      "TaskName": "Draft Proposal",
+      "TaskCode": "",
+      "CurrentStatusName": "Project draft",
+      "NextStatusName": "Under Pre-SR",
+      "CurrentStatusCode": "PRJ_DRFT",
+      "NextStatusCode": "",
+      "TaskInstanceLogId": 87706,
+      "UserRoleName": "Agencies/Partners",
+      "UserRoleCode": "PARTNER",
+      "UserName": "Luciana Bollati",
+      "UserEmail": "luciana.bollati@peopleinneed.net",
+      "WorkflowLogDate": "2023-01-24T15:51:21.167",
+      "Comments": "",
+      "TaskCreatedDate": "2023-01-18T14:39:30.457",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Luciana Bollati",
+        "UserEmail": "luciana.bollati@peopleinneed.net",
+        "UserRoleName": "Agencies/Partners",
+        "UserRoleCode": "PARTNER",
+        "Date": "2023-01-24T15:51:21.627"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 87706,
+          "AlertTitle": "Project Proposal Submission",
+          "EmailCount": 1,
+          "EncrAlertId": "oSTOZIXsbOk="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4172,
+      "NextStatusId": 4175,
+      "RowId": 2,
+      "TaskRowId": 2,
+      "TaskName": "Review (Pre-SR) and Send to SR",
+      "TaskCode": "",
+      "CurrentStatusName": "Under Pre-SR",
+      "NextStatusName": "Under SR",
+      "CurrentStatusCode": "",
+      "NextStatusCode": "PRJ_UND_SR",
+      "TaskInstanceLogId": 90570,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Olena Yegorova",
+      "UserEmail": "olena.yegorova@un.org",
+      "WorkflowLogDate": "2023-01-25T12:29:54.18",
+      "Comments": "",
+      "TaskCreatedDate": "2023-01-24T15:51:21.69",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Olena Yegorova",
+        "UserEmail": "olena.yegorova@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-01-25T12:29:54.43"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 90570,
+          "AlertTitle": "Under SR",
+          "EmailCount": 1,
+          "EncrAlertId": "VeXXyAB9xUI="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 90571,
+          "TaskName": "Review (Pre-SR) and Send to SR",
+          "TaskCode": "",
+          "TaskStatusName": "Completed",
+          "TaskStatusCode": "TSK_COMPLETE",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-01-24T15:51:21.69",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Olena Yegorova",
+            "UserEmail": "olena.yegorova@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-01-25T12:29:54.463"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4175,
+      "NextStatusId": 4176,
+      "RowId": 3,
+      "TaskRowId": 3,
+      "TaskName": "Review Proposal (SR)",
+      "TaskCode": "",
+      "CurrentStatusName": "Under SR",
+      "NextStatusName": "SR Assessed",
+      "CurrentStatusCode": "PRJ_UND_SR",
+      "NextStatusCode": "PRJ_SR_CMPL",
+      "TaskInstanceLogId": 91134,
+      "UserRoleName": "Clusters leads and support officers",
+      "UserRoleCode": "CC",
+      "UserName": "Olena Yegorova",
+      "UserEmail": "olena.yegorova@un.org",
+      "WorkflowLogDate": "2023-02-03T10:27:01.217",
+      "Comments": "",
+      "TaskCreatedDate": "2023-01-25T12:29:54.5",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Olena Yegorova",
+        "UserEmail": "olena.yegorova@un.org",
+        "UserRoleName": "Clusters leads and support officers",
+        "UserRoleCode": "CC",
+        "Date": "2023-02-03T10:27:01.36"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 91134,
+          "AlertTitle": "SR Completed",
+          "EmailCount": 1,
+          "EncrAlertId": "xrnsFMMc1cY="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4176,
+      "NextStatusId": 4179,
+      "RowId": 4,
+      "TaskRowId": 4,
+      "TaskName": "Confirm SR assessment results",
+      "TaskCode": "",
+      "CurrentStatusName": "SR Assessed",
+      "NextStatusName": "Under TR CC/Specialist",
+      "CurrentStatusCode": "PRJ_SR_CMPL",
+      "NextStatusCode": "PRJ_UND_TR_CC_SPC",
+      "TaskInstanceLogId": 96266,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Olena Yegorova",
+      "UserEmail": "olena.yegorova@un.org",
+      "WorkflowLogDate": "2023-02-03T10:27:26.83",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-03T10:27:01.417",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Olena Yegorova",
+        "UserEmail": "olena.yegorova@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-03T10:27:27.323"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 96266,
+          "AlertTitle": "PP Recommended for TR",
+          "EmailCount": 1,
+          "EncrAlertId": "H0fXcE90At0="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4179,
+      "NextStatusId": 4180,
+      "RowId": 5,
+      "TaskRowId": 5,
+      "TaskName": "Complete Technical Review and return to HFU",
+      "TaskCode": "",
+      "CurrentStatusName": "Under TR CC/Specialist",
+      "NextStatusName": "Under TR HFU",
+      "CurrentStatusCode": "PRJ_UND_TR_CC_SPC",
+      "NextStatusCode": "PRJ_UND_TR_HFU",
+      "TaskInstanceLogId": 96267,
+      "UserRoleName": "Clusters leads and support officers",
+      "UserRoleCode": "CC",
+      "UserName": "Olena Yegorova",
+      "UserEmail": "olena.yegorova@un.org",
+      "WorkflowLogDate": "2023-02-03T10:27:50.073",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-03T10:27:27.363",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Olena Yegorova",
+        "UserEmail": "olena.yegorova@un.org",
+        "UserRoleName": "Clusters leads and support officers",
+        "UserRoleCode": "CC",
+        "Date": "2023-02-03T10:27:50.193"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 96267,
+          "AlertTitle": "Under TR - HFU",
+          "EmailCount": 1,
+          "EncrAlertId": "tOqoi6T7k6Q="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 96268,
+          "TaskName": "Complete Technical Review and return to HFU",
+          "TaskCode": "",
+          "TaskStatusName": "Completed",
+          "TaskStatusCode": "TSK_COMPLETE",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-03T10:27:27.363",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Olena Yegorova",
+            "UserEmail": "olena.yegorova@un.org",
+            "UserRoleName": "Clusters leads and support officers",
+            "UserRoleCode": "CC",
+            "Date": "2023-02-03T10:27:50.22"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4180,
+      "NextStatusId": 4181,
+      "RowId": 6,
+      "TaskRowId": 6,
+      "TaskName": "Manage Technical Review",
+      "TaskCode": "",
+      "CurrentStatusName": "Under TR HFU",
+      "NextStatusName": "TR Draft",
+      "CurrentStatusCode": "PRJ_UND_TR_HFU",
+      "NextStatusCode": "PRJ_TR_DRFT",
+      "TaskInstanceLogId": 96269,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Olena Yegorova",
+      "UserEmail": "olena.yegorova@un.org",
+      "WorkflowLogDate": "2023-02-03T10:31:01.483",
+      "Comments": "Dear Partner, please address comments by 6 February COB. ",
+      "TaskCreatedDate": "2023-02-03T10:27:50.243",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Olena Yegorova",
+        "UserEmail": "olena.yegorova@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-03T10:31:01.613"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 96269,
+          "AlertTitle": "PP redraft",
+          "EmailCount": 1,
+          "EncrAlertId": "I8w3uFbYGZs="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 96270,
+          "TaskName": "Manage Technical Review",
+          "TaskCode": "",
+          "TaskStatusName": "Closed",
+          "TaskStatusCode": "TSK_CLOSED",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-03T10:27:50.243",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Olena Yegorova",
+            "UserEmail": "olena.yegorova@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-02-03T10:31:01.643"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4181,
+      "NextStatusId": 4180,
+      "RowId": 9,
+      "TaskRowId": 9,
+      "TaskName": "Re-draft (TR)",
+      "TaskCode": "",
+      "CurrentStatusName": "TR Draft",
+      "NextStatusName": "Under TR HFU",
+      "CurrentStatusCode": "PRJ_TR_DRFT",
+      "NextStatusCode": "PRJ_UND_TR_HFU",
+      "TaskInstanceLogId": 96271,
+      "UserRoleName": "Agencies/Partners",
+      "UserRoleCode": "PARTNER",
+      "UserName": "Luciana Bollati",
+      "UserEmail": "luciana.bollati@peopleinneed.net",
+      "WorkflowLogDate": "2023-02-06T14:48:36.583",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-03T10:31:01.67",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Luciana Bollati",
+        "UserEmail": "luciana.bollati@peopleinneed.net",
+        "UserRoleName": "Agencies/Partners",
+        "UserRoleCode": "PARTNER",
+        "Date": "2023-02-06T14:48:37.263"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 96271,
+          "AlertTitle": "TR re-draft completed",
+          "EmailCount": 1,
+          "EncrAlertId": "SUYWYxK2NII="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4180,
+      "NextStatusId": 4181,
+      "RowId": 7,
+      "TaskRowId": 6,
+      "TaskName": "Manage Technical Review",
+      "TaskCode": "",
+      "CurrentStatusName": "Under TR HFU",
+      "NextStatusName": "TR Draft",
+      "CurrentStatusCode": "PRJ_UND_TR_HFU",
+      "NextStatusCode": "PRJ_TR_DRFT",
+      "TaskInstanceLogId": 97028,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Yuliia Ibrahimova",
+      "UserEmail": "yuliia.ibrahimova@un.org",
+      "WorkflowLogDate": "2023-02-08T10:24:21.35",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-06T14:48:37.347",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Yuliia Ibrahimova",
+        "UserEmail": "yuliia.ibrahimova@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-08T10:24:21.737"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 97028,
+          "AlertTitle": "PP redraft",
+          "EmailCount": 1,
+          "EncrAlertId": "I8w3uFbYGZs="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 97029,
+          "TaskName": "Manage Technical Review",
+          "TaskCode": "",
+          "TaskStatusName": "Closed",
+          "TaskStatusCode": "TSK_CLOSED",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-06T14:48:37.347",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Yuliia Ibrahimova",
+            "UserEmail": "yuliia.ibrahimova@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-02-08T10:24:21.773"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4181,
+      "NextStatusId": 4180,
+      "RowId": 10,
+      "TaskRowId": 9,
+      "TaskName": "Re-draft (TR)",
+      "TaskCode": "",
+      "CurrentStatusName": "TR Draft",
+      "NextStatusName": "Under TR HFU",
+      "CurrentStatusCode": "PRJ_TR_DRFT",
+      "NextStatusCode": "PRJ_UND_TR_HFU",
+      "TaskInstanceLogId": 97810,
+      "UserRoleName": "Agencies/Partners",
+      "UserRoleCode": "PARTNER",
+      "UserName": "Luciana Bollati",
+      "UserEmail": "luciana.bollati@peopleinneed.net",
+      "WorkflowLogDate": "2023-02-09T16:16:29.563",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-08T10:24:21.8",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Luciana Bollati",
+        "UserEmail": "luciana.bollati@peopleinneed.net",
+        "UserRoleName": "Agencies/Partners",
+        "UserRoleCode": "PARTNER",
+        "Date": "2023-02-09T16:16:29.7"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 97810,
+          "AlertTitle": "TR re-draft completed",
+          "EmailCount": 1,
+          "EncrAlertId": "SUYWYxK2NII="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4180,
+      "NextStatusId": 8463,
+      "RowId": 8,
+      "TaskRowId": 6,
+      "TaskName": "Manage Technical Review",
+      "TaskCode": "",
+      "CurrentStatusName": "Under TR HFU",
+      "NextStatusName": "Under TR HFU Finance",
+      "CurrentStatusCode": "PRJ_UND_TR_HFU",
+      "NextStatusCode": "PRJ_UND_TR_HFU_FIN",
+      "TaskInstanceLogId": 98824,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Yuliia Ibrahimova",
+      "UserEmail": "yuliia.ibrahimova@un.org",
+      "WorkflowLogDate": "2023-02-10T13:42:04.523",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-09T16:16:29.737",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Yuliia Ibrahimova",
+        "UserEmail": "yuliia.ibrahimova@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-10T13:42:04.663"
+      },
+      "EmailLogs": [
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 98825,
+          "TaskName": "Manage Technical Review",
+          "TaskCode": "",
+          "TaskStatusName": "Closed",
+          "TaskStatusCode": "TSK_CLOSED",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-09T16:16:29.737",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Yuliia Ibrahimova",
+            "UserEmail": "yuliia.ibrahimova@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-02-10T13:42:04.693"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 8463,
+      "NextStatusId": 4189,
+      "RowId": 19,
+      "TaskRowId": 7,
+      "TaskName": "Complete Technical Review",
+      "TaskCode": "",
+      "CurrentStatusName": "Under TR HFU Finance",
+      "NextStatusName": "Budget Cleared",
+      "CurrentStatusCode": "PRJ_UND_TR_HFU_FIN",
+      "NextStatusCode": "PRJ_BUDGET_CLR",
+      "TaskInstanceLogId": 99205,
+      "UserRoleName": "HFU Finance",
+      "UserRoleCode": "HFUFIN",
+      "UserName": "Mohammad Al-Masri",
+      "UserEmail": "al-masri@un.org",
+      "WorkflowLogDate": "2023-02-10T13:59:26.04",
+      "Comments": "Budget Cleared. ",
+      "TaskCreatedDate": "2023-02-10T13:42:04.72",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Mohammad Al-Masri",
+        "UserEmail": "al-masri@un.org",
+        "UserRoleName": "HFU Finance",
+        "UserRoleCode": "HFUFIN",
+        "Date": "2023-02-10T13:59:26.95"
+      },
+      "EmailLogs": [
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4189,
+      "NextStatusId": 4190,
+      "RowId": 11,
+      "TaskRowId": 10,
+      "TaskName": "Send to HC endorsement",
+      "TaskCode": "",
+      "CurrentStatusName": "Budget Cleared",
+      "NextStatusName": "Under HC Endorsement",
+      "CurrentStatusCode": "PRJ_BUDGET_CLR",
+      "NextStatusCode": "",
+      "TaskInstanceLogId": 99213,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-17T07:49:39.66",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-10T13:59:27.073",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-17T07:49:39.787"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 99213,
+          "AlertTitle": "Under HC Approval",
+          "EmailCount": 1,
+          "EncrAlertId": "nBfojzAM1jU="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 99214,
+          "TaskName": "Send to HC endorsement",
+          "TaskCode": "",
+          "TaskStatusName": "Closed",
+          "TaskStatusCode": "TSK_CLOSED",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-10T13:59:27.073",
+          "AssignedTaskDetail": {
+            "UserName": "GMS Support CBPF",
+            "UserEmail": "gms-support@un.org",
+            "UserRoleName": "GMS Admin team (HQ FCS)",
+            "UserRoleCode": "GMSAdmin",
+            "Date": "2023-02-16T15:22:52.997"
+          },
+          "LoggedTaskDetail": {
+            "UserName": "Anastasiia Yarmolenko",
+            "UserEmail": "anastasiia.yarmolenko@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-02-17T07:49:39.827"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4190,
+      "NextStatusId": 4192,
+      "RowId": 12,
+      "TaskRowId": 11,
+      "TaskName": "Review Proposal and provide endorsement/rejection",
+      "TaskCode": "",
+      "CurrentStatusName": "Under HC Endorsement",
+      "NextStatusName": "HC Endorsed - Approved",
+      "CurrentStatusCode": "",
+      "NextStatusCode": "PRJ_HC_ENDR_APPRV",
+      "TaskInstanceLogId": 101662,
+      "UserRoleName": "Humanitarian Coordinator (HC)",
+      "UserRoleCode": "HC",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-17T07:56:45.86",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-17T07:49:39.85",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Coordinator (HC)",
+        "UserRoleCode": "HC",
+        "Date": "2023-02-17T07:56:46.15"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 101662,
+          "AlertTitle": "HC Approval Completed",
+          "EmailCount": 1,
+          "EncrAlertId": "uTXtbpOtWOo="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4192,
+      "NextStatusId": 4193,
+      "RowId": 13,
+      "TaskRowId": 12,
+      "TaskName": "Validate project info and timelines",
+      "TaskCode": "",
+      "CurrentStatusName": "HC Endorsed - Approved",
+      "NextStatusName": "Under GA Preparation",
+      "CurrentStatusCode": "PRJ_HC_ENDR_APPRV",
+      "NextStatusCode": "PRJ_UND_GA_PREPAR",
+      "TaskInstanceLogId": 101675,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-17T08:00:59.42",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-17T07:56:46.247",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-17T08:00:59.56"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 101675,
+          "AlertTitle": "Project Recommended following Technical Review",
+          "EmailCount": 1,
+          "EncrAlertId": "qKiTbGCOA5o="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 101676,
+          "TaskName": "Validate project info and timelines",
+          "TaskCode": "",
+          "TaskStatusName": "Completed",
+          "TaskStatusCode": "TSK_COMPLETE",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-17T07:56:46.247",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Anastasiia Yarmolenko",
+            "UserEmail": "anastasiia.yarmolenko@un.org",
+            "UserRoleName": "Humanitarian Financing Unit (HFU)",
+            "UserRoleCode": "HFU",
+            "Date": "2023-02-17T08:00:59.593"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4193,
+      "NextStatusId": 4194,
+      "RowId": 14,
+      "TaskRowId": 13,
+      "TaskName": "Generate Grant Agreement",
+      "TaskCode": "",
+      "CurrentStatusName": "Under GA Preparation",
+      "NextStatusName": "HC Final Approval and GA Signature",
+      "CurrentStatusCode": "PRJ_UND_GA_PREPAR",
+      "NextStatusCode": "PRJ_HC_APPROVAL",
+      "TaskInstanceLogId": 101681,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-17T08:04:58.103",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-17T08:00:59.62",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-17T08:04:58.72"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 101681,
+          "AlertTitle": "Under HC Signature of Grant Agreement",
+          "EmailCount": 1,
+          "EncrAlertId": "ofOtDODsvVg="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4194,
+      "NextStatusId": 4195,
+      "RowId": 15,
+      "TaskRowId": 14,
+      "TaskName": "Sign Grant Agreement",
+      "TaskCode": "",
+      "CurrentStatusName": "HC Final Approval and GA Signature",
+      "NextStatusName": "IP counter-signature",
+      "CurrentStatusCode": "PRJ_HC_APPROVAL",
+      "NextStatusCode": "PRJ_IP_CNT_SIG",
+      "TaskInstanceLogId": 101687,
+      "UserRoleName": "Humanitarian Coordinator (HC)",
+      "UserRoleCode": "HC",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-17T08:41:20.097",
+      "Comments": "Dear Partner,\r\n\r\nI kindly ask you to put signature, place, date and stamp on page 11 and the last page, and to sign each page as well.\r\n\r\nThank you.",
+      "TaskCreatedDate": "2023-02-17T08:04:58.803",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Coordinator (HC)",
+        "UserRoleCode": "HC",
+        "Date": "2023-02-17T08:41:20.507"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 101687,
+          "AlertTitle": "GA sent to IP for counter-signature",
+          "EmailCount": 1,
+          "EncrAlertId": "+/zQYjZltp4="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4195,
+      "NextStatusId": 4204,
+      "RowId": 16,
+      "TaskRowId": 15,
+      "TaskName": "Counter-sign Grant Agreement",
+      "TaskCode": "",
+      "CurrentStatusName": "IP counter-signature",
+      "NextStatusName": "IP submission of GA to HFU",
+      "CurrentStatusCode": "PRJ_IP_CNT_SIG",
+      "NextStatusCode": "PRJ_IP_SUB_GA_TO_HFU",
+      "TaskInstanceLogId": 101715,
+      "UserRoleName": "Agencies/Partners",
+      "UserRoleCode": "PARTNER",
+      "UserName": "Luciana Bollati",
+      "UserEmail": "luciana.bollati@peopleinneed.net",
+      "WorkflowLogDate": "2023-02-21T12:14:34.923",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-17T08:41:20.56",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Luciana Bollati",
+        "UserEmail": "luciana.bollati@peopleinneed.net",
+        "UserRoleName": "Agencies/Partners",
+        "UserRoleCode": "PARTNER",
+        "Date": "2023-02-21T12:14:36.893"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 101715,
+          "AlertTitle": "GA counter-signed by IP",
+          "EmailCount": 1,
+          "EncrAlertId": "f/OB5haeKKQ="
+        }
+      ],
+      "AdditionalTasks": [
+        {
+          "TaskInstanceLogId": 101714,
+          "TaskName": "Counter-sign Grant Agreement",
+          "TaskCode": "",
+          "TaskStatusName": "Completed",
+          "TaskStatusCode": "TSK_COMPLETE",
+          "IsSubTask": false,
+          "TaskCreatedDate": "2023-02-17T08:41:20.56",
+          "AssignedTaskDetail": null,
+          "LoggedTaskDetail": {
+            "UserName": "Luciana Bollati",
+            "UserEmail": "luciana.bollati@peopleinneed.net",
+            "UserRoleName": "Agencies/Partners",
+            "UserRoleCode": "PARTNER",
+            "Date": "2023-02-21T12:14:37.14"
+          },
+          "EmailLogs": [
+          ]
+        }
+      ]
+    },
+    {
+      "CurrentStatusId": 4204,
+      "NextStatusId": 4197,
+      "RowId": 18,
+      "TaskRowId": 16,
+      "TaskName": "Review counter signed GA",
+      "TaskCode": "",
+      "CurrentStatusName": "IP submission of GA to HFU",
+      "NextStatusName": "EO agreement clearance",
+      "CurrentStatusCode": "PRJ_IP_SUB_GA_TO_HFU",
+      "NextStatusCode": "PRJ_GA_SGN_BY_EO",
+      "TaskInstanceLogId": 103492,
+      "UserRoleName": "Humanitarian Financing Unit (HFU)",
+      "UserRoleCode": "HFU",
+      "UserName": "Anastasiia Yarmolenko",
+      "UserEmail": "anastasiia.yarmolenko@un.org",
+      "WorkflowLogDate": "2023-02-21T12:46:23.757",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-21T12:14:37.227",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Anastasiia Yarmolenko",
+        "UserEmail": "anastasiia.yarmolenko@un.org",
+        "UserRoleName": "Humanitarian Financing Unit (HFU)",
+        "UserRoleCode": "HFU",
+        "Date": "2023-02-21T12:46:23.913"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 103492,
+          "AlertTitle": "GA sent to FCS for final signature",
+          "EmailCount": 1,
+          "EncrAlertId": "OqfqUDQdZNE="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    },
+    {
+      "CurrentStatusId": 4197,
+      "NextStatusId": 4198,
+      "RowId": 17,
+      "TaskRowId": 17,
+      "TaskName": "Sign Grant Agreement (EO)",
+      "TaskCode": "",
+      "CurrentStatusName": "EO agreement clearance",
+      "NextStatusName": "Disbursement",
+      "CurrentStatusCode": "PRJ_GA_SGN_BY_EO",
+      "NextStatusCode": "PRJ_DISBURSEMENT",
+      "TaskInstanceLogId": 103509,
+      "UserRoleName": "FCS Finance",
+      "UserRoleCode": "OCHAFIN",
+      "UserName": "Yini Gao",
+      "UserEmail": "yini.gao@un.org",
+      "WorkflowLogDate": "2023-02-22T18:00:52.33",
+      "Comments": "",
+      "TaskCreatedDate": "2023-02-21T12:46:23.96",
+      "AssignedTaskDetail": null,
+      "LoggedTaskDetail": {
+        "UserName": "Yini Gao",
+        "UserEmail": "yini.gao@un.org",
+        "UserRoleName": "FCS Finance",
+        "UserRoleCode": "OCHAFIN",
+        "Date": "2023-02-22T18:00:52.6"
+      },
+      "EmailLogs": [
+        {
+          "TaskInstanceLogId": 103509,
+          "AlertTitle": "GA signed by EO",
+          "EmailCount": 1,
+          "EncrAlertId": "tg0fBtACdyc="
+        }
+      ],
+      "AdditionalTasks": [
+      ]
+    }
+  ],
+  "DataState": "OK",
+  "DataStateMessage": null
+}

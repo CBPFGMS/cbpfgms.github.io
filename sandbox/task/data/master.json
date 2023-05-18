@@ -1,0 +1,1312 @@
+{
+	"CurrentStatusId": 4198,
+	"CurrentStatusCode": "PRJ_DISBURSEMENT",
+	"ProjectTemplateId": 3,
+	"RowCount": 3,
+	"DataState": "OK",
+	"DataStateMessage": null,
+	"TaskStatuses": [
+		{
+			"StatusId": 0,
+			"RowId": 0,
+			"StatusType": "start",
+			"StatusName": "Project created",
+			"StatusCode": "CREATED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4171,
+			"RowId": 1,
+			"StatusType": "primary",
+			"StatusName": "Project draft",
+			"StatusCode": "PRJ_DRFT",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4172,
+					"NextStatusName": "Under Pre-SR",
+					"NextStatusCode": "",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "(Temp) Send to Pre-SR",
+							"ButtonText": "(Temp) Move to Pre-SR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						},
+						{
+							"TaskName": "Draft Proposal",
+							"ButtonText": "Send to PRe-SR",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						},
+						{
+							"TaskName": "Draft Proposal",
+							"ButtonText": "Submit Project Proposal",
+							"Roles": [
+								{
+									"UserRoleName": "Agencies/Partners",
+									"UserRoleCode": "PARTNER"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": [
+				{
+					"SubTaskName": "(Temp) Send to Pre-SR",
+					"SubTaskCode": "",
+					"IsTaskCompleted": false,
+					"AssignedToCurrentRole": true,
+					"Roles": [
+						{
+							"UserRoleName": "Humanitarian Financing Unit (HFU)",
+							"UserRoleCode": "HFU"
+						}
+					],
+					"TaskSteps": [
+						{
+							"TaskStepTypeName": "Move Workflow",
+							"TaskStepTypeCode": "WORKFLOW"
+						}
+					]
+				}
+			]
+		},
+		{
+			"StatusId": 4172,
+			"RowId": 2,
+			"StatusType": "primary",
+			"StatusName": "Under Pre-SR",
+			"StatusCode": "",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4171,
+					"NextStatusName": "Project draft",
+					"NextStatusCode": "PRJ_DRFT",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review (Pre-SR) and Send to SR",
+							"ButtonText": "Send to IP for Re-Draft",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						},
+						{
+							"TaskName": "Review (Pre-SR) and Send to SR",
+							"ButtonText": "Back to DRAFT",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4175,
+					"NextStatusName": "Under SR",
+					"NextStatusCode": "PRJ_UND_SR",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review (Pre-SR) and Send to SR",
+							"ButtonText": "Send to SR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4175,
+			"RowId": 3,
+			"StatusType": "secondary",
+			"StatusName": "Under SR",
+			"StatusCode": "PRJ_UND_SR",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4176,
+					"NextStatusName": "SR Assessed",
+					"NextStatusCode": "PRJ_SR_CMPL",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review Proposal (SR)",
+							"ButtonText": "SR Considered",
+							"Roles": [
+								{
+									"UserRoleName": "Clusters leads and support officers",
+									"UserRoleCode": "CC"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4176,
+			"RowId": 4,
+			"StatusType": "primary",
+			"StatusName": "SR Assessed",
+			"StatusCode": "PRJ_SR_CMPL",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4175,
+					"NextStatusName": "Under SR",
+					"NextStatusCode": "PRJ_UND_SR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Confirm SR assessment results",
+							"ButtonText": "Send Back",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4179,
+					"NextStatusName": "Under TR CC/Specialist",
+					"NextStatusCode": "PRJ_UND_TR_CC_SPC",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Confirm SR assessment results",
+							"ButtonText": "Send to Cluster Coordinator for TR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4179,
+			"RowId": 5,
+			"StatusType": "secondary",
+			"StatusName": "Under TR CC/Specialist",
+			"StatusCode": "PRJ_UND_TR_CC_SPC",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Complete Technical Review and return to HFU",
+							"ButtonText": "Return to HFU",
+							"Roles": [
+								{
+									"UserRoleName": "Clusters leads and support officers",
+									"UserRoleCode": "CC"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4180,
+			"RowId": 6,
+			"StatusType": "primary",
+			"StatusName": "Under TR HFU",
+			"StatusCode": "PRJ_UND_TR_HFU",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4179,
+					"NextStatusName": "Under TR CC/Specialist",
+					"NextStatusCode": "PRJ_UND_TR_CC_SPC",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "Send to Cluster Coordinator for TR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						},
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "Send Back",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage TR",
+							"ButtonText": "do not click",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4181,
+					"NextStatusName": "TR Draft",
+					"NextStatusCode": "PRJ_TR_DRFT",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "Send to IP for Re-Draft",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4193,
+					"NextStatusName": "Under GA Preparation",
+					"NextStatusCode": "PRJ_UND_GA_PREPAR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "GA prep",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4211,
+					"NextStatusName": "Under TR CBPF Finance",
+					"NextStatusCode": "PRJ_UND_TR_FIN",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "Send to FCS Finance for TR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 8463,
+					"NextStatusName": "Under TR HFU Finance",
+					"NextStatusCode": "PRJ_UND_TR_HFU_FIN",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Manage Technical Review",
+							"ButtonText": "Send to HFU Finance for TR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 8463,
+			"RowId": 7,
+			"StatusType": "secondary",
+			"StatusName": "Under TR HFU Finance",
+			"StatusCode": "PRJ_UND_TR_HFU_FIN",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "Return to TR by HFU",
+							"Roles": [
+								{
+									"UserRoleName": "HFU Finance",
+									"UserRoleCode": "HFUFIN"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4189,
+					"NextStatusName": "Budget Cleared",
+					"NextStatusCode": "PRJ_BUDGET_CLR",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "Budget Cleared",
+							"Roles": [
+								{
+									"UserRoleName": "HFU Finance",
+									"UserRoleCode": "HFUFIN"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4211,
+			"RowId": 8,
+			"StatusType": "secondary",
+			"StatusName": "Under TR CBPF Finance",
+			"StatusCode": "PRJ_UND_TR_FIN",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "Send Back",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						},
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "to TR HFU",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						},
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "Return to HFU",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4189,
+					"NextStatusName": "Budget Cleared",
+					"NextStatusCode": "PRJ_BUDGET_CLR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Complete Technical Review",
+							"ButtonText": "Budget Cleared",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4181,
+			"RowId": 9,
+			"StatusType": "secondary",
+			"StatusName": "TR Draft",
+			"StatusCode": "PRJ_TR_DRFT",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Re-draft (TR)",
+							"ButtonText": "Submit Project Proposal",
+							"Roles": [
+								{
+									"UserRoleName": "Agencies/Partners",
+									"UserRoleCode": "PARTNER"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4189,
+			"RowId": 10,
+			"StatusType": "primary",
+			"StatusName": "Budget Cleared",
+			"StatusCode": "PRJ_BUDGET_CLR",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Send to HC endorsement",
+							"ButtonText": "Under TR HFU",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4189,
+					"NextStatusName": "Budget Cleared",
+					"NextStatusCode": "PRJ_BUDGET_CLR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "manage budget clearance",
+							"ButtonText": "do not click",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4190,
+					"NextStatusName": "Under HC Endorsement",
+					"NextStatusCode": "",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Send to HC endorsement",
+							"ButtonText": "Send to HC for Endorsement",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4190,
+			"RowId": 11,
+			"StatusType": "secondary",
+			"StatusName": "Under HC Endorsement",
+			"StatusCode": "",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4192,
+					"NextStatusName": "HC Endorsed - Approved",
+					"NextStatusCode": "PRJ_HC_ENDR_APPRV",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review Proposal and provide endorsement/rejection",
+							"ButtonText": "HC Endorsed",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Coordinator (HC)",
+									"UserRoleCode": "HC"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4192,
+			"RowId": 12,
+			"StatusType": "primary",
+			"StatusName": "HC Endorsed - Approved",
+			"StatusCode": "PRJ_HC_ENDR_APPRV",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Validate project info and timelines",
+							"ButtonText": "Back to under TR HFU",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4190,
+					"NextStatusName": "Under HC Endorsement",
+					"NextStatusCode": "",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Validate project info and timelines",
+							"ButtonText": "Send back to HC for final decision",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4193,
+					"NextStatusName": "Under GA Preparation",
+					"NextStatusCode": "PRJ_UND_GA_PREPAR",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Validate project info and timelines",
+							"ButtonText": "GA Preparation",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4193,
+			"RowId": 13,
+			"StatusType": "primary",
+			"StatusName": "Under GA Preparation",
+			"StatusCode": "PRJ_UND_GA_PREPAR",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Generate Grant Agreement",
+							"ButtonText": "Send back to TR",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4192,
+					"NextStatusName": "HC Endorsed - Approved",
+					"NextStatusCode": "PRJ_HC_ENDR_APPRV",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Generate Grant Agreement",
+							"ButtonText": "Send Back",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4194,
+					"NextStatusName": "HC Final Approval and GA Signature",
+					"NextStatusCode": "PRJ_HC_APPROVAL",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Generate Grant Agreement",
+							"ButtonText": "Send to HC Signature",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4194,
+			"RowId": 14,
+			"StatusType": "secondary",
+			"StatusName": "HC Final Approval and GA Signature",
+			"StatusCode": "PRJ_HC_APPROVAL",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4195,
+					"NextStatusName": "IP counter-signature",
+					"NextStatusCode": "PRJ_IP_CNT_SIG",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Sign Grant Agreement",
+							"ButtonText": "HC Signed",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Coordinator (HC)",
+									"UserRoleCode": "HC"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4195,
+			"RowId": 15,
+			"StatusType": "secondary",
+			"StatusName": "IP counter-signature",
+			"StatusCode": "PRJ_IP_CNT_SIG",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4180,
+					"NextStatusName": "Under TR HFU",
+					"NextStatusCode": "PRJ_UND_TR_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Counter-sign Grant Agreement",
+							"ButtonText": "Send back to TR HFU",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4193,
+					"NextStatusName": "Under GA Preparation",
+					"NextStatusCode": "PRJ_UND_GA_PREPAR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Counter-sign Grant Agreement",
+							"ButtonText": "Send back to GA prep",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4204,
+					"NextStatusName": "IP submission of GA to HFU",
+					"NextStatusCode": "PRJ_IP_SUB_GA_TO_HFU",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Counter-sign Grant Agreement",
+							"ButtonText": "Submit for Final Signature and Disbursement",
+							"Roles": [
+								{
+									"UserRoleName": "Agencies/Partners",
+									"UserRoleCode": "PARTNER"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4204,
+			"RowId": 16,
+			"StatusType": "primary",
+			"StatusName": "IP submission of GA to HFU",
+			"StatusCode": "PRJ_IP_SUB_GA_TO_HFU",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4195,
+					"NextStatusName": "IP counter-signature",
+					"NextStatusCode": "PRJ_IP_CNT_SIG",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review counter signed GA",
+							"ButtonText": "Send back to IP",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4197,
+					"NextStatusName": "EO agreement clearance",
+					"NextStatusCode": "PRJ_GA_SGN_BY_EO",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Review counter signed GA",
+							"ButtonText": "Send to FCS for final signature",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4197,
+			"RowId": 17,
+			"StatusType": "secondary",
+			"StatusName": "EO agreement clearance",
+			"StatusCode": "PRJ_GA_SGN_BY_EO",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4198,
+					"NextStatusName": "Disbursement",
+					"NextStatusCode": "PRJ_DISBURSEMENT",
+					"IsCompleted": true,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Sign Grant Agreement (EO)",
+							"ButtonText": "GA counter-signed",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4204,
+					"NextStatusName": "IP submission of GA to HFU",
+					"NextStatusCode": "PRJ_IP_SUB_GA_TO_HFU",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Sign Grant Agreement (EO)",
+							"ButtonText": "Send comments on GA to HFU ",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4198,
+			"RowId": 18,
+			"StatusType": "secondary",
+			"StatusName": "Disbursement",
+			"StatusCode": "PRJ_DISBURSEMENT",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4197,
+					"NextStatusName": "EO agreement clearance",
+					"NextStatusCode": "PRJ_GA_SGN_BY_EO",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Confirm disbursement",
+							"ButtonText": "Send Back to EO Signature",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4199,
+					"NextStatusName": "Implementation & Reporting",
+					"NextStatusCode": "PRJ_IMPL_RPT",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Confirm disbursement",
+							"ButtonText": "Project disbursed",
+							"Roles": [
+								{
+									"UserRoleName": "FCS Finance",
+									"UserRoleCode": "OCHAFIN"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4199,
+			"RowId": 19,
+			"StatusType": "secondary",
+			"StatusName": "Implementation & Reporting",
+			"StatusCode": "PRJ_IMPL_RPT",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4232,
+					"NextStatusName": "Under Final Reporting",
+					"NextStatusCode": "PRJ_UND_FINAL_RPT",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Send to 'Under Final Reporting'",
+							"ButtonText": "Send to Under Final Reporting",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4232,
+			"RowId": 20,
+			"StatusType": "secondary",
+			"StatusName": "Under Final Reporting",
+			"StatusCode": "PRJ_UND_FINAL_RPT",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4199,
+					"NextStatusName": "Implementation & Reporting",
+					"NextStatusCode": "PRJ_IMPL_RPT",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Activate final processes (audit/closure)",
+							"ButtonText": "Send Back to Implementation",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4200,
+					"NextStatusName": "Under Closure",
+					"NextStatusCode": "PRJ_UND_CLSR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Activate final processes (audit/closure)",
+							"ButtonText": "Begin Project Closure",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4222,
+					"NextStatusName": "Under Audit",
+					"NextStatusCode": "PRJ_UND_AUD",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Activate final processes (audit/closure)",
+							"ButtonText": "Trigger Audit (Only for non-UN projects)",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4222,
+			"RowId": 21,
+			"StatusType": "secondary",
+			"StatusName": "Under Audit",
+			"StatusCode": "PRJ_UND_AUD",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4200,
+					"NextStatusName": "Under Closure",
+					"NextStatusCode": "PRJ_UND_CLSR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Process audit",
+							"ButtonText": "Trigger project closure (only for non-UN projects)",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				},
+				{
+					"NextStatusId": 4224,
+					"NextStatusName": "Under Refund",
+					"NextStatusCode": "PRJ_UND_REF",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Process audit",
+							"ButtonText": "Begin Refund",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4224,
+			"RowId": 22,
+			"StatusType": "secondary",
+			"StatusName": "Under Refund",
+			"StatusCode": "PRJ_UND_REF",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4200,
+					"NextStatusName": "Under Closure",
+					"NextStatusCode": "PRJ_UND_CLSR",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Process Refund",
+							"ButtonText": "Trigger Project Closure",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4200,
+			"RowId": 23,
+			"StatusType": "primary",
+			"StatusName": "Under Closure",
+			"StatusCode": "PRJ_UND_CLSR",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4219,
+					"NextStatusName": "Project Closed",
+					"NextStatusCode": "PRJ_PRJ_CLS",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Close project",
+							"ButtonText": "Project Closed",
+							"Roles": [
+								{
+									"UserRoleName": "Humanitarian Financing Unit (HFU)",
+									"UserRoleCode": "HFU"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4219,
+			"RowId": 24,
+			"StatusType": "secondary",
+			"StatusName": "Project Closed",
+			"StatusCode": "PRJ_PRJ_CLS",
+			"NextStatuses": [
+				{
+					"NextStatusId": 4222,
+					"NextStatusName": "Under Audit",
+					"NextStatusCode": "PRJ_UND_AUD",
+					"IsCompleted": false,
+					"LinkType": "direct",
+					"Tasks": [
+						{
+							"TaskName": "Close project",
+							"ButtonText": "back",
+							"Roles": [
+								{
+									"UserRoleName": "GMS Admin team (HQ FCS)",
+									"UserRoleCode": "GMSAdmin"
+								}
+							]
+						}
+					]
+				}
+			],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4230,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "IP Withdrawal",
+			"StatusCode": "PRJ_WITHDRAWN",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4191,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "HC Endorsed - Rejected",
+			"StatusCode": "PRJ_REJECTED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4218,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "TR Rejected",
+			"StatusCode": "PRJ_REJECTED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4188,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "TR Non-recommended",
+			"StatusCode": "PRJ_TR_NON_RECOMM",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4203,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "Under HC Rejection",
+			"StatusCode": "PRJ_REJECTED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4177,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "SR Rejected",
+			"StatusCode": "PRJ_REJECTED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4178,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "PP Withdrawn",
+			"StatusCode": "PRJ_WITHDRAWN",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4173,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "Pre-SR Rejected",
+			"StatusCode": "PRJ_REJECTED",
+			"NextStatuses": [],
+			"SubTasks": []
+		},
+		{
+			"StatusId": 4174,
+			"RowId": 999,
+			"StatusType": "reject",
+			"StatusName": "To be deleted",
+			"StatusCode": "PRJ_TO_BE_DELETED",
+			"NextStatuses": [],
+			"SubTasks": []
+		}
+	]
+}
