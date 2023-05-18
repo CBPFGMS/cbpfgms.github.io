@@ -1817,7 +1817,8 @@
 				(donorsArray.length * lollipopGroupHeight) + donorsPanel.padding[0]
 				]);
 
-				const cbpfName = cbpfRecipient ? " (donations to " + cbpfRecipient + ")" : "";
+				//removing text with selected funds
+				//const cbpfName = cbpfRecipient ? " (donations to " + cbpfRecipient + ")" : "";
 
 				let donorsPanelTitle = donorsPanel.main.selectAll(".pbiclcDonorsPanelTitle")
 					.data([true]);
@@ -1834,14 +1835,14 @@
 					.duration(duration)
 					.attr("x", donorsPanel.padding[3]);
 
-				let donorsPanelTitleSpan = donorsPanelTitle.selectAll(".pbiclcDonorsPanelTitleSpan")
-					.data([true]);
+				// let donorsPanelTitleSpan = donorsPanelTitle.selectAll(".pbiclcDonorsPanelTitleSpan")
+				// 	.data([true]);
 
-				donorsPanelTitleSpan = donorsPanelTitleSpan.enter()
-					.append("tspan")
-					.attr("class", "pbiclcDonorsPanelTitleSpan")
-					.merge(donorsPanelTitleSpan)
-					.text(cbpfName);
+				// donorsPanelTitleSpan = donorsPanelTitleSpan.enter()
+				// 	.append("tspan")
+				// 	.attr("class", "pbiclcDonorsPanelTitleSpan")
+				// 	.merge(donorsPanelTitleSpan)
+				// 	.text(cbpfName);
 
 				let donorGroup = donorsPanel.main.selectAll(".pbiclcDonorGroup")
 					.data(donorsArray, function (d) {
@@ -2229,7 +2230,8 @@
 				(cbpfsArray.length * lollipopGroupHeight) + cbpfsPanel.padding[0]
 				]);
 
-				const donorName = donorCountry ? " (donations from " + donorCountry + ")" : "";
+				//removing text with the selected donor
+				//const donorName = donorCountry ? " (donations from " + donorCountry + ")" : "";
 
 				let cbpfsPanelTitle = cbpfsPanel.main.selectAll(".pbiclcCbpfsPanelTitle")
 					.data([true]);
@@ -2246,14 +2248,14 @@
 					.duration(duration)
 					.attr("x", cbpfsPanel.padding[3]);
 
-				let cbpfsPanelTitleSpan = cbpfsPanelTitle.selectAll(".pbiclcCbpfsPanelTitleSpan")
-					.data([true]);
+				// let cbpfsPanelTitleSpan = cbpfsPanelTitle.selectAll(".pbiclcCbpfsPanelTitleSpan")
+				// 	.data([true]);
 
-				cbpfsPanelTitleSpan = cbpfsPanelTitleSpan.enter()
-					.append("tspan")
-					.attr("class", "pbiclcCbpfsPanelTitleSpan")
-					.merge(cbpfsPanelTitleSpan)
-					.text(donorName);
+				// cbpfsPanelTitleSpan = cbpfsPanelTitleSpan.enter()
+				// 	.append("tspan")
+				// 	.attr("class", "pbiclcCbpfsPanelTitleSpan")
+				// 	.merge(cbpfsPanelTitleSpan)
+				// 	.text(donorName);
 
 				let cbpfGroup = cbpfsPanel.main.selectAll(".pbiclcCbpfGroup")
 					.data(cbpfsArray, function (d) {
