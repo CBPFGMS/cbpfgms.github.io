@@ -19,17 +19,14 @@ const {
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
 const flowChartDivContainer = chartContainer
-		.append("div")
-		.attr("class", classPrefix + "flowChartDivContainer"),
+	.append("div")
+	.attr("class", classPrefix + "flowChartDivContainer"),
 	sideDiv = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "sideDiv"),
 	flowChartCurrentStatusDiv = sideDiv
 		.append("div")
 		.attr("class", classPrefix + "flowChartCurrentStatusDiv"),
-	currentStatusBullet = flowChartCurrentStatusDiv
-		.append("span")
-		.html("&#11045 "),
 	// eslint-disable-next-line no-unused-vars
 	currentStatusText = flowChartCurrentStatusDiv
 		.append("span")
@@ -93,11 +90,6 @@ function createFlowChart(rawData) {
 	const { linksGroup, labelsGroup } = drawLinks({ dataLinks, svg });
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
-
-	currentStatusBullet.style(
-		"color",
-		d3.color(currentStatusFillColor).darker(0.5)
-	);
 
 	currentStatusValueSpan
 		.style("text-decoration", "underline")

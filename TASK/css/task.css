@@ -11,7 +11,7 @@
 
 .taskflowChartDivContainer {
 	flex: 0 75%;
-	border-right: 1px solid #ddd;
+	border-right: 3px solid #fff;
 	display: flex;
 	flex-direction: column;
 }
@@ -30,21 +30,10 @@
 	border-radius: 4px;
 	padding: 0.5em;
 	margin-bottom: 1em;
+	margin-top: 2em;
 	background-color: white;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	box-sizing: border-box;
-}
-
-.taskflowChartHoveredDiv {
-	flex: 0 50%;
-	border: 1px solid #aaa;
-	border-radius: 4px;
-	padding: 0.5em;
-	font-style: italic;
-	font-size: 0.8em;
-	height: 100%;
-	display: flex;
-	align-items: center;
 }
 
 .taskcurrentStatusValueSpan {
@@ -78,7 +67,7 @@
 }
 
 details {
-	border: 1px solid #aaa;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 	border-radius: 4px;
 	padding: 0.5em 0.5em 0;
 	position: absolute;
@@ -101,7 +90,7 @@ details[open] {
 }
 
 details[open] summary {
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px solid #ddd;
 	margin-bottom: 0.5em;
 }
 
