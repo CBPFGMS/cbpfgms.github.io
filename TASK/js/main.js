@@ -13,9 +13,7 @@ const {
 	classPrefix,
 	chartContainer,
 	defaultNumberOfColumns,
-	yScale,
 	currentStatusFillColor,
-	defaultHoverText,
 } = constants;
 
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
@@ -26,19 +24,9 @@ const flowChartDivContainer = chartContainer
 	sideDiv = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "sideDiv"),
-	flowChartTopDiv = flowChartDivContainer
-		.append("div")
-		.attr("class", classPrefix + "flowChartTopDiv"),
-	flowChartCurrentStatusDiv = flowChartTopDiv
+	flowChartCurrentStatusDiv = sideDiv
 		.append("div")
 		.attr("class", classPrefix + "flowChartCurrentStatusDiv"),
-	flowChartHoveredDiv = flowChartTopDiv
-		.append("div")
-		.attr("class", classPrefix + "flowChartHoveredDiv"),
-	flowChartHoveredSpan = flowChartHoveredDiv
-		.append("span")
-		.attr("class", classPrefix + "flowChartHoveredSpan")
-		.html(defaultHoverText),
 	currentStatusBullet = flowChartCurrentStatusDiv
 		.append("span")
 		.html("&#11045 "),
@@ -77,7 +65,6 @@ const svg = flowChartDiv.append("svg").attr("width", width);
 d3.json("./data/master.json").then(createFlowChart);
 
 function createFlowChart(rawData) {
-
 	const data = processData(rawData);
 
 	const {
@@ -107,10 +94,6 @@ function createFlowChart(rawData) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	flowChartTopDiv
-		.style("margin-left", yScale(0) + "px")
-		.style("margin-right", yScale(0) + "px");
-
 	currentStatusBullet.style(
 		"color",
 		d3.color(currentStatusFillColor).darker(0.5)
@@ -127,7 +110,6 @@ function createFlowChart(rawData) {
 		linksGroup,
 		labelsGroup,
 		currentStatus,
-		dataNodes,
 		dataLinks,
 		currentStatusValueSpan,
 		currentSequence,
@@ -144,6 +126,7 @@ function createFlowChart(rawData) {
 		linksGroup,
 		labelsGroup,
 		linksList,
-		flowChartHoveredSpan,
+		flowChartCurrentStatusDiv,
+		currentStatus,
 	});
 }

@@ -21,7 +21,7 @@ const stylesList = {
 				"stroke-width": 0,
 				rx: 4,
 				ry: 4,
-				filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.3))",
+				filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.3))",
 			},
 			secondary: {
 				fill: "white",
@@ -29,7 +29,7 @@ const stylesList = {
 				"stroke-width": 0,
 				rx: 4,
 				ry: 4,
-				filter: "drop-shadow(0px 2px 6px rgba(0,0,0,0.3))",
+				filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.3))",
 			},
 			reject: {
 				fill: "#ddd",

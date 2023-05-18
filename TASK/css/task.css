@@ -6,7 +6,7 @@
 	width: 100%;
 	background-color: #f0f2f5;
 	border-radius: 8px;
-	padding: 8px;	
+	padding: 8px;
 }
 
 .taskflowChartDivContainer {
@@ -25,14 +25,14 @@
 }
 
 .taskflowChartCurrentStatusDiv {
-	display: flex;
 	align-items: center;
 	white-space: pre;
-	flex: 0 50%;
-	border: 1px solid #aaa;
 	border-radius: 4px;
 	padding: 0.5em;
-	height: 100%;
+	margin-bottom: 1em;
+	background-color: white;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	box-sizing: border-box;
 }
 
 .taskflowChartHoveredDiv {
@@ -59,7 +59,7 @@
 	flex: 0 25%;
 	padding-left: 0.8%;
 	padding-right: 0.8%;
-/*	display: flex;
+	/*	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;*/
 }
@@ -67,7 +67,7 @@
 .tasksideDivTitle {
 	position: relative;
 	min-height: 48px;
-/*	flex: 0 10%;*/
+	/*	flex: 0 10%;*/
 }
 
 .tasknodeText {
@@ -107,7 +107,7 @@ details[open] summary {
 
 .tasksideDivContainer {
 	width: 100%;
-/*	flex: 0 90%;*/
+	/*	flex: 0 90%;*/
 }
 
 .tasklistRows {
@@ -126,7 +126,7 @@ details[open] summary {
 	border-radius: 50%;
 	width: 34px;
 	height: 34px;
-	background: rgba(255,255,255,0.5);
+	background: rgba(255, 255, 255, 0.5);
 	border: 3px solid currentColor;
 	font-size: 16px;
 }
@@ -167,4 +167,3 @@ details[open] summary {
 	font-size: 12px;
 	font-family: "Arial", sans-serif;
 }
-

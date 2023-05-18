@@ -1,29 +1,31 @@
 import { constants } from "./constants.js";
 
-const {
-	fadeOpacityNodes,
-	fadeOpacityLinks,
-	fadeOpacityLinkLabels,
-	defaultHoverText,
-} = constants;
+const { fadeOpacityNodes, fadeOpacityLinks, fadeOpacityLinkLabels } = constants;
 
 function highlight({
 	nodesGroup,
 	linksGroup,
 	labelsGroup,
 	linksList,
-	flowChartHoveredSpan,
+	flowChartCurrentStatusDiv,
+	currentStatus,
 }) {
 	const labelsText = labelsGroup.select("text"),
 		labelsCircle = labelsGroup.select("circle");
 
+	const currentStatusNode = nodesGroup.filter(
+		d => d.data.id === currentStatus
+	);
+
 	nodesGroup.on("mouseenter", mouseoverNodesGroup).on("mouseleave", mouseout);
-
 	linksGroup.on("mouseenter", mouseoverLinks).on("mouseleave", mouseout);
-
 	labelsGroup.on("mouseenter", mouseoverLinks).on("mouseleave", mouseout);
-
 	linksList.on("mouseenter", mouseoverLinksList).on("mouseleave", mouseout);
+	flowChartCurrentStatusDiv
+		.on("mouseenter", () => {
+			mouseoverNodesGroup(null, currentStatusNode.datum());
+		})
+		.on("mouseleave", mouseout);
 
 	function mouseoverNodesGroup(event, d) {
 		const linkedNodes = [];
@@ -59,10 +61,6 @@ function highlight({
 				? 1
 				: fadeOpacityNodes
 		);
-		if (d.data.tooltipText)
-			flowChartHoveredSpan
-				.style("font-style", "normal")
-				.html(d.data.tooltipText);
 	}
 
 	function mouseoverLinks(event, d) {
@@ -116,7 +114,6 @@ function highlight({
 		labelsCircle.style("stroke-opacity", d => d.setOpacity);
 		labelsCircle.style("filter", null);
 		linksList.style("opacity", d => d.setOpacity);
-		flowChartHoveredSpan.style("font-style", null).html(defaultHoverText);
 	}
 }
 
