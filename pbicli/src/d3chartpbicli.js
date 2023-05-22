@@ -2528,7 +2528,7 @@
 					});
 					const thisDatum = filteredValue[filteredValue.length - 1];
 					return {
-						name: isoAlpha2to3[d.isoCode.toUpperCase()],
+						name: isoAlpha2to3[d.isoCode.substring(0,2).toUpperCase()],
 						datum: thisDatum,
 						yPos: yScaleCbpfs(thisDatum.total),
 						isoCode: d.isoCode
@@ -3036,7 +3036,7 @@
 
 				row.GMSDonorISO2Code = row.GMSDonorISO2Code.toLowerCase();
 
-				row.PooledFundISO2Code = row.PooledFundISO2Code.toLowerCase();
+				row.PooledFundISO2Code = row.PooledFundName.includes("Closed") ? row.PooledFundISO2Code.toLowerCase() + "closed" : row.PooledFundISO2Code.toLowerCase();
 
 				dataKeys.forEach(function (key) {
 					if (data[key].indexOf(row[dataColumns[key]].trim()) === -1) {
