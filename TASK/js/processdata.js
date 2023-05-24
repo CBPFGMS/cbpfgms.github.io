@@ -4,7 +4,7 @@ function processData(rawData) {
 		links: [],
 		numberOfColumns: rawData.RowCount + 1,
 		currentStatus: rawData.CurrentStatusId,
-		"currentSequence": [1, 2, 4, 6]
+		currentSequence: [],
 	};
 
 	const nodesSet = new Set();
@@ -28,14 +28,27 @@ function processData(rawData) {
 		}
 
 		node.NextStatuses.forEach(link => {
+			if (link.IsCompleted) {
+				if (data.currentSequence.length === 0) {
+					data.currentSequence.push(node.StatusId);
+				}
+				data.currentSequence.push(link.NextStatusId);
+			}
 			data.links.push({
 				source: node.StatusId,
 				target: link.NextStatusId,
 				text: "",
 				type: link.LinkType,
 				id: ++counterLink,
+				isCompleted: link.IsCompleted,
+				tasks: link.Tasks,
 			});
 		});
+	});
+
+	data.links.forEach(link => {
+		//This should be changed to filter the task name accordingly
+		link.text = link.tasks[0].TaskName;
 	});
 
 	return data;

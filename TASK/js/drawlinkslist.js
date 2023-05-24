@@ -2,8 +2,13 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { stylesList } from "./styleslist.js";
 import { constants, variables } from "./constants.js";
 
-const { classPrefix, nodesTextSpacing, previousStepsColor, nextStepsColor } =
-	constants;
+const {
+	classPrefix,
+	nodesTextSpacing,
+	stepsColorOpacity,
+	previousStepsColor,
+	nextStepsColor,
+} = constants;
 
 function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 	const dataList = dataLinksOriginal
@@ -24,7 +29,7 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 			const { r, g, b } = d3.color(
 				i ? nextStepsColor : previousStepsColor
 			);
-			return `rgba(${r},${g},${b}, 0.1)`;
+			return `rgba(${r},${g},${b}, ${stepsColorOpacity})`;
 		})
 		.attr("class", classPrefix + "stageDiv");
 
@@ -52,6 +57,12 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 		const rowNumber = listRows
 			.append("div")
 			.attr("class", classPrefix + "listRowsNumber")
+			.style("background-color", () => {
+				const { r, g, b } = d3.color(
+					i ? nextStepsColor : previousStepsColor
+				);
+				return `rgba(${r},${g},${b}, ${stepsColorOpacity})`;
+			})
 			.append("span")
 			.html(d => d.id);
 

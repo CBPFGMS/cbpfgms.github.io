@@ -1,6 +1,12 @@
 import { constants } from "./constants.js";
 
-const { fadeOpacityNodes, fadeOpacityLinks, fadeOpacityLinkLabels } = constants;
+const {
+	fadeOpacityNodes,
+	fadeOpacityLinks,
+	fadeOpacityLinkLabels,
+	fadeOpacityLinkList,
+	fadeOpacityLinkListBase,
+} = constants;
 
 function highlight({
 	nodesGroup,
@@ -54,7 +60,7 @@ function highlight({
 		linksList.style("opacity", e =>
 			e.source === d.data.id || e.target === d.data.id
 				? 1
-				: fadeOpacityLinkLabels
+				: fadeOpacityLinkListBase
 		);
 		nodesGroup.style("opacity", e =>
 			e.data.id === d.data.id || linkedNodes.includes(e.data.id)
@@ -77,7 +83,7 @@ function highlight({
 			e.data.id === d.data.id ? null : "contrast(0.9)"
 		);
 		linksList.style("opacity", e =>
-			e.id === d.data.id ? 1 : fadeOpacityLinks
+			e.id === d.data.id ? 1 : fadeOpacityLinkListBase
 		);
 		nodesGroup.style("opacity", e =>
 			e.data.id === d.data.source || e.data.id === d.data.target
@@ -87,7 +93,9 @@ function highlight({
 	}
 
 	function mouseoverLinksList(event, d) {
-		linksList.style("opacity", e => (e.id === d.id ? 1 : fadeOpacityLinks));
+		linksList.style("opacity", e =>
+			e.id === d.id ? 1 : fadeOpacityLinkList
+		);
 		linksGroup.style("opacity", e =>
 			e.data.id === d.id ? 1 : fadeOpacityLinks
 		);
@@ -98,7 +106,7 @@ function highlight({
 			e.data.id === d.id ? 1 : fadeOpacityLinks
 		);
 		labelsCircle.style("filter", e =>
-			e.data.id === d.data.id ? null : "contrast(0.9)"
+			e.data.id === d.id ? null : "contrast(0.9)"
 		);
 		nodesGroup.style("opacity", e =>
 			e.data.id === d.source || e.data.id === d.target

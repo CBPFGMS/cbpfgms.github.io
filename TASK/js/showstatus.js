@@ -1,3 +1,4 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
 
 const {
@@ -7,6 +8,7 @@ const {
 	previousStepsColor,
 	previousStepsStroke,
 	nextStepsOpacity,
+	previousStepsColorWithOpacity,
 } = constants;
 
 function showStatus({
@@ -25,27 +27,22 @@ function showStatus({
 		d => d.data.id === currentStatus
 	);
 
-	currentStatusNode.select("rect").style("fill", currentStatusFillColor);
-	currentStatusNode.select("text").style("fill", currentStatusTextFillColor);
-
 	currentStatusValueSpan.html(currentStatusNode.datum().data.text);
 
 	// const { previousNodes, previousLinks } = populatePreviousNodesAndLinks(dataLinks, currentStatus);
 
-	const currentLinks = populatePastLinks(currentSequence, dataLinks);
-
-	// nodesGroup.style("filter", d => d.data.id === currentStatus || d.data.type === "start" ? null : previousNodes.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
-	// 	`drop-shadow(0px 0px 4px ${nextStepsColor})`);
-	// linksGroup.select(`.${classPrefix}links`).style("filter", d => previousLinks.includes(d.data.id) ? `drop-shadow(0px 0px 4px ${previousStepsColor})` :
-	// 	`drop-shadow(0px 0px 4px ${nextStepsColor})`);
+	const currentLinks = dataLinks.reduce((acc, curr) => {
+		if (curr.data.isCompleted) acc.push(curr.data.id);
+		return acc;
+	}, []);
 
 	nodesGroup
 		.filter(
 			d => d.data.type !== "start" && currentSequence.includes(d.data.id)
 		)
 		.select("rect")
-		.style("filter", `drop-shadow(0px 0px 4px ${previousStepsColor})`)
-		.style("stroke", previousStepsColor);
+		.style("fill", previousStepsColorWithOpacity);
+
 	linksGroup
 		.filter(d => currentLinks.includes(d.data.id))
 		.select(`.${classPrefix}links`)
@@ -68,37 +65,10 @@ function showStatus({
 		.filter(d => !currentLinks.includes(d.data.id))
 		.style("stroke-opacity", d => (d.setOpacity = nextStepsOpacity));
 
+	currentStatusNode.select("rect").style("fill", currentStatusFillColor);
+	currentStatusNode.select("text").style("fill", currentStatusTextFillColor);
+
 	return currentLinks;
 }
-
-function populatePastLinks(currentSequence, dataLinks) {
-	const linksArray = dataLinks.reduce((acc, curr) => {
-		if (
-			currentSequence.includes(curr.data.source) &&
-			currentSequence.includes(curr.data.target)
-		)
-			acc.push(curr.data.id);
-		return acc;
-	}, []);
-	return linksArray;
-}
-
-// function populatePreviousNodesAndLinks(dataLinks, currentStatus) {
-// 	const previousNodes = [],
-// 		previousLinks = [];
-
-// 	const incomingLinks = dataLinks.filter(d => d.data.target === currentStatus);
-// 	incomingLinks.forEach(populateArrays);
-
-// 	function populateArrays(link) {
-// 		if (previousLinks.includes(link.data.id)) return;
-// 		previousLinks.push(link.data.id);
-// 		previousNodes.push(link.data.source);
-// 		const nextLinks = dataLinks.filter(d => d.data.target === link.data.source);
-// 		if (nextLinks.length) nextLinks.forEach(populateArrays);
-// 	};
-
-// 	return { previousNodes, previousLinks };
-// };
 
 export { showStatus };
