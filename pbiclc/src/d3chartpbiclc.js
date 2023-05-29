@@ -2556,10 +2556,12 @@
 					.select(".pbiclcDonorPaidIndicator")
 					.transition()
 					.duration(duration)
-					.style(
-						"opacity",
-						chartState.selectedContribution === "total" ? 1 : 0
-					)
+					.style("opacity", function (d) {
+						return chartState.selectedContribution === "total" &&
+							d.pledge
+							? 1
+							: 0;
+					})
 					.attr("transform", function (d) {
 						const thisPadding =
 							xScaleDonors(d.total) - xScaleDonors(d.paid) <
@@ -2640,7 +2642,10 @@
 										)(i(t))
 										.replace("G", "B")
 								);
-							if (chartState.selectedContribution === "total") {
+							if (
+								chartState.selectedContribution === "total" &&
+								d.pledge
+							) {
 								thisLabel.call(populateLabel);
 							} else {
 								thisLabel.append("tspan").text(null);
@@ -3110,10 +3115,12 @@
 					.select(".pbiclcCbpfPaidIndicator")
 					.transition()
 					.duration(duration)
-					.style(
-						"opacity",
-						chartState.selectedContribution === "total" ? 1 : 0
-					)
+					.style("opacity", function (d) {
+						return chartState.selectedContribution === "total" &&
+							d.pledge
+							? 1
+							: 0;
+					})
 					.attr("transform", function (d) {
 						const thisPadding =
 							xScaleCbpfs(d.total) - xScaleCbpfs(d.paid) <
@@ -3194,7 +3201,10 @@
 										)(i(t))
 										.replace("G", "B")
 								);
-							if (chartState.selectedContribution === "total") {
+							if (
+								chartState.selectedContribution === "total" &&
+								d.pledge
+							) {
 								thisLabel.call(populateLabel);
 							} else {
 								thisLabel.append("tspan").text(null);
