@@ -1961,7 +1961,7 @@
 					.merge(topPanelRfText)
 					.style(
 						"font-size",
-						dataCbpfsNonRhPF.length ? "15px" : "22px"
+						dataCbpfsNonRhPF.length ? "15px" : "20px"
 					)
 					.attr(
 						"y",
