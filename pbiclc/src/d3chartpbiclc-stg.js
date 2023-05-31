@@ -15,7 +15,7 @@
 			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = [
 			"https://cbpfgms.github.io/css/d3chartstyles-stg.css",
-			"../../OCHA Staging/cbpfgms.github.io/css/d3chartstylespbiclc-stg.css", //CHANGE
+			"https://cbpfgms.github.io/css/d3chartstylespbiclc-stg.css",
 			fontAwesomeLink,
 		],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
@@ -1899,8 +1899,6 @@
 					)
 					.text(dataCbpfsNonRhPF.length > 1 ? "CBPFs" : "CBPF");
 
-				//
-
 				let topPanelRfNumber = mainValueGroup
 					.selectAll(".pbiclctopPanelRfNumber")
 					.data(dataCbpfsRhPF.length ? [dataCbpfsRhPF.length] : []);
@@ -1974,8 +1972,6 @@
 							? "Regional funds"
 							: "Regional fund"
 					);
-
-				//
 
 				const overRectangle = topPanel.main
 					.selectAll(".pbiclctopPanelOverRectangle")
