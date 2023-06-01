@@ -375,7 +375,7 @@
 			.attr("class", "pbigamlaunchedValueDiv");
 
 		const launchedValue = launchedValueDiv
-			.append("p")
+			.append("span")
 			.attr("class", "pbigamlaunchedValue");
 
 		const svg = containerDiv
