@@ -453,7 +453,7 @@
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			moneyBagPadding: 50,
-			leftPadding: [180, 434, 110],
+			leftPadding: [180, 434, 138],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 4,
 		};
