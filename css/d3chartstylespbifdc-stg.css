@@ -93,9 +93,13 @@ p#pbifdcd3chartTitle {
 	font-size: 48px;
 }
 
-.pbifdctopPanelDonorsNumber, .pbifdctopPanelCbpfsNumber {
+.pbifdctopPanelDonorsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
+}
+
+.pbifdctopPanelCbpfsNumber, .pbifdctopPanelRhpfsNumber {
+	font-family: "Arial", sans-serif;
 }
 
 .pbifdctopPanelMainText, .pbifdctopPanelSubText {
@@ -104,9 +108,14 @@ p#pbifdcd3chartTitle {
 	fill: #888;
 }
 
-.pbifdctopPanelDonorsText, .pbifdctopPanelCbpfsText {
+.pbifdctopPanelDonorsText {
 	font-family: "Arial", sans-serif;
 	font-size: 16px;
+	fill: #888;
+}
+
+.pbifdctopPanelCbpfsText, .pbifdctopPanelRhpfsText {
+	font-family: "Arial", sans-serif;
 	fill: #888;
 }
 
