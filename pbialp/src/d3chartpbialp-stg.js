@@ -1680,7 +1680,7 @@
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(rhpfsData ? 2.7 : 1.9)
+								(rhpfsData ? 2.85 : 1.9)
 					)
 					.text(cbpfsData > 1 ? "CBPFs" : "CBPF");
 
