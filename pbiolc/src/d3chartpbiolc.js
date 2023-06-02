@@ -4040,62 +4040,62 @@
 				},
 				{
 					x: 20,
-					y: 68 + topDivHeight + totalSelectHeight,
+					y: 118 + topDivHeight + totalSelectHeight,
 					width: 420,
 					height: 30,
 					xTooltip: 78 * (topDivSize.width / width),
 					yTooltip:
-						(topDivHeight + totalSelectHeight + 104) *
+						(topDivHeight + totalSelectHeight + 154) *
 						(topDivSize.width / width),
 					text: "Use these buttons to select year. Double click or press ALT when clicking to select multiple years",
 				},
 				{
 					x: 488,
-					y: 68 + topDivHeight + totalSelectHeight,
+					y: 118 + topDivHeight + totalSelectHeight,
 					width: 212,
 					height: 30,
 					xTooltip: 444 * (topDivSize.width / width),
 					yTooltip:
-						(topDivHeight + totalSelectHeight + 104) *
+						(topDivHeight + totalSelectHeight + 154) *
 						(topDivSize.width / width),
 					text: "Use these buttons to select the modality type.",
 				},
 				{
 					x: 750,
-					y: 68 + topDivHeight + totalSelectHeight,
+					y: 118 + topDivHeight + totalSelectHeight,
 					width: 134,
 					height: 30,
 					xTooltip: 720 * (topDivSize.width / width),
 					yTooltip:
-						(topDivHeight + totalSelectHeight + 104) *
+						(topDivHeight + totalSelectHeight + 154) *
 						(topDivSize.width / width),
 					text: "Use these buttons to show targeted or actual persons.",
 				},
 				{
 					x: 190,
-					y: 106 + topDivHeight + totalSelectHeight,
+					y: 156 + topDivHeight + totalSelectHeight,
 					width: 170,
 					height: 30,
 					xTooltip: 142 * (topDivSize.width / width),
 					yTooltip:
-						(topDivHeight + totalSelectHeight + 142) *
+						(topDivHeight + totalSelectHeight + 192) *
 						(topDivSize.width / width),
 					text: "Click here to sort the sectors by allocations.",
 				},
 				{
 					x: 586,
-					y: 106 + topDivHeight + totalSelectHeight,
+					y: 156 + topDivHeight + totalSelectHeight,
 					width: 186,
 					height: 30,
 					xTooltip: 520 * (topDivSize.width / width),
 					yTooltip:
-						(topDivHeight + totalSelectHeight + 142) *
+						(topDivHeight + totalSelectHeight + 192) *
 						(topDivSize.width / width),
 					text: "Click here to sort the sectors by persons (targeted or reached).",
 				},
 				{
 					x: 6,
-					y: 152 + topDivHeight + totalSelectHeight,
+					y: 202 + topDivHeight + totalSelectHeight,
 					width: 312,
 					height: 334,
 					xTooltip: 326 * (topDivSize.width / width),
@@ -4106,7 +4106,7 @@
 				},
 				{
 					x: 582,
-					y: 152 + topDivHeight + totalSelectHeight,
+					y: 202 + topDivHeight + totalSelectHeight,
 					width: 312,
 					height: 334,
 					xTooltip: 268 * (topDivSize.width / width),
@@ -4421,7 +4421,9 @@
 
 				const modality = capitalize(chartState.selectedModality);
 
-				const reachedPersons = capitalize(chartState.selectedBeneficiary);
+				const reachedPersons = capitalize(
+					chartState.selectedBeneficiary
+				);
 
 				const selectedCountry = countriesList();
 
