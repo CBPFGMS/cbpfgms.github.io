@@ -1214,7 +1214,7 @@
 					.text("(")
 					.append("tspan")
 					.style("font-weight", "bold")
-					.text("affected, affected in %")
+					.text("reached, reached in %")
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
@@ -1230,7 +1230,7 @@
 					.text("\u25B2")
 					.append("tspan")
 					.style("fill", "#666")
-					.text(") indicates the number of affected persons.");
+					.text(") indicates the number of reached persons.");
 
 				allocationLegendGroup.style(
 					"opacity",
@@ -1718,7 +1718,7 @@
 								: "years\u002A";
 						return (
 							(chartState.selectedBeneficiary === "actual"
-								? "Affected"
+								? "Reached"
 								: "Targeted") +
 							" in " +
 							yearsText
@@ -2126,7 +2126,7 @@
 							: "#444";
 					})
 					.text(function (d) {
-						const buttonName = d === "actual" ? "affected" : d;
+						const buttonName = d === "actual" ? "reached" : d;
 						return capitalize(buttonName);
 					});
 
@@ -2605,7 +2605,7 @@
 					.merge(beneficiariesPanelTitle)
 					.text(
 						(chartState.selectedBeneficiary === "actual"
-							? "Affected"
+							? "Reached"
 							: "Targeted") + " Persons "
 					);
 
@@ -3280,7 +3280,7 @@
 							formatMoney0Decimals(d.reserve) +
 							"</span></div></div><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 							tooltipBarWidth +
-							"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Affected persons, " +
+							"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Reached persons, " +
 							chartState.selectedBeneficiary +
 							":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'>" +
 							formatComma(
@@ -3346,9 +3346,9 @@
 							formatMoney0Decimals(d.reserve) +
 							"</span></div></div><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 							tooltipBarWidth +
-							"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Affected persons, " +
+							"px;'><div style='display:flex;flex:0 60%;white-space:pre;'>Reached persons, " +
 							chartState.selectedBeneficiary +
-							":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'>No affected person</div></div>"
+							":</div><div style='display:flex;flex:0 40%;justify-content:flex-end;'>No reached person</div></div>"
 					);
 
 					createTooltipBar(
@@ -4092,7 +4092,7 @@
 					yTooltip:
 						(topDivHeight + totalSelectHeight + 142) *
 						(topDivSize.width / width),
-					text: "Click here to sort the sectors by persons (targeted or affected).",
+					text: "Click here to sort the sectors by persons (targeted or reached).",
 				},
 				{
 					x: 6,
@@ -4114,7 +4114,7 @@
 					yTooltip:
 						(topDivHeight + totalSelectHeight + 242) *
 						(topDivSize.width / width),
-					text: "This area depicts the number of targeted or affected persons for each sector. The black triangles, when present, indicate the number of affected persons.",
+					text: "This area depicts the number of targeted or reached persons for each sector. The black triangles, when present, indicate the number of reached persons.",
 				},
 			];
 
@@ -4422,7 +4422,7 @@
 
 				const modality = capitalize(chartState.selectedModality);
 
-				const affected = capitalize(chartState.selectedBeneficiary);
+				const reachedPersons = capitalize(chartState.selectedBeneficiary);
 
 				const selectedCountry = countriesList();
 
@@ -4435,8 +4435,8 @@
 						yearsList +
 						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Modality: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
 						modality +
-						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Affected Persons: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						affected +
+						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Reached Persons: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						reachedPersons +
 						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" +
 						selectedCountry.split("-")[0] +
 						": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
