@@ -93,9 +93,13 @@ p#pbiclcd3chartTitle {
 	color: #418fde;
 }
 
-.pbiclctopPanelMainValue, .pbiclctopPanelDonorsNumber, .pbiclctopPanelCbpfsNumber {
+.pbiclctopPanelMainValue, .pbiclctopPanelDonorsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
+}
+
+.pbiclctopPanelCbpfsNumber, .pbiclctopPanelRfNumber {
+	font-family: "Arial", sans-serif;
 }
 
 .pbiclctopPanelMainText, .pbiclctopPanelSubText {
@@ -104,9 +108,14 @@ p#pbiclcd3chartTitle {
 	fill: #888;
 }
 
-.pbiclctopPanelDonorsText, .pbiclctopPanelCbpfsText {
+.pbiclctopPanelDonorsText {
 	font-family: "Arial", sans-serif;
 	font-size: 22px;
+	fill: #888;
+}
+
+.pbiclctopPanelCbpfsText, .pbiclctopPanelRfText {
+	font-family: "Arial", sans-serif;
 	fill: #888;
 }
 

@@ -100,9 +100,13 @@ p#pbialpd3chartTitle {
 	pointer-events: none;
 }
 
-.pbialptopPanelMainValue, .pbialptopPanelCbpfsNumber {
+.pbialptopPanelMainValue {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
+}
+
+.pbialptopPanelCbpfsNumber, .pbialptopPanelRhpfsNumber {
+	font-family: "Arial", sans-serif;
 }
 
 .pbialptopPanelUnderApprovalValue, .pbialptopPanelAllocatedValue {
@@ -122,9 +126,8 @@ p#pbialpd3chartTitle {
 	fill: #888;
 }
 
-.pbialptopPanelCbpfsText {
+.pbialptopPanelCbpfsText, .pbialptopPanelRhpfsText {
 	font-family: "Arial", sans-serif;
-	font-size: 20px;
 	fill: #888;
 }
 

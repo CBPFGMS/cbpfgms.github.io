@@ -1572,6 +1572,14 @@
 								return acc;
 						  }, []);
 
+				const dataCbpfsNonRhPF = dataCbpfs.filter(function (d) {
+					return !d.cbpf.includes("RhPF");
+				});
+
+				const dataCbpfsRhPF = dataCbpfs.filter(function (d) {
+					return d.cbpf.includes("RhPF");
+				});
+
 				contributionType.forEach(function (d) {
 					contributionsTotals[d] = d3.sum(dataDonors, function (e) {
 						return e[d];
@@ -1616,6 +1624,11 @@
 				const previousCbpfs =
 					d3.select(".pbiclctopPanelCbpfsNumber").size() !== 0
 						? d3.select(".pbiclctopPanelCbpfsNumber").datum()
+						: 0;
+
+				const previousRf =
+					d3.select(".pbiclctopPanelRfNumber").size() !== 0
+						? d3.select(".pbiclctopPanelRfNumber").datum()
 						: 0;
 
 				let mainValueGroup = topPanel.main
@@ -1814,31 +1827,13 @@
 					)
 					.text(dataDonors.length > 1 ? "Donors" : "Donor");
 
-				let topPanelDonorsTextSubText = mainValueGroup
-					.selectAll(".pbiclctopPanelDonorsTextSubText")
-					.data([true]);
-
-				topPanelDonorsTextSubText = topPanelDonorsTextSubText
-					.enter()
-					.append("text")
-					.attr("class", "pbiclctopPanelDonorsTextSubText")
-					.attr(
-						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.2
-					)
-					.attr(
-						"x",
-						topPanel.moneyBagPadding +
-							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding
-					)
-					.attr("text-anchor", "start")
-					.merge(topPanelDonorsTextSubText)
-					.text(chartState.selectedDonors.length ? "(selected)" : "");
-
 				let topPanelCbpfsNumber = mainValueGroup
 					.selectAll(".pbiclctopPanelCbpfsNumber")
-					.data([dataCbpfs.length]);
+					.data(
+						dataCbpfsNonRhPF.length ? [dataCbpfsNonRhPF.length] : []
+					);
+
+				topPanelCbpfsNumber.exit().remove();
 
 				topPanelCbpfsNumber = topPanelCbpfsNumber
 					.enter()
@@ -1849,7 +1844,13 @@
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+					.style("font-size", dataCbpfsRhPF.length ? "22px" : "48px")
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(dataCbpfsRhPF.length ? 2.7 : 1)
+					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
@@ -1870,7 +1871,11 @@
 
 				let topPanelCbpfsText = mainValueGroup
 					.selectAll(".pbiclctopPanelCbpfsText")
-					.data([true]);
+					.data(
+						dataCbpfsNonRhPF.length ? [dataCbpfsNonRhPF.length] : []
+					);
+
+				topPanelCbpfsText.exit().remove();
 
 				topPanelCbpfsText = topPanelCbpfsText
 					.enter()
@@ -1884,26 +1889,65 @@
 					)
 					.attr("text-anchor", "start")
 					.merge(topPanelCbpfsText)
+					.style("font-size", dataCbpfsRhPF.length ? "15px" : "22px")
 					.attr(
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(chartState.selectedCbpfs.length ? 2.5 : 1.9)
+								(dataCbpfsRhPF.length ? 2.85 : 1.9)
 					)
-					.text(dataCbpfs.length > 1 ? "CBPFs" : "CBPF");
+					.text(dataCbpfsNonRhPF.length > 1 ? "CBPFs" : "CBPF");
 
-				let topPanelCbpfsTextSubText = mainValueGroup
-					.selectAll(".pbiclctopPanelCbpfsTextSubText")
-					.data([true]);
+				let topPanelRfNumber = mainValueGroup
+					.selectAll(".pbiclctopPanelRfNumber")
+					.data(dataCbpfsRhPF.length ? [dataCbpfsRhPF.length] : []);
 
-				topPanelCbpfsTextSubText = topPanelCbpfsTextSubText
+				topPanelRfNumber.exit().remove();
+
+				topPanelRfNumber = topPanelRfNumber
 					.enter()
 					.append("text")
-					.attr("class", "pbiclctopPanelCbpfsTextSubText")
+					.attr("class", "pbiclctopPanelRfNumber allocationColorFill")
+					.attr("text-anchor", "end")
+					.merge(topPanelRfNumber)
+					.style(
+						"font-size",
+						dataCbpfsNonRhPF.length ? "22px" : "48px"
+					)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.2
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(dataCbpfsNonRhPF.length ? 0.8 : 1)
 					)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[2] -
+							topPanel.mainValueHorPadding
+					);
+
+				topPanelRfNumber
+					.transition()
+					.duration(duration)
+					.tween("text", function (d) {
+						const node = this;
+						const i = d3.interpolate(previousRf, d);
+						return function (t) {
+							node.textContent = ~~i(t);
+						};
+					});
+
+				let topPanelRfText = mainValueGroup
+					.selectAll(".pbiclctopPanelRfText")
+					.data(dataCbpfsRhPF.length ? [dataCbpfsRhPF.length] : []);
+
+				topPanelRfText.exit().remove();
+
+				topPanelRfText = topPanelRfText
+					.enter()
+					.append("text")
+					.attr("class", "pbiclctopPanelRfText")
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
@@ -1911,8 +1955,22 @@
 							topPanel.mainValueHorPadding
 					)
 					.attr("text-anchor", "start")
-					.merge(topPanelCbpfsTextSubText)
-					.text(chartState.selectedCbpfs.length ? "(selected)" : "");
+					.merge(topPanelRfText)
+					.style(
+						"font-size",
+						dataCbpfsNonRhPF.length ? "15px" : "20px"
+					)
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(dataCbpfsNonRhPF.length ? 1 : 1.9)
+					)
+					.text(
+						dataCbpfsRhPF.length > 1
+							? "Regional funds"
+							: "Regional fund"
+					);
 
 				const overRectangle = topPanel.main
 					.selectAll(".pbiclctopPanelOverRectangle")
