@@ -2,6 +2,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 const constants = {
 	classPrefix: "task",
+	userRolesToIgnore: ["GMSAdmin"],
 	chartContainer: d3.select("#chartContainer"),
 	maxNodeCharactersNumber: 200,
 	maxLinkCharacterNumber: 200,

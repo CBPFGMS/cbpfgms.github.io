@@ -1,3 +1,7 @@
+import { constants } from "./constants.js";
+
+const { userRolesToIgnore } = constants;
+
 function processData(rawData) {
 	const data = {
 		nodes: [],
@@ -34,6 +38,7 @@ function processData(rawData) {
 				}
 				data.currentSequence.push(link.NextStatusId);
 			}
+			//only push if source and target are not the same
 			data.links.push({
 				source: node.StatusId,
 				target: link.NextStatusId,
