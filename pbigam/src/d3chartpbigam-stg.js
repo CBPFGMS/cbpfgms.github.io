@@ -1521,8 +1521,6 @@
 				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
 				.text("Projects");
 
-			//
-
 			let topPanelCbpfsNumber = mainValueGroup
 				.selectAll(".pbigamtopPanelCbpfsNumber")
 				.data(cbpfsValue ? [cbpfsValue] : []);
@@ -1590,8 +1588,6 @@
 					return d > 1 ? "CBPFs" : "CBPF";
 				});
 
-			//
-
 			let topPanelRhpfsNumber = mainValueGroup
 				.selectAll(".pbigamtopPanelRhpfsNumber")
 				.data(rhpfsValue ? [rhpfsValue] : []);
@@ -1658,8 +1654,6 @@
 				.text(function (d) {
 					return d > 1 ? "Regional funds" : "Regional fund";
 				});
-
-			//
 
 			//end of createTopPanel
 		}

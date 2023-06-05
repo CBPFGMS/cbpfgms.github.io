@@ -374,7 +374,7 @@
 			.attr("class", "pbigamlaunchedValueDiv");
 
 		const launchedValue = launchedValueDiv
-			.append("p")
+			.append("span")
 			.attr("class", "pbigamlaunchedValue");
 
 		const svg = containerDiv
@@ -1291,13 +1291,21 @@
 				return d.projects;
 			});
 
-			const cbpfsValue = data
+			const uniqueCbpfs = data
 				.map(function (d) {
 					return d.cbpfName;
 				})
 				.filter(function (elem, index, arr) {
 					return arr.indexOf(elem) === index;
-				}).length;
+				});
+
+			const cbpfsValue = uniqueCbpfs.filter(function (d) {
+				return !d.includes("RhPF");
+			}).length;
+
+			const rhpfsValue = uniqueCbpfs.filter(function (d) {
+				return d.includes("RhPF");
+			}).length;
 
 			const topPanelMoneyBag = topPanel.main
 				.selectAll(".pbigamtopPanelMoneyBag")
@@ -1328,6 +1336,11 @@
 			const previousCbpfs =
 				d3.select(".pbigamtopPanelCbpfsNumber").size() !== 0
 					? d3.select(".pbigamtopPanelCbpfsNumber").datum()
+					: 0;
+
+			const previousRhpfs =
+				d3.select(".pbigamtopPanelRhpfsNumber").size() !== 0
+					? d3.select(".pbigamtopPanelRhpfsNumber").datum()
 					: 0;
 
 			let mainValueGroup = topPanel.main
@@ -1509,7 +1522,9 @@
 
 			let topPanelCbpfsNumber = mainValueGroup
 				.selectAll(".pbigamtopPanelCbpfsNumber")
-				.data([cbpfsValue]);
+				.data(cbpfsValue ? [cbpfsValue] : []);
+
+			topPanelCbpfsNumber.exit().remove();
 
 			topPanelCbpfsNumber = topPanelCbpfsNumber
 				.enter()
@@ -1520,7 +1535,12 @@
 				)
 				.attr("text-anchor", "end")
 				.merge(topPanelCbpfsNumber)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.style("font-size", rhpfsValue ? "22px" : "48px")
+				.attr(
+					"y",
+					topPanel.height -
+						topPanel.mainValueVerPadding * (rhpfsValue ? 2.7 : 1)
+				)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
@@ -1541,7 +1561,9 @@
 
 			let topPanelCbpfsText = mainValueGroup
 				.selectAll(".pbigamtopPanelCbpfsText")
-				.data([cbpfsValue]);
+				.data(cbpfsValue ? [cbpfsValue] : []);
+
+			topPanelCbpfsText.exit().remove();
 
 			topPanelCbpfsText = topPanelCbpfsText
 				.enter()
@@ -1555,9 +1577,81 @@
 				)
 				.attr("text-anchor", "start")
 				.merge(topPanelCbpfsText)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2)
+				.style("font-size", rhpfsValue ? "15px" : "18px")
+				.attr(
+					"y",
+					topPanel.height -
+						topPanel.mainValueVerPadding * (rhpfsValue ? 2.85 : 1.9)
+				)
 				.text(function (d) {
 					return d > 1 ? "CBPFs" : "CBPF";
+				});
+
+			let topPanelRhpfsNumber = mainValueGroup
+				.selectAll(".pbigamtopPanelRhpfsNumber")
+				.data(rhpfsValue ? [rhpfsValue] : []);
+
+			topPanelRhpfsNumber.exit().remove();
+
+			topPanelRhpfsNumber = topPanelRhpfsNumber
+				.enter()
+				.append("text")
+				.attr(
+					"class",
+					"pbigamtopPanelRhpfsNumber contributionColorFill"
+				)
+				.attr("text-anchor", "end")
+				.merge(topPanelRhpfsNumber)
+				.style("font-size", cbpfsValue ? "22px" : "48px")
+				.attr(
+					"y",
+					topPanel.height -
+						topPanel.mainValueVerPadding * (cbpfsValue ? 0.8 : 1)
+				)
+				.attr(
+					"x",
+					topPanel.moneyBagPadding +
+						topPanel.leftPadding[2] -
+						topPanel.mainValueHorPadding
+				);
+
+			topPanelRhpfsNumber
+				.transition()
+				.duration(duration)
+				.tween("text", function (d) {
+					const node = this;
+					const i = d3.interpolate(previousRhpfs, d);
+					return function (t) {
+						node.textContent = ~~i(t);
+					};
+				});
+
+			let topPanelRhpfsText = mainValueGroup
+				.selectAll(".pbigamtopPanelRhpfsText")
+				.data(rhpfsValue ? [rhpfsValue] : []);
+
+			topPanelRhpfsText.exit().remove();
+
+			topPanelRhpfsText = topPanelRhpfsText
+				.enter()
+				.append("text")
+				.attr("class", "pbigamtopPanelRhpfsText")
+				.attr(
+					"x",
+					topPanel.moneyBagPadding +
+						topPanel.leftPadding[2] +
+						topPanel.mainValueHorPadding
+				)
+				.attr("text-anchor", "start")
+				.merge(topPanelRhpfsText)
+				.style("font-size", cbpfsValue ? "15px" : "18px")
+				.attr(
+					"y",
+					topPanel.height -
+						topPanel.mainValueVerPadding * (cbpfsValue ? 1 : 1.9)
+				)
+				.text(function (d) {
+					return d > 1 ? "Regional funds" : "Regional fund";
 				});
 
 			//end of createTopPanel

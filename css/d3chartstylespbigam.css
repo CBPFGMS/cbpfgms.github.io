@@ -143,14 +143,23 @@ p#pbigamd3chartTitle {
 	color: #f79a3b;
 }
 
-.pbigamtopPanelMainValue, .pbigamtopPanelProjectsNumber, .pbigamtopPanelCbpfsNumber {
+.pbigamtopPanelMainValue, .pbigamtopPanelProjectsNumber {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
 }
 
-.pbigamtopPanelMainText, .pbigamtopPanelSubText, .pbigamtopPanelProjectsText, .pbigamtopPanelCbpfsText, .pbigamtopPanelProjectsTextSubText {
+.pbigamtopPanelCbpfsNumber, .pbigamtopPanelRhpfsNumber {
+	font-family: "Arial", sans-serif;
+}
+
+.pbigamtopPanelMainText, .pbigamtopPanelSubText, .pbigamtopPanelProjectsText, .pbigamtopPanelProjectsTextSubText {
 	font-family: "Arial", sans-serif;
 	font-size: 18px;
+	fill: #888;
+}
+
+.pbigamtopPanelCbpfsText, .pbigamtopPanelRhpfsText {
+	font-family: "Arial", sans-serif;
 	fill: #888;
 }
 
