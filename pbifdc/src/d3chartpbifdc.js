@@ -1,34 +1,50 @@
 (function d3ChartIIFE() {
-
-	const isInternetExplorer = window.navigator.userAgent.indexOf("MSIE") > -1 || window.navigator.userAgent.indexOf("Trident") > -1,
+	const isInternetExplorer =
+			window.navigator.userAgent.indexOf("MSIE") > -1 ||
+			window.navigator.userAgent.indexOf("Trident") > -1,
 		hasFetch = window.fetch,
 		hasURLSearchParams = window.URLSearchParams,
-		isTouchScreenOnly = (window.matchMedia("(pointer: coarse)").matches && !window.matchMedia("(any-pointer: fine)").matches),
+		isTouchScreenOnly =
+			window.matchMedia("(pointer: coarse)").matches &&
+			!window.matchMedia("(any-pointer: fine)").matches,
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
-		isBookmarkPage = window.location.hostname + window.location.pathname === "cbpf.data.unocha.org/bookmark.html",
-		fontAwesomeLink = "https://use.fontawesome.com/releases/v5.6.3/css/all.css",
-		cssLinks = ["https://cbpfgms.github.io/css/d3chartstyles.css", "https://cbpfgms.github.io/css/d3chartstylespbifdc.css", fontAwesomeLink],
+		isBookmarkPage =
+			window.location.hostname + window.location.pathname ===
+			"cbpf.data.unocha.org/bookmark.html",
+		fontAwesomeLink =
+			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
+		cssLinks = [
+			"https://cbpfgms.github.io/css/d3chartstyles.css",
+			"https://cbpfgms.github.io/css/d3chartstylespbifdc.css",
+			fontAwesomeLink,
+		],
 		d3URL = "https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js",
-		html2ToCanvas = "https://cbpfgms.github.io/libraries/html2canvas.min.js",
-		jsPdf = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
-		URLSearchParamsPolyfill = "https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
-		fetchPolyfill1 = "https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
-		fetchPolyfill2 = "https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
+		html2ToCanvas =
+			"https://cbpfgms.github.io/libraries/html2canvas.min.js",
+		jsPdf =
+			"https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js",
+		URLSearchParamsPolyfill =
+			"https://cdn.jsdelivr.net/npm/@ungap/url-search-params@0.1.2/min.min.js",
+		fetchPolyfill1 =
+			"https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js",
+		fetchPolyfill2 =
+			"https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js";
 
 	cssLinks.forEach(function (cssLink) {
-
 		if (!isStyleLoaded(cssLink)) {
 			const externalCSS = document.createElement("link");
 			externalCSS.setAttribute("rel", "stylesheet");
 			externalCSS.setAttribute("type", "text/css");
 			externalCSS.setAttribute("href", cssLink);
 			if (cssLink === fontAwesomeLink) {
-				externalCSS.setAttribute("integrity", "sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/");
-				externalCSS.setAttribute("crossorigin", "anonymous")
-			};
+				externalCSS.setAttribute(
+					"integrity",
+					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+				);
+				externalCSS.setAttribute("crossorigin", "anonymous");
+			}
 			document.getElementsByTagName("head")[0].appendChild(externalCSS);
-		};
-
+		}
 	});
 
 	if (!isScriptLoaded(d3URL)) {
@@ -46,7 +62,7 @@
 					});
 				});
 			});
-		};
+		}
 	} else if (typeof d3 !== "undefined") {
 		if (hasFetch && hasURLSearchParams) {
 			d3Chart();
@@ -58,58 +74,57 @@
 					loadScript(URLSearchParamsPolyfill, d3Chart);
 				});
 			});
-		};
+		}
 	} else {
 		let d3Script;
-		const scripts = document.getElementsByTagName('script');
-		for (let i = scripts.length; i--;) {
+		const scripts = document.getElementsByTagName("script");
+		for (let i = scripts.length; i--; ) {
 			if (scripts[i].src == d3URL) d3Script = scripts[i];
-		};
+		}
 		d3Script.addEventListener("load", d3Chart);
-	};
+	}
 
 	function loadScript(url, callback) {
-		const head = document.getElementsByTagName('head')[0];
-		const script = document.createElement('script');
-		script.type = 'text/javascript';
+		const head = document.getElementsByTagName("head")[0];
+		const script = document.createElement("script");
+		script.type = "text/javascript";
 		script.src = url;
 		script.onreadystatechange = callback;
 		script.onload = callback;
 		head.appendChild(script);
-	};
+	}
 
 	function isStyleLoaded(url) {
-		const styles = document.getElementsByTagName('link');
-		for (let i = styles.length; i--;) {
+		const styles = document.getElementsByTagName("link");
+		for (let i = styles.length; i--; ) {
 			if (styles[i].href == url) return true;
 		}
 		return false;
-	};
+	}
 
 	function isScriptLoaded(url) {
-		const scripts = document.getElementsByTagName('script');
-		for (let i = scripts.length; i--;) {
+		const scripts = document.getElementsByTagName("script");
+		for (let i = scripts.length; i--; ) {
 			if (scripts[i].src == url) return true;
 		}
 		return false;
-	};
+	}
 
 	function d3Chart() {
-
 		//POLYFILLS
 
 		//Array.prototype.find()
 
 		if (!Array.prototype.find) {
-			Object.defineProperty(Array.prototype, 'find', {
+			Object.defineProperty(Array.prototype, "find", {
 				value: function (predicate) {
 					if (this == null) {
 						throw new TypeError('"this" is null or not defined');
 					}
 					var o = Object(this);
 					var len = o.length >>> 0;
-					if (typeof predicate !== 'function') {
-						throw new TypeError('predicate must be a function');
+					if (typeof predicate !== "function") {
+						throw new TypeError("predicate must be a function");
 					}
 					var thisArg = arguments[1];
 					var k = 0;
@@ -123,24 +138,25 @@
 					return undefined;
 				},
 				configurable: true,
-				writable: true
+				writable: true,
 			});
-		};
+		}
 
 		//Math.log10
 
-		Math.log10 = Math.log10 || function (x) {
-			return Math.log(x) * Math.LOG10E;
-		};
+		Math.log10 =
+			Math.log10 ||
+			function (x) {
+				return Math.log(x) * Math.LOG10E;
+			};
 
 		//toBlob
 
 		if (!HTMLCanvasElement.prototype.toBlob) {
-			Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+			Object.defineProperty(HTMLCanvasElement.prototype, "toBlob", {
 				value: function (callback, type, quality) {
-					var dataURL = this.toDataURL(type, quality).split(',')[1];
+					var dataURL = this.toDataURL(type, quality).split(",")[1];
 					setTimeout(function () {
-
 						var binStr = atob(dataURL),
 							len = binStr.length,
 							arr = new Uint8Array(len);
@@ -149,14 +165,15 @@
 							arr[i] = binStr.charCodeAt(i);
 						}
 
-						callback(new Blob([arr], {
-							type: type || 'image/png'
-						}));
-
+						callback(
+							new Blob([arr], {
+								type: type || "image/png",
+							})
+						);
 					});
-				}
+				},
 			});
-		};
+		}
 
 		//END OF POLYFILLS
 
@@ -170,7 +187,13 @@
 			panelVerticalPadding = 16,
 			nodesPanelWidthFactor = 0.75,
 			legendPanelWidthFactor = 1 - nodesPanelWidthFactor,
-			height = padding[0] + topPanelHeight + buttonsPanelHeight + nodesPanelHeight + (2 * panelHorizontalPadding) + padding[2],
+			height =
+				padding[0] +
+				topPanelHeight +
+				buttonsPanelHeight +
+				nodesPanelHeight +
+				2 * panelHorizontalPadding +
+				padding[2],
 			buttonsNumber = 10,
 			stickHeight = 2,
 			lollipopRadius = 4,
@@ -205,15 +228,19 @@
 			vizNameQueryString = "funding-overview",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/funding-overview",
-			blankFlag = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+			blankFlag =
+				"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
-			dataUrl = "https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
-			worldMapUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json",
+			dataUrl =
+				"https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
+			worldMapUrl =
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/worldmap.json",
 			flagSize = 24,
-			moneyBagdAttribute = ["M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
+			moneyBagdAttribute = [
+				"M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
 				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
-				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z"
+				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z",
 			],
 			duration = 1000,
 			shortDuration = 500,
@@ -221,7 +248,7 @@
 			chartState = {
 				selectedYear: [],
 				showMap: null,
-				showNames: null
+				showNames: null,
 			},
 			centroids = {};
 
@@ -238,77 +265,108 @@
 			"Latin America and the Caribbean": ["CO", "HT"],
 			"West and Central Africa": ["CF", "CD", "NG"],
 			"Southern and Eastern Africa": ["ET", "SO", "SS", "SD"],
-			"Middle East and North Africa": ["IQ", "JO", "LB", "PS", "SY", "XX", "YE"],
+			"Middle East and North Africa": [
+				"IQ",
+				"JO",
+				"LB",
+				"PS",
+				"SY",
+				"XX",
+				"YE",
+			],
 			"Asia and the Pacific": ["AF", "MM", "PK"],
-			"All": null
+			All: null,
 		};
 
 		const queryStringValues = new URLSearchParams(location.search);
 
-		if (!queryStringValues.has("viz")) queryStringValues.append("viz", vizNameQueryString);
+		if (!queryStringValues.has("viz"))
+			queryStringValues.append("viz", vizNameQueryString);
 
 		const containerDiv = d3.select("#d3chartcontainerpbifdc");
 
-		const selectedYearString = queryStringValues.has("year") ? queryStringValues.get("year").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-year");
+		const selectedYearString = queryStringValues.has("year")
+			? queryStringValues.get("year").replace(/\|/g, ",")
+			: containerDiv.node().getAttribute("data-year");
 
-		const selectedRegionString = queryStringValues.has("regions") ? queryStringValues.get("regions").replace(/\|/g, ",") : containerDiv.node().getAttribute("data-regions");
+		const selectedRegionString = queryStringValues.has("regions")
+			? queryStringValues.get("regions").replace(/\|/g, ",")
+			: containerDiv.node().getAttribute("data-regions");
 
-		let selectedRegion = selectedRegionString.toLowerCase() === "all" ? "All" :
-			selectedRegionString.split(",");
+		let selectedRegion =
+			selectedRegionString.toLowerCase() === "all"
+				? "All"
+				: selectedRegionString.split(",");
 
-		if (selectedRegion !== "All" && selectedRegion.some(function (d) {
-			return d3.keys(geoRegions).indexOf(d) === -1;
-		})) {
-			selectedRegion = "All"
-		};
+		if (
+			selectedRegion !== "All" &&
+			selectedRegion.some(function (d) {
+				return d3.keys(geoRegions).indexOf(d) === -1;
+			})
+		) {
+			selectedRegion = "All";
+		}
 
 		chartState.selectedRegion = selectedRegion;
 
-		const showMapOption = queryStringValues.has("showmap") ? queryStringValues.get("showmap") === "true" : containerDiv.node().getAttribute("data-showmap") === "true";
+		const showMapOption = queryStringValues.has("showmap")
+			? queryStringValues.get("showmap") === "true"
+			: containerDiv.node().getAttribute("data-showmap") === "true";
 
-		const showNamesOption = queryStringValues.has("shownames") ? queryStringValues.get("shownames") === "true" : containerDiv.node().getAttribute("data-shownames") === "true";
+		const showNamesOption = queryStringValues.has("shownames")
+			? queryStringValues.get("shownames") === "true"
+			: containerDiv.node().getAttribute("data-shownames") === "true";
 
-		const selectedResponsiveness = containerDiv.node().getAttribute("data-responsive") === "true";
+		const selectedResponsiveness =
+			containerDiv.node().getAttribute("data-responsive") === "true";
 
-		const lazyLoad = containerDiv.node().getAttribute("data-lazyload") === "true";
+		const lazyLoad =
+			containerDiv.node().getAttribute("data-lazyload") === "true";
 
-		const chartTitle = containerDiv.node().getAttribute("data-title") || chartTitleDefault;
+		const chartTitle =
+			containerDiv.node().getAttribute("data-title") || chartTitleDefault;
 
-		const showHelp = containerDiv.node().getAttribute("data-showhelp") === "true";
+		const showHelp =
+			containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const showLink = containerDiv.node().getAttribute("data-showlink") === "true";
+		const showLink =
+			containerDiv.node().getAttribute("data-showlink") === "true";
 
 		if (selectedResponsiveness === "false") {
-			containerDiv.style("width", width + "px")
+			containerDiv
+				.style("width", width + "px")
 				.style("height", height + "px");
-		};
+		}
 
-		const topDiv = containerDiv.append("div")
-			.attr("class", "pbifdcTopDiv");
+		const topDiv = containerDiv.append("div").attr("class", "pbifdcTopDiv");
 
-		const titleDiv = topDiv.append("div")
-			.attr("class", "pbifdcTitleDiv");
+		const titleDiv = topDiv.append("div").attr("class", "pbifdcTitleDiv");
 
-		const iconsDiv = topDiv.append("div")
+		const iconsDiv = topDiv
+			.append("div")
 			.attr("class", "pbifdcIconsDiv d3chartIconsDiv");
 
-		const svg = containerDiv.append("svg")
+		const svg = containerDiv
+			.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.style("background-color", "white");
 
 		if (isInternetExplorer) {
 			svg.attr("height", height);
-		};
+		}
 
-		const yearsDescriptionDiv = containerDiv.append("div")
+		const yearsDescriptionDiv = containerDiv
+			.append("div")
 			.attr("class", "pbifdcYearsDescriptionDiv");
 
-		const footerDiv = !isPfbiSite ? containerDiv.append("div")
-			.attr("class", "pbifdcFooterDiv") : null;
+		const footerDiv = !isPfbiSite
+			? containerDiv.append("div").attr("class", "pbifdcFooterDiv")
+			: null;
 
 		createProgressWheel(svg, width, height, "Loading visualisation...");
 
-		const snapshotTooltip = containerDiv.append("div")
+		const snapshotTooltip = containerDiv
+			.append("div")
 			.attr("id", "pbifdcSnapshotTooltip")
 			.attr("class", "pbifdcSnapshotContent")
 			.style("display", "none")
@@ -316,10 +374,12 @@
 				isSnapshotTooltipVisible = false;
 				snapshotTooltip.style("display", "none");
 				tooltip.style("display", "none");
-				if (currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
+				if (currentHoveredElem)
+					d3.select(currentHoveredElem).dispatch("mouseout");
 			});
 
-		snapshotTooltip.append("p")
+		snapshotTooltip
+			.append("p")
 			.attr("id", "pbifdcSnapshotTooltipPdfText")
 			.html("Download PDF")
 			.on("click", function () {
@@ -327,7 +387,8 @@
 				createSnapshot("pdf", true);
 			});
 
-		snapshotTooltip.append("p")
+		snapshotTooltip
+			.append("p")
 			.attr("id", "pbifdcSnapshotTooltipPngText")
 			.html("Download Image (PNG)")
 			.on("click", function () {
@@ -335,17 +396,23 @@
 				createSnapshot("png", true);
 			});
 
-		const browserHasSnapshotIssues = !isTouchScreenOnly && (window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
+		const browserHasSnapshotIssues =
+			!isTouchScreenOnly &&
+			(window.safari || window.navigator.userAgent.indexOf("Edge") > -1);
 
 		if (browserHasSnapshotIssues) {
-			snapshotTooltip.append("p")
+			snapshotTooltip
+				.append("p")
 				.attr("id", "pbifdcTooltipBestVisualizedText")
-				.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+				.html(
+					"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+				)
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
-		};
+		}
 
-		const tooltip = containerDiv.append("div")
+		const tooltip = containerDiv
+			.append("div")
 			.attr("id", "pbifdctooltipdiv")
 			.style("display", "none");
 
@@ -353,140 +420,217 @@
 			d3.event.preventDefault();
 			const thisMouse = d3.mouse(this);
 			isSnapshotTooltipVisible = true;
-			snapshotTooltip.style("display", "block")
+			snapshotTooltip
+				.style("display", "block")
 				.style("top", thisMouse[1] - 4 + "px")
 				.style("left", thisMouse[0] - 4 + "px");
 		});
 
 		const topPanel = {
-			main: svg.append("g")
+			main: svg
+				.append("g")
 				.attr("class", "pbifdcTopPanel")
-				.attr("transform", "translate(" + padding[3] + "," + padding[0] + ")"),
+				.attr(
+					"transform",
+					"translate(" + padding[3] + "," + padding[0] + ")"
+				),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
 			moneyBagPadding: 26,
 			leftPadding: [174, 428, 546],
 			mainValueVerPadding: 12,
-			mainValueHorPadding: 3
+			mainValueHorPadding: 3,
 		};
 
 		const buttonsPanel = {
-			main: svg.append("g")
+			main: svg
+				.append("g")
 				.attr("class", "pbifdcButtonsPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + panelHorizontalPadding) + ")"),
+				.attr(
+					"transform",
+					"translate(" +
+						padding[3] +
+						"," +
+						(padding[0] +
+							topPanel.height +
+							panelHorizontalPadding) +
+						")"
+				),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
 			padding: [0, 0, 0, 6],
 			buttonWidth: 60,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
-			arrowPadding: 18
+			arrowPadding: 18,
 		};
 
 		const nodesPanel = {
-			main: svg.append("g")
+			main: svg
+				.append("g")
 				.attr("class", "pbifdcNodesPanel")
-				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
-			width: (width - padding[1] - padding[3] - panelVerticalPadding) * nodesPanelWidthFactor,
+				.attr(
+					"transform",
+					"translate(" +
+						padding[3] +
+						"," +
+						(padding[0] +
+							topPanel.height +
+							buttonsPanel.height +
+							2 * panelHorizontalPadding) +
+						")"
+				),
+			width:
+				(width - padding[1] - padding[3] - panelVerticalPadding) *
+				nodesPanelWidthFactor,
 			height: nodesPanelHeight,
-			padding: [8, 28, 8, 16]
+			padding: [8, 28, 8, 16],
 		};
 
 		const legendPanel = {
-			main: svg.append("g")
+			main: svg
+				.append("g")
 				.attr("class", "pbifdcLegendPanel")
-				.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
-					(padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
-			width: (width - padding[1] - padding[3] - panelVerticalPadding) * legendPanelWidthFactor,
+				.attr(
+					"transform",
+					"translate(" +
+						(padding[3] + nodesPanel.width + panelVerticalPadding) +
+						"," +
+						(padding[0] +
+							topPanel.height +
+							buttonsPanel.height +
+							2 * panelHorizontalPadding) +
+						")"
+				),
+			width:
+				(width - padding[1] - padding[3] - panelVerticalPadding) *
+				legendPanelWidthFactor,
 			height: nodesPanelHeight,
-			padding: [10, 6, 12, 6]
+			padding: [10, 6, 12, 6],
 		};
 
 		const geoMenuPanel = {
-			main: svg.append("g")
+			main: svg
+				.append("g")
 				.attr("class", "pbifdcGeoMenuPanel")
-				.attr("transform", "translate(" + (padding[3] + buttonsPanel.padding[3] + buttonsPanel.arrowPadding + buttonsPanel.buttonPadding / 2) +
-					"," + (padding[0] + topPanel.height + buttonsPanel.height + (2 * panelHorizontalPadding)) + ")"),
+				.attr(
+					"transform",
+					"translate(" +
+						(padding[3] +
+							buttonsPanel.padding[3] +
+							buttonsPanel.arrowPadding +
+							buttonsPanel.buttonPadding / 2) +
+						"," +
+						(padding[0] +
+							topPanel.height +
+							buttonsPanel.height +
+							2 * panelHorizontalPadding) +
+						")"
+				),
 			widthCollapsed: 140,
 			widthTotal: 190,
 			heightCollapsed: 20,
 			heightTotal: 166,
 			padding: [42, 4, 4, 24],
-			titlePadding: 6
+			titlePadding: 6,
 		};
 
-		const nodesPanelMapClip = nodesPanel.main.append("clipPath")
+		const nodesPanelMapClip = nodesPanel.main
+			.append("clipPath")
 			.attr("id", "pbifdcMapClip")
 			.append("rect")
-			.attr("width", nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3])
-			.attr("height", nodesPanel.height - nodesPanel.padding[0] - nodesPanel.padding[2]);
+			.attr(
+				"width",
+				nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]
+			)
+			.attr(
+				"height",
+				nodesPanel.height -
+					nodesPanel.padding[0] -
+					nodesPanel.padding[2]
+			);
 
-		const nodesPanelMainClip = nodesPanel.main.append("clipPath")
+		const nodesPanelMainClip = nodesPanel.main
+			.append("clipPath")
 			.attr("id", "pbifdcMainClip")
 			.append("rect")
 			.attr("width", nodesPanel.width + panelVerticalPadding)
 			.attr("height", nodesPanel.height);
 
-		const mapLayer = nodesPanel.main.append("g")
+		const mapLayer = nodesPanel.main
+			.append("g")
 			.attr("class", "pbifdcMapLayer")
 			.attr("clip-path", "url(#pbifdcMapClip)")
 			.style("opacity", 0);
 
-		const zoomLayer = nodesPanel.main.append("g")
+		const zoomLayer = nodesPanel.main
+			.append("g")
 			.attr("class", "pbifdcZoomLayer")
 			.style("opacity", 0)
 			.attr("cursor", "move")
 			.attr("pointer-events", "none");
 
-		const linksLayer = nodesPanel.main.append("g")
+		const linksLayer = nodesPanel.main
+			.append("g")
 			.attr("class", "pbifdcLinksLayer")
 			.attr("clip-path", "url(#pbifdcMainClip)");
 
-		const nodesLayer = nodesPanel.main.append("g")
+		const nodesLayer = nodesPanel.main
+			.append("g")
 			.attr("class", "pbifdcNodesLayer")
 			.attr("clip-path", "url(#pbifdcMainClip)");
 
-		const nodesLabelLayer = nodesPanel.main.append("g")
+		const nodesLabelLayer = nodesPanel.main
+			.append("g")
 			.attr("class", "pbifdcNodesLabelLayer")
 			.attr("clip-path", "url(#pbifdcMainClip)");
 
-		const zoomRectangle = zoomLayer.append("rect")
+		const zoomRectangle = zoomLayer
+			.append("rect")
 			.attr("width", nodesPanel.width)
 			.attr("height", nodesPanel.height);
 
-		const mapContainer = mapLayer.append("g")
+		const mapContainer = mapLayer
+			.append("g")
 			.attr("class", "pbifdcMapContainer");
 
-		const mapProjection = d3.geoMercator()
-			.scale((nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]) / (2 * Math.PI))
-			.translate([(nodesPanel.width - nodesPanel.padding[1] - nodesPanel.padding[3]) / 2,
-			(nodesPanel.height - nodesPanel.padding[0] - nodesPanel.padding[2]) / 1.53
+		const mapProjection = d3
+			.geoMercator()
+			.scale(
+				(nodesPanel.width -
+					nodesPanel.padding[1] -
+					nodesPanel.padding[3]) /
+					(2 * Math.PI)
+			)
+			.translate([
+				(nodesPanel.width -
+					nodesPanel.padding[1] -
+					nodesPanel.padding[3]) /
+					2,
+				(nodesPanel.height -
+					nodesPanel.padding[0] -
+					nodesPanel.padding[2]) /
+					1.53,
 			]);
 
-		const mapPath = d3.geoPath()
-			.projection(mapProjection);
+		const mapPath = d3.geoPath().projection(mapProjection);
 
-		const nodeSizeScale = d3.scaleSqrt()
-			.range([0.5, maxNodeSize]);
+		const nodeSizeScale = d3.scaleSqrt().range([0.5, maxNodeSize]);
 
-		const nodeSizeMapScale = d3.scaleSqrt()
-			.range([0.5, maxNodeSizeMap]);
+		const nodeSizeMapScale = d3.scaleSqrt().range([0.5, maxNodeSizeMap]);
 
-		const linksWidthScale = d3.scaleLinear()
-			.range([1, maxLinkWidth]);
+		const linksWidthScale = d3.scaleLinear().range([1, maxLinkWidth]);
 
-		const linksWidthMapScale = d3.scaleLinear()
-			.range([1, maxLinkWidthMap]);
+		const linksWidthMapScale = d3.scaleLinear().range([1, maxLinkWidthMap]);
 
-		const strokeOpacityScale = d3.scaleLinear()
-			.range([0.25, 0.75]);
+		const strokeOpacityScale = d3.scaleLinear().range([0.25, 0.75]);
 
 		const xScaleLegend = d3.scaleLinear();
 
-		const yScaleLegend = d3.scalePoint()
-			.padding(0.5);
+		const yScaleLegend = d3.scalePoint().padding(0.5);
 
-		const xAxisLegend = d3.axisTop(xScaleLegend)
+		const xAxisLegend = d3
+			.axisTop(xScaleLegend)
 			.tickSizeOuter(0)
 			.ticks(2)
 			.tickPadding(4)
@@ -494,7 +638,8 @@
 				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
-		const yAxisLegend = d3.axisLeft(yScaleLegend)
+		const yAxisLegend = d3
+			.axisLeft(yScaleLegend)
 			.tickPadding(6)
 			.tickSizeInner(0)
 			.tickSizeOuter(0);
@@ -507,49 +652,79 @@
 			Promise.all([
 				window.cbpfbiDataObject.contributionsTotalData,
 				window.cbpfbiDataObject.worldMap,
-				window.cbpfbiDataObject.flags
+				window.cbpfbiDataObject.flags,
 			]).then(rawData => csvCallback(rawData));
 		} else {
 			Promise.all([
-				fetchFile(classPrefix + "data", dataUrl, "contributions data", "csv"),
+				fetchFile(
+					classPrefix + "data",
+					dataUrl,
+					"contributions data",
+					"csv"
+				),
 				fetchFile(classPrefix + "map", worldMapUrl, "map data", "json"),
-				fetchFile("flags", flagsUrl, "flags data", "json")
+				fetchFile("flags", flagsUrl, "flags data", "json"),
 			]).then(rawData => csvCallback(rawData));
-		};
+		}
 
 		function fetchFile(fileName, url, warningString, method) {
-			if (localStorage.getItem(fileName) &&
-				JSON.parse(localStorage.getItem(fileName)).timestamp > (currentDate.getTime() - localStorageTime)) {
-				const fetchedData = method === "csv" ? d3.csvParse(JSON.parse(localStorage.getItem(fileName)).data) :
-					JSON.parse(localStorage.getItem(fileName)).data;
-				console.info(classPrefix + " chart info: " + warningString + " from local storage");
+			if (
+				localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp >
+					currentDate.getTime() - localStorageTime
+			) {
+				const fetchedData =
+					method === "csv"
+						? d3.csvParse(
+								JSON.parse(localStorage.getItem(fileName)).data
+						  )
+						: JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(
+					classPrefix +
+						" chart info: " +
+						warningString +
+						" from local storage"
+				);
 				return Promise.resolve(fetchedData);
 			} else {
 				const fetchMethod = method === "csv" ? d3.csv : d3.json;
 				return fetchMethod(url).then(fetchedData => {
 					try {
-						localStorage.setItem(fileName, JSON.stringify({
-							data: method === "csv" ? d3.csvFormat(fetchedData) : fetchedData,
-							timestamp: currentDate.getTime()
-						}));
+						localStorage.setItem(
+							fileName,
+							JSON.stringify({
+								data:
+									method === "csv"
+										? d3.csvFormat(fetchedData)
+										: fetchedData,
+								timestamp: currentDate.getTime(),
+							})
+						);
 					} catch (error) {
 						console.info(classPrefix + " chart, " + error);
-					};
-					console.info(classPrefix + " chart info: " + warningString + " from API");
+					}
+					console.info(
+						classPrefix +
+							" chart info: " +
+							warningString +
+							" from API"
+					);
 					return fetchedData;
 				});
-			};
-		};
+			}
+		}
 
 		function csvCallback(rawData) {
-
 			removeProgressWheel();
 
-			yearsArray = rawData[0].map(function (d) {
-				return +d.FiscalYear
-			}).filter(function (value, index, self) {
-				return self.indexOf(value) === index;
-			}).sort();
+			yearsArray = rawData[0]
+				.map(function (d) {
+					return +d.FiscalYear;
+				})
+				.filter(function (value, index, self) {
+					return self.indexOf(value) === index;
+				})
+				.sort();
 
 			validateYear(selectedYearString);
 
@@ -562,24 +737,32 @@
 			} else {
 				d3.select(window).on("scroll.pbifdc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbifdc", function () {
-					chartState.selectedYear = [validateCustomEventYear(+d3.event.detail)]
+					chartState.selectedYear = [
+						validateCustomEventYear(+d3.event.detail),
+					];
 				});
 				checkPosition();
-			};
+			}
 
 			function checkPosition() {
-				const containerPosition = containerDiv.node().getBoundingClientRect();
-				if (!(containerPosition.bottom < 0 || containerPosition.top - windowHeight > 0)) {
+				const containerPosition = containerDiv
+					.node()
+					.getBoundingClientRect();
+				if (
+					!(
+						containerPosition.bottom < 0 ||
+						containerPosition.top - windowHeight > 0
+					)
+				) {
 					d3.select(window).on("scroll.pbifdc", null);
 					draw(rawData);
-				};
-			};
+				}
+			}
 
 			//end of csvCallback
-		};
+		}
 
 		function draw(rawData) {
-
 			const flagsData = rawData[2];
 
 			createTitle();
@@ -592,7 +775,8 @@
 
 			createMap(dataMap);
 
-			mapLayer.transition()
+			mapLayer
+				.transition()
 				.duration(duration)
 				.style("opacity", function () {
 					return chartState.showMap ? 1 : 0;
@@ -615,68 +799,84 @@
 			if (showHelp) createAnnotationsDiv();
 
 			function createTitle() {
-
-				const title = titleDiv.append("p")
+				const title = titleDiv
+					.append("p")
 					.attr("id", "pbifdcd3chartTitle")
 					.html(chartTitle);
 
-				const helpIcon = iconsDiv.append("button")
+				const helpIcon = iconsDiv
+					.append("button")
 					.attr("id", "pbifdcHelpButton");
 
-				helpIcon.html("HELP  ")
+				helpIcon
+					.html("HELP  ")
 					.append("span")
-					.attr("class", "fas fa-info")
+					.attr("class", "fas fa-info");
 
-				const downloadIcon = iconsDiv.append("button")
+				const downloadIcon = iconsDiv
+					.append("button")
 					.attr("id", "pbifdcDownloadButton");
 
-				downloadIcon.html(".CSV  ")
+				downloadIcon
+					.html(".CSV  ")
 					.append("span")
 					.attr("class", "fas fa-download");
 
-				const snapshotDiv = iconsDiv.append("div")
+				const snapshotDiv = iconsDiv
+					.append("div")
 					.attr("class", "pbifdcSnapshotDiv");
 
-				const snapshotIcon = snapshotDiv.append("button")
+				const snapshotIcon = snapshotDiv
+					.append("button")
 					.attr("id", "pbifdcSnapshotButton");
 
-				snapshotIcon.html("IMAGE ")
+				snapshotIcon
+					.html("IMAGE ")
 					.append("span")
 					.attr("class", "fas fa-camera");
 
-				const snapshotContent = snapshotDiv.append("div")
+				const snapshotContent = snapshotDiv
+					.append("div")
 					.attr("class", "pbifdcSnapshotContent");
 
-				const pdfSpan = snapshotContent.append("p")
+				const pdfSpan = snapshotContent
+					.append("p")
 					.attr("id", "pbifdcSnapshotPdfText")
 					.html("Download PDF")
 					.on("click", function () {
 						createSnapshot("pdf", false);
 					});
 
-				const pngSpan = snapshotContent.append("p")
+				const pngSpan = snapshotContent
+					.append("p")
 					.attr("id", "pbifdcSnapshotPngText")
 					.html("Download Image (PNG)")
 					.on("click", function () {
 						createSnapshot("png", false);
 					});
 
-				const playIcon = iconsDiv.append("button")
+				const playIcon = iconsDiv
+					.append("button")
 					.datum({
-						clicked: false
+						clicked: false,
 					})
 					.attr("id", "pbifdcPlayButton");
 
-				playIcon.html("PLAY  ")
+				playIcon
+					.html("PLAY  ")
 					.append("span")
 					.attr("class", "fas fa-play");
 
 				playIcon.on("click", function (d) {
 					d.clicked = !d.clicked;
 
-					playIcon.html(d.clicked ? "PAUSE " : "PLAY  ")
+					playIcon
+						.html(d.clicked ? "PAUSE " : "PLAY  ")
 						.append("span")
-						.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
+						.attr(
+							"class",
+							d.clicked ? "fas fa-pause" : "fas fa-play"
+						);
 
 					if (d.clicked) {
 						chartState.selectedYear.length = 1;
@@ -684,83 +884,143 @@
 						timer = d3.interval(loopButtons, 3 * duration);
 					} else {
 						timer.stop();
-					};
+					}
 
 					function loopButtons() {
-						const index = yearsArray.indexOf(chartState.selectedYear[0]);
+						const index = yearsArray.indexOf(
+							chartState.selectedYear[0]
+						);
 
-						chartState.selectedYear[0] = yearsArray[(index + 1) % yearsArray.length];
+						chartState.selectedYear[0] =
+							yearsArray[(index + 1) % yearsArray.length];
 
-						const yearButton = d3.selectAll(".pbifdcbuttonsRects")
+						const yearButton = d3
+							.selectAll(".pbifdcbuttonsRects")
 							.filter(function (d) {
-								return d === chartState.selectedYear[0]
+								return d === chartState.selectedYear[0];
 							});
 
 						yearButton.dispatch("click");
 
-						const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
-							0 :
-							chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-								yearsArray.length - buttonsNumber :
-								yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
+						const firstYearIndex =
+							chartState.selectedYear[0] <
+							yearsArray[buttonsNumber / 2]
+								? 0
+								: chartState.selectedYear[0] >
+								  yearsArray[
+										yearsArray.length - buttonsNumber / 2
+								  ]
+								? yearsArray.length - buttonsNumber
+								: yearsArray.indexOf(
+										chartState.selectedYear[0]
+								  ) -
+								  buttonsNumber / 2;
 
-						const currentTranslate = -(buttonsPanel.buttonWidth * firstYearIndex);
+						const currentTranslate = -(
+							buttonsPanel.buttonWidth * firstYearIndex
+						);
 
 						if (currentTranslate === 0) {
-							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#ccc")
-							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "none");
+							svg.select(".pbifdcLeftArrowGroup")
+								.select("text")
+								.style("fill", "#ccc");
+							svg.select(".pbifdcLeftArrowGroup").attr(
+								"pointer-events",
+								"none"
+							);
 						} else {
-							svg.select(".pbifdcLeftArrowGroup").select("text").style("fill", "#666")
-							svg.select(".pbifdcLeftArrowGroup").attr("pointer-events", "all");
-						};
+							svg.select(".pbifdcLeftArrowGroup")
+								.select("text")
+								.style("fill", "#666");
+							svg.select(".pbifdcLeftArrowGroup").attr(
+								"pointer-events",
+								"all"
+							);
+						}
 
-						if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
-							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#ccc")
-							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "none");
+						if (
+							Math.abs(currentTranslate) >=
+							(yearsArray.length - buttonsNumber) *
+								buttonsPanel.buttonWidth
+						) {
+							svg.select(".pbifdcRightArrowGroup")
+								.select("text")
+								.style("fill", "#ccc");
+							svg.select(".pbifdcRightArrowGroup").attr(
+								"pointer-events",
+								"none"
+							);
 						} else {
-							svg.select(".pbifdcRightArrowGroup").select("text").style("fill", "#666")
-							svg.select(".pbifdcRightArrowGroup").attr("pointer-events", "all");
-						};
+							svg.select(".pbifdcRightArrowGroup")
+								.select("text")
+								.style("fill", "#666");
+							svg.select(".pbifdcRightArrowGroup").attr(
+								"pointer-events",
+								"all"
+							);
+						}
 
-						svg.select(".pbifdcbuttonsGroup").transition()
+						svg.select(".pbifdcbuttonsGroup")
+							.transition()
 							.duration(duration)
 							.attrTween("transform", function () {
-								return d3.interpolateString(this.getAttribute("transform"), "translate(" + currentTranslate + ",0)");
+								return d3.interpolateString(
+									this.getAttribute("transform"),
+									"translate(" + currentTranslate + ",0)"
+								);
 							});
-					};
+					}
 				});
 
 				if (!isBookmarkPage) {
-
-					const shareIcon = iconsDiv.append("button")
+					const shareIcon = iconsDiv
+						.append("button")
 						.attr("id", "pbifdcShareButton");
 
-					shareIcon.html("SHARE  ")
+					shareIcon
+						.html("SHARE  ")
 						.append("span")
 						.attr("class", "fas fa-share");
 
-					const shareDiv = containerDiv.append("div")
+					const shareDiv = containerDiv
+						.append("div")
 						.attr("class", "d3chartShareDiv")
 						.style("display", "none");
 
-					shareIcon.on("mouseover", function () {
-						shareDiv.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv.node().getBoundingClientRect();
-						const shareBox = shareDiv.node().getBoundingClientRect();
-						const thisOffsetTop = thisBox.top - containerBox.top - (shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
-						shareDiv.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					}).on("mouseout", function () {
-						shareDiv.style("display", "none");
-					})
+					shareIcon
+						.on("mouseover", function () {
+							shareDiv
+								.html("Click to copy")
+								.style("display", "block");
+							const thisBox = this.getBoundingClientRect();
+							const containerBox = containerDiv
+								.node()
+								.getBoundingClientRect();
+							const shareBox = shareDiv
+								.node()
+								.getBoundingClientRect();
+							const thisOffsetTop =
+								thisBox.top -
+								containerBox.top -
+								(shareBox.height - thisBox.height) / 2;
+							const thisOffsetLeft =
+								thisBox.left -
+								containerBox.left -
+								shareBox.width -
+								12;
+							shareDiv
+								.style("top", thisOffsetTop + "px")
+								.style("left", thisOffsetLeft + "20px");
+						})
+						.on("mouseout", function () {
+							shareDiv.style("display", "none");
+						})
 						.on("click", function () {
+							const newURL =
+								bookmarkSite + queryStringValues.toString();
 
-							const newURL = bookmarkSite + queryStringValues.toString();
-
-							const shareInput = shareDiv.append("input")
+							const shareInput = shareDiv
+								.append("input")
 								.attr("type", "text")
 								.attr("readonly", true)
 								.attr("spellcheck", "false")
@@ -773,51 +1033,62 @@
 							shareDiv.html("Copied!");
 
 							const thisBox = this.getBoundingClientRect();
-							const containerBox = containerDiv.node().getBoundingClientRect();
-							const shareBox = shareDiv.node().getBoundingClientRect();
-							const thisOffsetLeft = thisBox.left - containerBox.left - shareBox.width - 12;
+							const containerBox = containerDiv
+								.node()
+								.getBoundingClientRect();
+							const shareBox = shareDiv
+								.node()
+								.getBoundingClientRect();
+							const thisOffsetLeft =
+								thisBox.left -
+								containerBox.left -
+								shareBox.width -
+								12;
 							shareDiv.style("left", thisOffsetLeft + "20px");
-
 						});
-
-				};
+				}
 
 				if (browserHasSnapshotIssues) {
-					const bestVisualizedSpan = snapshotContent.append("p")
+					const bestVisualizedSpan = snapshotContent
+						.append("p")
 						.attr("id", "pbifdcBestVisualizedText")
-						.html("For best results use Chrome, Firefox, Opera or Chromium-based Edge.")
+						.html(
+							"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+						)
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
-				};
+				}
 
-				snapshotDiv.on("mouseover", function () {
-					snapshotContent.style("display", "block")
-				}).on("mouseout", function () {
-					snapshotContent.style("display", "none")
-				});
+				snapshotDiv
+					.on("mouseover", function () {
+						snapshotContent.style("display", "block");
+					})
+					.on("mouseout", function () {
+						snapshotContent.style("display", "none");
+					});
 
 				helpIcon.on("click", createAnnotationsDiv);
 
 				downloadIcon.on("click", function () {
-
 					const csv = createCsv(rawData[0]);
 
 					const currentDate = new Date();
 
-					const fileName = "ContributionsFlow_" + csvDateFormat(currentDate) + ".csv";
+					const fileName =
+						"ContributionsFlow_" +
+						csvDateFormat(currentDate) +
+						".csv";
 
 					const blob = new Blob([csv], {
-						type: 'text/csv;charset=utf-8;'
+						type: "text/csv;charset=utf-8;",
 					});
 
 					if (navigator.msSaveBlob) {
 						navigator.msSaveBlob(blob, filename);
 					} else {
-
 						const link = document.createElement("a");
 
 						if (link.download !== undefined) {
-
 							const url = URL.createObjectURL(blob);
 
 							link.setAttribute("href", url);
@@ -829,22 +1100,19 @@
 							link.click();
 
 							document.body.removeChild(link);
-
-						};
-					};
-
+						}
+					}
 				});
 
 				//end of createTitle
-			};
+			}
 
 			function createMap(dataMap) {
-
 				dataMap.features.forEach(function (d) {
 					centroids[d.properties.iso_a2] = {
 						x: mapPath.centroid(d.geometry)[0],
-						y: mapPath.centroid(d.geometry)[1]
-					}
+						y: mapPath.centroid(d.geometry)[1],
+					};
 				});
 
 				centroids.US.x += 60;
@@ -856,23 +1124,23 @@
 				centroids.FR.y -= 9;
 				centroids.XX = centroids.TR;
 
-				const map = mapContainer.append("path")
+				const map = mapContainer
+					.append("path")
 					.attr("d", mapPath(dataMap))
 					.attr("fill", "none")
 					.attr("stroke", "#e9e9f9")
 					.attr("stroke-width", "1px");
 
 				//end of createMap
-			};
+			}
 
 			function createTopPanel(data) {
-
 				const donors = data.filter(function (d) {
 					return d.category === "Donor";
 				});
 
 				const mainValue = d3.sum(donors, function (d) {
-					return d.total
+					return d.total;
 				});
 
 				donorsNumber = donors.length;
@@ -881,163 +1149,271 @@
 
 				contributionType.forEach(function (d) {
 					contributionsTotals[d] = d3.sum(donors, function (e) {
-						return e[d]
+						return e[d];
 					});
 				});
 
-				const topPanelMoneyBag = topPanel.main.selectAll(".pbifdctopPanelMoneyBag")
+				const topPanelMoneyBag = topPanel.main
+					.selectAll(".pbifdctopPanelMoneyBag")
 					.data([true]);
 
-				topPanelMoneyBag.enter()
+				topPanelMoneyBag
+					.enter()
 					.append("g")
-					.attr("class", "pbifdctopPanelMoneyBag contributionColorFill")
-					.attr("transform", "translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)")
+					.attr(
+						"class",
+						"pbifdctopPanelMoneyBag contributionColorFill"
+					)
+					.attr(
+						"transform",
+						"translate(" +
+							topPanel.moneyBagPadding +
+							",6) scale(0.5)"
+					)
 					.each(function (_, i, n) {
 						moneyBagdAttribute.forEach(function (d) {
-							d3.select(n[i]).append("path")
-								.attr("d", d);
+							d3.select(n[i]).append("path").attr("d", d);
 						});
 					});
 
-				const previousValue = d3.select(".pbifdctopPanelMainValue").size() !== 0 ? d3.select(".pbifdctopPanelMainValue").datum() : 0;
+				const previousValue =
+					d3.select(".pbifdctopPanelMainValue").size() !== 0
+						? d3.select(".pbifdctopPanelMainValue").datum()
+						: 0;
 
-				const previousDonors = d3.select(".pbifdctopPanelDonorsNumber").size() !== 0 ? d3.select(".pbifdctopPanelDonorsNumber").datum() : 0;
+				const previousDonors =
+					d3.select(".pbifdctopPanelDonorsNumber").size() !== 0
+						? d3.select(".pbifdctopPanelDonorsNumber").datum()
+						: 0;
 
-				const previousCbpfs = d3.select(".pbifdctopPanelCbpfsNumber").size() !== 0 ? d3.select(".pbifdctopPanelCbpfsNumber").datum() : 0;
+				const previousCbpfs =
+					d3.select(".pbifdctopPanelCbpfsNumber").size() !== 0
+						? d3.select(".pbifdctopPanelCbpfsNumber").datum()
+						: 0;
 
-				let mainValueGroup = topPanel.main.selectAll(".pbifdcmainValueGroup")
+				let mainValueGroup = topPanel.main
+					.selectAll(".pbifdcmainValueGroup")
 					.data([true]);
 
-				mainValueGroup = mainValueGroup.enter()
+				mainValueGroup = mainValueGroup
+					.enter()
 					.append("g")
 					.attr("class", "pbifdcmainValueGroup")
 					.merge(mainValueGroup);
 
-				let topPanelMainValue = mainValueGroup.selectAll(".pbifdctopPanelMainValue")
+				let topPanelMainValue = mainValueGroup
+					.selectAll(".pbifdctopPanelMainValue")
 					.data([mainValue]);
 
-				topPanelMainValue = topPanelMainValue.enter()
+				topPanelMainValue = topPanelMainValue
+					.enter()
 					.append("text")
-					.attr("class", "pbifdctopPanelMainValue contributionColorFill")
+					.attr(
+						"class",
+						"pbifdctopPanelMainValue contributionColorFill"
+					)
 					.attr("text-anchor", "end")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] - topPanel.mainValueHorPadding)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[0] -
+							topPanel.mainValueHorPadding
+					)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelMainValue);
 
-				topPanelMainValue.transition()
+				topPanelMainValue
+					.transition()
 					.duration(duration)
 					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousValue, d);
 						return function (t) {
-							const siString = formatSIFloat(i(t))
-							node.textContent = "$" + siString.substring(0, siString.length - 1);
+							const siString = formatSIFloat(i(t));
+							node.textContent =
+								"$" +
+								siString.substring(0, siString.length - 1);
 						};
 					});
 
-				let topPanelMainText = mainValueGroup.selectAll(".pbifdctopPanelMainText")
+				let topPanelMainText = mainValueGroup
+					.selectAll(".pbifdctopPanelMainText")
 					.data([mainValue]);
 
-				topPanelMainText = topPanelMainText.enter()
+				topPanelMainText = topPanelMainText
+					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelMainText")
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.9)
-					.merge(topPanelMainText)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[0] +
+							topPanel.mainValueHorPadding
+					)
+					.attr(
+						"y",
+						topPanel.height - topPanel.mainValueVerPadding * 2.9
+					)
+					.merge(topPanelMainText);
 
-				topPanelMainText.transition()
+				topPanelMainText
+					.transition()
 					.duration(duration)
 					.style("opacity", 1)
 					.text(function (d) {
-						const yearsText = chartState.selectedYear.length === 1 ? chartState.selectedYear[0] : "years\u002A";
+						const yearsText =
+							chartState.selectedYear.length === 1
+								? chartState.selectedYear[0]
+								: "years\u002A";
 						const valueSI = formatSIFloat(d);
 						const unit = valueSI[valueSI.length - 1];
-						return (unit === "k" ? "Thousand" : unit === "M" ? "Million" : unit === "G" ? "Billion" : "") +
-							" Donated in " + yearsText;
+						return (
+							(unit === "k"
+								? "Thousand"
+								: unit === "M"
+								? "Million"
+								: unit === "G"
+								? "Billion"
+								: "") +
+							" Donated in " +
+							yearsText
+						);
 					});
 
-				let topPanelSubText = mainValueGroup.selectAll(".pbifdctopPanelSubText")
+				let topPanelSubText = mainValueGroup
+					.selectAll(".pbifdctopPanelSubText")
 					.data([true]);
 
-				topPanelSubText = topPanelSubText.enter()
+				topPanelSubText = topPanelSubText
+					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelSubText")
 					.style("opacity", 0)
 					.attr("text-anchor", "start")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[0] + topPanel.mainValueHorPadding)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.3)
-					.merge(topPanelSubText)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[0] +
+							topPanel.mainValueHorPadding
+					)
+					.attr(
+						"y",
+						topPanel.height - topPanel.mainValueVerPadding * 1.3
+					)
+					.merge(topPanelSubText);
 
-				topPanelSubText.transition()
+				topPanelSubText
+					.transition()
 					.duration(duration)
 					.style("opacity", 1)
-					.text(chartState.selectedYear <= new Date().getFullYear() ? "(Total Contributions)" : "(Pledged Values)");
+					.text(
+						chartState.selectedYear <= new Date().getFullYear()
+							? "(Total Contributions)"
+							: "(Pledged Values)"
+					);
 
-				let topPanelDonorsNumber = mainValueGroup.selectAll(".pbifdctopPanelDonorsNumber")
+				let topPanelDonorsNumber = mainValueGroup
+					.selectAll(".pbifdctopPanelDonorsNumber")
 					.data([donorsNumber]);
 
-				topPanelDonorsNumber = topPanelDonorsNumber.enter()
+				topPanelDonorsNumber = topPanelDonorsNumber
+					.enter()
 					.append("text")
-					.attr("class", "pbifdctopPanelDonorsNumber contributionColorFill")
+					.attr(
+						"class",
+						"pbifdctopPanelDonorsNumber contributionColorFill"
+					)
 					.attr("text-anchor", "end")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1] - topPanel.mainValueHorPadding)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[1] -
+							topPanel.mainValueHorPadding
+					)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelDonorsNumber);
 
-				topPanelDonorsNumber.transition()
+				topPanelDonorsNumber
+					.transition()
 					.duration(duration)
 					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousDonors, d);
 						return function (t) {
-							node.textContent = ~~(i(t));
+							node.textContent = ~~i(t);
 						};
 					});
 
-				const topPanelDonorsText = mainValueGroup.selectAll(".pbifdctopPanelDonorsText")
+				const topPanelDonorsText = mainValueGroup
+					.selectAll(".pbifdctopPanelDonorsText")
 					.data([true])
 					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelDonorsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+					.attr(
+						"y",
+						topPanel.height - topPanel.mainValueVerPadding * 1.9
+					)
 					.attr("text-anchor", "start")
 					.text("Donors")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[1]);
+					.attr(
+						"x",
+						topPanel.moneyBagPadding + topPanel.leftPadding[1]
+					);
 
-				let topPanelCbpfsNumber = mainValueGroup.selectAll(".pbifdctopPanelCbpfsNumber")
+				let topPanelCbpfsNumber = mainValueGroup
+					.selectAll(".pbifdctopPanelCbpfsNumber")
 					.data([cbpfsNumber]);
 
-				topPanelCbpfsNumber = topPanelCbpfsNumber.enter()
+				topPanelCbpfsNumber = topPanelCbpfsNumber
+					.enter()
 					.append("text")
-					.attr("class", "pbifdctopPanelCbpfsNumber allocationColorFill")
+					.attr(
+						"class",
+						"pbifdctopPanelCbpfsNumber allocationColorFill"
+					)
 					.attr("text-anchor", "end")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2] - topPanel.mainValueHorPadding)
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[2] -
+							topPanel.mainValueHorPadding
+					)
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 					.merge(topPanelCbpfsNumber);
 
-				topPanelCbpfsNumber.transition()
+				topPanelCbpfsNumber
+					.transition()
 					.duration(duration)
 					.tween("text", function (d) {
 						const node = this;
 						const i = d3.interpolate(previousCbpfs, d);
 						return function (t) {
-							node.textContent = ~~(i(t));
+							node.textContent = ~~i(t);
 						};
 					});
 
-				const topPanelCbpfsText = mainValueGroup.selectAll(".pbifdctopPanelCbpfsText")
+				const topPanelCbpfsText = mainValueGroup
+					.selectAll(".pbifdctopPanelCbpfsText")
 					.data([true])
 					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelCbpfsText")
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.9)
+					.attr(
+						"y",
+						topPanel.height - topPanel.mainValueVerPadding * 1.9
+					)
 					.attr("text-anchor", "start")
 					.text("CBPFs")
-					.attr("x", topPanel.moneyBagPadding + topPanel.leftPadding[2]);
+					.attr(
+						"x",
+						topPanel.moneyBagPadding + topPanel.leftPadding[2]
+					);
 
-				const overRectangle = topPanel.main.selectAll(".pbifdctopPanelOverRectangle")
+				const overRectangle = topPanel.main
+					.selectAll(".pbifdctopPanelOverRectangle")
 					.data([true])
 					.enter()
 					.append("rect")
@@ -1046,49 +1422,72 @@
 					.attr("height", topPanel.height)
 					.style("opacity", 0);
 
-				overRectangle.on("mouseover", mouseOverTopPanel)
+				overRectangle
+					.on("mouseover", mouseOverTopPanel)
 					.on("mousemove", mouseMoveTopPanel)
 					.on("mouseout", mouseOutTopPanel);
 
 				//end of createTopPanel
-			};
+			}
 
 			function createButtonsPanel() {
-
-				const clipPathButtons = buttonsPanel.main.append("clipPath")
+				const clipPathButtons = buttonsPanel.main
+					.append("clipPath")
 					.attr("id", "pbifdcclipPathButtons")
 					.append("rect")
 					.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
 					.attr("height", buttonsPanel.height);
 
-				const clipPathGroup = buttonsPanel.main.append("g")
+				const clipPathGroup = buttonsPanel.main
+					.append("g")
 					.attr("class", "pbifdcClipPathGroup")
-					.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding) + ",0)")
+					.attr(
+						"transform",
+						"translate(" +
+							(buttonsPanel.padding[3] +
+								buttonsPanel.arrowPadding) +
+							",0)"
+					)
 					.attr("clip-path", "url(#pbifdcclipPathButtons)");
 
-				const buttonsGroup = clipPathGroup.append("g")
+				const buttonsGroup = clipPathGroup
+					.append("g")
 					.attr("class", "pbifdcbuttonsGroup")
 					.attr("transform", "translate(0,0)")
 					.style("cursor", "pointer");
 
-				const buttonsRects = buttonsGroup.selectAll(null)
+				const buttonsRects = buttonsGroup
+					.selectAll(null)
 					.data(yearsArray)
 					.enter()
 					.append("rect")
 					.attr("rx", "2px")
 					.attr("ry", "2px")
 					.attr("class", "pbifdcbuttonsRects")
-					.attr("width", buttonsPanel.buttonWidth - buttonsPanel.buttonPadding)
-					.attr("height", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2)
+					.attr(
+						"width",
+						buttonsPanel.buttonWidth - buttonsPanel.buttonPadding
+					)
+					.attr(
+						"height",
+						buttonsPanel.height -
+							buttonsPanel.buttonVerticalPadding * 2
+					)
 					.attr("y", buttonsPanel.buttonVerticalPadding)
 					.attr("x", function (_, i) {
-						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonPadding / 2;
+						return (
+							i * buttonsPanel.buttonWidth +
+							buttonsPanel.buttonPadding / 2
+						);
 					})
 					.style("fill", function (d) {
-						return chartState.selectedYear.indexOf(d) > -1 ? unBlue : "#eaeaea";
+						return chartState.selectedYear.indexOf(d) > -1
+							? unBlue
+							: "#eaeaea";
 					});
 
-				const buttonsText = buttonsGroup.selectAll(null)
+				const buttonsText = buttonsGroup
+					.selectAll(null)
 					.data(yearsArray)
 					.enter()
 					.append("text")
@@ -1096,77 +1495,129 @@
 					.attr("class", "pbifdcbuttonsText")
 					.attr("y", buttonsPanel.height / 1.6)
 					.attr("x", function (_, i) {
-						return i * buttonsPanel.buttonWidth + buttonsPanel.buttonWidth / 2;
+						return (
+							i * buttonsPanel.buttonWidth +
+							buttonsPanel.buttonWidth / 2
+						);
 					})
 					.style("fill", function (d) {
-						return chartState.selectedYear.indexOf(d) > -1 ? "white" : "#444";
+						return chartState.selectedYear.indexOf(d) > -1
+							? "white"
+							: "#444";
 					})
 					.text(function (d) {
 						return d;
 					});
 
-				const leftArrow = buttonsPanel.main.append("g")
+				const leftArrow = buttonsPanel.main
+					.append("g")
 					.attr("class", "pbifdcLeftArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + buttonsPanel.padding[3] + ",0)");
+					.attr(
+						"transform",
+						"translate(" + buttonsPanel.padding[3] + ",0)"
+					);
 
-				const leftArrowRect = leftArrow.append("rect")
+				const leftArrowRect = leftArrow
+					.append("rect")
 					.style("fill", "white")
 					.attr("width", buttonsPanel.arrowPadding)
 					.attr("height", buttonsPanel.height);
 
-				const leftArrowText = leftArrow.append("text")
+				const leftArrowText = leftArrow
+					.append("text")
 					.attr("class", "pbifdcleftArrowText")
 					.attr("x", 0)
-					.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+					.attr(
+						"y",
+						buttonsPanel.height -
+							buttonsPanel.buttonVerticalPadding * 2.1
+					)
 					.style("fill", "#666")
 					.text("\u25c4");
 
-				const rightArrow = buttonsPanel.main.append("g")
+				const rightArrow = buttonsPanel.main
+					.append("g")
 					.attr("class", "pbifdcRightArrowGroup")
 					.style("cursor", "pointer")
-					.attr("transform", "translate(" + (buttonsPanel.padding[3] + buttonsPanel.arrowPadding +
-						(buttonsNumber * buttonsPanel.buttonWidth)) + ",0)");
+					.attr(
+						"transform",
+						"translate(" +
+							(buttonsPanel.padding[3] +
+								buttonsPanel.arrowPadding +
+								buttonsNumber * buttonsPanel.buttonWidth) +
+							",0)"
+					);
 
-				const rightArrowRect = rightArrow.append("rect")
+				const rightArrowRect = rightArrow
+					.append("rect")
 					.style("fill", "white")
 					.attr("width", buttonsPanel.arrowPadding)
 					.attr("height", buttonsPanel.height);
 
-				const rightArrowText = rightArrow.append("text")
+				const rightArrowText = rightArrow
+					.append("text")
 					.attr("class", "pbifdcrightArrowText")
 					.attr("x", -1)
-					.attr("y", buttonsPanel.height - buttonsPanel.buttonVerticalPadding * 2.1)
+					.attr(
+						"y",
+						buttonsPanel.height -
+							buttonsPanel.buttonVerticalPadding * 2.1
+					)
 					.style("fill", "#666")
 					.text("\u25ba");
 
-				const showMapGroup = buttonsPanel.main.append("g")
+				const showMapGroup = buttonsPanel.main
+					.append("g")
 					.attr("class", "pbifdcShowMapGroup")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding) + "," +
-						(buttonsPanel.height * 0.6) + ")")
+					.attr(
+						"transform",
+						"translate(" +
+							(padding[3] +
+								nodesPanel.width +
+								panelVerticalPadding) +
+							"," +
+							buttonsPanel.height * 0.6 +
+							")"
+					)
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
-				const showMapGroupLegend = buttonsPanel.main.append("g")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + "," +
-						(buttonsPanel.height * 0.6) + ")")
+				const showMapGroupLegend = buttonsPanel.main
+					.append("g")
+					.attr(
+						"transform",
+						"translate(" +
+							(padding[3] +
+								nodesPanel.width +
+								panelVerticalPadding -
+								groupLegendPadding) +
+							"," +
+							buttonsPanel.height * 0.6 +
+							")"
+					)
 					.style("opacity", 0)
 					.attr("pointer-events", "none");
 
-				const showMapGroupLegendText = showMapGroupLegend.append("text")
+				const showMapGroupLegendText = showMapGroupLegend
+					.append("text")
 					.attr("class", "pbifdcShowMapGroupLegendText")
-					.text("Show the nodes in their corresponding geographic coordinates")
+					.text(
+						"Show the nodes in their corresponding geographic coordinates"
+					)
 					.attr("x", 0)
 					.attr("y", 0)
 					.call(wrapText, 150);
 
-				const showMapGroupLegendLine = showMapGroupLegend.append("polyline")
+				const showMapGroupLegendLine = showMapGroupLegend
+					.append("polyline")
 					.attr("points", "56,30 0,30 0,40")
 					.style("fill", "none")
 					.style("stroke", "#aaa")
 					.style("stroke-width", "1px");
 
-				const outerRectangle = showMapGroup.append("rect")
+				const outerRectangle = showMapGroup
+					.append("rect")
 					.attr("width", 14)
 					.attr("height", 14)
 					.attr("rx", 2)
@@ -1176,44 +1627,75 @@
 					.attr("fill", "white")
 					.attr("stroke", "darkslategray");
 
-				const innerCheck = showMapGroup.append("polyline")
+				const innerCheck = showMapGroup
+					.append("polyline")
 					.style("stroke-width", "2px")
 					.attr("points", "-6,-4 -3,-1 2,-8")
 					.style("fill", "none")
-					.style("stroke", chartState.showMap ? "darkslategray" : "white");
+					.style(
+						"stroke",
+						chartState.showMap ? "darkslategray" : "white"
+					);
 
-				const showMapText = showMapGroup.append("text")
+				const showMapText = showMapGroup
+					.append("text")
 					.attr("class", "pbifdcShowMapTextControl")
 					.attr("x", 8)
 					.text("Show Map");
 
-				const showNamesGroup = buttonsPanel.main.append("g")
+				const showNamesGroup = buttonsPanel.main
+					.append("g")
 					.attr("class", "pbifdcShowNamesGroup")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding) + "," +
-						(buttonsPanel.height * 0.6) + ")")
+					.attr(
+						"transform",
+						"translate(" +
+							(padding[3] +
+								nodesPanel.width +
+								panelVerticalPadding +
+								showNamesPadding) +
+							"," +
+							buttonsPanel.height * 0.6 +
+							")"
+					)
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
 
-				const showNamesGroupLegend = buttonsPanel.main.append("g")
-					.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + "," +
-						(buttonsPanel.height * 0.6) + ")")
+				const showNamesGroupLegend = buttonsPanel.main
+					.append("g")
+					.attr(
+						"transform",
+						"translate(" +
+							(padding[3] +
+								nodesPanel.width +
+								panelVerticalPadding +
+								showNamesPadding -
+								groupLegendPadding) +
+							"," +
+							buttonsPanel.height * 0.6 +
+							")"
+					)
 					.style("opacity", 0)
 					.attr("pointer-events", "none");
 
-				const showNamesGroupLegendText = showNamesGroupLegend.append("text")
+				const showNamesGroupLegendText = showNamesGroupLegend
+					.append("text")
 					.attr("class", "pbifdcShowMapGroupLegendText")
-					.text("Show or hide the name of each node. Hiding the name is useful in the map view")
+					.text(
+						"Show or hide the name of each node. Hiding the name is useful in the map view"
+					)
 					.attr("x", 0)
 					.attr("y", 0)
 					.call(wrapText, 140);
 
-				const showNamesGroupLegendLine = showNamesGroupLegend.append("polyline")
+				const showNamesGroupLegendLine = showNamesGroupLegend
+					.append("polyline")
 					.attr("points", "76,30 0,30 0,40")
 					.style("fill", "none")
 					.style("stroke", "#aaa")
 					.style("stroke-width", "1px");
 
-				const outerRectangleShowNames = showNamesGroup.append("rect")
+				const outerRectangleShowNames = showNamesGroup
+					.append("rect")
 					.attr("width", 14)
 					.attr("height", 14)
 					.attr("rx", 2)
@@ -1223,41 +1705,50 @@
 					.attr("fill", "white")
 					.attr("stroke", "darkslategray");
 
-				const innerCheckShowNames = showNamesGroup.append("polyline")
+				const innerCheckShowNames = showNamesGroup
+					.append("polyline")
 					.style("stroke-width", "2px")
 					.attr("points", "-6,-4 -3,-1 2,-8")
 					.style("fill", "none")
-					.style("stroke", chartState.showNames ? "darkslategray" : "white");
+					.style(
+						"stroke",
+						chartState.showNames ? "darkslategray" : "white"
+					);
 
-				const showNamesText = showNamesGroup.append("text")
+				const showNamesText = showNamesGroup
+					.append("text")
 					.attr("class", "pbifdcShowMapTextControl")
 					.attr("x", 8)
 					.text("Show Names");
 
-				buttonsRects.on("mouseover", mouseOverButtonsRects)
+				buttonsRects
+					.on("mouseover", mouseOverButtonsRects)
 					.on("mouseout", mouseOutButtonsRects)
 					.on("click", function (d) {
 						const self = this;
 						if (d3.event.altKey) {
 							clickButtonsRects(d, false);
 							return;
-						};
+						}
 						if (localVariable.get(this) !== "clicked") {
 							localVariable.set(this, "clicked");
 							setTimeout(function () {
 								if (localVariable.get(self) === "clicked") {
 									clickButtonsRects(d, true);
-								};
+								}
 								localVariable.set(self, null);
 							}, 250);
 						} else {
 							clickButtonsRects(d, false);
 							localVariable.set(this, null);
-						};
+						}
 					});
 
 				d3.select("body").on("d3ChartsYear.pbifdc", function () {
-					clickButtonsRects(validateCustomEventYear(+d3.event.detail), true);
+					clickButtonsRects(
+						validateCustomEventYear(+d3.event.detail),
+						true
+					);
 					repositionButtonsGroup();
 					checkArrows();
 				});
@@ -1268,107 +1759,200 @@
 
 				leftArrow.on("click", function () {
 					leftArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform")
+					)[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
-					buttonsGroup.transition()
+					buttonsGroup
+						.transition()
 						.duration(duration)
-						.attr("transform", "translate(" +
-							Math.min(0, (currentTranslate + buttonsNumber * buttonsPanel.buttonWidth)) + ",0)")
+						.attr(
+							"transform",
+							"translate(" +
+								Math.min(
+									0,
+									currentTranslate +
+										buttonsNumber * buttonsPanel.buttonWidth
+								) +
+								",0)"
+						)
 						.on("end", checkArrows);
 				});
 
 				rightArrow.on("click", function () {
 					rightArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform")
+					)[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
-					buttonsGroup.transition()
+					buttonsGroup
+						.transition()
 						.duration(duration)
-						.attr("transform", "translate(" +
-							Math.max(-((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth),
-								(-(Math.abs(currentTranslate) + buttonsNumber * buttonsPanel.buttonWidth))) +
-							",0)")
+						.attr(
+							"transform",
+							"translate(" +
+								Math.max(
+									-(
+										(yearsArray.length - buttonsNumber) *
+										buttonsPanel.buttonWidth
+									),
+									-(
+										Math.abs(currentTranslate) +
+										buttonsNumber * buttonsPanel.buttonWidth
+									)
+								) +
+								",0)"
+						)
 						.on("end", checkArrows);
 				});
 
-				showMapGroup.on("mouseover", function () {
-					currentHoveredElem = this;
-					showMapGroupLegend.transition()
-						.duration(duration)
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + ",-36)")
-						.style("opacity", 1);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					showMapGroupLegend.interrupt()
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding - groupLegendPadding) + "," +
-							(buttonsPanel.height * 0.6) + ")")
-						.style("opacity", 0);
-				}).on("click", function () {
+				showMapGroup
+					.on("mouseover", function () {
+						currentHoveredElem = this;
+						showMapGroupLegend
+							.transition()
+							.duration(duration)
+							.attr(
+								"transform",
+								"translate(" +
+									(padding[3] +
+										nodesPanel.width +
+										panelVerticalPadding -
+										groupLegendPadding) +
+									",-36)"
+							)
+							.style("opacity", 1);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						showMapGroupLegend
+							.interrupt()
+							.attr(
+								"transform",
+								"translate(" +
+									(padding[3] +
+										nodesPanel.width +
+										panelVerticalPadding -
+										groupLegendPadding) +
+									"," +
+									buttonsPanel.height * 0.6 +
+									")"
+							)
+							.style("opacity", 0);
+					})
+					.on("click", function () {
+						chartState.showMap = !chartState.showMap;
 
-					chartState.showMap = !chartState.showMap;
+						if (queryStringValues.has("showmap")) {
+							queryStringValues.set(
+								"showmap",
+								chartState.showMap
+							);
+						} else {
+							queryStringValues.append(
+								"showmap",
+								chartState.showMap
+							);
+						}
 
-					if (queryStringValues.has("showmap")) {
-						queryStringValues.set("showmap", chartState.showMap);
-					} else {
-						queryStringValues.append("showmap", chartState.showMap);
-					};
+						innerCheck.style(
+							"stroke",
+							chartState.showMap ? "darkslategray" : "white"
+						);
 
-					innerCheck.style("stroke", chartState.showMap ? "darkslategray" : "white");
+						showMapGroupLegend.interrupt().style("opacity", 0);
 
-					showMapGroupLegend.interrupt()
-						.style("opacity", 0);
+						mapLayer.style("opacity", function () {
+							return chartState.showMap ? 1 : 0;
+						});
 
-					mapLayer.style("opacity", function () {
-						return chartState.showMap ? 1 : 0;
+						createNodesPanel(dataObject.nodes, dataObject.links);
+
+						drawLegend(dataObject.nodes, dataObject.links);
 					});
 
-					createNodesPanel(dataObject.nodes, dataObject.links);
+				showNamesGroup
+					.on("mouseover", function () {
+						currentHoveredElem = this;
+						showNamesGroupLegend
+							.transition()
+							.duration(duration)
+							.attr(
+								"transform",
+								"translate(" +
+									(padding[3] +
+										nodesPanel.width +
+										panelVerticalPadding +
+										showNamesPadding -
+										groupLegendPadding) +
+									",-36)"
+							)
+							.style("opacity", 1);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						showNamesGroupLegend
+							.interrupt()
+							.attr(
+								"transform",
+								"translate(" +
+									(padding[3] +
+										nodesPanel.width +
+										panelVerticalPadding +
+										showNamesPadding -
+										groupLegendPadding) +
+									"," +
+									buttonsPanel.height * 0.6 +
+									")"
+							)
+							.style("opacity", 0);
+					})
+					.on("click", function () {
+						chartState.showNames = !chartState.showNames;
 
-					drawLegend(dataObject.nodes, dataObject.links);
+						if (queryStringValues.has("shownames")) {
+							queryStringValues.set(
+								"shownames",
+								chartState.showNames
+							);
+						} else {
+							queryStringValues.append(
+								"shownames",
+								chartState.showNames
+							);
+						}
 
-				});
+						innerCheckShowNames.style(
+							"stroke",
+							chartState.showNames ? "darkslategray" : "white"
+						);
 
-				showNamesGroup.on("mouseover", function () {
-					currentHoveredElem = this;
-					showNamesGroupLegend.transition()
-						.duration(duration)
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + ",-36)")
-						.style("opacity", 1);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					showNamesGroupLegend.interrupt()
-						.attr("transform", "translate(" + (padding[3] + nodesPanel.width + panelVerticalPadding + showNamesPadding - groupLegendPadding) + "," +
-							(buttonsPanel.height * 0.6) + ")")
-						.style("opacity", 0);
-				}).on("click", function () {
+						showNamesGroupLegend.interrupt().style("opacity", 0);
 
-					chartState.showNames = !chartState.showNames;
+						nodesLabelLayer
+							.selectAll(
+								".pbifdcNodesLabelBack, .pbifdcNodesLabel"
+							)
+							.style("opacity", chartState.showNames ? 1 : 0);
 
-					if (queryStringValues.has("shownames")) {
-						queryStringValues.set("shownames", chartState.showNames);
-					} else {
-						queryStringValues.append("shownames", chartState.showNames);
-					};
-
-					innerCheckShowNames.style("stroke", chartState.showNames ? "darkslategray" : "white");
-
-					showNamesGroupLegend.interrupt()
-						.style("opacity", 0);
-
-					nodesLabelLayer.selectAll(".pbifdcNodesLabelBack, .pbifdcNodesLabel")
-						.style("opacity", chartState.showNames ? 1 : 0);
-
-					nodesLabelLayer.selectAll(".pbifdcNodesLabelBack, .pbifdcNodesLabel")
-						.attr("pointer-events", chartState.showNames ? "all" : "none");
-
-				});
+						nodesLabelLayer
+							.selectAll(
+								".pbifdcNodesLabelBack, .pbifdcNodesLabel"
+							)
+							.attr(
+								"pointer-events",
+								chartState.showNames ? "all" : "none"
+							);
+					});
 
 				function checkArrows() {
-
-					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform")
+					)[0];
 
 					if (currentTranslate === 0) {
 						leftArrow.select("text").style("fill", "#ccc");
@@ -1376,53 +1960,64 @@
 					} else {
 						leftArrow.select("text").style("fill", "#666");
 						leftArrow.attr("pointer-events", "all");
-					};
+					}
 
-					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
+					if (
+						Math.abs(currentTranslate) >=
+						(yearsArray.length - buttonsNumber) *
+							buttonsPanel.buttonWidth
+					) {
 						rightArrow.select("text").style("fill", "#ccc");
 						rightArrow.attr("pointer-events", "none");
 					} else {
 						rightArrow.select("text").style("fill", "#666");
 						rightArrow.attr("pointer-events", "all");
 					}
-
-				};
+				}
 
 				function checkCurrentTranslate() {
-
-					const currentTranslate = parseTransform(buttonsGroup.attr("transform"))[0];
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform")
+					)[0];
 
 					if (currentTranslate === 0) {
-						leftArrow.select("text").style("fill", "#ccc")
+						leftArrow.select("text").style("fill", "#ccc");
 						leftArrow.attr("pointer-events", "none");
-					};
+					}
 
-					if (Math.abs(currentTranslate) >= ((yearsArray.length - buttonsNumber) * buttonsPanel.buttonWidth)) {
-						rightArrow.select("text").style("fill", "#ccc")
+					if (
+						Math.abs(currentTranslate) >=
+						(yearsArray.length - buttonsNumber) *
+							buttonsPanel.buttonWidth
+					) {
+						rightArrow.select("text").style("fill", "#ccc");
 						rightArrow.attr("pointer-events", "none");
-					};
-
-				};
+					}
+				}
 
 				function repositionButtonsGroup() {
+					const firstYearIndex =
+						chartState.selectedYear[0] <
+						yearsArray[buttonsNumber / 2]
+							? 0
+							: chartState.selectedYear[0] >
+							  yearsArray[yearsArray.length - buttonsNumber / 2]
+							? yearsArray.length - buttonsNumber
+							: yearsArray.indexOf(chartState.selectedYear[0]) -
+							  buttonsNumber / 2;
 
-					const firstYearIndex = chartState.selectedYear[0] < yearsArray[buttonsNumber / 2] ?
-						0 :
-						chartState.selectedYear[0] > yearsArray[yearsArray.length - (buttonsNumber / 2)] ?
-							yearsArray.length - buttonsNumber :
-							yearsArray.indexOf(chartState.selectedYear[0]) - (buttonsNumber / 2);
-
-					buttonsGroup.attr("transform", "translate(" +
-						(-(buttonsPanel.buttonWidth * firstYearIndex)) +
-						",0)");
-
-				};
+					buttonsGroup.attr(
+						"transform",
+						"translate(" +
+							-(buttonsPanel.buttonWidth * firstYearIndex) +
+							",0)"
+					);
+				}
 
 				//end of createButtonsPanel
-			};
+			}
 
 			function createNodesPanel(dataNodes, dataLinks) {
-
 				let currentTransform;
 
 				if (chartState.showMap) {
@@ -1430,79 +2025,148 @@
 				} else {
 					zoomLayer.attr("pointer-events", "none");
 					nodesPanel.main.on(".zoom", null);
-				};
+				}
 
 				const simulationTypes = {
-					geoSimulation: d3.forceSimulation()
-						.force("link", d3.forceLink().id(function (d) {
-							return d.uniqueId;
-						}).strength(0))
-						.force("x", d3.forceX(function (d) {
-							if (centroids[d.isoCode] && centroids[d.isoCode].x === centroids[d.isoCode].x) {
-								return centroids[d.isoCode].x;
-							} else {
-								return centroids.CH.x;
-							}
-						}).strength(1))
-						.force("y", d3.forceY(function (d) {
-							if (centroids[d.isoCode] && centroids[d.isoCode].y === centroids[d.isoCode].y) {
-								return centroids[d.isoCode].y;
-							} else {
-								return centroids.CH.y;
-							}
-						}).strength(1)),
-					naturalSimulation: d3.forceSimulation()
-						.force("link", d3.forceLink().id(function (d) {
-							return d.uniqueId;
-						}))
+					geoSimulation: d3
+						.forceSimulation()
+						.force(
+							"link",
+							d3
+								.forceLink()
+								.id(function (d) {
+									return d.uniqueId;
+								})
+								.strength(0)
+						)
+						.force(
+							"x",
+							d3
+								.forceX(function (d) {
+									if (
+										centroids[d.isoCode] &&
+										centroids[d.isoCode].x ===
+											centroids[d.isoCode].x
+									) {
+										return centroids[d.isoCode].x;
+									} else {
+										return centroids.CH.x;
+									}
+								})
+								.strength(1)
+						)
+						.force(
+							"y",
+							d3
+								.forceY(function (d) {
+									if (
+										centroids[d.isoCode] &&
+										centroids[d.isoCode].y ===
+											centroids[d.isoCode].y
+									) {
+										return centroids[d.isoCode].y;
+									} else {
+										return centroids.CH.y;
+									}
+								})
+								.strength(1)
+						),
+					naturalSimulation: d3
+						.forceSimulation()
+						.force(
+							"link",
+							d3.forceLink().id(function (d) {
+								return d.uniqueId;
+							})
+						)
 						.force("charge", d3.forceManyBody())
-						.force("center", d3.forceCenter(nodesPanel.width / 2, nodesPanel.height / 2))
-						.force("collide", d3.forceCollide(function (d) {
-							return minNodeCollide + nodeSizeScale(d.total) * collideMargin;
-						}))
-						.force("boundary", forceBoundary(nodesPanel.padding[3] + maxNodeSize, nodesPanel.padding[0] + maxNodeSize,
-							nodesPanel.width - nodesPanel.padding[1] - maxNodeSize, nodesPanel.height - nodesPanel.padding[2] - maxNodeSize))
+						.force(
+							"center",
+							d3.forceCenter(
+								nodesPanel.width / 2,
+								nodesPanel.height / 2
+							)
+						)
+						.force(
+							"collide",
+							d3.forceCollide(function (d) {
+								return (
+									minNodeCollide +
+									nodeSizeScale(d.total) * collideMargin
+								);
+							})
+						)
+						.force(
+							"boundary",
+							forceBoundary(
+								nodesPanel.padding[3] + maxNodeSize,
+								nodesPanel.padding[0] + maxNodeSize,
+								nodesPanel.width -
+									nodesPanel.padding[1] -
+									maxNodeSize,
+								nodesPanel.height -
+									nodesPanel.padding[2] -
+									maxNodeSize
+							)
+						),
 				};
 
-				const simulation = chartState.showMap ? simulationTypes.geoSimulation : simulationTypes.naturalSimulation;
+				const simulation = chartState.showMap
+					? simulationTypes.geoSimulation
+					: simulationTypes.naturalSimulation;
 
-				const thisNodeScale = chartState.showMap ? nodeSizeMapScale : nodeSizeScale;
+				const thisNodeScale = chartState.showMap
+					? nodeSizeMapScale
+					: nodeSizeScale;
 
-				const thisLinkScale = chartState.showMap ? linksWidthMapScale : linksWidthScale;
+				const thisLinkScale = chartState.showMap
+					? linksWidthMapScale
+					: linksWidthScale;
 
-				thisNodeScale.domain([0, d3.max(dataNodes, function (d) {
-					return d.total;
-				})]);
+				thisNodeScale.domain([
+					0,
+					d3.max(dataNodes, function (d) {
+						return d.total;
+					}),
+				]);
 
-				thisLinkScale.domain([0, d3.max(dataLinks, function (d) {
-					return d.total;
-				})]);
+				thisLinkScale.domain([
+					0,
+					d3.max(dataLinks, function (d) {
+						return d.total;
+					}),
+				]);
 
-				strokeOpacityScale.domain([0, d3.max(dataLinks, function (d) {
-					return d.total;
-				})]);
+				strokeOpacityScale.domain([
+					0,
+					d3.max(dataLinks, function (d) {
+						return d.total;
+					}),
+				]);
 
 				simulation.stop();
 
 				simulation.nodes(dataNodes);
 
-				simulation.force("link")
-					.links(dataLinks);
+				simulation.force("link").links(dataLinks);
 
 				for (let i = 0; i < simulationsNumber; ++i) simulation.tick();
 
-				let links = linksLayer.selectAll(".pbifdcLinks")
+				let links = linksLayer
+					.selectAll(".pbifdcLinks")
 					.data(dataLinks, function (d) {
 						return d.source.uniqueId + d.target.uniqueId;
 					});
 
-				const linksExit = links.exit()
+				const linksExit = links
+					.exit()
 					.transition()
 					.duration(duration)
 					.attr("stroke-width", 0)
 					.remove();
 
-				const linksEnter = links.enter()
+				const linksEnter = links
+					.enter()
 					.append("path")
 					.style("opacity", 0)
 					.style("fill", "none")
@@ -1510,83 +2174,120 @@
 					.attr("stroke-width", 0)
 					.attr("class", "pbifdcLinks")
 					.attr("d", function (d) {
-						const sweepFlag = (~~(Math.random() * 2));
+						const sweepFlag = ~~(Math.random() * 2);
 						localVariable.set(this, sweepFlag);
 						const dx = d.target.x - d.source.x,
 							dy = d.target.y - d.source.y,
 							dr = Math.sqrt(dx * dx + dy * dy);
-						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
-							d.target.x + "," + d.target.y;
+						return (
+							"M" +
+							d.source.x +
+							"," +
+							d.source.y +
+							"A" +
+							dr +
+							"," +
+							dr +
+							" 0 0 " +
+							sweepFlag +
+							" " +
+							d.target.x +
+							"," +
+							d.target.y
+						);
 					})
 					.attr("transform", function () {
 						if (!chartState.showMap) {
 							return "translate(0,0) scale(1)";
 						} else {
 							return currentTransform;
-						};
+						}
 					});
 
 				links = linksEnter.merge(links);
 
-				links.transition()
+				links
+					.transition()
 					.duration(duration)
 					.style("opacity", function (d) {
-						return strokeOpacityScale(d.total)
+						return strokeOpacityScale(d.total);
 					})
 					.attr("stroke-width", function (d) {
 						if (!chartState.showMap) {
-							return thisLinkScale(d.total)
+							return thisLinkScale(d.total);
 						} else {
 							return thisLinkScale(d.total) / currentTransform.k;
-						};
+						}
 					})
 					.attr("d", function (d) {
 						const sweepFlag = localVariable.get(this);
 						const dx = d.target.x - d.source.x,
 							dy = d.target.y - d.source.y,
 							dr = Math.sqrt(dx * dx + dy * dy);
-						return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0 " + sweepFlag + " " +
-							d.target.x + "," + d.target.y;
+						return (
+							"M" +
+							d.source.x +
+							"," +
+							d.source.y +
+							"A" +
+							dr +
+							"," +
+							dr +
+							" 0 0 " +
+							sweepFlag +
+							" " +
+							d.target.x +
+							"," +
+							d.target.y
+						);
 					})
 					.attr("transform", function () {
 						if (!chartState.showMap) {
 							return "translate(0,0) scale(1)";
 						} else {
 							return currentTransform;
-						};
+						}
 					});
 
-				let nodeCircle = nodesLayer.selectAll(".pbifdcNodeCircle")
+				let nodeCircle = nodesLayer
+					.selectAll(".pbifdcNodeCircle")
 					.data(dataNodes, function (d) {
 						return d.uniqueId;
 					});
 
-				const nodeCircleExit = nodeCircle.exit()
+				const nodeCircleExit = nodeCircle
+					.exit()
 					.transition()
 					.duration(duration)
 					.attr("r", 0)
-					.remove()
+					.remove();
 
-				const nodeCircleEnter = nodeCircle.enter()
+				const nodeCircleEnter = nodeCircle
+					.enter()
 					.append("circle")
 					.attr("r", 0)
 					.attr("cx", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("cy", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.attr("class", function (d) {
-						return d.category === "Donor" ? "pbifdcNodeCircle contributionColorFill" :
-							"pbifdcNodeCircle allocationColorFill"
+						return d.category === "Donor"
+							? "pbifdcNodeCircle contributionColorFill"
+							: "pbifdcNodeCircle allocationColorFill";
 					})
 					.style("stroke", "darkslategray")
 					.style("stroke-width", "1px");
@@ -1594,14 +2295,13 @@
 				nodeCircle = nodeCircleEnter.merge(nodeCircle);
 
 				if (chartState.showMap) {
-
 					nodeCircle.sort(function (a, b) {
 						return b.total - a.total;
 					});
+				}
 
-				};
-
-				nodeCircle.transition()
+				nodeCircle
+					.transition()
 					.duration(duration)
 					.attr("r", function (d) {
 						return thisNodeScale(d.total);
@@ -1610,275 +2310,390 @@
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("cy", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.on("end", function () {
 						if (chartState.showMap) callZoom();
 					});
 
-				let nodesLabelGroup = nodesLabelLayer.selectAll(".pbifdcNodesLabelGroup")
+				let nodesLabelGroup = nodesLabelLayer
+					.selectAll(".pbifdcNodesLabelGroup")
 					.data(dataNodes, function (d) {
 						return d.uniqueId;
 					});
 
-				const nodesLabelGroupExit = nodesLabelGroup.exit()
+				const nodesLabelGroupExit = nodesLabelGroup
+					.exit()
 					.transition()
 					.duration(duration)
 					.style("opacity", 0)
 					.remove();
 
-				const nodesLabelGroupEnter = nodesLabelGroup.enter()
+				const nodesLabelGroupEnter = nodesLabelGroup
+					.enter()
 					.append("g")
 					.attr("class", "pbifdcNodesLabelGroup")
 					.style("opacity", 0)
 					.style("cursor", "default");
 
-				const nodesLabelBack = nodesLabelGroupEnter.append("text")
+				const nodesLabelBack = nodesLabelGroupEnter
+					.append("text")
 					.attr("class", "pbifdcNodesLabelBack")
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
 					.style("opacity", chartState.showNames ? 1 : 0)
-					.attr("pointer-events", chartState.showNames ? "all" : "none")
+					.attr(
+						"pointer-events",
+						chartState.showNames ? "all" : "none"
+					)
 					.text(function (d) {
-						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
-							d.labelText[0];
+						return d.labelText.length > 2
+							? d.labelText[0] + " " + d.labelText[1]
+							: d.labelText[0];
 					})
 					.each(function (d) {
 						if (d.labelText.length > 1) {
-							d3.select(this).append("tspan")
-								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
-									d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding)
+							d3.select(this)
+								.append("tspan")
+								.attr(
+									"x",
+									!chartState.showMap
+										? d.x +
+												thisNodeScale(d.total) +
+												labelPadding
+										: d.x * currentTransform.k +
+												currentTransform.x +
+												thisNodeScale(d.total) +
+												labelPadding
+								)
 								.attr("dy", 10)
-								.text(d.labelText.length > 2 ? d.labelText[2] :
-									d.labelText[1]);
-						};
+								.text(
+									d.labelText.length > 2
+										? d.labelText[2]
+										: d.labelText[1]
+								);
+						}
 					});
 
-				const nodesLabel = nodesLabelGroupEnter.append("text")
+				const nodesLabel = nodesLabelGroupEnter
+					.append("text")
 					.attr("class", "pbifdcNodesLabel")
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					})
 					.style("opacity", chartState.showNames ? 1 : 0)
-					.attr("pointer-events", chartState.showNames ? "all" : "none")
+					.attr(
+						"pointer-events",
+						chartState.showNames ? "all" : "none"
+					)
 					.text(function (d) {
-						return d.labelText.length > 2 ? d.labelText[0] + " " + d.labelText[1] :
-							d.labelText[0];
+						return d.labelText.length > 2
+							? d.labelText[0] + " " + d.labelText[1]
+							: d.labelText[0];
 					})
 					.each(function (d) {
 						if (d.labelText.length > 1) {
-							d3.select(this).append("tspan")
-								.attr("x", !chartState.showMap ? d.x + thisNodeScale(d.total) + labelPadding :
-									d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding)
+							d3.select(this)
+								.append("tspan")
+								.attr(
+									"x",
+									!chartState.showMap
+										? d.x +
+												thisNodeScale(d.total) +
+												labelPadding
+										: d.x * currentTransform.k +
+												currentTransform.x +
+												thisNodeScale(d.total) +
+												labelPadding
+								)
 								.attr("dy", 10)
-								.text(d.labelText.length > 2 ? d.labelText[2] :
-									d.labelText[1]);
-						};
+								.text(
+									d.labelText.length > 2
+										? d.labelText[2]
+										: d.labelText[1]
+								);
+						}
 					});
 
 				nodesLabelGroup = nodesLabelGroupEnter.merge(nodesLabelGroup);
 
-				nodesLabelGroup.transition()
+				nodesLabelGroup
+					.transition()
 					.duration(duration)
 					.style("opacity", 1);
 
-				nodesLabelGroup.select("text.pbifdcNodesLabelBack")
+				nodesLabelGroup
+					.select("text.pbifdcNodesLabelBack")
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
 
-				nodesLabelGroup.select("text.pbifdcNodesLabel")
+				nodesLabelGroup
+					.select("text.pbifdcNodesLabel")
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x;
-						};
+							return (
+								d.x * currentTransform.k + currentTransform.x
+							);
+						}
 					})
 					.attr("y", function (d) {
 						if (!chartState.showMap) {
 							return d.y;
 						} else {
-							return d.y * currentTransform.k + currentTransform.y;
-						};
+							return (
+								d.y * currentTransform.k + currentTransform.y
+							);
+						}
 					})
 					.attr("dx", function (d) {
 						return thisNodeScale(d.total) + labelPadding;
 					});
 
-				nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
+				nodesLabelGroup
+					.select(".pbifdcNodesLabelBack tspan")
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x + thisNodeScale(d.total) + labelPadding;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
-						};
+							return (
+								d.x * currentTransform.k +
+								currentTransform.x +
+								thisNodeScale(d.total) +
+								labelPadding
+							);
+						}
 					});
 
-				nodesLabelGroup.select(".pbifdcNodesLabel tspan")
+				nodesLabelGroup
+					.select(".pbifdcNodesLabel tspan")
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
 						if (!chartState.showMap) {
 							return d.x + thisNodeScale(d.total) + labelPadding;
 						} else {
-							return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
-						};
+							return (
+								d.x * currentTransform.k +
+								currentTransform.x +
+								thisNodeScale(d.total) +
+								labelPadding
+							);
+						}
 					});
 
-				nodeCircle.on("mouseover", null)
-					.on("mouseout", null);
+				nodeCircle.on("mouseover", null).on("mouseout", null);
 
-				nodesLabelGroup.on("mouseover", null)
-					.on("mouseout", null);
+				nodesLabelGroup.on("mouseover", null).on("mouseout", null);
 
-				links.on("mouseover", null)
-					.on("mouseout", null);
+				links.on("mouseover", null).on("mouseout", null);
 
 				d3.timeout(function () {
-					nodeCircle.on("mouseover", nodeMouseOver)
+					nodeCircle
+						.on("mouseover", nodeMouseOver)
 						.on("mouseout", nodeLinkMouseOut);
 
-					nodesLabelGroup.on("mouseover", nodeMouseOver)
+					nodesLabelGroup
+						.on("mouseover", nodeMouseOver)
 						.on("mouseout", nodeLinkMouseOut);
 
-					links.on("mouseover", linksMouseOver)
+					links
+						.on("mouseover", linksMouseOver)
 						.on("mouseout", nodeLinkMouseOut);
 				}, duration * 1.1);
 
 				function callZoom() {
-
 					zoomLayer.attr("pointer-events", "all");
 
-					const zoom = d3.zoom()
+					const zoom = d3
+						.zoom()
 						.scaleExtent([1, 20])
 						.extent([
 							[0, 0],
-							[nodesPanel.width, nodesPanel.height]
+							[nodesPanel.width, nodesPanel.height],
 						])
 						.translateExtent([
 							[0, 0],
-							[nodesPanel.width, nodesPanel.height]
+							[nodesPanel.width, nodesPanel.height],
 						])
 						.on("zoom", zoomed);
 
 					nodesPanel.main.call(zoom);
 
 					function zoomed() {
-
 						mapContainer.attr("transform", d3.event.transform);
 
-						mapContainer.select("path")
-							.attr("stroke-width", 1 / d3.event.transform.k + "px");
+						mapContainer
+							.select("path")
+							.attr(
+								"stroke-width",
+								1 / d3.event.transform.k + "px"
+							);
 
-						nodeCircle.attr("cx", function (d) {
-							return d.x * d3.event.transform.k + d3.event.transform.x;
-						})
+						nodeCircle
+							.attr("cx", function (d) {
+								return (
+									d.x * d3.event.transform.k +
+									d3.event.transform.x
+								);
+							})
 							.attr("cy", function (d) {
-								return d.y * d3.event.transform.k + d3.event.transform.y;
+								return (
+									d.y * d3.event.transform.k +
+									d3.event.transform.y
+								);
 							});
 
-						nodesLabelGroup.select("text.pbifdcNodesLabelBack")
+						nodesLabelGroup
+							.select("text.pbifdcNodesLabelBack")
 							.attr("x", function (d) {
-								return d.x * d3.event.transform.k + d3.event.transform.x;
+								return (
+									d.x * d3.event.transform.k +
+									d3.event.transform.x
+								);
 							})
 							.attr("y", function (d) {
-								return d.y * d3.event.transform.k + d3.event.transform.y;
+								return (
+									d.y * d3.event.transform.k +
+									d3.event.transform.y
+								);
 							});
 
-						nodesLabelGroup.select("text.pbifdcNodesLabel")
+						nodesLabelGroup
+							.select("text.pbifdcNodesLabel")
 							.attr("x", function (d) {
-								return d.x * d3.event.transform.k + d3.event.transform.x;
+								return (
+									d.x * d3.event.transform.k +
+									d3.event.transform.x
+								);
 							})
 							.attr("y", function (d) {
-								return d.y * d3.event.transform.k + d3.event.transform.y;
+								return (
+									d.y * d3.event.transform.k +
+									d3.event.transform.y
+								);
 							});
 
-						nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
+						nodesLabelGroup
+							.select(".pbifdcNodesLabelBack tspan")
 							.attr("x", function (d) {
-								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
+								return (
+									d.x * d3.event.transform.k +
+									d3.event.transform.x +
+									thisNodeScale(d.total) +
+									labelPadding
+								);
 							});
 
-						nodesLabelGroup.select(".pbifdcNodesLabel tspan")
+						nodesLabelGroup
+							.select(".pbifdcNodesLabel tspan")
 							.attr("x", function (d) {
-								return d.x * d3.event.transform.k + d3.event.transform.x + thisNodeScale(d.total) + labelPadding;
+								return (
+									d.x * d3.event.transform.k +
+									d3.event.transform.x +
+									thisNodeScale(d.total) +
+									labelPadding
+								);
 							});
 
-						links.attr("transform", d3.event.transform)
+						links
+							.attr("transform", d3.event.transform)
 							.attr("stroke-width", function (d) {
-								return thisLinkScale(d.total) / d3.event.transform.k;
+								return (
+									thisLinkScale(d.total) /
+									d3.event.transform.k
+								);
 							});
 
 						//end of zoomed
-					};
+					}
 
 					//end of callZoom
-				};
+				}
 
 				function nodeMouseOver(datum) {
-
 					currentHoveredElem = this;
 
 					if (chartState.showMap) {
-						currentTransform = d3.zoomTransform(nodesPanel.main.node());
-					};
+						currentTransform = d3.zoomTransform(
+							nodesPanel.main.node()
+						);
+					}
 
 					const connections = datum.connections.map(function (d) {
 						return d.uniqueId;
@@ -1888,7 +2703,9 @@
 						return connections.indexOf(d.uniqueId) > -1;
 					});
 
-					const connectedLabels = nodesLabelGroup.filter(function (d) {
+					const connectedLabels = nodesLabelGroup.filter(function (
+						d
+					) {
 						return connections.indexOf(d.uniqueId) > -1;
 					});
 
@@ -1903,83 +2720,121 @@
 					});
 
 					links.style("opacity", function (d) {
-						return d.source.uniqueId === datum.uniqueId || d.target.uniqueId === datum.uniqueId ?
-							strokeOpacityScale(d.total) : 0;
+						return d.source.uniqueId === datum.uniqueId ||
+							d.target.uniqueId === datum.uniqueId
+							? strokeOpacityScale(d.total)
+							: 0;
 					});
 
 					drawLegendNode(datum);
 
-					connectedNodes.transition()
+					connectedNodes
+						.transition()
 						.duration(duration / 2)
 						.attr("r", function (d) {
-							const thisDatum = datum.connections.find(function (e) {
+							const thisDatum = datum.connections.find(function (
+								e
+							) {
 								return d.uniqueId === e.uniqueId;
 							});
 							return thisNodeScale(thisDatum.total);
 						});
 
-					connectedLabels.select("text.pbifdcNodesLabelBack")
+					connectedLabels
+						.select("text.pbifdcNodesLabelBack")
 						.transition()
 						.duration(duration / 2)
 						.attr("dx", function (d) {
-							const thisDatum = datum.connections.find(function (e) {
+							const thisDatum = datum.connections.find(function (
+								e
+							) {
 								return d.uniqueId === e.uniqueId;
 							});
 							localVariable.set(this.parentNode, thisDatum);
-							return thisNodeScale(thisDatum.total) + labelPadding;
+							return (
+								thisNodeScale(thisDatum.total) + labelPadding
+							);
 						});
 
-					connectedLabels.select("text.pbifdcNodesLabel")
+					connectedLabels
+						.select("text.pbifdcNodesLabel")
 						.transition()
 						.duration(duration / 2)
 						.attr("dx", function (d) {
 							const thisDatum = localVariable.get(this);
-							return thisNodeScale(thisDatum.total) + labelPadding;
+							return (
+								thisNodeScale(thisDatum.total) + labelPadding
+							);
 						});
 
-					connectedLabels.select(".pbifdcNodesLabelBack tspan")
+					connectedLabels
+						.select(".pbifdcNodesLabelBack tspan")
 						.transition()
 						.duration(duration / 2)
 						.attr("x", function (d) {
 							const thisDatum = localVariable.get(this);
 							if (!chartState.showMap) {
-								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
+								return (
+									d.x +
+									thisNodeScale(thisDatum.total) +
+									labelPadding
+								);
 							} else {
-								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisDatum.total) + labelPadding;
-							};
+								return (
+									d.x * currentTransform.k +
+									currentTransform.x +
+									thisNodeScale(thisDatum.total) +
+									labelPadding
+								);
+							}
 						});
 
-					connectedLabels.select(".pbifdcNodesLabel tspan")
+					connectedLabels
+						.select(".pbifdcNodesLabel tspan")
 						.transition()
 						.duration(duration / 2)
 						.attr("x", function (d) {
 							const thisDatum = localVariable.get(this);
 							if (!chartState.showMap) {
-								return d.x + thisNodeScale(thisDatum.total) + labelPadding;
+								return (
+									d.x +
+									thisNodeScale(thisDatum.total) +
+									labelPadding
+								);
 							} else {
-								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisDatum.total) + labelPadding;
-							};
+								return (
+									d.x * currentTransform.k +
+									currentTransform.x +
+									thisNodeScale(thisDatum.total) +
+									labelPadding
+								);
+							}
 						});
 
 					//end of nodeMouseOver
-				};
+				}
 
 				function linksMouseOver(datum) {
-
 					currentHoveredElem = this;
 
 					if (chartState.showMap) {
-						currentTransform = d3.zoomTransform(nodesPanel.main.node());
-					};
+						currentTransform = d3.zoomTransform(
+							nodesPanel.main.node()
+						);
+					}
 
 					nodeCircle.style("opacity", function (d) {
-						return d.uniqueId === datum.source.uniqueId || d.uniqueId === datum.target.uniqueId ?
-							1 : 0;
+						return d.uniqueId === datum.source.uniqueId ||
+							d.uniqueId === datum.target.uniqueId
+							? 1
+							: 0;
 					});
 
 					nodesLabelGroup.style("opacity", function (d) {
-						return d.uniqueId === datum.source.uniqueId || d.uniqueId === datum.target.uniqueId ?
-							1 : 0;
+						return d.uniqueId === datum.source.uniqueId ||
+							d.uniqueId === datum.target.uniqueId
+							? 1
+							: 0;
 					});
 
 					links.style("opacity", 0);
@@ -1988,68 +2843,92 @@
 						return strokeOpacityScale(d.total);
 					});
 
-					const thisValue = datum.source.connections.find(function (d) {
+					const thisValue = datum.source.connections.find(function (
+						d
+					) {
 						return d.uniqueId === datum.target.uniqueId;
 					}).total;
 
 					[datum.source, datum.target].forEach(function (thisDatum) {
-
-						nodeCircle.filter(function (d) {
-							return d.uniqueId === thisDatum.uniqueId;
-						})
+						nodeCircle
+							.filter(function (d) {
+								return d.uniqueId === thisDatum.uniqueId;
+							})
 							.transition()
 							.duration(duration / 2)
 							.attr("r", thisNodeScale(thisValue));
 
-						const connectedLabels = nodesLabelGroup.filter(function (d) {
-							return d.uniqueId === thisDatum.uniqueId;
-						});
+						const connectedLabels = nodesLabelGroup.filter(
+							function (d) {
+								return d.uniqueId === thisDatum.uniqueId;
+							}
+						);
 
-						connectedLabels.select("text.pbifdcNodesLabelBack")
+						connectedLabels
+							.select("text.pbifdcNodesLabelBack")
 							.transition()
 							.duration(duration / 2)
 							.attr("dx", function (d) {
 								return thisNodeScale(thisValue) + labelPadding;
 							});
 
-						connectedLabels.select("text.pbifdcNodesLabel")
+						connectedLabels
+							.select("text.pbifdcNodesLabel")
 							.transition()
 							.duration(duration / 2)
 							.attr("dx", function (d) {
 								return thisNodeScale(thisValue) + labelPadding;
 							});
 
-						connectedLabels.select(".pbifdcNodesLabelBack tspan")
+						connectedLabels
+							.select(".pbifdcNodesLabelBack tspan")
 							.transition()
 							.duration(duration / 2)
 							.attr("x", function (d) {
 								if (!chartState.showMap) {
-									return d.x + thisNodeScale(thisValue) + labelPadding;
+									return (
+										d.x +
+										thisNodeScale(thisValue) +
+										labelPadding
+									);
 								} else {
-									return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisValue) + labelPadding;
-								};
+									return (
+										d.x * currentTransform.k +
+										currentTransform.x +
+										thisNodeScale(thisValue) +
+										labelPadding
+									);
+								}
 							});
 
-						connectedLabels.select(".pbifdcNodesLabel tspan")
+						connectedLabels
+							.select(".pbifdcNodesLabel tspan")
 							.transition()
 							.duration(duration / 2)
 							.attr("x", function (d) {
 								if (!chartState.showMap) {
-									return d.x + thisNodeScale(thisValue) + labelPadding;
+									return (
+										d.x +
+										thisNodeScale(thisValue) +
+										labelPadding
+									);
 								} else {
-									return d.x * currentTransform.k + currentTransform.x + thisNodeScale(thisValue) + labelPadding;
-								};
+									return (
+										d.x * currentTransform.k +
+										currentTransform.x +
+										thisNodeScale(thisValue) +
+										labelPadding
+									);
+								}
 							});
-
 					});
 
 					drawLegendLink(datum);
 
 					//end of linksMouseOver
-				};
+				}
 
 				function nodeLinkMouseOut() {
-
 					if (isSnapshotTooltipVisible) return;
 					currentHoveredElem = null;
 
@@ -2057,39 +2936,56 @@
 
 					nodesLabelGroup.selectAll("*").interrupt();
 
-					nodeCircle.style("opacity", 1)
-						.attr("r", function (d) {
-							return thisNodeScale(d.total);
-						});
+					nodeCircle.style("opacity", 1).attr("r", function (d) {
+						return thisNodeScale(d.total);
+					});
 
 					nodesLabelGroup.style("opacity", 1);
 
-					nodesLabelGroup.select("text.pbifdcNodesLabelBack")
+					nodesLabelGroup
+						.select("text.pbifdcNodesLabelBack")
 						.attr("dx", function (d) {
 							return thisNodeScale(d.total) + labelPadding;
 						});
 
-					nodesLabelGroup.select("text.pbifdcNodesLabel")
+					nodesLabelGroup
+						.select("text.pbifdcNodesLabel")
 						.attr("dx", function (d) {
 							return thisNodeScale(d.total) + labelPadding;
 						});
 
-					nodesLabelGroup.select(".pbifdcNodesLabelBack tspan")
+					nodesLabelGroup
+						.select(".pbifdcNodesLabelBack tspan")
 						.attr("x", function (d) {
 							if (!chartState.showMap) {
-								return d.x + thisNodeScale(d.total) + labelPadding;
+								return (
+									d.x + thisNodeScale(d.total) + labelPadding
+								);
 							} else {
-								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
-							};
+								return (
+									d.x * currentTransform.k +
+									currentTransform.x +
+									thisNodeScale(d.total) +
+									labelPadding
+								);
+							}
 						});
 
-					nodesLabelGroup.select(".pbifdcNodesLabel tspan")
+					nodesLabelGroup
+						.select(".pbifdcNodesLabel tspan")
 						.attr("x", function (d) {
 							if (!chartState.showMap) {
-								return d.x + thisNodeScale(d.total) + labelPadding;
+								return (
+									d.x + thisNodeScale(d.total) + labelPadding
+								);
 							} else {
-								return d.x * currentTransform.k + currentTransform.x + thisNodeScale(d.total) + labelPadding;
-							};
+								return (
+									d.x * currentTransform.k +
+									currentTransform.x +
+									thisNodeScale(d.total) +
+									labelPadding
+								);
+							}
 						});
 
 					links.style("opacity", function (d) {
@@ -2099,14 +2995,14 @@
 					drawLegend(dataObject.nodes, dataObject.links);
 
 					//end of nodeLinkMouseOut
-				};
+				}
 
 				//end of createNodesPanel
-			};
+			}
 
 			function drawLegendBorder() {
-
-				const legendBorder = legendPanel.main.append("rect")
+				const legendBorder = legendPanel.main
+					.append("rect")
 					.attr("width", legendPanel.width)
 					.attr("height", legendPanel.height)
 					.attr("rx", 3)
@@ -2114,25 +3010,31 @@
 					.style("fill", "none")
 					.style("stroke-width", "0.5px")
 					.style("stroke", "#ccc");
-
-			};
+			}
 
 			function drawLegend(dataNodes, dataLinks) {
-
-				const otherGroups = legendPanel.main.selectAll(".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup");
+				const otherGroups = legendPanel.main.selectAll(
+					".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup"
+				);
 
 				otherGroups.selectAll("*").interrupt();
 
 				otherGroups.remove();
 
-				const thisNodeScale = chartState.showMap ? nodeSizeMapScale : nodeSizeScale;
+				const thisNodeScale = chartState.showMap
+					? nodeSizeMapScale
+					: nodeSizeScale;
 
-				const thisLinkScale = chartState.showMap ? linksWidthMapScale : linksWidthScale;
+				const thisLinkScale = chartState.showMap
+					? linksWidthMapScale
+					: linksWidthScale;
 
-				const legendGroup = legendPanel.main.append("g")
+				const legendGroup = legendPanel.main
+					.append("g")
 					.attr("class", "pbifdcLegendGroup");
 
-				const legendTitle = legendGroup.append("text")
+				const legendTitle = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
@@ -2140,42 +3042,59 @@
 					.text("LEGEND");
 
 				if (dataNodes.length === 0) {
-					legendGroup.append("text")
+					legendGroup
+						.append("text")
 						.attr("class", "pbifdcLegendSubTitle")
 						.attr("x", legendPanel.width / 2)
 						.attr("y", legendPanel.padding[0] + 86)
 						.attr("text-anchor", "middle")
-						.text("No data for the current selection (" + chartState.selectedRegion.join(",") + ")")
+						.text(
+							"No data for the current selection (" +
+								chartState.selectedRegion.join(",") +
+								")"
+						)
 						.call(wrapText, 200);
 
 					return;
-				};
+				}
 
-				const colorTitle = legendGroup.append("text")
+				const colorTitle = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 66)
 					.text("COLOR:");
 
-				const legendColorGroups = legendGroup.selectAll(null)
+				const legendColorGroups = legendGroup
+					.selectAll(null)
 					.data(["Donor", "CBPF"])
 					.enter()
 					.append("g")
 					.attr("transform", function (_, i) {
-						return "translate(" + legendPanel.padding[3] + "," + (legendPanel.padding[0] + 76 + i * 20) + ")";
+						return (
+							"translate(" +
+							legendPanel.padding[3] +
+							"," +
+							(legendPanel.padding[0] + 76 + i * 20) +
+							")"
+						);
 					});
 
-				legendColorGroups.append("rect")
+				legendColorGroups
+					.append("rect")
 					.attr("width", 16)
 					.attr("height", 16)
 					.attr("rx", 2)
 					.attr("ry", 2)
 					.style("stroke", "darkslategray")
 					.attr("class", function (_, i) {
-						return i ? "allocationColorFill" : "contributionColorFill";
+						return i
+							? "allocationColorFill"
+							: "contributionColorFill";
 					});
 
-				legendColorGroups.append("text")
+				legendColorGroups
+					.append("text")
 					.attr("x", 22)
 					.attr("y", 12)
 					.style("cursor", "default")
@@ -2184,101 +3103,176 @@
 						return i ? "CBPF" : "Donor";
 					});
 
-				const sizeTitle = legendGroup.append("text")
+				const sizeTitle = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 192)
 					.text("SIZE:");
 
-				const sizeSubTitle = sizeTitle.append("tspan")
+				const sizeSubTitle = sizeTitle
+					.append("tspan")
 					.attr("class", "pbifdcLegendTextSmall2")
 					.text(" (hover for info)");
 
-				const sizeText = legendGroup.append("text")
+				const sizeText = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall2")
 					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 162)
-					.text("The size of each node represents the total amount received (CBPF) or donated (donor).")
-					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
+					.text(
+						"The size of each node represents the total amount received (CBPF) or donated (donor)."
+					)
+					.call(
+						wrapText,
+						legendPanel.width -
+							legendPanel.padding[1] -
+							legendPanel.padding[3]
+					);
 
-				const sizeRectangle = legendGroup.append("rect")
+				const sizeRectangle = legendGroup
+					.append("rect")
 					.attr("y", legendPanel.padding[0] + 122)
 					.attr("width", legendPanel.width)
 					.attr("height", 80)
 					.style("opacity", 0);
 
-				const nodeSizeData = d3.extent(dataNodes, function (d) {
-					return d.total;
-				}).map(function (d) {
-					return dataNodes.find(function (e) {
-						return e.total === d;
-					});
-				}).reverse();
+				const nodeSizeData = d3
+					.extent(dataNodes, function (d) {
+						return d.total;
+					})
+					.map(function (d) {
+						return dataNodes.find(function (e) {
+							return e.total === d;
+						});
+					})
+					.reverse();
 
-				const nodeSizeGroup = legendGroup.selectAll(null)
+				const nodeSizeGroup = legendGroup
+					.selectAll(null)
 					.data(nodeSizeData)
 					.enter()
 					.append("g");
 
-				const nodeSizeText = nodeSizeGroup.append("text")
+				const nodeSizeText = nodeSizeGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", function (_, i) {
-						return i ? legendPanel.padding[0] + 216 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 216;
+						return i
+							? legendPanel.padding[0] +
+									216 +
+									thisNodeScale.range()[1] * 2 +
+									54
+							: legendPanel.padding[0] + 216;
 					})
 					.text(function (_, i) {
-						return i ? "Smallest node:" : "Biggest node:"
+						return i ? "Smallest node:" : "Biggest node:";
 					});
 
-				const nodeSizeSubText = nodeSizeGroup.append("text")
+				const nodeSizeSubText = nodeSizeGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", function (_, i) {
-						return i ? legendPanel.padding[0] + 232 + (thisNodeScale.range()[1] * 2) + 54 : legendPanel.padding[0] + 232;
+						return i
+							? legendPanel.padding[0] +
+									232 +
+									thisNodeScale.range()[1] * 2 +
+									54
+							: legendPanel.padding[0] + 232;
 					})
 					.text(function (d) {
-						return d.name + " (" + d.category + "): $" + formatMoney0Decimals(d.total);
+						return (
+							d.name +
+							" (" +
+							d.category +
+							"): $" +
+							formatMoney0Decimals(d.total)
+						);
 					})
 					.each(function (d) {
-						let currentFontSize = parseInt(d3.style(this, "font-size"));
-						while (this.getComputedTextLength() > legendPanel.width - legendPanel.padding[3]) {
-							d3.select(this).style("font-size", --currentFontSize);
-						};
+						let currentFontSize = parseInt(
+							d3.style(this, "font-size")
+						);
+						while (
+							this.getComputedTextLength() >
+							legendPanel.width - legendPanel.padding[3]
+						) {
+							d3.select(this).style(
+								"font-size",
+								--currentFontSize
+							);
+						}
 					});
 
 				const maxNodeValue = d3.max(dataNodes, function (d) {
 					return d.total;
 				});
 
-				const sizeCirclesData = [0, maxNodeValue / 4, maxNodeValue / 2, maxNodeValue];
+				const sizeCirclesData = [
+					0,
+					maxNodeValue / 4,
+					maxNodeValue / 2,
+					maxNodeValue,
+				];
 
-				const nodeSizeCircleGroup = legendGroup.selectAll(null)
+				const nodeSizeCircleGroup = legendGroup
+					.selectAll(null)
 					.data(sizeCirclesData)
 					.enter()
 					.append("g");
 
-				const nodeSizeLines = nodeSizeCircleGroup.append("line")
-					.attr("x1", legendPanel.padding[3] + thisNodeScale.range()[1])
-					.attr("x2", legendPanel.padding[3] + thisNodeScale.range()[1] + 70)
+				const nodeSizeLines = nodeSizeCircleGroup
+					.append("line")
+					.attr(
+						"x1",
+						legendPanel.padding[3] + thisNodeScale.range()[1]
+					)
+					.attr(
+						"x2",
+						legendPanel.padding[3] + thisNodeScale.range()[1] + 70
+					)
 					.attr("y1", function (d) {
-						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
-							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
+						return d
+							? legendPanel.padding[0] +
+									250 +
+									thisNodeScale.range()[1] * 2 -
+									thisNodeScale(d) * 2
+							: legendPanel.padding[0] +
+									250 +
+									thisNodeScale.range()[1] * 2;
 					})
 					.attr("y2", function (d) {
-						return d ? legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
-							legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2);
+						return d
+							? legendPanel.padding[0] +
+									250 +
+									thisNodeScale.range()[1] * 2 -
+									thisNodeScale(d) * 2
+							: legendPanel.padding[0] +
+									250 +
+									thisNodeScale.range()[1] * 2;
 					})
 					.style("stroke", "#ddd")
 					.style("stroke-dasharray", "2,2")
 					.style("stroke-width", "1px");
 
-				const nodeSizeCircles = nodeSizeCircleGroup.append("circle")
-					.attr("cx", legendPanel.padding[3] + thisNodeScale.range()[1])
+				const nodeSizeCircles = nodeSizeCircleGroup
+					.append("circle")
+					.attr(
+						"cx",
+						legendPanel.padding[3] + thisNodeScale.range()[1]
+					)
 					.attr("cy", function (d) {
-						return legendPanel.padding[0] + 250 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d);
+						return (
+							legendPanel.padding[0] +
+							250 +
+							thisNodeScale.range()[1] * 2 -
+							thisNodeScale(d)
+						);
 					})
 					.attr("r", function (d) {
 						return !d ? 0 : thisNodeScale(d);
@@ -2286,84 +3280,157 @@
 					.style("fill", "none")
 					.style("stroke", "darkslategray");
 
-				const nodeSizeCirclesText = nodeSizeCircleGroup.append("text")
+				const nodeSizeCirclesText = nodeSizeCircleGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall3")
-					.attr("x", legendPanel.padding[3] + thisNodeScale.range()[1] + 74)
+					.attr(
+						"x",
+						legendPanel.padding[3] + thisNodeScale.range()[1] + 74
+					)
 					.attr("y", function (d, i) {
 						if (chartState.showMap) {
-							return i === 1 ? legendPanel.padding[0] + 255 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
-								!i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) :
-									legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2;
+							return i === 1
+								? legendPanel.padding[0] +
+										255 +
+										thisNodeScale.range()[1] * 2 -
+										thisNodeScale(d) * 2
+								: !i
+								? legendPanel.padding[0] +
+								  253 +
+								  thisNodeScale.range()[1] * 2
+								: legendPanel.padding[0] +
+								  253 +
+								  thisNodeScale.range()[1] * 2 -
+								  thisNodeScale(d) * 2;
 						} else {
-							return i ? legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2) - thisNodeScale(d) * 2 :
-								legendPanel.padding[0] + 253 + (thisNodeScale.range()[1] * 2);
+							return i
+								? legendPanel.padding[0] +
+										253 +
+										thisNodeScale.range()[1] * 2 -
+										thisNodeScale(d) * 2
+								: legendPanel.padding[0] +
+										253 +
+										thisNodeScale.range()[1] * 2;
 						}
 					})
 					.text(function (d) {
 						if (!d) {
-							return "0"
+							return "0";
 						} else {
 							let valueSI = d3.formatPrefix(".0", d)(d);
 							const unit = valueSI[valueSI.length - 1];
 							valueSI = valueSI.slice(0, -1);
-							return valueSI + (unit === "k" ? " Thousand" : unit === "M" ? " Million" : unit === "G" ? " Billion" : "");
-						};
+							return (
+								valueSI +
+								(unit === "k"
+									? " Thousand"
+									: unit === "M"
+									? " Million"
+									: unit === "G"
+									? " Billion"
+									: "")
+							);
+						}
 					});
 
-				const linkTitle = legendGroup.append("text")
+				const linkTitle = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 364 + (thisNodeScale.range()[1] * 2))
+					.attr(
+						"y",
+						legendPanel.padding[0] +
+							364 +
+							thisNodeScale.range()[1] * 2
+					)
 					.text("LINKS:");
 
-				const linkSubTitle = linkTitle.append("tspan")
+				const linkSubTitle = linkTitle
+					.append("tspan")
 					.attr("class", "pbifdcLegendTextSmall2")
 					.text(" (hover for info)");
 
-				const linkText = legendGroup.append("text")
+				const linkText = legendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall2")
 					.style("opacity", 0)
 					.attr("x", legendPanel.padding[3])
-					.attr("y", legendPanel.padding[0] + 340 + (thisNodeScale.range()[1] * 2))
-					.text("The width of each link represents the amount donated from a donor to a CBPF.")
-					.call(wrapText, legendPanel.width - legendPanel.padding[1] - legendPanel.padding[3]);
+					.attr(
+						"y",
+						legendPanel.padding[0] +
+							340 +
+							thisNodeScale.range()[1] * 2
+					)
+					.text(
+						"The width of each link represents the amount donated from a donor to a CBPF."
+					)
+					.call(
+						wrapText,
+						legendPanel.width -
+							legendPanel.padding[1] -
+							legendPanel.padding[3]
+					);
 
-				const linkRectangle = legendGroup.append("rect")
-					.attr("y", legendPanel.padding[0] + 300 + (thisNodeScale.range()[1] * 2))
+				const linkRectangle = legendGroup
+					.append("rect")
+					.attr(
+						"y",
+						legendPanel.padding[0] +
+							300 +
+							thisNodeScale.range()[1] * 2
+					)
 					.attr("width", legendPanel.width)
 					.attr("height", 80)
 					.style("opacity", 0);
 
-				const linkWidthData = d3.extent(dataLinks, function (d) {
-					return d.total;
-				}).map(function (d) {
-					return dataLinks.find(function (e) {
-						return e.total === d;
-					});
-				}).reverse();
+				const linkWidthData = d3
+					.extent(dataLinks, function (d) {
+						return d.total;
+					})
+					.map(function (d) {
+						return dataLinks.find(function (e) {
+							return e.total === d;
+						});
+					})
+					.reverse();
 
-				const linkWidthGroup = legendGroup.selectAll(null)
+				const linkWidthGroup = legendGroup
+					.selectAll(null)
 					.data(linkWidthData)
 					.enter()
 					.append("g");
 
-				const linkWidthText = linkWidthGroup.append("text")
+				const linkWidthText = linkWidthGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", function (_, i) {
-						return legendPanel.padding[0] + 391 + (thisNodeScale.range()[1] * 2) + (i * 53);
+						return (
+							legendPanel.padding[0] +
+							391 +
+							thisNodeScale.range()[1] * 2 +
+							i * 53
+						);
 					})
 					.text(function (_, i) {
-						return i ? "Smallest individual donation:" : "Biggest individual donation:"
+						return i
+							? "Smallest individual donation:"
+							: "Biggest individual donation:";
 					});
 
-				const linkWidthSubText = linkWidthGroup.append("text")
+				const linkWidthSubText = linkWidthGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.style("cursor", "default")
 					.attr("x", legendPanel.padding[3] + 50)
 					.attr("y", function (_, i) {
-						return legendPanel.padding[0] + 407 + (thisNodeScale.range()[1] * 2) + (i * 53);
+						return (
+							legendPanel.padding[0] +
+							407 +
+							thisNodeScale.range()[1] * 2 +
+							i * 53
+						);
 					})
 					.text(function (d) {
 						return d.source.name + " to " + d.target.name + ",";
@@ -2371,154 +3438,230 @@
 					.append("tspan")
 					.attr("x", legendPanel.padding[3] + 50)
 					.attr("y", function (_, i) {
-						return legendPanel.padding[0] + 423 + (thisNodeScale.range()[1] * 2) + (i * 53);
+						return (
+							legendPanel.padding[0] +
+							423 +
+							thisNodeScale.range()[1] * 2 +
+							i * 53
+						);
 					})
 					.text(function (d) {
-						return "$" + formatMoney0Decimals(d.total)
+						return "$" + formatMoney0Decimals(d.total);
 					});
 
 				linkWidthSubText.each(function () {
-					let elementFontSize = parseInt(d3.style(this.parentNode, "font-size"));
-					while (this.parentNode.getBoundingClientRect().width > (legendPanel.width - legendPanel.padding[3] - legendPanel.padding[1] - 50)) {
-						d3.select(this.parentNode).style("font-size", --elementFontSize);
-					};
+					let elementFontSize = parseInt(
+						d3.style(this.parentNode, "font-size")
+					);
+					while (
+						this.parentNode.getBoundingClientRect().width >
+						legendPanel.width -
+							legendPanel.padding[3] -
+							legendPanel.padding[1] -
+							50
+					) {
+						d3.select(this.parentNode).style(
+							"font-size",
+							--elementFontSize
+						);
+					}
 				});
 
-				const linkWidthLinks = linkWidthGroup.append("line")
+				const linkWidthLinks = linkWidthGroup
+					.append("line")
 					.attr("x1", legendPanel.padding[3])
 					.attr("x2", legendPanel.padding[3] + 40)
 					.attr("y1", function (d, i) {
-						return legendPanel.padding[0] + 411 + (thisNodeScale.range()[1] * 2) + (i * 53);
+						return (
+							legendPanel.padding[0] +
+							411 +
+							thisNodeScale.range()[1] * 2 +
+							i * 53
+						);
 					})
 					.attr("y2", function (d, i) {
-						return legendPanel.padding[0] + 411 + (thisNodeScale.range()[1] * 2) + (i * 53);
+						return (
+							legendPanel.padding[0] +
+							411 +
+							thisNodeScale.range()[1] * 2 +
+							i * 53
+						);
 					})
 					.style("stroke", "#ccc")
 					.style("opacity", 0.5)
 					.attr("stroke-width", function (d) {
-						return thisLinkScale(d.total)
+						return thisLinkScale(d.total);
 					});
 
-				legendColorGroups.on("mouseover", function (d) {
-					currentHoveredElem = this;
-					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function (e) {
-							return e.category === d ? 1 : 0;
-						});
-					nodesPanel.main.selectAll(".pbifdcLinks")
-						.style("opacity", 0);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					restoreNodesPanel();
-				});
+				legendColorGroups
+					.on("mouseover", function (d) {
+						currentHoveredElem = this;
+						nodesPanel.main
+							.selectAll(
+								".pbifdcNodeCircle, .pbifdcNodesLabelGroup"
+							)
+							.style("opacity", function (e) {
+								return e.category === d ? 1 : 0;
+							});
+						nodesPanel.main
+							.selectAll(".pbifdcLinks")
+							.style("opacity", 0);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						restoreNodesPanel();
+					});
 
-				nodeSizeGroup.on("mouseover", function (d) {
-					currentHoveredElem = this;
-					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function (e) {
-							return e.uniqueId === d.uniqueId ? 1 : 0;
-						});
-					nodesPanel.main.selectAll(".pbifdcLinks")
-						.style("opacity", 0);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					nodeSizeCircles.style("opacity", 1);
-					restoreNodesPanel();
-				});
+				nodeSizeGroup
+					.on("mouseover", function (d) {
+						currentHoveredElem = this;
+						nodesPanel.main
+							.selectAll(
+								".pbifdcNodeCircle, .pbifdcNodesLabelGroup"
+							)
+							.style("opacity", function (e) {
+								return e.uniqueId === d.uniqueId ? 1 : 0;
+							});
+						nodesPanel.main
+							.selectAll(".pbifdcLinks")
+							.style("opacity", 0);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						nodeSizeCircles.style("opacity", 1);
+						restoreNodesPanel();
+					});
 
-				linkWidthGroup.on("mouseover", function (d) {
-					currentHoveredElem = this;
-					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
-						.style("opacity", function (e) {
-							return e.uniqueId === d.source.uniqueId || e.uniqueId === d.target.uniqueId ? 1 : 0;
-						});
-					nodesPanel.main.selectAll(".pbifdcLinks")
-						.style("opacity", function (e) {
-							return e.source.uniqueId === d.source.uniqueId && e.target.uniqueId === d.target.uniqueId ? 1 : 0;
-						});
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					restoreNodesPanel();
-				});
+				linkWidthGroup
+					.on("mouseover", function (d) {
+						currentHoveredElem = this;
+						nodesPanel.main
+							.selectAll(
+								".pbifdcNodeCircle, .pbifdcNodesLabelGroup"
+							)
+							.style("opacity", function (e) {
+								return e.uniqueId === d.source.uniqueId ||
+									e.uniqueId === d.target.uniqueId
+									? 1
+									: 0;
+							});
+						nodesPanel.main
+							.selectAll(".pbifdcLinks")
+							.style("opacity", function (e) {
+								return e.source.uniqueId ===
+									d.source.uniqueId &&
+									e.target.uniqueId === d.target.uniqueId
+									? 1
+									: 0;
+							});
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						restoreNodesPanel();
+					});
 
-				sizeRectangle.on("mouseover", function () {
-					currentHoveredElem = this;
-					sizeTitle.transition()
-						.duration(duration)
-						.attr("y", legendPanel.padding[0] + 142);
-					sizeSubTitle.transition()
-						.duration(duration)
-						.style("opacity", 0);
-					sizeText.transition()
-						.duration(duration)
-						.style("opacity", 1);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					sizeTitle.interrupt()
-						.attr("y", legendPanel.padding[0] + 192);
-					sizeSubTitle.interrupt()
-						.style("opacity", 1);
-					sizeText.interrupt()
-						.style("opacity", 0);
-				});
+				sizeRectangle
+					.on("mouseover", function () {
+						currentHoveredElem = this;
+						sizeTitle
+							.transition()
+							.duration(duration)
+							.attr("y", legendPanel.padding[0] + 142);
+						sizeSubTitle
+							.transition()
+							.duration(duration)
+							.style("opacity", 0);
+						sizeText
+							.transition()
+							.duration(duration)
+							.style("opacity", 1);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						sizeTitle
+							.interrupt()
+							.attr("y", legendPanel.padding[0] + 192);
+						sizeSubTitle.interrupt().style("opacity", 1);
+						sizeText.interrupt().style("opacity", 0);
+					});
 
-				linkRectangle.on("mouseover", function () {
-					currentHoveredElem = this;
-					linkTitle.transition()
-						.duration(duration)
-						.attr("y", legendPanel.padding[0] + 320 + (thisNodeScale.range()[1] * 2));
-					linkSubTitle.transition()
-						.duration(duration)
-						.style("opacity", 0);
-					linkText.transition()
-						.duration(duration)
-						.style("opacity", 1);
-				}).on("mouseout", function () {
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
-					linkTitle.interrupt()
-						.attr("y", legendPanel.padding[0] + 364 + (thisNodeScale.range()[1] * 2))
-					linkSubTitle.interrupt()
-						.style("opacity", 1);
-					linkText.interrupt()
-						.style("opacity", 0);
-				});
+				linkRectangle
+					.on("mouseover", function () {
+						currentHoveredElem = this;
+						linkTitle
+							.transition()
+							.duration(duration)
+							.attr(
+								"y",
+								legendPanel.padding[0] +
+									320 +
+									thisNodeScale.range()[1] * 2
+							);
+						linkSubTitle
+							.transition()
+							.duration(duration)
+							.style("opacity", 0);
+						linkText
+							.transition()
+							.duration(duration)
+							.style("opacity", 1);
+					})
+					.on("mouseout", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
+						linkTitle
+							.interrupt()
+							.attr(
+								"y",
+								legendPanel.padding[0] +
+									364 +
+									thisNodeScale.range()[1] * 2
+							);
+						linkSubTitle.interrupt().style("opacity", 1);
+						linkText.interrupt().style("opacity", 0);
+					});
 
 				function restoreNodesPanel() {
-					nodesPanel.main.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
+					nodesPanel.main
+						.selectAll(".pbifdcNodeCircle, .pbifdcNodesLabelGroup")
 						.style("opacity", 1);
-					nodesPanel.main.selectAll(".pbifdcLinks")
+					nodesPanel.main
+						.selectAll(".pbifdcLinks")
 						.style("opacity", function (d) {
 							return strokeOpacityScale(d.total);
 						});
-				};
+				}
 
 				//end of drawLegend
-			};
+			}
 
 			function drawLegendNode(datum) {
-
-				const otherGroups = legendPanel.main.selectAll(".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup");
+				const otherGroups = legendPanel.main.selectAll(
+					".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup"
+				);
 
 				otherGroups.selectAll("*").interrupt();
 
 				otherGroups.remove();
 
-				const nodeLegendGroup = legendPanel.main.append("g")
+				const nodeLegendGroup = legendPanel.main
+					.append("g")
 					.attr("class", "pbifdcNodeLegendGroup");
 
-				const legendTitleCategory = nodeLegendGroup.append("text")
+				const legendTitleCategory = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
 					.attr("y", legendPanel.padding[0] + 16)
 					.text(datum.category);
 
-				const legendTitle = nodeLegendGroup.append("text")
+				const legendTitle = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
@@ -2526,96 +3669,137 @@
 					.text(datum.name);
 
 				if (datum.category === "Donor") {
-
 					const legendTitleBox = legendTitle.node().getBBox();
 
-					const flag = nodeLegendGroup.append("image")
+					const flag = nodeLegendGroup
+						.append("image")
 						.attr("y", legendPanel.padding[0] + 18)
 						.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 						.attr("width", flagSize)
 						.attr("height", flagSize)
-						.attr("href", !datum.isoCode || !flagsData[datum.isoCode.toLowerCase()] ? blankFlag : flagsData[datum.isoCode.toLowerCase()]);
+						.attr(
+							"href",
+							!datum.isoCode ||
+								!flagsData[datum.isoCode.toLowerCase()]
+								? blankFlag
+								: flagsData[datum.isoCode.toLowerCase()]
+						);
+				}
 
-				};
-
-				const summaryTitle = nodeLegendGroup.append("text")
+				const summaryTitle = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 70)
 					.text("SUMMARY:");
 
-				const totalAmount = nodeLegendGroup.append("text")
+				const totalAmount = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 90)
-					.text("Total " + (datum.category === "Donor" ? "donated:" : "received:"));
+					.text(
+						"Total " +
+							(datum.category === "Donor"
+								? "donated:"
+								: "received:")
+					);
 
-				const totalPaid = nodeLegendGroup.append("text")
+				const totalPaid = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 106)
 					.text("Paid amount:");
 
-				const totalPledge = nodeLegendGroup.append("text")
+				const totalPledge = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 122)
 					.text("Pledged amount:");
 
-				const totalAmountValue = nodeLegendGroup.append("text")
+				const totalAmountValue = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 90)
 					.text("$" + formatMoney0Decimals(datum.total));
 
-				const totalPaidValue = nodeLegendGroup.append("text")
+				const totalPaidValue = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 106)
 					.text("$" + formatMoney0Decimals(datum.paid));
 
-				const totalPledgeValue = nodeLegendGroup.append("text")
+				const totalPledgeValue = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 122)
 					.text("$" + formatMoney0Decimals(datum.pledge));
 
-				const numberOfConnections = nodeLegendGroup.append("text")
+				const numberOfConnections = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 152)
-					.text(datum.category === "Donor" ? "Donated to: " + (datum.connections.length === 1 ?
-						datum.connections.length + " CBPF" : datum.connections.length + " CBPFs") :
-						"Received from: " + (datum.connections.length === 1 ? datum.connections.length + " donor" :
-							datum.connections.length + " donors"));
+					.text(
+						datum.category === "Donor"
+							? "Donated to: " +
+									(datum.connections.length === 1
+										? datum.connections.length + " CBPF"
+										: datum.connections.length + " CBPFs")
+							: "Received from: " +
+									(datum.connections.length === 1
+										? datum.connections.length + " donor"
+										: datum.connections.length + " donors")
+					);
 
-				const chartTitle = nodeLegendGroup.append("text")
+				const chartTitle = nodeLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 190)
-					.text(datum.category === "Donor" ? "AMOUNT DONATED:" : "AMOUNT RECEIVED:");
+					.text(
+						datum.category === "Donor"
+							? "AMOUNT DONATED:"
+							: "AMOUNT RECEIVED:"
+					);
 
 				let lollipopGroupHeight = 18;
 
-				const lollipopVerticalSpace = legendPanel.height - legendPanel.padding[2] - 220;
+				const lollipopVerticalSpace =
+					legendPanel.height - legendPanel.padding[2] - 220;
 
-				while (lollipopGroupHeight * datum.connections.length > lollipopVerticalSpace) {
+				while (
+					lollipopGroupHeight * datum.connections.length >
+					lollipopVerticalSpace
+				) {
 					lollipopGroupHeight -= 0.2;
-				};
+				}
 
 				datum.connections.sort(function (a, b) {
 					return b.total - a.total;
 				});
 
-				yScaleLegend.range([230, 230 + datum.connections.length * lollipopGroupHeight])
-					.domain(datum.connections.map(function (d) {
-						return d.name;
-					}));
+				yScaleLegend
+					.range([
+						230,
+						230 + datum.connections.length * lollipopGroupHeight,
+					])
+					.domain(
+						datum.connections.map(function (d) {
+							return d.name;
+						})
+					);
 
-				const yAxisLegendGroup = nodeLegendGroup.append("g")
+				const yAxisLegendGroup = nodeLegendGroup
+					.append("g")
 					.attr("class", "pbifdcYAxisLegendGroup")
 					.call(yAxisLegend);
 
@@ -2623,26 +3807,41 @@
 
 				yAxisLegendGroup.selectAll("text").each(function (d) {
 					const thisLenght = this.getComputedTextLength();
-					biggestLabel = thisLenght > biggestLabel ? thisLenght : biggestLabel;
+					biggestLabel =
+						thisLenght > biggestLabel ? thisLenght : biggestLabel;
 				});
 
-				xScaleLegend.range([legendPanel.padding[3] + (~~biggestLabel) + yAxisLegend.tickPadding(),
-				legendPanel.width - legendPanel.padding[1] - 40
-				])
-					.domain([0, d3.max(datum.connections, function (d) {
-						return d.total;
-					})]);
+				xScaleLegend
+					.range([
+						legendPanel.padding[3] +
+							~~biggestLabel +
+							yAxisLegend.tickPadding(),
+						legendPanel.width - legendPanel.padding[1] - 40,
+					])
+					.domain([
+						0,
+						d3.max(datum.connections, function (d) {
+							return d.total;
+						}),
+					]);
 
-				yAxisLegendGroup.attr("transform", "translate(" + xScaleLegend.range()[0] + ",0)");
+				yAxisLegendGroup.attr(
+					"transform",
+					"translate(" + xScaleLegend.range()[0] + ",0)"
+				);
 
-				xAxisLegend.tickSizeInner(-(yScaleLegend.range()[1] - yScaleLegend.range()[0]));
+				xAxisLegend.tickSizeInner(
+					-(yScaleLegend.range()[1] - yScaleLegend.range()[0])
+				);
 
-				const xAxisLegendGroup = nodeLegendGroup.append("g")
+				const xAxisLegendGroup = nodeLegendGroup
+					.append("g")
 					.attr("class", "pbifdcXAxisLegendGroup")
 					.attr("transform", "translate(0,230)")
 					.call(xAxisLegend);
 
-				xAxisLegendGroup.selectAll(".tick")
+				xAxisLegendGroup
+					.selectAll(".tick")
 					.filter(function (d) {
 						return d === 0;
 					})
@@ -2652,23 +3851,35 @@
 
 				function separateTicks(selection) {
 					if (selection.size() < 2) return;
-					const firstTick = selection.filter(function (_, i) {
-						return !i
-					}).select("text");
-					const secondTick = selection.filter(function (_, i) {
-						return i
-					}).select("text");
+					const firstTick = selection
+						.filter(function (_, i) {
+							return !i;
+						})
+						.select("text");
+					const secondTick = selection
+						.filter(function (_, i) {
+							return i;
+						})
+						.select("text");
 					const minimumSeparation = 6;
 					let accumulator = 0;
-					while (secondTick.node().getBoundingClientRect().left < firstTick.node().getBoundingClientRect().right + minimumSeparation) {
-						firstTick.attr("x", -(++accumulator));
+					while (
+						secondTick.node().getBoundingClientRect().left <
+						firstTick.node().getBoundingClientRect().right +
+							minimumSeparation
+					) {
+						firstTick.attr("x", -++accumulator);
 						secondTick.attr("x", accumulator);
-					};
-				};
+					}
+				}
 
-				const lollipopClass = datum.category === "Donor" ? "allocationColorFill" : "contributionColorFill";
+				const lollipopClass =
+					datum.category === "Donor"
+						? "allocationColorFill"
+						: "contributionColorFill";
 
-				const lollipopGroups = nodeLegendGroup.selectAll(null)
+				const lollipopGroups = nodeLegendGroup
+					.selectAll(null)
 					.data(datum.connections)
 					.enter()
 					.append("g")
@@ -2676,24 +3887,27 @@
 						return "translate(0," + yScaleLegend(d.name) + ")";
 					});
 
-				const lollipopStick = lollipopGroups.append("rect")
+				const lollipopStick = lollipopGroups
+					.append("rect")
 					.attr("x", xScaleLegend(0))
-					.attr("y", -(stickHeight / 2 - (stickHeight / 4)))
+					.attr("y", -(stickHeight / 2 - stickHeight / 4))
 					.attr("height", stickHeight)
 					.attr("width", function (d) {
 						return xScaleLegend(d.total) - xScaleLegend(0);
 					})
 					.classed(lollipopClass, true);
 
-				const lollipop = lollipopGroups.append("circle")
+				const lollipop = lollipopGroups
+					.append("circle")
 					.attr("cx", function (d) {
 						return xScaleLegend(d.total);
 					})
-					.attr("cy", (stickHeight / 4))
+					.attr("cy", stickHeight / 4)
 					.attr("r", lollipopRadius)
 					.classed(lollipopClass, true);
 
-				const legendLabel = lollipopGroups.append("text")
+				const legendLabel = lollipopGroups
+					.append("text")
 					.attr("class", "pbifdcLegendLabel")
 					.attr("y", verticalLabelPadding)
 					.attr("x", function (d) {
@@ -2704,27 +3918,31 @@
 					});
 
 				//end of drawLegendNode
-			};
+			}
 
 			function drawLegendLink(datum) {
-
-				const otherGroups = legendPanel.main.selectAll(".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup");
+				const otherGroups = legendPanel.main.selectAll(
+					".pbifdcNodeLegendGroup,.pbifdcLinkLegendGroup,.pbifdcLegendGroup"
+				);
 
 				otherGroups.selectAll("*").interrupt();
 
 				otherGroups.remove();
 
-				const linkLegendGroup = legendPanel.main.append("g")
+				const linkLegendGroup = legendPanel.main
+					.append("g")
 					.attr("class", "pbifdcLinkLegendGroup");
 
-				const legendTitleCategoryDonor = linkLegendGroup.append("text")
+				const legendTitleCategoryDonor = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
 					.attr("y", legendPanel.padding[0] + 16)
 					.text("Donor");
 
-				const legendTitleDonor = linkLegendGroup.append("text")
+				const legendTitleDonor = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
@@ -2733,66 +3951,82 @@
 
 				const legendTitleBox = legendTitleDonor.node().getBBox();
 
-				const flag = linkLegendGroup.append("image")
+				const flag = linkLegendGroup
+					.append("image")
 					.attr("y", legendPanel.padding[0] + 18)
 					.attr("x", legendTitleBox.x + legendTitleBox.width + 4)
 					.attr("width", flagSize)
 					.attr("height", flagSize)
-					.attr("href", !datum.isoCode || !flagsData[datum.isoCode.toLowerCase()] ? blankFlag : flagsData[datum.isoCode.toLowerCase()]);
+					.attr(
+						"href",
+						!datum.isoCode ||
+							!flagsData[datum.isoCode.toLowerCase()]
+							? blankFlag
+							: flagsData[datum.isoCode.toLowerCase()]
+					);
 
-				const legendTitleCategoryCbpf = linkLegendGroup.append("text")
+				const legendTitleCategoryCbpf = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
 					.attr("y", legendPanel.padding[0] + 66)
 					.text("CBPF:");
 
-				const legendTitleCbpf = linkLegendGroup.append("text")
+				const legendTitleCbpf = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTitle")
 					.attr("x", legendPanel.width / 2)
 					.attr("text-anchor", "middle")
 					.attr("y", legendPanel.padding[0] + 86)
 					.text(datum.target.name);
 
-				const summaryTitle = linkLegendGroup.append("text")
+				const summaryTitle = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendSubTitle")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 130)
 					.text("SUMMARY:");
 
-				const totalAmount = linkLegendGroup.append("text")
+				const totalAmount = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 150)
 					.text("Total donated:");
 
-				const totalPaid = linkLegendGroup.append("text")
+				const totalPaid = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 166)
 					.text("Paid amount:");
 
-				const totalPledge = linkLegendGroup.append("text")
+				const totalPledge = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.padding[3])
 					.attr("y", legendPanel.padding[0] + 182)
 					.text("Pledged amount:");
 
-				const totalAmountValue = linkLegendGroup.append("text")
+				const totalAmountValue = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 150)
 					.text("$" + formatMoney0Decimals(datum.total));
 
-				const totalPaidValue = linkLegendGroup.append("text")
+				const totalPaidValue = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
 					.attr("y", legendPanel.padding[0] + 166)
 					.text("$" + formatMoney0Decimals(datum.paid));
 
-				const totalPledgeValue = linkLegendGroup.append("text")
+				const totalPledgeValue = linkLegendGroup
+					.append("text")
 					.attr("class", "pbifdcLegendTextSmall")
 					.attr("x", legendPanel.width - legendPanel.padding[1])
 					.attr("text-anchor", "end")
@@ -2800,13 +4034,13 @@
 					.text("$" + formatMoney0Decimals(datum.pledge));
 
 				//end of drawLegendLink
-			};
+			}
 
 			function createGeoMenu() {
+				const geoMenuContainer = geoMenuPanel.main.append("g");
 
-				const geoMenuContainer = geoMenuPanel.main.append("g")
-
-				const menuRectangle = geoMenuContainer.append("rect")
+				const menuRectangle = geoMenuContainer
+					.append("rect")
 					.attr("rx", 2)
 					.attr("ry", 2)
 					.attr("width", geoMenuPanel.widthCollapsed)
@@ -2816,13 +4050,15 @@
 					.style("opacity", 0.9)
 					.style("stroke", "#aaa");
 
-				const menuRectangleClip = geoMenuContainer.append("clipPath")
+				const menuRectangleClip = geoMenuContainer
+					.append("clipPath")
 					.attr("id", "pbifdcGeoMenuClip")
 					.append("rect")
 					.attr("width", geoMenuPanel.widthCollapsed)
 					.attr("height", geoMenuPanel.heightCollapsed);
 
-				const geoMenuTitle = geoMenuContainer.append("text")
+				const geoMenuTitle = geoMenuContainer
+					.append("text")
 					.attr("class", "pbifdcGeoMenuTitle")
 					.attr("x", geoMenuPanel.titlePadding)
 					.attr("y", 15)
@@ -2830,20 +4066,29 @@
 
 				const geoMenuData = d3.keys(geoRegions);
 
-				const geoMenuClipContainer = geoMenuContainer.append("g")
+				const geoMenuClipContainer = geoMenuContainer
+					.append("g")
 					.attr("clip-path", "url(#pbifdcGeoMenuClip)");
 
-				const geoMenuGroups = geoMenuClipContainer.selectAll(null)
+				const geoMenuGroups = geoMenuClipContainer
+					.selectAll(null)
 					.data(geoMenuData)
 					.enter()
 					.append("g")
 					.attr("class", "pbifdcGeoMenuGroups")
 					.attr("pointer-events", "none")
 					.attr("transform", function (_, i) {
-						return "translate(" + geoMenuPanel.padding[3] + "," + (geoMenuPanel.padding[0] + 22 * i) + ")";
+						return (
+							"translate(" +
+							geoMenuPanel.padding[3] +
+							"," +
+							(geoMenuPanel.padding[0] + 22 * i) +
+							")"
+						);
 					});
 
-				const geoMenuText = geoMenuGroups.append("text")
+				const geoMenuText = geoMenuGroups
+					.append("text")
 					.attr("class", "pbifdcGeoMenuText")
 					.attr("x", 0)
 					.text(function (d) {
@@ -2852,7 +4097,8 @@
 
 				geoMenuGroups.each(function (d) {
 					if (d !== "All") {
-						d3.select(this).append("rect")
+						d3.select(this)
+							.append("rect")
 							.attr("width", 14)
 							.attr("height", 14)
 							.attr("rx", 2)
@@ -2862,23 +4108,26 @@
 							.style("fill", "none")
 							.style("stroke", "darkslategray");
 					} else {
-						d3.select(this).append("circle")
+						d3.select(this)
+							.append("circle")
 							.attr("r", 7)
 							.attr("cx", -12)
 							.attr("cy", -4)
 							.style("fill", "none")
 							.style("stroke", "darkslategray");
-					};
+					}
 				});
 
-				const geoMenuCheckmarks = geoMenuGroups.filter(":not(:last-child)")
+				const geoMenuCheckmarks = geoMenuGroups
+					.filter(":not(:last-child)")
 					.append("polyline")
 					.style("stroke-width", "2px")
 					.attr("points", "-16,-5 -13,-2 -8,-9")
 					.style("fill", "none")
 					.style("stroke", "none");
 
-				const geoMenuInnerCircle = geoMenuGroups.filter(":last-child")
+				const geoMenuInnerCircle = geoMenuGroups
+					.filter(":last-child")
 					.append("circle")
 					.attr("r", 4)
 					.attr("cx", -12)
@@ -2886,53 +4135,58 @@
 					.style("fill", "none");
 
 				if (chartState.selectedRegion === "All") {
-					geoMenuInnerCircle.style("fill", "darkslategray")
+					geoMenuInnerCircle.style("fill", "darkslategray");
 				} else {
-					geoMenuCheckmarks.filter(function (d) {
-						return chartState.selectedRegion.indexOf(d) > -1
-					})
+					geoMenuCheckmarks
+						.filter(function (d) {
+							return chartState.selectedRegion.indexOf(d) > -1;
+						})
 						.style("stroke", "darkslategray");
-				};
+				}
 
-				geoMenuContainer.on("mouseover", function () {
+				geoMenuContainer
+					.on("mouseover", function () {
+						currentHoveredElem = this;
 
-					currentHoveredElem = this;
+						menuRectangle
+							.transition()
+							.duration(duration / 2)
+							.attr("height", geoMenuPanel.heightTotal)
+							.attr("width", geoMenuPanel.widthTotal);
 
-					menuRectangle.transition()
-						.duration(duration / 2)
-						.attr("height", geoMenuPanel.heightTotal)
-						.attr("width", geoMenuPanel.widthTotal);
+						menuRectangleClip
+							.transition()
+							.duration(duration / 2)
+							.attr("height", geoMenuPanel.heightTotal)
+							.attr("width", geoMenuPanel.widthTotal);
 
-					menuRectangleClip.transition()
-						.duration(duration / 2)
-						.attr("height", geoMenuPanel.heightTotal)
-						.attr("width", geoMenuPanel.widthTotal);
+						geoMenuTitle
+							.transition()
+							.duration(duration / 2)
+							.attr("x", geoMenuPanel.padding[3]);
 
-					geoMenuTitle.transition()
-						.duration(duration / 2)
-						.attr("x", geoMenuPanel.padding[3]);
+						geoMenuGroups.attr("pointer-events", "all");
+					})
+					.on("mouseleave", function () {
+						if (isSnapshotTooltipVisible) return;
+						currentHoveredElem = null;
 
-					geoMenuGroups.attr("pointer-events", "all");
+						menuRectangle
+							.interrupt()
+							.attr("height", geoMenuPanel.heightCollapsed)
+							.attr("width", geoMenuPanel.widthCollapsed);
 
-				}).on("mouseleave", function () {
+						menuRectangleClip
+							.interrupt()
+							.attr("height", geoMenuPanel.heightCollapsed)
+							.attr("width", geoMenuPanel.widthCollapsed);
 
-					if (isSnapshotTooltipVisible) return;
-					currentHoveredElem = null;
+						geoMenuTitle
+							.interrupt()
+							.attr("x", geoMenuPanel.titlePadding);
 
-					menuRectangle.interrupt()
-						.attr("height", geoMenuPanel.heightCollapsed)
-						.attr("width", geoMenuPanel.widthCollapsed);
-
-					menuRectangleClip.interrupt()
-						.attr("height", geoMenuPanel.heightCollapsed)
-						.attr("width", geoMenuPanel.widthCollapsed);
-
-					geoMenuTitle.interrupt()
-						.attr("x", geoMenuPanel.titlePadding);
-
-					geoMenuGroups.attr("pointer-events", "none");
-
-				});
+						geoMenuGroups.attr("pointer-events", "none");
+					});
 
 				geoMenuGroups.on("click", function (d) {
 					if (d === "All") {
@@ -2950,38 +4204,53 @@
 								if (chartState.selectedRegion.length === 1) {
 									chartState.selectedRegion = "All";
 									geoMenuCheckmarks.style("stroke", "none");
-									geoMenuInnerCircle.style("fill", "darkslategray");
+									geoMenuInnerCircle.style(
+										"fill",
+										"darkslategray"
+									);
 
 									dataObject = processData(rawData[0]);
 
 									createTopPanel(dataObject.nodes);
 
-									createNodesPanel(dataObject.nodes, dataObject.links);
+									createNodesPanel(
+										dataObject.nodes,
+										dataObject.links
+									);
 
-									drawLegend(dataObject.nodes, dataObject.links);
+									drawLegend(
+										dataObject.nodes,
+										dataObject.links
+									);
 
 									return;
 								} else {
 									chartState.selectedRegion.splice(index, 1);
-								};
-							};
-						};
+								}
+							}
+						}
 						geoMenuInnerCircle.style("fill", "none");
 						geoMenuCheckmarks.style("stroke", function (e) {
-							return chartState.selectedRegion.indexOf(e) > -1 ? "darkslategray" : "none";
+							return chartState.selectedRegion.indexOf(e) > -1
+								? "darkslategray"
+								: "none";
 						});
-					};
+					}
 
-					const allRegions = chartState.selectedRegion === "All" ? "All" :
-						chartState.selectedRegion.map(function (d) {
-							return d;
-						}).join("|");
+					const allRegions =
+						chartState.selectedRegion === "All"
+							? "All"
+							: chartState.selectedRegion
+									.map(function (d) {
+										return d;
+									})
+									.join("|");
 
 					if (queryStringValues.has("regions")) {
 						queryStringValues.set("regions", allRegions);
 					} else {
 						queryStringValues.append("regions", allRegions);
-					};
+					}
 
 					dataObject = processData(rawData[0]);
 
@@ -2990,14 +4259,12 @@
 					createNodesPanel(dataObject.nodes, dataObject.links);
 
 					drawLegend(dataObject.nodes, dataObject.links);
-
 				});
 
 				//end of createGeoMenu
-			};
+			}
 
 			function clickButtonsRects(d, singleSelection) {
-
 				if (singleSelection) {
 					chartState.selectedYear = [d];
 				} else {
@@ -3010,28 +4277,32 @@
 						}
 					} else {
 						chartState.selectedYear.push(d);
-					};
-				};
+					}
+				}
 
-				const allYears = chartState.selectedYear.map(function (d) {
-					return d;
-				}).join("|");
+				const allYears = chartState.selectedYear
+					.map(function (d) {
+						return d;
+					})
+					.join("|");
 
 				if (queryStringValues.has("year")) {
 					queryStringValues.set("year", allYears);
 				} else {
 					queryStringValues.append("year", allYears);
-				};
+				}
 
-				d3.selectAll(".pbifdcbuttonsRects")
-					.style("fill", function (e) {
-						return chartState.selectedYear.indexOf(e) > -1 ? unBlue : "#eaeaea";
-					});
+				d3.selectAll(".pbifdcbuttonsRects").style("fill", function (e) {
+					return chartState.selectedYear.indexOf(e) > -1
+						? unBlue
+						: "#eaeaea";
+				});
 
-				d3.selectAll(".pbifdcbuttonsText")
-					.style("fill", function (e) {
-						return chartState.selectedYear.indexOf(e) > -1 ? "white" : "#444";
-					});
+				d3.selectAll(".pbifdcbuttonsText").style("fill", function (e) {
+					return chartState.selectedYear.indexOf(e) > -1
+						? "white"
+						: "#444";
+				});
 
 				setYearsDescriptionDiv();
 
@@ -3044,39 +4315,64 @@
 				drawLegend(dataObject.nodes, dataObject.links);
 
 				//end of clickButtonsRects
-			};
+			}
 
 			function mouseOverTopPanel() {
-
 				currentHoveredElem = this;
 
-				const thisOffset = (topPanelRectBoundingRect = this.getBoundingClientRect()).top - (containerDivBoundingRect = containerDiv.node().getBoundingClientRect()).top;
+				const thisOffset =
+					(topPanelRectBoundingRect = this.getBoundingClientRect())
+						.top -
+					(containerDivBoundingRect = containerDiv
+						.node()
+						.getBoundingClientRect()).top;
 
 				const mouseContainer = d3.mouse(containerDiv.node());
 
 				const mouse = d3.mouse(this);
 
-				tooltip.style("display", "block")
-					.html("<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.total) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" + (formatPercent(contributionsTotals.paid / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.paid) +
-						"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" + (formatPercent(contributionsTotals.pledge / contributionsTotals.total)) +
-						")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" + formatMoney0Decimals(contributionsTotals.pledge) + "</span></div></div>");
+				tooltip
+					.style("display", "block")
+					.html(
+						"<div style='margin:0px;display:flex;flex-wrap:wrap;width:256px;'><div style='display:flex;flex:0 54%;'>Total contributions:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
+							formatMoney0Decimals(contributionsTotals.total) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" +
+							formatPercent(
+								contributionsTotals.paid /
+									contributionsTotals.total
+							) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
+							formatMoney0Decimals(contributionsTotals.paid) +
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledged <span style='color: #888;'>(" +
+							formatPercent(
+								contributionsTotals.pledge /
+									contributionsTotals.total
+							) +
+							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
+							formatMoney0Decimals(contributionsTotals.pledge) +
+							"</span></div></div>"
+					);
 
 				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				localVariable.set(this, tooltipSize);
 
-				tooltip.style("top", thisOffset + "px")
-					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						mouseContainer[0] + 14 + "px" :
-						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
-
-			};
+				tooltip
+					.style("top", thisOffset + "px")
+					.style(
+						"left",
+						mouse[0] < topPanel.width - 14 - tooltipSize.width
+							? mouseContainer[0] + 14 + "px"
+							: mouseContainer[0] -
+									(mouse[0] -
+										(topPanel.width - tooltipSize.width)) +
+									"px"
+					);
+			}
 
 			function mouseMoveTopPanel() {
-
-				const thisOffset = topPanelRectBoundingRect.top - containerDivBoundingRect.top;
+				const thisOffset =
+					topPanelRectBoundingRect.top - containerDivBoundingRect.top;
 
 				const mouseContainer = d3.mouse(containerDiv.node());
 
@@ -3084,48 +4380,95 @@
 
 				const tooltipSize = localVariable.get(this);
 
-				tooltip.style("top", thisOffset + "px")
-					.style("left", mouse[0] < topPanel.width - 14 - tooltipSize.width ?
-						mouseContainer[0] + 14 + "px" :
-						mouseContainer[0] - (mouse[0] - (topPanel.width - tooltipSize.width)) + "px");
-
-			};
+				tooltip
+					.style("top", thisOffset + "px")
+					.style(
+						"left",
+						mouse[0] < topPanel.width - 14 - tooltipSize.width
+							? mouseContainer[0] + 14 + "px"
+							: mouseContainer[0] -
+									(mouse[0] -
+										(topPanel.width - tooltipSize.width)) +
+									"px"
+					);
+			}
 
 			function mouseOutTopPanel() {
 				if (isSnapshotTooltipVisible) return;
 				currentHoveredElem = null;
 				tooltip.style("display", "none");
-			};
+			}
 
 			function mouseOverButtonsRects(d) {
-				tooltip.style("display", "block")
-					.html(null)
+				tooltip.style("display", "block").html(null);
 
-				const innerTooltip = tooltip.append("div")
+				const innerTooltip = tooltip
+					.append("div")
 					.style("max-width", "200px")
 					.attr("id", "pbifdcInnerTooltipDiv");
 
-				innerTooltip.html("Click for selecting a single year. Double-click or ALT + click for selecting multiple years.");
+				innerTooltip.html(
+					"Click for selecting a single year. Double-click or ALT + click for selecting multiple years."
+				);
 
-				const containerSize = containerDiv.node().getBoundingClientRect();
+				const containerSize = containerDiv
+					.node()
+					.getBoundingClientRect();
 
 				const thisSize = this.getBoundingClientRect();
 
 				tooltipSize = tooltip.node().getBoundingClientRect();
 
-				tooltip.style("left", (thisSize.left + thisSize.width / 2 - containerSize.left) > containerSize.width - (tooltipSize.width / 2) - padding[1] ?
-					containerSize.width - tooltipSize.width - padding[1] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) < tooltipSize.width / 2 + buttonsPanel.padding[3] + padding[0] ?
-						buttonsPanel.padding[3] + padding[0] + "px" : (thisSize.left + thisSize.width / 2 - containerSize.left) - (tooltipSize.width / 2) + "px")
-					.style("top", (thisSize.top + thisSize.height / 2 - containerSize.top) < tooltipSize.height ? thisSize.top - containerSize.top + thisSize.height + 2 + "px" :
-						thisSize.top - containerSize.top - tooltipSize.height - 4 + "px");
+				tooltip
+					.style(
+						"left",
+						thisSize.left +
+							thisSize.width / 2 -
+							containerSize.left >
+							containerSize.width -
+								tooltipSize.width / 2 -
+								padding[1]
+							? containerSize.width -
+									tooltipSize.width -
+									padding[1] +
+									"px"
+							: thisSize.left +
+									thisSize.width / 2 -
+									containerSize.left <
+							  tooltipSize.width / 2 +
+									buttonsPanel.padding[3] +
+									padding[0]
+							? buttonsPanel.padding[3] + padding[0] + "px"
+							: thisSize.left +
+							  thisSize.width / 2 -
+							  containerSize.left -
+							  tooltipSize.width / 2 +
+							  "px"
+					)
+					.style(
+						"top",
+						thisSize.top + thisSize.height / 2 - containerSize.top <
+							tooltipSize.height
+							? thisSize.top -
+									containerSize.top +
+									thisSize.height +
+									2 +
+									"px"
+							: thisSize.top -
+									containerSize.top -
+									tooltipSize.height -
+									4 +
+									"px"
+					);
 
 				d3.select(this).style("fill", unBlue);
-				d3.select(this.parentNode).selectAll("text")
+				d3.select(this.parentNode)
+					.selectAll("text")
 					.filter(function (e) {
-						return e === d
+						return e === d;
 					})
 					.style("fill", "white");
-			};
+			}
 
 			function mouseOutButtonsRects(d) {
 				tooltip.style("display", "none");
@@ -3133,42 +4476,50 @@
 				d3.select(this).style("fill", "#eaeaea");
 				d3.selectAll(".pbifdcbuttonsText")
 					.filter(function (e) {
-						return e === d
+						return e === d;
 					})
 					.style("fill", "#444");
-			};
+			}
 
 			//end of draw
-		};
+		}
 
 		function processData(rawData) {
-
 			let filteredData;
 
 			if (chartState.selectedRegion === "All") {
 				filteredData = rawData.filter(function (d) {
-					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 && d.GMSDonorISO2Code !== "";
+					return (
+						chartState.selectedYear.indexOf(+d.FiscalYear) > -1 &&
+						d.GMSDonorISO2Code !== ""
+					);
 				});
 			} else {
-				const CBPFlist = chartState.selectedRegion.reduce(function (acc, curr) {
+				const CBPFlist = chartState.selectedRegion.reduce(function (
+					acc,
+					curr
+				) {
 					return acc.concat(geoRegions[curr]);
-				}, []);
+				},
+				[]);
 				filteredData = rawData.filter(function (d) {
-					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1 &&
+					return (
+						chartState.selectedYear.indexOf(+d.FiscalYear) > -1 &&
 						CBPFlist.indexOf(d.PooledFundISO2Code) > -1 &&
-						d.GMSDonorISO2Code !== "";
+						d.GMSDonorISO2Code !== ""
+					);
 				});
-			};
+			}
 
 			filteredData.forEach(function (d) {
 				if (d.GMSDonorName.indexOf("Macedonia") > -1) {
 					d.GMSDonorName = "Macedonia";
-				};
+				}
 			});
 
 			const data = {
 				nodes: [],
-				links: []
+				links: [],
 			};
 
 			filteredData.forEach(function (d) {
@@ -3185,38 +4536,42 @@
 						isoCode: d.GMSDonorISO2Code,
 						category: "Donor",
 						labelText: d.GMSDonorName.split(" "),
-						total: (+d.PaidAmt) + (+d.PledgeAmt),
+						total: +d.PaidAmt + +d.PledgeAmt,
 						paid: +d.PaidAmt,
 						pledge: +d.PledgeAmt,
-						connections: [{
-							uniqueId: "cbpf" + d.PooledFundISO2Code,
-							name: d.PooledFundName,
-							total: (+d.PaidAmt) + (+d.PledgeAmt),
-							paid: +d.PaidAmt,
-							pledge: +d.PledgeAmt,
-						}]
+						connections: [
+							{
+								uniqueId: "cbpf" + d.PooledFundISO2Code,
+								name: d.PooledFundName,
+								total: +d.PaidAmt + +d.PledgeAmt,
+								paid: +d.PaidAmt,
+								pledge: +d.PledgeAmt,
+							},
+						],
 					});
 				} else {
-					foundDonor.total += (+d.PaidAmt) + (+d.PledgeAmt);
+					foundDonor.total += +d.PaidAmt + +d.PledgeAmt;
 					foundDonor.paid += +d.PaidAmt;
 					foundDonor.pledge += +d.PledgeAmt;
-					const foundDonorConnection = foundDonor.connections.find(function (e) {
-						return e.uniqueId === "cbpf" + d.PooledFundISO2Code;
-					});
+					const foundDonorConnection = foundDonor.connections.find(
+						function (e) {
+							return e.uniqueId === "cbpf" + d.PooledFundISO2Code;
+						}
+					);
 					if (foundDonorConnection) {
-						foundDonorConnection.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundDonorConnection.total += +d.PaidAmt + +d.PledgeAmt;
 						foundDonorConnection.paid += +d.PaidAmt;
 						foundDonorConnection.pledge += +d.PledgeAmt;
 					} else {
 						foundDonor.connections.push({
 							uniqueId: "cbpf" + d.PooledFundISO2Code,
 							name: d.PooledFundName,
-							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							total: +d.PaidAmt + +d.PledgeAmt,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
 						});
-					};
-				};
+					}
+				}
 				if (!foundCBPF) {
 					data.nodes.push({
 						name: d.PooledFundName,
@@ -3224,70 +4579,92 @@
 						isoCode: d.PooledFundISO2Code,
 						category: "CBPF",
 						labelText: d.PooledFundName.split(" "),
-						total: (+d.PaidAmt) + (+d.PledgeAmt),
+						total: +d.PaidAmt + +d.PledgeAmt,
 						paid: +d.PaidAmt,
 						pledge: +d.PledgeAmt,
-						connections: [{
-							uniqueId: "donor" + d.GMSDonorISO2Code,
-							name: d.GMSDonorName,
-							total: (+d.PaidAmt) + (+d.PledgeAmt),
-							paid: +d.PaidAmt,
-							pledge: +d.PledgeAmt,
-						}]
+						connections: [
+							{
+								uniqueId: "donor" + d.GMSDonorISO2Code,
+								name: d.GMSDonorName,
+								total: +d.PaidAmt + +d.PledgeAmt,
+								paid: +d.PaidAmt,
+								pledge: +d.PledgeAmt,
+							},
+						],
 					});
 				} else {
-					foundCBPF.total += (+d.PaidAmt) + (+d.PledgeAmt);
+					foundCBPF.total += +d.PaidAmt + +d.PledgeAmt;
 					foundCBPF.paid += +d.PaidAmt;
 					foundCBPF.pledge += +d.PledgeAmt;
-					const foundCBPFConnections = foundCBPF.connections.find(function (e) {
-						return e.uniqueId === "donor" + d.GMSDonorISO2Code;
-					});
+					const foundCBPFConnections = foundCBPF.connections.find(
+						function (e) {
+							return e.uniqueId === "donor" + d.GMSDonorISO2Code;
+						}
+					);
 					if (foundCBPFConnections) {
-						foundCBPFConnections.total += (+d.PaidAmt) + (+d.PledgeAmt);
+						foundCBPFConnections.total += +d.PaidAmt + +d.PledgeAmt;
 						foundCBPFConnections.paid += +d.PaidAmt;
 						foundCBPFConnections.pledge += +d.PledgeAmt;
 					} else {
 						foundCBPF.connections.push({
 							uniqueId: "donor" + d.GMSDonorISO2Code,
 							name: d.GMSDonorName,
-							total: (+d.PaidAmt) + (+d.PledgeAmt),
+							total: +d.PaidAmt + +d.PledgeAmt,
 							paid: +d.PaidAmt,
 							pledge: +d.PledgeAmt,
 						});
-					};
-				};
+					}
+				}
 				const foundLink = data.links.find(function (e) {
-					return e.source === "donor" + d.GMSDonorISO2Code && e.target === "cbpf" + d.PooledFundISO2Code;
+					return (
+						e.source === "donor" + d.GMSDonorISO2Code &&
+						e.target === "cbpf" + d.PooledFundISO2Code
+					);
 				});
 				if (foundLink) {
-					foundLink.total += (+d.PaidAmt) + (+d.PledgeAmt);
+					foundLink.total += +d.PaidAmt + +d.PledgeAmt;
 					foundLink.paid += +d.PaidAmt;
 					foundLink.pledge += +d.PledgeAmt;
 				} else {
 					data.links.push({
 						source: "donor" + d.GMSDonorISO2Code,
 						target: "cbpf" + d.PooledFundISO2Code,
-						total: (+d.PaidAmt) + (+d.PledgeAmt),
+						total: +d.PaidAmt + +d.PledgeAmt,
 						paid: +d.PaidAmt,
-						pledge: +d.PledgeAmt
+						pledge: +d.PledgeAmt,
 					});
-				};
+				}
 			});
 
 			return data;
 
 			//end of processData
-		};
+		}
 
 		function createCsv(rawData) {
-
-			const filteredDataRaw = rawData.filter(function (d) {
-				return chartState.selectedYear.indexOf(+d.FiscalYear) > -1
-			}).sort(function (a, b) {
-				return (+b.FiscalYear) - (+a.FiscalYear) || (a.GMSDonorName.toLowerCase() < b.GMSDonorName.toLowerCase() ? -1 :
-					a.GMSDonorName.toLowerCase() > b.GMSDonorName.toLowerCase() ? 1 : 0) || (a.PooledFundName.toLowerCase() < b.PooledFundName.toLowerCase() ? -1 :
-						a.PooledFundName.toLowerCase() > b.PooledFundName.toLowerCase() ? 1 : 0);
-			});
+			const filteredDataRaw = rawData
+				.filter(function (d) {
+					return chartState.selectedYear.indexOf(+d.FiscalYear) > -1;
+				})
+				.sort(function (a, b) {
+					return (
+						+b.FiscalYear - +a.FiscalYear ||
+						(a.GMSDonorName.toLowerCase() <
+						b.GMSDonorName.toLowerCase()
+							? -1
+							: a.GMSDonorName.toLowerCase() >
+							  b.GMSDonorName.toLowerCase()
+							? 1
+							: 0) ||
+						(a.PooledFundName.toLowerCase() <
+						b.PooledFundName.toLowerCase()
+							? -1
+							: a.PooledFundName.toLowerCase() >
+							  b.PooledFundName.toLowerCase()
+							? 1
+							: 0)
+					);
+				});
 
 			const filteredData = JSON.parse(JSON.stringify(filteredDataRaw));
 
@@ -3297,12 +4674,13 @@
 				d["CBPF Name"] = d.PooledFundName;
 				d["Paid Amount"] = +d.PaidAmt;
 				d["Pledged Amount"] = +d.PledgeAmt;
-				d["Total Contributions"] = (+d.PaidAmt) + (+d.PledgeAmt);
+				d["Total Contributions"] = +d.PaidAmt + +d.PledgeAmt;
 				d["Local Curency"] = d.PaidAmtLocalCurrency;
 				d["Exchange Rate"] = d.PaidAmtCurrencyExchangeRate;
 				d["Paid Amount (Local Currency)"] = +d.PaidAmtLocal;
 				d["Pledged Amount (Local Currency)"] = +d.PledgeAmtLocal;
-				d["Total Contributions (Local Currency)"] = (+d.PaidAmtLocal) + (+d.PledgeAmtLocal);
+				d["Total Contributions (Local Currency)"] =
+					+d.PaidAmtLocal + +d.PledgeAmtLocal;
 
 				delete d.FiscalYear;
 				delete d.GMSDonorName;
@@ -3322,43 +4700,45 @@
 			const header = d3.keys(filteredData[0]);
 
 			const replacer = function (key, value) {
-				return value === null ? '' : value
+				return value === null ? "" : value;
 			};
 
 			let rows = filteredData.map(function (row) {
-				return header.map(function (fieldName) {
-					return JSON.stringify(row[fieldName], replacer)
-				}).join(',')
+				return header
+					.map(function (fieldName) {
+						return JSON.stringify(row[fieldName], replacer);
+					})
+					.join(",");
 			});
 
-			rows.unshift(header.join(','));
+			rows.unshift(header.join(","));
 
-			return rows.join('\r\n');
+			return rows.join("\r\n");
 
 			//end of createCsv
-		};
+		}
 
 		function createFooterDiv() {
-
 			let footerText = "© OCHA CBPF Section " + currentYear;
 
-			const footerLink = " | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
+			const footerLink =
+				" | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
 
 			if (showLink) footerText += footerLink;
 
-			footerDiv.append("div")
+			footerDiv
+				.append("div")
 				.attr("class", "d3chartFooterText")
 				.html(footerText);
 
 			//end of createFooterDiv
-		};
+		}
 
 		function createAnnotationsDiv() {
+			iconsDiv.style("opacity", 0).style("pointer-events", "none");
 
-			iconsDiv.style("opacity", 0)
-				.style("pointer-events", "none");
-
-			const overDiv = containerDiv.append("div")
+			const overDiv = containerDiv
+				.append("div")
 				.attr("class", "pbifdcOverDivHelp");
 
 			const topDivSize = topDiv.node().getBoundingClientRect();
@@ -3367,23 +4747,32 @@
 
 			const topDivHeight = topDivSize.height * (width / topDivSize.width);
 
-			const helpSVG = overDiv.append("svg")
-				.attr("viewBox", "0 0 " + width + " " + (height + topDivHeight));
+			const helpSVG = overDiv
+				.append("svg")
+				.attr(
+					"viewBox",
+					"0 0 " + width + " " + (height + topDivHeight)
+				);
 
-			const helpButtons = [{
-				text: "CLOSE",
-				width: 90
-			}, {
-				text: "GO TO HELP PORTAL",
-				width: 180
-			}];
+			const helpButtons = [
+				{
+					text: "CLOSE",
+					width: 90,
+				},
+				{
+					text: "GO TO HELP PORTAL",
+					width: 180,
+				},
+			];
 
-			const closeRects = helpSVG.selectAll(null)
+			const closeRects = helpSVG
+				.selectAll(null)
 				.data(helpButtons)
 				.enter()
 				.append("g");
 
-			closeRects.append("rect")
+			closeRects
+				.append("rect")
 				.attr("rx", 4)
 				.attr("ry", 4)
 				.style("stroke", "rgba(0, 0, 0, 0.3)")
@@ -3396,78 +4785,96 @@
 					return d.width;
 				})
 				.attr("x", function (d, i) {
-					return width - padding[1] - d.width - (i ? helpButtons[0].width + 8 : 0);
+					return (
+						width -
+						padding[1] -
+						d.width -
+						(i ? helpButtons[0].width + 8 : 0)
+					);
 				})
 				.on("click", function (_, i) {
-					iconsDiv.style("opacity", 1)
-						.style("pointer-events", "all");
+					iconsDiv.style("opacity", 1).style("pointer-events", "all");
 					overDiv.remove();
 					if (i) window.open(helpPortalUrl, "help_portal");
 				});
 
-			closeRects.append("text")
+			closeRects
+				.append("text")
 				.attr("class", "pbifdcAnnotationMainText")
 				.attr("text-anchor", "middle")
 				.attr("x", function (d, i) {
-					return width - padding[1] - (d.width / 2) - (i ? (helpButtons[0].width) + 8 : 0);
+					return (
+						width -
+						padding[1] -
+						d.width / 2 -
+						(i ? helpButtons[0].width + 8 : 0)
+					);
 				})
 				.attr("y", 22)
 				.text(function (d) {
-					return d.text
+					return d.text;
 				});
 
-			const helpData = [{
-				x: 10,
-				y: 72 + topDivHeight,
-				width: 640,
-				height: 30,
-				xTooltip: 180 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-				text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years. Click the arrows to reveal more years."
-			}, {
-				x: 668,
-				y: 72 + topDivHeight,
-				width: 80,
-				height: 30,
-				xTooltip: 550 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-				text: "This checkbox repositions the nodes according to their geographic positions. You can zoom/pan the map."
-			}, {
-				x: 752,
-				y: 72 + topDivHeight,
-				width: 96,
-				height: 30,
-				xTooltip: 600 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
-				text: "This checkbox shows/hides the nodes labels, which is useful in the “map” view."
-			}, {
-				x: 28,
-				y: 106 + topDivHeight,
-				width: 148,
-				height: 22,
-				xTooltip: 10 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 136) * (topDivSize.width / width),
-				text: "Use these checkboxes to filter the funds by region."
-			}, {
-				x: 28,
-				y: 134 + topDivHeight,
-				width: 640,
-				height: 546,
-				xTooltip: 676 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
-				text: "Hover over the nodes (the countries) and the links (the donations) present in this area to show additional information about the donor, the CBPF or the donation in the Legend area at the right-hand side. When hovering, the values for the donors and funds change accordingly."
-			}, {
-				x: 680,
-				y: 134 + topDivHeight,
-				width: 212,
-				height: 546,
-				xTooltip: 384 * (topDivSize.width / width),
-				yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
-				text: "The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element."
-			}];
+			const helpData = [
+				{
+					x: 10,
+					y: 72 + topDivHeight,
+					width: 640,
+					height: 30,
+					xTooltip: 180 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+					text: "Use these buttons to select the year. Double click or press ALT when clicking to select multiple years. Click the arrows to reveal more years.",
+				},
+				{
+					x: 668,
+					y: 72 + topDivHeight,
+					width: 80,
+					height: 30,
+					xTooltip: 550 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+					text: "This checkbox repositions the nodes according to their geographic positions. You can zoom/pan the map.",
+				},
+				{
+					x: 752,
+					y: 72 + topDivHeight,
+					width: 96,
+					height: 30,
+					xTooltip: 600 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 112) * (topDivSize.width / width),
+					text: "This checkbox shows/hides the nodes labels, which is useful in the “map” view.",
+				},
+				{
+					x: 28,
+					y: 106 + topDivHeight,
+					width: 148,
+					height: 22,
+					xTooltip: 10 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 136) * (topDivSize.width / width),
+					text: "Use these checkboxes to filter the funds by region.",
+				},
+				{
+					x: 28,
+					y: 134 + topDivHeight,
+					width: 640,
+					height: 546,
+					xTooltip: 676 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
+					text: "Hover over the nodes (the countries) and the links (the donations) present in this area to show additional information about the donor, the CBPF or the donation in the Legend area at the right-hand side. When hovering, the values for the donors and funds change accordingly.",
+				},
+				{
+					x: 680,
+					y: 134 + topDivHeight,
+					width: 212,
+					height: 546,
+					xTooltip: 384 * (topDivSize.width / width),
+					yTooltip: (topDivHeight + 280) * (topDivSize.width / width),
+					text: "The Legend area shows additional information regarding the selected year. When hovering over a node (a donor or a CBPF) or a link (the donations) this Legend area changes, displaying additional information regarding the selected element.",
+				},
+			];
 
 			helpData.forEach(function (d) {
-				helpSVG.append("rect")
+				helpSVG
+					.append("rect")
 					.attr("rx", 4)
 					.attr("ry", 4)
 					.attr("x", d.x)
@@ -3487,8 +4894,9 @@
 					.on("mouseout", removeTooltip);
 			});
 
-			const explanationTextRect = helpSVG.append("rect")
-				.attr("x", (width / 2) - 180)
+			const explanationTextRect = helpSVG
+				.append("rect")
+				.attr("x", width / 2 - 180)
 				.attr("y", 244)
 				.attr("width", 360)
 				.attr("height", 50)
@@ -3496,7 +4904,8 @@
 				.style("fill", "white")
 				.style("stroke", "#888");
 
-			const explanationText = helpSVG.append("text")
+			const explanationText = helpSVG
+				.append("text")
 				.attr("class", "pbifdcAnnotationExplanationText")
 				.attr("font-family", "Roboto")
 				.attr("font-size", "18px")
@@ -3505,7 +4914,9 @@
 				.attr("x", width / 2)
 				.attr("y", 264)
 				.attr("pointer-events", "none")
-				.text("Hover over the elements surrounded by a blue rectangle to get additional information")
+				.text(
+					"Hover over the elements surrounded by a blue rectangle to get additional information"
+				)
 				.call(wrapText, 350);
 
 			function createTooltip(xPos, yPos, text, self) {
@@ -3513,48 +4924,57 @@
 				explanationTextRect.style("opacity", 0);
 				helpSVG.selectAll(".pbifdcHelpRectangle").style("opacity", 0.1);
 				d3.select(self).style("opacity", 1);
-				const containerBox = containerDiv.node().getBoundingClientRect();
-				tooltip.style("top", yPos + "px")
+				const containerBox = containerDiv
+					.node()
+					.getBoundingClientRect();
+				tooltip
+					.style("top", yPos + "px")
 					.style("left", xPos + "px")
 					.style("display", "block")
 					.html(text);
-			};
+			}
 
 			function removeTooltip() {
 				tooltip.style("display", "none");
 				explanationText.style("opacity", 1);
 				explanationTextRect.style("opacity", 1);
 				helpSVG.selectAll(".pbifdcHelpRectangle").style("opacity", 0.5);
-			};
+			}
 
 			//end of createAnnotationsDiv
-		};
+		}
 
 		function validateYear(yearString) {
-			const allYears = yearString.split(",").map(function (d) {
-				return +(d.trim());
-			}).sort(function (a, b) {
-				return a - b;
-			});
+			const allYears = yearString
+				.split(",")
+				.map(function (d) {
+					return +d.trim();
+				})
+				.sort(function (a, b) {
+					return a - b;
+				});
 			allYears.forEach(function (d) {
-				if (d && yearsArray.indexOf(d) > -1) chartState.selectedYear.push(d);
+				if (d && yearsArray.indexOf(d) > -1)
+					chartState.selectedYear.push(d);
 			});
-			if (!chartState.selectedYear.length) chartState.selectedYear.push(new Date().getFullYear());
-		};
+			if (!chartState.selectedYear.length)
+				chartState.selectedYear.push(new Date().getFullYear());
+		}
 
 		function validateCustomEventYear(yearNumber) {
 			if (yearsArray.indexOf(yearNumber) > -1) {
 				return yearNumber;
-			};
+			}
 			while (yearsArray.indexOf(yearNumber) === -1) {
-				yearNumber = yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
-			};
+				yearNumber =
+					yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			}
 			return yearNumber;
-		};
+		}
 
 		function capitalize(str) {
-			return str[0].toUpperCase() + str.substring(1)
-		};
+			return str[0].toUpperCase() + str.substring(1);
+		}
 
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
@@ -3564,28 +4984,40 @@
 				const lastDigit = result[result.length - 1];
 				const units = { k: "M", M: "B" };
 				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
-			};
+			}
 			return result;
-		};
+		}
 
 		function parseTransform(translate) {
-			const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+			const group = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"g"
+			);
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
 			return [matrix.e, matrix.f];
-		};
+		}
 
 		function setYearsDescriptionDiv() {
 			yearsDescriptionDiv.html(function () {
 				if (chartState.selectedYear.length === 1) return null;
-				const yearsList = chartState.selectedYear.sort(function (a, b) {
-					return a - b;
-				}).reduce(function (acc, curr, index) {
-					return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
-				}, "");
+				const yearsList = chartState.selectedYear
+					.sort(function (a, b) {
+						return a - b;
+					})
+					.reduce(function (acc, curr, index) {
+						return (
+							acc +
+							(index >= chartState.selectedYear.length - 2
+								? index > chartState.selectedYear.length - 2
+									? curr
+									: curr + " and "
+								: curr + ", ")
+						);
+					}, "");
 				return "\u002ASelected years: " + yearsList;
 			});
-		};
+		}
 
 		function wrapText(text, width) {
 			text.each(function () {
@@ -3598,20 +5030,21 @@
 					y = text.attr("y"),
 					x = text.attr("x"),
 					dy = 0,
-					tspan = text.text(null)
+					tspan = text
+						.text(null)
 						.append("tspan")
 						.attr("x", x)
 						.attr("y", y)
 						.attr("dy", dy + "em");
-				while (word = words.pop()) {
+				while ((word = words.pop())) {
 					line.push(word);
 					tspan.text(line.join(" "));
-					if (tspan.node()
-						.getComputedTextLength() > width) {
+					if (tspan.node().getComputedTextLength() > width) {
 						line.pop();
 						tspan.text(line.join(" "));
 						line = [word];
-						tspan = text.append("tspan")
+						tspan = text
+							.append("tspan")
 							.attr("x", x)
 							.attr("y", y)
 							.attr("dy", ++lineNumber * lineHeight + dy + "em")
@@ -3621,34 +5054,45 @@
 			});
 
 			//end of wrap
-		};
+		}
 
 		function createSnapshot(type, fromContextMenu) {
-
 			if (isInternetExplorer) {
-				alert("This functionality is not supported by Internet Explorer");
+				alert(
+					"This functionality is not supported by Internet Explorer"
+				);
 				return;
-			};
+			}
 
-			const downloadingDiv = d3.select("body").append("div")
+			const downloadingDiv = d3
+				.select("body")
+				.append("div")
 				.style("position", "fixed")
 				.attr("id", "pbifdcDownloadingDiv")
 				.style("left", window.innerWidth / 2 - 100 + "px")
 				.style("top", window.innerHeight / 2 - 100 + "px");
 
-			const downloadingDivSvg = downloadingDiv.append("svg")
+			const downloadingDivSvg = downloadingDiv
+				.append("svg")
 				.attr("class", "pbifdcDownloadingDivSvg")
 				.attr("width", 200)
 				.attr("height", 100);
 
 			const downloadingDivText = "Downloading " + type.toUpperCase();
 
-			createProgressWheel(downloadingDivSvg, 200, 175, downloadingDivText);
+			createProgressWheel(
+				downloadingDivSvg,
+				200,
+				175,
+				downloadingDivText
+			);
 
 			const svgRealSize = svg.node().getBoundingClientRect();
 
-			svg.attr("width", svgRealSize.width)
-				.attr("height", svgRealSize.height);
+			svg.attr("width", svgRealSize.width).attr(
+				"height",
+				svgRealSize.height
+			);
 
 			const listOfStyles = [
 				"font-size",
@@ -3663,7 +5107,7 @@
 				"text-transform",
 				"shape-rendering",
 				"letter-spacing",
-				"white-space"
+				"white-space",
 			];
 
 			const imageDiv = containerDiv.node();
@@ -3673,55 +5117,52 @@
 			if (type === "png") {
 				iconsDiv.style("opacity", 0);
 			} else {
-				topDiv.style("opacity", 0)
-			};
+				topDiv.style("opacity", 0);
+			}
 
 			snapshotTooltip.style("display", "none");
 
 			html2canvas(imageDiv).then(function (canvas) {
-
-				svg.attr("width", null)
-					.attr("height", null);
+				svg.attr("width", null).attr("height", null);
 
 				if (type === "png") {
 					iconsDiv.style("opacity", 1);
 				} else {
-					topDiv.style("opacity", 1)
-				};
+					topDiv.style("opacity", 1);
+				}
 
 				if (type === "png") {
 					downloadSnapshotPng(canvas);
 				} else {
 					downloadSnapshotPdf(canvas);
-				};
+				}
 
-				if (fromContextMenu && currentHoveredElem) d3.select(currentHoveredElem).dispatch("mouseout");
-
+				if (fromContextMenu && currentHoveredElem)
+					d3.select(currentHoveredElem).dispatch("mouseout");
 			});
 
 			function setSvgStyles(node) {
-
 				if (!node.style) return;
 
 				let styles = getComputedStyle(node);
 
 				for (let i = 0; i < listOfStyles.length; i++) {
 					node.style[listOfStyles[i]] = styles[listOfStyles[i]];
-				};
+				}
 
 				for (let i = 0; i < node.childNodes.length; i++) {
 					setSvgStyles(node.childNodes[i]);
-				};
-			};
+				}
+			}
 
 			//end of createSnapshot
-		};
+		}
 
 		function downloadSnapshotPng(source) {
-
 			const currentDate = new Date();
 
-			const fileName = "ContributionsFlow_" + csvDateFormat(currentDate) + ".png";
+			const fileName =
+				"ContributionsFlow_" + csvDateFormat(currentDate) + ".png";
 
 			source.toBlob(function (blob) {
 				const url = URL.createObjectURL(blob);
@@ -3735,128 +5176,195 @@
 					document.body.removeChild(link);
 				} else {
 					window.location.href = url;
-				};
+				}
 			});
 
 			removeProgressWheel();
 
 			d3.select("#pbifdcDownloadingDiv").remove();
-
-		};
+		}
 
 		function downloadSnapshotPdf(source) {
-
 			const pdfMargins = {
 				top: 10,
 				bottom: 16,
 				left: 20,
-				right: 30
+				right: 30,
 			};
 
-			d3.image("https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png")
-				.then(function (logo) {
+			d3.image(
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png"
+			).then(function (logo) {
+				let pdfTextPosition;
 
-					let pdfTextPosition;
+				const pdf = new jsPDF();
 
-					const pdf = new jsPDF();
+				createLetterhead();
 
-					createLetterhead();
+				const intro = pdf.splitTextToSize(
+					"CBPF receives broad support from United Nations Member States, the private sectors and individuals. Contributions from donors around the world are collected into single, unearmarked funds to support local humanitarian efforts.",
+					210 - pdfMargins.left - pdfMargins.right,
+					{
+						fontSize: 12,
+					}
+				);
 
-					const intro = pdf.splitTextToSize("CBPF receives broad support from United Nations Member States, the private sectors and individuals. Contributions from donors around the world are collected into single, unearmarked funds to support local humanitarian efforts.", (210 - pdfMargins.left - pdfMargins.right), {
-						fontSize: 12
-					});
+				const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
 
-					const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
+				pdf.setTextColor(60);
+				pdf.setFont("helvetica");
+				pdf.setFontType("normal");
+				pdf.setFontSize(12);
+				pdf.text(pdfMargins.left, 48, intro);
 
-					pdf.setTextColor(60);
-					pdf.setFont('helvetica');
-					pdf.setFontType("normal");
-					pdf.setFontSize(12);
-					pdf.text(pdfMargins.left, 48, intro);
+				pdf.setTextColor(65, 143, 222);
+				pdf.setFont("helvetica");
+				pdf.setFontType("bold");
+				pdf.setFontSize(16);
+				pdf.text(chartTitle, pdfMargins.left, 71);
 
-					pdf.setTextColor(65, 143, 222);
-					pdf.setFont('helvetica');
-					pdf.setFontType("bold");
-					pdf.setFontSize(16);
-					pdf.text(chartTitle, pdfMargins.left, 71);
+				pdf.setFontSize(12);
 
-					pdf.setFontSize(12);
-
-					const yearsList = chartState.selectedYear.sort(function (a, b) {
+				const yearsList = chartState.selectedYear
+					.sort(function (a, b) {
 						return a - b;
-					}).reduce(function (acc, curr, index) {
-						return acc + (index >= chartState.selectedYear.length - 2 ? index > chartState.selectedYear.length - 2 ? curr : curr + " and " : curr + ", ");
+					})
+					.reduce(function (acc, curr, index) {
+						return (
+							acc +
+							(index >= chartState.selectedYear.length - 2
+								? index > chartState.selectedYear.length - 2
+									? curr
+									: curr + " and "
+								: curr + ", ")
+						);
 					}, "");
 
-					const yearsText = chartState.selectedYear.length > 1 ? "Selected years: " : "Selected year: ";
+				const yearsText =
+					chartState.selectedYear.length > 1
+						? "Selected years: "
+						: "Selected year: ";
 
-					const regionsText = chartState.selectedRegion !== "All" && chartState.selectedRegion.length === 1 ? "Selected Region" : "Selected Regions";
+				const regionsText =
+					chartState.selectedRegion !== "All" &&
+					chartState.selectedRegion.length === 1
+						? "Selected Region"
+						: "Selected Regions";
 
-					const selectedRegions = chartState.selectedRegion === "All" ? "All" : chartState.selectedRegion.join(", ");
+				const selectedRegions =
+					chartState.selectedRegion === "All"
+						? "All"
+						: chartState.selectedRegion.join(", ");
 
-					pdf.fromHTML("<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						fullDate + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + yearsText + "<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						yearsList + "</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" + regionsText + ": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
-						selectedRegions + "</span></div>", pdfMargins.left, 77, {
-						width: 210 - pdfMargins.left - pdfMargins.right
+				pdf.fromHTML(
+					"<div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>Date: <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						fullDate +
+						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" +
+						yearsText +
+						"<span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						yearsList +
+						"</span></div><div style='margin-bottom: 2px; font-family: Arial, sans-serif; color: rgb(60, 60 60);'>" +
+						regionsText +
+						": <span style='color: rgb(65, 143, 222); font-weight: 700;'>" +
+						selectedRegions +
+						"</span></div>",
+					pdfMargins.left,
+					77,
+					{
+						width: 210 - pdfMargins.left - pdfMargins.right,
 					},
-						function (position) {
-							pdfTextPosition = position;
-						});
+					function (position) {
+						pdfTextPosition = position;
+					}
+				);
 
-					const sourceDimentions = containerDiv.node().getBoundingClientRect();
-					const widthInMilimeters = 210 - pdfMargins.left * 2;
+				const sourceDimentions = containerDiv
+					.node()
+					.getBoundingClientRect();
+				const widthInMilimeters = 210 - pdfMargins.left * 2;
 
-					pdf.addImage(source, "PNG", pdfMargins.left, pdfTextPosition.y + 2, widthInMilimeters, widthInMilimeters * (sourceDimentions.height / sourceDimentions.width));
+				pdf.addImage(
+					source,
+					"PNG",
+					pdfMargins.left,
+					pdfTextPosition.y + 2,
+					widthInMilimeters,
+					widthInMilimeters *
+						(sourceDimentions.height / sourceDimentions.width)
+				);
 
-					const currentDate = new Date();
+				const currentDate = new Date();
 
-					pdf.save("ContributionsFlow_" + csvDateFormat(currentDate) + ".pdf");
+				pdf.save(
+					"ContributionsFlow_" + csvDateFormat(currentDate) + ".pdf"
+				);
 
-					removeProgressWheel();
+				removeProgressWheel();
 
-					d3.select("#pbifdcDownloadingDiv").remove();
+				d3.select("#pbifdcDownloadingDiv").remove();
 
-					function createLetterhead() {
+				function createLetterhead() {
+					const footer =
+						"© OCHA CBPF Section " +
+						currentYear +
+						" | For more information, please visit cbpf.data.unocha.org";
 
-						const footer = "© OCHA CBPF Section " + currentYear + " | For more information, please visit cbpf.data.unocha.org";
+					pdf.setFillColor(65, 143, 222);
+					pdf.rect(0, pdfMargins.top, 210, 15, "F");
 
-						pdf.setFillColor(65, 143, 222);
-						pdf.rect(0, pdfMargins.top, 210, 15, "F");
+					pdf.setFillColor(236, 161, 84);
+					pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
 
-						pdf.setFillColor(236, 161, 84);
-						pdf.rect(0, pdfMargins.top + 15, 210, 2, "F");
+					pdf.setFillColor(255, 255, 255);
+					pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
 
-						pdf.setFillColor(255, 255, 255);
-						pdf.rect(pdfMargins.left, pdfMargins.top - 1, 94, 20, "F");
+					pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
+					pdf.ellipse(
+						pdfMargins.left + 94,
+						pdfMargins.top + 9,
+						5,
+						9,
+						"F"
+					);
 
-						pdf.ellipse(pdfMargins.left, pdfMargins.top + 9, 5, 9, "F");
-						pdf.ellipse(pdfMargins.left + 94, pdfMargins.top + 9, 5, 9, "F");
+					pdf.addImage(
+						logo,
+						"PNG",
+						pdfMargins.left + 2,
+						pdfMargins.top,
+						90,
+						18
+					);
 
-						pdf.addImage(logo, "PNG", pdfMargins.left + 2, pdfMargins.top, 90, 18);
+					pdf.setFillColor(236, 161, 84);
+					pdf.rect(0, 297 - pdfMargins.bottom, 210, 2, "F");
 
-						pdf.setFillColor(236, 161, 84);
-						pdf.rect(0, 297 - pdfMargins.bottom, 210, 2, "F");
-
-						pdf.setTextColor(60);
-						pdf.setFont("arial");
-						pdf.setFontType("normal");
-						pdf.setFontSize(10);
-						pdf.text(footer, pdfMargins.left, 297 - pdfMargins.bottom + 10);
-
-					};
-
-				});
+					pdf.setTextColor(60);
+					pdf.setFont("arial");
+					pdf.setFontType("normal");
+					pdf.setFontSize(10);
+					pdf.text(
+						footer,
+						pdfMargins.left,
+						297 - pdfMargins.bottom + 10
+					);
+				}
+			});
 
 			//end of downloadSnapshotPdf
-		};
+		}
 
 		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
-			const wheelGroup = thissvg.append("g")
+			const wheelGroup = thissvg
+				.append("g")
 				.attr("class", "pbifdcd3chartwheelGroup")
-				.attr("transform", "translate(" + thiswidth / 2 + "," + thisheight / 4 + ")");
+				.attr(
+					"transform",
+					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
+				);
 
-			const loadingText = wheelGroup.append("text")
+			const loadingText = wheelGroup
+				.append("text")
 				.attr("text-anchor", "middle")
 				.style("font-family", "Roboto")
 				.style("font-weight", "bold")
@@ -3865,14 +5373,13 @@
 				.attr("class", "contributionColorFill")
 				.text(thistext);
 
-			const arc = d3.arc()
-				.outerRadius(25)
-				.innerRadius(20);
+			const arc = d3.arc().outerRadius(25).innerRadius(20);
 
-			const wheel = wheelGroup.append("path")
+			const wheel = wheelGroup
+				.append("path")
 				.datum({
 					startAngle: 0,
-					endAngle: 0
+					endAngle: 0,
 				})
 				.classed("contributionColorFill", true)
 				.attr("d", arc);
@@ -3880,50 +5387,51 @@
 			transitionIn();
 
 			function transitionIn() {
-				wheel.transition()
+				wheel
+					.transition()
 					.duration(1000)
 					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
 						return function (t) {
 							d.endAngle = interpolate(t);
-							return arc(d)
-						}
+							return arc(d);
+						};
 					})
-					.on("end", transitionOut)
-			};
+					.on("end", transitionOut);
+			}
 
 			function transitionOut() {
-				wheel.transition()
+				wheel
+					.transition()
 					.duration(1000)
 					.attrTween("d", function (d) {
 						const interpolate = d3.interpolate(0, Math.PI * 2);
 						return function (t) {
 							d.startAngle = interpolate(t);
-							return arc(d)
-						}
+							return arc(d);
+						};
 					})
 					.on("end", function (d) {
 						d.startAngle = 0;
-						transitionIn()
-					})
-			};
+						transitionIn();
+					});
+			}
 
 			//end of createProgressWheel
-		};
+		}
 
 		function removeProgressWheel() {
 			const wheelGroup = d3.select(".pbifdcd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
-		};
+		}
 
 		//end of d3Chart
-	};
+	}
 
 	//force boundaries
 
 	function forceBoundary(x0, y0, x1, y1) {
-
 		var constant = function (x) {
 			return function () {
 				return x;
@@ -3936,11 +5444,13 @@
 			nodes,
 			strengthsX,
 			strengthsY,
-			x0z, x1z,
-			y0z, y1z,
+			x0z,
+			x1z,
+			y0z,
+			y1z,
 			borderz,
-			halfX, halfY;
-
+			halfX,
+			halfY;
 
 		if (typeof x0 !== "function") x0 = constant(x0 == null ? -100 : +x0);
 		if (typeof x1 !== "function") x1 = constant(x1 == null ? 100 : +x1);
@@ -3949,17 +5459,38 @@
 
 		function getVx(halfX, x, strengthX, border, alpha) {
 			// var targetX = x > halfX ? (x0 + border) : (x1 - border);
-			return (halfX - x) * Math.min(2, Math.abs(halfX - x) / halfX) * strengthX * alpha;
+			return (
+				(halfX - x) *
+				Math.min(2, Math.abs(halfX - x) / halfX) *
+				strengthX *
+				alpha
+			);
 		}
 
 		function force(alpha) {
 			for (var i = 0, n = nodes.length, node; i < n; ++i) {
 				node = nodes[i];
 
-				if ((node.x < (x0z[i] + borderz[i]) || node.x > (x1z[i] - borderz[i])) ||
-					(node.y < (y0z[i] + borderz[i]) || node.y > (y1z[i] - borderz[i]))) {
-					node.vx += getVx(halfX[i], node.x, strengthsX[i], borderz[i], alpha);
-					node.vy += getVx(halfY[i], node.y, strengthsY[i], borderz[i], alpha);
+				if (
+					node.x < x0z[i] + borderz[i] ||
+					node.x > x1z[i] - borderz[i] ||
+					node.y < y0z[i] + borderz[i] ||
+					node.y > y1z[i] - borderz[i]
+				) {
+					node.vx += getVx(
+						halfX[i],
+						node.x,
+						strengthsX[i],
+						borderz[i],
+						alpha
+					);
+					node.vy += getVx(
+						halfY[i],
+						node.y,
+						strengthsY[i],
+						borderz[i],
+						alpha
+					);
 				} else {
 					node.vx = 0;
 					node.vy = 0;
@@ -3976,7 +5507,8 @@
 
 		function initialize() {
 			if (!nodes) return;
-			var i, n = nodes.length;
+			var i,
+				n = nodes.length;
 			strengthsX = new Array(n);
 			strengthsY = new Array(n);
 			x0z = new Array(n);
@@ -3988,11 +5520,18 @@
 			borderz = new Array(n);
 
 			for (i = 0; i < n; ++i) {
-				strengthsX[i] = (isNaN(x0z[i] = +x0(nodes[i], i, nodes)) ||
-					isNaN(x1z[i] = +x1(nodes[i], i, nodes))) ? 0 : +strength(nodes[i], i, nodes);
-				strengthsY[i] = (isNaN(y0z[i] = +y0(nodes[i], i, nodes)) ||
-					isNaN(y1z[i] = +y1(nodes[i], i, nodes))) ? 0 : +strength(nodes[i], i, nodes);
-				halfX[i] = x0z[i] + (x1z[i] - x0z[i]) / 2, halfY[i] = y0z[i] + (y1z[i] - y0z[i]) / 2;
+				strengthsX[i] =
+					isNaN((x0z[i] = +x0(nodes[i], i, nodes))) ||
+					isNaN((x1z[i] = +x1(nodes[i], i, nodes)))
+						? 0
+						: +strength(nodes[i], i, nodes);
+				strengthsY[i] =
+					isNaN((y0z[i] = +y0(nodes[i], i, nodes))) ||
+					isNaN((y1z[i] = +y1(nodes[i], i, nodes)))
+						? 0
+						: +strength(nodes[i], i, nodes);
+				(halfX[i] = x0z[i] + (x1z[i] - x0z[i]) / 2),
+					(halfY[i] = y0z[i] + (y1z[i] - y0z[i]) / 2);
 				borderz[i] = +border(nodes[i], i, nodes);
 			}
 		}
@@ -4003,35 +5542,61 @@
 		};
 
 		force.x0 = function (_) {
-			return arguments.length ? (x0 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : x0;
+			return arguments.length
+				? ((x0 = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: x0;
 		};
 
 		force.x1 = function (_) {
-			return arguments.length ? (x1 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : x1;
+			return arguments.length
+				? ((x1 = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: x1;
 		};
 
 		force.y0 = function (_) {
-			return arguments.length ? (y0 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : y0;
+			return arguments.length
+				? ((y0 = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: y0;
 		};
 
 		force.y1 = function (_) {
-			return arguments.length ? (y1 = typeof _ === "function" ? _ : constant(+_), initialize(), force) : y1;
+			return arguments.length
+				? ((y1 = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: y1;
 		};
 
 		force.strength = function (_) {
-			return arguments.length ? (strength = typeof _ === "function" ? _ : constant(+_), initialize(), force) : strength;
+			return arguments.length
+				? ((strength = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: strength;
 		};
 
 		force.border = function (_) {
-			return arguments.length ? (border = typeof _ === "function" ? _ : constant(+_), initialize(), force) : border;
+			return arguments.length
+				? ((border = typeof _ === "function" ? _ : constant(+_)),
+				  initialize(),
+				  force)
+				: border;
 		};
 
 		force.hardBoundary = function (_) {
-			return arguments.length ? (hardBoundary = _, force) : hardBoundary;
+			return arguments.length
+				? ((hardBoundary = _), force)
+				: hardBoundary;
 		};
 
 		return force;
-	};
+	}
 
 	//end of d3ChartIIFE
-}());
+})();
