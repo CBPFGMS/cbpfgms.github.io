@@ -2295,6 +2295,16 @@
 					.select(".pbialpCbpfStandardIndicator")
 					.transition()
 					.duration(duration)
+					.style("opacity", function (d) {
+						const thisUnderApproval =
+							chartState.selectedPartner === "total"
+								? d.underApproval
+								: d[
+										"underApproval-" +
+											chartState.selectedPartner
+								  ];
+						return thisUnderApproval === 0 ? 0 : 1;
+					})
 					.attr("transform", function (d) {
 						const thisUnderApproval =
 							chartState.selectedPartner === "total"
@@ -2347,27 +2357,37 @@
 							reverseFormat(node.textContent) || 0,
 							d[chartState.selectedPartner]
 						);
-						return function (t) {
-							d3.select(node)
-								.text(formatNumberSI(i(t)).replace("G", "B"))
-								.append("tspan")
-								.attr("class", "pbialpCbpfLabelPercentage")
-								.attr("dy", "-0.5px")
-								.text(" (")
-								.append("tspan")
-								.style("fill", underApprovalColor)
-								.text(
-									d3
-										.formatPrefix(
-											".0",
-											thisUnderApproval
-										)(thisUnderApproval)
-										.replace("G", "B")
-								)
-								.append("tspan")
-								.style("fill", "#aaa")
-								.text(")");
-						};
+						if (thisUnderApproval === 0) {
+							return function (t) {
+								d3.select(node).text(
+									formatNumberSI(i(t)).replace("G", "B")
+								);
+							};
+						} else {
+							return function (t) {
+								d3.select(node)
+									.text(
+										formatNumberSI(i(t)).replace("G", "B")
+									)
+									.append("tspan")
+									.attr("class", "pbialpCbpfLabelPercentage")
+									.attr("dy", "-0.5px")
+									.text(" (")
+									.append("tspan")
+									.style("fill", underApprovalColor)
+									.text(
+										d3
+											.formatPrefix(
+												".0",
+												thisUnderApproval
+											)(thisUnderApproval)
+											.replace("G", "B")
+									)
+									.append("tspan")
+									.style("fill", "#aaa")
+									.text(")");
+							};
+						}
 					});
 
 				const cbpfTooltipRectangle = cbpfGroup.select(
