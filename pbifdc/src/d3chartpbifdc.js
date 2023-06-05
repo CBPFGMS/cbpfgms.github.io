@@ -1145,7 +1145,13 @@
 
 				donorsNumber = donors.length;
 
-				cbpfsNumber = data.length - donors.length;
+				const cbpfsNumber = data.filter(function (d) {
+					return d.category === "CBPF" && !d.name.includes("RhPF");
+				}).length;
+
+				const rhpfsNumber = data.filter(function (d) {
+					return d.category === "CBPF" && d.name.includes("RhPF");
+				}).length;
 
 				contributionType.forEach(function (d) {
 					contributionsTotals[d] = d3.sum(donors, function (e) {
@@ -1189,6 +1195,11 @@
 				const previousCbpfs =
 					d3.select(".pbifdctopPanelCbpfsNumber").size() !== 0
 						? d3.select(".pbifdctopPanelCbpfsNumber").datum()
+						: 0;
+
+				const previousRhpfs =
+					d3.select(".pbifdctopPanelRhpfsNumber").size() !== 0
+						? d3.select(".pbifdctopPanelRhpfsNumber").datum()
 						: 0;
 
 				let mainValueGroup = topPanel.main
@@ -1365,7 +1376,9 @@
 
 				let topPanelCbpfsNumber = mainValueGroup
 					.selectAll(".pbifdctopPanelCbpfsNumber")
-					.data([cbpfsNumber]);
+					.data(cbpfsNumber ? [cbpfsNumber] : []);
+
+				topPanelCbpfsNumber.exit().remove();
 
 				topPanelCbpfsNumber = topPanelCbpfsNumber
 					.enter()
@@ -1381,8 +1394,14 @@
 							topPanel.leftPadding[2] -
 							topPanel.mainValueHorPadding
 					)
-					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-					.merge(topPanelCbpfsNumber);
+					.merge(topPanelCbpfsNumber)
+					.style("font-size", rhpfsNumber ? "22px" : "48px")
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(rhpfsNumber ? 2.7 : 1)
+					);
 
 				topPanelCbpfsNumber
 					.transition()
@@ -1395,22 +1414,95 @@
 						};
 					});
 
-				const topPanelCbpfsText = mainValueGroup
+				let topPanelCbpfsText = mainValueGroup
 					.selectAll(".pbifdctopPanelCbpfsText")
-					.data([true])
+					.data(cbpfsNumber ? [cbpfsNumber] : []);
+
+				topPanelCbpfsText.exit().remove();
+
+				topPanelCbpfsText = topPanelCbpfsText
 					.enter()
 					.append("text")
 					.attr("class", "pbifdctopPanelCbpfsText")
-					.attr(
-						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.9
-					)
 					.attr("text-anchor", "start")
-					.text("CBPFs")
 					.attr(
 						"x",
 						topPanel.moneyBagPadding + topPanel.leftPadding[2]
+					)
+					.merge(topPanelCbpfsText)
+					.style("font-size", rhpfsNumber ? "14px" : "16px")
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(rhpfsNumber ? 2.85 : 1.9)
+					)
+					.text(cbpfsNumber > 1 ? "CBPFs" : "CBPF");
+
+				let topPanelRhpfsNumber = mainValueGroup
+					.selectAll(".pbifdctopPanelRhpfsNumber")
+					.data(rhpfsNumber ? [rhpfsNumber] : []);
+
+				topPanelRhpfsNumber.exit().remove();
+
+				topPanelRhpfsNumber = topPanelRhpfsNumber
+					.enter()
+					.append("text")
+					.attr(
+						"class",
+						"pbifdctopPanelRhpfsNumber allocationColorFill"
+					)
+					.attr("text-anchor", "end")
+					.attr(
+						"x",
+						topPanel.moneyBagPadding +
+							topPanel.leftPadding[2] -
+							topPanel.mainValueHorPadding
+					)
+					.merge(topPanelRhpfsNumber)
+					.style("font-size", cbpfsNumber ? "22px" : "48px")
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(cbpfsNumber ? 0.8 : 1)
 					);
+
+				topPanelRhpfsNumber
+					.transition()
+					.duration(duration)
+					.tween("text", function (d) {
+						const node = this;
+						const i = d3.interpolate(previousRhpfs, d);
+						return function (t) {
+							node.textContent = ~~i(t);
+						};
+					});
+
+				let topPanelRhpfsText = mainValueGroup
+					.selectAll(".pbifdctopPanelRhpfsText")
+					.data(rhpfsNumber ? [rhpfsNumber] : []);
+
+				topPanelRhpfsText.exit().remove();
+
+				topPanelRhpfsText = topPanelRhpfsText
+					.enter()
+					.append("text")
+					.attr("class", "pbifdctopPanelRhpfsText")
+					.attr("text-anchor", "start")
+					.attr(
+						"x",
+						topPanel.moneyBagPadding + topPanel.leftPadding[2]
+					)
+					.merge(topPanelRhpfsText)
+					.style("font-size", cbpfsNumber ? "14px" : "16px")
+					.attr(
+						"y",
+						topPanel.height -
+							topPanel.mainValueVerPadding *
+								(cbpfsNumber ? 1 : 1.9)
+					)
+					.text(rhpfsNumber > 1 ? "Regional funds" : "Regional fund");
 
 				const overRectangle = topPanel.main
 					.selectAll(".pbifdctopPanelOverRectangle")
