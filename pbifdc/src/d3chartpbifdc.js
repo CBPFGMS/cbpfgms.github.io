@@ -2144,7 +2144,7 @@
 											d.isoCode.toLowerCase()
 										].x;
 									} else {
-										return centroids.CH.x;
+										return centroids.ch.x;
 									}
 								})
 								.strength(1)
@@ -2162,7 +2162,7 @@
 											d.isoCode.toLowerCase()
 										].y;
 									} else {
-										return centroids.CH.y;
+										return centroids.ch.y;
 									}
 								})
 								.strength(1)
