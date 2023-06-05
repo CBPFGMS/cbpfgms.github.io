@@ -2110,8 +2110,6 @@
 				//end of createButtonsPanel
 			}
 
-			console.log(centroids)
-
 			function createNodesPanel(dataNodes, dataLinks) {
 				let currentTransform;
 
@@ -2138,8 +2136,6 @@
 							"x",
 							d3
 								.forceX(function (d) {
-									console.log(d);
-									console.log(centroids[d.isoCode]);
 									if (
 										centroids[d.isoCode] &&
 										centroids[d.isoCode].x ===
