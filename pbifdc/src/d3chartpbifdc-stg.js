@@ -1110,20 +1110,20 @@
 
 			function createMap(dataMap) {
 				dataMap.features.forEach(function (d) {
-					centroids[d.properties.iso_a2] = {
+					centroids[d.properties.iso_a2.toLowerCase()] = {
 						x: mapPath.centroid(d.geometry)[0],
 						y: mapPath.centroid(d.geometry)[1],
 					};
 				});
 
-				centroids.US.x += 60;
-				centroids.US.y += 40;
-				centroids.CA.x -= 20;
-				centroids.CA.y += 40;
-				centroids.NO.y += 40;
-				centroids.FR.x += 9;
-				centroids.FR.y -= 9;
-				centroids.XX = centroids.TR;
+				centroids.us.x += 60;
+				centroids.us.y += 40;
+				centroids.ca.x -= 20;
+				centroids.ca.y += 40;
+				centroids.no.y += 40;
+				centroids.fr.x += 9;
+				centroids.fr.y -= 9;
+				centroids.xx = centroids.tr;
 
 				const map = mapContainer
 					.append("path")
@@ -2137,11 +2137,13 @@
 							d3
 								.forceX(function (d) {
 									if (
-										centroids[d.isoCode] &&
-										centroids[d.isoCode].x ===
-											centroids[d.isoCode].x
+										centroids[d.isoCode.toLowerCase()] &&
+										centroids[d.isoCode.toLowerCase()].x ===
+											centroids[d.isoCode.toLowerCase()].x
 									) {
-										return centroids[d.isoCode].x;
+										return centroids[
+											d.isoCode.toLowerCase()
+										].x;
 									} else {
 										return centroids.CH.x;
 									}
@@ -2153,11 +2155,13 @@
 							d3
 								.forceY(function (d) {
 									if (
-										centroids[d.isoCode] &&
-										centroids[d.isoCode].y ===
-											centroids[d.isoCode].y
+										centroids[d.isoCode.toLowerCase()] &&
+										centroids[d.isoCode.toLowerCase()].y ===
+											centroids[d.isoCode.toLowerCase()].y
 									) {
-										return centroids[d.isoCode].y;
+										return centroids[
+											d.isoCode.toLowerCase()
+										].y;
 									} else {
 										return centroids.CH.y;
 									}
