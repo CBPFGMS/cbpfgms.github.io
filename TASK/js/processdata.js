@@ -38,16 +38,21 @@ function processData(rawData) {
 				}
 				data.currentSequence.push(link.NextStatusId);
 			}
-			//only push if source and target are not the same
-			data.links.push({
-				source: node.StatusId,
-				target: link.NextStatusId,
-				text: "",
-				type: link.LinkType,
-				id: ++counterLink,
-				isCompleted: link.IsCompleted,
-				tasks: link.Tasks,
+			link.Tasks = link.Tasks.filter(e => {
+				const userCode = e.Roles[0].UserRoleCode;
+				return !userRolesToIgnore.includes(userCode);
 			});
+			if (node.StatusId !== link.NextStatusId && link.Tasks.length > 0) {
+				data.links.push({
+					source: node.StatusId,
+					target: link.NextStatusId,
+					text: "",
+					type: link.LinkType,
+					id: ++counterLink,
+					isCompleted: link.IsCompleted,
+					tasks: link.Tasks,
+				});
+			}
 		});
 	});
 

@@ -6,7 +6,7 @@ const { classPrefix, lineGenerator, labelCircleRadius } = constants;
 
 //create label collision detection based on the length along the path, increasing or decreasing it.
 
-function drawLinks({ dataLinks, svg }) {
+function drawLinks({ dataLinks, svg, currentSequence }) {
 	const defs = svg.append("defs");
 
 	Object.keys(stylesList.links.paths).forEach(type => {
@@ -42,7 +42,12 @@ function drawLinks({ dataLinks, svg }) {
 		.append("path")
 		.attr("class", classPrefix + "links")
 		.attr("d", d => lineGenerator(d.waypoints))
-		.attr("marker-end", d => `url(#arrow${d.data.type})`);
+		.attr("marker-end", d =>
+			currentSequence.includes(d.data.source) &&
+			currentSequence.includes(d.data.target)
+				? "url(#arrowprevious)"
+				: `url(#arrow${d.data.type})`
+		);
 
 	const labelsGroup = svg
 		.selectAll(null)

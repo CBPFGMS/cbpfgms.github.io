@@ -1,3 +1,7 @@
+import { constants } from "./constants.js";
+
+const { previousStepsColor } = constants;
+
 const stylesList = {
 	nodes: {
 		rects: {
@@ -77,6 +81,11 @@ const stylesList = {
 			indirect: {
 				"stroke-dasharray": "4 4",
 				stroke: "#888",
+				"stroke-width": 1,
+			},
+			previous: {
+				"stroke-dasharray": null,
+				stroke: previousStepsColor,
 				"stroke-width": 1,
 			},
 		},

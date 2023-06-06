@@ -19,8 +19,8 @@ const {
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
 const flowChartDivContainer = chartContainer
-	.append("div")
-	.attr("class", classPrefix + "flowChartDivContainer"),
+		.append("div")
+		.attr("class", classPrefix + "flowChartDivContainer"),
 	sideDiv = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "sideDiv"),
@@ -87,7 +87,11 @@ function createFlowChart(rawData) {
 
 	svg.attr("height", variables.height);
 
-	const { linksGroup, labelsGroup } = drawLinks({ dataLinks, svg });
+	const { linksGroup, labelsGroup } = drawLinks({
+		dataLinks,
+		svg,
+		currentSequence,
+	});
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
