@@ -15,7 +15,6 @@ function showStatus({
 	linksGroup,
 	labelsGroup,
 	currentStatus,
-	dataLinks,
 	currentStatusValueSpan,
 	currentSequence,
 }) {
@@ -30,11 +29,6 @@ function showStatus({
 
 	// const { previousNodes, previousLinks } = populatePreviousNodesAndLinks(dataLinks, currentStatus);
 
-	const currentLinks = dataLinks.reduce((acc, curr) => {
-		if (curr.data.isCompleted) acc.push(curr.data.id);
-		return acc;
-	}, []);
-
 	nodesGroup
 		.filter(
 			d => d.data.type !== "start" && currentSequence.includes(d.data.id)
@@ -43,7 +37,7 @@ function showStatus({
 		.style("fill", previousStepsColorWithOpacity);
 
 	linksGroup
-		.filter(d => currentLinks.includes(d.data.id))
+		.filter(d => d.data.isCompleted)
 		.select(`.${classPrefix}links`)
 		.style("stroke-width", previousStepsStroke)
 		.style("stroke", previousStepsColor);
@@ -53,21 +47,20 @@ function showStatus({
 		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
 	linksGroup
-		.filter(d => !currentLinks.includes(d.data.id))
+		.filter(d => !d.data.isCompleted)
 		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
 	labelsText
-		.filter(d => !currentLinks.includes(d.data.id))
+		.filter(d => !d.data.isCompleted)
 		.style("opacity", d => (d.setOpacity = nextStepsOpacity));
 
 	labelsCircle
-		.filter(d => !currentLinks.includes(d.data.id))
+		.filter(d => !d.data.isCompleted)
 		.style("stroke-opacity", d => (d.setOpacity = nextStepsOpacity));
 
 	currentStatusNode.select("rect").style("fill", currentStatusFillColor);
 	currentStatusNode.select("text").style("fill", currentStatusTextFillColor);
 
-	return currentLinks;
 }
 
 export { showStatus };

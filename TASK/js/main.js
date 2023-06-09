@@ -101,12 +101,11 @@ function createFlowChart(rawData) {
 		.style("text-underline-offset", "0.3em")
 		.style("text-decoration-color", currentStatusFillColor);
 
-	const currentLinks = showStatus({
+	showStatus({
 		nodesGroup,
 		linksGroup,
 		labelsGroup,
 		currentStatus,
-		dataLinks,
 		currentStatusValueSpan,
 		currentSequence,
 	});
@@ -114,7 +113,6 @@ function createFlowChart(rawData) {
 	const linksList = drawLinksList({
 		dataLinksOriginal,
 		sideDivContainer,
-		currentLinks,
 	});
 
 	highlight({

@@ -1,23 +1,16 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import { stylesList } from "./styleslist.js";
-import { constants, variables } from "./constants.js";
+import { constants } from "./constants.js";
 
-const {
-	classPrefix,
-	nodesTextSpacing,
-	stepsColorOpacity,
-	previousStepsColor,
-	nextStepsColor,
-} = constants;
+const { classPrefix, stepsColorOpacity, previousStepsColor, nextStepsColor } =
+	constants;
 
-function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
+function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 	const dataList = dataLinksOriginal
-		.map(({ id, text, source, target }) => ({ id, text, source, target }))
-		.sort((a, b) => a.id - b.id)
-		.filter(({ text }) => text);
+		.filter(({ text }) => text)
+		.sort((a, b) => a.id - b.id);
 
-	const dataListPrevious = dataList.filter(d => currentLinks.includes(d.id)),
-		dataListNext = dataList.filter(d => !currentLinks.includes(d.id));
+	const dataListPrevious = dataList.filter(d => d.isCompleted),
+		dataListNext = dataList.filter(d => !d.isCompleted);
 
 	const stages = sideDivContainer
 		.selectAll(null)
@@ -38,23 +31,33 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 		.attr("class", classPrefix + "stageText")
 		.html((_, i) => (i ? "Other steps" : "Steps already completed"));
 
-	// const stages = sideDivContainer.selectAll(null)
-	// 	.data(d3.range(3))
-	// 	.enter()
-	// 	.append("div")
-	// 	.style("color", d => colors[d])
-	// 	.attr("class", classPrefix + "stageDiv");
-
 	stages.each((d, i, n) => {
-		const listRows = d3
+		const listRowsContainer = d3
 			.select(n[i])
 			.selectAll(null)
 			.data(d)
 			.enter()
 			.append("div")
+			.attr("class", classPrefix + "listRowsContainer")
+			.each(d => (d.clicked = false));
+
+		const listRows = listRowsContainer
+			.append("div")
 			.attr("class", classPrefix + "listRows");
 
-		const rowNumber = listRows
+		const tasks = listRowsContainer
+			.selectAll(null)
+			.data(d => d.tasks)
+			.enter()
+			.append("div")
+			.attr("class", classPrefix + "listRowsTasks");
+
+		tasks
+			.append("div")
+			.attr("class", classPrefix + "listRowsTasksDivs")
+			.html(d => d.ButtonText);
+
+		listRows
 			.append("div")
 			.attr("class", classPrefix + "listRowsNumber")
 			.style("background-color", () => {
@@ -66,24 +69,26 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer, currentLinks }) {
 			.append("span")
 			.html(d => d.id);
 
-		const rowText = listRows
+		listRows
 			.append("div")
 			.attr("class", classPrefix + "listRowsText")
 			.html(d => d.text);
-	});
 
-	const rows = sideDivContainer.selectAll(`.${classPrefix}listRows`);
+		listRows
+			.append("div")
+			.attr("class", classPrefix + "listRowsArrow")
+			.append("i")
+			.attr("class", "fas fa-angle-down");
 
-	return rows;
-}
-
-function applyStyles(selection, styles) {
-	selection.each((d, i, n) => {
-		const thisSelection = d3.select(n[i]);
-		Object.entries(styles[d.data.type]).forEach(([key, value]) => {
-			thisSelection.style(key, value);
+		listRowsContainer.on("click", (event, d) => {
+			d.clicked = !d.clicked;
+			d3.select(event.currentTarget).classed("active", d.clicked);
 		});
 	});
+
+	const rows = sideDivContainer.selectAll(`.${classPrefix}listRowsContainer`);
+
+	return rows;
 }
 
 export { drawLinksList };
