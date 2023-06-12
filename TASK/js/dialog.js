@@ -57,7 +57,7 @@ function createDialog(projectLog, listRowsContainer) {
 		emailLogsContainer
 			.append("div")
 			.attr("class", classPrefix + "dialogFieldLabel")
-			.html("Email logs:");
+			.html("Email logs: ");
 
 		emailLogsContainer
 			.append("div")
