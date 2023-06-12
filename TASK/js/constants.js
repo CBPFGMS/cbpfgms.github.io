@@ -4,6 +4,13 @@ const constants = {
 	classPrefix: "task",
 	userRolesToIgnore: ["GMSAdmin"],
 	chartContainer: d3.select("#chartContainer"),
+	get dialogContainer() {
+		return d3.select("#dialogContainer").size()
+			? d3.select("#dialogContainer")
+			: this.chartContainer
+					.append("dialog")
+					.attr("id", "dialogContainer");
+	},
 	maxNodeCharactersNumber: 200,
 	maxLinkCharacterNumber: 200,
 	rowHeight: 100,

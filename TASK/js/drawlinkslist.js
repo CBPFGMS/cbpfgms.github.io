@@ -1,8 +1,16 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
+import { createDialog } from "./dialog.js";
 
-const { classPrefix, stepsColorOpacity, previousStepsColor, nextStepsColor } =
-	constants;
+const {
+	classPrefix,
+	stepsColorOpacity,
+	previousStepsColor,
+	nextStepsColor,
+	dialogContainer,
+} = constants;
+
+const localVariable = d3.local();
 
 function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 	const dataList = dataLinksOriginal
@@ -50,7 +58,16 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			.data(d => d.tasks)
 			.enter()
 			.append("div")
-			.attr("class", classPrefix + "listRowsTasks");
+			.attr("class", classPrefix + "listRowsTasks")
+			.style("cursor", (d, i, n) => {
+				const parentDatum = d3.select(n[i].parentNode).datum();
+				localVariable.set(n[i], parentDatum);
+				const foundRole = parentDatum.projectLogs.some(
+					({ UserRoleCode }) =>
+						UserRoleCode === d.Roles[0].UserRoleCode
+				);
+				return foundRole ? "pointer" : "default";
+			});
 
 		tasks
 			.append("div")
@@ -83,6 +100,20 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 		listRowsContainer.on("click", (event, d) => {
 			d.clicked = !d.clicked;
 			d3.select(event.currentTarget).classed("active", d.clicked);
+		});
+
+		tasks.on("click", (event, d) => {
+			event.stopPropagation();
+			const parentDatum = localVariable.get(event.currentTarget);
+			const projectLog = parentDatum.projectLogs.find(
+				({ UserRoleCode }) => UserRoleCode === d.Roles[0].UserRoleCode
+			);
+			if (projectLog)
+				createDialog(
+					projectLog,
+					d3.select(event.currentTarget.parentNode)
+				);
+			dialogContainer.node().showModal();
 		});
 	});
 

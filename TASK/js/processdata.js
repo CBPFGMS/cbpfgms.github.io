@@ -2,7 +2,7 @@ import { constants } from "./constants.js";
 
 const { userRolesToIgnore } = constants;
 
-function processData(rawData) {
+function processData(rawData, projectsData) {
 	const data = {
 		nodes: [],
 		links: [],
@@ -50,6 +50,11 @@ function processData(rawData) {
 					isCompleted: link.IsCompleted,
 					tasks: link.Tasks,
 					text: link.Tasks[0].TaskName, //This should be changed to filter the task name accordingly
+					projectLogs: projectsData.TrackingLogs.filter(
+						e =>
+							e.CurrentStatusId === node.StatusId &&
+							e.NextStatusId === link.NextStatusId
+					),
 					show: true,
 				});
 			}

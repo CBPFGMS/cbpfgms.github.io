@@ -149,6 +149,7 @@ details[open] summary {
 	background-color: white;
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
 	box-sizing: border-box;
+	cursor: pointer;
 }
 
 .tasklistRowsNumber {
@@ -200,4 +201,74 @@ details[open] summary {
 	text-anchor: middle;
 	font-size: 12px;
 	font-family: "Arial", sans-serif;
+}
+
+dialog {
+	border-radius: 8px;
+	background-color: white;
+	border: 1px solid #ddd;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	padding: 0px;
+	font-family: "Arial", sans-serif;
+}
+
+.taskdialogBody {
+	display: flex;
+	flex-direction: column;
+	padding: 1em;
+}
+
+.taskdialogFieldContainer {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 0.5em;
+}
+
+.taskdialogFieldLabel {
+	font-size: 13px;
+	color: #666;
+	white-space: pre;
+}
+
+.taskdialogFieldValue {
+	font-size: 14px;
+	color: #222;
+	font-weight: 500;
+}
+
+.taskdialogCloseButton {
+	align-self: center;
+	background-color: #5392cb;
+	color: white;
+	border-radius: 4px;
+	border: none;
+	padding: 0.5em;
+	margin-top: 1em;
+	font-size: 14px;
+}
+
+.taskdialogCloseButton:focus {
+	outline: none;
+}
+
+.taskdialogTitle {
+	background-color: #5392cb;
+	color: white;
+	height: 2.5em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	white-space: pre-wrap;
+	padding: 1em;
+}
+
+.taskdialogTitleProjectLog {
+	font-size: 16px;
+	font-weight: 300;
+}
+
+.taskdialogTitleProjectName {
+	font-size: 16px;
+	font-weight: bold;
 }

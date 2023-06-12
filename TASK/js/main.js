@@ -1,4 +1,3 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { flowNodesGenerator } from "./flownodesgenerator.js";
 import { flowLinksGenerator } from "./flowlinksgenerator.js";
 import { constants, variables } from "./constants.js";
@@ -8,6 +7,7 @@ import { drawLinksList } from "./drawlinkslist.js";
 import { highlight } from "./highlight.js";
 import { showStatus } from "./showstatus.js";
 import { processData } from "./processdata.js";
+import { fetchFile } from "./fetchfile.js";
 
 const {
 	classPrefix,
@@ -17,6 +17,9 @@ const {
 } = constants;
 
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
+
+const dataUrl = "./data/master.json",
+	projectsUrl = "./data/project.json";
 
 const flowChartDivContainer = chartContainer
 		.append("div")
@@ -59,10 +62,13 @@ const { width } = flowChartDivSize;
 
 const svg = flowChartDiv.append("svg").attr("width", width);
 
-d3.json("./data/master.json").then(createFlowChart);
+Promise.all([
+	fetchFile("masterData", dataUrl, "json"),
+	fetchFile("projectsData", projectsUrl, "json"),
+]).then(createFlowChart);
 
-function createFlowChart(rawData) {
-	const data = processData(rawData);
+function createFlowChart([rawData, projectsData]) {
+	const data = processData(rawData, projectsData);
 
 	const {
 		nodes: dataNodesOriginal,
