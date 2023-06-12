@@ -174,6 +174,7 @@
 			panelHorizontalPadding = 6,
 			panelVerticalPadding = 12,
 			buttonsPanelHeight = 36,
+			fundsNumberPanelHeight = buttonsPanelHeight,
 			topSummaryPanelHeight = 80,
 			stackedBarPanelHeight = 94,
 			donutsPanelHeight = 58,
@@ -203,6 +204,7 @@
 				"hrpfunding",
 				"hrprequirements",
 			],
+			fundsNumberRightPadding = [82, 260],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
 			legendRectangleSize = 16,
@@ -403,13 +405,33 @@
 					"transform",
 					"translate(" + padding[3] + "," + padding[0] + ")"
 				),
-			width: width - padding[1] - padding[3],
+			width: (width - padding[1] - padding[3]) / 2,
 			height: buttonsPanelHeight,
 			padding: [0, 0, 6, 0],
 			buttonWidth: 54,
 			buttonPadding: 4,
 			buttonVerticalPadding: 4,
 			arrowPadding: 18,
+		};
+
+		const fundsNumberPanel = {
+			main: svg
+				.append("g")
+				.attr("class", "pbihrpfundsNumberPanel")
+				.attr(
+					"transform",
+					"translate(" +
+						(padding[3] +
+							buttonsPanel.width +
+							buttonsPanel.arrowPadding) +
+						"," +
+						padding[0] +
+						")"
+				),
+			width: width - padding[1] - padding[3] - buttonsPanel.width,
+			height: fundsNumberPanelHeight,
+			padding: [0, 0, 0, 0],
+			textPadding: 4,
 		};
 
 		const topSummaryPanel = {
@@ -797,6 +819,8 @@
 			createButtonsPanel(yearsArray, completeData);
 
 			createTopSummaryPanel(data.totalData, data.hrpYear);
+
+			createTotalNumbers(data);
 
 			createStackedBarPanel(data.totalData);
 
@@ -1449,6 +1473,8 @@
 					resizeSVGHeight(data);
 
 					createTopSummaryPanel(data.totalData, data.hrpYear);
+
+					createTotalNumbers(data);
 
 					createStackedBarPanel(data.totalData);
 
@@ -2262,6 +2288,146 @@
 			}
 
 			//end of createTopSummaryPanel
+		}
+
+		function createTotalNumbers(data) {
+			const cbpfHrpNumber = data.hrpData.filter(
+					e => !e.cbpfName.includes("RhPF")
+				).length,
+				cbpfNonHrpNumber = data.nonHrpData.filter(
+					e => !e.cbpfName.includes("RhPF")
+				).length,
+				cbpfTotalNumber = cbpfHrpNumber + cbpfNonHrpNumber;
+
+			const rhpfHrpNumber = data.hrpData.filter(e =>
+					e.cbpfName.includes("RhPF")
+				).length,
+				rhpfNonHrpNumber = data.nonHrpData.filter(e =>
+					e.cbpfName.includes("RhPF")
+				).length,
+				rhpfTotalNumber = rhpfHrpNumber + rhpfNonHrpNumber;
+
+			const previousCbpfs =
+				d3.select(".pbihrptopValuesCbpfsNumber").size() !== 0
+					? d3.select(".pbihrptopValuesCbpfsNumber").datum()
+					: 0;
+
+			const previousRhpfs =
+				d3.select(".pbihrptopValuesRhpfsNumber").size() !== 0
+					? d3.select(".pbihrptopValuesRhpfsNumber").datum()
+					: 0;
+
+			let topPanelCbpfsNumber = fundsNumberPanel.main
+				.selectAll(".pbihrptopValuesCbpfsNumber")
+				.data(cbpfTotalNumber ? [cbpfTotalNumber] : []);
+
+			topPanelCbpfsNumber.exit().remove();
+
+			topPanelCbpfsNumber = topPanelCbpfsNumber
+				.enter()
+				.append("text")
+				.attr(
+					"class",
+					"pbihrptopValuesCbpfsNumber contributionColorFill"
+				)
+				.attr("y", padding[0] + buttonsPanel.height / 2)
+				.attr(
+					"x",
+					fundsNumberPanel.width -
+						fundsNumberRightPadding[0] -
+						fundsNumberPanel.textPadding
+				)
+				.merge(topPanelCbpfsNumber);
+
+			topPanelCbpfsNumber
+				.transition()
+				.duration(duration)
+				.tween("text", function (d) {
+					const node = this;
+					const i = d3.interpolate(previousCbpfs, d);
+					return function (t) {
+						node.textContent = ~~i(t);
+					};
+				});
+
+			let topPanelCbpfsText = fundsNumberPanel.main
+				.selectAll(".pbihrptopValuesCbpfsText")
+				.data(cbpfTotalNumber ? [cbpfTotalNumber] : []);
+
+			topPanelCbpfsText.exit().remove();
+
+			topPanelCbpfsText = topPanelCbpfsText
+				.enter()
+				.append("text")
+				.attr("class", "pbihrptopValuesCbpfsText")
+				.attr("y", padding[0] + buttonsPanel.height / 2)
+				.attr(
+					"x",
+					fundsNumberPanel.width -
+						fundsNumberRightPadding[0] +
+						fundsNumberPanel.textPadding
+				)
+				.merge(topPanelCbpfsText)
+				.text(function (d) {
+					return d > 1 ? "CBPFs" : "CBPF";
+				});
+
+			let topPanelRhpfsNumber = fundsNumberPanel.main
+				.selectAll(".pbihrptopValuesRhpfsNumber")
+				.data(rhpfTotalNumber ? [rhpfTotalNumber] : []);
+
+			topPanelRhpfsNumber.exit().remove();
+
+			topPanelRhpfsNumber = topPanelRhpfsNumber
+				.enter()
+				.append("text")
+				.attr(
+					"class",
+					"pbihrptopValuesRhpfsNumber contributionColorFill"
+				)
+				.attr("y", padding[0] + buttonsPanel.height / 2)
+				.attr(
+					"x",
+					fundsNumberPanel.width -
+						fundsNumberRightPadding[1] -
+						fundsNumberPanel.textPadding
+				)
+				.merge(topPanelRhpfsNumber);
+
+			topPanelRhpfsNumber
+				.transition()
+				.duration(duration)
+				.tween("text", function (d) {
+					const node = this;
+					const i = d3.interpolate(previousRhpfs, d);
+					return function (t) {
+						node.textContent = ~~i(t);
+					};
+				});
+
+			let topPanelRhpfsText = fundsNumberPanel.main
+				.selectAll(".pbihrptopValuesRhpfsText")
+				.data(rhpfTotalNumber ? [rhpfTotalNumber] : []);
+
+			topPanelRhpfsText.exit().remove();
+
+			topPanelRhpfsText = topPanelRhpfsText
+				.enter()
+				.append("text")
+				.attr("class", "pbihrptopValuesRhpfsText")
+				.attr("y", padding[0] + buttonsPanel.height / 2)
+				.attr(
+					"x",
+					fundsNumberPanel.width -
+						fundsNumberRightPadding[1] +
+						fundsNumberPanel.textPadding
+				)
+				.merge(topPanelRhpfsText)
+				.text(function (d) {
+					return d > 1 ? "Regional funds" : "Regional fund";
+				});
+
+			//end of createTotalNumbers
 		}
 
 		function createStackedBarPanel(data) {
