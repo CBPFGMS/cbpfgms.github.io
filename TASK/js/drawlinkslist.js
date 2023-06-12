@@ -98,8 +98,10 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			.attr("class", "fas fa-angle-down");
 
 		listRowsContainer.on("click", (event, d) => {
-			d.clicked = !d.clicked;
-			d3.select(event.currentTarget).classed("active", d.clicked);
+			const thisClicked = !d.clicked;
+			listRowsContainer.each(d => (d.clicked = false));
+			d.clicked = thisClicked;
+			listRowsContainer.classed("active", e => e.clicked);
 		});
 
 		tasks.on("click", (event, d) => {
@@ -108,12 +110,13 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			const projectLog = parentDatum.projectLogs.find(
 				({ UserRoleCode }) => UserRoleCode === d.Roles[0].UserRoleCode
 			);
-			if (projectLog)
+			if (projectLog) {
 				createDialog(
 					projectLog,
 					d3.select(event.currentTarget.parentNode)
 				);
-			dialogContainer.node().showModal();
+				dialogContainer.node().showModal();
+			}
 		});
 	});
 
