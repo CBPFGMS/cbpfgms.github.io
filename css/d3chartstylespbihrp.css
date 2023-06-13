@@ -279,3 +279,19 @@ p#pbihrpd3chartTitle {
 	background-color: #1F69B3;
 	color: white;
 }
+
+.pbihrptopValuesCbpfsNumber, .pbihrptopValuesRhpfsNumber {
+	font-family: "Arial", sans-serif;
+	font-size: 40px;
+	font-weight: 700;
+	text-anchor: end;
+	dominant-baseline: middle;
+}
+
+.pbihrptopValuesCbpfsText, .pbihrptopValuesRhpfsText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	text-anchor: start;
+	dominant-baseline: middle;
+	fill: #444;
+}
