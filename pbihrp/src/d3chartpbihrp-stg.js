@@ -174,6 +174,7 @@
 			panelHorizontalPadding = 6,
 			panelVerticalPadding = 12,
 			buttonsPanelHeight = 36,
+			classPrefix = "pbihrp",
 			fundsNumberPanelHeight = buttonsPanelHeight,
 			topSummaryPanelHeight = 80,
 			stackedBarPanelHeight = 94,
@@ -192,6 +193,7 @@
 			barChartPercentageLabelPadding = 6,
 			barChartPercentageLabelVertPadding = 8,
 			maxTickLength = 12,
+			rfTooltipPadding = 12,
 			formatPercent = d3.format(".0%"),
 			formatPercent2Decimals = d3.format(".2%"),
 			formatMoney0Decimals = d3.format(",.0f"),
@@ -236,6 +238,8 @@
 			sortByArray = Object.keys(sortByValues),
 			dataFile =
 				"https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary?PoolfundCodeAbbrv=&$format=csv",
+			masterRegionalFundsUrl =
+				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			allFunds = [],
 			hardcodedFundIdsTooltipText = ["70", "81", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
 			tooltipHRPAdditionalText = " (*50% out of total HRP funding)",
@@ -739,35 +743,92 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (
-			localStorage.getItem("pbihrpdata") &&
-			JSON.parse(localStorage.getItem("pbihrpdata")).timestamp >
-				currentDate.getTime() - localStorageTime
-		) {
-			const rawData = d3.csvParse(
-				JSON.parse(localStorage.getItem("pbihrpdata")).data
-			);
-			console.info("pbihrp: data from local storage");
-			csvCallback(rawData);
-		} else {
-			d3.csv(dataFile).then(function (rawData) {
-				try {
-					localStorage.setItem(
-						"pbihrpdata",
-						JSON.stringify({
-							data: d3.csvFormat(rawData),
-							timestamp: currentDate.getTime(),
-						})
+		// if (
+		// 	localStorage.getItem("pbihrpdata") &&
+		// 	JSON.parse(localStorage.getItem("pbihrpdata")).timestamp >
+		// 		currentDate.getTime() - localStorageTime
+		// ) {
+		// 	const rawData = d3.csvParse(
+		// 		JSON.parse(localStorage.getItem("pbihrpdata")).data
+		// 	);
+		// 	console.info("pbihrp: data from local storage");
+		// 	csvCallback(rawData);
+		// } else {
+		// 	d3.csv(dataFile).then(function (rawData) {
+		// 		try {
+		// 			localStorage.setItem(
+		// 				"pbihrpdata",
+		// 				JSON.stringify({
+		// 					data: d3.csvFormat(rawData),
+		// 					timestamp: currentDate.getTime(),
+		// 				})
+		// 			);
+		// 		} catch (error) {
+		// 			console.info("D3 chart pbihrp, " + error);
+		// 		}
+		// 		console.info("pbihrp: data from API");
+		// 		csvCallback(rawData);
+		// 	});
+		// }
+
+		Promise.all([
+			fetchFile("data", dataFile, "data", "csv"),
+			fetchFile(
+				"masterRegionalFunds",
+				masterRegionalFundsUrl,
+				"Regional funds master",
+				"json"
+			),
+		]).then(rawData => csvCallback(rawData));
+
+		function fetchFile(fileName, url, warningString, method) {
+			if (
+				localStorage.getItem(fileName) &&
+				JSON.parse(localStorage.getItem(fileName)).timestamp >
+					currentDate.getTime() - localStorageTime
+			) {
+				const fetchedData =
+					method === "csv"
+						? d3.csvParse(
+								JSON.parse(localStorage.getItem(fileName)).data
+						  )
+						: JSON.parse(localStorage.getItem(fileName)).data;
+				console.info(
+					classPrefix +
+						" chart info: " +
+						warningString +
+						" from local storage"
+				);
+				return Promise.resolve(fetchedData);
+			} else {
+				const fetchMethod = method === "csv" ? d3.csv : d3.json;
+				return fetchMethod(url).then(fetchedData => {
+					try {
+						localStorage.setItem(
+							fileName,
+							JSON.stringify({
+								data:
+									method === "csv"
+										? d3.csvFormat(fetchedData)
+										: fetchedData,
+								timestamp: currentDate.getTime(),
+							})
+						);
+					} catch (error) {
+						console.info(classPrefix + " chart, " + error);
+					}
+					console.info(
+						classPrefix +
+							" chart info: " +
+							warningString +
+							" from API"
 					);
-				} catch (error) {
-					console.info("D3 chart pbihrp, " + error);
-				}
-				console.info("pbihrp: data from API");
-				csvCallback(rawData);
-			});
+					return fetchedData;
+				});
+			}
 		}
 
-		function csvCallback(rawData) {
+		function csvCallback([rawData, masterRegionalFunds]) {
 			removeProgressWheel();
 
 			const completeData = processData(rawData);
@@ -783,7 +844,7 @@
 			validateYear(selectedYearString);
 
 			if (!lazyLoad) {
-				draw(completeData);
+				draw(completeData, masterRegionalFunds);
 			} else {
 				d3.select(window).on("scroll.pbihrp", checkPosition);
 				checkPosition();
@@ -800,14 +861,14 @@
 					)
 				) {
 					d3.select(window).on("scroll.pbihrp", null);
-					draw(completeData);
+					draw(completeData, masterRegionalFunds);
 				}
 			}
 
 			//end of csvCallback
 		}
 
-		function draw(completeData) {
+		function draw(completeData, masterRegionalFunds) {
 			const data = completeData.find(function (d) {
 				return d.year === chartState.selectedYear;
 			});
@@ -816,11 +877,11 @@
 
 			createTitle(completeData);
 
-			createButtonsPanel(yearsArray, completeData);
+			createButtonsPanel(yearsArray, completeData, masterRegionalFunds);
 
 			createTopSummaryPanel(data.totalData, data.hrpYear);
 
-			createTotalNumbers(data);
+			createTotalNumbers(data, masterRegionalFunds);
 
 			createStackedBarPanel(data.totalData);
 
@@ -1199,7 +1260,11 @@
 			//end of createTitle
 		}
 
-		function createButtonsPanel(yearsData, completeData) {
+		function createButtonsPanel(
+			yearsData,
+			completeData,
+			masterRegionalFunds
+		) {
 			const clipPathButtons = buttonsPanel.main
 				.append("clipPath")
 				.attr("id", "pbihrpclipPathButtons")
@@ -1474,7 +1539,7 @@
 
 					createTopSummaryPanel(data.totalData, data.hrpYear);
 
-					createTotalNumbers(data);
+					createTotalNumbers(data, masterRegionalFunds);
 
 					createStackedBarPanel(data.totalData);
 
@@ -2290,7 +2355,7 @@
 			//end of createTopSummaryPanel
 		}
 
-		function createTotalNumbers(data) {
+		function createTotalNumbers(data, masterRegionalFunds) {
 			const cbpfHrpNumber = data.hrpData.filter(
 					e => !e.cbpfName.includes("RhPF")
 				).length,
@@ -2299,13 +2364,33 @@
 				).length,
 				cbpfTotalNumber = cbpfHrpNumber + cbpfNonHrpNumber;
 
-			const rhpfHrpNumber = data.hrpData.filter(e =>
-					e.cbpfName.includes("RhPF")
-				).length,
-				rhpfNonHrpNumber = data.nonHrpData.filter(e =>
-					e.cbpfName.includes("RhPF")
-				).length,
-				rhpfTotalNumber = rhpfHrpNumber + rhpfNonHrpNumber;
+			const rhpfs = new Set();
+
+			data.hrpData.forEach(function (d) {
+				if (d.cbpfName.includes("RhPF")) {
+					const fundName = d.cbpfName.split("(RhPF")[0].trim();
+					const regionalFund = masterRegionalFunds.find(function (e) {
+						return e.RFundName.includes(fundName);
+					});
+					if (regionalFund) {
+						rhpfs.add(regionalFund.RFundAbbrv);
+					}
+				}
+			});
+
+			data.nonHrpData.forEach(function (d) {
+				if (d.cbpfName.includes("RhPF")) {
+					const fundName = d.cbpfName.split("(RhPF")[0].trim();
+					const regionalFund = masterRegionalFunds.find(function (e) {
+						return e.RFundName.includes(fundName);
+					});
+					if (regionalFund) {
+						rhpfs.add(regionalFund.RFundAbbrv);
+					}
+				}
+			});
+
+			const rhpfTotalNumber = Array.from(rhpfs).length;
 
 			const previousCbpfs =
 				d3.select(".pbihrptopValuesCbpfsNumber").size() !== 0
@@ -2422,10 +2507,113 @@
 						fundsNumberRightPadding[1] +
 						fundsNumberPanel.textPadding
 				)
+				.style("cursor", "default")
 				.merge(topPanelRhpfsText)
 				.text(function (d) {
 					return d > 1 ? "Regional funds" : "Regional fund";
 				});
+
+			topPanelRhpfsText
+				.append("tspan")
+				.attr("class", "pbihrpinfoIcon contributionColorFill")
+				.text(" \uf05a");
+
+			topPanelRhpfsText
+				.on("mouseover", mouseOverTopPanelRfText)
+				.on("mouseout", mouseOutTopPanel);
+
+			function mouseOverTopPanelRfText() {
+				const thisOffset =
+					this.getBoundingClientRect().top -
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height +
+					rfTooltipPadding;
+
+				tooltip.style("display", "block").html(null);
+
+				const regionalData = [];
+
+				data.hrpData.forEach(populateList);
+				data.nonHrpData.forEach(populateList);
+
+				function populateList(d) {
+					if (d.cbpfName.includes("RhPF")) {
+						const fundName = d.cbpfName.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						const foundFund = regionalData.find(function (e) {
+							return e.rfCode === regionalFund.RFundAbbrv;
+						});
+						if (foundFund) {
+							foundFund.funds.push(d.cbpfName);
+						} else {
+							regionalData.push({
+								rfCode: regionalFund.RFundAbbrv,
+								rfName: regionalFund.RFundTitle,
+								funds: [d.cbpfName],
+							});
+						}
+					}
+				}
+
+				const innerTooltip = tooltip
+					.append("div")
+					.style("max-width", "300px")
+					.attr("id", "pbihrpInnerTooltipDiv");
+
+				const fundsDiv = innerTooltip
+					.selectAll(null)
+					.data(regionalData)
+					.enter()
+					.append("div")
+					.attr("class", "pbihrpFundsDiv");
+
+				fundsDiv
+					.append("div")
+					.attr("class", "pbihrpfundsDivTitle")
+					.html(function (d) {
+						return d.rfName;
+					});
+
+				fundsDiv.append("div").html(function (d) {
+					return (
+						d.funds.length +
+						(d.funds.length > 1
+							? " Country envelopes:"
+							: " Country envelope:")
+					);
+				});
+
+				const fundsList = fundsDiv
+					.append("ul")
+					.selectAll(null)
+					.data(function (d) {
+						return d.funds;
+					})
+					.enter()
+					.append("li")
+					.attr("class", "pbihrpFundsList")
+					.html(function (d) {
+						return d;
+					});
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip
+					.style("top", thisOffset + "px")
+					.style(
+						"left",
+						svg.width - tooltipSize.width + "px"
+					);
+			}
+
+			function mouseOutTopPanel() {
+				if (isSnapshotTooltipVisible) return;
+				tooltip.style("display", "none");
+			}
 
 			//end of createTotalNumbers
 		}
