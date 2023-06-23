@@ -202,6 +202,7 @@
 			totalValueVerticalPadding = 3,
 			tooltipWidthFactor = 0.48,
 			tooltipHeight = 60,
+			rfTooltipPadding = 12,
 			formatSIaxes = d3.format("~s"),
 			formatSI2Decimals = d3.format(".2s"),
 			formatPercent = d3.format(".0%"),
@@ -232,6 +233,8 @@
 				"https://cbpfapi.unocha.org/vo2/odata/GenderMarker?$format=csv",
 			launchedAllocationsDataUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
+			masterRegionalFundsUrl =
+				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			displayTypes = ["marker", "aggregated"],
 			allocationValueTypes = {
 				budget: "allocations",
@@ -627,6 +630,7 @@
 				window.cbpfbiDataObject.dataGam,
 				window.cbpfbiDataObject.masterGam,
 				window.cbpfbiDataObject.launchedAllocationsData,
+				window.cbpfbiDataObject.masterRegionalFunds,
 			]).then(allData => csvCallback(allData));
 		} else {
 			Promise.all([
@@ -642,6 +646,12 @@
 					launchedAllocationsDataUrl,
 					"launched allocations data",
 					"csv"
+				),
+				fetchFile(
+					"masterRegionalFunds",
+					masterRegionalFundsUrl,
+					"master regional funds data",
+					"json"
 				),
 			]).then(allData => csvCallback(allData));
 		}
@@ -695,7 +705,12 @@
 			}
 		}
 
-		function csvCallback([rawData, metaData, rawLaunchedAllocationsData]) {
+		function csvCallback([
+			rawData,
+			metaData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds,
+		]) {
 			removeProgressWheel();
 
 			processRawData(rawData, metaData);
@@ -723,7 +738,7 @@
 					  })[0].gamGroup);
 
 			if (!lazyLoad) {
-				draw(rawData, rawLaunchedAllocationsData);
+				draw(rawData, rawLaunchedAllocationsData, masterRegionalFunds);
 			} else {
 				d3.select(window).on("scroll.pbigam", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbigam", function () {
@@ -748,23 +763,39 @@
 					)
 				) {
 					d3.select(window).on("scroll.pbigam", null);
-					draw(rawData, rawLaunchedAllocationsData);
+					draw(
+						rawData,
+						rawLaunchedAllocationsData,
+						masterRegionalFunds
+					);
 				}
 			}
 
 			//end of csvCallback
 		}
 
-		function draw(rawData, rawLaunchedAllocationsData) {
+		function draw(
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds
+		) {
 			const data = processData(rawData, rawLaunchedAllocationsData);
 
 			createTitle(rawData);
 
-			createCheckboxes(rawData, rawLaunchedAllocationsData);
+			createCheckboxes(
+				rawData,
+				rawLaunchedAllocationsData,
+				masterRegionalFunds
+			);
 
-			createTopPanel(data);
+			createTopPanel(data, masterRegionalFunds);
 
-			createButtonsPanel(rawData, rawLaunchedAllocationsData);
+			createButtonsPanel(
+				rawData,
+				rawLaunchedAllocationsData,
+				masterRegionalFunds
+			);
 
 			setYearsDescriptionDiv();
 
@@ -1106,7 +1137,11 @@
 			//end of createTitle
 		}
 
-		function createCheckboxes(rawData, rawLaunchedAllocationsData) {
+		function createCheckboxes(
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds
+		) {
 			selectTitleDiv.html("Select CBPF:");
 
 			const checkboxData = d3.keys(cbpfsList);
@@ -1229,7 +1264,7 @@
 
 				const data = processData(rawData, rawLaunchedAllocationsData);
 
-				createTopPanel(data);
+				createTopPanel(data, masterRegionalFunds);
 				createBeeswarm(data);
 				createLegend(data);
 			});
@@ -1237,7 +1272,7 @@
 			//end of createCheckboxes
 		}
 
-		function createTopPanel(data) {
+		function createTopPanel(data, masterRegionalFunds) {
 			const yearsListOriginal = chartState.selectedYear
 				.sort(function (a, b) {
 					return a - b;
@@ -1304,9 +1339,21 @@
 				return !d.includes("RhPF");
 			}).length;
 
-			const rhpfsValue = uniqueCbpfs.filter(function (d) {
-				return d.includes("RhPF");
-			}).length;
+			const rhpfs = new Set();
+
+			uniqueCbpfs.forEach(function (d) {
+				if (d.includes("RhPF")) {
+					const fundName = d.split("(RhPF")[0].trim();
+					const regionalFund = masterRegionalFunds.find(function (e) {
+						return e.RFundName.includes(fundName);
+					});
+					if (regionalFund) {
+						rhpfs.add(regionalFund.RFundAbbrv);
+					}
+				}
+			});
+
+			const rhpfsValue = Array.from(rhpfs).length;
 
 			const topPanelMoneyBag = topPanel.main
 				.selectAll(".pbigamtopPanelMoneyBag")
@@ -1644,6 +1691,7 @@
 						topPanel.mainValueHorPadding
 				)
 				.attr("text-anchor", "start")
+				.style("cursor", "default")
 				.merge(topPanelRhpfsText)
 				.style("font-size", cbpfsValue ? "15px" : "18px")
 				.attr(
@@ -1655,10 +1703,112 @@
 					return d > 1 ? "Regional funds" : "Regional fund";
 				});
 
+			topPanelRhpfsText
+				.append("tspan")
+				.attr("class", "pbiclcinfoIcon contributionColorFill")
+				.text(" \uf05a");
+
+			topPanelRhpfsText
+				.on("mouseover", mouseOverTopPanelRfText)
+				.on("mouseout", mouseOutTopPanel);
+
+			function mouseOverTopPanelRfText() {
+				const thisOffset =
+					this.getBoundingClientRect().top -
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height +
+					rfTooltipPadding;
+
+				tooltip.style("display", "block").html(null);
+
+				const regionalData = [];
+
+				data.forEach(function (d) {
+					if (d.cbpfName.includes("RhPF")) {
+						const fundName = d.cbpfName.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						const foundFund = regionalData.find(function (e) {
+							return e.rfCode === regionalFund.RFundAbbrv;
+						});
+						if (foundFund) {
+							if (!foundFund.funds.includes(d.cbpfName)) {
+								foundFund.funds.push(d.cbpfName);
+							}
+						} else {
+							regionalData.push({
+								rfCode: regionalFund.RFundAbbrv,
+								rfName: regionalFund.RFundTitle,
+								funds: [d.cbpfName],
+							});
+						}
+					}
+				});
+
+				const innerTooltip = tooltip
+					.append("div")
+					.style("max-width", "300px")
+					.attr("id", "pbiclcInnerTooltipDiv");
+
+				const fundsDiv = innerTooltip
+					.selectAll(null)
+					.data(regionalData)
+					.enter()
+					.append("div")
+					.attr("class", "pbiclcFundsDiv");
+
+				fundsDiv
+					.append("div")
+					.attr("class", "pbiclcfundsDivTitle")
+					.html(function (d) {
+						return d.rfName;
+					});
+
+				fundsDiv.append("div").html(function (d) {
+					return (
+						d.funds.length +
+						(d.funds.length > 1
+							? " Country envelopes:"
+							: " Country envelope:")
+					);
+				});
+
+				const fundsList = fundsDiv
+					.append("ul")
+					.selectAll(null)
+					.data(function (d) {
+						return d.funds;
+					})
+					.enter()
+					.append("li")
+					.attr("class", "pbiclcFundsList")
+					.html(function (d) {
+						return d;
+					});
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip
+					.style("top", thisOffset + "px")
+					.style("left", topPanel.width - tooltipSize.width + "px");
+			}
+
+			function mouseOutTopPanel() {
+				if (isSnapshotTooltipVisible) return;
+				tooltip.style("display", "none");
+			}
+
 			//end of createTopPanel
 		}
 
-		function createButtonsPanel(rawData, rawLaunchedAllocationsData) {
+		function createButtonsPanel(
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds
+		) {
 			const buttonsLegendGroup = buttonsPanel.main
 				.selectAll(".pbigambuttonsLegendGroup")
 				.data(gamGroupsArray)
@@ -2417,7 +2567,7 @@
 					});
 
 				setScales();
-				createTopPanel(data);
+				createTopPanel(data, masterRegionalFunds);
 				createBeeswarm(data);
 				createLegend(data);
 
