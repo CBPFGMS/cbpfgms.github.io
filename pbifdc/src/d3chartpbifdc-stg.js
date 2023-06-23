@@ -1536,7 +1536,7 @@
 
 				topPanelRhpfsText
 					.append("tspan")
-					.attr("class", "pbiclcinfoIcon contributionColorFill")
+					.attr("class", "pbifdcinfoIcon contributionColorFill")
 					.text(" \uf05a");
 
 				const overRectangle = topPanel.main
@@ -4523,18 +4523,18 @@
 				const innerTooltip = tooltip
 					.append("div")
 					.style("max-width", "300px")
-					.attr("id", "pbiclcInnerTooltipDiv");
+					.attr("id", "pbifdcInnerTooltipDiv");
 
 				const fundsDiv = innerTooltip
 					.selectAll(null)
 					.data(regionalData)
 					.enter()
 					.append("div")
-					.attr("class", "pbiclcFundsDiv");
+					.attr("class", "pbifdcFundsDiv");
 
 				fundsDiv
 					.append("div")
-					.attr("class", "pbiclcfundsDivTitle")
+					.attr("class", "pbifdcfundsDivTitle")
 					.html(function (d) {
 						return d.rfName;
 					});
@@ -4556,7 +4556,7 @@
 					})
 					.enter()
 					.append("li")
-					.attr("class", "pbiclcFundsList")
+					.attr("class", "pbifdcFundsList")
 					.html(function (d) {
 						return d;
 					});
