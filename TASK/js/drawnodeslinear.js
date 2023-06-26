@@ -10,4 +10,4 @@ function drawNodesLinear(svgList) {
 		.text("This is a placeholder for the linear view");
 }
 
-export default drawNodesLinear;
+export { drawNodesLinear };

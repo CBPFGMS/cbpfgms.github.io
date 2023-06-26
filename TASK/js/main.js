@@ -8,8 +8,8 @@ import { highlight } from "./highlight.js";
 import { showStatus } from "./showstatus.js";
 import { processData } from "./processdata.js";
 import { fetchFile } from "./fetchfile.js";
-import createRadioButtons from "./radiobuttons.js";
-import drawNodesLinear from "./drawnodeslinear.js";
+import { createRadioButtons } from "./radiobuttons.js";
+import { drawNodesLinear } from "./drawnodeslinear.js";
 
 const {
 	classPrefix,
