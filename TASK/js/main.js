@@ -8,13 +8,18 @@ import { highlight } from "./highlight.js";
 import { showStatus } from "./showstatus.js";
 import { processData } from "./processdata.js";
 import { fetchFile } from "./fetchfile.js";
+import createRadioButtons from "./radiobuttons.js";
+import drawNodesLinear from "./drawnodeslinear.js";
 
 const {
 	classPrefix,
 	chartContainer,
 	defaultNumberOfColumns,
 	currentStatusFillColor,
+	defaultView,
 } = constants;
+
+variables.view = defaultView;
 
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
@@ -27,7 +32,16 @@ const flowChartDivContainer = chartContainer
 	sideDiv = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "sideDiv"),
-	flowChartCurrentStatusDiv = sideDiv
+	flowChartTopDiv = flowChartDivContainer
+		.append("div")
+		.attr("class", classPrefix + "flowChartTopDiv"),
+	flowChartTopDivButtons = flowChartTopDiv
+		.append("div")
+		.attr("class", classPrefix + "flowChartTopDivButtons"),
+	flowChartTopDivCurrentStatus = flowChartTopDiv
+		.append("div")
+		.attr("class", classPrefix + "flowChartTopDivCurrentStatus"),
+	flowChartCurrentStatusDiv = flowChartTopDivCurrentStatus
 		.append("div")
 		.attr("class", classPrefix + "flowChartCurrentStatusDiv"),
 	// eslint-disable-next-line no-unused-vars
@@ -37,9 +51,15 @@ const flowChartDivContainer = chartContainer
 	currentStatusValueSpan = flowChartCurrentStatusDiv
 		.append("span")
 		.attr("class", classPrefix + "currentStatusValueSpan"),
-	flowChartDiv = flowChartDivContainer
+	flowChartDivWrapper = flowChartDivContainer
+		.append("div")
+		.attr("class", classPrefix + "flowChartDivWrapper"),
+	flowChartDiv = flowChartDivWrapper
 		.append("div")
 		.attr("class", classPrefix + "flowChartDiv"),
+	flowChartDivList = flowChartDivWrapper
+		.append("div")
+		.attr("class", classPrefix + "flowChartDivList"),
 	sideDivTitle = sideDiv
 		.append("div")
 		.attr("class", classPrefix + "sideDivTitle"),
@@ -61,6 +81,30 @@ const flowChartDivSize = flowChartDiv.node().getBoundingClientRect();
 const { width } = flowChartDivSize;
 
 const svg = flowChartDiv.append("svg").attr("width", width);
+
+const svgList = flowChartDivList.append("svg").attr("width", width);
+
+const { inputs: buttons, inputDivs } = createRadioButtons(
+	flowChartTopDivButtons
+);
+
+switchView();
+
+buttons.on("click", (event, d) => {
+	variables.view = d;
+	inputDivs.classed("active", e => e === d);
+	switchView();
+});
+
+function switchView() {
+	if (variables.view === "list") {
+		flowChartDivList.style("display", "block");
+		flowChartDiv.style("display", "none");
+	} else {
+		flowChartDivList.style("display", "none");
+		flowChartDiv.style("display", "block");
+	}
+}
 
 Promise.all([
 	fetchFile("masterData", dataUrl, "json"),
@@ -100,6 +144,8 @@ function createFlowChart([rawData, projectsData]) {
 	});
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
+
+	drawNodesLinear(svgList);
 
 	currentStatusValueSpan
 		.style("text-decoration", "underline")

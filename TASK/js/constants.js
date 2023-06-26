@@ -27,6 +27,10 @@ const constants = {
 	yScale: d3.scalePoint(),
 	minLinkDistanceFromNodes: 4,
 	connectionPositions: ["top", "right", "bottom", "left"],
+	viewTypes: ["workflow", "list"],
+	get defaultView() {
+		return this.viewTypes[0];
+	},
 	cornerRadius: 4,
 	linkPaddingFromNode: 4,
 	labelCircleRadius: 12,

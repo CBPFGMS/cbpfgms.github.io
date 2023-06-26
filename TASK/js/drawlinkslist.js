@@ -59,20 +59,28 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			.enter()
 			.append("div")
 			.attr("class", classPrefix + "listRowsTasks")
-			.style("cursor", (d, i, n) => {
+			.each((d, i, n) => {
+				const thisElement = d3.select(n[i]);
 				const parentDatum = d3.select(n[i].parentNode).datum();
 				localVariable.set(n[i], parentDatum);
 				const foundRole = parentDatum.projectLogs.some(
 					({ UserRoleCode }) =>
 						UserRoleCode === d.Roles[0].UserRoleCode
 				);
-				return foundRole ? "pointer" : "default";
+				thisElement.style("cursor", foundRole ? "pointer" : "default");
+				if (foundRole) {
+					thisElement.append("i").attr("class", "fas fa-info-circle");
+				}
+				thisElement
+					.append("span")
+					.attr("class", classPrefix + "listRowsTasksSpan")
+					.html(d.ButtonText);
 			});
 
-		tasks
-			.append("div")
-			.attr("class", classPrefix + "listRowsTasksDivs")
-			.html(d => d.ButtonText);
+		// tasks
+		// 	.append("div")
+		// 	.attr("class", classPrefix + "listRowsTasksDivs")
+		// 	.html(d => d.ButtonText);
 
 		listRows
 			.append("div")
@@ -101,7 +109,14 @@ function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 			const thisClicked = !d.clicked;
 			listRowsContainer.each(d => (d.clicked = false));
 			d.clicked = thisClicked;
-			listRowsContainer.classed("active", e => e.clicked);
+			listRowsContainer
+				.classed("active", e => e.clicked)
+				.selectChildren(`.${classPrefix}listRowsTasks`)
+				.style("max-height", (e, i, n) =>
+					d3.select(n[i].parentNode).datum().clicked
+						? n[i].scrollHeight * 2 + "px"
+						: null
+				);
 		});
 
 		tasks.on("click", (event, d) => {
