@@ -205,6 +205,7 @@
 			lollipopExtraPadding = 4,
 			percentagePadding = 22,
 			percentagePadding2 = 10,
+			rfTooltipPadding = 12,
 			underApprovalColor = "#E56A54",
 			unBlue = "#1F69B3",
 			highlightColor = "#F79A3B",
@@ -243,6 +244,8 @@
 				"https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&FundingType=3&$format=csv",
 			launchedAllocationsDataUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
+			masterRegionalFundsUrl =
+				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			moneyBagdAttribute = [
 				"M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -668,6 +671,7 @@
 			Promise.all([
 				window.cbpfbiDataObject.allocationsData,
 				window.cbpfbiDataObject.launchedAllocationsData,
+				window.cbpfbiDataObject.masterRegionalFunds,
 			]).then(allData => csvCallback(allData));
 		} else {
 			Promise.all([
@@ -682,6 +686,12 @@
 					launchedAllocationsDataUrl,
 					"launched allocations data",
 					"csv"
+				),
+				fetchFile(
+					"masterRegionalFunds",
+					masterRegionalFundsUrl,
+					"master regional funds data",
+					"json"
 				),
 			]).then(allData => csvCallback(allData));
 		}
@@ -735,7 +745,11 @@
 			}
 		}
 
-		function csvCallback([rawData, rawLaunchedAllocationsData]) {
+		function csvCallback([
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds,
+		]) {
 			removeProgressWheel();
 
 			yearsArray = rawData
@@ -754,7 +768,7 @@
 			validateCbpfs(selectedCbpfsString);
 
 			if (!lazyLoad) {
-				draw(rawData, rawLaunchedAllocationsData);
+				draw(rawData, rawLaunchedAllocationsData, masterRegionalFunds);
 			} else {
 				d3.select(window).on("scroll.pbialp", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbialp", function () {
@@ -776,14 +790,22 @@
 					)
 				) {
 					d3.select(window).on("scroll.pbialp", null);
-					draw(rawData, rawLaunchedAllocationsData);
+					draw(
+						rawData,
+						rawLaunchedAllocationsData,
+						masterRegionalFunds
+					);
 				}
 			}
 
 			//end of csvCallback
 		}
 
-		function draw(rawData, rawLaunchedAllocationsData) {
+		function draw(
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds
+		) {
 			let data = processData(rawData, rawLaunchedAllocationsData);
 
 			const allCbpfs = [];
@@ -1227,9 +1249,23 @@
 					return !d.cbpf.includes("RhPF");
 				}).length;
 
-				const rhpfsData = data.filter(function (d) {
-					return d.cbpf.includes("RhPF");
-				}).length;
+				const rhpfs = new Set();
+
+				data.forEach(function (d) {
+					if (d.cbpf.includes("RhPF")) {
+						const fundName = d.cbpf.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						if (regionalFund) {
+							rhpfs.add(regionalFund.RFundAbbrv);
+						}
+					}
+				});
+
+				const rhpfsData = Array.from(rhpfs).length;
 
 				partnerListWithTotal.forEach(function (d) {
 					partnersTotals[d] = d3.sum(data, function (e) {
@@ -1739,6 +1775,7 @@
 							topPanel.mainValueHorPadding
 					)
 					.attr("text-anchor", "start")
+					.style("cursor", "default")
 					.merge(topPanelRhpfsText)
 					.style("font-size", cbpfsData ? "15px" : "20px")
 					.attr(
@@ -1748,19 +1785,27 @@
 					)
 					.text(rhpfsData > 1 ? "Regional funds" : "Regional fund");
 
+				topPanelRhpfsText
+					.append("tspan")
+					.attr("class", "pbialpinfoIcon contributionColorFill")
+					.text(" \uf05a");
+
 				const topPanelOverRectangle = topPanel.main
 					.selectAll(".pbialptopPanelOverRectangle")
 					.data([true])
 					.enter()
 					.append("rect")
 					.attr("class", "pbialptopPanelOverRectangle")
-					.attr("width", topPanel.width)
+					.attr("width", topPanel.width - topPanel.leftPadding[2])
 					.attr("height", topPanel.height)
 					.style("opacity", 0);
 
 				topPanelOverRectangle
 					.on("mouseover", mouseOverTopPanel)
-					.on("mousemove", mouseMoveTopPanel)
+					.on("mouseout", mouseOutTopPanel);
+
+				topPanelRhpfsText
+					.on("mouseover", mouseOverTopPanelRfText)
 					.on("mouseout", mouseOutTopPanel);
 
 				//end of createTopPanel
@@ -3797,13 +3842,10 @@
 			}
 
 			function mouseOverTopPanel() {
-				thisOffsetTopPanel =
+				const thisOffset =
 					this.getBoundingClientRect().top -
-					containerDiv.node().getBoundingClientRect().top;
-
-				const mouseContainer = d3.mouse(containerDiv.node());
-
-				const mouse = d3.mouse(this);
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height;
 
 				tooltip
 					.style("display", "block")
@@ -3821,41 +3863,91 @@
 							"</span></div></div>"
 					);
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
-
-				localVariable.set(this, tooltipSize);
-
 				tooltip
-					.style("top", thisOffsetTopPanel + "px")
-					.style(
-						"left",
-						mouse[0] < topPanel.width - 14 - tooltipSize.width
-							? mouseContainer[0] + 14 + "px"
-							: mouseContainer[0] -
-									(mouse[0] -
-										(topPanel.width - tooltipSize.width)) +
-									"px"
-					);
+					.style("top", thisOffset + "px")
+					.style("left", topPanel.moneyBagPadding + "px");
 			}
 
-			function mouseMoveTopPanel() {
-				const mouseContainer = d3.mouse(containerDiv.node());
+			function mouseOverTopPanelRfText() {
+				const thisOffset =
+					this.getBoundingClientRect().top -
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height +
+					rfTooltipPadding;
 
-				const mouse = d3.mouse(this);
+				tooltip.style("display", "block").html(null);
 
-				const tooltipSize = localVariable.get(this);
+				const regionalData = [];
+
+				data.forEach(function (d) {
+					if (d.cbpf.includes("RhPF")) {
+						const fundName = d.cbpf.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						const foundFund = regionalData.find(function (e) {
+							return e.rfCode === regionalFund.RFundAbbrv;
+						});
+						if (foundFund) {
+							foundFund.funds.push(d.cbpf);
+						} else {
+							regionalData.push({
+								rfCode: regionalFund.RFundAbbrv,
+								rfName: regionalFund.RFundTitle,
+								funds: [d.cbpf],
+							});
+						}
+					}
+				});
+
+				const innerTooltip = tooltip
+					.append("div")
+					.style("max-width", "300px")
+					.attr("id", "pbialpInnerTooltipDiv");
+
+				const fundsDiv = innerTooltip
+					.selectAll(null)
+					.data(regionalData)
+					.enter()
+					.append("div")
+					.attr("class", "pbialpFundsDiv");
+
+				fundsDiv
+					.append("div")
+					.attr("class", "pbialpfundsDivTitle")
+					.html(function (d) {
+						return d.rfName;
+					});
+
+				fundsDiv.append("div").html(function (d) {
+					return (
+						d.funds.length +
+						(d.funds.length > 1
+							? " Country envelopes:"
+							: " Country envelope:")
+					);
+				});
+
+				const fundsList = fundsDiv
+					.append("ul")
+					.selectAll(null)
+					.data(function (d) {
+						return d.funds;
+					})
+					.enter()
+					.append("li")
+					.attr("class", "pbialpFundsList")
+					.html(function (d) {
+						return d;
+					});
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip
-					.style("top", thisOffsetTopPanel + "px")
-					.style(
-						"left",
-						mouse[0] < topPanel.width - 14 - tooltipSize.width
-							? mouseContainer[0] + 14 + "px"
-							: mouseContainer[0] -
-									(mouse[0] -
-										(topPanel.width - tooltipSize.width)) +
-									"px"
-					);
+					.style("top", thisOffset + "px")
+					.style("left", topPanel.width - tooltipSize.width + "px");
 			}
 
 			function mouseOutTopPanel() {
@@ -4701,6 +4793,7 @@
 					yearsWithUnderApprovalAboveMin[row.AllocationYear] =
 						(yearsWithUnderApprovalAboveMin[row.AllocationYear] ||
 							0) + row.TotalUnderApprovalBudget;
+					//IMPORTANT: ASK ABOUT THE LAUNCHEDALLOC FILE NOT HAVING PARTNER TYPE, IF WE CAN USE THE REGULAR DATA FILE
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval +=
 						row.TotalUnderApprovalBudget;

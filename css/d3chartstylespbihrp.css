@@ -295,3 +295,20 @@ p#pbihrpd3chartTitle {
 	dominant-baseline: middle;
 	fill: #444;
 }
+
+.pbihrpinfoIcon {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 600;
+	font-size: 18px;
+}
+
+.pbihrpFundsDiv ul {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	padding-inline-start: 20px;
+}
+
+.pbihrpfundsDivTitle {
+	margin-bottom: 8px;
+	font-weight: bold;
+}

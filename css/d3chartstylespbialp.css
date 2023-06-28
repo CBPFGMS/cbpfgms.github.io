@@ -356,3 +356,20 @@ p#pbialpd3chartTitle {
 	background-color: #1F69B3;
 	color: white;
 }
+
+.pbialpinfoIcon {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 600;
+	font-size: 18px;
+}
+
+.pbialpFundsDiv ul {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	padding-inline-start: 20px;
+}
+
+.pbialpfundsDivTitle {
+	margin-bottom: 8px;
+	font-weight: bold;
+}

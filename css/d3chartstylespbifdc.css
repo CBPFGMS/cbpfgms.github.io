@@ -293,3 +293,20 @@ p#pbifdcd3chartTitle {
 	background-color: #1F69B3;
 	color: white;
 }
+
+.pbifdcinfoIcon {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 600;
+	font-size: 18px;
+}
+
+.pbifdcFundsDiv ul {
+	margin-top: 4px;
+	margin-bottom: 4px;
+	padding-inline-start: 20px;
+}
+
+.pbifdcfundsDivTitle {
+	margin-bottom: 8px;
+	font-weight: bold;
+}

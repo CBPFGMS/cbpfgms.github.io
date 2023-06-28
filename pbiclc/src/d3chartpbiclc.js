@@ -460,6 +460,7 @@
 			highlightColor = "#F79A3B",
 			buttonsNumber = 8,
 			verticalLabelPadding = 4,
+			rfTooltipPadding = 12,
 			allYearsOption = "all",
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
@@ -472,6 +473,8 @@
 			dataUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
 			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
+			masterRegionalFundsUrl =
+				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			moneyBagdAttribute = [
 				"M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
 				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
@@ -799,6 +802,7 @@
 			Promise.all([
 				window.cbpfbiDataObject.contributionsTotalData,
 				window.cbpfbiDataObject.flags,
+				window.cbpfbiDataObject.masterRegionalFunds,
 			]).then(allData => csvCallback(allData));
 		} else {
 			Promise.all([
@@ -809,6 +813,12 @@
 					"csv"
 				),
 				fetchFile("flags", flagsUrl, "flags data", "json"),
+				fetchFile(
+					"masterRegionalFunds",
+					masterRegionalFundsUrl,
+					"master regional funds data",
+					"json"
+				),
 			]).then(allData => csvCallback(allData));
 		}
 
@@ -859,7 +869,7 @@
 			}
 		}
 
-		function csvCallback([rawData, flagsData]) {
+		function csvCallback([rawData, flagsData, masterRegionalFunds]) {
 			removeProgressWheel();
 
 			yearsArray = rawData
@@ -900,7 +910,7 @@
 				});
 
 			if (!lazyLoad) {
-				draw([rawData, flagsData]);
+				draw([rawData, flagsData, masterRegionalFunds]);
 			} else {
 				d3.select(window).on("scroll.pbiclc", checkPosition);
 				d3.select("body").on("d3ChartsYear.pbiclc", function () {
@@ -924,14 +934,14 @@
 					)
 				) {
 					d3.select(window).on("scroll.pbiclc", null);
-					draw([rawData, flagsData]);
+					draw([rawData, flagsData, masterRegionalFunds]);
 				}
 			}
 
 			//end of csvCallback
 		}
 
-		function draw([rawData, flagsData]) {
+		function draw([rawData, flagsData, masterRegionalFunds]) {
 			const dataArray = processData(rawData);
 
 			const data = {
@@ -1576,9 +1586,23 @@
 					return !d.cbpf.includes("RhPF");
 				});
 
-				const dataCbpfsRhPF = dataCbpfs.filter(function (d) {
-					return d.cbpf.includes("RhPF");
+				const rhpfs = new Set();
+
+				dataCbpfs.forEach(function (d) {
+					if (d.cbpf.includes("RhPF")) {
+						const fundName = d.cbpf.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						if (regionalFund) {
+							rhpfs.add(regionalFund.RFundAbbrv);
+						}
+					}
 				});
+
+				const dataCbpfsRhPF = Array.from(rhpfs);
 
 				contributionType.forEach(function (d) {
 					contributionsTotals[d] = d3.sum(dataDonors, function (e) {
@@ -1955,6 +1979,7 @@
 							topPanel.mainValueHorPadding
 					)
 					.attr("text-anchor", "start")
+					.style("cursor", "default")
 					.merge(topPanelRfText)
 					.style(
 						"font-size",
@@ -1972,19 +1997,27 @@
 							: "Regional fund"
 					);
 
+				topPanelRfText
+					.append("tspan")
+					.attr("class", "pbiclcinfoIcon contributionColorFill")
+					.text(" \uf05a");
+
 				const overRectangle = topPanel.main
 					.selectAll(".pbiclctopPanelOverRectangle")
 					.data([true])
 					.enter()
 					.append("rect")
 					.attr("class", "pbiclctopPanelOverRectangle")
-					.attr("width", topPanel.width)
+					.attr("width", topPanel.leftPadding[1])
 					.attr("height", topPanel.height)
 					.style("opacity", 0);
 
 				overRectangle
 					.on("mouseover", mouseOverTopPanel)
-					.on("mousemove", mouseMoveTopPanel)
+					.on("mouseout", mouseOutTopPanel);
+
+				topPanelRfText
+					.on("mouseover", mouseOverTopPanelRfText)
 					.on("mouseout", mouseOutTopPanel);
 
 				//end of createTopPanel
@@ -3498,11 +3531,8 @@
 			function mouseOverTopPanel() {
 				const thisOffset =
 					this.getBoundingClientRect().top -
-					containerDiv.node().getBoundingClientRect().top;
-
-				const mouseContainer = d3.mouse(containerDiv.node());
-
-				const mouse = d3.mouse(this);
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height;
 
 				tooltip
 					.style("display", "block")
@@ -3526,45 +3556,91 @@
 							"</span></div></div>"
 					);
 
-				const tooltipSize = tooltip.node().getBoundingClientRect();
-
-				localVariable.set(this, tooltipSize);
-
 				tooltip
 					.style("top", thisOffset + "px")
-					.style(
-						"left",
-						mouse[0] < topPanel.width - 14 - tooltipSize.width
-							? mouseContainer[0] + 14 + "px"
-							: mouseContainer[0] -
-									(mouse[0] -
-										(topPanel.width - tooltipSize.width)) +
-									"px"
-					);
+					.style("left", topPanel.moneyBagPadding + "px");
 			}
 
-			function mouseMoveTopPanel() {
+			function mouseOverTopPanelRfText() {
 				const thisOffset =
 					this.getBoundingClientRect().top -
-					containerDiv.node().getBoundingClientRect().top;
+					containerDiv.node().getBoundingClientRect().top +
+					this.getBoundingClientRect().height +
+					rfTooltipPadding;
 
-				const mouseContainer = d3.mouse(containerDiv.node());
+				tooltip.style("display", "block").html(null);
 
-				const mouse = d3.mouse(this);
+				const regionalData = [];
 
-				const tooltipSize = localVariable.get(this);
+				data.dataCbpfs.forEach(function (d) {
+					if (d.cbpf.includes("RhPF")) {
+						const fundName = d.cbpf.split("(RhPF")[0].trim();
+						const regionalFund = masterRegionalFunds.find(function (
+							e
+						) {
+							return e.RFundName.includes(fundName);
+						});
+						const foundFund = regionalData.find(function (e) {
+							return e.rfCode === regionalFund.RFundAbbrv;
+						});
+						if (foundFund) {
+							foundFund.funds.push(d.cbpf);
+						} else {
+							regionalData.push({
+								rfCode: regionalFund.RFundAbbrv,
+								rfName: regionalFund.RFundTitle,
+								funds: [d.cbpf],
+							});
+						}
+					}
+				});
+
+				const innerTooltip = tooltip
+					.append("div")
+					.style("max-width", "300px")
+					.attr("id", "pbiclcInnerTooltipDiv");
+
+				const fundsDiv = innerTooltip
+					.selectAll(null)
+					.data(regionalData)
+					.enter()
+					.append("div")
+					.attr("class", "pbiclcFundsDiv");
+
+				fundsDiv
+					.append("div")
+					.attr("class", "pbiclcfundsDivTitle")
+					.html(function (d) {
+						return d.rfName;
+					});
+
+				fundsDiv.append("div").html(function (d) {
+					return (
+						d.funds.length +
+						(d.funds.length > 1
+							? " Country envelopes:"
+							: " Country envelope:")
+					);
+				});
+
+				const fundsList = fundsDiv
+					.append("ul")
+					.selectAll(null)
+					.data(function (d) {
+						return d.funds;
+					})
+					.enter()
+					.append("li")
+					.attr("class", "pbiclcFundsList")
+					.html(function (d) {
+						return d;
+					});
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
 
 				tooltip
 					.style("top", thisOffset + "px")
-					.style(
-						"left",
-						mouse[0] < topPanel.width - 14 - tooltipSize.width
-							? mouseContainer[0] + 14 + "px"
-							: mouseContainer[0] -
-									(mouse[0] -
-										(topPanel.width - tooltipSize.width)) +
-									"px"
-					);
+					.style("left", topPanel.width - tooltipSize.width + "px");
 			}
 
 			function mouseOutTopPanel() {
