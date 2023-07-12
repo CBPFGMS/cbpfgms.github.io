@@ -1,3 +1,4 @@
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
 
 const { dialogContainer, classPrefix } = constants;
@@ -71,7 +72,14 @@ function createDialog(projectLog, listRowsContainer) {
 		.html("Close")
 		.on("click", () => {
 			dialogContainer.node().close();
-			listRowsContainer.classed("active", d => (d.clicked = !d.clicked));
+			listRowsContainer
+				.classed("active", d => (d.clicked = !d.clicked))
+				.selectChildren(`.${classPrefix}listRowsTasks`)
+				.style("max-height", (e, i, n) =>
+					d3.select(n[i].parentNode).datum().clicked
+						? n[i].scrollHeight * 2 + "px"
+						: null
+				);
 		});
 }
 

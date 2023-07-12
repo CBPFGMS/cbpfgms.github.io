@@ -82,8 +82,6 @@ const { width } = flowChartDivSize;
 
 const svg = flowChartDiv.append("svg").attr("width", width);
 
-const svgList = flowChartDivList.append("svg").attr("width", width);
-
 const { inputs: buttons, inputDivs } = createRadioButtons(
 	flowChartTopDivButtons
 );
@@ -145,7 +143,13 @@ function createFlowChart([rawData, projectsData]) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	drawNodesLinear(svgList);
+	drawNodesLinear({
+		dataNodesOriginal,
+		dataLinksOriginal,
+		flowChartDivList,
+		currentStatus,
+		currentSequence,
+	});
 
 	currentStatusValueSpan
 		.style("text-decoration", "underline")

@@ -1,6 +1,6 @@
 import { constants } from "./constants.js";
 
-const { userRolesToIgnore } = constants;
+const { userRolesToIgnore, userRolesToIgnoreForList } = constants;
 
 function processData(rawData, projectsData) {
 	const data = {
@@ -72,7 +72,11 @@ function processData(rawData, projectsData) {
 		data.links.find(f => f.source === e.id || f.target === e.id)
 	);
 
-	data.links.forEach(link => (link.id = ++counterLink));
+	let linkWithNoId;
+
+	while ((linkWithNoId = data.links.find(e => !e.id))) {
+		createLinkIds(linkWithNoId);
+	}
 
 	return data;
 
@@ -91,6 +95,14 @@ function processData(rawData, projectsData) {
 			}
 			if (!nodesAlreadyVisited.has(link.source))
 				reachableNode(node, reachable && !!linkToPrevious);
+		});
+	}
+
+	function createLinkIds(link) {
+		link.id = ++counterLink;
+		const nextLinks = data.links.filter(e => e.source === link.target);
+		nextLinks.forEach(e => {
+			if (!e.id) createLinkIds(e);
 		});
 	}
 }

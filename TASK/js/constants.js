@@ -3,6 +3,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 const constants = {
 	classPrefix: "task",
 	userRolesToIgnore: ["GMSAdmin"],
+	userRolesToIgnoreForList: [],
 	chartContainer: d3.select("#chartContainer"),
 	get dialogContainer() {
 		return d3.select("#dialogContainer").size()

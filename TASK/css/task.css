@@ -58,6 +58,7 @@
 .taskflowChartDiv,
 .taskflowChartDivList {
 	width: 100%;
+	height: 100%;
 	position: relative;
 }
 
@@ -339,4 +340,12 @@ dialog {
 
 .taskinputDivs:hover {
 	background-color: #dddee1;
+}
+
+.tasklinearContainerDiv {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
 }

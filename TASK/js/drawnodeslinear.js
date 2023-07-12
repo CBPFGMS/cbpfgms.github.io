@@ -1,13 +1,17 @@
-function drawNodesLinear(svgList) {
-	//this is just a placveholder for now
-	svgList.attr("height", "600px");
-	svgList
-		.append("text")
-		.attr("x", "50%")
-		.attr("y", "50%")
-		.attr("text-anchor", "middle")
-		.attr("dominant-baseline", "middle")
-		.text("This is a placeholder for the linear view");
+import { constants } from "./constants.js";
+
+const { classPrefix } = constants;
+
+function drawNodesLinear({
+	dataNodesOriginal,
+	dataLinksOriginal,
+	flowChartDivList,
+	currentStatus,
+	currentSequence,
+}) {
+	const linearContainerDiv = flowChartDivList
+		.append("div")
+		.attr("class", classPrefix + "linearContainerDiv");
 }
 
 export { drawNodesLinear };
