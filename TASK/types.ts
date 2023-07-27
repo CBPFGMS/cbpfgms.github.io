@@ -154,5 +154,16 @@ declare interface Links {
 }
 
 declare interface drawLinksList {
-	(args: { dataLinksOriginal: Links[]; sideDivContainer: any }): void;
+	({
+		dataLinksOriginal,
+		sideDivContainer,
+	}: {
+		dataLinksOriginal: Links[];
+		sideDivContainer: any;
+	}): void;
 }
+
+//Also:
+// declare interface drawLinksList {
+// 	(args: { dataLinksOriginal: Links[]; sideDivContainer: any }): void;
+// }
