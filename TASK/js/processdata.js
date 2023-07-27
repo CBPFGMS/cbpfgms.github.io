@@ -1,8 +1,10 @@
 import { constants } from "./constants.js";
 
-const { userRolesToIgnore, userRolesToIgnoreForList } = constants;
+const { userRolesToIgnore } = constants;
 
+/** @type {ProcessData} */
 function processData(rawData, projectsData) {
+	/** @type {Data} */
 	const data = {
 		nodes: [],
 		links: [],

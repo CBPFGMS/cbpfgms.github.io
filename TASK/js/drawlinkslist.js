@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
 import { createDialog } from "./dialog.js";
@@ -12,7 +13,8 @@ const {
 
 const localVariable = d3.local();
 
-function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
+/** @type {drawLinksList} */
+function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 	const dataList = dataLinksOriginal
 		.filter(({ text }) => text)
 		.sort((a, b) => a.id - b.id);
