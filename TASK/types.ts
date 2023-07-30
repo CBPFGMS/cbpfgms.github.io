@@ -153,15 +153,13 @@ declare interface Links {
 	id?: number;
 }
 
-declare interface drawLinksList {
-	({
-		dataLinksOriginal,
-		sideDivContainer,
-	}: {
-		dataLinksOriginal: Links[];
-		sideDivContainer: any;
-	}): void;
-}
+declare type drawLinksList = ({
+	dataLinksOriginal,
+	sideDivContainer,
+}: {
+	dataLinksOriginal: Links[];
+	sideDivContainer: any;
+}) => void;
 
 //Also:
 // declare interface drawLinksList {
