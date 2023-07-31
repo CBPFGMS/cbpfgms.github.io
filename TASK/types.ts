@@ -131,6 +131,7 @@ declare interface Data {
 	numberOfColumns: number;
 	currentStatus: number;
 	currentSequence: number[];
+	currentLinearSequence: Linear[];
 }
 
 declare interface Nodes {
@@ -153,12 +154,52 @@ declare interface Links {
 	id?: number;
 }
 
+declare interface Linear {
+	linearId: number;
+	thisNode: number;
+	nextNode: number | null;
+	link: Links | null;
+}
+
 declare type drawLinksList = ({
 	dataLinksOriginal,
 	sideDivContainer,
 }: {
 	dataLinksOriginal: Links[];
 	sideDivContainer: any;
+}) => void;
+
+declare type createFlowChart = ([RawData, projectsData]: [
+	RawData,
+	ProjectsData
+]) => void;
+
+declare type drawNodesLinear = ({
+	dataNodesOriginal,
+	currentLinearSequence,
+	svgLinear,
+	width,
+	currentStatus,
+}: {
+	dataNodesOriginal: Nodes[];
+	currentLinearSequence: Linear[];
+	svgLinear: any;
+	width: number;
+	currentStatus: number;
+}) => any;
+
+declare type drawLinksLinear = ({
+	dataLinksOriginal,
+	nodesGroupLinear,
+	currentLinearSequence,
+	svgLinear,
+	width,
+}: {
+	dataLinksOriginal: Links[];
+	nodesGroupLinear: any;
+	currentLinearSequence: Linear[];
+	svgLinear: any;
+	width: number;
 }) => void;
 
 //Also:

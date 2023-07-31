@@ -11,6 +11,7 @@ function processData(rawData, projectsData) {
 		numberOfColumns: rawData.RowCount + 1,
 		currentStatus: rawData.CurrentStatusId,
 		currentSequence: [],
+		currentLinearSequence: [],
 	};
 
 	const nodesSet = new Set();
@@ -61,6 +62,29 @@ function processData(rawData, projectsData) {
 				});
 			}
 		});
+	});
+
+	let linearCount = 0;
+
+	for (const log of projectsData.TrackingLogs) {
+		data.currentLinearSequence.push({
+			linearId: linearCount++,
+			thisNode: log.CurrentStatusId,
+			nextNode: log.NextStatusId,
+			link: data.links.find(
+				e =>
+					e.source === log.CurrentStatusId &&
+					e.target === log.NextStatusId
+			),
+		});
+	}
+
+	//given the current structure of project.json, the current status is the NextStatusId of the last element of TrackingLogs
+	data.currentLinearSequence.push({
+		linearId: linearCount++,
+		thisNode: projectsData.TrackingLogs.at(-1).NextStatusId,
+		nextNode: null,
+		link: null,
 	});
 
 	const nodesAlreadyVisited = new Set();

@@ -10,6 +10,7 @@ import { processData } from "./processdata.js";
 import { fetchFile } from "./fetchfile.js";
 import { createRadioButtons } from "./radiobuttons.js";
 import { drawNodesLinear } from "./drawnodeslinear.js";
+import { drawLinksLinear } from "./drawlinkslinear.js";
 
 const {
 	classPrefix,
@@ -17,6 +18,7 @@ const {
 	defaultNumberOfColumns,
 	currentStatusFillColor,
 	defaultView,
+	rowHeightLinear,
 } = constants;
 
 variables.view = defaultView;
@@ -57,9 +59,12 @@ const flowChartDivContainer = chartContainer
 	flowChartDiv = flowChartDivWrapper
 		.append("div")
 		.attr("class", classPrefix + "flowChartDiv"),
-	flowChartDivList = flowChartDivWrapper
+	flowChartDivLinear = flowChartDivWrapper
 		.append("div")
-		.attr("class", classPrefix + "flowChartDivList"),
+		.attr("class", classPrefix + "flowChartDivLinear"),
+	linearContainerDiv = flowChartDivLinear
+		.append("div")
+		.attr("class", classPrefix + "linearContainerDiv"),
 	sideDivTitle = sideDiv
 		.append("div")
 		.attr("class", classPrefix + "sideDivTitle"),
@@ -81,12 +86,11 @@ const flowChartDivSize = flowChartDiv.node().getBoundingClientRect();
 const { width } = flowChartDivSize;
 
 const svg = flowChartDiv.append("svg").attr("width", width);
+const svgLinear = linearContainerDiv.append("svg").attr("width", width);
 
 const { inputs: buttons, inputDivs } = createRadioButtons(
 	flowChartTopDivButtons
 );
-
-switchView();
 
 buttons.on("click", (event, d) => {
 	variables.view = d;
@@ -96,10 +100,10 @@ buttons.on("click", (event, d) => {
 
 function switchView() {
 	if (variables.view === "list") {
-		flowChartDivList.style("display", "block");
+		flowChartDivLinear.style("display", "block");
 		flowChartDiv.style("display", "none");
 	} else {
-		flowChartDivList.style("display", "none");
+		flowChartDivLinear.style("display", "none");
 		flowChartDiv.style("display", "block");
 	}
 }
@@ -109,6 +113,7 @@ Promise.all([
 	fetchFile("projectsData", projectsUrl, "json"),
 ]).then(createFlowChart);
 
+/** @type {createFlowChart} */
 function createFlowChart([rawData, projectsData]) {
 	const data = processData(rawData, projectsData);
 
@@ -117,6 +122,7 @@ function createFlowChart([rawData, projectsData]) {
 		links: dataLinksOriginal,
 		currentStatus,
 		currentSequence,
+		currentLinearSequence,
 	} = data;
 
 	const numberOfColumns =
@@ -135,6 +141,10 @@ function createFlowChart([rawData, projectsData]) {
 
 	svg.attr("height", variables.height);
 
+	variables.heightLinear = currentLinearSequence.length * rowHeightLinear;
+
+	svgLinear.attr("height", variables.heightLinear);
+
 	const { linksGroup, labelsGroup } = drawLinks({
 		dataLinks,
 		svg,
@@ -143,13 +153,23 @@ function createFlowChart([rawData, projectsData]) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	drawNodesLinear({
+	const nodesGroupLinear =  drawNodesLinear({
 		dataNodesOriginal,
-		dataLinksOriginal,
-		flowChartDivList,
+		currentLinearSequence,
+		svgLinear,
+		width,
 		currentStatus,
-		currentSequence,
 	});
+
+	drawLinksLinear({
+		dataLinksOriginal,
+		nodesGroupLinear,
+		currentLinearSequence,
+		svgLinear,
+		width,
+	});
+
+	switchView();
 
 	currentStatusValueSpan
 		.style("text-decoration", "underline")

@@ -56,14 +56,14 @@
 
 .taskflowChartDivWrapper,
 .taskflowChartDiv,
-.taskflowChartDivList {
+.taskflowChartDivLinear {
 	width: 100%;
 	height: 100%;
 	position: relative;
 }
 
 .taskflowChartDiv,
-.taskflowChartDivList {
+.taskflowChartDivLinear {
 	position: absolute;
 }
 
@@ -82,7 +82,7 @@
 	/*	flex: 0 10%;*/
 }
 
-.tasknodeText {
+.tasknodeText, .tasknodeTextLinear {
 	font-family: "Roboto", sans-serif;
 	font-size: 15px;
 	text-anchor: middle;
@@ -229,7 +229,7 @@ details[open] summary {
 	fill: none;
 }
 
-.tasklabelsGroupText {
+.tasklabelsGroupText, .tasklabelsGroupLinearText {
 	dominant-baseline: central;
 	text-anchor: middle;
 	font-size: 12px;
@@ -348,4 +348,5 @@ dialog {
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
+	overflow-y: scroll;
 }

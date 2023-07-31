@@ -1,6 +1,7 @@
+//@ts-ignore
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-const constants = {
+const constants = Object.freeze({
 	classPrefix: "task",
 	userRolesToIgnore: ["GMSAdmin"],
 	userRolesToIgnoreForList: [],
@@ -15,10 +16,12 @@ const constants = {
 	maxNodeCharactersNumber: 200,
 	maxLinkCharacterNumber: 200,
 	rowHeight: 100,
+	rowHeightLinear: 100,
 	rowHeightIncrement: 20,
 	defaultNumberOfColumns: 2,
 	innerPaddingPercentage: 0.3,
 	padding: [10, 10, 10, 10],
+	paddingLinear: [10, 10, 10, 10],
 	xScalePadding: 0.5,
 	yScalePadding: 0.5,
 	nodesTextPaddingVertical: 8,
@@ -26,6 +29,7 @@ const constants = {
 	nodesTextSpacing: 12,
 	xScale: d3.scalePoint(),
 	yScale: d3.scalePoint(),
+	yScaleLinear: d3.scalePoint(),
 	minLinkDistanceFromNodes: 4,
 	connectionPositions: ["top", "right", "bottom", "left"],
 	viewTypes: ["workflow", "list"],
@@ -55,7 +59,7 @@ const constants = {
 		.x(d => d.x)
 		.y(d => d.y)
 		.curve(d3.curveBasis),
-};
+});
 
 const variables = {
 	heightValue: null,

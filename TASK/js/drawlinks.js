@@ -1,3 +1,4 @@
+//@ts-ignore
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { stylesList } from "./styleslist.js";
 import { constants } from "./constants.js";
@@ -111,7 +112,7 @@ function detectCollision(selection, linksGroup) {
 				}
 			});
 		});
-		if ((collisions = collisionPairs.length)) {
+		if ((collisions = !!collisionPairs.length)) {
 			collisionPairs.forEach(pair => {
 				d3.selectAll(pair).each((d, i, n) => {
 					if (!i) {
