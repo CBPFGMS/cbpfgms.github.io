@@ -75,7 +75,7 @@ function drawLinksLinear({
 				.datum();
 			return targetNode.rectMidY + targetNode.rectHeight / 2;
 		})
-		.attr("marker-end", d => `url(#arrowLinearprevious)`);
+		.attr("marker-end", "url(#arrowLinearprevious)");
 
 	const labelsGroupLinear = svgLinear
 		.selectAll(null)
