@@ -222,6 +222,11 @@ declare type detectCollision = (
 	linksGroup: d3.Selection<SVGGElement, unknown, null, undefined>
 ) => void;
 
+declare type fetchMethod = (
+	url: string,
+	rowFunction: Function | object | null
+) => Promise<any>;
+
 //Also:
 // declare interface drawLinksList {
 // 	(args: { dataLinksOriginal: Links[]; sideDivContainer: any }): void;

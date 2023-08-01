@@ -23,9 +23,9 @@ function fetchFile(fileName, url, method) {
 		);
 		return Promise.resolve(fetchedData);
 	} else {
+		/** @type {fetchMethod} */
 		const fetchMethod = method === "csv" ? d3.csv : d3.json;
 		const rowFunction = method === "csv" ? d3.autoType : null;
-		// @ts-ignore
 		return fetchMethod(url, rowFunction).then(
 			/** @param {Array} fetchedData */
 			fetchedData => {
