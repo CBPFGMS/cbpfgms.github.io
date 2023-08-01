@@ -1,12 +1,13 @@
-//@ts-ignore
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { stylesList } from "./styleslist.js";
 import { constants } from "./constants.js";
+
+/* global d3 */
 
 const { classPrefix, lineGenerator, labelCircleRadius } = constants;
 
 //create label collision detection based on the length along the path, increasing or decreasing it.
 
+/** @type {drawLinks} */
 function drawLinks({ dataLinks, svg, currentSequence }) {
 	const defs = svg.append("defs");
 
@@ -97,48 +98,65 @@ function positionLabelGroup(selection, linksGroup) {
 	});
 }
 
+/** @type {detectCollision} */
 function detectCollision(selection, linksGroup) {
 	let collisions = true;
 	while (collisions) {
 		const collisionPairs = [];
-		selection.each((d, i, n) => {
-			selection.each((e, j, m) => {
-				if (i < j) {
-					const { translateX: x1, translateY: y1 } = d;
-					const { translateX: x2, translateY: y2 } = e;
-					const distance = Math.hypot(x2 - x1, y2 - y1);
-					if (distance < labelCircleRadius * 2)
-						collisionPairs.push([n[i], m[j]]);
-				}
-			});
-		});
+		selection.each(
+			/** @param {any} d */
+			(d, i, n) => {
+				selection.each(
+					/** @param {any} e */
+					(e, j, m) => {
+						if (i < j) {
+							const { translateX: x1, translateY: y1 } = d;
+							const { translateX: x2, translateY: y2 } = e;
+							const distance = Math.hypot(x2 - x1, y2 - y1);
+							if (distance < labelCircleRadius * 2)
+								collisionPairs.push([n[i], m[j]]);
+						}
+					}
+				);
+			}
+		);
 		if ((collisions = !!collisionPairs.length)) {
 			collisionPairs.forEach(pair => {
-				d3.selectAll(pair).each((d, i, n) => {
-					if (!i) {
-						d.pointLength += labelCircleRadius;
-					} else {
-						const previousDatum = d3.select(n[0]).datum();
-						let signal =
-							previousDatum.data.source === d.data.target &&
-							previousDatum.data.target === d.data.source
-								? 1
-								: -1;
-						d.pointLength += labelCircleRadius * signal;
+				d3.selectAll(pair).each(
+					/** @param {any} d */
+					(d, i, n) => {
+						if (!i) {
+							d.pointLength += labelCircleRadius;
+						} else {
+							const previousDatum = d3.select(n[0]).datum();
+							let signal =
+								previousDatum.data.source === d.data.target &&
+								previousDatum.data.target === d.data.source
+									? 1
+									: -1;
+							d.pointLength += labelCircleRadius * signal;
+						}
+						const thisPath = linksGroup
+							.filter(
+								/** @param {any} e */
+								e => e.data.id === d.data.id
+							)
+							.select("path")
+							.node();
+						// @ts-ignore
+						const thisPoint = thisPath.getPointAtLength(
+							d.pointLength
+						);
+						d.translateX = thisPoint.x;
+						d.translateY = thisPoint.y;
 					}
-					const thisPath = linksGroup
-						.filter(e => e.data.id === d.data.id)
-						.select("path")
-						.node();
-					const thisPoint = thisPath.getPointAtLength(d.pointLength);
-					d.translateX = thisPoint.x;
-					d.translateY = thisPoint.y;
-				});
+				);
 			});
 		}
 	}
 	selection.attr(
 		"transform",
+		/** @param {any} d */
 		d => `translate(${d.translateX}, ${d.translateY})`
 	);
 }

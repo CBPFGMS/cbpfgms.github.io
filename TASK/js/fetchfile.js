@@ -1,4 +1,4 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+/* global d3 */
 
 const localStorageTime = 10 * 60 * 1000, //1 hour
 	currentDate = new Date(),
@@ -25,7 +25,10 @@ function fetchFile(fileName, url, method) {
 	} else {
 		const fetchMethod = method === "csv" ? d3.csv : d3.json;
 		const rowFunction = method === "csv" ? d3.autoType : null;
-		return fetchMethod(url, rowFunction).then(fetchedData => {
+		// @ts-ignore
+		return fetchMethod(url, rowFunction).then(
+			/** @param {Array} fetchedData */
+			fetchedData => {
 			try {
 				localStorage.setItem(
 					fileName,

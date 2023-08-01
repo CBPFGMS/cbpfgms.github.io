@@ -1,5 +1,5 @@
-//@ts-ignore
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+// @ts-nocheck
+/* global d3 */
 
 const constants = Object.freeze({
 	classPrefix: "task",

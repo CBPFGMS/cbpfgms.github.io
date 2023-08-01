@@ -1,7 +1,7 @@
-//@ts-ignore
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
 import { stylesList } from "./styleslist.js";
+
+/* global d3 */
 
 const {
 	classPrefix,
@@ -18,7 +18,8 @@ function drawLinksLinear({
 	svgLinear,
 	width,
 }) {
-	const linearSequence = currentLinearSequence.slice(0, -1);
+	/** @type {LinearExtended[]} */
+	const linearSequence = structuredClone(currentLinearSequence.slice(0, -1));
 
 	const defs = svgLinear.append("defs");
 
@@ -41,22 +42,18 @@ function drawLinksLinear({
 
 	const linksGroup = svgLinear
 		.selectAll(null)
-		.data(structuredClone(linearSequence))
+		.data(linearSequence)
 		.enter()
 		.append("g")
 		.attr("class", classPrefix + "linksGroup")
-		.each(
-			/** @param {Linear} d */
-			d => {
-				const originalLink = dataLinksOriginal.find(
-					e =>
-						e.source === d.link.source && e.target === d.link.target
-				);
-				for (const key in originalLink) {
-					d[key] = originalLink[key];
-				}
+		.each(d => {
+			const originalLink = dataLinksOriginal.find(
+				e => e.source === d.link.source && e.target === d.link.target
+			);
+			for (const key in originalLink) {
+				d[key] = originalLink[key];
 			}
-		);
+		});
 
 	const links = linksGroup
 		.append("line")
@@ -83,18 +80,14 @@ function drawLinksLinear({
 		.enter()
 		.append("g")
 		.attr("class", classPrefix + "labelsGroupLinear")
-		.each(
-			/** @param {Linear} d */
-			d => {
-				const originalLink = dataLinksOriginal.find(
-					e =>
-						e.source === d.link.source && e.target === d.link.target
-				);
-				for (const key in originalLink) {
-					d[key] = originalLink[key];
-				}
+		.each(d => {
+			const originalLink = dataLinksOriginal.find(
+				e => e.source === d.link.source && e.target === d.link.target
+			);
+			for (const key in originalLink) {
+				d[key] = originalLink[key];
 			}
-		)
+		})
 		.attr("transform", (d, i) => {
 			const sourceNode = nodesGroupLinear
 				.filter(e => e.linearId === i)

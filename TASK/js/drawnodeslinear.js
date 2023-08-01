@@ -1,7 +1,7 @@
-//@ts-ignore
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants, variables } from "./constants.js";
 import { stylesList } from "./styleslist.js";
+
+/* global d3 */
 
 const {
 	yScaleLinear,
@@ -23,18 +23,22 @@ function drawNodesLinear({
 	currentStatus,
 }) {
 	yScaleLinear
-		.domain(currentLinearSequence.map(e => e.linearId))
+		.domain(currentLinearSequence.map(e => e.linearId.toString()))
 		.range([variables.heightLinear - paddingLinear[2], paddingLinear[0]])
 		.padding(1);
 
+	/** @type {LinearExtended[]} */
+	const linearData = structuredClone(currentLinearSequence);
+
 	const nodesGroupLinear = svgLinear
 		.selectAll(null)
-		.data(structuredClone(currentLinearSequence))
+		.data(linearData)
 		.enter()
 		.append("g")
 		.attr(
 			"transform",
-			d => `translate(${width / 2},${yScaleLinear(d.linearId)})`
+			d =>
+				`translate(${width / 2},${yScaleLinear(d.linearId.toString())})`
 		)
 		.each(d => {
 			const originalNode = dataNodesOriginal.find(
@@ -51,10 +55,11 @@ function drawNodesLinear({
 		.text(d => dataNodesOriginal.find(e => e.id === d.thisNode).text);
 
 	nodesGroupLinear.each((d, i, n) => {
+		// @ts-ignore
 		const { width, height } = n[i].firstChild.getBBox();
 		d.rectWidth = width + nodesTextPaddingHorizontal * 2;
 		d.rectHeight = height + nodesTextPaddingVertical * 2;
-		d.rectMidY = yScaleLinear(d.linearId);
+		d.rectMidY = yScaleLinear(d.linearId.toString());
 	});
 
 	const rectangles = nodesGroupLinear

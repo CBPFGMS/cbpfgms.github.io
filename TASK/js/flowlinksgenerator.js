@@ -1,8 +1,8 @@
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants, variables } from "./constants.js";
 
+/* global d3 */
+
 const {
-	classPrefix,
 	connectionPositions,
 	xScale,
 	yScale,
@@ -281,8 +281,6 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 	});
 
 	links.forEach((link, index) => {
-		const nodeSource = dataNodes.find(d => d.data.id === link.data.source);
-		const nodeTarget = dataNodes.find(d => d.data.id === link.data.target);
 		const nodeConnectionSource = dataNodes.find(
 			d => d.data.id === link.data.source
 		);
@@ -331,7 +329,7 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 			};
 		}
 	}
-
+	/** @return {[string, string, boolean]} */
 	function setPositions({
 		sourceRow,
 		sourceColumn,
@@ -398,8 +396,10 @@ function calculateConnectionPositions({ dataLinksOriginal, links, dataNodes }) {
 }
 
 function calculateFreeRowsAndColumns(nodes) {
-	const numberOfRows = 2 + yScale.domain()[yScale.domain().length - 1];
-	const numberOfColumns = 2 + xScale.domain()[xScale.domain().length - 1];
+	/** @type {number} */
+	const numberOfRows = 2 + +yScale.domain()[yScale.domain().length - 1];
+	/** @type {number} */
+	const numberOfColumns = 2 + +xScale.domain()[xScale.domain().length - 1];
 
 	const data = {
 		rows: {},

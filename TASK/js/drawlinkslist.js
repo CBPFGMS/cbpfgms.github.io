@@ -1,7 +1,7 @@
-// @ts-ignore
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { constants } from "./constants.js";
 import { createDialog } from "./dialog.js";
+
+/* global d3 */
 
 const {
 	classPrefix,

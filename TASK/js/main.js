@@ -23,6 +23,7 @@ const {
 
 variables.view = defaultView;
 
+// @ts-ignore
 const numberOfColumnsDataset = +chartContainer.node().dataset.columns;
 
 const dataUrl = "./data/master.json",
@@ -85,7 +86,10 @@ const flowChartDivSize = flowChartDiv.node().getBoundingClientRect();
 
 const { width } = flowChartDivSize;
 
+/** @type {d3.Selection} */
 const svg = flowChartDiv.append("svg").attr("width", width);
+
+/** @type {d3.Selection} */
 const svgLinear = linearContainerDiv.append("svg").attr("width", width);
 
 const { inputs: buttons, inputDivs } = createRadioButtons(

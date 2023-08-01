@@ -1,7 +1,8 @@
+declare type D3 = typeof import("d3");
+
 declare interface ProcessData {
 	(rawData: RawData, projectsData: ProjectsData): Data;
 }
-
 declare interface RawData {
 	CurrentStatusId: number;
 	CurrentStatusCode: string;
@@ -161,6 +162,10 @@ declare interface Linear {
 	link: Links | null;
 }
 
+declare interface LinearExtended extends Linear {
+	[key: string]: any;
+}
+
 declare type drawLinksList = ({
 	dataLinksOriginal,
 	sideDivContainer,
@@ -183,7 +188,7 @@ declare type drawNodesLinear = ({
 }: {
 	dataNodesOriginal: Nodes[];
 	currentLinearSequence: Linear[];
-	svgLinear: any;
+	svgLinear: d3.Selection<SVGGElement, unknown, null, undefined>;
 	width: number;
 	currentStatus: number;
 }) => any;
@@ -198,9 +203,24 @@ declare type drawLinksLinear = ({
 	dataLinksOriginal: Links[];
 	nodesGroupLinear: any;
 	currentLinearSequence: Linear[];
-	svgLinear: any;
+	svgLinear: d3.Selection<SVGGElement, unknown, null, undefined>;
 	width: number;
 }) => void;
+
+declare type drawLinks = ({
+	dataLinks,
+	svg,
+	currentSequence,
+}: {
+	dataLinks: any;
+	svg: d3.Selection<SVGGElement, unknown, null, undefined>;
+	currentSequence: number[];
+}) => any;
+
+declare type detectCollision = (
+	selection: d3.Selection<SVGGElement, unknown, null, undefined>,
+	linksGroup: d3.Selection<SVGGElement, unknown, null, undefined>
+) => void;
 
 //Also:
 // declare interface drawLinksList {
