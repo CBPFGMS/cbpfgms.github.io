@@ -1,5 +1,3 @@
-declare type D3 = typeof import("d3");
-
 declare interface ProcessData {
 	(rawData: RawData, projectsData: ProjectsData): Data;
 }
