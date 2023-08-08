@@ -8,6 +8,9 @@ const {
 	previousStepsColor,
 	previousStepsStroke,
 	labelCircleRadius,
+	labelCirclePadding,
+	firstAlphabetLetter,
+	additionalTasksColors,
 } = constants;
 
 /** @type {drawLinksLinear} */
@@ -16,10 +19,14 @@ function drawLinksLinear({
 	nodesGroupLinear,
 	currentLinearSequence,
 	svgLinear,
+	linearLegendDiv,
 	width,
 }) {
 	/** @type {LinearExtended[]} */
 	const linearSequence = structuredClone(currentLinearSequence.slice(0, -1));
+	const subTasksData = linearSequence.filter(
+		d => d.additionalTasks.length > 0
+	);
 
 	const defs = svgLinear.append("defs");
 
@@ -116,6 +123,67 @@ function drawLinksLinear({
 		.append("text")
 		.attr("class", classPrefix + "labelsGroupLinearText")
 		.text(d => d.id);
+
+	const subTasksGroup = svgLinear
+		.selectAll(null)
+		.data(subTasksData)
+		.enter()
+		.append("g")
+		.attr("class", classPrefix + "subTasksGroup")
+		.attr("transform", d => {
+			const thisNode = nodesGroupLinear
+				.filter(e => e.linearId === d.linearId)
+				.datum();
+			const x = width / 2 - thisNode.rectWidth / 2;
+			const y = thisNode.rectMidY - thisNode.rectHeight / 2;
+			return `translate(${x + labelCircleRadius},${y})`;
+		});
+
+	const subTasksSubGroup = subTasksGroup
+		.selectAll(null)
+		.data(d => d.additionalTasks)
+		.enter()
+		.append("g")
+		.attr("class", classPrefix + "subTasksSubGroup")
+		.attr(
+			"transform",
+			(_, i) =>
+				`translate(${
+					i * labelCircleRadius * 2 + i * labelCirclePadding
+				},0)`
+		);
+
+	subTasksSubGroup
+		.append("circle")
+		.attr("class", classPrefix + "subTasksCircle")
+		.style("fill", d => additionalTasksColors(d.TaskStatusName))
+		.attr("r", labelCircleRadius);
+
+	subTasksSubGroup
+		.append("text")
+		.attr("class", classPrefix + "subTasksText")
+		.text((_, i) => String.fromCharCode(firstAlphabetLetter + i));
+
+	linearLegendDiv.append("div").html("Additional tasks");
+
+	const linearLegendRow = linearLegendDiv
+		.selectAll(null)
+		.data(additionalTasksColors.domain())
+		.enter()
+		.append("div")
+		.attr("class", classPrefix + "linearLegendRow");
+
+	linearLegendRow
+		.append("div")
+		.attr("class", classPrefix + "legendCircle")
+		.style("width", labelCircleRadius * 2 + "px")
+		.style("height", labelCircleRadius * 2 + "px")
+		.style("background-color", d => additionalTasksColors(d));
+
+	linearLegendRow
+		.append("div")
+		.attr("class", classPrefix + "legendText")
+		.text(d => d);
 
 	links.call(applyStyles, stylesList.links.paths);
 	labelCirclesLinear.call(applyStyles, stylesList.links.circles);

@@ -52,13 +52,17 @@ function drawNodesLinear({
 	const texts = nodesGroupLinear
 		.append("text")
 		.attr("class", classPrefix + "nodeTextLinear")
+		.attr("dy", d => (d.additionalTasks.length > 0 ? "0.5em" : null))
 		.text(d => dataNodesOriginal.find(e => e.id === d.thisNode).text);
 
 	nodesGroupLinear.each((d, i, n) => {
+		const hasAdditionalTasks = d.additionalTasks.length > 0;
 		// @ts-ignore
 		const { width, height } = n[i].firstChild.getBBox();
-		d.rectWidth = width + nodesTextPaddingHorizontal * 2;
-		d.rectHeight = height + nodesTextPaddingVertical * 2;
+		d.rectWidth =
+			width + nodesTextPaddingHorizontal * (hasAdditionalTasks ? 3 : 2);
+		d.rectHeight =
+			height + nodesTextPaddingVertical * (hasAdditionalTasks ? 3 : 2);
 		d.rectMidY = yScaleLinear(d.linearId.toString());
 	});
 

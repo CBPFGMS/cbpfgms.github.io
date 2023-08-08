@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* global d3 */
 
 const constants = Object.freeze({
@@ -16,7 +15,7 @@ const constants = Object.freeze({
 	maxNodeCharactersNumber: 200,
 	maxLinkCharacterNumber: 200,
 	rowHeight: 100,
-	rowHeightLinear: 100,
+	rowHeightLinear: 110,
 	rowHeightIncrement: 20,
 	defaultNumberOfColumns: 2,
 	innerPaddingPercentage: 0.3,
@@ -27,7 +26,9 @@ const constants = Object.freeze({
 	nodesTextPaddingVertical: 8,
 	nodesTextPaddingHorizontal: 12,
 	nodesTextSpacing: 12,
+	/** @type {scalePoint} */
 	xScale: d3.scalePoint(),
+	/** @type {scalePoint} */
 	yScale: d3.scalePoint(),
 	yScaleLinear: d3.scalePoint(),
 	minLinkDistanceFromNodes: 4,
@@ -39,6 +40,7 @@ const constants = Object.freeze({
 	cornerRadius: 4,
 	linkPaddingFromNode: 4,
 	labelCircleRadius: 12,
+	labelCirclePadding: 4,
 	fadeOpacityNodes: 0.1,
 	fadeOpacityLinks: 0.1,
 	fadeOpacityLinkLabels: 0.1,
@@ -54,9 +56,16 @@ const constants = Object.freeze({
 	previousStepsStroke: 2,
 	nextStepsOpacity: 1, //keep at 1 while testing other alternatives
 	defaultHoverText: "Hover over the nodes for additional information",
+	firstAlphabetLetter: "a".charCodeAt(0),
+	additionalTasksColors: d3
+		.scaleOrdinal()
+		.range(["#deebf7", "#fee6ce"])
+		.domain(["Completed", "Closed"]),
 	lineGenerator: d3
 		.line()
+		// @ts-ignore
 		.x(d => d.x)
+		// @ts-ignore
 		.y(d => d.y)
 		.curve(d3.curveBasis),
 });

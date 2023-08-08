@@ -17,6 +17,7 @@ const {
 	nodesTextSpacing,
 } = constants;
 
+/** @type {flowNodesGenerator} */
 function flowNodesGenerator({
 	dataNodesOriginal,
 	width,

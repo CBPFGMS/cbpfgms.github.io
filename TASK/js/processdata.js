@@ -71,6 +71,7 @@ function processData(rawData, projectsData) {
 			linearId: linearCount++,
 			thisNode: log.CurrentStatusId,
 			nextNode: log.NextStatusId,
+			additionalTasks: log.AdditionalTasks,
 			link: data.links.find(
 				e =>
 					e.source === log.CurrentStatusId &&
@@ -84,6 +85,7 @@ function processData(rawData, projectsData) {
 		linearId: linearCount++,
 		thisNode: projectsData.TrackingLogs.at(-1).NextStatusId,
 		nextNode: null,
+		additionalTasks: [],
 		link: null,
 	});
 

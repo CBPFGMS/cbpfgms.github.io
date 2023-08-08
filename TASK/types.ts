@@ -157,6 +157,7 @@ declare interface Linear {
 	linearId: number;
 	thisNode: number;
 	nextNode: number | null;
+	additionalTasks: AdditionalTask[];
 	link: Links | null;
 }
 
@@ -196,12 +197,14 @@ declare type drawLinksLinear = ({
 	nodesGroupLinear,
 	currentLinearSequence,
 	svgLinear,
+	linearLegendDiv,
 	width,
 }: {
 	dataLinksOriginal: Links[];
 	nodesGroupLinear: any;
 	currentLinearSequence: Linear[];
 	svgLinear: d3.Selection<SVGGElement, unknown, null, undefined>;
+	linearLegendDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
 	width: number;
 }) => void;
 
@@ -229,3 +232,34 @@ declare type fetchMethod = (
 // declare interface drawLinksList {
 // 	(args: { dataLinksOriginal: Links[]; sideDivContainer: any }): void;
 // }
+
+declare interface NodeData {
+	boundaries: {
+		bottom: number;
+		left: number;
+		right: number;
+		top: number;
+	};
+	column: number;
+	data: Nodes;
+	nodeText: string[];
+	rectHeight: number;
+	rectWidth: number;
+	row: number;
+	x: number;
+	y: number;
+}
+
+declare type flowNodesGenerator = ({
+	dataNodesOriginal,
+	width,
+	numberOfColumns,
+	svg,
+}: {
+	dataNodesOriginal: Nodes[];
+	width: number;
+	numberOfColumns: number;
+	svg: d3.Selection<SVGGElement, unknown, null, undefined>;
+}) => NodeData[];
+
+declare interface scalePoint extends d3.ScalePoint<number> {}

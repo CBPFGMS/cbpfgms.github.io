@@ -66,6 +66,9 @@ const flowChartDivContainer = chartContainer
 	linearContainerDiv = flowChartDivLinear
 		.append("div")
 		.attr("class", classPrefix + "linearContainerDiv"),
+	linearLegendDiv = linearContainerDiv
+		.append("div")
+		.attr("class", classPrefix + "linearLegendDiv"),
 	sideDivTitle = sideDiv
 		.append("div")
 		.attr("class", classPrefix + "sideDivTitle"),
@@ -157,7 +160,7 @@ function createFlowChart([rawData, projectsData]) {
 
 	const nodesGroup = drawNodes({ dataNodes, svg });
 
-	const nodesGroupLinear =  drawNodesLinear({
+	const nodesGroupLinear = drawNodesLinear({
 		dataNodesOriginal,
 		currentLinearSequence,
 		svgLinear,
@@ -170,6 +173,7 @@ function createFlowChart([rawData, projectsData]) {
 		nodesGroupLinear,
 		currentLinearSequence,
 		svgLinear,
+		linearLegendDiv,
 		width,
 	});
 

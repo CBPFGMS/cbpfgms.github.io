@@ -82,7 +82,8 @@
 	/*	flex: 0 10%;*/
 }
 
-.tasknodeText, .tasknodeTextLinear {
+.tasknodeText,
+.tasknodeTextLinear {
 	font-family: "Roboto", sans-serif;
 	font-size: 15px;
 	text-anchor: middle;
@@ -229,7 +230,9 @@ details[open] summary {
 	fill: none;
 }
 
-.tasklabelsGroupText, .tasklabelsGroupLinearText {
+.tasklabelsGroupText,
+.tasklabelsGroupLinearText,
+.tasksubTasksText {
 	dominant-baseline: central;
 	text-anchor: middle;
 	font-size: 12px;
@@ -349,4 +352,40 @@ dialog {
 	flex-direction: row;
 	justify-content: center;
 	overflow-y: scroll;
+}
+
+.tasksubTasksCircle {
+	fill: white;
+	stroke: #666;
+	stroke-width: 1;
+}
+
+.tasklinearLegendDiv {
+	position: absolute;
+	top: 1em;
+	left: 2em;
+	display: flex;
+	background-color: rgba(255, 255, 255, 0.7);
+	border-radius: 8px;
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+}
+
+.tasklinearLegendRow {
+	display: flex;
+	flex-direction: row;
+	margin-top: 6px;
+	align-items: center;
+}
+
+.tasklegendText {
+	padding-left: 0.5em;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+}
+
+.tasklegendCircle {
+	border-radius: 50%;
+	border: 1px solid #666;
 }
