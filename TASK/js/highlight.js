@@ -12,18 +12,29 @@ function highlight({
 	nodesGroup,
 	linksGroup,
 	labelsGroup,
+	nodesGroupLinear,
+	linksGroupLinear,
+	labelsGroupLinear,
+	subTasksSubGroup,
 	linksList,
 	flowChartCurrentStatusDiv,
 	currentStatus,
 }) {
 	const labelsText = labelsGroup.select("text"),
-		labelsCircle = labelsGroup.select("circle");
+		labelsCircle = labelsGroup.select("circle"),
+		labelsTextLinear = labelsGroupLinear.select("text"),
+		labelsCircleLinear = labelsGroupLinear.select("circle"),
+		subTasksLabelsText = subTasksSubGroup.select("text"),
+		subTasksLabelsCircle = subTasksSubGroup.select("circle");
 
 	const currentStatusNode = nodesGroup.filter(
 		d => d.data.id === currentStatus
 	);
 
 	nodesGroup.on("mouseenter", mouseoverNodesGroup).on("mouseleave", mouseout);
+	nodesGroupLinear
+		.on("mouseenter", mouseoverNodesGroupLinear)
+		.on("mouseleave", mouseoutLinear);
 	linksGroup.on("mouseenter", mouseoverLinks).on("mouseleave", mouseout);
 	labelsGroup.on("mouseenter", mouseoverLinks).on("mouseleave", mouseout);
 	linksList.on("mouseenter", mouseoverLinksList).on("mouseleave", mouseout);
@@ -67,6 +78,43 @@ function highlight({
 				? 1
 				: fadeOpacityNodes
 		);
+	}
+
+	function mouseoverNodesGroupLinear(event, d) {
+		linksGroupLinear.style("opacity", e =>
+			e.linearId === d.linearId || e.linearId === d.linearId - 1
+				? 1
+				: fadeOpacityNodes
+		);
+		nodesGroupLinear.style("opacity", e =>
+			e.linearId === d.linearId ||
+			e.linearId === d.linearId + 1 ||
+			e.linearId === d.linearId - 1
+				? 1
+				: fadeOpacityNodes
+		);
+		linksList.style("opacity", e =>
+			e.source === d.thisNode || e.target === d.thisNode
+				? 1
+				: fadeOpacityLinkListBase
+		);
+		labelsTextLinear.style("opacity", e =>
+			e.linearId === d.linearId || e.linearId === d.linearId - 1
+				? 1
+				: fadeOpacityLinkLabels
+		);
+		labelsCircleLinear.style("stroke-opacity", e =>
+			e.linearId === d.linearId || e.linearId === d.linearId - 1
+				? 1
+				: fadeOpacityLinkLabels
+		);
+		labelsCircleLinear.style("filter", e =>
+			e.linearId === d.linearId || e.linearId === d.linearId - 1
+				? null
+				: "contrast(0.9)"
+		);
+		subTasksLabelsText.style("opacity", fadeOpacityLinkLabels);
+		subTasksLabelsCircle.style("stroke-opacity", fadeOpacityLinkLabels);
 	}
 
 	function mouseoverLinks(event, d) {
@@ -121,6 +169,18 @@ function highlight({
 		labelsText.style("opacity", d => d.setOpacity);
 		labelsCircle.style("stroke-opacity", d => d.setOpacity);
 		labelsCircle.style("filter", null);
+		linksList.style("opacity", d => d.setOpacity);
+	}
+
+	function mouseoutLinear() {
+		nodesGroupLinear.style("opacity", 1);
+		linksGroupLinear.style("opacity", 1);
+		labelsTextLinear.style("opacity", 1);
+		labelsCircleLinear.style("stroke-opacity", 1);
+		labelsCircleLinear.style("filter", null);
+		subTasksLabelsText.style("opacity", 1);
+		subTasksLabelsCircle.style("stroke-opacity", 1);
+		subTasksLabelsCircle.style("filter", null);
 		linksList.style("opacity", d => d.setOpacity);
 	}
 }

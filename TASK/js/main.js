@@ -113,6 +113,9 @@ function switchView() {
 	if (variables.view === "list") {
 		flowChartDivLinear.style("display", "block");
 		flowChartDiv.style("display", "none");
+		linearContainerDiv.on("scroll", () => {
+			tooltipDiv.html(null).style("display", "none");
+		});
 	} else {
 		flowChartDivLinear.style("display", "none");
 		flowChartDiv.style("display", "block");
@@ -172,15 +175,16 @@ function createFlowChart([rawData, projectsData]) {
 		currentStatus,
 	});
 
-	drawLinksLinear({
-		dataLinksOriginal,
-		nodesGroupLinear,
-		currentLinearSequence,
-		svgLinear,
-		linearLegendDiv,
-		tooltipDiv,
-		width,
-	});
+	const { linksGroupLinear, labelsGroupLinear, subTasksSubGroup } =
+		drawLinksLinear({
+			dataLinksOriginal,
+			nodesGroupLinear,
+			currentLinearSequence,
+			svgLinear,
+			linearLegendDiv,
+			tooltipDiv,
+			width,
+		});
 
 	switchView();
 
@@ -208,6 +212,10 @@ function createFlowChart([rawData, projectsData]) {
 		nodesGroup,
 		linksGroup,
 		labelsGroup,
+		nodesGroupLinear,
+		linksGroupLinear,
+		labelsGroupLinear,
+		subTasksSubGroup,
 		linksList,
 		flowChartCurrentStatusDiv,
 		currentStatus,

@@ -48,7 +48,7 @@ function drawLinksLinear({
 			.attr("class", "arrowHead");
 	});
 
-	const linksGroup = svgLinear
+	const linksGroupLinear = svgLinear
 		.selectAll(null)
 		.data(linearSequence)
 		.enter()
@@ -63,7 +63,7 @@ function drawLinksLinear({
 			}
 		});
 
-	const links = linksGroup
+	const links = linksGroupLinear
 		.append("line")
 		.attr("class", classPrefix + "linksLinear")
 		.attr("x1", width / 2)
@@ -195,6 +195,8 @@ function drawLinksLinear({
 	links
 		.style("stroke-width", previousStepsStroke)
 		.style("stroke", previousStepsColor);
+
+	return { linksGroupLinear, labelsGroupLinear, subTasksSubGroup };
 
 	function showTooltip(event, d) {
 		tooltipDiv.style("display", "block");

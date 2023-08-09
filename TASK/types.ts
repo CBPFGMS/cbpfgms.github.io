@@ -208,7 +208,26 @@ declare type drawLinksLinear = ({
 	linearLegendDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
 	tooltipDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
 	width: number;
-}) => void;
+}) => {
+	linksGroupLinear: d3.Selection<
+		SVGGElement,
+		LinearExtended,
+		SVGGElement,
+		unknown
+	>;
+	labelsGroupLinear: d3.Selection<
+		SVGGElement,
+		LinearExtended,
+		SVGGElement,
+		unknown
+	>;
+	subTasksSubGroup: d3.Selection<
+		SVGGElement,
+		AdditionalTask,
+		SVGGElement,
+		LinearExtended
+	>;
+};
 
 declare type drawLinks = ({
 	dataLinks,
