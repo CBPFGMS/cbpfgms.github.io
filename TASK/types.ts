@@ -198,6 +198,7 @@ declare type drawLinksLinear = ({
 	currentLinearSequence,
 	svgLinear,
 	linearLegendDiv,
+	tooltipDiv,
 	width,
 }: {
 	dataLinksOriginal: Links[];
@@ -205,6 +206,7 @@ declare type drawLinksLinear = ({
 	currentLinearSequence: Linear[];
 	svgLinear: d3.Selection<SVGGElement, unknown, null, undefined>;
 	linearLegendDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
+	tooltipDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
 	width: number;
 }) => void;
 

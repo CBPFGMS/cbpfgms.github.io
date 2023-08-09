@@ -32,6 +32,10 @@ const dataUrl = "./data/master.json",
 const flowChartDivContainer = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "flowChartDivContainer"),
+	tooltipDiv = chartContainer
+		.append("div")
+		.attr("class", classPrefix + "tooltipDiv")
+		.style("display", "none"),
 	sideDiv = chartContainer
 		.append("div")
 		.attr("class", classPrefix + "sideDiv"),
@@ -174,6 +178,7 @@ function createFlowChart([rawData, projectsData]) {
 		currentLinearSequence,
 		svgLinear,
 		linearLegendDiv,
+		tooltipDiv,
 		width,
 	});
 
