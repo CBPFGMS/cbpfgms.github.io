@@ -1,5 +1,4 @@
 import { ReactComponent as Ochalogo } from "../assets/ocha-lockup-blue.svg";
-import "../styles/header.css";
 
 function Header() {
 	return (
