@@ -43,13 +43,15 @@ function AccordionComponent({
 					sx={{
 						color: "#144372",
 						fontWeight: "bold",
-						width: "30%",
+						width: "25%",
 						fontSize: "1.2rem",
 					}}
 				>
 					{type + ":"}
 				</Typography>
-				<Typography sx={{ color: "text.secondary" }}>
+				<Typography
+					sx={{ color: "text.secondary", alignSelf: "center" }}
+				>
 					{value.length === data[dataProperty as keyof Idata].length
 						? `All ${type}s selected`
 						: value.length < 6
@@ -71,8 +73,9 @@ function AccordionComponent({
 					variant="body2"
 					m={1}
 				>
-					Select the {type.toLocaleLowerCase()}. Multiple{" "}
-					{type.toLocaleLowerCase()}s are allowed.
+					Select the {type.toLocaleLowerCase()}.{" "}
+					{filterType === "dropdowncheck" &&
+						`Multiple ${type.toLocaleLowerCase()}s are allowed.`}
 				</Typography>
 				{filterType === "dropdowncheck" && (
 					<Dropdown

@@ -4,6 +4,7 @@ import Title from "./components/title";
 import Selectors from "./components/selectors";
 import DataContext from "./context/DataContext";
 import data from "./data/data.ts";
+import ChartArea from "./components/chartarea";
 
 function App() {
 	const [year, setYear] = useState<string[]>([data.years[0]!]);
@@ -37,6 +38,7 @@ function App() {
 						beneficiaryType={beneficiaryType}
 						setBeneficiaryType={setBeneficiaryType}
 					/>
+					<ChartArea />
 				</DataContext.Provider>
 			</div>
 		</>

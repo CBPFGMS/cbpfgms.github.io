@@ -47,16 +47,11 @@ function Selectors({
 				backgroundColor: "rgb(243, 246, 249)",
 				border: "1px solid rgb(229, 234, 242)",
 				borderRadius: "12px",
+				marginBottom: "3em",
 			}}
 			variant="outlined"
 		>
 			<CardContent>
-				<Typography
-					gutterBottom
-					variant="h6"
-				>
-					Selection Filters
-				</Typography>
 				<Typography
 					gutterBottom
 					variant="subtitle1"

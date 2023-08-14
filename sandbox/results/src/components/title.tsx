@@ -6,7 +6,8 @@ function Title() {
 			<Typography
 				variant="h4"
 				mb={1}
-				color="text.primary"
+				color="#424242"
+				sx={{ fontWeight: 700, fontSize: "2.25rem" }}
 			>
 				Results
 			</Typography>
