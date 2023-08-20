@@ -30,7 +30,7 @@ function AccordionComponent({
 	expanded,
 	handleAccordionExpand,
 }: AccordionComponentProps) {
-	const data = useContext(DataContext);
+	const data = useContext<Idata>(DataContext);
 
 	return (
 		<Accordion
