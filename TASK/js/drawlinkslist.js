@@ -29,6 +29,7 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 		.append("div")
 		.style("color", (_, i) => (i ? nextStepsColor : previousStepsColor))
 		.style("background-color", (_, i) => {
+			// @ts-ignore
 			const { r, g, b } = d3.color(
 				i ? nextStepsColor : previousStepsColor
 			);
@@ -63,6 +64,7 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 			.attr("class", classPrefix + "listRowsTasks")
 			.each((d, i, n) => {
 				const thisElement = d3.select(n[i]);
+				// @ts-ignore
 				const parentDatum = d3.select(n[i].parentNode).datum();
 				localVariable.set(n[i], parentDatum);
 				const foundRole = parentDatum.projectLogs.some(
@@ -76,7 +78,7 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 				thisElement
 					.append("span")
 					.attr("class", classPrefix + "listRowsTasksSpan")
-					.html(d.ButtonText);
+					.html(d.TaskName);
 			});
 
 		// tasks
@@ -88,6 +90,7 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 			.append("div")
 			.attr("class", classPrefix + "listRowsNumber")
 			.style("background-color", () => {
+				// @ts-ignore
 				const { r, g, b } = d3.color(
 					i ? nextStepsColor : previousStepsColor
 				);
@@ -115,7 +118,9 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 				.classed("active", e => e.clicked)
 				.selectChildren(`.${classPrefix}listRowsTasks`)
 				.style("max-height", (e, i, n) =>
+					// @ts-ignore
 					d3.select(n[i].parentNode).datum().clicked
+						// @ts-ignore
 						? n[i].scrollHeight * 2 + "px"
 						: null
 				);

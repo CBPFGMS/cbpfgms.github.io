@@ -182,7 +182,6 @@ function createFlowChart([rawData, projectsData]) {
 			currentLinearSequence,
 			svgLinear,
 			linearLegendDiv,
-			tooltipDiv,
 			width,
 		});
 
@@ -219,5 +218,6 @@ function createFlowChart([rawData, projectsData]) {
 		linksList,
 		flowChartCurrentStatusDiv,
 		currentStatus,
+		tooltipDiv,
 	});
 }

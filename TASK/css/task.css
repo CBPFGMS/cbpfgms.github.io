@@ -393,7 +393,6 @@ dialog {
 
 .tasktooltipDiv {
 	position: absolute;
-	padding: 8px;
 	background-color: #fff;
 	border-radius: 8px;
 	border: 1px solid #ddd;
@@ -401,5 +400,36 @@ dialog {
 	font-family: "Arial", sans-serif;
 	font-size: 14px;
 	color: #222;
+	padding: 0px;
 	width: auto;
+	overflow: hidden;
+}
+
+.tasktooltipBody {
+	display: flex;
+	flex-direction: column;
+	padding: 1em;
+}
+
+.tasktooltipFieldName {
+	font-size: 13px;
+	color: #666;
+	white-space: pre;
+}
+
+.tasktooltipFieldValue {
+	font-size: 14px;
+	color: #222;
+	font-weight: 500;
+}
+
+.tasktooltipTitle {
+	background-color: #5392cb;
+	color: white;
+	height: 2.5em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	white-space: pre-wrap;
+	padding: 1em;
 }

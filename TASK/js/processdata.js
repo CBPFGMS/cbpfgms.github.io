@@ -45,6 +45,11 @@ function processData(rawData, projectsData) {
 				const userCode = e.Roles[0].UserRoleCode;
 				return !userRolesToIgnore.includes(userCode);
 			});
+			const taskNameLinear = projectsData.TrackingLogs.find(
+				e =>
+					e.CurrentStatusId === node.StatusId &&
+					e.NextStatusId === link.NextStatusId
+			);
 			if (node.StatusId !== link.NextStatusId && link.Tasks.length > 0) {
 				data.links.push({
 					source: node.StatusId,
@@ -52,7 +57,9 @@ function processData(rawData, projectsData) {
 					type: link.LinkType,
 					isCompleted: link.IsCompleted,
 					tasks: link.Tasks,
-					text: link.Tasks[0].TaskName, //This should be changed to filter the task name accordingly
+					text: taskNameLinear
+						? taskNameLinear.TaskName
+						: link.Tasks[0].TaskName, //This should be changed to filter the task name accordingly
 					projectLogs: projectsData.TrackingLogs.filter(
 						e =>
 							e.CurrentStatusId === node.StatusId &&

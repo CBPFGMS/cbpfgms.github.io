@@ -20,7 +20,6 @@ function drawLinksLinear({
 	currentLinearSequence,
 	svgLinear,
 	linearLegendDiv,
-	tooltipDiv,
 	width,
 }) {
 	/** @type {LinearExtended[]} */
@@ -165,8 +164,6 @@ function drawLinksLinear({
 		.attr("class", classPrefix + "subTasksText")
 		.text((_, i) => String.fromCharCode(firstAlphabetLetter + i));
 
-	subTasksSubGroup.on("mouseover", showTooltip).on("mouseout", hideTooltip);
-
 	linearLegendDiv.append("div").html("Additional tasks");
 
 	const linearLegendRow = linearLegendDiv
@@ -197,32 +194,6 @@ function drawLinksLinear({
 		.style("stroke", previousStepsColor);
 
 	return { linksGroupLinear, labelsGroupLinear, subTasksSubGroup };
-
-	function showTooltip(event, d) {
-		tooltipDiv.style("display", "block");
-		tooltipDiv.append("div").html("Task: " + d.TaskName);
-		tooltipDiv.append("div").html("Status: " + d.TaskStatusName);
-		const thisOffset = event.currentTarget.getBoundingClientRect();
-		const tooltipOffset = tooltipDiv.node().getBoundingClientRect();
-		const containerOffset = tooltipDiv
-			.node()
-			// @ts-ignore
-			.parentNode.getBoundingClientRect();
-		tooltipDiv
-			.style(
-				"left",
-				thisOffset.left -
-					tooltipOffset.width -
-					containerOffset.left -
-					10 +
-					"px"
-			)
-			.style("top", thisOffset.top - containerOffset.top + "px");
-	}
-
-	function hideTooltip() {
-		tooltipDiv.html(null).style("display", "none");
-	}
 }
 
 function applyStyles(selection, styles) {

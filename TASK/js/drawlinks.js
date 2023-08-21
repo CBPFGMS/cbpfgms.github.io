@@ -3,7 +3,11 @@ import { constants } from "./constants.js";
 
 /* global d3 */
 
-const { classPrefix, lineGenerator, labelCircleRadius } = constants;
+const {
+	classPrefix,
+	lineGenerator,
+	labelCircleRadius,
+} = constants;
 
 //create label collision detection based on the length along the path, increasing or decreasing it.
 
@@ -73,9 +77,7 @@ function drawLinks({ dataLinks, svg, currentSequence }) {
 	links.call(applyStyles, stylesList.links.paths);
 	labelCircles.call(applyStyles, stylesList.links.circles);
 	labelTexts.call(applyStyles, stylesList.links.texts);
-
 	labelsGroup.call(positionLabelGroup, linksGroup);
-
 	labelsGroup.call(detectCollision, linksGroup);
 
 	return { linksGroup, labelsGroup };

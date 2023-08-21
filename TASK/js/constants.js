@@ -68,6 +68,8 @@ const constants = Object.freeze({
 		// @ts-ignore
 		.y(d => d.y)
 		.curve(d3.curveBasis),
+	taskDateParser: d3.utcParse("%Y-%m-%dT%H:%M:%S.%L"),
+	taskDateFormatter: d3.timeFormat("%d %b %Y at %H:%M:%S"),
 });
 
 const variables = {

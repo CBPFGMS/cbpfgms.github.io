@@ -105,7 +105,7 @@ declare interface AdditionalTask {
 	TaskCreatedDate: string;
 	AssignedTaskDetail?: AssignedTaskDetail;
 	LoggedTaskDetail: LoggedTaskDetail2;
-	EmailLogs: any[];
+	EmailLogs: EmailLog[];
 }
 
 declare interface AssignedTaskDetail {
@@ -198,7 +198,6 @@ declare type drawLinksLinear = ({
 	currentLinearSequence,
 	svgLinear,
 	linearLegendDiv,
-	tooltipDiv,
 	width,
 }: {
 	dataLinksOriginal: Links[];
@@ -206,7 +205,6 @@ declare type drawLinksLinear = ({
 	currentLinearSequence: Linear[];
 	svgLinear: d3.Selection<SVGGElement, unknown, null, undefined>;
 	linearLegendDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
-	tooltipDiv: d3.Selection<HTMLDivElement, any, HTMLElement, any>;
 	width: number;
 }) => {
 	linksGroupLinear: d3.Selection<
