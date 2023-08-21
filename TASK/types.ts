@@ -282,3 +282,5 @@ declare type flowNodesGenerator = ({
 }) => NodeData[];
 
 declare interface scalePoint extends d3.ScalePoint<number> {}
+
+declare type RGBColor = d3.RGBColor

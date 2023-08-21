@@ -14,7 +14,7 @@ const {
 const localVariable = d3.local();
 
 /** @type {drawLinksList} */
-function drawLinksList({dataLinksOriginal, sideDivContainer}) {
+function drawLinksList({ dataLinksOriginal, sideDivContainer }) {
 	const dataList = dataLinksOriginal
 		.filter(({ text }) => text)
 		.sort((a, b) => a.id - b.id);
@@ -29,10 +29,9 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 		.append("div")
 		.style("color", (_, i) => (i ? nextStepsColor : previousStepsColor))
 		.style("background-color", (_, i) => {
-			// @ts-ignore
-			const { r, g, b } = d3.color(
-				i ? nextStepsColor : previousStepsColor
-			);
+			const { r, g, b } =
+				/** @type {RGBColor} */
+				(d3.color(i ? nextStepsColor : previousStepsColor));
 			return `rgba(${r},${g},${b}, ${stepsColorOpacity})`;
 		})
 		.attr("class", classPrefix + "stageDiv");
@@ -90,10 +89,9 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 			.append("div")
 			.attr("class", classPrefix + "listRowsNumber")
 			.style("background-color", () => {
-				// @ts-ignore
-				const { r, g, b } = d3.color(
-					i ? nextStepsColor : previousStepsColor
-				);
+				const { r, g, b } =
+					/** @type {RGBColor} */
+					(d3.color(i ? nextStepsColor : previousStepsColor));
 				return `rgba(${r},${g},${b}, ${stepsColorOpacity})`;
 			})
 			.append("span")
@@ -120,8 +118,8 @@ function drawLinksList({dataLinksOriginal, sideDivContainer}) {
 				.style("max-height", (e, i, n) =>
 					// @ts-ignore
 					d3.select(n[i].parentNode).datum().clicked
-						// @ts-ignore
-						? n[i].scrollHeight * 2 + "px"
+						? // @ts-ignore
+						  n[i].scrollHeight * 2 + "px"
 						: null
 				);
 		});
