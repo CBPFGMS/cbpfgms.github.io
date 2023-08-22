@@ -75,10 +75,10 @@ const classPrefix = "pfbiam",
 	mapAspectRatio = 2.225,
 	legendPanelHeight = 132,
 	legendPanelWidth = 110,
-	legendPanelHorPadding = 44,
-	legendPanelVertPadding = 32,
+	legendPanelHorPadding = 18,
+	legendPanelVertPadding = 18,
 	legendTextPadding = 18,
-	mapZoomButtonHorPadding = 48,
+	mapZoomButtonHorPadding = 18,
 	mapZoomButtonVertPadding = 10,
 	mapZoomButtonSize = 26,
 	maxPieSize = 18,
@@ -277,9 +277,9 @@ function createAllocations(colors, mapData, lists) {
 			.attr("transform", "translate(" + (svgMapPadding[3] + legendPanelHorPadding) + "," + (svgMapPadding[0] + mapPanel.height - legendPanelHeight - legendPanelVertPadding) + ")"),
 		width: legendPanelWidth,
 		height: legendPanelHeight,
-		titleHorizontalPadding: 2,
+		titleHorizontalPadding: 6,
 		titleVerticalPadding: 16,
-		padding: [40, 0, 20, 4]
+		padding: [40, 0, 20, 6]
 	};
 
 	const mapZoomButtonPanel = {
@@ -997,7 +997,9 @@ function createAllocations(colors, mapData, lists) {
 			.append("rect")
 			.attr("class", classPrefix + "backgroundRectangle")
 			.style("fill", "#fff")
-			.style("opacity", 0.6)
+			.style("opacity", 0.9)
+			.style("stroke", "#ccc")
+			.style("stroke-width", "1px")
 			.attr("width", legendPanel.width)
 			.attr("height", legendPanel.height)
 			.merge(backgroundRectangle);
