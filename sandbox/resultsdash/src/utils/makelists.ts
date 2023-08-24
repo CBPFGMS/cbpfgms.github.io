@@ -1,22 +1,12 @@
-import {
-	LocationMasterObj,
-	AllocationSourcesMasterObj,
-	AllocationTypeMasterObj,
-	FundsMasterObj,
-	BeneficiariesMasterObj,
-	PartnerTypesMasterObj,
-	SectorsMasterObj,
-} from "./api";
-
-function makeLists(
-	fundsMaster: FundsMasterObj[],
-	locationMaster: LocationMasterObj[],
-	beneficiariesMaster: BeneficiariesMasterObj[],
-	allocationTypeMaster: AllocationTypeMasterObj[],
-	allocationSourcesMaster: AllocationSourcesMasterObj[],
-	partnerTypesMaster: PartnerTypesMasterObj[],
-	sectorsMaster: SectorsMasterObj[]
-) {
+function makeLists({
+	fundsMaster,
+	locationMaster,
+	beneficiariesMaster,
+	allocationTypeMaster,
+	allocationSourcesMaster,
+	partnerTypesMaster,
+	sectorsMaster,
+}: MakeListParams) {
 	return {};
 }
 
