@@ -49,4 +49,4 @@ function fetchFile(fileName: string, url: string, method: string) {
 	}
 }
 
-export { fetchFile };
+export default fetchFile;

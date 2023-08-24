@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { fetchFile } from "./fetchfile";
+import fetchFile from "./fetchfile";
+import makeLists from "./makelists";
 
 //types
 type Beneficiaries = number | null;
 
-type byClusterObj = {
+type ByClusterObj = {
 	PooledFundId: number;
 	AllocationYear: number;
 	ReportApprovedDate: Date;
@@ -22,7 +23,7 @@ type byClusterObj = {
 	ReachedGirls: Beneficiaries;
 };
 
-type byDisabilityObj = {
+type ByDisabilityObj = {
 	PooledFundId: number;
 	AllocationYear: number;
 	ReportApprovedDate: Date;
@@ -47,7 +48,7 @@ type byDisabilityObj = {
 	ReachedDisabledGirls: Beneficiaries;
 };
 
-type byLocationObj = {
+type ByLocationObj = {
 	PooledFundId: number;
 	AllocationYear: number;
 	ApprovedDate: Date;
@@ -64,7 +65,7 @@ type byLocationObj = {
 	ReachedGirls: Beneficiaries;
 };
 
-type byTypeObj = {
+type ByTypeObj = {
 	PooledFundId: number;
 	AllocationYear: number;
 	ReportApprovedDate: Date;
@@ -81,7 +82,7 @@ type byTypeObj = {
 	ReachedGirls: Beneficiaries;
 };
 
-type locationMasterObj = {
+export type LocationMasterObj = {
 	LocationID: number;
 	Location: string;
 	AdminLocation1: string;
@@ -89,12 +90,63 @@ type locationMasterObj = {
 	AdminLocation1Longitude: number;
 };
 
+export type AllocationTypeMasterObj = {
+	AllocationTypeId: number;
+	AllocationType: string;
+};
+
+export type BeneficiariesMasterObj = {
+	BeneficiaryTypeId: number;
+	BeneficiaryType: string;
+};
+
+export type FundsMasterObj = {
+	id: number;
+	PooledFundName: string;
+	PooledFundNameAbbrv: string;
+	RegionName: string;
+	RegionNameArr: string;
+	SubRegionName: string;
+	ContinentName: string;
+	CountryCode: string;
+	ISO2Code: string;
+	latitude: number;
+	longitude: number;
+	CBPFFundStatus: number;
+	CBPFId: number;
+	CERFId: number;
+	AreaType: string;
+};
+
+export type AllocationSourcesMasterObj = {
+	id: number;
+	AllocationName: string;
+};
+
+export type PartnerTypesMasterObj = {
+	id: number;
+	OrganizationTypeName: string;
+};
+
+export type SectorsMasterObj = {
+	id: number;
+	ClustNm: string;
+	ClustCode: string;
+};
+
+type ListObj = {
+	[key: number]: string;
+};
+
+type List = {
+	[key: string]: ListObj;
+};
+
 type RawData = {
-	byCluster: byClusterObj[];
-	byDisability: byDisabilityObj[];
-	byLocation: byLocationObj[];
-	byType: byTypeObj[];
-	locationMaster: locationMasterObj[];
+	byCluster: ByClusterObj[];
+	byDisability: ByDisabilityObj[];
+	byLocation: ByLocationObj[];
+	byType: ByTypeObj[];
 };
 
 function useData() {
@@ -107,9 +159,22 @@ function useData() {
 		byTypeUrl =
 			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/ByType.csv",
 		locationMasterUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/locationMst.csv";
+			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/locationMst.csv",
+		beneficiariesMasterUrl =
+			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/MstBeneficiaryType.csv",
+		allocationTypeMasterUrl =
+			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/MstAllocationType.csv",
+		fundsMasterUrl =
+			"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
+		allocationSourcesMasterUrl =
+			"https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",
+		partnerTypesMasterUrl =
+			"https://cbpfgms.github.io/pfbi-data/mst/MstOrganization.json",
+		sectorsMasterUrl =
+			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json";
 
-	const [rawData, setData] = useState<RawData | null>(null),
+	const [rawData, setRawData] = useState<RawData | null>(null),
+		[lists, setLists] = useState<List | null>(null),
 		[loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<unknown>(null);
 
@@ -120,6 +185,16 @@ function useData() {
 			fetchFile("byLocation", byLocationUrl, "csv"),
 			fetchFile("byType", byTypeUrl, "csv"),
 			fetchFile("locationMaster", locationMasterUrl, "csv"),
+			fetchFile("beneficiariesMaster", beneficiariesMasterUrl, "csv"),
+			fetchFile("allocationTypeMaster", allocationTypeMasterUrl, "csv"),
+			fetchFile("fundsMaster", fundsMasterUrl, "json"),
+			fetchFile(
+				"allocationSourcesMaster",
+				allocationSourcesMasterUrl,
+				"json"
+			),
+			fetchFile("partnerTypesMaster", partnerTypesMasterUrl, "json"),
+			fetchFile("sectorsMaster", sectorsMasterUrl, "json"),
 		])
 			.then(receiveData)
 			.catch(error => {
@@ -133,19 +208,52 @@ function useData() {
 			byLocation,
 			byType,
 			locationMaster,
-		]:[
-			byClusterObj[],
-			byDisabilityObj[],
-			byLocationObj[],
-			byTypeObj[],
-			locationMasterObj[],
-		]) {
-			setData({
+			beneficiariesMaster,
+			allocationTypeMaster,
+			fundsMaster,
+			allocationSourcesMaster,
+			partnerTypesMaster,
+			sectorsMaster,
+		]: [
+			ByClusterObj[],
+			ByDisabilityObj[],
+			ByLocationObj[],
+			ByTypeObj[],
+			LocationMasterObj[],
+			BeneficiariesMasterObj[],
+			AllocationTypeMasterObj[],
+			FundsMasterObj[],
+			AllocationSourcesMasterObj[],
+			PartnerTypesMasterObj[],
+			SectorsMasterObj[]
+		]): void {
+			const {
+				fundNamesList,
+				fundAbbreviatedNamesList,
+				fundIsoCodes2List,
+				fundIsoCodes3List,
+				beneficiaryTypesList,
+				allocationTypesList,
+				allocationSourcesList,
+				partnerNamesList,
+				sectorNamesList,
+				locationNamesList,
+				locationLatLongList,
+			} = makeLists(
+				fundsMaster,
+				locationMaster,
+				beneficiariesMaster,
+				allocationTypeMaster,
+				allocationSourcesMaster,
+				partnerTypesMaster,
+				sectorsMaster
+			);
+
+			setRawData({
 				byCluster: byCluster,
 				byDisability: byDisability,
 				byLocation: byLocation,
 				byType: byType,
-				locationMaster: locationMaster,
 			});
 			setLoading(false);
 		}
