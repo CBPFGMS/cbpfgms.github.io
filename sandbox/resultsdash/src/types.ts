@@ -1,4 +1,5 @@
-//types
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 type Beneficiaries = number | null;
 
 type ByClusterObj = {
@@ -25,6 +26,7 @@ type ByDisabilityObj = {
 	ReportApprovedDate: Date;
 	AllocationtypeId: number;
 	AllocationSourceId: number;
+	NumbofProjects: number;
 	Budget: number;
 	TargetedMen: Beneficiaries;
 	TargetedWomen: Beneficiaries;

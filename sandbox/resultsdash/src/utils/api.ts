@@ -80,19 +80,7 @@ function useData() {
 			PartnerTypesMasterObj[],
 			SectorsMasterObj[]
 		]): void {
-			const {
-				fundNamesList,
-				fundAbbreviatedNamesList,
-				fundIsoCodes2List,
-				fundIsoCodes3List,
-				beneficiaryTypesList,
-				allocationTypesList,
-				allocationSourcesList,
-				partnerNamesList,
-				sectorNamesList,
-				locationNamesList,
-				locationLatLongList,
-			} = makeLists({
+			const lists = makeLists({
 				fundsMaster,
 				locationMaster,
 				beneficiariesMaster,
