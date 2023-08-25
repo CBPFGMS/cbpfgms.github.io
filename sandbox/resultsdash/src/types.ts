@@ -89,7 +89,7 @@ type LocationMasterObj = {
 };
 
 type AllocationTypeMasterObj = {
-	AllocationTypeId: number;
+	AllocationtypeId: number;
 	AllocationType: string;
 };
 
@@ -136,15 +136,19 @@ type ListObj = {
 	[key: number]: string;
 };
 
+type locationObj = {
+	[key: number]: number[];
+};
+
 type List = {
-	[key: string]: ListObj;
+	[key: string]: ListObj | locationObj;
 };
 
 type RawData = {
-	byCluster: ByClusterObj[];
-	byDisability: ByDisabilityObj[];
-	byLocation: ByLocationObj[];
-	byType: ByTypeObj[];
+	byCluster: ByClusterYear;
+	byDisability: ByDisabilityYear;
+	byLocation: ByLocationYear;
+	byType: ByTypeYear;
 };
 
 type MakeListParams = {
@@ -156,3 +160,45 @@ type MakeListParams = {
 	partnerTypesMaster: PartnerTypesMasterObj[];
 	sectorsMaster: SectorsMasterObj[];
 };
+
+type InDataLists = {
+	reportYears: Set<number>;
+	sectors: Set<number>;
+	allocationTypes: Set<number>;
+	allocationSources: Set<number>;
+	beneficiaryTypes: Set<number>;
+};
+
+type ByClusterYear = { year: number; values: ByClusterObj[] }[];
+
+type ByDisabilityYear = { year: number; values: ByDisabilityObj[] }[];
+
+type ByLocationYear = { year: number; values: ByLocationObj[] }[];
+
+type ByTypeYear = { year: number; values: ByTypeObj[] }[];
+
+type PreProcessDataParams = {
+	byCluster: ByClusterObj[];
+	byDisability: ByDisabilityObj[];
+	byLocation: ByLocationObj[];
+	byType: ByTypeObj[];
+	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
+};
+
+type PreProcessDataReturn = {
+	byClusterYear: ByClusterYear;
+	byDisabilityYear: ByDisabilityYear;
+	byLocationYear: ByLocationYear;
+	byTypeYear: ByTypeYear;
+};
+
+type PopulateYearRow =
+	| ByDisabilityObj
+	| ByLocationObj
+	| ByTypeObj
+	| ByClusterObj;
+
+type PopulateYearArray = {
+	year: number;
+	values: (ByClusterObj | ByDisabilityObj | ByLocationObj | ByTypeObj)[];
+}[];

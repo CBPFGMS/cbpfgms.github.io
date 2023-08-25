@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import fetchFile from "./fetchfile";
 import makeLists from "./makelists";
+import preProcessData from "./preprocessdata";
 
 function useData() {
 	const byClusterUrl =
@@ -28,6 +29,7 @@ function useData() {
 
 	const [rawData, setRawData] = useState<RawData | null>(null),
 		[lists, setLists] = useState<List | null>(null),
+		[inDataLists, setInDataLists] = useState<InDataLists | null>(null),
 		[loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<unknown>(null);
 
@@ -80,7 +82,7 @@ function useData() {
 			PartnerTypesMasterObj[],
 			SectorsMasterObj[]
 		]): void {
-			const lists = makeLists({
+			const listsObj: List = makeLists({
 				fundsMaster,
 				locationMaster,
 				beneficiariesMaster,
@@ -90,17 +92,32 @@ function useData() {
 				sectorsMaster,
 			});
 
-			setRawData({
-				byCluster: byCluster,
-				byDisability: byDisability,
-				byLocation: byLocation,
-				byType: byType,
+			const {
+				byClusterYear,
+				byDisabilityYear,
+				byLocationYear,
+				byTypeYear,
+			} = preProcessData({
+				byCluster,
+				byDisability,
+				byLocation,
+				byType,
+				setInDataLists,
 			});
+
+			setRawData({
+				byCluster: byClusterYear,
+				byDisability: byDisabilityYear,
+				byLocation: byLocationYear,
+				byType: byTypeYear,
+			});
+			console.log(rawData)
+			setLists(listsObj);
 			setLoading(false);
 		}
 	}, []);
 
-	return { rawData, loading, error };
+	return { rawData, lists, inDataLists, loading, error };
 }
 
 export default useData;
