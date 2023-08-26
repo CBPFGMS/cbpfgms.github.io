@@ -169,13 +169,18 @@ type InDataLists = {
 	beneficiaryTypes: Set<number>;
 };
 
-type ByClusterYear = { year: number; values: ByClusterObj[] }[];
+type GenericYear<TObj> = {
+	year: number;
+	values: TObj[];
+}[];
 
-type ByDisabilityYear = { year: number; values: ByDisabilityObj[] }[];
+type ByClusterYear = GenericYear<ByClusterObj>;
 
-type ByLocationYear = { year: number; values: ByLocationObj[] }[];
+type ByDisabilityYear = GenericYear<ByDisabilityObj>;
 
-type ByTypeYear = { year: number; values: ByTypeObj[] }[];
+type ByLocationYear = GenericYear<ByLocationObj>;
+
+type ByTypeYear = GenericYear<ByTypeObj>;
 
 type PreProcessDataParams = {
 	byCluster: ByClusterObj[];
@@ -192,13 +197,21 @@ type PreProcessDataReturn = {
 	byTypeYear: ByTypeYear;
 };
 
-type PopulateYearRow =
-	| ByDisabilityObj
-	| ByLocationObj
-	| ByTypeObj
-	| ByClusterObj;
+type DataContext = {
+	rawData: RawData;
+	lists: List;
+	inDataLists: InDataLists;
+};
 
-type PopulateYearArray = {
+type SelectionContext = {
+	reportYear: number;
+	setReportYear: React.Dispatch<React.SetStateAction<number>>;
 	year: number;
-	values: (ByClusterObj | ByDisabilityObj | ByLocationObj | ByTypeObj)[];
-}[];
+	setYear: React.Dispatch<React.SetStateAction<number>>;
+	allocationType: number;
+	setAllocationType: React.Dispatch<React.SetStateAction<number>>;
+	fund: number;
+	setFund: React.Dispatch<React.SetStateAction<number>>;
+	allocationSource: number;
+	setAllocationSource: React.Dispatch<React.SetStateAction<number>>;
+};

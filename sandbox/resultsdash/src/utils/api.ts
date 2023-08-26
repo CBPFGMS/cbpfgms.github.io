@@ -111,7 +111,6 @@ function useData() {
 				byLocation: byLocationYear,
 				byType: byTypeYear,
 			});
-			console.log(rawData)
 			setLists(listsObj);
 			setLoading(false);
 		}

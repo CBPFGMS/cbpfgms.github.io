@@ -20,7 +20,7 @@ function preProcessData({
 		reportYearsSet.add(row.ReportApprovedDate.getFullYear());
 		allocationTypesSet.add(row.AllocationtypeId);
 		allocationSourcesSet.add(row.AllocationSourceId);
-		populateYear(
+		populateYear<typeof row>(
 			row,
 			byDisabilityYear,
 			row.ReportApprovedDate.getFullYear()
@@ -29,16 +29,28 @@ function preProcessData({
 
 	byCluster.forEach(row => {
 		sectorsSet.add(row.ClusterId);
-		populateYear(row, byClusterYear, row.ReportApprovedDate.getFullYear());
+		populateYear<typeof row>(
+			row,
+			byClusterYear,
+			row.ReportApprovedDate.getFullYear()
+		);
 	});
 
 	byLocation.forEach(row => {
-		populateYear(row, byLocationYear, row.ApprovedDate.getFullYear());
+		populateYear<typeof row>(
+			row,
+			byLocationYear,
+			row.ApprovedDate.getFullYear()
+		);
 	});
 
 	byType.forEach(row => {
 		beneficiaryTypesSet.add(row.BeneficiaryTypeId);
-		populateYear(row, byTypeYear, row.ReportApprovedDate.getFullYear());
+		populateYear<typeof row>(
+			row,
+			byTypeYear,
+			row.ReportApprovedDate.getFullYear()
+		);
 	});
 
 	setInDataLists({
@@ -57,9 +69,9 @@ function preProcessData({
 	return { byClusterYear, byDisabilityYear, byLocationYear, byTypeYear };
 }
 
-function populateYear(
-	row: PopulateYearRow,
-	dataArray: PopulateYearArray,
+function populateYear<TObj>(
+	row: TObj,
+	dataArray: GenericYear<TObj>,
 	yearValue: number
 ): void {
 	const foundYear = dataArray.find(year => year.year === yearValue);
