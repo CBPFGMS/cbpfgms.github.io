@@ -167,6 +167,7 @@ type InDataLists = {
 	allocationTypes: Set<number>;
 	allocationSources: Set<number>;
 	beneficiaryTypes: Set<number>;
+	funds: Set<number>;
 };
 
 type GenericYear<TObj> = {
@@ -204,14 +205,21 @@ type DataContext = {
 };
 
 type SelectionContext = {
-	reportYear: number;
-	setReportYear: React.Dispatch<React.SetStateAction<number>>;
-	year: number;
-	setYear: React.Dispatch<React.SetStateAction<number>>;
-	allocationType: number;
-	setAllocationType: React.Dispatch<React.SetStateAction<number>>;
-	fund: number;
-	setFund: React.Dispatch<React.SetStateAction<number>>;
-	allocationSource: number;
-	setAllocationSource: React.Dispatch<React.SetStateAction<number>>;
+	reportYear: number[];
+	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
+	year: number[] | null;
+	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
+	allocationType: number[];
+	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	fund: number[];
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationSource: number[];
+	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	beneficiaryType: number[];
+	setBeneficiaryType: React.Dispatch<React.SetStateAction<number[]>>;
+};
+
+type YearSelectorProps = {
+	reportYear: number[];
+	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
 };

@@ -10,6 +10,7 @@ function preProcessData({
 	const allocationTypesSet = new Set<number>();
 	const allocationSourcesSet = new Set<number>();
 	const beneficiaryTypesSet = new Set<number>();
+	const fundsSet = new Set<number>();
 
 	const byClusterYear: ByClusterYear = [];
 	const byDisabilityYear: ByDisabilityYear = [];
@@ -17,6 +18,7 @@ function preProcessData({
 	const byTypeYear: ByTypeYear = [];
 
 	byDisability.forEach(row => {
+		fundsSet.add(row.PooledFundId);
 		reportYearsSet.add(row.ReportApprovedDate.getFullYear());
 		allocationTypesSet.add(row.AllocationtypeId);
 		allocationSourcesSet.add(row.AllocationSourceId);
@@ -59,6 +61,7 @@ function preProcessData({
 		allocationTypes: allocationTypesSet,
 		allocationSources: allocationSourcesSet,
 		beneficiaryTypes: beneficiaryTypesSet,
+		funds: fundsSet,
 	});
 
 	byClusterYear.sort((a, b) => a.year - b.year);
