@@ -4,15 +4,15 @@ function GradientPaper() {
 	return (
 		<Paper
 			style={{
-				width: "120px",
-				height: "120px",
+				width: "140px",
+				height: "140px",
 				backgroundColor: "#1677ff",
 				position: "absolute",
-				bottom: "-60px",
-				right: "-60px",
+				bottom: "-70px",
+				right: "-70px",
 				borderRadius: "50%",
-				filter: "blur(60px)",
-				opacity: "0.2",
+				filter: "blur(70px)",
+				opacity: "0.3",
 			}}
 		></Paper>
 	);

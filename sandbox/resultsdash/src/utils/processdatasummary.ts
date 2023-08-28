@@ -33,6 +33,8 @@ const processDataSummary: processDataSummary = ({
 		}
 	});
 
+	data.sort((a, b) => b.year - a.year);
+
 	return data;
 };
 

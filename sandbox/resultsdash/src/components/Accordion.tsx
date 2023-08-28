@@ -8,6 +8,7 @@ import DataContext from "../context/DataContext";
 import Dropdown from "./Dropdown";
 import CheckboxLabel from "./Checkbox";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 function AccordionComponent({
 	type,
@@ -28,8 +29,12 @@ function AccordionComponent({
 			? lists.fundAbbreviatedNames
 			: lists[dataProperty as keyof List];
 
-	function handleButtonClick() {
+	function handleDeselectAll() {
 		setValue([]);
+	}
+
+	function handleSelectAll() {
+		setValue(dataArray);
 	}
 
 	return (
@@ -107,14 +112,24 @@ function AccordionComponent({
 					/>
 				)}
 				{filterType === "dropdowncheck" && (
-					<Button
-						variant="contained"
-						size="small"
-						onClick={handleButtonClick}
-						style={{ marginLeft: "8px" }}
-					>
-						Deselect all
-					</Button>
+					<Box style={{ display: "flex", flexDirection: "row" }}>
+						<Button
+							variant="contained"
+							size="small"
+							onClick={handleDeselectAll}
+							style={{ marginLeft: "8px" }}
+						>
+							Deselect all
+						</Button>
+						<Button
+							variant="contained"
+							size="small"
+							onClick={handleSelectAll}
+							style={{ marginLeft: "8px" }}
+						>
+							Select all
+						</Button>
+					</Box>
 				)}
 			</AccordionDetails>
 		</Accordion>
