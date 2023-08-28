@@ -1,10 +1,15 @@
 import { useContext, useState } from "react";
-import SelectionContext from "../context/selectioncontext";
 import DataContext from "../context/DataContext";
 import Grid from "@mui/material/Unstable_Grid2";
 import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
 import YearSelector from "./YearSelector";
 import Selectors from "./Selectors";
+import SummaryChart from "./SummaryChart";
+import GradientPaper from "./GradientPaper";
+import Divider from "@mui/material/Divider";
+import { Typography } from "@mui/material";
+import Box from "@mui/material/Box";
 
 function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
@@ -22,47 +27,110 @@ function MainContainer() {
 	const [allocationSource, setAllocationSource] = useState<number[]>([
 		...apiData.inDataLists.allocationSources,
 	]);
-	const [beneficiaryType, setBeneficiaryType] = useState<number[]>([
-		...apiData.inDataLists.beneficiaryTypes,
-	]);
 
 	return (
-		<SelectionContext.Provider
-			value={{
-				reportYear,
-				setReportYear,
-				year,
-				setYear,
-				allocationType,
-				setAllocationType,
-				fund,
-				setFund,
-				allocationSource,
-				setAllocationSource,
-				beneficiaryType,
-				setBeneficiaryType,
+		<Container
+			disableGutters={true}
+			style={{
+				paddingLeft: "12px",
+				paddingRight: "12px",
 			}}
 		>
-			<Container
-				disableGutters={true}
-				sx={{ pl: "12px", pr: "12px" }}
+			<Grid
+				container
+				spacing={2}
 			>
-				<Grid
-					container
-					spacing={2}
+				<Paper
+					elevation={0}
+					style={{
+						width: "100%",
+						paddingTop: "2em",
+						paddingBottom: "1em",
+						backgroundColor: "#f5f8ff",
+						borderRadius: "8px",
+						position: "relative",
+						overflow: "hidden",
+					}}
 				>
-					<Grid xs={12}>
+					<GradientPaper />
+					<Grid
+						xs={12}
+						mb={6}
+					>
 						<YearSelector
 							reportYear={reportYear}
 							setReportYear={setReportYear}
+							reportYears={apiData.inDataLists.reportYears}
 						/>
 					</Grid>
 					<Grid xs={12}>
-						<Selectors />
+						<Selectors
+							fund={fund}
+							setFund={setFund}
+							allocationSource={allocationSource}
+							setAllocationSource={setAllocationSource}
+							allocationType={allocationType}
+							setAllocationType={setAllocationType}
+						/>
 					</Grid>
-				</Grid>
-			</Container>
-		</SelectionContext.Provider>
+				</Paper>
+			</Grid>
+			<Grid
+				container
+				spacing={2}
+				mt={6}
+			>
+				<Paper
+					elevation={0}
+					style={{
+						width: "100%",
+						paddingTop: "2em",
+						paddingBottom: "1em",
+						backgroundColor: "#f5f8ff",
+						borderRadius: "6px",
+						position: "relative",
+						overflow: "hidden",
+					}}
+				>
+					<GradientPaper />
+					<Grid
+						container
+						direction={"row"}
+						spacing={1}
+						xs={12}
+						flexWrap={"nowrap"}
+					>
+						<Grid xs={6}>
+							<SummaryChart
+								reportYear={reportYear}
+								year={year}
+								setYear={setYear}
+								allocationType={allocationType}
+								fund={fund}
+								allocationSource={allocationSource}
+							/>
+						</Grid>
+						<Divider
+							orientation="vertical"
+							flexItem
+							style={{
+								borderLeft: "3px dotted #ccc",
+								borderRight: "none",
+							}}
+						/>
+						<Grid xs={6}>
+							<Box
+								display={"flex"}
+								alignItems={"center"}
+								justifyContent={"center"}
+							>
+								<Typography>Chart 02</Typography>
+							</Box>
+						</Grid>
+					</Grid>
+				</Paper>
+			</Grid>
+		</Container>
 	);
 }
 

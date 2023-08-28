@@ -222,4 +222,71 @@ type SelectionContext = {
 type YearSelectorProps = {
 	reportYear: number[];
 	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
+	reportYears: Set<number>;
 };
+
+type SummaryChartProps = {
+	reportYear: number[];
+	year: number[] | null;
+	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
+	allocationType: number[];
+	fund: number[];
+	allocationSource: number[];
+};
+
+type SelectorsProps = {
+	fund: number[];
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: number[];
+	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationSource: number[];
+	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+};
+
+type AccordionComponentProps = {
+	type: string;
+	filterType: string;
+	dataProperty: string;
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	expanded: string | false;
+	handleAccordionExpand: (
+		panel: string
+	) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
+};
+
+type DropdownProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+	type: string;
+};
+
+type CheckboxProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+};
+
+type SummaryData = {
+	year: number;
+	allocations: number;
+	projects: number;
+	partners: number;
+};
+
+type processDataSummary = ({
+	rawData,
+	reportYear,
+	fund,
+	allocationSource,
+	allocationType,
+}: {
+	rawData: RawData;
+	reportYear: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+}) => SummaryData[];
