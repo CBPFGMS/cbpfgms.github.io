@@ -1,6 +1,3 @@
-import { useContext } from "react";
-import DataContext from "../context/DataContext";
-import processDataSummary from "../utils/processdatasummary";
 import { sum } from "d3-array";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -83,23 +80,10 @@ function SummaryRow({
 	);
 }
 
-function SummaryChart({
-	reportYear,
-	year,
-	setYear,
-	fund,
-	allocationSource,
-	allocationType,
-}: SummaryChartProps) {
-	const apiData = useContext(DataContext) as DataContext;
-	const rawData = apiData.rawData;
-	const data = processDataSummary({
-		rawData,
-		reportYear,
-		fund,
-		allocationSource,
-		allocationType,
-	});
+function SummaryChart({ dataSummary, year }: SummaryChartProps) {
+	const data = dataSummary.filter(d =>
+		year !== null ? year.includes(d.year) : true
+	);
 
 	const total = sum(data, d => d.allocations);
 

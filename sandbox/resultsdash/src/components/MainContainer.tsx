@@ -10,9 +10,12 @@ import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
+import processDataSummary from "../utils/processdatasummary";
+import TopChart from "./TopChart";
 
 function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
+	const rawData = apiData.rawData;
 
 	const lastYear = [...apiData.inDataLists.reportYears].sort(
 		(a, b) => b - a
@@ -27,6 +30,14 @@ function MainContainer() {
 	const [allocationSource, setAllocationSource] = useState<number[]>([
 		...apiData.inDataLists.allocationSources,
 	]);
+
+	const dataSummary = processDataSummary({
+		rawData,
+		reportYear,
+		fund,
+		allocationSource,
+		allocationType,
+	});
 
 	return (
 		<Container
@@ -44,7 +55,7 @@ function MainContainer() {
 					elevation={0}
 					style={{
 						width: "100%",
-						paddingTop: "2em",
+						paddingTop: "1em",
 						paddingBottom: "1em",
 						backgroundColor: "#f5f8ff",
 						borderRadius: "8px",
@@ -93,6 +104,19 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
+					<Grid xs={12}>
+						<Box
+							display={"flex"}
+							alignItems={"center"}
+							justifyContent={"center"}
+						>
+							<TopChart
+								year={year}
+								dataSummary={dataSummary}
+								setYear={setYear}
+							/>
+						</Box>
+					</Grid>
 					<Grid
 						container
 						direction={"row"}
@@ -102,12 +126,8 @@ function MainContainer() {
 					>
 						<Grid xs={6}>
 							<SummaryChart
-								reportYear={reportYear}
+								dataSummary={dataSummary}
 								year={year}
-								setYear={setYear}
-								allocationType={allocationType}
-								fund={fund}
-								allocationSource={allocationSource}
 							/>
 						</Grid>
 						<Divider

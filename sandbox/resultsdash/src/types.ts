@@ -227,12 +227,8 @@ type YearSelectorProps = {
 };
 
 type SummaryChartProps = {
-	reportYear: number[];
+	dataSummary: SummaryData[];
 	year: number[] | null;
-	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
-	allocationType: number[];
-	fund: number[];
-	allocationSource: number[];
 };
 
 type SelectorsProps = {
@@ -295,3 +291,11 @@ type processDataSummary = ({
 	allocationSource: number[];
 	allocationType: number[];
 }) => SummaryData[];
+
+type TopChartProps = {
+	year: number[] | null;
+	dataSummary: SummaryData[];
+	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
+};
+
+type ChartValue = "allocations" | "projects" | "partners";
