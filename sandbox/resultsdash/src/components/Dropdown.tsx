@@ -20,10 +20,7 @@ const MenuProps = {
 function Dropdown({ value, setValue, names, namesList, type }: DropdownProps) {
 	function handleChange(event: SelectChangeEvent<typeof value>) {
 		const eventArray: number[] = [event.target.value as number[]].flat();
-		eventArray.sort((a, b) => {
-			console.log(a, namesList[a]);
-			return namesList[a].localeCompare(namesList[b]);
-		});
+		eventArray.sort((a, b) => namesList[a].localeCompare(namesList[b]));
 		setValue(eventArray);
 	}
 

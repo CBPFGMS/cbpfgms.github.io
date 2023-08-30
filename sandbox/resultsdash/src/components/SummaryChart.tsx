@@ -7,68 +7,79 @@ import Box from "@mui/material/Box";
 import MoneyBag from "../assets/MoneyBag";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
+import Divider from "@mui/material/Divider";
 
 const unColor = "#418fde";
 
-function SummaryRow({ year, allocations, projects, partners }: SummaryData) {
+function SummaryRow({
+	year,
+	allocations,
+	projects,
+	partners,
+	last,
+}: SummaryRowProps) {
 	return (
-		<Box
-			style={{
-				width: "100%",
-				display: "flex",
-				flexDirection: "column",
-			}}
-		>
+		<>
 			<Box
 				style={{
-					fontSize: "0.7rem",
-					fontWeight: 900,
-					color: unColor,
-					marginLeft: "7%",
-				}}
-			>
-				{year}
-			</Box>
-			<Box
-				style={{
+					width: "100%",
 					display: "flex",
-					flexDirection: "row",
-					justifyContent: "space-evenly",
+					flexDirection: "column",
 				}}
 			>
-				{[allocations, projects, partners].map((d, i) => (
-					<Box
-						key={i}
-						style={{
-							display: "flex",
-							flex: "0 24%",
-							flexDirection: "column",
-						}}
-					>
+				<Box
+					style={{
+						fontSize: "0.8rem",
+						fontWeight: 900,
+						color: unColor,
+						marginLeft: "7%",
+						marginBottom: "-0.4em",
+					}}
+				>
+					{year}
+				</Box>
+				<Box
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						justifyContent: "space-evenly",
+					}}
+				>
+					{[allocations, projects, partners].map((d, i) => (
 						<Box
+							key={i}
 							style={{
-								fontSize: "1.6rem",
-								fontWeight: 500,
-								color: "#222",
+								display: "flex",
+								flex: "0 24%",
+								flexDirection: "column",
 							}}
 						>
-							{(i ? "" : "$") + formatSIFloat(d)}
+							<Box
+								style={{
+									fontSize: "1.6rem",
+									fontWeight: 500,
+									color: "#222",
+								}}
+							>
+								{(i ? "" : "$") + formatSIFloat(d)}
+							</Box>
+							<Box
+								style={{
+									fontSize: "0.8rem",
+									color: "#666",
+									marginTop: "-0.4em",
+								}}
+							>
+								{["Allocation", "Project", "Partner"][
+									i
+								].toUpperCase() + (d > 1 ? "S" : "")}
+							</Box>
 						</Box>
-						<Box
-							style={{
-								fontSize: "0.8rem",
-								color: "#666",
-								marginTop: "-0.4em",
-							}}
-						>
-							{["Allocations", "Projects", "Partners"][
-								i
-							].toUpperCase()}
-						</Box>
-					</Box>
-				))}
+					))}
+				</Box>
 			</Box>
-		</Box>
+			{!last && <Divider style={{ width: "90%" }} />}
+		</>
 	);
 }
 
@@ -98,7 +109,7 @@ function SummaryChart({
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"center"}
-				gap={2}
+				gap={1}
 				marginBottom={2}
 			>
 				<MoneyBag sx={{ fontSize: 60, fill: unColor }} />
@@ -132,16 +143,17 @@ function SummaryChart({
 				flexDirection={"column"}
 				alignItems={"center"}
 				justifyContent={"center"}
-				gap={2}
+				gap={1}
 				marginLeft={4}
 			>
-				{data.map(d => (
+				{data.map((d, i) => (
 					<SummaryRow
 						key={d.year}
 						year={d.year}
 						allocations={d.allocations}
 						projects={d.projects}
 						partners={d.partners}
+						last={i === data.length - 1}
 					/>
 				))}
 			</Box>

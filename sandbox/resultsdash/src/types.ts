@@ -27,6 +27,7 @@ type ByDisabilityObj = {
 	AllocationtypeId: number;
 	AllocationSourceId: number;
 	NumbofProjects: number;
+	TotalNumbPartners: number;
 	Budget: number;
 	TargetedMen: Beneficiaries;
 	TargetedWomen: Beneficiaries;
@@ -275,6 +276,10 @@ type SummaryData = {
 	allocations: number;
 	projects: number;
 	partners: number;
+};
+
+type SummaryRowProps = SummaryData & {
+	last: boolean;
 };
 
 type processDataSummary = ({

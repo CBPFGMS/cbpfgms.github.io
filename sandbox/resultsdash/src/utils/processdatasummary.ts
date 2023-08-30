@@ -21,13 +21,13 @@ const processDataSummary: processDataSummary = ({
 			if (foundYear) {
 				foundYear.allocations += value.Budget;
 				foundYear.projects += value.NumbofProjects;
-				//in the future, do foundYear.partners += value.NumbofPartners;
+				foundYear.partners += value.TotalNumbPartners;
 			} else {
 				data.push({
 					year: value.AllocationYear,
 					allocations: value.Budget,
 					projects: value.NumbofProjects,
-					partners: 0,
+					partners: value.TotalNumbPartners,
 				});
 			}
 		}
