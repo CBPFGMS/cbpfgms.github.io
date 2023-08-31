@@ -5,6 +5,7 @@ import MoneyBag from "../assets/MoneyBag";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
+import NumberAnimator from "./NumberAnimator";
 
 const unColor = "#418fde";
 
@@ -58,7 +59,9 @@ function SummaryRow({
 									color: "#222",
 								}}
 							>
-								{(i ? "" : "$") + formatSIFloat(d)}
+								{d < 1e4
+									? d
+									: (i ? "" : "$") + formatSIFloat(d)}
 							</Box>
 							<Box
 								style={{
@@ -109,7 +112,16 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 						fontWeight={500}
 						style={{ color: unColor }}
 					>
-						{formatSIFloat(total)}
+						{total < 1e3 ? (
+							<NumberAnimator number={total} />
+						) : (
+							<span>
+								<NumberAnimator
+									number={parseFloat(formatSIFloat(total))}
+								/>
+								{formatSIFloat(total).slice(-1)}
+							</span>
+						)}
 					</Typography>
 					<Typography
 						style={{

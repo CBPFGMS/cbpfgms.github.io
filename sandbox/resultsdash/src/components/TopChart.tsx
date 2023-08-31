@@ -9,10 +9,7 @@ import createTopChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
 
 function TopChart({ year, dataSummary, setYear }: TopChartProps) {
-	const height = 190,
-		padding = [4, 4, 20, 4],
-		minStep = 40,
-		width = padding[1] + padding[3] + dataSummary.length * minStep;
+	const height = 190;
 
 	const chartPropertyArray: ChartValue[] = [
 		"allocations",
@@ -25,12 +22,20 @@ function TopChart({ year, dataSummary, setYear }: TopChartProps) {
 	const svgContainer = useRef(null);
 
 	useEffect(() => {
-		createTopChart();
+		createTopChart({
+			height,
+			dataSummary,
+			chartValue,
+			svgContainer,
+		});
 	}, [dataSummary, chartValue]);
 
 	function handleRadioChange(event: React.ChangeEvent<HTMLInputElement>) {
 		setChartValue(event.target.value as ChartValue);
 	}
+
+	// function handleBarClick(event , d: SummaryData) {
+	// };
 
 	return (
 		<Box
@@ -41,14 +46,17 @@ function TopChart({ year, dataSummary, setYear }: TopChartProps) {
 				justifyContent: "center",
 			}}
 		>
-			<Box>
+			<Box style={{ marginRight: "1em" }}>
 				<FormControl>
-					<FormLabel id="topchart-buttons-group-label">
+					<FormLabel
+						id="topchart-buttons-group-label"
+						style={{ marginBottom: "0.4em" }}
+					>
 						Show
 					</FormLabel>
 					<RadioGroup
 						aria-labelledby="topchart-buttons-group-label"
-						defaultValue={chartValue}
+						defaultValue={chartPropertyArray[0]}
 						name="topchart-radio-buttons-group"
 						onChange={handleRadioChange}
 					>
@@ -78,7 +86,6 @@ function TopChart({ year, dataSummary, setYear }: TopChartProps) {
 			<Box>
 				<svg
 					ref={svgContainer}
-					width={width}
 					height={height}
 				></svg>
 			</Box>

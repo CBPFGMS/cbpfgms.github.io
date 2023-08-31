@@ -95,7 +95,7 @@ function MainContainer() {
 					elevation={0}
 					style={{
 						width: "100%",
-						paddingTop: "2em",
+						paddingTop: "1em",
 						paddingBottom: "1em",
 						backgroundColor: "#f5f8ff",
 						borderRadius: "6px",
@@ -109,6 +109,7 @@ function MainContainer() {
 							display={"flex"}
 							alignItems={"center"}
 							justifyContent={"center"}
+							mb={1}
 						>
 							<TopChart
 								year={year}

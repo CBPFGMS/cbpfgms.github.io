@@ -299,3 +299,10 @@ type TopChartProps = {
 };
 
 type ChartValue = "allocations" | "projects" | "partners";
+
+type CreateTopChartParams = {
+	height: number;
+	dataSummary: SummaryData[];
+	chartValue: ChartValue;
+	svgContainer: React.RefObject<SVGSVGElement>;
+};
