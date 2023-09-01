@@ -10,20 +10,24 @@ function YearSelector({
 	reportYear,
 	setReportYear,
 	reportYears,
+	setYear,
 }: YearSelectorProps) {
 	function handleLeftClick() {
+		setYear(null);
 		setReportYear(prev =>
 			reportYears.has(prev[0] - 1) ? [prev[0] - 1] : prev
 		);
 	}
 
 	function handleRightClick() {
+		setYear(null);
 		setReportYear(prev =>
 			reportYears.has(prev[0] + 1) ? [prev[0] + 1] : prev
 		);
 	}
 
 	const handleChange = (event: SelectChangeEvent) => {
+		setYear(null);
 		setReportYear([+event.target.value]);
 	};
 
@@ -54,7 +58,12 @@ function YearSelector({
 					{[...reportYears]
 						.sort((a, b) => b - a)
 						.map(year => (
-							<MenuItem key={year} value={year}>{year}</MenuItem>
+							<MenuItem
+								key={year}
+								value={year}
+							>
+								{year}
+							</MenuItem>
 						))}
 				</Select>
 			</FormControl>

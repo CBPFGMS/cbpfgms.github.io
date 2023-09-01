@@ -59,9 +59,19 @@ function SummaryRow({
 									color: "#222",
 								}}
 							>
-								{d < 1e4
-									? d
-									: (i ? "" : "$") + formatSIFloat(d)}
+								{d < 1e4 ? (
+									<NumberAnimator number={d} />
+								) : (
+									<span>
+										{i ? "" : "$"}
+										<NumberAnimator
+											number={parseFloat(
+												formatSIFloat(d)
+											)}
+										/>
+										{formatSIFloat(d).slice(-1)}
+									</span>
+								)}
 							</Box>
 							<Box
 								style={{
@@ -144,7 +154,7 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 			>
 				{data.map((d, i) => (
 					<SummaryRow
-						key={d.year}
+						key={i}
 						year={d.year}
 						allocations={d.allocations}
 						projects={d.projects}

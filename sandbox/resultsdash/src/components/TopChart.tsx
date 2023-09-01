@@ -8,7 +8,7 @@ import FormLabel from "@mui/material/FormLabel";
 import createTopChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
 
-function TopChart({ year, dataSummary, setYear }: TopChartProps) {
+function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 	const height = 190;
 
 	const chartPropertyArray: ChartValue[] = [
@@ -27,6 +27,8 @@ function TopChart({ year, dataSummary, setYear }: TopChartProps) {
 			dataSummary,
 			chartValue,
 			svgContainer,
+			year,
+			setYear,
 		});
 	}, [dataSummary, chartValue]);
 
@@ -83,7 +85,19 @@ function TopChart({ year, dataSummary, setYear }: TopChartProps) {
 					</RadioGroup>
 				</FormControl>
 			</Box>
-			<Box>
+			<Box
+				style={{
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+				}}
+			>
+				<Typography
+					variant="body2"
+					style={{ marginBottom: "0.5em" }}
+				>
+					Results reported in <strong>{reportYear[0]}</strong>
+				</Typography>
 				<svg
 					ref={svgContainer}
 					height={height}

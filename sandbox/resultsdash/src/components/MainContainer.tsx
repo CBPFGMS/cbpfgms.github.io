@@ -72,6 +72,7 @@ function MainContainer() {
 							reportYear={reportYear}
 							setReportYear={setReportYear}
 							reportYears={apiData.inDataLists.reportYears}
+							setYear={setYear}
 						/>
 					</Grid>
 					<Grid xs={12}>
@@ -115,6 +116,7 @@ function MainContainer() {
 								year={year}
 								dataSummary={dataSummary}
 								setYear={setYear}
+								reportYear={reportYear}
 							/>
 						</Box>
 					</Grid>

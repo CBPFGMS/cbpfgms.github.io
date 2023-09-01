@@ -224,6 +224,7 @@ type YearSelectorProps = {
 	reportYear: number[];
 	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
 	reportYears: Set<number>;
+	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };
 
 type SummaryChartProps = {
@@ -296,6 +297,7 @@ type TopChartProps = {
 	year: number[] | null;
 	dataSummary: SummaryData[];
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
+	reportYear: number[];
 };
 
 type ChartValue = "allocations" | "projects" | "partners";
@@ -305,4 +307,6 @@ type CreateTopChartParams = {
 	dataSummary: SummaryData[];
 	chartValue: ChartValue;
 	svgContainer: React.RefObject<SVGSVGElement>;
+	year: number[] | null;
+	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };

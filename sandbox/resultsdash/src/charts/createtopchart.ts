@@ -13,6 +13,8 @@ function createTopChart({
 	dataSummary,
 	chartValue,
 	svgContainer,
+	year,
+	setYear,
 }: CreateTopChartParams): void {
 	const svg = select(svgContainer.current),
 		padding = [20, 4, 26, 38],
@@ -100,13 +102,19 @@ function createTopChart({
 		.attr("y", yScale(0))
 		.attr("width", xScale.bandwidth())
 		.attr("height", 0)
-		.attr("fill", "#888");
+		.attr("fill", d =>
+			year !== null && year.includes(d.year) ? "#144372" : "#a6a6a6"
+		);
 
 	bars = barsEnter.merge(bars);
 
 	bars.transition(syncedTransition)
+		.attr("fill", d =>
+			year !== null && year.includes(d.year) ? "#144372" : "#a6a6a6"
+		)
 		.attr("x", d => xScale(d.year.toString())!)
 		.attr("y", d => yScale(d[chartValue]))
+		.attr("width", xScale.bandwidth())
 		.attr("height", d => height - padding[2] - yScale(d[chartValue]));
 
 	let labels = chartGroup
@@ -141,6 +149,43 @@ function createTopChart({
 					interpolator(t)
 				)(interpolator(t)).replace("G", "B");
 		});
+
+	let overlayBars = chartGroup
+		.selectAll<SVGRectElement, SummaryData>(".topChartOverlayBars")
+		.data<SummaryData>(dataSummary, d => d.year);
+
+	overlayBars.exit().remove();
+
+	const overlayBarsEnter = overlayBars
+		.enter()
+		.append("rect")
+		.attr("class", "topChartOverlayBars")
+		.style("cursor", "pointer")
+		.attr("x", d => xScale(d.year.toString())!)
+		.attr("y", padding[0])
+		.attr("width", xScale.bandwidth())
+		.attr("height", height - padding[2] - padding[0])
+		.attr("opacity", 0);
+
+	overlayBars = overlayBarsEnter.merge(overlayBars);
+
+	overlayBars
+		.transition(syncedTransition)
+		.attr("x", d => xScale(d.year.toString())!)
+		.attr("width", xScale.bandwidth());
+
+	overlayBars.on("click", (event, d) => {
+		if (year !== null && year.includes(d.year)) {
+			const filteredYear = year.filter(e => e !== d.year);
+			setYear(filteredYear.length ? filteredYear : null);
+		} else {
+			setYear(year ? [...year, d.year] : [d.year]);
+		}
+		bars.filter(e => e.year === d.year).attr(
+			"fill",
+			year === null || !year.includes(d.year) ? "#144372" : "#a6a6a6"
+		);
+	});
 }
 
 export default createTopChart;
