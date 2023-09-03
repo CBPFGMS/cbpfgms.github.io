@@ -7,6 +7,7 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import createTopChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
+import { Tooltip } from "react-tooltip";
 
 function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 	const height = 190;
@@ -98,6 +99,12 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 				>
 					Results reported in <strong>{reportYear[0]}</strong>
 				</Typography>
+				{dataSummary.map((d, i) => (
+					<Tooltip
+						key={i}
+						id={`tooltip-topchart-${i}`}
+					/>
+				))}
 				<svg
 					ref={svgContainer}
 					height={height}

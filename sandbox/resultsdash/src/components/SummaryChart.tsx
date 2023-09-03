@@ -6,6 +6,8 @@ import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
 import NumberAnimator from "./NumberAnimator";
+import { format } from "d3-format";
+import { Tooltip } from "react-tooltip";
 
 const unColor = "#418fde";
 
@@ -52,7 +54,15 @@ function SummaryRow({
 								flexDirection: "column",
 							}}
 						>
+							{!i && <Tooltip id={`tooltip-row-${i}`} />}
 							<Box
+								{...(!i && {
+									"data-tooltip-id": `tooltip-row-${i}`,
+									"data-tooltip-content": `Allocations: $${format(
+										",.2f"
+									)(d)}`,
+									"data-tooltip-place": "top",
+								})}
 								style={{
 									fontSize: "1.6rem",
 									fontWeight: 500,
@@ -102,12 +112,18 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 
 	return (
 		<Container disableGutters={true}>
+			<Tooltip id="summary-chart-tooltip" />
 			<Box
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"center"}
 				gap={1}
 				marginBottom={2}
+				data-tooltip-id="summary-chart-tooltip"
+				data-tooltip-content={`Total allocations: $${format(",.2f")(
+					total
+				)}`}
+				data-tooltip-place="top"
 			>
 				<MoneyBag sx={{ fontSize: 60, fill: unColor }} />
 				<Box
@@ -120,7 +136,7 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 					<Typography
 						variant="h3"
 						fontWeight={500}
-						style={{ color: unColor }}
+						style={{ color: unColor, border: "none" }}
 					>
 						{total < 1e3 ? (
 							<NumberAnimator number={total} />

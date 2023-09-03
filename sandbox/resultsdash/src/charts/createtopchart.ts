@@ -108,7 +108,14 @@ function createTopChart({
 
 	bars = barsEnter.merge(bars);
 
-	bars.transition(syncedTransition)
+	bars.attr("data-tooltip-id", (d, i) => `tooltip-topchart-${i}`)
+		.attr("data-tooltip-content", d =>
+			chartValue !== "allocations"
+				? ""
+				: "$" + format(",.2f")(d[chartValue])
+		)
+		.attr("data-tooltip-place", "top")
+		.transition(syncedTransition)
 		.attr("fill", d =>
 			year !== null && year.includes(d.year) ? "#144372" : "#a6a6a6"
 		)
@@ -174,18 +181,25 @@ function createTopChart({
 		.attr("x", d => xScale(d.year.toString())!)
 		.attr("width", xScale.bandwidth());
 
-	overlayBars.on("click", (event, d) => {
-		if (year !== null && year.includes(d.year)) {
-			const filteredYear = year.filter(e => e !== d.year);
-			setYear(filteredYear.length ? filteredYear : null);
-		} else {
-			setYear(year ? [...year, d.year] : [d.year]);
-		}
-		bars.filter(e => e.year === d.year).attr(
-			"fill",
-			year === null || !year.includes(d.year) ? "#144372" : "#a6a6a6"
-		);
-	});
+	overlayBars
+		.on("mouseenter", (_, d) => {
+			bars.filter(e => e.year === d.year).dispatch("mouseenter");
+		})
+		.on("mouseleave", (_, d) => {
+			bars.filter(e => e.year === d.year).dispatch("mouseleave");
+		})
+		.on("click", (event, d) => {
+			if (year !== null && year.includes(d.year)) {
+				const filteredYear = year.filter(e => e !== d.year);
+				setYear(filteredYear.length ? filteredYear : null);
+			} else {
+				setYear(year ? [...year, d.year] : [d.year]);
+			}
+			bars.filter(e => e.year === d.year).attr(
+				"fill",
+				year === null || !year.includes(d.year) ? "#144372" : "#a6a6a6"
+			);
+		});
 }
 
 export default createTopChart;
