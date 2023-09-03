@@ -31,6 +31,7 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 			year,
 			setYear,
 		});
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dataSummary, chartValue]);
 
 	function handleRadioChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -99,7 +100,7 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 				>
 					Results reported in <strong>{reportYear[0]}</strong>
 				</Typography>
-				{dataSummary.map((d, i) => (
+				{dataSummary.map((_, i) => (
 					<Tooltip
 						key={i}
 						id={`tooltip-topchart-${i}`}

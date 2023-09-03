@@ -108,7 +108,7 @@ function createTopChart({
 
 	bars = barsEnter.merge(bars);
 
-	bars.attr("data-tooltip-id", (d, i) => `tooltip-topchart-${i}`)
+	bars.attr("data-tooltip-id", (_, i) => `tooltip-topchart-${i}`)
 		.attr("data-tooltip-content", d =>
 			chartValue !== "allocations"
 				? ""
@@ -188,7 +188,7 @@ function createTopChart({
 		.on("mouseleave", (_, d) => {
 			bars.filter(e => e.year === d.year).dispatch("mouseleave");
 		})
-		.on("click", (event, d) => {
+		.on("click", (_, d) => {
 			if (year !== null && year.includes(d.year)) {
 				const filteredYear = year.filter(e => e !== d.year);
 				setYear(filteredYear.length ? filteredYear : null);
