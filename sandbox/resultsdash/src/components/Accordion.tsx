@@ -41,6 +41,7 @@ function AccordionComponent({
 		<Accordion
 			expanded={expanded === type}
 			onChange={handleAccordionExpand(type)}
+			style={{ backgroundColor: "rgb(248, 251, 255)" }}
 		>
 			<AccordionSummary
 				expandIcon={<ExpandMoreIcon />}

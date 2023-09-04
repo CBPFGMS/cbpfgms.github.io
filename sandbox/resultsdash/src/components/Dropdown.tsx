@@ -5,6 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
+import { useMemo } from "react";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -24,10 +25,12 @@ function Dropdown({ value, setValue, names, namesList, type }: DropdownProps) {
 		setValue(eventArray);
 	}
 
-	//PROVISORY
-	names = names.filter(d => namesList[d]);
-
-	names.sort((a, b) => namesList[a].localeCompare(namesList[b]));
+	const namesListMemo = useMemo(() => {
+		//PROVISORY
+		const filteredNames = names.filter(d => namesList[d]);
+		filteredNames.sort((a, b) => namesList[a].localeCompare(namesList[b]));
+		return filteredNames;
+	}, [names, namesList]);
 
 	return (
 		<div>
@@ -45,7 +48,7 @@ function Dropdown({ value, setValue, names, namesList, type }: DropdownProps) {
 					}
 					MenuProps={MenuProps}
 				>
-					{names.map(name => (
+					{namesListMemo.map(name => (
 						<MenuItem
 							key={name}
 							value={name}

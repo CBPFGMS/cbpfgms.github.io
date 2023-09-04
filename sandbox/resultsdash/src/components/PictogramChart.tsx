@@ -2,11 +2,12 @@
 import Box from "@mui/material/Box";
 // import createPictogramChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
-// import { Tooltip } from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
 import Divider from "@mui/material/Divider";
+import { format } from "d3-format";
 
 const unColor = "#418fde";
 
@@ -54,6 +55,8 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 				gap={3}
 				marginBottom={2}
 			>
+				<Tooltip id="targeted-tooltip" />
+				<Tooltip id="reached-tooltip" />
 				<Pictogram
 					svgProps={{
 						style: {
@@ -69,6 +72,11 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 					alignItems={"center"}
 					justifyContent={"center"}
 					gap={0}
+					data-tooltip-id="targeted-tooltip"
+					data-tooltip-content={`People targeted: ${format(",.0f")(
+						totalTargeted
+					)}`}
+					data-tooltip-place="top"
 				>
 					<Typography
 						variant="h3"
@@ -112,6 +120,11 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 					alignItems={"center"}
 					justifyContent={"center"}
 					gap={0}
+					data-tooltip-id="reached-tooltip"
+					data-tooltip-content={`People reached: ${format(",.0f")(
+						totalReached
+					)}`}
+					data-tooltip-place="top"
 				>
 					<Typography
 						variant="h3"
