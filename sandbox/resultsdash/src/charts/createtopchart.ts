@@ -19,10 +19,12 @@ function createTopChart({
 	const svg = select(svgContainer.current),
 		padding = [20, 4, 26, 38],
 		minStep = 40,
-		width = Math.min(
-			800,
-			padding[1] + padding[3] + dataSummary.length * minStep
-		),
+		width = dataSummary.length
+			? Math.min(
+					800,
+					padding[1] + padding[3] + dataSummary.length * minStep
+			  )
+			: 400,
 		duration = 750,
 		xScale = scaleBand()
 			.range([width - padding[1], padding[3]])
@@ -87,6 +89,22 @@ function createTopChart({
 		.selectAll(".tick")
 		.filter(d => d === 0)
 		.remove();
+
+	const noDataText = svg
+		.selectAll<SVGTextElement, boolean>(".noDataText")
+		.data(dataSummary.length ? [] : [true]);
+
+	noDataText.exit().remove();
+
+	noDataText
+		.enter()
+		.append("text")
+		.attr("class", "noDataText")
+		.attr("x", width / 2)
+		.attr("y", height / 2)
+		.attr("text-anchor", "middle")
+		.attr("dominant-baseline", "middle")
+		.text("No data available for the selection");
 
 	let bars = chartGroup
 		.selectAll<SVGRectElement, SummaryData>(".topChartBars")

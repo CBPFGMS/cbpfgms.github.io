@@ -31,7 +31,7 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 			year,
 			setYear,
 		});
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dataSummary, chartValue]);
 
 	function handleRadioChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -70,6 +70,7 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 								value={d}
 								control={
 									<Radio
+										disabled={dataSummary.length === 0}
 										style={{
 											paddingTop: "4px",
 											paddingBottom: "4px",

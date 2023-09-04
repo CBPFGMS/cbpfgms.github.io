@@ -8,10 +8,11 @@ import Selectors from "./Selectors";
 import SummaryChart from "./SummaryChart";
 import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
-import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import processDataSummary from "../utils/processdatasummary";
+import processDataPictogram from "../utils/processdatapictogram";
 import TopChart from "./TopChart";
+import PictogramChart from "./PictogramChart";
 
 function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
@@ -37,6 +38,15 @@ function MainContainer() {
 		fund,
 		allocationSource,
 		allocationType,
+	});
+
+	const dataPictogram = processDataPictogram({
+		rawData,
+		reportYear,
+		fund,
+		allocationSource,
+		allocationType,
+		year,
 	});
 
 	return (
@@ -110,7 +120,7 @@ function MainContainer() {
 							display={"flex"}
 							alignItems={"center"}
 							justifyContent={"center"}
-							mb={1}
+							mb={2}
 						>
 							<TopChart
 								year={year}
@@ -147,7 +157,9 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								<Typography>Chart 02</Typography>
+								<PictogramChart
+									dataPictogram={dataPictogram}
+								/>
 							</Box>
 						</Grid>
 					</Grid>

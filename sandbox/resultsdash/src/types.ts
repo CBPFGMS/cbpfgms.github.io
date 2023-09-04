@@ -310,3 +310,36 @@ type CreateTopChartParams = {
 	year: number[] | null;
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };
+
+type PictogramData = {
+	targetedMen: number;
+	targetedWomen: number;
+	targetedBoys: number;
+	targetedGirls: number;
+	reachedMen: number;
+	reachedWomen: number;
+	reachedBoys: number;
+	reachedGirls: number;
+};
+
+type ProcessDataPictogram = ({
+	rawData,
+	reportYear,
+	fund,
+	allocationSource,
+	allocationType,
+	year,
+}: {
+	rawData: RawData;
+	reportYear: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	year: number[] | null;
+}) => PictogramData;
+
+type PictogramChartProps = {
+	dataPictogram: PictogramData;
+};
+
+type PictogramTypes = "total" | "girls" | "boys" | "women" | "men";

@@ -125,7 +125,7 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 				)}`}
 				data-tooltip-place="top"
 			>
-				<MoneyBag sx={{ fontSize: 60, fill: unColor }} />
+				<MoneyBag style={{ fontSize: 60, fill: unColor }} />
 				<Box
 					display={"flex"}
 					flexDirection={"column"}
