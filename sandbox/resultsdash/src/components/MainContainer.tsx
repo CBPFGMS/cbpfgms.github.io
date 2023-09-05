@@ -13,6 +13,7 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataPictogram from "../utils/processdatapictogram";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
+import { Typography } from "@mui/material";
 
 function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
@@ -60,13 +61,61 @@ function MainContainer() {
 			<Grid
 				container
 				spacing={2}
+				justifyContent={"center"}
+			>
+				<Grid
+					xs={12}
+					mb={2}
+					display={"flex"}
+					alignItems={"center"}
+					justifyContent={"center"}
+				>
+					<YearSelector
+						reportYear={reportYear}
+						setReportYear={setReportYear}
+						reportYears={apiData.inDataLists.reportYears}
+						setYear={setYear}
+					/>
+					<Typography
+						variant={"h4"}
+						style={{
+							fontFamily: "Montserrat",
+							fontSize: "40px",
+							fontWeight: 700,
+							marginLeft: "1em",
+						}}
+					>
+						Results Dashboard
+					</Typography>
+				</Grid>
+				<Grid
+					xs={8}
+					mb={3}
+				>
+					<Typography
+						variant="body1"
+						style={{
+							fontFamily: "Montserrat",
+							fontSize: "14px",
+							textAlign: "center",
+						}}
+					>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+						Sed ullamcorper, nisl quis tincidunt aliquam, nunc nibh
+						ullamcorper nisi, quis tincidunt elit nunc quis nunc.
+						Sed.
+					</Typography>
+				</Grid>
+			</Grid>
+			<Grid
+				container
+				spacing={2}
 			>
 				<Paper
 					elevation={0}
 					style={{
 						width: "100%",
-						paddingTop: "1em",
-						paddingBottom: "1em",
+						padding: "1em",
 						backgroundColor: "#f5f8ff",
 						borderRadius: "8px",
 						position: "relative",
@@ -74,17 +123,6 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
-					<Grid
-						xs={12}
-						mb={6}
-					>
-						<YearSelector
-							reportYear={reportYear}
-							setReportYear={setReportYear}
-							reportYears={apiData.inDataLists.reportYears}
-							setYear={setYear}
-						/>
-					</Grid>
 					<Grid xs={12}>
 						<Selectors
 							fund={fund}
@@ -94,6 +132,32 @@ function MainContainer() {
 							allocationType={allocationType}
 							setAllocationType={setAllocationType}
 						/>
+					</Grid>
+					<Grid
+						xs={12}
+						display={"flex"}
+						justifyContent={"flex-start"}
+					>
+						<Box
+							mt={1}
+							mb={1}
+							ml={0}
+						>
+							<Paper
+								elevation={1}
+								style={{
+									padding: "12px",
+									backgroundColor: "rgb(252,252,252)",
+								}}
+							>
+								<TopChart
+									year={year}
+									dataSummary={dataSummary}
+									setYear={setYear}
+									reportYear={reportYear}
+								/>
+							</Paper>
+						</Box>
 					</Grid>
 				</Paper>
 			</Grid>
@@ -115,27 +179,13 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
-					<Grid xs={12}>
-						<Box
-							display={"flex"}
-							alignItems={"center"}
-							justifyContent={"center"}
-							mb={2}
-						>
-							<TopChart
-								year={year}
-								dataSummary={dataSummary}
-								setYear={setYear}
-								reportYear={reportYear}
-							/>
-						</Box>
-					</Grid>
 					<Grid
 						container
 						direction={"row"}
 						spacing={1}
 						xs={12}
 						flexWrap={"nowrap"}
+						mt={2}
 					>
 						<Grid xs={6}>
 							<SummaryChart
@@ -157,9 +207,7 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								<PictogramChart
-									dataPictogram={dataPictogram}
-								/>
+								<PictogramChart dataPictogram={dataPictogram} />
 							</Box>
 						</Grid>
 					</Grid>

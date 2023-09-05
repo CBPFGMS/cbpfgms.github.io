@@ -41,13 +41,14 @@ function AccordionComponent({
 		<Accordion
 			expanded={expanded === type}
 			onChange={handleAccordionExpand(type)}
-			style={{ backgroundColor: "rgb(248, 251, 255)" }}
+			style={{ backgroundColor: "rgb(252, 252, 252)" }}
 		>
 			<AccordionSummary
 				expandIcon={<ExpandMoreIcon />}
 				sx={{
 					width: "100%",
 					height: "66px",
+					overflow: "hidden",
 				}}
 			>
 				<Typography
@@ -67,22 +68,13 @@ function AccordionComponent({
 						alignSelf: "center",
 						justifySelf: "flex-end",
 						fontSize: "0.8rem",
-						width: "40%",
+						width: "45%",
 					}}
 				>
 					{value.length === dataArray.length
 						? `All ${type}s selected`
-						: value.length < 6
-						? value.reduce(function (acc, curr, index) {
-								return (
-									acc +
-									(index >= value.length - 2
-										? index > value.length - 2
-											? namesList[curr]
-											: namesList[curr] + " and "
-										: namesList[curr] + ", ")
-								);
-						  }, "")
+						: value.length === 1
+						? namesList[value[0]]
 						: `${value.length} ${type}s selected`}
 				</Typography>
 			</AccordionSummary>

@@ -53,6 +53,7 @@ function YearSelector({
 					id="report-year-select"
 					value={reportYear[0].toString()}
 					label="Year"
+					sx={{ fontSize: "24px", fontWeight: "700" }}
 					onChange={handleChange}
 				>
 					{[...reportYears]
