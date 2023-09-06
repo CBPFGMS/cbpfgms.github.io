@@ -44,3 +44,7 @@
 	font-weight: bold;
 	letter-spacing: -0.5px;
 }
+
+.downloadIcon:focus {
+	outline: none;
+}

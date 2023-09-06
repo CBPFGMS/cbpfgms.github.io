@@ -8,6 +8,7 @@ import Divider from "@mui/material/Divider";
 import NumberAnimator from "./NumberAnimator";
 import { format } from "d3-format";
 import { Tooltip } from "react-tooltip";
+import DownloadIcon from "./DownloadIcon";
 
 const unColor = "#418fde";
 
@@ -108,10 +109,18 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 		year !== null ? year.includes(d.year) : true
 	);
 
+	function handleDownloadClick() {
+		console.log("test");
+	}
+
 	const total = sum(data, d => d.allocations);
 
 	return (
-		<Container disableGutters={true}>
+		<Container
+			disableGutters={true}
+			style={{ position: "relative" }}
+		>
+			<DownloadIcon handleDownloadClick={handleDownloadClick} />
 			<Tooltip id="summary-chart-tooltip" />
 			<Box
 				display={"flex"}

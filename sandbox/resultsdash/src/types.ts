@@ -239,18 +239,20 @@ type SelectorsProps = {
 	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	inSelectionData: InSelectionObject;
 };
 
 type AccordionComponentProps = {
 	type: string;
 	filterType: string;
-	dataProperty: string;
+	dataProperty: DataProperties;
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	expanded: string | false;
 	handleAccordionExpand: (
 		panel: string
 	) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
+	inSelectionData: InSelectionObject;
 };
 
 type DropdownProps = {
@@ -259,6 +261,8 @@ type DropdownProps = {
 	names: number[];
 	namesList: ListObj;
 	type: string;
+	inSelectionData: InSelectionObject;
+	dataProperty: DataProperties;
 };
 
 type CheckboxProps = {
@@ -266,6 +270,8 @@ type CheckboxProps = {
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	names: number[];
 	namesList: ListObj;
+	inSelectionData: InSelectionObject;
+	dataProperty: DataProperties;
 };
 
 type SummaryData = {
@@ -285,13 +291,27 @@ type processDataSummary = ({
 	fund,
 	allocationSource,
 	allocationType,
+	year,
 }: {
 	rawData: RawData;
 	reportYear: number[];
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
-}) => SummaryData[];
+	year: number[] | null;
+}) => {
+	dataSummary: SummaryData[];
+	dataPictogram: PictogramData;
+	inSelectionData: InSelectionObject;
+};
+
+type InSelectionObject = {
+	funds: Set<number>;
+	allocationSources: Set<number>;
+	allocationTypes: Set<number>;
+};
+
+type DataProperties = keyof InSelectionObject;
 
 type TopChartProps = {
 	year: number[] | null;
@@ -343,3 +363,7 @@ type PictogramChartProps = {
 };
 
 type PictogramTypes = "total" | "girls" | "boys" | "women" | "men";
+
+type DownloadIconProps = {
+	handleDownloadClick: () => void;
+};

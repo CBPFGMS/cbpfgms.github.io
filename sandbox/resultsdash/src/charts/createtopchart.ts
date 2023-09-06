@@ -17,19 +17,19 @@ function createTopChart({
 	setYear,
 }: CreateTopChartParams): void {
 	const svg = select(svgContainer.current),
-		padding = [20, 4, 26, 38],
-		minStep = 40,
+		padding = [20, 8, 26, 48],
+		minStep = 48,
 		width = dataSummary.length
 			? Math.min(
 					800,
 					padding[1] + padding[3] + dataSummary.length * minStep
 			  )
-			: 400,
+			: 480,
 		duration = 750,
 		xScale = scaleBand()
 			.range([width - padding[1], padding[3]])
 			.domain(dataSummary.map(d => d.year.toString()))
-			.padding(0.4),
+			.padding(0.5),
 		yScale = scaleLinear()
 			.range([height - padding[2], padding[0]])
 			.domain([0, max(dataSummary, d => d[chartValue])!]),

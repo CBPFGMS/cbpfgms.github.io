@@ -8,6 +8,8 @@ import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
 import Divider from "@mui/material/Divider";
 import { format } from "d3-format";
+import DownloadIcon from "./DownloadIcon";
+import Container from "@mui/material/Container";
 
 const unColor = "#418fde";
 
@@ -39,14 +41,13 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 	// }, [dataSummary, chartValue]);
 
 	return (
-		<Box
+		<Container
+			disableGutters={true}
 			style={{
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "center",
-				justifyContent: "center",
+				position: "relative",
 			}}
 		>
+			<DownloadIcon handleDownloadClick={() => console.log("download")} />
 			<Box
 				display={"flex"}
 				flexDirection={"row"}
@@ -155,7 +156,7 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 					</Typography>
 				</Box>
 			</Box>
-		</Box>
+		</Container>
 	);
 }
 

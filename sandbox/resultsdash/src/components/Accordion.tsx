@@ -18,6 +18,7 @@ function AccordionComponent({
 	setValue,
 	expanded,
 	handleAccordionExpand,
+	inSelectionData,
 }: AccordionComponentProps) {
 	const apiData = useContext(DataContext) as DataContext;
 	const lists = apiData.lists;
@@ -41,7 +42,7 @@ function AccordionComponent({
 		<Accordion
 			expanded={expanded === type}
 			onChange={handleAccordionExpand(type)}
-			style={{ backgroundColor: "rgb(252, 252, 252)" }}
+			style={{ backgroundColor: "#ffffff" }}
 		>
 			<AccordionSummary
 				expandIcon={<ExpandMoreIcon />}
@@ -94,6 +95,8 @@ function AccordionComponent({
 						names={dataArray}
 						namesList={namesList as ListObj}
 						type={type}
+						inSelectionData={inSelectionData}
+						dataProperty={dataProperty}
 					/>
 				)}
 				{filterType === "checkbox" && (
@@ -102,6 +105,8 @@ function AccordionComponent({
 						setValue={setValue}
 						names={dataArray}
 						namesList={namesList as ListObj}
+						inSelectionData={inSelectionData}
+						dataProperty={dataProperty}
 					/>
 				)}
 				{filterType === "dropdowncheck" && (

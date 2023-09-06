@@ -10,7 +10,6 @@ import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import processDataSummary from "../utils/processdatasummary";
-import processDataPictogram from "../utils/processdatapictogram";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
 import { Typography } from "@mui/material";
@@ -33,15 +32,7 @@ function MainContainer() {
 		...apiData.inDataLists.allocationSources,
 	]);
 
-	const dataSummary = processDataSummary({
-		rawData,
-		reportYear,
-		fund,
-		allocationSource,
-		allocationType,
-	});
-
-	const dataPictogram = processDataPictogram({
+	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
 		rawData,
 		reportYear,
 		fund,
@@ -131,6 +122,7 @@ function MainContainer() {
 							setAllocationSource={setAllocationSource}
 							allocationType={allocationType}
 							setAllocationType={setAllocationType}
+							inSelectionData={inSelectionData}
 						/>
 					</Grid>
 					<Grid
@@ -143,20 +135,12 @@ function MainContainer() {
 							mb={1}
 							ml={0}
 						>
-							<Paper
-								elevation={1}
-								style={{
-									padding: "12px",
-									backgroundColor: "rgb(252,252,252)",
-								}}
-							>
-								<TopChart
-									year={year}
-									dataSummary={dataSummary}
-									setYear={setYear}
-									reportYear={reportYear}
-								/>
-							</Paper>
+							<TopChart
+								year={year}
+								dataSummary={dataSummary}
+								setYear={setYear}
+								reportYear={reportYear}
+							/>
 						</Box>
 					</Grid>
 				</Paper>

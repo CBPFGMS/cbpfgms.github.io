@@ -9,6 +9,7 @@ function Selectors({
 	setAllocationSource,
 	allocationType,
 	setAllocationType,
+	inSelectionData
 }: SelectorsProps) {
 	const [expanded, setExpanded] = useState<string | false>(false);
 
@@ -31,6 +32,7 @@ function Selectors({
 					setValue={setFund}
 					expanded={expanded}
 					handleAccordionExpand={handleAccordionExpand}
+					inSelectionData={inSelectionData}
 				/>
 			</Grid>
 			<Grid xs={4}>
@@ -42,6 +44,7 @@ function Selectors({
 					setValue={setAllocationType}
 					expanded={expanded}
 					handleAccordionExpand={handleAccordionExpand}
+					inSelectionData={inSelectionData}
 				/>
 			</Grid>
 			<Grid xs={4}>
@@ -53,6 +56,7 @@ function Selectors({
 					setValue={setAllocationSource}
 					expanded={expanded}
 					handleAccordionExpand={handleAccordionExpand}
+					inSelectionData={inSelectionData}
 				/>
 			</Grid>
 		</Grid>
