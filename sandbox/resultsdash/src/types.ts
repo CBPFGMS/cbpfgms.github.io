@@ -230,6 +230,8 @@ type YearSelectorProps = {
 type SummaryChartProps = {
 	dataSummary: SummaryData[];
 	year: number[] | null;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 type SelectorsProps = {
@@ -342,28 +344,24 @@ type PictogramData = {
 	reachedGirls: number;
 };
 
-type ProcessDataPictogram = ({
-	rawData,
-	reportYear,
-	fund,
-	allocationSource,
-	allocationType,
-	year,
-}: {
-	rawData: RawData;
-	reportYear: number[];
-	fund: number[];
-	allocationSource: number[];
-	allocationType: number[];
-	year: number[] | null;
-}) => PictogramData;
-
 type PictogramChartProps = {
 	dataPictogram: PictogramData;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 type PictogramTypes = "total" | "girls" | "boys" | "women" | "men";
 
 type DownloadIconProps = {
 	handleDownloadClick: () => void;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	type: Charts;
 };
+
+type DownloadStates = {
+	summary: boolean;
+	pictogram: boolean;
+};
+
+type Charts = "summary" | "pictogram";

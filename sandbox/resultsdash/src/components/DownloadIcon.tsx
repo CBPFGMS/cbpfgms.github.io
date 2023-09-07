@@ -2,10 +2,13 @@ import Box from "@mui/material/Box";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import FileDownloadDoneOutlinedIcon from "@mui/icons-material/FileDownloadDoneOutlined";
 import { Tooltip } from "react-tooltip";
-import { useState } from "react";
 
-function DownloadIcon({ handleDownloadClick }: DownloadIconProps) {
-	const [clicked, setClicked] = useState<boolean>(false);
+function DownloadIcon({
+	handleDownloadClick,
+	clickedDownload,
+	setClickedDownload,
+	type,
+}: DownloadIconProps) {
 	return (
 		<Box
 			style={{
@@ -17,12 +20,12 @@ function DownloadIcon({ handleDownloadClick }: DownloadIconProps) {
 				zIndex: 1000,
 			}}
 			onClick={() => {
-				setClicked(true);
+				setClickedDownload(prev => ({ ...prev, [type]: true }));
 				handleDownloadClick();
 			}}
 		>
 			<Tooltip id="download-tooltip" />
-			{clicked ? (
+			{clickedDownload[type] ? (
 				<FileDownloadDoneOutlinedIcon
 					className="downloadIcon"
 					fontSize="large"

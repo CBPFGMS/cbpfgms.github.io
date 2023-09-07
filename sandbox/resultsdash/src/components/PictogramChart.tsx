@@ -13,7 +13,11 @@ import Container from "@mui/material/Container";
 
 const unColor = "#418fde";
 
-function PictogramChart({ dataPictogram }: PictogramChartProps) {
+function PictogramChart({
+	dataPictogram,
+	clickedDownload,
+	setClickedDownload,
+}: PictogramChartProps) {
 	const totalTargeted =
 		dataPictogram.targetedBoys +
 		dataPictogram.targetedGirls +
@@ -47,7 +51,12 @@ function PictogramChart({ dataPictogram }: PictogramChartProps) {
 				position: "relative",
 			}}
 		>
-			<DownloadIcon handleDownloadClick={() => console.log("download")} />
+			<DownloadIcon
+				handleDownloadClick={() => console.log("download")}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				type="pictogram"
+			/>
 			<Box
 				display={"flex"}
 				flexDirection={"row"}

@@ -104,7 +104,12 @@ function SummaryRow({
 	);
 }
 
-function SummaryChart({ dataSummary, year }: SummaryChartProps) {
+function SummaryChart({
+	dataSummary,
+	year,
+	clickedDownload,
+	setClickedDownload,
+}: SummaryChartProps) {
 	const data = dataSummary.filter(d =>
 		year !== null ? year.includes(d.year) : true
 	);
@@ -120,7 +125,12 @@ function SummaryChart({ dataSummary, year }: SummaryChartProps) {
 			disableGutters={true}
 			style={{ position: "relative" }}
 		>
-			<DownloadIcon handleDownloadClick={handleDownloadClick} />
+			<DownloadIcon
+				handleDownloadClick={handleDownloadClick}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				type="summary"
+			/>
 			<Tooltip id="summary-chart-tooltip" />
 			<Box
 				display={"flex"}

@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DataContext from "../context/DataContext";
 import Grid from "@mui/material/Unstable_Grid2";
 import Container from "@mui/material/Container";
@@ -13,6 +13,11 @@ import processDataSummary from "../utils/processdatasummary";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
 import { Typography } from "@mui/material";
+
+const downloadStates: DownloadStates = {
+	summary: false,
+	pictogram: false,
+};
 
 function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
@@ -32,6 +37,9 @@ function MainContainer() {
 		...apiData.inDataLists.allocationSources,
 	]);
 
+	const [clickedDownload, setClickedDownload] =
+		useState<DownloadStates>(downloadStates);
+
 	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
 		rawData,
 		reportYear,
@@ -40,6 +48,10 @@ function MainContainer() {
 		allocationType,
 		year,
 	});
+
+	useEffect(() => {
+		setClickedDownload(downloadStates);
+	}, [reportYear, fund, allocationSource, allocationType]);
 
 	return (
 		<Container
@@ -175,6 +187,8 @@ function MainContainer() {
 							<SummaryChart
 								dataSummary={dataSummary}
 								year={year}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
 							/>
 						</Grid>
 						<Divider
@@ -191,7 +205,11 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								<PictogramChart dataPictogram={dataPictogram} />
+								<PictogramChart
+									dataPictogram={dataPictogram}
+									clickedDownload={clickedDownload}
+									setClickedDownload={setClickedDownload}
+								/>
 							</Box>
 						</Grid>
 					</Grid>
