@@ -11,8 +11,11 @@ import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import PictogramRow from "./PictogramRow";
 import { max } from "d3-array";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import DoneIcon from "@mui/icons-material/Done";
 
-const unColor = "#418fde";
+const unColor = "#418fde",
+	unColorLighter = "#82b5e9";
 
 function PictogramChart({
 	dataPictogram,
@@ -43,8 +46,6 @@ function PictogramChart({
 	const [maxNumberOfPictograms, setMaxNumberOfPictograms] =
 		useState<number>(0);
 
-	console.log(maxNumberOfPictograms);
-
 	return (
 		<Container
 			disableGutters={true}
@@ -65,6 +66,7 @@ function PictogramChart({
 				justifyContent={"center"}
 				gap={3}
 				marginBottom={2}
+				width={"90%"}
 			>
 				<Tooltip id="targeted-tooltip" />
 				<Tooltip id="reached-tooltip" />
@@ -92,7 +94,7 @@ function PictogramChart({
 					<Typography
 						variant="h3"
 						fontWeight={500}
-						style={{ color: unColor, border: "none" }}
+						style={{ color: unColorLighter, border: "none" }}
 					>
 						{totalTargeted < 1e3 ? (
 							<NumberAnimator number={totalTargeted} />
@@ -115,6 +117,15 @@ function PictogramChart({
 						}}
 					>
 						People Targeted
+						<AdsClickIcon
+							style={{
+								fontSize: 18,
+								marginLeft: 4,
+								color: "#777",
+								opacity: 0.6,
+								marginBottom: "-3px",
+							}}
+						/>
 					</Typography>
 				</Box>
 				<Divider
@@ -163,6 +174,15 @@ function PictogramChart({
 						}}
 					>
 						People Reached
+						<DoneIcon
+							style={{
+								fontSize: 18,
+								marginLeft: 4,
+								color: "#777",
+								opacity: 0.6,
+								marginBottom: "-2px",
+							}}
+						/>
 					</Typography>
 				</Box>
 			</Box>
@@ -175,6 +195,31 @@ function PictogramChart({
 				gap={3}
 				marginTop={4}
 			>
+				<Box
+					mb={-2}
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "flex-end",
+						textAlign: "right",
+						width: "100%",
+					}}
+				>
+					<Typography
+						variant="body2"
+						fontSize={12}
+						style={{
+							color: "#222",
+							border: "none",
+							fontStyle: "italic",
+							letterSpacing: "-0.05em",
+						}}
+					>
+						Reached as %<br />
+						of targeted
+					</Typography>
+				</Box>
 				{beneficiaryTypesArray.map(type => (
 					<PictogramRow
 						key={type}

@@ -8,8 +8,11 @@ import { useState, useEffect, useRef } from "react";
 import Pictogram from "../assets/Pictogram";
 import { scaleLinear } from "d3-scale";
 import { format } from "d3-format";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import DoneIcon from "@mui/icons-material/Done";
 
-const unColor = "#418fde";
+const unColor = "#418fde",
+	unColorLighter = "#82b5e9";
 
 function PictogramRow({
 	type,
@@ -59,7 +62,7 @@ function PictogramRow({
 			</Box>
 			<Box
 				style={{
-					flex: "0 85%",
+					flex: "0 75%",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -74,22 +77,22 @@ function PictogramRow({
 							alignItems: "center",
 						}}
 						key={i}
+						data-tooltip-id={"tooltip-" + type + "-" + i}
+						data-tooltip-content={`${capitalizeString(type)} ${
+							i ? "reached" : "targeted"
+						}: ${format(",.0f")(d)}`}
+						data-tooltip-place="top"
 					>
 						<Tooltip id={"tooltip-" + type + "-" + i} />
 						<Box
 							style={{
-								flex: "0 32%",
+								flex: "0 28%",
 								display: "flex",
 								flexDirection: "row",
 								justifyContent: "flex-end",
 								alignItems: "baseline",
-								marginRight: "8px",
+								marginRight: "12px",
 							}}
-							data-tooltip-id={"tooltip-" + type + "-" + i}
-							data-tooltip-content={`${capitalizeString(type)} ${
-								i ? "reached" : "targeted"
-							}: ${format(",.0f")(d)}`}
-							data-tooltip-place="top"
 						>
 							<Typography
 								variant="body2"
@@ -106,20 +109,38 @@ function PictogramRow({
 								variant="body2"
 								fontWeight={400}
 								style={{
-									color: "#555",
 									border: "none",
-									marginLeft: "4px",
 								}}
 							>
-								{i ? "Reached" : "Targeted"}
+								{i ? (
+									<DoneIcon
+										style={{
+											fontSize: 18,
+											marginLeft: 3,
+											color: "#777",
+											opacity: 0.6,
+											marginBottom: "-2px",
+										}}
+									/>
+								) : (
+									<AdsClickIcon
+										style={{
+											fontSize: 18,
+											marginLeft: 3,
+											color: "#777",
+											opacity: 0.6,
+											marginBottom: "-3px",
+										}}
+									/>
+								)}
 							</Typography>
 						</Box>
 						<Box
 							ref={divRef}
 							style={{
-								flex: "0 68%",
-								marginTop: "6px",
-								marginBottom: "6px",
+								flex: "0 72%",
+								marginTop: "2px",
+								marginBottom: "2px",
 								display: "flex",
 								alignItems: "center",
 								width: "100%",
@@ -135,22 +156,44 @@ function PictogramRow({
 									transitionDuration: "0.75s",
 								}}
 							>
-								{numberOfPictogramsArray.map((_, i) => (
+								{numberOfPictogramsArray.map((_, j) => (
 									<Pictogram
 										svgProps={{
 											style: {
 												width: pictogramWidth,
-												fill: unColor,
+												fill: i
+													? unColor
+													: unColorLighter,
 											},
 										}}
 										type={type}
-										key={i}
+										key={j}
 									/>
 								))}
 							</Box>
 						</Box>
 					</Box>
 				))}
+			</Box>
+			<Box
+				style={{
+					flex: "0 10%",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Typography
+					variant="body2"
+					style={{
+						fontSize: 12,
+						color: "#444",
+						border: "none",
+						fontStyle: "italic",
+					}}
+				>
+					<NumberAnimator number={~~((reached * 100) / targeted)} />%
+				</Typography>
 			</Box>
 		</Box>
 	);
