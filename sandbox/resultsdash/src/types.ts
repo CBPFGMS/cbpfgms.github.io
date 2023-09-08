@@ -350,7 +350,9 @@ type PictogramChartProps = {
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-type PictogramTypes = "total" | "girls" | "boys" | "women" | "men";
+type PictogramTypes = "girls" | "boys" | "women" | "men";
+
+type PictogramTypesWithTotal = PictogramTypes | "total";
 
 type DownloadIconProps = {
 	handleDownloadClick: () => void;
@@ -365,3 +367,11 @@ type DownloadStates = {
 };
 
 type Charts = "summary" | "pictogram";
+
+type PictogramRowProps = {
+	type: PictogramTypes;
+	targeted: number;
+	reached: number;
+	setMaxNumberOfPictograms: React.Dispatch<React.SetStateAction<number>>;
+	maxValue: number;
+};

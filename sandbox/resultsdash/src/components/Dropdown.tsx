@@ -41,7 +41,6 @@ function Dropdown({
 			const windowHeight = window.innerHeight;
 			const remainingSpace = windowHeight - selectRect.bottom;
 			setDropdownHeight(remainingSpace);
-			console.log(remainingSpace);
 		}
 	}
 
