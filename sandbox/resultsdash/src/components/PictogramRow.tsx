@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-// import createPictogramChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
 import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
@@ -10,9 +9,7 @@ import { scaleLinear } from "d3-scale";
 import { format } from "d3-format";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
-
-const unColor = "#418fde",
-	unColorLighter = "#82b5e9";
+import colors from "../utils/colors";
 
 function PictogramRow({
 	type,
@@ -162,8 +159,8 @@ function PictogramRow({
 											style: {
 												width: pictogramWidth,
 												fill: i
-													? unColor
-													: unColorLighter,
+													? colors.unColor
+													: colors.contrastColorLighter,
 											},
 										}}
 										type={type}

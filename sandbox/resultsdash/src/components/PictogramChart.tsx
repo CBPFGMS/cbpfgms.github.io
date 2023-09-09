@@ -13,9 +13,7 @@ import PictogramRow from "./PictogramRow";
 import { max } from "d3-array";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
-
-const unColor = "#418fde",
-	unColorLighter = "#82b5e9";
+import colors from "../utils/colors";
 
 function PictogramChart({
 	dataPictogram,
@@ -74,7 +72,7 @@ function PictogramChart({
 					svgProps={{
 						style: {
 							fontSize: 72,
-							fill: unColor,
+							fill: colors.unColor,
 						},
 					}}
 					type="total"
@@ -94,7 +92,7 @@ function PictogramChart({
 					<Typography
 						variant="h3"
 						fontWeight={500}
-						style={{ color: unColorLighter, border: "none" }}
+						style={{ color: colors.contrastColor, border: "none" }}
 					>
 						{totalTargeted < 1e3 ? (
 							<NumberAnimator number={totalTargeted} />
@@ -151,7 +149,7 @@ function PictogramChart({
 					<Typography
 						variant="h3"
 						fontWeight={500}
-						style={{ color: unColor, border: "none" }}
+						style={{ color: colors.unColor, border: "none" }}
 					>
 						{totalReached < 1e3 ? (
 							<NumberAnimator number={totalReached} />

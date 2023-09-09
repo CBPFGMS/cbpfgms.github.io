@@ -9,8 +9,22 @@ import createTopChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { Tooltip } from "react-tooltip";
+import colors from "../utils/colors";
 
 function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
+	const [barClicked, setBarClicked] = useState<boolean>(false);
+
+	useEffect(() => {
+		// if (year !== null) {
+		// 	localStorage.setItem("barClicked", "true");
+		// }
+		// const clicked = JSON.parse(
+		// 	localStorage.getItem("barClicked") || "false"
+		// );
+		// setBarClicked(clicked);
+		if (year !== null) setBarClicked(true);
+	}, [year]);
+
 	const height = 190;
 
 	const chartPropertyArray: ChartValue[] = [
@@ -114,7 +128,10 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 						variant="body2"
 						style={{ marginBottom: "0.5em", textAlign: "center" }}
 					>
-						Report dashboard of <strong>{reportYear[0]}</strong>{" "}
+						Report dashboard of{" "}
+						<strong style={{ color: colors.contrastColorDarker }}>
+							{reportYear[0]}
+						</strong>{" "}
 						contains data
 						<br />
 						from the following allocation year
@@ -132,6 +149,24 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 					></svg>
 				</Box>
 			</Paper>
+			{!barClicked && (
+				<Box
+					style={{
+						width: "180px",
+						borderBottom: "1px solid " + colors.contrastColor,
+						borderLeft: "1px solid " + colors.contrastColor,
+						paddingLeft: "0.5em",
+					}}
+				>
+					<Typography
+						variant="body2"
+						style={{ marginBottom: "0.5em", textAlign: "center" }}
+					>
+						You can click on the chart to select one or more years
+						whose allocations belong to the {reportYear[0]} report
+					</Typography>
+				</Box>
+			)}
 		</Box>
 	);
 }

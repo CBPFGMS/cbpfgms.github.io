@@ -7,6 +7,7 @@ import { format, formatPrefix } from "d3-format";
 import formatSIFloat from "../utils/formatsi";
 import reverseFormat from "../utils/reverseformat";
 import { interpolate } from "d3-interpolate";
+import colors from "../utils/colors";
 
 function createTopChart({
 	height,
@@ -133,10 +134,12 @@ function createTopChart({
 				: "$" + format(",.2f")(d[chartValue])
 		)
 		.attr("data-tooltip-place", "top")
-		.transition(syncedTransition)
 		.attr("fill", d =>
-			year !== null && year.includes(d.year) ? "#144372" : "#a6a6a6"
+			year !== null && year.includes(d.year)
+				? colors.contrastColor
+				: "#a6a6a6"
 		)
+		.transition(syncedTransition)
 		.attr("x", d => xScale(d.year.toString())!)
 		.attr("y", d => yScale(d[chartValue]))
 		.attr("width", xScale.bandwidth())
@@ -213,10 +216,6 @@ function createTopChart({
 			} else {
 				setYear(year ? [...year, d.year] : [d.year]);
 			}
-			bars.filter(e => e.year === d.year).attr(
-				"fill",
-				year === null || !year.includes(d.year) ? "#144372" : "#a6a6a6"
-			);
 		});
 }
 

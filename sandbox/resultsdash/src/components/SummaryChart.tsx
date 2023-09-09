@@ -9,8 +9,7 @@ import NumberAnimator from "./NumberAnimator";
 import { format } from "d3-format";
 import { Tooltip } from "react-tooltip";
 import DownloadIcon from "./DownloadIcon";
-
-const unColor = "#418fde";
+import colors from "../utils/colors";
 
 function SummaryRow({
 	year,
@@ -32,7 +31,7 @@ function SummaryRow({
 					style={{
 						fontSize: "0.8rem",
 						fontWeight: 900,
-						color: unColor,
+						color: colors.unColor,
 						marginLeft: "7%",
 						marginBottom: "-0.4em",
 					}}
@@ -144,7 +143,7 @@ function SummaryChart({
 				)}`}
 				data-tooltip-place="top"
 			>
-				<MoneyBag style={{ fontSize: 60, fill: unColor }} />
+				<MoneyBag style={{ fontSize: 60, fill: colors.unColor }} />
 				<Box
 					display={"flex"}
 					flexDirection={"column"}
@@ -155,7 +154,7 @@ function SummaryChart({
 					<Typography
 						variant="h3"
 						fontWeight={500}
-						style={{ color: unColor, border: "none" }}
+						style={{ color: colors.unColor, border: "none" }}
 					>
 						{total < 1e3 ? (
 							<NumberAnimator number={total} />
