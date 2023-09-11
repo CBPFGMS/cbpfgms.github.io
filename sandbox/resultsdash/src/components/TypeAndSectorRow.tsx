@@ -9,13 +9,13 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 
-function TypeRow({
-	beneficiaryTypesList,
+function TypeAndSectorRow({
+	list,
 	maxValue,
 	reached,
 	targeted,
 	type,
-}: TypeRowProps) {
+}: TypeAndSectorRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 	const limitValue = 90;
 
@@ -29,7 +29,12 @@ function TypeRow({
 			}}
 		>
 			<Box
-				style={{ flex: "0 18%", display: "flex", alignItems: "center" }}
+				style={{
+					flex: "0 18%",
+					display: "flex",
+					alignItems: "center",
+					overflow: "hidden",
+				}}
 			>
 				<Typography
 					variant="body2"
@@ -37,7 +42,7 @@ function TypeRow({
 					fontSize={13}
 					style={{ color: "#444", border: "none" }}
 				>
-					{beneficiaryTypesList[type]}
+					{list[type]}
 				</Typography>
 			</Box>
 			<Box
@@ -59,7 +64,7 @@ function TypeRow({
 						key={i}
 						data-tooltip-id={"tooltip-" + type + "-" + i}
 						data-tooltip-content={`${
-							i ? "reached" : "targeted"
+							i ? "Reached" : "Targeted"
 						}: ${format(",.0f")(d)}`}
 						data-tooltip-place="top"
 					>
@@ -147,7 +152,10 @@ function TypeRow({
 												: "#fff",
 									}}
 								>
-									{formatSIFloat(d)}
+									<NumberAnimator
+										number={parseFloat(formatSIFloat(d))}
+									/>
+									{formatSIFloat(d).slice(-1)}
 								</Typography>
 							</Box>
 						</Box>
@@ -178,4 +186,4 @@ function TypeRow({
 	);
 }
 
-export default TypeRow;
+export default TypeAndSectorRow;

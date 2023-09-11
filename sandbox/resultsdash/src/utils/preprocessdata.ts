@@ -1,5 +1,5 @@
 function preProcessData({
-	byCluster,
+	bySector,
 	byDisability,
 	byLocation,
 	byType,
@@ -12,7 +12,7 @@ function preProcessData({
 	const beneficiaryTypesSet = new Set<number>();
 	const fundsSet = new Set<number>();
 
-	const byClusterYear: ByClusterYear = [];
+	const bySectorYear: BySectorYear = [];
 	const byDisabilityYear: ByDisabilityYear = [];
 	const byLocationYear: ByLocationYear = [];
 	const byTypeYear: ByTypeYear = [];
@@ -29,11 +29,11 @@ function preProcessData({
 		);
 	});
 
-	byCluster.forEach(row => {
+	bySector.forEach(row => {
 		sectorsSet.add(row.ClusterId);
 		populateYear<typeof row>(
 			row,
-			byClusterYear,
+			bySectorYear,
 			row.ReportApprovedDate.getFullYear()
 		);
 	});
@@ -64,12 +64,12 @@ function preProcessData({
 		funds: fundsSet,
 	});
 
-	byClusterYear.sort((a, b) => a.year - b.year);
+	bySectorYear.sort((a, b) => a.year - b.year);
 	byDisabilityYear.sort((a, b) => a.year - b.year);
 	byLocationYear.sort((a, b) => a.year - b.year);
 	byTypeYear.sort((a, b) => a.year - b.year);
 
-	return { byClusterYear, byDisabilityYear, byLocationYear, byTypeYear };
+	return { bySectorYear, byDisabilityYear, byLocationYear, byTypeYear };
 }
 
 function populateYear<TObj>(

@@ -14,11 +14,14 @@ import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
 import { Typography } from "@mui/material";
 import processDataBeneficiaryType from "../utils/processdatabytype";
-import BeneficiaryTypeChart from "./TypeChart";
+import TypeAndSectorChart from "./TypeAndSectorChart";
+import processDataSectors from "../utils/processdatasectors";
 
 const downloadStates: DownloadStates = {
 	summary: false,
 	pictogram: false,
+	beneficiaryTypes: false,
+	sectors: false,
 };
 
 function MainContainer() {
@@ -52,6 +55,15 @@ function MainContainer() {
 	});
 
 	const dataBeneficiaryTypes = processDataBeneficiaryType({
+		rawData,
+		reportYear,
+		fund,
+		allocationSource,
+		allocationType,
+		year,
+	});
+
+	const dataSectors = processDataSectors({
 		rawData,
 		reportYear,
 		fund,
@@ -245,11 +257,13 @@ function MainContainer() {
 						mb={3}
 					>
 						<Grid xs={6}>
-							<BeneficiaryTypeChart
-								dataBeneficiaryTypes={dataBeneficiaryTypes}
-								beneficiaryTypesList={
+							<TypeAndSectorChart
+								data={dataBeneficiaryTypes}
+								list={
 									apiData.lists.beneficiaryTypes
 								}
+								title="People targeted and reached by type"
+								chartType="beneficiaryTypes"
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
 							/>
@@ -268,11 +282,14 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								{/* <PictogramChart
-									dataPictogram={dataPictogram}
+								<TypeAndSectorChart
+									data={dataSectors}
+									list={apiData.lists.sectors}
+									title="People targeted and reached by sector"
+									chartType="sectors"
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
-								/> */}
+								/>
 							</Box>
 						</Grid>
 					</Grid>

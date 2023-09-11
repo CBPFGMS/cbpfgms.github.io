@@ -4,7 +4,7 @@ import makeLists from "./makelists";
 import preProcessData from "./preprocessdata";
 
 function useData() {
-	const byClusterUrl =
+	const bySectorUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByCluster.csv",
 		byDisabilityUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByGender_Disability.csv",
@@ -35,7 +35,7 @@ function useData() {
 
 	useEffect(() => {
 		Promise.all([
-			fetchFile("byCluster", byClusterUrl, "csv"),
+			fetchFile("bySector", bySectorUrl, "csv"),
 			fetchFile("byDisability", byDisabilityUrl, "csv"),
 			fetchFile("byLocation", byLocationUrl, "csv"),
 			fetchFile("byType", byTypeUrl, "csv"),
@@ -58,7 +58,7 @@ function useData() {
 			});
 
 		function receiveData([
-			byCluster,
+			bySector,
 			byDisability,
 			byLocation,
 			byType,
@@ -70,7 +70,7 @@ function useData() {
 			partnerTypesMaster,
 			sectorsMaster,
 		]: [
-			ByClusterObj[],
+			BySectorObj[],
 			ByDisabilityObj[],
 			ByLocationObj[],
 			ByTypeObj[],
@@ -93,12 +93,12 @@ function useData() {
 			});
 
 			const {
-				byClusterYear,
+				bySectorYear,
 				byDisabilityYear,
 				byLocationYear,
 				byTypeYear,
 			} = preProcessData({
-				byCluster,
+				bySector,
 				byDisability,
 				byLocation,
 				byType,
@@ -106,7 +106,7 @@ function useData() {
 			});
 
 			setRawData({
-				byCluster: byClusterYear,
+				bySector: bySectorYear,
 				byDisability: byDisabilityYear,
 				byLocation: byLocationYear,
 				byType: byTypeYear,

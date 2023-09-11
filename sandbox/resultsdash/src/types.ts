@@ -2,11 +2,11 @@
 
 type Beneficiaries = number | null;
 
-type ByClusterObj = {
+type BySectorObj = {
 	PooledFundId: number;
 	AllocationYear: number;
 	ReportApprovedDate: Date;
-	AllocationTypeId: number;
+	AllocationtypeId: number;
 	AllocationSourceId: number;
 	ClusterId: number;
 	ClusterBudget: number;
@@ -154,7 +154,7 @@ type List = {
 };
 
 type RawData = {
-	byCluster: ByClusterYear;
+	bySector: BySectorYear;
 	byDisability: ByDisabilityYear;
 	byLocation: ByLocationYear;
 	byType: ByTypeYear;
@@ -184,7 +184,7 @@ type GenericYear<TObj> = {
 	values: TObj[];
 }[];
 
-type ByClusterYear = GenericYear<ByClusterObj>;
+type BySectorYear = GenericYear<BySectorObj>;
 
 type ByDisabilityYear = GenericYear<ByDisabilityObj>;
 
@@ -193,7 +193,7 @@ type ByLocationYear = GenericYear<ByLocationObj>;
 type ByTypeYear = GenericYear<ByTypeObj>;
 
 type PreProcessDataParams = {
-	byCluster: ByClusterObj[];
+	bySector: BySectorObj[];
 	byDisability: ByDisabilityObj[];
 	byLocation: ByLocationObj[];
 	byType: ByTypeObj[];
@@ -201,7 +201,7 @@ type PreProcessDataParams = {
 };
 
 type PreProcessDataReturn = {
-	byClusterYear: ByClusterYear;
+	bySectorYear: BySectorYear;
 	byDisabilityYear: ByDisabilityYear;
 	byLocationYear: ByLocationYear;
 	byTypeYear: ByTypeYear;
@@ -337,6 +337,29 @@ type BeneficiaryTypeData = {
 	reached: number;
 };
 
+type ProcessDataSectors = ({
+	rawData,
+	reportYear,
+	fund,
+	allocationSource,
+	allocationType,
+	year,
+}: {
+	rawData: RawData;
+	reportYear: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	year: number[] | null;
+}) => SectorsData[];
+
+
+type SectorsData = {
+	sector: number;
+	targeted: number;
+	reached: number;
+};
+
 type InSelectionObject = {
 	funds: Set<number>;
 	allocationSources: Set<number>;
@@ -394,9 +417,11 @@ type DownloadIconProps = {
 type DownloadStates = {
 	summary: boolean;
 	pictogram: boolean;
+	beneficiaryTypes: boolean;
+	sectors: boolean;
 };
 
-type Charts = "summary" | "pictogram" | "beneficiaryTypes";
+type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors";
 
 type PictogramRowProps = {
 	type: PictogramTypes;
@@ -406,17 +431,19 @@ type PictogramRowProps = {
 	maxValue: number;
 };
 
-type BeneficiaryTypesProps = {
-	dataBeneficiaryTypes: BeneficiaryTypeData[];
-	beneficiaryTypesList: ListObj;
+type TypesAndSectorChartProps = {
+	data: BeneficiaryTypeData[] | SectorsData[];
+	list: ListObj;
 	clickedDownload: DownloadStates;
+	title: string;
+	chartType: Charts;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-type TypeRowProps = {
+type TypeAndSectorRowProps = {
 	type: number;
 	targeted: number;
 	reached: number;
-	beneficiaryTypesList: ListObj;
+	list: ListObj;
 	maxValue: number;
 };

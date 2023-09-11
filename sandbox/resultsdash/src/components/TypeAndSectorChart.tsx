@@ -3,19 +3,21 @@ import Typography from "@mui/material/Typography";
 import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import { max } from "d3-array";
-import TypeRow from "./TypeRow";
+import TypeAndSectorRow from "./TypeAndSectorRow";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 
-function BeneficiaryTypeChart({
-	dataBeneficiaryTypes,
-	beneficiaryTypesList,
+function TypeAndSectorChart({
+	data,
+	list,
 	clickedDownload,
+	title,
+	chartType,
 	setClickedDownload,
-}: BeneficiaryTypesProps) {
+}: TypesAndSectorChartProps) {
 	const maxValue = max(
-		dataBeneficiaryTypes.map(d => Math.max(d.reached, d.targeted))
+		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
 
 	return (
@@ -29,7 +31,7 @@ function BeneficiaryTypeChart({
 				handleDownloadClick={() => console.log("download")}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
-				type="beneficiaryTypes"
+				type={chartType}
 			/>
 			<Box
 				style={{
@@ -48,7 +50,7 @@ function BeneficiaryTypeChart({
 						textTransform: "uppercase",
 					}}
 				>
-					People targeted and reached by type
+					{title}
 				</Typography>
 				<Typography
 					style={{
@@ -117,14 +119,22 @@ function BeneficiaryTypeChart({
 						of targeted
 					</Typography>
 				</Box>
-				{dataBeneficiaryTypes.map(d => (
-					<TypeRow
-						key={d.beneficiaryType}
-						type={d.beneficiaryType}
+				{data.map(d => (
+					<TypeAndSectorRow
+						key={
+							chartType === "beneficiaryTypes"
+								? (d as BeneficiaryTypeData).beneficiaryType
+								: (d as SectorsData).sector
+						}
+						type={
+							chartType === "beneficiaryTypes"
+								? (d as BeneficiaryTypeData).beneficiaryType
+								: (d as SectorsData).sector
+						}
 						targeted={d.targeted}
 						reached={d.reached}
 						maxValue={maxValue}
-						beneficiaryTypesList={beneficiaryTypesList}
+						list={list}
 					/>
 				))}
 			</Box>
@@ -132,4 +142,4 @@ function BeneficiaryTypeChart({
 	);
 }
 
-export default BeneficiaryTypeChart;
+export default TypeAndSectorChart;
