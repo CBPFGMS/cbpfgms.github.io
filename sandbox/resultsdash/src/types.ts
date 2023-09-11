@@ -137,12 +137,20 @@ type ListObj = {
 	[key: number]: string;
 };
 
-type locationObj = {
+type LocationObj = {
 	[key: number]: number[];
 };
 
 type List = {
-	[key: string]: ListObj | locationObj;
+	fundNames: ListObj;
+	fundAbbreviatedNames: ListObj;
+	fundIsoCodes: ListObj;
+	locations: LocationObj;
+	beneficiaryTypes: ListObj;
+	allocationTypes: ListObj;
+	allocationSources: ListObj;
+	partnerTypes: ListObj;
+	sectors: ListObj;
 };
 
 type RawData = {
@@ -307,6 +315,28 @@ type processDataSummary = ({
 	inSelectionData: InSelectionObject;
 };
 
+type ProcessDataBeneficiaryType = ({
+	rawData,
+	reportYear,
+	fund,
+	allocationSource,
+	allocationType,
+	year,
+}: {
+	rawData: RawData;
+	reportYear: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	year: number[] | null;
+}) => BeneficiaryTypeData[];
+
+type BeneficiaryTypeData = {
+	beneficiaryType: number;
+	targeted: number;
+	reached: number;
+};
+
 type InSelectionObject = {
 	funds: Set<number>;
 	allocationSources: Set<number>;
@@ -366,12 +396,27 @@ type DownloadStates = {
 	pictogram: boolean;
 };
 
-type Charts = "summary" | "pictogram";
+type Charts = "summary" | "pictogram" | "beneficiaryTypes";
 
 type PictogramRowProps = {
 	type: PictogramTypes;
 	targeted: number;
 	reached: number;
 	setMaxNumberOfPictograms: React.Dispatch<React.SetStateAction<number>>;
+	maxValue: number;
+};
+
+type BeneficiaryTypesProps = {
+	dataBeneficiaryTypes: BeneficiaryTypeData[];
+	beneficiaryTypesList: ListObj;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+};
+
+type TypeRowProps = {
+	type: number;
+	targeted: number;
+	reached: number;
+	beneficiaryTypesList: ListObj;
 	maxValue: number;
 };

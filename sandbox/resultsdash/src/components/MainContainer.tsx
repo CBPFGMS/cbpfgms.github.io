@@ -13,6 +13,8 @@ import processDataSummary from "../utils/processdatasummary";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
 import { Typography } from "@mui/material";
+import processDataBeneficiaryType from "../utils/processdatabytype";
+import BeneficiaryTypeChart from "./TypeChart";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -41,6 +43,15 @@ function MainContainer() {
 		useState<DownloadStates>(downloadStates);
 
 	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
+		rawData,
+		reportYear,
+		fund,
+		allocationSource,
+		allocationType,
+		year,
+	});
+
+	const dataBeneficiaryTypes = processDataBeneficiaryType({
 		rawData,
 		reportYear,
 		fund,
@@ -181,7 +192,8 @@ function MainContainer() {
 						spacing={1}
 						xs={12}
 						flexWrap={"nowrap"}
-						mt={2}
+						mt={3}
+						mb={3}
 					>
 						<Grid xs={6}>
 							<SummaryChart
@@ -210,6 +222,57 @@ function MainContainer() {
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
 								/>
+							</Box>
+						</Grid>
+					</Grid>
+					<Divider
+						orientation="horizontal"
+						flexItem
+						style={{
+							borderTop: "3px dotted #ccc",
+							borderBottom: "none",
+							width: "96%",
+							marginLeft: "2%",
+						}}
+					/>
+					<Grid
+						container
+						direction={"row"}
+						spacing={1}
+						xs={12}
+						flexWrap={"nowrap"}
+						mt={3}
+						mb={3}
+					>
+						<Grid xs={6}>
+							<BeneficiaryTypeChart
+								dataBeneficiaryTypes={dataBeneficiaryTypes}
+								beneficiaryTypesList={
+									apiData.lists.beneficiaryTypes
+								}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+							/>
+						</Grid>
+						<Divider
+							orientation="vertical"
+							flexItem
+							style={{
+								borderLeft: "3px dotted #ccc",
+								borderRight: "none",
+							}}
+						/>
+						<Grid xs={6}>
+							<Box
+								display={"flex"}
+								alignItems={"center"}
+								justifyContent={"center"}
+							>
+								{/* <PictogramChart
+									dataPictogram={dataPictogram}
+									clickedDownload={clickedDownload}
+									setClickedDownload={setClickedDownload}
+								/> */}
 							</Box>
 						</Grid>
 					</Grid>

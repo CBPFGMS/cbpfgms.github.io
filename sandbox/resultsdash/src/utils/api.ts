@@ -5,19 +5,19 @@ import preProcessData from "./preprocessdata";
 
 function useData() {
 	const byClusterUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/ByCluster.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByCluster.csv",
 		byDisabilityUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/ByGender_Disability.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByGender_Disability.csv",
 		byLocationUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/ByLocation.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByLocation.csv",
 		byTypeUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/ByType.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByType.csv",
 		locationMasterUrl =
 			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/locationMst.csv",
 		beneficiariesMasterUrl =
 			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/MstBeneficiaryType.csv",
 		allocationTypeMasterUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/MstAllocationType.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstAllocationType.csv",
 		fundsMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 		allocationSourcesMasterUrl =
