@@ -16,6 +16,7 @@ import { Typography } from "@mui/material";
 import processDataBeneficiaryType from "../utils/processdatabytype";
 import TypeAndSectorChart from "./TypeAndSectorChart";
 import processDataSectors from "../utils/processdatasectors";
+import colors from "../utils/colors";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -180,10 +181,48 @@ function MainContainer() {
 					</Grid>
 				</Paper>
 			</Grid>
+			<Box
+				mt={3}
+				mb={2}
+				style={{
+					opacity: year === null ? 0 : 1,
+				}}
+			>
+				{year === null ? (
+					<Typography fontSize={12}>...</Typography>
+				) : (
+					<Typography fontSize={12}>
+						{" "}
+						{"Projects from allocation year"}
+						{year.length > 1 ? "s " : " "}
+						{year
+							.sort((a, b) => a - b)
+							.reduce(
+								(acc, curr, index) =>
+									acc +
+									(index >= year.length - 2
+										? index > year.length - 2
+											? curr
+											: curr + " and "
+										: curr + ", "),
+								""
+							)}
+						{" contributing to "}
+						<span
+							style={{
+								color: colors.contrastColorDarker,
+								fontWeight: 700,
+							}}
+						>
+							{reportYear[0]}
+						</span>
+						{" results."}
+					</Typography>
+				)}
+			</Box>
 			<Grid
 				container
 				spacing={2}
-				mt={6}
 			>
 				<Paper
 					elevation={0}
@@ -259,9 +298,7 @@ function MainContainer() {
 						<Grid xs={6}>
 							<TypeAndSectorChart
 								data={dataBeneficiaryTypes}
-								list={
-									apiData.lists.beneficiaryTypes
-								}
+								list={apiData.lists.beneficiaryTypes}
 								title="People targeted and reached by type"
 								chartType="beneficiaryTypes"
 								clickedDownload={clickedDownload}

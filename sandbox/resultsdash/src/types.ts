@@ -353,7 +353,6 @@ type ProcessDataSectors = ({
 	year: number[] | null;
 }) => SectorsData[];
 
-
 type SectorsData = {
 	sector: number;
 	targeted: number;
@@ -427,7 +426,7 @@ type PictogramRowProps = {
 	type: PictogramTypes;
 	targeted: number;
 	reached: number;
-	setMaxNumberOfPictograms: React.Dispatch<React.SetStateAction<number>>;
+	maxNumberOfPictograms: number;
 	maxValue: number;
 };
 

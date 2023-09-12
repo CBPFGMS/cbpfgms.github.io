@@ -3,7 +3,6 @@ import Typography from "@mui/material/Typography";
 import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
-import { useState, useEffect, useRef } from "react";
 import Pictogram from "../assets/Pictogram";
 import { scaleLinear } from "d3-scale";
 import { format } from "d3-format";
@@ -15,27 +14,15 @@ function PictogramRow({
 	type,
 	reached,
 	targeted,
-	setMaxNumberOfPictograms,
+	maxNumberOfPictograms,
 	maxValue,
 }: PictogramRowProps) {
-	const [divWidth, setDivWidth] = useState<number>(0);
-	const divRef = useRef<HTMLDivElement>(null);
-
 	const pictogramWidth = 12;
-	const numberOfPictograms = Math.floor(divWidth / pictogramWidth);
 	const numberOfPictogramsArray = Array.from(
-		Array(numberOfPictograms).keys()
+		Array(maxNumberOfPictograms).keys()
 	);
 
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
-
-	useEffect(() => {
-		const divWidth = divRef.current?.offsetWidth;
-		if (divWidth) {
-			setDivWidth(divWidth);
-			setMaxNumberOfPictograms(numberOfPictograms);
-		}
-	}, [numberOfPictograms, setMaxNumberOfPictograms]);
 
 	return (
 		<Box
@@ -133,7 +120,6 @@ function PictogramRow({
 							</Typography>
 						</Box>
 						<Box
-							ref={divRef}
 							style={{
 								flex: "0 72%",
 								marginTop: "2px",

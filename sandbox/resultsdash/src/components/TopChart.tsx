@@ -10,19 +10,20 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { Tooltip } from "react-tooltip";
 import colors from "../utils/colors";
+import MiniChart from "../assets/MiniChart";
 
 function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 	const [barClicked, setBarClicked] = useState<boolean>(false);
 
 	useEffect(() => {
-		// if (year !== null) {
-		// 	localStorage.setItem("barClicked", "true");
-		// }
-		// const clicked = JSON.parse(
-		// 	localStorage.getItem("barClicked") || "false"
-		// );
-		// setBarClicked(clicked);
-		if (year !== null) setBarClicked(true);
+		if (year !== null) {
+			localStorage.setItem("barClicked", "true");
+		}
+		const clicked = JSON.parse(
+			localStorage.getItem("barClicked") || "false"
+		);
+		setBarClicked(clicked);
+		// if (year !== null) setBarClicked(true);
 	}, [year]);
 
 	const height = 190;
@@ -152,18 +153,28 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 			{!barClicked && (
 				<Box
 					style={{
-						width: "180px",
+						width: "260px",
 						borderBottom: "1px solid " + colors.contrastColor,
-						borderLeft: "1px solid " + colors.contrastColor,
 						paddingLeft: "0.5em",
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
 					}}
 				>
+					<MiniChart style={{ fontSize: "4em" }} />
 					<Typography
 						variant="body2"
-						style={{ marginBottom: "0.5em", textAlign: "center" }}
+						style={{
+							marginBottom: "0.5em",
+							textAlign: "center",
+							marginLeft: "1em",
+						}}
 					>
-						You can click on the chart to select one or more years
-						whose allocations belong to the {reportYear[0]} report
+						Click on Allocation YEAR bar to filter{" "}
+						<span style={{ textDecoration: "underline" }}>
+							projects
+						</span>{" "}
+						contributing for the selected year results
 					</Typography>
 				</Box>
 			)}

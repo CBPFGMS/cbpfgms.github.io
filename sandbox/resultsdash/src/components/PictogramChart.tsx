@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Tooltip } from "react-tooltip";
@@ -40,9 +39,7 @@ function PictogramChart({
 	];
 
 	const maxValue = max(Object.values(dataPictogram)) as number;
-
-	const [maxNumberOfPictograms, setMaxNumberOfPictograms] =
-		useState<number>(0);
+	const maxNumberOfPictograms = 22;
 
 	return (
 		<Container
@@ -108,6 +105,7 @@ function PictogramChart({
 						)}
 					</Typography>
 					<Typography
+						noWrap={true}
 						style={{
 							marginTop: "-0.6em",
 							fontSize: 18,
@@ -147,6 +145,7 @@ function PictogramChart({
 					data-tooltip-place="top"
 				>
 					<Typography
+						noWrap={true}
 						variant="h3"
 						fontWeight={500}
 						style={{ color: colors.unColor, border: "none" }}
@@ -163,8 +162,25 @@ function PictogramChart({
 								{formatSIFloat(totalReached).slice(-1)}
 							</span>
 						)}
+						<span
+							style={{
+								color: "#666",
+								fontSize: 14,
+								fontStyle: "italic",
+								marginLeft: "6px",
+							}}
+						>
+							{"("}
+							<NumberAnimator
+								number={
+									~~((totalReached * 100) / totalTargeted)
+								}
+							/>
+							{"%)"}
+						</span>
 					</Typography>
 					<Typography
+						noWrap={true}
 						style={{
 							marginTop: "-0.6em",
 							fontSize: 18,
@@ -238,7 +254,7 @@ function PictogramChart({
 									)) as keyof PictogramData
 							]
 						}
-						setMaxNumberOfPictograms={setMaxNumberOfPictograms}
+						maxNumberOfPictograms={maxNumberOfPictograms}
 						maxValue={maxValue}
 					/>
 				))}
@@ -247,37 +263,33 @@ function PictogramChart({
 				marginLeft={"3%"}
 				marginTop={4}
 			>
-				{maxNumberOfPictograms > 0 && (
-					<Typography style={{ color: "#666", fontSize: 12 }}>
-						{"Each symbol ("}
-						{
-							<Pictogram
-								svgProps={{
-									style: {
-										fontSize: 14,
-										fill: "#666",
-										marginBottom: "-3px",
-									},
-								}}
-								type="total"
-							></Pictogram>
-						}
-						{") represents "}
-						{
-							<NumberAnimator
-								number={parseFloat(
-									formatSIFloat(
-										maxValue / maxNumberOfPictograms
-									)
-								)}
-							/>
-						}
-						{formatSIFloat(maxValue / maxNumberOfPictograms)
-							.slice(-1)
-							.replace("k", " thousand")
-							.replace("M", " million") + " people"}
-					</Typography>
-				)}
+				<Typography style={{ color: "#666", fontSize: 12 }}>
+					{"Each symbol ("}
+					{
+						<Pictogram
+							svgProps={{
+								style: {
+									fontSize: 14,
+									fill: "#666",
+									marginBottom: "-3px",
+								},
+							}}
+							type="total"
+						></Pictogram>
+					}
+					{") represents "}
+					{
+						<NumberAnimator
+							number={parseFloat(
+								formatSIFloat(maxValue / maxNumberOfPictograms)
+							)}
+						/>
+					}
+					{formatSIFloat(maxValue / maxNumberOfPictograms)
+						.slice(-1)
+						.replace("k", " thousand")
+						.replace("M", " million") + " people"}
+				</Typography>
 			</Box>
 		</Container>
 	);

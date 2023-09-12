@@ -47,7 +47,7 @@ function TypeAndSectorRow({
 			</Box>
 			<Box
 				style={{
-					flex: "0 72%",
+					flex: "0 70%",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -164,7 +164,7 @@ function TypeAndSectorRow({
 			</Box>
 			<Box
 				style={{
-					flex: "0 10%",
+					flex: "0 12%",
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",

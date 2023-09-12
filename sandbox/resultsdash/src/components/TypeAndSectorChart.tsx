@@ -64,7 +64,7 @@ function TypeAndSectorChart({
 							marginLeft: 3,
 							color: "#777",
 							opacity: 0.6,
-							marginBottom: "-4px",
+							marginBottom: "-3px",
 						}}
 					/>
 					{
@@ -79,7 +79,7 @@ function TypeAndSectorChart({
 							marginLeft: 3,
 							color: "#777",
 							opacity: 0.6,
-							marginBottom: "-4px",
+							marginBottom: "-3px",
 						}}
 					/>
 					{<span style={{ color: colors.unColor }}> reached)</span>}
