@@ -39,7 +39,7 @@ function Selectors({
 				<AccordionComponent
 					type="Allocation Type"
 					dataProperty="allocationTypes"
-					filterType="dropdowncheck"
+					filterType="search"
 					value={allocationType}
 					setValue={setAllocationType}
 					expanded={expanded}

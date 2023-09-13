@@ -96,7 +96,10 @@ function Dropdown({
 								checked={value.includes(name)}
 								sx={{ padding: "6px" }}
 							/>
-							<ListItemText primary={namesList[name]} />
+							<ListItemText
+								style={{ maxWidth: "500px" }}
+								primary={namesList[name]}
+							/>
 						</MenuItem>
 					))}
 				</Select>

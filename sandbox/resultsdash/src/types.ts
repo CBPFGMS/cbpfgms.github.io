@@ -275,6 +275,15 @@ type DropdownProps = {
 	dataProperty: DataProperties;
 };
 
+type SearchProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+	inSelectionData: InSelectionObject;
+	dataProperty: DataProperties;
+};
+
 type CheckboxProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;

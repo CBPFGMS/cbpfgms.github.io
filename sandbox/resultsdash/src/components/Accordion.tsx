@@ -9,6 +9,7 @@ import Dropdown from "./Dropdown";
 import CheckboxLabel from "./Checkbox";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import Search from "./Search";
 
 function AccordionComponent({
 	type,
@@ -83,10 +84,11 @@ function AccordionComponent({
 				<Typography
 					variant="body2"
 					m={1}
+					mb={2}
 				>
-					Select the {type.toLocaleLowerCase()}.{" "}
+					Select the {type.toLocaleLowerCase()}
 					{filterType === "dropdowncheck" &&
-						`Multiple ${type.toLocaleLowerCase()}s are allowed.`}
+						`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
 				</Typography>
 				{filterType === "dropdowncheck" && (
 					<Dropdown
@@ -95,6 +97,16 @@ function AccordionComponent({
 						names={dataArray}
 						namesList={namesList as ListObj}
 						type={type}
+						inSelectionData={inSelectionData}
+						dataProperty={dataProperty}
+					/>
+				)}
+				{filterType === "search" && (
+					<Search
+						value={value}
+						setValue={setValue}
+						names={dataArray}
+						namesList={namesList as ListObj}
 						inSelectionData={inSelectionData}
 						dataProperty={dataProperty}
 					/>
@@ -109,7 +121,8 @@ function AccordionComponent({
 						dataProperty={dataProperty}
 					/>
 				)}
-				{filterType === "dropdowncheck" && (
+				{(filterType === "dropdowncheck" ||
+					filterType === "search") && (
 					<Box style={{ display: "flex", flexDirection: "row" }}>
 						<Button
 							variant="contained"
