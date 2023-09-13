@@ -199,10 +199,14 @@ function MainContainer() {
 							textAlign: "center",
 						}}
 					>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						Sed ullamcorper, nisl quis tincidunt aliquam, nunc nibh
-						ullamcorper nisi, quis tincidunt elit nunc quis nunc.
-						Sed.
+						Welcome to the Results Dashboard, a comprehensive tool
+						that showcases the impact of Country-Based Pooled Funds.
+						Here, you'll find a detailed breakdown of the total
+						number of beneficiaries both targeted and reached,
+						further segmented by gender/age group, type, location,
+						and sector. For a more tailored view, users can apply
+						the available filters to select specific allocation
+						types or CBPF funds.
 					</Typography>
 				</Grid>
 			</Grid>
