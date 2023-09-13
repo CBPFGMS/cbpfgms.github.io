@@ -104,7 +104,7 @@ function Search({
 					<TextField
 						{...params}
 						label="Allocation Type"
-						placeholder="Start typing or use the dropdown"
+						placeholder="Start typing or use the menu"
 					/>
 				)}
 			/>

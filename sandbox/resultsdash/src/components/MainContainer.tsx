@@ -26,6 +26,8 @@ const downloadStates: DownloadStates = {
 };
 
 function MainContainer() {
+	const queryStringValues = new URLSearchParams(location.search);
+
 	const apiData = useContext(DataContext) as DataContext;
 	const rawData = apiData.rawData;
 
@@ -74,8 +76,78 @@ function MainContainer() {
 	});
 
 	useEffect(() => {
+		const reportYearParam = queryStringValues.has("reportYear")
+			? queryStringValues
+					.get("reportYear")
+					?.split(",")
+					.map(d => +d)
+			: null;
+		const allocationTypesParam = queryStringValues.has("allocationType")
+			? queryStringValues
+					.get("allocationType")
+					?.split(",")
+					.map(d => +d)
+			: null;
+		const allocationSourcesParam = queryStringValues.has("allocationSource")
+			? queryStringValues
+					.get("allocationSource")
+					?.split(",")
+					.map(d => +d)
+			: null;
+		const fundParam = queryStringValues.has("fund")
+			? queryStringValues
+					.get("fund")
+					?.split(",")
+					.map(d => +d)
+			: null;
+		const yearParam = queryStringValues.has("year")
+			? queryStringValues
+					.get("year")
+					?.split(",")
+					.map(d => +d)
+			: null;
+		if (reportYearParam) setReportYear(reportYearParam);
+		if (allocationTypesParam) setAllocationType(allocationTypesParam);
+		if (allocationSourcesParam) setAllocationSource(allocationSourcesParam);
+		if (fundParam) setFund(fundParam);
+		if (yearParam) setYear(yearParam);
+		return () => {};
+	}, []);
+
+	useEffect(() => {
 		setClickedDownload(downloadStates);
-	}, [reportYear, fund, allocationSource, allocationType]);
+		const allocationTypesParam =
+			allocationType.length === apiData.inDataLists.allocationTypes.size
+				? ""
+				: `&allocationType=${allocationType}`;
+		const allocationSourcesParam =
+			allocationSource.length ===
+			apiData.inDataLists.allocationSources.size
+				? ""
+				: `&allocationSource=${allocationSource}`;
+		const fundParam =
+			fund.length === apiData.inDataLists.funds.size
+				? ""
+				: `&fund=${fund}`;
+		const yearParam = year === null ? "" : `&year=${year}`;
+		const reportYearParam =
+			reportYear[0] === lastYear ? "" : `&reportYear=${reportYear[0]}`;
+		if (
+			allocationTypesParam ||
+			allocationSourcesParam ||
+			fundParam ||
+			yearParam ||
+			reportYearParam
+		) {
+			window.history.replaceState(
+				{},
+				"",
+				`?${allocationTypesParam}${allocationSourcesParam}${fundParam}${yearParam}${reportYearParam}`
+			);
+		} else {
+			window.history.replaceState({}, "", window.location.pathname);
+		}
+	}, [reportYear, year, fund, allocationSource, allocationType]);
 
 	return (
 		<Container
