@@ -273,6 +273,7 @@ type DropdownProps = {
 	type: string;
 	inSelectionData: InSelectionObject;
 	dataProperty: DataProperties;
+	fromQuickSelectors: boolean;
 };
 
 type SearchProps = {
@@ -455,3 +456,5 @@ type TypeAndSectorRowProps = {
 	list: ListObj;
 	maxValue: number;
 };
+
+type DownloadData = <T extends object>(data: T[], fileName: string) => void;

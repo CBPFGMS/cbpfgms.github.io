@@ -15,6 +15,7 @@ function Dropdown({
 	type,
 	inSelectionData,
 	dataProperty,
+	fromQuickSelectors,
 }: DropdownProps) {
 	let isAllSelected = value.length === names.length;
 
@@ -62,7 +63,13 @@ function Dropdown({
 					onMouseEnter={calculateHeight}
 					input={<OutlinedInput label={type} />}
 					renderValue={selected =>
-						(selected as number[]).map(d => namesList[d]).join(", ")
+						fromQuickSelectors
+							? isAllSelected
+								? "All selected"
+								: `${selected.length} selected`
+							: (selected as number[])
+									.map(d => namesList[d])
+									.join(", ")
 					}
 					MenuProps={{
 						PaperProps: {

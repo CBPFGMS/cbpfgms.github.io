@@ -10,6 +10,7 @@ import { format } from "d3-format";
 import { Tooltip } from "react-tooltip";
 import DownloadIcon from "./DownloadIcon";
 import colors from "../utils/colors";
+import downloadData from "../utils/downloaddata";
 
 function SummaryRow({
 	year,
@@ -114,7 +115,7 @@ function SummaryChart({
 	);
 
 	function handleDownloadClick() {
-		console.log("test");
+		downloadData<(typeof data)[number]>(data, "summary");
 	}
 
 	const total = sum(data, d => d.allocations);

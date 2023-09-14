@@ -99,6 +99,7 @@ function AccordionComponent({
 						type={type}
 						inSelectionData={inSelectionData}
 						dataProperty={dataProperty}
+						fromQuickSelectors={false}
 					/>
 				)}
 				{filterType === "search" && (

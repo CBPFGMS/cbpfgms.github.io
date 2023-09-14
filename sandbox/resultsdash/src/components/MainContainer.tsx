@@ -17,6 +17,8 @@ import processDataBeneficiaryType from "../utils/processdatabytype";
 import TypeAndSectorChart from "./TypeAndSectorChart";
 import processDataSectors from "../utils/processdatasectors";
 import colors from "../utils/colors";
+import { useInView } from "react-intersection-observer";
+import QuickSelectors from "./QuickSelectors";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -47,6 +49,14 @@ function MainContainer() {
 
 	const [clickedDownload, setClickedDownload] =
 		useState<DownloadStates>(downloadStates);
+
+	const [ref, inView] = useInView({
+		threshold: 0.999,
+	});
+
+	const [ref2, inView2] = useInView({
+		threshold: 0.999,
+	});
 
 	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
 		rawData,
@@ -161,10 +171,22 @@ function MainContainer() {
 				container
 				spacing={2}
 				justifyContent={"center"}
+				position={"sticky"}
+				top={-1}
+				ref={ref}
+				mb={2}
+				style={{
+					backgroundColor: "rgba(255,255,255,0.95)",
+					zIndex: 1200,
+					boxShadow: inView
+						? "none"
+						: "0px 4px 2px -2px rgba(0,0,0,0.25)",
+				}}
 			>
 				<Grid
+					pb={2}
+					pt={2}
 					xs={12}
-					mb={2}
 					display={"flex"}
 					alignItems={"center"}
 					justifyContent={"center"}
@@ -179,16 +201,33 @@ function MainContainer() {
 						variant={"h4"}
 						style={{
 							fontFamily: "Montserrat",
-							fontSize: "40px",
+							fontSize: inView2 ? "40px" : "22px",
 							fontWeight: 700,
 							marginLeft: "1em",
 						}}
 					>
-						Results Dashboard
+						Results{inView2 ? " " : <br />}Dashboard
 					</Typography>
+					{!inView2 && (
+						<QuickSelectors
+							fund={fund}
+							setFund={setFund}
+							allocationSource={allocationSource}
+							setAllocationSource={setAllocationSource}
+							allocationType={allocationType}
+							setAllocationType={setAllocationType}
+							inSelectionData={inSelectionData}
+						/>
+					)}
 				</Grid>
+			</Grid>
+			<Grid
+				container
+				spacing={2}
+				justifyContent={"center"}
+			>
 				<Grid
-					xs={8}
+					xs={10}
 					mb={3}
 				>
 					<Typography
@@ -226,7 +265,10 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
-					<Grid xs={12}>
+					<Grid
+						ref={ref2}
+						xs={12}
+					>
 						<Selectors
 							fund={fund}
 							setFund={setFund}
