@@ -30,6 +30,7 @@ function QuickSelectors({
 			display={"flex"}
 			flexDirection={"row"}
 			marginLeft={"4em"}
+			gap={1}
 		>
 			<Dropdown
 				value={fund}

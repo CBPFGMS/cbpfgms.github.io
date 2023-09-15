@@ -4,8 +4,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { SyntheticEvent, useMemo, useRef, useState } from "react";
-
-//WORK IN PROGRESS
+import Snack from "./Snack";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -23,7 +22,14 @@ function Search({
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
 
+	const [openSnack, setOpenSnack] = useState<boolean>(false);
+
 	function handleChange(_: SyntheticEvent, eventValue: number[]) {
+		if (eventValue.length === 0) {
+			setValue(value);
+			setOpenSnack(true);
+			return;
+		}
 		if (isAllSelected) {
 			const missingItems: number[] = names.filter(
 				d => !eventValue.includes(d)
@@ -55,6 +61,11 @@ function Search({
 			ref={selectRef}
 			style={{ marginBottom: "0.5em" }}
 		>
+			<Snack
+				openSnack={openSnack}
+				setOpenSnack={setOpenSnack}
+				message={`At least one allocation type must be selected`}
+			/>
 			<Autocomplete
 				onMouseEnter={calculateHeight}
 				multiple

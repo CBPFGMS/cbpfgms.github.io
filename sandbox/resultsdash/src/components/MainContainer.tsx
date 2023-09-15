@@ -55,7 +55,7 @@ function MainContainer() {
 	});
 
 	const [ref2, inView2] = useInView({
-		threshold: 0.999,
+		threshold: 0,
 	});
 
 	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
@@ -178,9 +178,10 @@ function MainContainer() {
 				style={{
 					backgroundColor: "rgba(255,255,255,0.95)",
 					zIndex: 1200,
+					borderBottom: inView ? "none" : "1px solid #ccc",
 					boxShadow: inView
 						? "none"
-						: "0px 4px 2px -2px rgba(0,0,0,0.25)",
+						: "0px 6px 4px -4px rgba(0,0,0,0.2)",
 				}}
 			>
 				<Grid
@@ -201,9 +202,9 @@ function MainContainer() {
 						variant={"h4"}
 						style={{
 							fontFamily: "Montserrat",
-							fontSize: inView2 ? "40px" : "22px",
+							fontSize: inView2 ? "40px" : "18px",
 							fontWeight: 700,
-							marginLeft: "1em",
+							marginLeft: inView2 ? "1em" : "2em",
 						}}
 					>
 						Results{inView2 ? " " : <br />}Dashboard

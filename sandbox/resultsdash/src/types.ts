@@ -458,3 +458,9 @@ type TypeAndSectorRowProps = {
 };
 
 type DownloadData = <T extends object>(data: T[], fileName: string) => void;
+
+type SnackProps = {
+	openSnack: boolean;
+	setOpenSnack: React.Dispatch<React.SetStateAction<boolean>>;
+	message: string;
+};

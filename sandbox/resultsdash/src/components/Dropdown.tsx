@@ -6,6 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { useMemo, useRef, useState } from "react";
+import Snack from "./Snack";
 
 function Dropdown({
 	value,
@@ -22,8 +23,15 @@ function Dropdown({
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
 
+	const [openSnack, setOpenSnack] = useState<boolean>(false);
+
 	function handleChange(event: SelectChangeEvent<typeof value>) {
 		const eventArray: number[] = [event.target.value as number[]].flat();
+		if (eventArray.length === 0) {
+			setValue(value);
+			setOpenSnack(true);
+			return;
+		}
 		if (isAllSelected) {
 			isAllSelected = eventArray.length !== names.length;
 			const missingItems: number[] = names.filter(
@@ -52,7 +60,22 @@ function Dropdown({
 
 	return (
 		<div ref={selectRef}>
-			<FormControl sx={{ m: 1, maxWidth: "95%", minWidth: "95%" }}>
+			<Snack
+				openSnack={openSnack}
+				setOpenSnack={setOpenSnack}
+				message={`At least one ${type.toLocaleLowerCase()} must be selected`}
+			/>
+			<FormControl
+				sx={
+					fromQuickSelectors
+						? {
+								maxWidth: "100%",
+								minWidth: "100%",
+						  }
+						: { m: 1, maxWidth: "95%", minWidth: "95%" }
+				}
+				size={fromQuickSelectors ? "small" : "medium"}
+			>
 				<InputLabel id="multiple-checkbox-label">{type}</InputLabel>
 				<Select
 					labelId="multiple-checkbox-label"

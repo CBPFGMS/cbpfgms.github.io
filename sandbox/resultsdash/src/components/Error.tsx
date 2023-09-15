@@ -1,4 +1,4 @@
-import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 
 function Error() {
 	return (
@@ -12,15 +12,10 @@ function Error() {
 				alignItems: "center",
 			}}
 		>
-			<Typography
-				variant="body2"
-				align="center"
-				mt={3}
-				style={{ whiteSpace: "pre-line" }}
-			>
-				An error occurred while loading the data.{"\n"} Please try again
+			<Alert severity="error">
+				An error occurred while loading the data. Please try again
 				later.
-			</Typography>
+			</Alert>
 		</div>
 	);
 }
