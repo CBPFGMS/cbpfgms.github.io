@@ -7,6 +7,7 @@ import TypeAndSectorRow from "./TypeAndSectorRow";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
+import downloadData from "../utils/downloaddata";
 
 function TypeAndSectorChart({
 	data,
@@ -20,6 +21,27 @@ function TypeAndSectorChart({
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
 
+	function handleDownloadClick() {
+		if (chartType === "beneficiaryTypes") {
+			const csvData = (data as BeneficiaryTypeData[]).map(d => ({
+				"Beneficiary Type": list[d.beneficiaryType],
+				Targeted: d.targeted,
+				Reached: d.reached,
+			}));
+			downloadData<(typeof csvData)[number]>(
+				csvData,
+				"beneficiary_types"
+			);
+		} else {
+			const csvData = (data as SectorsData[]).map(d => ({
+				Sector: list[d.sector],
+				Targeted: d.targeted,
+				Reached: d.reached,
+			}));
+			downloadData<(typeof csvData)[number]>(csvData, "sectors");
+		}
+	}
+
 	return (
 		<Container
 			disableGutters={true}
@@ -28,7 +50,7 @@ function TypeAndSectorChart({
 			}}
 		>
 			<DownloadIcon
-				handleDownloadClick={() => console.log("download")}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type={chartType}

@@ -13,6 +13,7 @@ import { max } from "d3-array";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
+import downloadData from "../utils/downloaddata";
 
 function PictogramChart({
 	dataPictogram,
@@ -41,6 +42,21 @@ function PictogramChart({
 	const maxValue = max(Object.values(dataPictogram)) as number;
 	const maxNumberOfPictograms = 22;
 
+	function handleDownloadClick() {
+		const data = beneficiaryTypesArray.map(type => ({
+			"Beneficiary Type": capitalizeString(type),
+			Targeted:
+				dataPictogram[
+					("targeted" + capitalizeString(type)) as keyof PictogramData
+				],
+			Reached:
+				dataPictogram[
+					("reached" + capitalizeString(type)) as keyof PictogramData
+				],
+		}));
+		downloadData<(typeof data)[number]>(data, "people_targeted_reached");
+	}
+
 	return (
 		<Container
 			disableGutters={true}
@@ -49,7 +65,7 @@ function PictogramChart({
 			}}
 		>
 			<DownloadIcon
-				handleDownloadClick={() => console.log("download")}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="pictogram"
