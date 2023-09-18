@@ -138,7 +138,10 @@ type ListObj = {
 };
 
 type LocationObj = {
-	[key: number]: number[];
+	[key: number]: {
+		coordinates: number[];
+		locationName: string;
+	};
 };
 
 type List = {
@@ -369,6 +372,31 @@ type SectorsData = {
 	reached: number;
 };
 
+type ProcessDataMap = ({
+	rawData,
+	reportYear,
+	fund,
+	allocationSource,
+	allocationType,
+	year,
+	locationsList,
+}: {
+	rawData: RawData;
+	reportYear: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	year: number[] | null;
+	locationsList: LocationObj;
+}) => MapData[];
+
+type MapData = {
+	locationId: number;
+	locationName: string;
+	coordinates: number[];
+	beneficiaries: PictogramData;
+};
+
 type InSelectionObject = {
 	funds: Set<number>;
 	allocationSources: Set<number>;
@@ -430,7 +458,7 @@ type DownloadStates = {
 	sectors: boolean;
 };
 
-type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors";
+type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors" | "map";
 
 type PictogramRowProps = {
 	type: PictogramTypes;
@@ -463,4 +491,21 @@ type SnackProps = {
 	openSnack: boolean;
 	setOpenSnack: React.Dispatch<React.SetStateAction<boolean>>;
 	message: string;
+};
+
+type MapProps = {
+	data: MapData[];
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+};
+
+type CreateMapParams = {
+	data: MapData[];
+	svgGroupRef: React.RefObject<SVGGElement>;
+	maxCircleRadius: number;
+};
+
+type SVGOverlayComponentProps = {
+	data: MapData[];
+	maxZoomValue: number;
 };

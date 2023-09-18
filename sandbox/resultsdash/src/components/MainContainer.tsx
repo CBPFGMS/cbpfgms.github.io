@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import DataContext from "../context/DataContext";
 import Grid from "@mui/material/Unstable_Grid2";
 import Container from "@mui/material/Container";
@@ -12,13 +12,15 @@ import Box from "@mui/material/Box";
 import processDataSummary from "../utils/processdatasummary";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
-import { Typography } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import processDataBeneficiaryType from "../utils/processdatabytype";
 import TypeAndSectorChart from "./TypeAndSectorChart";
 import processDataSectors from "../utils/processdatasectors";
 import colors from "../utils/colors";
 import { useInView } from "react-intersection-observer";
 import QuickSelectors from "./QuickSelectors";
+import Map from "./Map";
+import processDataMap from "../utils/processdatamap";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -58,32 +60,68 @@ function MainContainer() {
 		threshold: 0,
 	});
 
-	const { dataSummary, dataPictogram, inSelectionData } = processDataSummary({
-		rawData,
-		reportYear,
-		fund,
-		allocationSource,
-		allocationType,
-		year,
-	});
+	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
+		() =>
+			processDataSummary({
+				rawData,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType,
+				year,
+			}),
+		[rawData, reportYear, fund, allocationSource, allocationType, year]
+	);
 
-	const dataBeneficiaryTypes = processDataBeneficiaryType({
-		rawData,
-		reportYear,
-		fund,
-		allocationSource,
-		allocationType,
-		year,
-	});
+	const dataBeneficiaryTypes = useMemo(
+		() =>
+			processDataBeneficiaryType({
+				rawData,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType,
+				year,
+			}),
+		[rawData, reportYear, fund, allocationSource, allocationType, year]
+	);
 
-	const dataSectors = processDataSectors({
-		rawData,
-		reportYear,
-		fund,
-		allocationSource,
-		allocationType,
-		year,
-	});
+	const dataSectors = useMemo(
+		() =>
+			processDataSectors({
+				rawData,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType,
+				year,
+			}),
+		[rawData, reportYear, fund, allocationSource, allocationType, year]
+	);
+
+	const locationsList = apiData.lists.locations;
+
+	const dataMap = useMemo(
+		() =>
+			processDataMap({
+				rawData,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType,
+				year,
+				locationsList,
+			}),
+		[
+			rawData,
+			reportYear,
+			fund,
+			allocationSource,
+			allocationType,
+			year,
+			locationsList,
+		]
+	);
 
 	useEffect(() => {
 		const reportYearParam = queryStringValues.has("reportYear")
@@ -448,6 +486,38 @@ function MainContainer() {
 								/>
 							</Box>
 						</Grid>
+					</Grid>
+				</Paper>
+			</Grid>
+			<Grid
+				container
+				spacing={2}
+				mt={6}
+				mb={3}
+			>
+				<Paper
+					elevation={0}
+					style={{
+						width: "100%",
+						paddingTop: "1em",
+						paddingBottom: "1em",
+						backgroundColor: "#f5f8ff",
+						borderRadius: "6px",
+						position: "relative",
+						overflow: "hidden",
+					}}
+				>
+					<GradientPaper />
+					<Grid
+						direction={"column"}
+						spacing={2}
+						xs={12}
+					>
+						<Map
+							data={dataMap}
+							clickedDownload={clickedDownload}
+							setClickedDownload={setClickedDownload}
+						/>
 					</Grid>
 				</Paper>
 			</Grid>

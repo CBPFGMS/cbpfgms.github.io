@@ -60,29 +60,7 @@ const processDataSummary: processDataSummary = ({
 				dataPictogram.targetedMen += value.TargetedMen || 0;
 				dataPictogram.targetedWomen += value.TargetedWomen || 0;
 			}
-			// ATTEMPT 1
-			// inSelectionData.funds.add(value.PooledFundId);
-			// inSelectionData.allocationSources.add(value.AllocationSourceId);
-			// inSelectionData.allocationTypes.add(value.AllocationtypeId);
 		}
-		// ATTEMPT 2
-		// fund.includes(value.PooledFundId) &&
-		// allocationSource.includes(value.AllocationSourceId) &&
-		// allocationType.includes(value.AllocationtypeId)
-		//
-		// 	if (fund.includes(value.PooledFundId)) {
-		// 		inSelectionData.allocationSources.add(value.AllocationSourceId);
-		// 		inSelectionData.allocationTypes.add(value.AllocationtypeId);
-		// 	}
-		// 	if (allocationSource.includes(value.AllocationSourceId)) {
-		// 		inSelectionData.funds.add(value.PooledFundId);
-		// 		inSelectionData.allocationTypes.add(value.AllocationtypeId);
-		// 	}
-		// 	if (allocationType.includes(value.AllocationtypeId)) {
-		// 		inSelectionData.funds.add(value.PooledFundId);
-		// 		inSelectionData.allocationSources.add(value.AllocationSourceId);
-		// 	}
-		// });
 
 		if (
 			fund.includes(value.PooledFundId) &&

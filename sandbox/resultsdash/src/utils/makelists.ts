@@ -26,10 +26,10 @@ function makeLists({
 	});
 
 	locationMaster.forEach(d => {
-		lists.locations[d.LocationID] = [
-			d.AdminLocation1Longitude,
-			d.AdminLocation1Latitude,
-		];
+		lists.locations[d.LocationID] = {
+			coordinates: [d.AdminLocation1Latitude, d.AdminLocation1Longitude],
+			locationName: d.AdminLocation1,
+		};
 	});
 
 	beneficiariesMaster.forEach(d => {

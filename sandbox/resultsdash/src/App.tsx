@@ -3,7 +3,6 @@ import Loading from "./components/Loading";
 import Error from "./components/Error";
 import DataContext from "./context/DataContext";
 import MainContainer from "./components/MainContainer";
-// import SelectionContext from "./context/selectioncontext";
 
 function App() {
 	const { rawData, lists, inDataLists, loading, error } = useData();
