@@ -503,9 +503,29 @@ type CreateMapParams = {
 	data: MapData[];
 	svgGroupRef: React.RefObject<SVGGElement>;
 	maxCircleRadius: number;
+	maxValue: number;
+	minCircleRadius: number;
 };
 
 type SVGOverlayComponentProps = {
 	data: MapData[];
 	maxZoomValue: number;
+	maxValue: number;
+	maxCircleRadius: number;
+	minCircleRadius: number;
+};
+
+type CreateSizeLegendParams = {
+	svgRef: SVGSVGElement;
+	maxValue: number;
+	legendSvgWidth: number;
+	legendSvgHeight: number;
+	maxCircleRadius: number;
+	minCircleRadius: number;
+};
+
+type CreateColorLegendParams = {
+	svgRef: SVGSVGElement;
+	legendSvgWidth: number;
+	legendSvgHeight: number;
 };

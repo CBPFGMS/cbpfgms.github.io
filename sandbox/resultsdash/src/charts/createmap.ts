@@ -1,6 +1,5 @@
 import { select } from "d3-selection";
 import { scaleLinear, scaleSqrt } from "d3-scale";
-import { max } from "d3-array";
 import { transition } from "d3-transition";
 import { interpolateRgb } from "d3-interpolate";
 import colors from "../utils/colors";
@@ -10,23 +9,14 @@ function createMap({
 	data,
 	svgGroupRef,
 	maxCircleRadius,
+	maxValue,
+	minCircleRadius,
 }: CreateMapParams): void {
 	const svgGroup = select(svgGroupRef.current);
 
-	const minCircleRadius = 0.5,
-		minValueColor = "#eee",
+	const minValueColor = "#eee",
 		maxMarkerColor = colors.contrastColorDarker,
 		colorInterpolator = interpolateRgb(minValueColor, maxMarkerColor);
-
-	const maxValue =
-		max(
-			data,
-			d =>
-				d.beneficiaries.targetedBoys +
-				d.beneficiaries.targetedGirls +
-				d.beneficiaries.targetedMen +
-				d.beneficiaries.targetedWomen
-		) || 0;
 
 	const latitudeScale = scaleLinear<number>()
 		.domain([latitudeToMercator(85), latitudeToMercator(-85)])
@@ -169,7 +159,9 @@ function createHtmlString(d: MapData): string {
 	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(totalTargeted)}</div>
 	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
 		totalReached
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(totalReached / totalTargeted)})</span></div>
+	)} <span style="font-size:10px;">(${tooltipFormatPercent(
+		totalReached / totalTargeted
+	)})</span></div>
 	</div>
 	</div>`;
 }

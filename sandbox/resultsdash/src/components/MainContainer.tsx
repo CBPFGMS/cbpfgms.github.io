@@ -493,7 +493,7 @@ function MainContainer() {
 				container
 				spacing={2}
 				mt={6}
-				mb={3}
+				mb={6}
 			>
 				<Paper
 					elevation={0}
