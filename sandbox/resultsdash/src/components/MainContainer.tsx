@@ -195,7 +195,17 @@ function MainContainer() {
 		} else {
 			window.history.replaceState({}, "", window.location.pathname);
 		}
-	}, [reportYear, year, fund, allocationSource, allocationType]);
+	}, [
+		reportYear,
+		year,
+		fund,
+		allocationSource,
+		allocationType,
+		apiData.inDataLists.allocationTypes.size,
+		apiData.inDataLists.allocationSources.size,
+		apiData.inDataLists.funds.size,
+		lastYear,
+	]);
 
 	return (
 		<Container
