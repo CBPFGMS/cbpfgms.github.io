@@ -5,6 +5,7 @@ import formatSIFloat from "../utils/formatsi";
 function createSizeLegend({
 	svgRef,
 	maxValue,
+	minValue,
 	legendSvgWidth,
 	legendSvgHeight,
 	maxCircleRadius,
@@ -12,9 +13,17 @@ function createSizeLegend({
 }: CreateSizeLegendParams): void {
 	const svg = select(svgRef);
 	const textPadding = 12;
+	const circleBaseRatio = 1.7;
 	const sizeCirclesData =
 		maxValue !== 0
-			? [maxValue / 10, maxValue / 4, maxValue / 2, maxValue]
+			? [
+					minValue,
+					maxValue * 0.1,
+					maxValue * 0.25,
+					maxValue * 0.5,
+					maxValue * 0.75,
+					maxValue,
+			  ]
 			: [];
 	const posScale = scalePoint<string>()
 		.domain(sizeCirclesData.map((_, i) => i.toString()))
@@ -36,7 +45,7 @@ function createSizeLegend({
 		.merge(sizeCircles)
 		.attr("r", d => radiusScale(d))
 		.attr("cx", (_, i) => posScale(i.toString())!)
-		.attr("cy", d => legendSvgHeight / 1.5 - radiusScale(d))
+		.attr("cy", d => legendSvgHeight / circleBaseRatio - radiusScale(d))
 		.attr("fill", "none")
 		.attr("stroke", "black")
 		.attr("stroke-width", 0.5)
@@ -53,14 +62,20 @@ function createSizeLegend({
 		.append("text")
 		.merge(sizeLabels)
 		.attr("x", (_, i) => posScale(i.toString())!)
-		.attr("y", legendSvgHeight / 1.5 + textPadding)
+		.attr("y", legendSvgHeight / circleBaseRatio + textPadding)
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
 		.attr("font-size", "0.7rem")
-		.text(
-			(d, i) =>
-				formatSIFloat(d) +
-				(i === sizeCirclesData.length - 1 ? " (max)" : "")
+		.text(d => formatSIFloat(d))
+		.append("tspan")
+		.attr("x", (_, i) => posScale(i.toString())!)
+		.attr("dy", "1em")
+		.text((_, i) =>
+			i === sizeCirclesData.length - 1
+				? " (max)"
+				: i === 0
+				? " (min)"
+				: ""
 		);
 }
 

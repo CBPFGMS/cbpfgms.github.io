@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
@@ -79,8 +78,6 @@ function PictogramChart({
 				marginBottom={2}
 				width={"90%"}
 			>
-				<Tooltip id="targeted-tooltip" />
-				<Tooltip id="reached-tooltip" />
 				<Pictogram
 					svgProps={{
 						style: {
@@ -96,7 +93,7 @@ function PictogramChart({
 					alignItems={"center"}
 					justifyContent={"center"}
 					gap={0}
-					data-tooltip-id="targeted-tooltip"
+					data-tooltip-id="tooltip"
 					data-tooltip-content={`People targeted: ${format(",.0f")(
 						totalTargeted
 					)}`}
@@ -154,7 +151,7 @@ function PictogramChart({
 					alignItems={"center"}
 					justifyContent={"center"}
 					gap={0}
-					data-tooltip-id="reached-tooltip"
+					data-tooltip-id="tooltip"
 					data-tooltip-content={`People reached: ${format(",.0f")(
 						totalReached
 					)}`}

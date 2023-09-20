@@ -21,12 +21,14 @@ import { useInView } from "react-intersection-observer";
 import QuickSelectors from "./QuickSelectors";
 import Map from "./Map";
 import processDataMap from "../utils/processdatamap";
+import { Tooltip } from "react-tooltip";
 
 const downloadStates: DownloadStates = {
 	summary: false,
 	pictogram: false,
 	beneficiaryTypes: false,
 	sectors: false,
+	map: false,
 };
 
 function MainContainer() {
@@ -215,6 +217,10 @@ function MainContainer() {
 				paddingRight: "12px",
 			}}
 		>
+			<Tooltip
+				id="tooltip"
+				style={{ zIndex: 9999 }}
+			/>
 			<Grid
 				container
 				spacing={2}

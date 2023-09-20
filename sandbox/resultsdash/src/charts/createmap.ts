@@ -45,7 +45,7 @@ function createMap({
 			d => latitudeScale(latitudeToMercator(d.coordinates[0])) + "%"
 		)
 		.attr("r", 0)
-		.attr("data-tooltip-id", "tooltip-map")
+		.attr("data-tooltip-id", "tooltip")
 		.attr("data-tooltip-html", d => createHtmlString(d))
 		.attr("data-tooltip-place", "top")
 		.attr("stroke", "black")

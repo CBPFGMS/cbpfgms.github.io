@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import FileDownloadDoneOutlinedIcon from "@mui/icons-material/FileDownloadDoneOutlined";
-import { Tooltip } from "react-tooltip";
 
 function DownloadIcon({
 	handleDownloadClick,
@@ -24,13 +23,12 @@ function DownloadIcon({
 				handleDownloadClick();
 			}}
 		>
-			<Tooltip id="download-tooltip" />
 			{clickedDownload[type] ? (
 				<FileDownloadDoneOutlinedIcon
 					className="downloadIcon"
 					fontSize="large"
 					style={{ color: "dimgray" }}
-					data-tooltip-id="download-tooltip"
+					data-tooltip-id="tooltip"
 					data-tooltip-html="<div style='text-align:center;'>Download started, check<br />your browser's download folder.</div>"
 					data-tooltip-place="bottom"
 				/>
@@ -39,7 +37,7 @@ function DownloadIcon({
 					className="downloadIcon"
 					fontSize="large"
 					style={{ color: "dimgray" }}
-					data-tooltip-id="download-tooltip"
+					data-tooltip-id="tooltip"
 					data-tooltip-content="Download CSV data file"
 					data-tooltip-place="bottom"
 				/>

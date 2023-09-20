@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
@@ -61,13 +60,12 @@ function PictogramRow({
 							alignItems: "center",
 						}}
 						key={i}
-						data-tooltip-id={"tooltip-" + type + "-" + i}
+						data-tooltip-id="tooltip"
 						data-tooltip-content={`${capitalizeString(type)} ${
 							i ? "reached" : "targeted"
 						}: ${format(",.0f")(d)}`}
 						data-tooltip-place="top"
 					>
-						<Tooltip id={"tooltip-" + type + "-" + i} />
 						<Box
 							style={{
 								flex: "0 28%",

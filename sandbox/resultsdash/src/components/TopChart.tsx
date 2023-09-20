@@ -8,7 +8,6 @@ import FormLabel from "@mui/material/FormLabel";
 import createTopChart from "../charts/createtopchart";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import { Tooltip } from "react-tooltip";
 import colors from "../utils/colors";
 import MiniChart from "../assets/MiniChart";
 
@@ -138,12 +137,6 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 						from the following allocation year
 						{dataSummary.length > 1 ? "s" : ""}:
 					</Typography>
-					{dataSummary.map((_, i) => (
-						<Tooltip
-							key={i}
-							id={`tooltip-topchart-${i}`}
-						/>
-					))}
 					<svg
 						ref={svgContainer}
 						height={height}

@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { Tooltip } from "react-tooltip";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3-scale";
@@ -62,13 +61,12 @@ function TypeAndSectorRow({
 							alignItems: "center",
 						}}
 						key={i}
-						data-tooltip-id={"tooltip-" + type + "-" + i}
+						data-tooltip-id="tooltip"
 						data-tooltip-content={`${
 							i ? "Reached" : "Targeted"
 						}: ${format(",.0f")(d)}`}
 						data-tooltip-place="top"
 					>
-						<Tooltip id={"tooltip-" + type + "-" + i} />
 						<Box
 							style={{
 								flex: "0 10%",

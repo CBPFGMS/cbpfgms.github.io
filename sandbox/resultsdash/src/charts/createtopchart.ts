@@ -127,7 +127,7 @@ function createTopChart({
 
 	bars = barsEnter.merge(bars);
 
-	bars.attr("data-tooltip-id", (_, i) => `tooltip-topchart-${i}`)
+	bars.attr("data-tooltip-id", "tooltip")
 		.attr("data-tooltip-content", d =>
 			chartValue !== "allocations"
 				? ""

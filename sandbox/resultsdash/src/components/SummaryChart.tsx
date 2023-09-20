@@ -7,7 +7,6 @@ import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
 import NumberAnimator from "./NumberAnimator";
 import { format } from "d3-format";
-import { Tooltip } from "react-tooltip";
 import DownloadIcon from "./DownloadIcon";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
@@ -55,10 +54,9 @@ function SummaryRow({
 								flexDirection: "column",
 							}}
 						>
-							{!i && <Tooltip id={`tooltip-row-${i}`} />}
 							<Box
 								{...(!i && {
-									"data-tooltip-id": `tooltip-row-${i}`,
+									"data-tooltip-id": "tooltip",
 									"data-tooltip-content": `Allocations: $${format(
 										",.2f"
 									)(d)}`,
@@ -131,14 +129,13 @@ function SummaryChart({
 				setClickedDownload={setClickedDownload}
 				type="summary"
 			/>
-			<Tooltip id="summary-chart-tooltip" />
 			<Box
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"center"}
 				gap={1}
 				marginBottom={2}
-				data-tooltip-id="summary-chart-tooltip"
+				data-tooltip-id="tooltip"
 				data-tooltip-content={`Total allocations: $${format(",.2f")(
 					total
 				)}`}

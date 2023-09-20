@@ -7,14 +7,14 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import DownloadIcon from "./DownloadIcon";
 import { useRef, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { Tooltip } from "react-tooltip";
-import { max } from "d3-array";
+import { extent } from "d3-array";
 import SVGOverlayComponent from "./SVGOverlayComponent";
 import createSizeLegend from "../charts/createsizelegend";
 import createColorLegend from "../charts/createcolorlegend";
 
 function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	const maxZoomValue = 12;
+	const minZoomValue = 2;
 	const mapHeight = 512;
 	const legendSvgWidth = 494;
 	const legendSvgHeight = 80;
@@ -30,28 +30,28 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 		threshold: 0,
 	});
 
-	const maxValue =
-		max(
-			data,
-			d =>
-				d.beneficiaries.targetedBoys +
-				d.beneficiaries.targetedGirls +
-				d.beneficiaries.targetedMen +
-				d.beneficiaries.targetedWomen
-		) || 0;
+	const minMaxValue = extent(
+		data,
+		(d): number =>
+			(d.beneficiaries.targetedBoys || 0) +
+			(d.beneficiaries.targetedGirls || 0) +
+			(d.beneficiaries.targetedMen || 0) +
+			(d.beneficiaries.targetedWomen || 0)
+	) as [number, number];
 
 	useEffect(() => {
 		if (sizeSvgRef.current) {
 			createSizeLegend({
 				svgRef: sizeSvgRef.current,
-				maxValue,
+				maxValue: minMaxValue[1],
+				minValue: minMaxValue[0],
 				legendSvgWidth,
 				legendSvgHeight,
 				maxCircleRadius,
 				minCircleRadius,
 			});
 		}
-	}, [maxValue]);
+	}, [minMaxValue]);
 
 	useEffect(() => {
 		if (colorSvgRef.current) {
@@ -71,10 +71,6 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 				position: "relative",
 			}}
 		>
-			<Tooltip
-				id={"tooltip-map"}
-				style={{ zIndex: 1999 }}
-			/>
 			<DownloadIcon
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
@@ -103,7 +99,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 				<MapContainer
 					style={{ height: `${mapHeight}px`, width: "100%" }}
 					center={[0, 0]}
-					zoom={2}
+					zoom={minZoomValue}
 					scrollWheelZoom={false}
 				>
 					<TileLayer
@@ -111,12 +107,13 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 						attribution="&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> &copy; <a href='https://carto.com/attributions'>CARTO</a>"
 						subdomains={"abcd"}
 						maxZoom={maxZoomValue}
+						minZoom={minZoomValue}
 					/>
 					{inView && (
 						<SVGOverlayComponent
 							data={data}
 							maxZoomValue={maxZoomValue}
-							maxValue={maxValue}
+							maxValue={minMaxValue[1]}
 							maxCircleRadius={maxCircleRadius}
 							minCircleRadius={minCircleRadius}
 						/>
@@ -127,7 +124,12 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 				mt={2}
 				style={{ marginLeft: "2%", marginRight: "2%" }}
 			>
-				<Typography variant="h6">How to read this map</Typography>
+				<Typography
+					variant="body1"
+					style={{ fontWeight: "bold" }}
+				>
+					How to read this map
+				</Typography>
 				<Typography variant="body2">
 					The map shows the geographic location of people targeted and
 					reached by CBPFs. The size of the circles represents the

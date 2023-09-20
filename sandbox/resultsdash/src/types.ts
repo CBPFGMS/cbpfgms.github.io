@@ -456,6 +456,7 @@ type DownloadStates = {
 	pictogram: boolean;
 	beneficiaryTypes: boolean;
 	sectors: boolean;
+	map: boolean;
 };
 
 type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors" | "map";
@@ -518,6 +519,7 @@ type SVGOverlayComponentProps = {
 type CreateSizeLegendParams = {
 	svgRef: SVGSVGElement;
 	maxValue: number;
+	minValue: number;
 	legendSvgWidth: number;
 	legendSvgHeight: number;
 	maxCircleRadius: number;
