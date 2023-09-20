@@ -65,6 +65,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 
 	return (
 		<Container
+			ref={ref}
 			disableGutters={true}
 			style={{
 				position: "relative",
@@ -81,7 +82,6 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 				type={"map"}
 			/>
 			<Box
-				ref={ref}
 				style={{
 					display: "flex",
 					justifyContent: "center",
