@@ -11,6 +11,7 @@ import { extent } from "d3-array";
 import SVGOverlayComponent from "./SVGOverlayComponent";
 import createSizeLegend from "../charts/createsizelegend";
 import createColorLegend from "../charts/createcolorlegend";
+import downloadData from "../utils/downloaddata";
 
 function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	const maxZoomValue = 12;
@@ -24,7 +25,23 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	const sizeSvgRef = useRef<SVGSVGElement | null>(null);
 	const colorSvgRef = useRef<SVGSVGElement | null>(null);
 
-	function handleDownloadClick() {}
+	function handleDownloadClick() {
+		const csvData = data.map(d => ({
+			Location: d.locationName,
+			"Targeted boys": d.beneficiaries.targetedBoys,
+			"Targeted girls": d.beneficiaries.targetedGirls,
+			"Targeted men": d.beneficiaries.targetedMen,
+			"Targeted women": d.beneficiaries.targetedWomen,
+			"Reached boys": d.beneficiaries.reachedBoys,
+			"Reached girls": d.beneficiaries.reachedGirls,
+			"Reached men": d.beneficiaries.reachedMen,
+			"Reached women": d.beneficiaries.reachedWomen,
+		}));
+		downloadData<(typeof csvData)[number]>(
+			csvData,
+			"locations"
+		);
+	}
 
 	const [ref, inView] = useInView({
 		threshold: 0,
