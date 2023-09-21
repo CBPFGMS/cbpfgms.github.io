@@ -76,7 +76,7 @@ function AccordionComponent({
 					{value.length === dataArray.length
 						? `All ${type}s selected`
 						: value.length === 1
-						? namesList[value[0]]
+						? (namesList[value[0]] as string)
 						: `${value.length} ${type}s selected`}
 				</Typography>
 			</AccordionSummary>
