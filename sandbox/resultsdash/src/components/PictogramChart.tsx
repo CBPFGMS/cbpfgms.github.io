@@ -18,6 +18,8 @@ function PictogramChart({
 	dataPictogram,
 	clickedDownload,
 	setClickedDownload,
+	summaryDataDownload,
+	fundsList,
 }: PictogramChartProps) {
 	const totalTargeted =
 		dataPictogram.targetedBoys +
@@ -42,16 +44,18 @@ function PictogramChart({
 	const maxNumberOfPictograms = 22;
 
 	function handleDownloadClick() {
-		const data = beneficiaryTypesArray.map(type => ({
-			"Beneficiary Type": capitalizeString(type),
-			Targeted:
-				dataPictogram[
-					("targeted" + capitalizeString(type)) as keyof PictogramData
-				],
-			Reached:
-				dataPictogram[
-					("reached" + capitalizeString(type)) as keyof PictogramData
-				],
+		const data = summaryDataDownload.map(d => ({
+			"Report date": d.ReportApprovedDate,
+			Year: d.AllocationYear,
+			Fund: fundsList[d.PooledFundId],
+			"Targeted women": d.TargetedWomen || 0,
+			"Targeted men": d.TargetedMen || 0,
+			"Targeted girls": d.TargetedGirls || 0,
+			"Targeted boys": d.TargetedBoys || 0,
+			"Reached women": d.ReachedWomen || 0,
+			"Reached men": d.ReachedMen || 0,
+			"Reached girls": d.ReachedGirls || 0,
+			"Reached boys": d.ReachedBoys || 0,
 		}));
 		downloadData<(typeof data)[number]>(data, "people_targeted_reached");
 	}

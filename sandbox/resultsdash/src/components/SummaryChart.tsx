@@ -16,12 +16,22 @@ function SummaryChart({
 	year,
 	clickedDownload,
 	setClickedDownload,
+	summaryDataDownload,
+	fundsList,
 }: SummaryChartProps) {
 	const data = dataSummary.filter(d =>
 		year !== null ? year.includes(d.year) : true
 	);
 
 	function handleDownloadClick() {
+		const data = summaryDataDownload.map(d => ({
+			"Report date": d.ReportApprovedDate,
+			Year: d.AllocationYear,
+			Allocation: d.Budget,
+			Fund: fundsList[d.PooledFundId],
+			"Number of Projects": d.NumbofProjects,
+			"Number of Partners": d.TotalNumbPartners,
+		}));
 		downloadData<(typeof data)[number]>(data, "summary");
 	}
 

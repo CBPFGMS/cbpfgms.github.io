@@ -9,36 +9,56 @@ import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
 
-function TypeAndSectorChart({
+function TypeAndSectorChart<DownloadType>({
 	data,
 	list,
 	clickedDownload,
 	title,
 	chartType,
 	setClickedDownload,
-}: TypesAndSectorChartProps) {
+	dataDownload,
+}: TypesAndSectorChartProps<DownloadType>) {
 	const maxValue = max(
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
 
 	function handleDownloadClick() {
 		if (chartType === "beneficiaryTypes") {
-			const csvData = (data as BeneficiaryTypeData[]).map(d => ({
-				"Beneficiary Type": list[d.beneficiaryType],
-				Targeted: d.targeted,
-				Reached: d.reached,
+			const data = (dataDownload as ByTypeObj[]).map(d => ({
+				"Report date": d.ReportApprovedDate,
+				Year: d.AllocationYear,
+				Fund: list.fundNames[d.PooledFundId],
+				"Beneficiary Type": list.beneficiaryTypes[d.BeneficiaryTypeId],
+				Targeted:
+					(d.TargetBoys || 0) +
+					(d.TargetGirls || 0) +
+					(d.TargetMen || 0) +
+					(d.TargetWomen || 0),
+				Reached:
+					(d.ReachedBoys || 0) +
+					(d.ReachedGirls || 0) +
+					(d.ReachedMen || 0) +
+					(d.ReachedWomen || 0),
 			}));
-			downloadData<(typeof csvData)[number]>(
-				csvData,
-				"beneficiary_types"
-			);
+			downloadData<(typeof data)[number]>(data, "beneficiary_types");
 		} else {
-			const csvData = (data as SectorsData[]).map(d => ({
-				Sector: list[d.sector],
-				Targeted: d.targeted,
-				Reached: d.reached,
+			const data = (dataDownload as BySectorObj[]).map(d => ({
+				"Report date": d.ReportApprovedDate,
+				Year: d.AllocationYear,
+				Fund: list.fundNames[d.PooledFundId],
+				Sector: list.sectors[d.ClusterId],
+				Targeted:
+					(d.TargetedBoys || 0) +
+					(d.TargetedGirls || 0) +
+					(d.TargetedMen || 0) +
+					(d.TargetedWomen || 0),
+				Reached:
+					(d.ReachedBoys || 0) +
+					(d.ReachedGirls || 0) +
+					(d.ReachedMen || 0) +
+					(d.ReachedWomen || 0),
 			}));
-			downloadData<(typeof csvData)[number]>(csvData, "sectors");
+			downloadData<(typeof data)[number]>(data, "sectors");
 		}
 	}
 
@@ -156,7 +176,11 @@ function TypeAndSectorChart({
 						targeted={d.targeted}
 						reached={d.reached}
 						maxValue={maxValue}
-						list={list}
+						list={
+							chartType === "beneficiaryTypes"
+								? list.beneficiaryTypes
+								: list.sectors
+						}
 					/>
 				))}
 			</Box>

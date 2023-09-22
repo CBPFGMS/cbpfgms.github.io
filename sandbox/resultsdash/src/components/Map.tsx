@@ -37,10 +37,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 			"Reached men": d.beneficiaries.reachedMen,
 			"Reached women": d.beneficiaries.reachedWomen,
 		}));
-		downloadData<(typeof csvData)[number]>(
-			csvData,
-			"locations"
-		);
+		downloadData<(typeof csvData)[number]>(csvData, "locations");
 	}
 
 	const [ref, inView] = useInView({
@@ -214,6 +211,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 									}}
 								>
 									indicates the percentage of people reached
+									(can be greater than 100%)
 								</span>
 							</Typography>
 							<svg

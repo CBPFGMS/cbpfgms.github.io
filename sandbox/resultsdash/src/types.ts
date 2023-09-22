@@ -243,6 +243,8 @@ type SummaryChartProps = {
 	year: number[] | null;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	summaryDataDownload: ByDisabilityObj[];
+	fundsList: ListObj;
 };
 
 type SelectorsProps = {
@@ -438,6 +440,8 @@ type PictogramChartProps = {
 	dataPictogram: PictogramData;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	summaryDataDownload: ByDisabilityObj[];
+	fundsList: ListObj;
 };
 
 type PictogramTypes = "girls" | "boys" | "women" | "men";
@@ -469,14 +473,17 @@ type PictogramRowProps = {
 	maxValue: number;
 };
 
-type TypesAndSectorChartProps = {
+type TypesAndSectorChartProps<DownloadType> = {
 	data: BeneficiaryTypeData[] | SectorsData[];
-	list: ListObj;
+	list: List;
 	clickedDownload: DownloadStates;
 	title: string;
 	chartType: Charts;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	dataDownload: DownloadType[];
 };
+
+type DownloadType = ByTypeObj | BySectorObj;
 
 type TypeAndSectorRowProps = {
 	type: number;

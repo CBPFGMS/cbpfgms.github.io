@@ -125,6 +125,51 @@ function MainContainer() {
 		]
 	);
 
+	const summaryDataDownload = useMemo(() => {
+		const yearData = rawData.byDisability.find(
+			d => d.year === reportYear[0]
+		)?.values;
+		const data = yearData
+			? yearData.filter(
+					value =>
+						fund.includes(value.PooledFundId) &&
+						allocationSource.includes(value.AllocationSourceId) &&
+						allocationType.includes(value.AllocationtypeId)
+			  )
+			: [];
+		return data;
+	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+
+	const byBeneficiaryTypeDataDownload = useMemo(() => {
+		const yearData = rawData.byType.find(
+			d => d.year === reportYear[0]
+		)?.values;
+		const data = yearData
+			? yearData.filter(
+					value =>
+						fund.includes(value.PooledFundId) &&
+						allocationSource.includes(value.AllocationSourceId) &&
+						allocationType.includes(value.AllocationtypeId)
+			  )
+			: [];
+		return data;
+	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+
+	const bySectorDataDownload = useMemo(() => {
+		const yearData = rawData.bySector.find(
+			d => d.year === reportYear[0]
+		)?.values;
+		const data = yearData
+			? yearData.filter(
+					value =>
+						fund.includes(value.PooledFundId) &&
+						allocationSource.includes(value.AllocationSourceId) &&
+						allocationType.includes(value.AllocationtypeId)
+			  )
+			: [];
+		return data;
+	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+
 	useEffect(() => {
 		const reportYearParam = queryStringValues.has("reportYear")
 			? queryStringValues
@@ -425,6 +470,8 @@ function MainContainer() {
 								year={year}
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
+								summaryDataDownload={summaryDataDownload}
+								fundsList={apiData.lists.fundNames}
 							/>
 						</Grid>
 						<Divider
@@ -445,6 +492,8 @@ function MainContainer() {
 									dataPictogram={dataPictogram}
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
+									summaryDataDownload={summaryDataDownload}
+									fundsList={apiData.lists.fundNames}
 								/>
 							</Box>
 						</Grid>
@@ -469,13 +518,14 @@ function MainContainer() {
 						mb={3}
 					>
 						<Grid xs={6}>
-							<TypeAndSectorChart
+							<TypeAndSectorChart<ByTypeObj>
 								data={dataBeneficiaryTypes}
-								list={apiData.lists.beneficiaryTypes}
+								list={apiData.lists}
 								title="People targeted and reached by type"
 								chartType="beneficiaryTypes"
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
+								dataDownload={byBeneficiaryTypeDataDownload}
 							/>
 						</Grid>
 						<Divider
@@ -492,13 +542,14 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								<TypeAndSectorChart
+								<TypeAndSectorChart<BySectorObj>
 									data={dataSectors}
-									list={apiData.lists.sectors}
+									list={apiData.lists}
 									title="People targeted and reached by sector"
 									chartType="sectors"
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
+									dataDownload={bySectorDataDownload}
 								/>
 							</Box>
 						</Grid>
