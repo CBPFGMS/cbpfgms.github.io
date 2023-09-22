@@ -15,7 +15,7 @@ function useData() {
 		locationMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/locationMst.csv",
 		beneficiariesMasterUrl =
-			"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/sandbox/resultsdata/MstBeneficiaryType.csv",
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		allocationTypeMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstAllocationType.csv",
 		fundsMasterUrl =

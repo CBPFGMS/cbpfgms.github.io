@@ -308,15 +308,18 @@ function MainContainer() {
 						}}
 					>
 						Results{inView2 ? " " : <br />}Dashboard
-						<sup>
-							<InfoIcon
-								data-tooltip-id="tooltip"
-								data-tooltip-content={`The results aggregates data from all final Narrative Reports approved in ${reportYear[0]}.`}
-								data-tooltip-place="top"
-								style={{ color: colors.unColor }}
-							/>
-						</sup>
 					</Typography>
+					<InfoIcon
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`The results aggregates data from all final Narrative Reports approved in ${reportYear[0]}.`}
+						data-tooltip-place="top"
+						style={{
+							color: colors.unColor,
+							fontSize: inView2 ? "26px" : "18px",
+							marginLeft: "0.1em",
+							alignSelf: inView2 ? "flex-start" : "center",
+						}}
+					/>
 					{!inView2 && (
 						<QuickSelectors
 							fund={fund}
