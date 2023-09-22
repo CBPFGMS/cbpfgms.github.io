@@ -22,6 +22,7 @@ import QuickSelectors from "./QuickSelectors";
 import Map from "./Map";
 import processDataMap from "../utils/processdatamap";
 import { Tooltip } from "react-tooltip";
+import InfoIcon from "@mui/icons-material/Info";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -307,6 +308,14 @@ function MainContainer() {
 						}}
 					>
 						Results{inView2 ? " " : <br />}Dashboard
+						<sup>
+							<InfoIcon
+								data-tooltip-id="tooltip"
+								data-tooltip-content={`The results aggregates data from all final Narrative Reports approved in ${reportYear[0]}.`}
+								data-tooltip-place="top"
+								style={{ color: colors.unColor }}
+							/>
+						</sup>
 					</Typography>
 					{!inView2 && (
 						<QuickSelectors
@@ -471,7 +480,7 @@ function MainContainer() {
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
 								summaryDataDownload={summaryDataDownload}
-								fundsList={apiData.lists.fundNames}
+								fundsList={apiData.lists.fundAbbreviatedNames}
 							/>
 						</Grid>
 						<Divider
@@ -493,7 +502,9 @@ function MainContainer() {
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
 									summaryDataDownload={summaryDataDownload}
-									fundsList={apiData.lists.fundNames}
+									fundsList={
+										apiData.lists.fundAbbreviatedNames
+									}
 								/>
 							</Box>
 						</Grid>

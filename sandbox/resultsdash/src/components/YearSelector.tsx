@@ -47,12 +47,12 @@ function YearSelector({
 				}
 			/>
 			<FormControl size="small">
-				<InputLabel id="report-year-label">Year</InputLabel>
+				<InputLabel id="report-year-label">Report Year</InputLabel>
 				<Select
 					labelId="report-year-label"
 					id="report-year-select"
 					value={reportYear[0].toString()}
-					label="Year"
+					label="Report Year"
 					sx={{ fontSize: "24px", fontWeight: "700" }}
 					onChange={handleChange}
 				>

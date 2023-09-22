@@ -27,7 +27,7 @@ function TypeAndSectorChart<DownloadType>({
 			const data = (dataDownload as ByTypeObj[]).map(d => ({
 				"Report date": d.ReportApprovedDate,
 				Year: d.AllocationYear,
-				Fund: list.fundNames[d.PooledFundId],
+				Fund: list.fundAbbreviatedNames[d.PooledFundId],
 				"Beneficiary Type": list.beneficiaryTypes[d.BeneficiaryTypeId],
 				Targeted:
 					(d.TargetBoys || 0) +
@@ -45,7 +45,7 @@ function TypeAndSectorChart<DownloadType>({
 			const data = (dataDownload as BySectorObj[]).map(d => ({
 				"Report date": d.ReportApprovedDate,
 				Year: d.AllocationYear,
-				Fund: list.fundNames[d.PooledFundId],
+				Fund: list.fundAbbreviatedNames[d.PooledFundId],
 				Sector: list.sectors[d.ClusterId],
 				Targeted:
 					(d.TargetedBoys || 0) +
