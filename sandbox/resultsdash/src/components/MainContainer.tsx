@@ -32,9 +32,9 @@ const downloadStates: DownloadStates = {
 	map: false,
 };
 
-function MainContainer() {
-	const queryStringValues = new URLSearchParams(location.search);
+const queryStringValues = new URLSearchParams(location.search);
 
+function MainContainer() {
 	const apiData = useContext(DataContext) as DataContext;
 	const rawData = apiData.rawData;
 
@@ -126,11 +126,15 @@ function MainContainer() {
 		]
 	);
 
-	const summaryDataDownload = useMemo(() => {
-		const yearData = rawData.byDisability.find(
-			d => d.year === reportYear[0]
-		)?.values;
-		const data = yearData
+	const filterDownloadArray: FilterDownloadArray = (
+		arr,
+		reportYear,
+		fund,
+		allocationSource,
+		allocationType
+	) => {
+		const yearData = arr.find(d => d.year === reportYear[0])?.values;
+		return yearData
 			? yearData.filter(
 					value =>
 						fund.includes(value.PooledFundId) &&
@@ -138,38 +142,43 @@ function MainContainer() {
 						allocationType.includes(value.AllocationtypeId)
 			  )
 			: [];
-		return data;
-	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+	};
 
-	const byBeneficiaryTypeDataDownload = useMemo(() => {
-		const yearData = rawData.byType.find(
-			d => d.year === reportYear[0]
-		)?.values;
-		const data = yearData
-			? yearData.filter(
-					value =>
-						fund.includes(value.PooledFundId) &&
-						allocationSource.includes(value.AllocationSourceId) &&
-						allocationType.includes(value.AllocationtypeId)
-			  )
-			: [];
-		return data;
-	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+	const summaryDataDownload = useMemo(
+		() =>
+			filterDownloadArray<ByDisabilityObj>(
+				rawData.byDisability,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType
+			),
+		[rawData, reportYear, fund, allocationSource, allocationType]
+	);
 
-	const bySectorDataDownload = useMemo(() => {
-		const yearData = rawData.bySector.find(
-			d => d.year === reportYear[0]
-		)?.values;
-		const data = yearData
-			? yearData.filter(
-					value =>
-						fund.includes(value.PooledFundId) &&
-						allocationSource.includes(value.AllocationSourceId) &&
-						allocationType.includes(value.AllocationtypeId)
-			  )
-			: [];
-		return data;
-	}, [rawData, reportYear, fund, allocationSource, allocationType]);
+	const byBeneficiaryTypeDataDownload = useMemo(
+		() =>
+			filterDownloadArray<ByTypeObj>(
+				rawData.byType,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType
+			),
+		[rawData, reportYear, fund, allocationSource, allocationType]
+	);
+
+	const bySectorDataDownload = useMemo(
+		() =>
+			filterDownloadArray<BySectorObj>(
+				rawData.bySector,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType
+			),
+		[rawData, reportYear, fund, allocationSource, allocationType]
+	);
 
 	useEffect(() => {
 		const reportYearParam = queryStringValues.has("reportYear")

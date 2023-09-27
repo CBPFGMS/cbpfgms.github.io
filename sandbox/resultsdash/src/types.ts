@@ -538,3 +538,13 @@ type CreateColorLegendParams = {
 	legendSvgWidth: number;
 	legendSvgHeight: number;
 };
+
+type TFilterObj = BySectorObj | ByDisabilityObj | ByTypeObj;
+
+type FilterDownloadArray = <TFObj extends TFilterObj>(
+	arr: GenericYear<TFObj>,
+	reportYear: number[],
+	fund: number[],
+	allocationSource: number[],
+	allocationType: number[]
+) => TFObj[];
