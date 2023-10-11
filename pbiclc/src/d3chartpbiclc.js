@@ -3373,7 +3373,7 @@
 						.style("opacity", function (d) {
 							const isoCode = Object.keys(countryNames).find(
 								function (e) {
-									return countryNames[e].includes(d);
+									return countryNames[e] === d;
 								}
 							);
 							return chartState.selectedCbpfs.indexOf(isoCode) >
@@ -3513,7 +3513,7 @@
 							.style("opacity", function (d) {
 								const isoCode = Object.keys(countryNames).find(
 									function (e) {
-										return countryNames[e].includes(d);
+										return countryNames[e] === d;
 									}
 								);
 								return chartState.selectedCbpfs.indexOf(
