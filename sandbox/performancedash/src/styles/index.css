@@ -1,0 +1,50 @@
+#resultsroot {
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+
+	--ocha-blue: #1f69b3;
+	--ocha-blue-lighter: #82b5e9;
+	--ocha-blue-darker: #144372;
+}
+
+.xAxisTopChart path,
+.yAxisTopChart path {
+	stroke: none;
+	fill: none;
+}
+
+.xAxisTopChart line {
+	stroke: #666;
+	fill: none;
+}
+
+.yAxisTopChart line {
+	stroke: #ccc;
+	fill: none;
+	stroke-dasharray: 3, 3;
+}
+
+.xAxisTopChart text,
+.yAxisTopChart text {
+	font-size: 10px;
+	fill: #666;
+}
+
+.topChartLabels {
+	text-anchor: middle;
+	fill: #333;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: -0.5px;
+}
+
+.downloadIcon:focus {
+	outline: none;
+}

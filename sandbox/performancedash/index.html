@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link
+			rel="icon"
+			type="image/x-icon"
+			href="/favicon.ico"
+		/>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i">
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+		integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+		crossorigin=""/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Results Dashboard</title>
+	</head>
+	<body style="margin: 0">
+		<div
+			style="
+				display: flex;
+				flex: 1;
+				background-color: #ffffff;
+				justify-content: start;
+				align-items: center;
+				flex-direction: column;
+			"
+		>
+			<div
+				style="
+					width: 1110px;
+					background-color: #ffffff;
+					height: 500px;
+					padding-top: 4em;
+				"
+				id="resultsroot"
+			></div>
+		</div>
+		<script
+			type="module"
+			src="/src/main.tsx"
+		></script>
+	</body>
+</html>
