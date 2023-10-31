@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import fetchFile from "./fetchfile";
 import makeLists from "./makelists";
 import preProcessData from "./preprocessdata";
+import processApproved from "./processapproved";
 
 function useData() {
 	const bySectorUrl =
@@ -25,7 +26,9 @@ function useData() {
 		partnerTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstOrganization.json",
 		sectorsMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json";
+			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json",
+		approvedAllocationsUrl =
+			"https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=&$format=csv";
 
 	const [rawData, setRawData] = useState<RawData | null>(null),
 		[lists, setLists] = useState<List | null>(null),
@@ -50,6 +53,7 @@ function useData() {
 			),
 			fetchFile("partnerTypesMaster", partnerTypesMasterUrl, "json"),
 			fetchFile("sectorsMaster", sectorsMasterUrl, "json"),
+			fetchFile("approvedAllocations", approvedAllocationsUrl, "csv"),
 		])
 			.then(receiveData)
 			.catch(error => {
@@ -69,19 +73,8 @@ function useData() {
 			allocationSourcesMaster,
 			partnerTypesMaster,
 			sectorsMaster,
-		]: [
-			BySectorObj[],
-			ByDisabilityObj[],
-			ByLocationObj[],
-			ByTypeObj[],
-			LocationMasterObj[],
-			BeneficiariesMasterObj[],
-			AllocationTypeMasterObj[],
-			FundsMasterObj[],
-			AllocationSourcesMasterObj[],
-			PartnerTypesMasterObj[],
-			SectorsMasterObj[]
-		]): void {
+			approvedAllocations,
+		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				fundsMaster,
 				locationMaster,
@@ -105,11 +98,15 @@ function useData() {
 				setInDataLists,
 			});
 
+			const approvedAllocationsByYear =
+				processApproved(approvedAllocations);
+
 			setRawData({
 				bySector: bySectorYear,
 				byDisability: byDisabilityYear,
 				byLocation: byLocationYear,
 				byType: byTypeYear,
+				approved: approvedAllocationsByYear,
 			});
 			setLists(listsObj);
 			setLoading(false);

@@ -10,8 +10,23 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import colors from "../utils/colors";
 import MiniChart from "../assets/MiniChart";
+import ApprovedChart from "./ApprovedChart";
 
-function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
+const height = 190;
+
+const chartPropertyArray: ChartValue[] = [
+	"allocations",
+	"projects",
+	"partners",
+];
+
+function TopChart({
+	year,
+	dataSummary,
+	setYear,
+	reportYear,
+	approvedData,
+}: TopChartProps) {
 	const [barClicked, setBarClicked] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -25,15 +40,9 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 		// if (year !== null) setBarClicked(true);
 	}, [year]);
 
-	const height = 190;
-
-	const chartPropertyArray: ChartValue[] = [
-		"allocations",
-		"projects",
-		"partners",
-	];
-
-	const [chartValue, setChartValue] = useState<ChartValue>("allocations");
+	const [chartValue, setChartValue] = useState<ChartValue>(
+		chartPropertyArray[0]
+	);
 
 	const svgContainer = useRef(null);
 
@@ -143,7 +152,12 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 					></svg>
 				</Box>
 			</Paper>
-			{!barClicked && (
+			{year !== null ? (
+				<ApprovedChart
+					approvedData={approvedData}
+					year={year}
+				/>
+			) : !barClicked ? (
 				<Box
 					style={{
 						width: "260px",
@@ -170,6 +184,8 @@ function TopChart({ year, dataSummary, setYear, reportYear }: TopChartProps) {
 						contributing for the selected year results
 					</Typography>
 				</Box>
+			) : (
+				<></>
 			)}
 		</Box>
 	);

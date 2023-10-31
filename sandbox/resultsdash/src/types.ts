@@ -2,6 +2,38 @@
 
 type Beneficiaries = number | null;
 
+type ReceiveDataArgs = [
+	BySectorObj[],
+	ByDisabilityObj[],
+	ByLocationObj[],
+	ByTypeObj[],
+	LocationMasterObj[],
+	BeneficiariesMasterObj[],
+	AllocationTypeMasterObj[],
+	FundsMasterObj[],
+	AllocationSourcesMasterObj[],
+	PartnerTypesMasterObj[],
+	SectorsMasterObj[],
+	ApprovedAllocationsObj[]
+];
+
+type ApprovedAllocationsObj = {
+	AllocationYear: number;
+	ApprovedBudget: number;
+	ApprovedReserveBudget: number;
+	ApprovedReserveBudgetPercentage: number;
+	ApprovedStandardBudget: number;
+	ApprovedStandardBudgetPercentage: number;
+	FundingType: number;
+	OrganizationType: string;
+	PipelineBudget: number;
+	PipelineReserveBudget: number;
+	PipelineReserveBudgetPercentage: number;
+	PipelineStandardBudget: number;
+	PipelineStandardBudgetPercentage: number;
+	PooledFundName: string;
+};
+
 type BySectorObj = {
 	PooledFundId: number;
 	AllocationYear: number;
@@ -117,6 +149,13 @@ type FundsMasterObj = {
 	AreaType: string;
 };
 
+type ApprovedAllocationsByYear = {
+	year: number;
+	approved: number;
+	underApproval: number;
+	percentage: number;
+};
+
 type AllocationSourcesMasterObj = {
 	id: number;
 	AllocationName: string;
@@ -161,6 +200,7 @@ type RawData = {
 	byDisability: ByDisabilityYear;
 	byLocation: ByLocationYear;
 	byType: ByTypeYear;
+	approved: ApprovedAllocationsByYear[];
 };
 
 type MakeListParams = {
@@ -412,6 +452,7 @@ type TopChartProps = {
 	dataSummary: SummaryData[];
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 	reportYear: number[];
+	approvedData: ApprovedAllocationsByYear[];
 };
 
 type ChartValue = "allocations" | "projects" | "partners";
@@ -548,3 +589,8 @@ type FilterDownloadArray = <TFObj extends TFilterObj>(
 	allocationSource: number[],
 	allocationType: number[]
 ) => TFObj[];
+
+type ApprovedChartProps = {
+	approvedData: ApprovedAllocationsByYear[];
+	year: number[];
+};

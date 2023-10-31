@@ -415,6 +415,7 @@ function MainContainer() {
 								dataSummary={dataSummary}
 								setYear={setYear}
 								reportYear={reportYear}
+								approvedData={rawData.approved}
 							/>
 						</Box>
 					</Grid>
