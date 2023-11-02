@@ -153,7 +153,6 @@ type ApprovedAllocationsByYear = {
 	year: number;
 	approved: number;
 	underApproval: number;
-	percentage: number;
 };
 
 type AllocationSourcesMasterObj = {
@@ -466,6 +465,13 @@ type CreateTopChartParams = {
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };
 
+type CreateDonutParams = {
+	size: number;
+	svgContainer: React.RefObject<SVGSVGElement>;
+	total: ApprovedAndUnder;
+	allocatedSelected: number;
+};
+
 type PictogramData = {
 	targetedMen: number;
 	targetedWomen: number;
@@ -593,4 +599,11 @@ type FilterDownloadArray = <TFObj extends TFilterObj>(
 type ApprovedChartProps = {
 	approvedData: ApprovedAllocationsByYear[];
 	year: number[];
+	dataSummary: SummaryData[];
+	reportYear: number[];
+};
+
+type ApprovedAndUnder = {
+	approved: number;
+	underApproval: number;
 };

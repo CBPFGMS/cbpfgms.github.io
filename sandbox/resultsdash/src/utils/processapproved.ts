@@ -14,15 +14,9 @@ function processApproved(
 				year: row.AllocationYear,
 				approved: row.ApprovedBudget,
 				underApproval: row.PipelineBudget,
-				percentage: 0,
 			});
 		}
 	});
-
-	data.forEach(
-		row =>
-			(row.percentage = row.approved / (row.approved + row.underApproval))
-	);
 
 	data.sort((a, b) => a.year - b.year);
 

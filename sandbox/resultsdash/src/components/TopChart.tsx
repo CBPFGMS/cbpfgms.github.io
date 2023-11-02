@@ -156,6 +156,8 @@ function TopChart({
 				<ApprovedChart
 					approvedData={approvedData}
 					year={year}
+					dataSummary={dataSummary}
+					reportYear={reportYear}
 				/>
 			) : !barClicked ? (
 				<Box
