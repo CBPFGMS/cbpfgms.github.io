@@ -90,6 +90,7 @@ function useData() {
 				byDisabilityYear,
 				byLocationYear,
 				byTypeYear,
+				allocatedTotals,
 			} = preProcessData({
 				bySector,
 				byDisability,
@@ -107,6 +108,7 @@ function useData() {
 				byLocation: byLocationYear,
 				byType: byTypeYear,
 				approved: approvedAllocationsByYear,
+				allocatedTotals: allocatedTotals,
 			});
 			setLists(listsObj);
 			setLoading(false);

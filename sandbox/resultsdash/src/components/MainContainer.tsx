@@ -23,6 +23,7 @@ import Map from "./Map";
 import processDataMap from "../utils/processdatamap";
 import { Tooltip } from "react-tooltip";
 import InfoIcon from "@mui/icons-material/Info";
+import describeYears from "../utils/describeyears";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -416,6 +417,7 @@ function MainContainer() {
 								setYear={setYear}
 								reportYear={reportYear}
 								approvedData={rawData.approved}
+								allocatedTotals={rawData.allocatedTotals}
 							/>
 						</Box>
 					</Grid>
@@ -435,18 +437,7 @@ function MainContainer() {
 						{" "}
 						{"Projects from allocation year"}
 						{year.length > 1 ? "s " : " "}
-						{year
-							.sort((a, b) => a - b)
-							.reduce(
-								(acc, curr, index) =>
-									acc +
-									(index >= year.length - 2
-										? index > year.length - 2
-											? curr
-											: curr + " and "
-										: curr + ", "),
-								""
-							)}
+						{describeYears(year)}
 						{" contributing to "}
 						<span
 							style={{

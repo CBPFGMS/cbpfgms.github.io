@@ -16,12 +16,15 @@ function preProcessData({
 	const byDisabilityYear: ByDisabilityYear = [];
 	const byLocationYear: ByLocationYear = [];
 	const byTypeYear: ByTypeYear = [];
+	const allocatedTotals: AllocatedTotals = {};
 
 	byDisability.forEach(row => {
 		fundsSet.add(row.PooledFundId);
 		reportYearsSet.add(row.ReportApprovedDate.getFullYear());
 		allocationTypesSet.add(row.AllocationtypeId);
 		allocationSourcesSet.add(row.AllocationSourceId);
+		allocatedTotals[row.AllocationYear] =
+			(allocatedTotals[row.AllocationYear] || 0) + row.Budget;
 		populateYear<typeof row>(
 			row,
 			byDisabilityYear,
@@ -69,7 +72,13 @@ function preProcessData({
 	byLocationYear.sort((a, b) => a.year - b.year);
 	byTypeYear.sort((a, b) => a.year - b.year);
 
-	return { bySectorYear, byDisabilityYear, byLocationYear, byTypeYear };
+	return {
+		bySectorYear,
+		byDisabilityYear,
+		byLocationYear,
+		byTypeYear,
+		allocatedTotals,
+	};
 }
 
 function populateYear<TObj>(

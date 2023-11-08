@@ -26,6 +26,7 @@ function TopChart({
 	setYear,
 	reportYear,
 	approvedData,
+	allocatedTotals,
 }: TopChartProps) {
 	const [barClicked, setBarClicked] = useState<boolean>(false);
 
@@ -55,8 +56,7 @@ function TopChart({
 			year,
 			setYear,
 		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dataSummary, chartValue]);
+	});
 
 	function handleRadioChange(event: React.ChangeEvent<HTMLInputElement>) {
 		setChartValue(event.target.value as ChartValue);
@@ -158,6 +158,7 @@ function TopChart({
 					year={year}
 					dataSummary={dataSummary}
 					reportYear={reportYear}
+					allocatedTotals={allocatedTotals}
 				/>
 			) : !barClicked ? (
 				<Box

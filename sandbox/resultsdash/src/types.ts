@@ -200,6 +200,7 @@ type RawData = {
 	byLocation: ByLocationYear;
 	byType: ByTypeYear;
 	approved: ApprovedAllocationsByYear[];
+	allocatedTotals: AllocatedTotals;
 };
 
 type MakeListParams = {
@@ -242,11 +243,16 @@ type PreProcessDataParams = {
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
 };
 
+type AllocatedTotals = {
+	[key: string]: number;
+};
+
 type PreProcessDataReturn = {
 	bySectorYear: BySectorYear;
 	byDisabilityYear: ByDisabilityYear;
 	byLocationYear: ByLocationYear;
 	byTypeYear: ByTypeYear;
+	allocatedTotals: AllocatedTotals;
 };
 
 type DataContext = {
@@ -452,6 +458,7 @@ type TopChartProps = {
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 	reportYear: number[];
 	approvedData: ApprovedAllocationsByYear[];
+	allocatedTotals: AllocatedTotals;
 };
 
 type ChartValue = "allocations" | "projects" | "partners";
@@ -468,8 +475,9 @@ type CreateTopChartParams = {
 type CreateDonutParams = {
 	size: number;
 	svgContainer: React.RefObject<SVGSVGElement>;
-	total: ApprovedAndUnder;
-	allocatedSelected: number;
+	donutData: DonutData;
+	colorScale: d3.ScaleOrdinal<DonutTypes, string>;
+	reportYear: number[];
 };
 
 type PictogramData = {
@@ -601,9 +609,24 @@ type ApprovedChartProps = {
 	year: number[];
 	dataSummary: SummaryData[];
 	reportYear: number[];
+	allocatedTotals: AllocatedTotals;
 };
 
 type ApprovedAndUnder = {
 	approved: number;
 	underApproval: number;
 };
+
+type DonutDatum = {
+	type: DonutTypes;
+	value: number;
+};
+
+type DonutData = DonutDatum[];
+
+type DonutTypes = "selected" | "allocated" | "underImplementation";
+
+type arcObject = {
+	startAngle: number;
+	endAngle: number;
+}
