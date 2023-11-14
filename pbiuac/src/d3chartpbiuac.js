@@ -437,7 +437,7 @@
 				),
 			width: width - padding[1] - padding[3],
 			height: brushPanelHeight,
-			padding: [14, 0, 10, 102],
+			padding: [14, 0, 10, 130],
 		};
 
 		const mainPanel = {
@@ -458,7 +458,7 @@
 				),
 			width: width - padding[1] - padding[3],
 			height: mainPanelHeight,
-			padding: [14, 0, 0, 102],
+			padding: [14, 0, 0, 130],
 		};
 
 		const legendPanel = {
@@ -3141,6 +3141,8 @@
 			} else {
 				documentsDivList.append("p").html("Unavailable");
 			}
+
+			listDiv.node().scrollIntoView({ behavior: "smooth" });
 
 			//end of generateList
 		}
