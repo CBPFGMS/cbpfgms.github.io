@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import fetchFile from "./fetchfile";
 import makeLists from "./makelists";
 import preProcessData from "./preprocessdata";
-import processApproved from "./processapproved";
+import proccessApproved from "./processapproved.ts";
 
 function useData() {
 	const bySectorUrl =
@@ -99,15 +99,14 @@ function useData() {
 				setInDataLists,
 			});
 
-			const approvedAllocationsByYear =
-				processApproved(approvedAllocations);
+			proccessApproved(approvedAllocations, listsObj);
 
 			setRawData({
 				bySector: bySectorYear,
 				byDisability: byDisabilityYear,
 				byLocation: byLocationYear,
 				byType: byTypeYear,
-				approved: approvedAllocationsByYear,
+				approved: approvedAllocations,
 				allocatedTotals: allocatedTotals,
 			});
 			setLists(listsObj);

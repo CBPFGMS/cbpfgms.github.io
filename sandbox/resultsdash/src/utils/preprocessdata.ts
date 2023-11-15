@@ -16,20 +16,19 @@ function preProcessData({
 	const byDisabilityYear: ByDisabilityYear = [];
 	const byLocationYear: ByLocationYear = [];
 	const byTypeYear: ByTypeYear = [];
-	const allocatedTotals: AllocatedTotals = {};
+	const allocatedTotals: ByDisabilityYear = [];
 
 	byDisability.forEach(row => {
 		fundsSet.add(row.PooledFundId);
 		reportYearsSet.add(row.ReportApprovedDate.getFullYear());
 		allocationTypesSet.add(row.AllocationtypeId);
 		allocationSourcesSet.add(row.AllocationSourceId);
-		allocatedTotals[row.AllocationYear] =
-			(allocatedTotals[row.AllocationYear] || 0) + row.Budget;
 		populateYear<typeof row>(
 			row,
 			byDisabilityYear,
 			row.ReportApprovedDate.getFullYear()
 		);
+		populateYear<typeof row>(row, allocatedTotals, row.AllocationYear);
 	});
 
 	bySector.forEach(row => {

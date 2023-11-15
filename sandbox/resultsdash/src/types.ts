@@ -32,6 +32,7 @@ type ApprovedAllocationsObj = {
 	PipelineStandardBudget: number;
 	PipelineStandardBudgetPercentage: number;
 	PooledFundName: string;
+	PooledFundId?: number;
 };
 
 type BySectorObj = {
@@ -149,12 +150,6 @@ type FundsMasterObj = {
 	AreaType: string;
 };
 
-type ApprovedAllocationsByYear = {
-	year: number;
-	approved: number;
-	underApproval: number;
-};
-
 type AllocationSourcesMasterObj = {
 	id: number;
 	AllocationName: string;
@@ -173,6 +168,10 @@ type SectorsMasterObj = {
 
 type ListObj = {
 	[key: number]: string;
+};
+
+type ReversedNames = {
+	[key: string]: number;
 };
 
 type LocationObj = {
@@ -199,8 +198,8 @@ type RawData = {
 	byDisability: ByDisabilityYear;
 	byLocation: ByLocationYear;
 	byType: ByTypeYear;
-	approved: ApprovedAllocationsByYear[];
-	allocatedTotals: AllocatedTotals;
+	approved: ApprovedAllocationsObj[];
+	allocatedTotals: ByDisabilityYear;
 };
 
 type MakeListParams = {
@@ -235,6 +234,12 @@ type ByLocationYear = GenericYear<ByLocationObj>;
 
 type ByTypeYear = GenericYear<ByTypeObj>;
 
+type ApprovedSummary = {
+	year: number;
+	approved: number;
+	underApproval: number;
+};
+
 type PreProcessDataParams = {
 	bySector: BySectorObj[];
 	byDisability: ByDisabilityObj[];
@@ -252,7 +257,7 @@ type PreProcessDataReturn = {
 	byDisabilityYear: ByDisabilityYear;
 	byLocationYear: ByLocationYear;
 	byTypeYear: ByTypeYear;
-	allocatedTotals: AllocatedTotals;
+	allocatedTotals: ByDisabilityYear;
 };
 
 type DataContext = {
@@ -355,7 +360,7 @@ type SummaryRowProps = SummaryData & {
 	last: boolean;
 };
 
-type processDataSummary = ({
+type ProcessDataSummary = ({
 	rawData,
 	reportYear,
 	fund,
@@ -373,6 +378,8 @@ type processDataSummary = ({
 	dataSummary: SummaryData[];
 	dataPictogram: PictogramData;
 	inSelectionData: InSelectionObject;
+	approvedSummary: ApprovedSummary[];
+	allocatedTotals: AllocatedTotals;
 };
 
 type ProcessDataBeneficiaryType = ({
@@ -457,7 +464,7 @@ type TopChartProps = {
 	dataSummary: SummaryData[];
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 	reportYear: number[];
-	approvedData: ApprovedAllocationsByYear[];
+	approvedData: ApprovedSummary[];
 	allocatedTotals: AllocatedTotals;
 };
 
@@ -605,7 +612,7 @@ type FilterDownloadArray = <TFObj extends TFilterObj>(
 ) => TFObj[];
 
 type ApprovedChartProps = {
-	approvedData: ApprovedAllocationsByYear[];
+	approvedData: ApprovedSummary[];
 	year: number[];
 	dataSummary: SummaryData[];
 	reportYear: number[];
@@ -629,4 +636,4 @@ type DonutTypes = "selected" | "allocated" | "underImplementation";
 type arcObject = {
 	startAngle: number;
 	endAngle: number;
-}
+};

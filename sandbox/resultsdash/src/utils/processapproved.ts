@@ -1,26 +1,24 @@
 function processApproved(
-	approvedAllocations: ApprovedAllocationsObj[]
-): ApprovedAllocationsByYear[] {
-	const data: ApprovedAllocationsByYear[] = [];
+	approvedAllocations: ApprovedAllocationsObj[],
+	lists: List
+) {
+	const reversedNames: ReversedNames = Object.entries(
+		lists.fundAbbreviatedNames
+	).reduce((acc, [key, value]) => {
+		acc[value] = +key;
+		return acc;
+	}, {} as ReversedNames);
 
 	approvedAllocations.forEach(row => {
-		const foundYear = data.find(d => d.year === row.AllocationYear);
-
-		if (foundYear) {
-			foundYear.approved += row.ApprovedBudget;
-			foundYear.underApproval += row.PipelineBudget;
-		} else {
-			data.push({
-				year: row.AllocationYear,
-				approved: row.ApprovedBudget,
-				underApproval: row.PipelineBudget,
-			});
+		const thisFund =
+			reversedNames[row.PooledFundName.replace("(RhPF-WCA)", "").trim()];
+		if (thisFund === undefined) {
+			console.warn(
+				`Allocations data, fund with name not found in the master list: ${row.PooledFundName}`
+			);
 		}
+		row.PooledFundId = thisFund;
 	});
-
-	data.sort((a, b) => a.year - b.year);
-
-	return data;
 }
 
 export default processApproved;

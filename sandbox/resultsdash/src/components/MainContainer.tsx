@@ -64,7 +64,13 @@ function MainContainer() {
 		threshold: 0,
 	});
 
-	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
+	const {
+		dataSummary,
+		dataPictogram,
+		inSelectionData,
+		approvedSummary,
+		allocatedTotals,
+	} = useMemo(
 		() =>
 			processDataSummary({
 				rawData,
@@ -416,8 +422,8 @@ function MainContainer() {
 								dataSummary={dataSummary}
 								setYear={setYear}
 								reportYear={reportYear}
-								approvedData={rawData.approved}
-								allocatedTotals={rawData.allocatedTotals}
+								approvedData={approvedSummary}
+								allocatedTotals={allocatedTotals}
 							/>
 						</Box>
 					</Grid>

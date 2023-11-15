@@ -18,15 +18,12 @@ function ApprovedChart({
 	reportYear,
 	allocatedTotals,
 }: ApprovedChartProps) {
-	const total = approvedData.reduce(
-		(acc: number, curr: ApprovedAllocationsByYear) => {
-			if (year.includes(curr.year)) {
-				acc += curr.approved;
-			}
-			return acc;
-		},
-		0
-	);
+	const total = approvedData.reduce((acc: number, curr: ApprovedSummary) => {
+		if (year.includes(curr.year)) {
+			acc += curr.approved;
+		}
+		return acc;
+	}, 0);
 
 	const allocatedSelected = dataSummary.reduce(
 		(acc: number, curr: SummaryData) => {

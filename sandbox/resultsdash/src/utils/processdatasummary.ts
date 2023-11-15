@@ -1,4 +1,4 @@
-const processDataSummary: processDataSummary = ({
+const processDataSummary: ProcessDataSummary = ({
 	rawData,
 	reportYear,
 	fund,
@@ -7,6 +7,10 @@ const processDataSummary: processDataSummary = ({
 	year,
 }) => {
 	const dataSummary: SummaryData[] = [];
+
+	const approvedSummary: ApprovedSummary[] = [];
+
+	const allocatedTotals: AllocatedTotals = {};
 
 	const dataPictogram: PictogramData = {
 		reachedBoys: 0,
@@ -82,9 +86,62 @@ const processDataSummary: processDataSummary = ({
 		}
 	});
 
+	//hardcoded allocation sources, change this in future releases
+	//1: Reserve
+	//2: Standard
+	const hasReserve = allocationSource.includes(1);
+	const hasStandard = allocationSource.includes(2);
+
+	rawData.approved.forEach(row => {
+		if (row.PooledFundId && fund.includes(row.PooledFundId)) {
+			const foundYear = approvedSummary.find(
+				d => d.year === row.AllocationYear
+			);
+			if (foundYear) {
+				foundYear.approved +=
+					(hasReserve ? row.ApprovedReserveBudget : 0) +
+					(hasStandard ? row.ApprovedStandardBudget : 0);
+				foundYear.underApproval +=
+					(hasReserve ? row.PipelineReserveBudget : 0) +
+					(hasStandard ? row.PipelineStandardBudget : 0);
+			} else {
+				approvedSummary.push({
+					year: row.AllocationYear,
+					approved:
+						(hasReserve ? row.ApprovedReserveBudget : 0) +
+						(hasStandard ? row.ApprovedStandardBudget : 0),
+					underApproval:
+						(hasReserve ? row.PipelineReserveBudget : 0) +
+						(hasStandard ? row.PipelineStandardBudget : 0),
+				});
+			}
+		}
+	});
+
+	rawData.allocatedTotals.forEach(row => {
+		row.values.forEach(value => {
+			if (
+				fund.includes(value.PooledFundId) &&
+				allocationSource.includes(value.AllocationSourceId) &&
+				allocationType.includes(value.AllocationtypeId)
+			) {
+				allocatedTotals[row.year] =
+					(allocatedTotals[row.year] || 0) + value.Budget;
+			}
+		});
+	});
+
+	console.log(allocatedTotals);
+
 	dataSummary.sort((a, b) => b.year - a.year);
 
-	return { dataSummary, dataPictogram, inSelectionData };
+	return {
+		dataSummary,
+		dataPictogram,
+		inSelectionData,
+		approvedSummary,
+		allocatedTotals,
+	};
 };
 
 export default processDataSummary;
