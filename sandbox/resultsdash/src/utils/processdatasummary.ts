@@ -131,8 +131,6 @@ const processDataSummary: ProcessDataSummary = ({
 		});
 	});
 
-	console.log(allocatedTotals);
-
 	dataSummary.sort((a, b) => b.year - a.year);
 
 	return {
