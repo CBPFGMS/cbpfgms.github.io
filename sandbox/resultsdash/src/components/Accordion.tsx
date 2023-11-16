@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -21,6 +21,9 @@ function AccordionComponent({
 	handleAccordionExpand,
 	inSelectionData,
 }: AccordionComponentProps) {
+	const [boxHeight, setBoxHeight] = useState<number>(0);
+	const accordionRef = useRef<HTMLDivElement>(null);
+
 	const apiData = useContext(DataContext) as DataContext;
 	const lists = apiData.lists;
 	const dataArray = [
@@ -39,112 +42,131 @@ function AccordionComponent({
 		setValue(dataArray);
 	}
 
+	useEffect(() => {
+		if (accordionRef.current) {
+			setBoxHeight(accordionRef.current.clientHeight);
+		}
+	}, []);
+
 	return (
-		<Accordion
-			expanded={expanded === type}
-			onChange={handleAccordionExpand(type)}
-			style={{ backgroundColor: "#ffffff" }}
+		<Box
+			style={{
+				position: "relative",
+				height: boxHeight + "px",
+			}}
 		>
-			<AccordionSummary
-				expandIcon={<ExpandMoreIcon />}
-				sx={{
-					width: "100%",
-					height: "66px",
-					overflow: "hidden",
+			<Accordion
+				expanded={expanded === type}
+				onChange={handleAccordionExpand(type)}
+				style={{
+					backgroundColor: "#ffffff",
+					position: "absolute",
+					zIndex: 2000,
+					maxWidth: "100%",
 				}}
+				ref={accordionRef}
 			>
-				<Typography
+				<AccordionSummary
+					expandIcon={<ExpandMoreIcon />}
 					sx={{
-						color: "#144372",
-						fontWeight: "bold",
-						fontSize: "1rem",
-						width: "30%",
+						width: "100%",
+						height: "66px",
+						overflow: "hidden",
 					}}
 				>
-					{type + ":"}
-				</Typography>
-				<Typography sx={{ flexGrow: 1 }} />
-				<Typography
-					sx={{
-						color: "text.secondary",
-						alignSelf: "center",
-						justifySelf: "flex-end",
-						fontSize: "0.8rem",
-						width: "45%",
-					}}
-				>
-					{value.length === dataArray.length
-						? `All ${type}s selected`
-						: value.length === 1
-						? (namesList[value[0]] as string)
-						: `${value.length} ${type}s selected`}
-				</Typography>
-			</AccordionSummary>
-			<AccordionDetails>
-				<Typography
-					variant="body2"
-					m={1}
-					mb={2}
-				>
-					Select the {type.toLocaleLowerCase()}
-					{filterType === "dropdowncheck" &&
-						`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
-				</Typography>
-				{filterType === "dropdowncheck" && (
-					<Dropdown
-						value={value}
-						setValue={setValue}
-						names={dataArray}
-						namesList={namesList as ListObj}
-						type={type}
-						inSelectionData={inSelectionData}
-						dataProperty={dataProperty}
-						fromQuickSelectors={false}
-					/>
-				)}
-				{filterType === "search" && (
-					<Search
-						value={value}
-						setValue={setValue}
-						names={dataArray}
-						namesList={namesList as ListObj}
-						inSelectionData={inSelectionData}
-						dataProperty={dataProperty}
-					/>
-				)}
-				{filterType === "checkbox" && (
-					<CheckboxLabel
-						value={value}
-						setValue={setValue}
-						names={dataArray}
-						namesList={namesList as ListObj}
-						inSelectionData={inSelectionData}
-						dataProperty={dataProperty}
-					/>
-				)}
-				{(filterType === "dropdowncheck" ||
-					filterType === "search") && (
-					<Box style={{ display: "flex", flexDirection: "row" }}>
-						<Button
-							variant="contained"
-							size="small"
-							onClick={handleDeselectAll}
-							style={{ marginLeft: "8px" }}
-						>
-							Deselect all
-						</Button>
-						<Button
-							variant="contained"
-							size="small"
-							onClick={handleSelectAll}
-							style={{ marginLeft: "8px" }}
-						>
-							Select all
-						</Button>
-					</Box>
-				)}
-			</AccordionDetails>
-		</Accordion>
+					<Typography
+						sx={{
+							color: "#144372",
+							fontWeight: "bold",
+							fontSize: "1rem",
+							width: "30%",
+						}}
+					>
+						{type + ":"}
+					</Typography>
+					<Typography sx={{ flexGrow: 1 }} />
+					<Typography
+						sx={{
+							color: "text.secondary",
+							alignSelf: "center",
+							justifySelf: "flex-end",
+							fontSize: "0.8rem",
+							width: "45%",
+						}}
+					>
+						{value.length === dataArray.length
+							? `All ${type}s selected`
+							: value.length === 1
+							? (namesList[value[0]] as string)
+							: `${value.length} ${type}s selected`}
+					</Typography>
+				</AccordionSummary>
+				<AccordionDetails>
+					<Typography
+						variant="body2"
+						m={1}
+						mb={2}
+					>
+						Select the {type.toLocaleLowerCase()}
+						{filterType === "dropdowncheck" &&
+							`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
+					</Typography>
+					{filterType === "dropdowncheck" && (
+						<Dropdown
+							value={value}
+							setValue={setValue}
+							names={dataArray}
+							namesList={namesList as ListObj}
+							type={type}
+							inSelectionData={inSelectionData}
+							dataProperty={dataProperty}
+							fromQuickSelectors={false}
+						/>
+					)}
+					{filterType === "search" && (
+						<Search
+							value={value}
+							setValue={setValue}
+							names={dataArray}
+							namesList={namesList as ListObj}
+							inSelectionData={inSelectionData}
+							dataProperty={dataProperty}
+						/>
+					)}
+					{filterType === "checkbox" && (
+						<CheckboxLabel
+							value={value}
+							setValue={setValue}
+							names={dataArray}
+							namesList={namesList as ListObj}
+							inSelectionData={inSelectionData}
+							dataProperty={dataProperty}
+						/>
+					)}
+					{(filterType === "dropdowncheck" ||
+						filterType === "search") && (
+						<Box style={{ display: "flex", flexDirection: "row" }}>
+							<Button
+								variant="contained"
+								size="small"
+								onClick={handleDeselectAll}
+								style={{ marginLeft: "8px" }}
+							>
+								Deselect all
+							</Button>
+							<Button
+								variant="contained"
+								size="small"
+								onClick={handleSelectAll}
+								style={{ marginLeft: "8px" }}
+							>
+								Select all
+							</Button>
+						</Box>
+					)}
+				</AccordionDetails>
+			</Accordion>
+		</Box>
 	);
 }
 

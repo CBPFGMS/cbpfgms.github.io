@@ -389,10 +389,23 @@ function MainContainer() {
 						backgroundColor: "#f5f8ff",
 						borderRadius: "8px",
 						position: "relative",
-						overflow: "hidden",
 					}}
 				>
-					<GradientPaper />
+					<Box
+						style={{
+							width: "100%",
+							height: "100%",
+							overflow: "hidden",
+							position: "absolute",
+							borderRadius: "8px",
+							boxSizing: "border-box",
+							top: "0px",
+							left: "0px",
+							pointerEvents: "none",
+						}}
+					>
+						<GradientPaper />
+					</Box>
 					<Grid
 						ref={ref2}
 						xs={12}
