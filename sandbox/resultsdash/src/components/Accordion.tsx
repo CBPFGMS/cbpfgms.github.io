@@ -61,7 +61,7 @@ function AccordionComponent({
 				style={{
 					backgroundColor: "#ffffff",
 					position: "absolute",
-					zIndex: 2000,
+					zIndex: 1000,
 					maxWidth: "100%",
 				}}
 				ref={accordionRef}

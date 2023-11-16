@@ -84,16 +84,11 @@ function Search({
 						style={
 							!inSelectionData[dataProperty].has(option)
 								? {
-										whiteSpace: "normal",
-										padding: "1px",
-										opacity: 0.4,
-										filter: "grayscale(100%)",
+										display: "none",
 								  }
 								: {
 										whiteSpace: "normal",
 										padding: "1px",
-										opacity: 1,
-										filter: "grayscale(0%)",
 								  }
 						}
 					>

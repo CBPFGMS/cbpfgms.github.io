@@ -111,14 +111,11 @@ function Dropdown({
 							style={
 								!inSelectionData[dataProperty].has(name)
 									? {
-											whiteSpace: "normal",
-											padding: "1px",
-											filter: "grayscale(100%)",
+											display: "none",
 									  }
 									: {
 											whiteSpace: "normal",
 											padding: "1px",
-											filter: "grayscale(0%)",
 									  }
 							}
 						>

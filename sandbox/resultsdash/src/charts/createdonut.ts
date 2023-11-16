@@ -135,6 +135,8 @@ function createDonut({
 	percentage = percentage
 		.enter()
 		.append("text")
+		.attr("data-tooltip-id", "tooltip")
+		.attr("data-tooltip-place", "top")
 		.attr("class", "totalLabel")
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "central")
@@ -143,13 +145,24 @@ function createDonut({
 		.style("fill", "#444")
 		.merge(percentage);
 
-	percentage.transition(syncedTransition).textTween((d, i, n) => {
-		const interpolator = interpolate(
-			parseFloat(n[i].textContent + "") / 100 || 0,
-			d
-		);
-		return t => format(".1%")(interpolator(t));
-	});
+	percentage
+		.attr(
+			"data-tooltip-html",
+			d =>
+				`Percentage of reports approved in ${
+					reportYear[0]
+				}<br />compared to reports approved in other years<br />and under implementation: <strong>${format(
+					".2~%"
+				)(d)}</strong>`
+		)
+		.transition(syncedTransition)
+		.textTween((d, i, n) => {
+			const interpolator = interpolate(
+				parseFloat(n[i].textContent + "") / 100 || 0,
+				d
+			);
+			return t => format(".1%")(interpolator(t));
+		});
 }
 
 export default createDonut;
