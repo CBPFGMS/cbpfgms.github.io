@@ -48,3 +48,7 @@
 .downloadIcon:focus {
 	outline: none;
 }
+
+.MuiButtonBase-root:focus {
+	outline: none;
+}
