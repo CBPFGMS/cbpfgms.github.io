@@ -42,9 +42,9 @@ function ApprovedChart({
 	}
 
 	const donutData: DonutData = [
-		{ type: "selected", value: allocatedSelected },
-		{ type: "allocated", value: allocatedTotal - allocatedSelected },
-		{ type: "underImplementation", value: total - allocatedTotal },
+		{ type: "selected", value: ~~allocatedSelected },
+		{ type: "allocated", value: ~~allocatedTotal - ~~allocatedSelected },
+		{ type: "underImplementation", value: ~~total - ~~allocatedTotal },
 	];
 
 	const svgContainer = useRef(null);
@@ -107,12 +107,12 @@ function ApprovedChart({
 				/>
 				<BulletPoint
 					color={colorScale("allocated")}
-					value={allocatedTotal - allocatedSelected}
+					value={~~allocatedTotal - ~~allocatedSelected}
 					text="Reports approved in other years"
 				/>
 				<BulletPoint
 					color={colorScale("underImplementation")}
-					value={total - allocatedTotal}
+					value={~~total - ~~allocatedTotal}
 					text={"Under Implementation"}
 				/>
 			</Box>
@@ -136,14 +136,18 @@ function BulletPoint({
 		>
 			<span style={{ color: color, fontSize: 16 }}>{"\u25CF "}</span>
 			<span style={{ color: "#444" }}>{text}: </span>
-			{value < 1e3 ? (
-				<NumberAnimator number={value} />
-			) : (
-				<span style={{ fontWeight: "bold" }}>
-					<NumberAnimator number={parseFloat(formatSIFloat(value))} />
-					{formatSIFloat(value).slice(-1)}
-				</span>
-			)}
+			<span style={{ fontWeight: "bold" }}>
+				{value < 1e3 ? (
+					<NumberAnimator number={value} />
+				) : (
+					<>
+						<NumberAnimator
+							number={parseFloat(formatSIFloat(value))}
+						/>
+						{formatSIFloat(value).slice(-1)}
+					</>
+				)}
+			</span>
 		</Typography>
 	);
 }
