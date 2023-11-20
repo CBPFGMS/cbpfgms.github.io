@@ -52,3 +52,7 @@
 .MuiButtonBase-root:focus {
 	outline: none;
 }
+
+.scrollSpyTab:hover {
+	background-color: #f5f8ff;
+}

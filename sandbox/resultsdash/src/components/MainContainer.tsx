@@ -24,6 +24,7 @@ import processDataMap from "../utils/processdatamap";
 import { Tooltip } from "react-tooltip";
 import InfoIcon from "@mui/icons-material/Info";
 import describeYears from "../utils/describeyears";
+import ScrollSpy from "./ScrollSpy";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -56,13 +57,30 @@ function MainContainer() {
 	const [clickedDownload, setClickedDownload] =
 		useState<DownloadStates>(downloadStates);
 
-	const [ref, inView] = useInView({
+	const [titleRef, inViewTitle] = useInView({
 		threshold: 0.999,
 	});
 
-	const [ref2, inView2] = useInView({
+	const [menusRef, inViewMenus] = useInView({
 		threshold: 0,
 	});
+
+	const chartsThreshold = {
+		threshold: 0.9,
+	};
+
+	const [summaryRef, inViewSummary] = useInView(chartsThreshold);
+	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
+	const [beneficiaryTypesRef, inViewBeneficiaryTypes] =
+		useInView(chartsThreshold);
+	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
+	const [mapRef, inViewMap] = useInView(chartsThreshold);
+
+	const summaryRefId = "summaryRefId",
+		pictogramRefId = "pictogramRefId",
+		beneficiaryTypesRefId = "beneficiaryTypesRefId",
+		sectorsRefId = "sectorsRefId",
+		mapRefId = "mapRefId";
 
 	const {
 		dataSummary,
@@ -289,15 +307,16 @@ function MainContainer() {
 				justifyContent={"center"}
 				position={"sticky"}
 				top={-1}
-				ref={ref}
+				ref={titleRef}
 				mb={2}
+				pt={1}
 				style={{
 					backgroundColor: "rgba(255,255,255,0.95)",
 					zIndex: 1200,
-					borderBottom: inView ? "none" : "1px solid #ccc",
-					boxShadow: inView
+					borderBottom: inViewTitle ? "none" : "1px solid #ccc",
+					boxShadow: inViewTitle
 						? "none"
-						: "0px 6px 4px -4px rgba(0,0,0,0.2)",
+						: "0px 10px 10px -10px rgba(0,0,0,0.2)",
 				}}
 			>
 				<Grid
@@ -318,12 +337,12 @@ function MainContainer() {
 						variant={"h4"}
 						style={{
 							fontFamily: "Montserrat",
-							fontSize: inView2 ? "40px" : "18px",
+							fontSize: inViewMenus ? "40px" : "18px",
 							fontWeight: 700,
-							marginLeft: inView2 ? "1em" : "2em",
+							marginLeft: inViewMenus ? "1em" : "2em",
 						}}
 					>
-						Results{inView2 ? " " : <br />}Dashboard
+						Results{inViewMenus ? " " : <br />}Dashboard
 					</Typography>
 					<InfoIcon
 						data-tooltip-id="tooltip"
@@ -331,12 +350,12 @@ function MainContainer() {
 						data-tooltip-place="top"
 						style={{
 							color: colors.unColor,
-							fontSize: inView2 ? "26px" : "18px",
+							fontSize: inViewMenus ? "26px" : "18px",
 							marginLeft: "0.1em",
-							alignSelf: inView2 ? "flex-start" : "center",
+							alignSelf: inViewMenus ? "flex-start" : "center",
 						}}
 					/>
-					{!inView2 && (
+					{!inViewMenus && (
 						<QuickSelectors
 							fund={fund}
 							setFund={setFund}
@@ -348,6 +367,18 @@ function MainContainer() {
 						/>
 					)}
 				</Grid>
+				<ScrollSpy
+					inViewSummary={inViewSummary}
+					inViewPictogram={inViewPictogram}
+					inViewBeneficiaryTypes={inViewBeneficiaryTypes}
+					inViewSectors={inViewSectors}
+					inViewMap={inViewMap}
+					summaryRef={summaryRefId}
+					pictogramRef={pictogramRefId}
+					beneficiaryTypesRef={beneficiaryTypesRefId}
+					sectorsRef={sectorsRefId}
+					mapRef={mapRefId}
+				/>
 			</Grid>
 			<Grid
 				container
@@ -407,7 +438,7 @@ function MainContainer() {
 						<GradientPaper />
 					</Box>
 					<Grid
-						ref={ref2}
+						ref={menusRef}
 						xs={12}
 					>
 						<Selectors
@@ -496,7 +527,11 @@ function MainContainer() {
 						mt={3}
 						mb={3}
 					>
-						<Grid xs={6}>
+						<Grid
+							xs={6}
+							ref={summaryRef}
+							id={summaryRefId}
+						>
 							<SummaryChart
 								dataSummary={dataSummary}
 								year={year}
@@ -514,7 +549,11 @@ function MainContainer() {
 								borderRight: "none",
 							}}
 						/>
-						<Grid xs={6}>
+						<Grid
+							xs={6}
+							ref={pictogramRef}
+							id={pictogramRefId}
+						>
 							<Box
 								display={"flex"}
 								alignItems={"center"}
@@ -552,15 +591,20 @@ function MainContainer() {
 						mb={3}
 					>
 						<Grid xs={6}>
-							<TypeAndSectorChart<ByTypeObj>
-								data={dataBeneficiaryTypes}
-								list={apiData.lists}
-								title="People targeted and reached by type"
-								chartType="beneficiaryTypes"
-								clickedDownload={clickedDownload}
-								setClickedDownload={setClickedDownload}
-								dataDownload={byBeneficiaryTypeDataDownload}
-							/>
+							<Box
+								ref={beneficiaryTypesRef}
+								id={beneficiaryTypesRefId}
+							>
+								<TypeAndSectorChart<ByTypeObj>
+									data={dataBeneficiaryTypes}
+									list={apiData.lists}
+									title="People targeted and reached by type"
+									chartType="beneficiaryTypes"
+									clickedDownload={clickedDownload}
+									setClickedDownload={setClickedDownload}
+									dataDownload={byBeneficiaryTypeDataDownload}
+								/>
+							</Box>
 						</Grid>
 						<Divider
 							orientation="vertical"
@@ -570,7 +614,11 @@ function MainContainer() {
 								borderRight: "none",
 							}}
 						/>
-						<Grid xs={6}>
+						<Grid
+							xs={6}
+							ref={sectorsRef}
+							id={sectorsRefId}
+						>
 							<Box
 								display={"flex"}
 								alignItems={"center"}
@@ -613,6 +661,8 @@ function MainContainer() {
 						direction={"column"}
 						spacing={2}
 						xs={12}
+						ref={mapRef}
+						id={mapRefId}
 					>
 						<Map
 							data={dataMap}

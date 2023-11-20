@@ -637,3 +637,23 @@ type arcObject = {
 	startAngle: number;
 	endAngle: number;
 };
+
+type ScrollSpyProps = {
+	inViewSummary: boolean;
+	inViewPictogram: boolean;
+	inViewBeneficiaryTypes: boolean;
+	inViewSectors: boolean;
+	inViewMap: boolean;
+	summaryRef: string;
+	pictogramRef: string;
+	beneficiaryTypesRef: string;
+	sectorsRef: string;
+	mapRef: string;
+};
+
+type TabProps = {
+	label: string;
+	inView: boolean;
+	reference: string;
+	handleOnClick: (reference: string) => void;
+};
