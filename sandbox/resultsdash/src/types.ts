@@ -656,4 +656,5 @@ type TabProps = {
 	inView: boolean;
 	reference: string;
 	handleOnClick: (reference: string) => void;
+	Icon: React.ElementType;
 };
