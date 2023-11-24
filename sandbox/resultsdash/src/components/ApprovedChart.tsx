@@ -42,9 +42,15 @@ function ApprovedChart({
 	}
 
 	const donutData: DonutData = [
-		{ type: "selected", value: ~~allocatedSelected },
-		{ type: "allocated", value: ~~allocatedTotal - ~~allocatedSelected },
-		{ type: "underImplementation", value: ~~total - ~~allocatedTotal },
+		{ type: "selected", value: Math.floor(allocatedSelected) },
+		{
+			type: "allocated",
+			value: Math.floor(allocatedTotal) - Math.floor(allocatedSelected),
+		},
+		{
+			type: "underImplementation",
+			value: Math.floor(total) - Math.floor(allocatedTotal),
+		},
 	];
 
 	const svgContainer = useRef(null);
@@ -107,12 +113,15 @@ function ApprovedChart({
 				/>
 				<BulletPoint
 					color={colorScale("allocated")}
-					value={~~allocatedTotal - ~~allocatedSelected}
+					value={
+						Math.floor(allocatedTotal) -
+						Math.floor(allocatedSelected)
+					}
 					text="Reports approved in other years"
 				/>
 				<BulletPoint
 					color={colorScale("underImplementation")}
-					value={~~total - ~~allocatedTotal}
+					value={Math.floor(total) - Math.floor(allocatedTotal)}
 					text={"Under Implementation"}
 				/>
 			</Box>
