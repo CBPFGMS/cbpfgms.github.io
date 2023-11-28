@@ -4,6 +4,7 @@ import { transition } from "d3-transition";
 import { interpolateRgb } from "d3-interpolate";
 import colors from "../utils/colors";
 import { format } from "d3-format";
+import { CreateMapParams, MapData } from "../types";
 
 function createMap({
 	data,

@@ -1,4 +1,5 @@
 import { sum } from "d3-array";
+import { ProcessDataMap, MapData } from "../types";
 
 const processDataMap: ProcessDataMap = ({
 	rawData,

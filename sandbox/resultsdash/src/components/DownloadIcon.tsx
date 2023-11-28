@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import FileDownloadDoneOutlinedIcon from "@mui/icons-material/FileDownloadDoneOutlined";
+import { DownloadIconProps } from "../types";
 
 function DownloadIcon({
 	handleDownloadClick,

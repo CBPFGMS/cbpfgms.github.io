@@ -3,6 +3,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Snack from "./Snack";
 import { useState } from "react";
+import { CheckboxProps } from "../types";
 
 function CheckboxLabel({
 	value,

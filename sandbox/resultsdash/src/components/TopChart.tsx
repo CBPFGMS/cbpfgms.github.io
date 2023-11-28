@@ -13,6 +13,7 @@ import colors from "../utils/colors";
 import MiniChart from "../assets/MiniChart";
 import ApprovedChart from "./ApprovedChart";
 import Collapse from "@mui/material/Collapse";
+import { ChartValue, TopChartProps } from "../types";
 
 const height = 190;
 

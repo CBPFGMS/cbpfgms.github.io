@@ -4,6 +4,7 @@ import Divider from "@mui/material/Divider";
 import NumberAnimator from "./NumberAnimator";
 import { format } from "d3-format";
 import colors from "../utils/colors";
+import { SummaryRowProps } from "../types";
 
 function SummaryRow({
 	year,

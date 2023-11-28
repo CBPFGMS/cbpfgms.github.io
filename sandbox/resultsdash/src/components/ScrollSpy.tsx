@@ -6,6 +6,7 @@ import ListIcon from "@mui/icons-material/List";
 import Pictogram from "../assets/Pictogram";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PaidIcon from "@mui/icons-material/Paid";
+import { ScrollSpyProps, TabProps } from "../types";
 
 function ScroolSpy({
 	inViewSummary,

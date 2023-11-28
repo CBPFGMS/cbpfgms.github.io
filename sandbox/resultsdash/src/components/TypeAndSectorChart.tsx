@@ -8,6 +8,12 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
+import {
+	TypesAndSectorChartProps,
+	BeneficiaryTypeData,
+	SectorsData,
+} from "../types";
+import { BySectorObj, ByTypeObj } from "../schemas";
 
 function TypeAndSectorChart<DownloadType>({
 	data,

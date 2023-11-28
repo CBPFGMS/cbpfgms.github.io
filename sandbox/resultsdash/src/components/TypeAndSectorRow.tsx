@@ -7,6 +7,7 @@ import { format } from "d3-format";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
+import { TypeAndSectorRowProps } from "../types";
 
 function TypeAndSectorRow({
 	list,

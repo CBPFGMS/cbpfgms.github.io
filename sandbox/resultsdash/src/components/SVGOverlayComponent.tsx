@@ -2,6 +2,7 @@ import { SVGOverlay, useMap } from "react-leaflet";
 import { useRef, useEffect } from "react";
 import createMap from "../charts/createmap";
 import { extent } from "d3-array";
+import { SVGOverlayComponentProps, MapData } from "../types";
 
 function SVGOverlayComponent({
 	data,

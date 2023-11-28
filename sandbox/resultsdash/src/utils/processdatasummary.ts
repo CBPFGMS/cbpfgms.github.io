@@ -1,3 +1,12 @@
+import {
+	ProcessDataSummary,
+	SummaryData,
+	ApprovedSummary,
+	AllocatedTotals,
+	PictogramData,
+	InSelectionObject,
+} from "../types";
+
 const processDataSummary: ProcessDataSummary = ({
 	rawData,
 	reportYear,

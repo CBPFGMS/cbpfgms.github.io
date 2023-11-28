@@ -1,3 +1,5 @@
+import { MakeListParams, List } from "../types";
+
 function makeLists({
 	fundsMaster,
 	locationMaster,

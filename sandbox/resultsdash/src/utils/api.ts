@@ -3,6 +3,7 @@ import fetchFile from "./fetchfile";
 import makeLists from "./makelists";
 import preProcessData from "./preprocessdata";
 import proccessApproved from "./processapproved.ts";
+import { RawData, List, InDataLists, ReceiveDataArgs } from "../types.ts";
 
 function useData() {
 	const bySectorUrl =
@@ -99,14 +100,17 @@ function useData() {
 				setInDataLists,
 			});
 
-			proccessApproved(approvedAllocations, listsObj);
+			const processedApprovedAllocations = proccessApproved(
+				approvedAllocations,
+				listsObj
+			);
 
 			setRawData({
 				bySector: bySectorYear,
 				byDisability: byDisabilityYear,
 				byLocation: byLocationYear,
 				byType: byTypeYear,
-				approved: approvedAllocations,
+				approved: processedApprovedAllocations,
 				allocatedTotals: allocatedTotals,
 			});
 			setLists(listsObj);

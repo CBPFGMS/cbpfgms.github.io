@@ -13,6 +13,7 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
+import { PictogramChartProps, PictogramTypes, PictogramData } from "../types";
 
 function PictogramChart({
 	dataPictogram,

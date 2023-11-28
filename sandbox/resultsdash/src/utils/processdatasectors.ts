@@ -1,3 +1,5 @@
+import { ProcessDataSectors, SectorsData } from "../types";
+
 const processDataSectors: ProcessDataSectors = ({
 	allocationSource,
 	allocationType,

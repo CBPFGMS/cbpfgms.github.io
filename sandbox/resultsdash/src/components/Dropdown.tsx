@@ -7,6 +7,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
+import { DropdownProps } from "../types";
 
 function Dropdown({
 	value,

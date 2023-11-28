@@ -8,6 +8,7 @@ import { format } from "d3-format";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
+import { PictogramRowProps } from "../types";
 
 function PictogramRow({
 	type,

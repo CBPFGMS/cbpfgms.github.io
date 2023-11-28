@@ -10,6 +10,7 @@ import DownloadIcon from "./DownloadIcon";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
 import SummaryRow from "./SummaryRow";
+import { SummaryChartProps } from "../types";
 
 function SummaryChart({
 	dataSummary,

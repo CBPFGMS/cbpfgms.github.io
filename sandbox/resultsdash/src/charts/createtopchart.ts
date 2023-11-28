@@ -8,6 +8,7 @@ import formatSIFloat from "../utils/formatsi";
 import reverseFormat from "../utils/reverseformat";
 import { interpolate } from "d3-interpolate";
 import colors from "../utils/colors";
+import { CreateTopChartParams, SummaryData } from "../types";
 
 function createTopChart({
 	height,

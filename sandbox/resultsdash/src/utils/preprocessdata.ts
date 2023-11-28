@@ -1,3 +1,20 @@
+import {
+	PreProcessDataParams,
+	PreProcessDataReturn,
+	BySectorYear,
+	ByDisabilityYear,
+	ByLocationYear,
+	ByTypeYear,
+	GenericYear,
+} from "../types.ts";
+import {
+	bySectorObjSchema,
+	byDisabilityObjSchema,
+	byLocationObjSchema,
+	byTypeObjSchema,
+} from "../schemas.ts";
+import warnInvalidSchema from "./warninvalid.ts";
+
 function preProcessData({
 	bySector,
 	byDisability,
@@ -19,42 +36,58 @@ function preProcessData({
 	const allocatedTotals: ByDisabilityYear = [];
 
 	byDisability.forEach(row => {
-		fundsSet.add(row.PooledFundId);
-		reportYearsSet.add(row.ReportApprovedDate.getFullYear());
-		allocationTypesSet.add(row.AllocationtypeId);
-		allocationSourcesSet.add(row.AllocationSourceId);
-		populateYear<typeof row>(
-			row,
-			byDisabilityYear,
-			row.ReportApprovedDate.getFullYear()
-		);
-		populateYear<typeof row>(row, allocatedTotals, row.AllocationYear);
+		if (byDisabilityObjSchema.safeParse(row).success) {
+			fundsSet.add(row.PooledFundId);
+			reportYearsSet.add(row.ReportApprovedDate.getFullYear());
+			allocationTypesSet.add(row.AllocationtypeId);
+			allocationSourcesSet.add(row.AllocationSourceId);
+			populateYear<typeof row>(
+				row,
+				byDisabilityYear,
+				row.ReportApprovedDate.getFullYear()
+			);
+			populateYear<typeof row>(row, allocatedTotals, row.AllocationYear);
+		} else {
+			warnInvalidSchema("ByGender_Disability", row);
+		}
 	});
 
 	bySector.forEach(row => {
-		sectorsSet.add(row.ClusterId);
-		populateYear<typeof row>(
-			row,
-			bySectorYear,
-			row.ReportApprovedDate.getFullYear()
-		);
+		if (bySectorObjSchema.safeParse(row).success) {
+			sectorsSet.add(row.ClusterId);
+			populateYear<typeof row>(
+				row,
+				bySectorYear,
+				row.ReportApprovedDate.getFullYear()
+			);
+		} else {
+			warnInvalidSchema("BySector", row);
+		}
 	});
 
 	byLocation.forEach(row => {
-		populateYear<typeof row>(
-			row,
-			byLocationYear,
-			row.ApprovedDate.getFullYear()
-		);
+		if (byLocationObjSchema.safeParse(row).success) {
+			populateYear<typeof row>(
+				row,
+				byLocationYear,
+				row.ApprovedDate.getFullYear()
+			);
+		} else {
+			warnInvalidSchema("ByLocation", row);
+		}
 	});
 
 	byType.forEach(row => {
-		beneficiaryTypesSet.add(row.BeneficiaryTypeId);
-		populateYear<typeof row>(
-			row,
-			byTypeYear,
-			row.ReportApprovedDate.getFullYear()
-		);
+		if (byTypeObjSchema.safeParse(row).success) {
+			beneficiaryTypesSet.add(row.BeneficiaryTypeId);
+			populateYear<typeof row>(
+				row,
+				byTypeYear,
+				row.ReportApprovedDate.getFullYear()
+			);
+		} else {
+			warnInvalidSchema("ByType", row);
+		}
 	});
 
 	setInDataLists({

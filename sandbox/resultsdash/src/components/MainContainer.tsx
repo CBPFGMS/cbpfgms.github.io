@@ -25,6 +25,12 @@ import { Tooltip } from "react-tooltip";
 import InfoIcon from "@mui/icons-material/Info";
 import describeYears from "../utils/describeyears";
 import ScrollSpy from "./ScrollSpy";
+import {
+	DownloadStates,
+	DataContextType,
+	FilterDownloadArray,
+} from "../types.ts";
+import { BySectorObj, ByDisabilityObj, ByTypeObj } from "../schemas";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -37,7 +43,7 @@ const downloadStates: DownloadStates = {
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer() {
-	const apiData = useContext(DataContext) as DataContext;
+	const apiData = useContext(DataContext) as DataContextType;
 	const rawData = apiData.rawData;
 
 	const lastYear = [...apiData.inDataLists.reportYears].sort(

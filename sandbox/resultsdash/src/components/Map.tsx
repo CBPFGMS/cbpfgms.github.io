@@ -12,6 +12,7 @@ import SVGOverlayComponent from "./SVGOverlayComponent";
 import createSizeLegend from "../charts/createsizelegend";
 import createColorLegend from "../charts/createcolorlegend";
 import downloadData from "../utils/downloaddata";
+import { MapProps } from "../types";
 
 function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	const maxZoomValue = 12;

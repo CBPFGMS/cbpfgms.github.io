@@ -1,5 +1,6 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 import pathAttributes from "./pathAttributes";
+import { PictogramTypesWithTotal } from "../types";
 
 function Pictogram({
 	svgProps,

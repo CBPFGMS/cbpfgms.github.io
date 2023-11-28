@@ -3,6 +3,7 @@ import { interpolateRgb } from "d3-interpolate";
 import colors from "../utils/colors";
 import { scalePoint } from "d3-scale";
 import { range } from "d3-array";
+import { CreateColorLegendParams } from "../types";
 
 function createColorLegend({
 	svgRef,

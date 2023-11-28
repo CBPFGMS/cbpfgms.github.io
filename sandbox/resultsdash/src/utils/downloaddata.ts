@@ -1,4 +1,5 @@
 import { csvFormat } from "d3-dsv";
+import { DownloadData } from "../types";
 
 const downloadData: DownloadData = (data, fileName) => {
 	const csv = csvFormat<(typeof data)[number]>(data);

@@ -8,6 +8,13 @@ import createDonut from "../charts/createdonut";
 import describeYears from "../utils/describeyears";
 import { scaleOrdinal } from "d3-scale";
 import colors from "../utils/colors";
+import {
+	ApprovedChartProps,
+	ApprovedSummary,
+	SummaryData,
+	DonutData,
+	DonutTypes,
+} from "../types";
 
 const donutBoxSize = 134;
 

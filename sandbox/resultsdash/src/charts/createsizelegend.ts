@@ -1,6 +1,7 @@
 import { select } from "d3-selection";
 import { scalePoint, scaleSqrt } from "d3-scale";
 import formatSIFloat from "../utils/formatsi";
+import { CreateSizeLegendParams } from "../types";
 
 function createSizeLegend({
 	svgRef,

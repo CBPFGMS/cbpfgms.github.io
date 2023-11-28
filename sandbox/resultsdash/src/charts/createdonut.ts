@@ -4,8 +4,9 @@ import { range, sum } from "d3-array";
 import { transition } from "d3-transition";
 import { format } from "d3-format";
 import { interpolate, interpolateObject } from "d3-interpolate";
+import { CreateDonutParams, DonutDatum, ArcObject } from "../types";
 
-const localVariable = local<arcObject>();
+const localVariable = local<ArcObject>();
 
 function createDonut({
 	size,

@@ -2,7 +2,7 @@
 
 type Beneficiaries = number | null;
 
-type ReceiveDataArgs = [
+export type ReceiveDataArgs = [
 	BySectorObj[],
 	ByDisabilityObj[],
 	ByLocationObj[],
@@ -17,102 +17,15 @@ type ReceiveDataArgs = [
 	ApprovedAllocationsObj[]
 ];
 
-type ApprovedAllocationsObj = {
-	AllocationYear: number;
-	ApprovedBudget: number;
-	ApprovedReserveBudget: number;
-	ApprovedReserveBudgetPercentage: number;
-	ApprovedStandardBudget: number;
-	ApprovedStandardBudgetPercentage: number;
-	FundingType: number;
-	OrganizationType: string;
-	PipelineBudget: number;
-	PipelineReserveBudget: number;
-	PipelineReserveBudgetPercentage: number;
-	PipelineStandardBudget: number;
-	PipelineStandardBudgetPercentage: number;
-	PooledFundName: string;
-	PooledFundId?: number;
-};
+import { ApprovedAllocationsObj } from "./schemas";
 
-type BySectorObj = {
-	PooledFundId: number;
-	AllocationYear: number;
-	ReportApprovedDate: Date;
-	AllocationtypeId: number;
-	AllocationSourceId: number;
-	ClusterId: number;
-	ClusterBudget: number;
-	TargetedMen: Beneficiaries;
-	TargetedWomen: Beneficiaries;
-	TargetedBoys: Beneficiaries;
-	TargetedGirls: Beneficiaries;
-	ReachedMen: Beneficiaries;
-	ReachedWomen: Beneficiaries;
-	ReachedBoys: Beneficiaries;
-	ReachedGirls: Beneficiaries;
-};
+import { BySectorObj } from "./schemas";
 
-type ByDisabilityObj = {
-	PooledFundId: number;
-	AllocationYear: number;
-	ReportApprovedDate: Date;
-	AllocationtypeId: number;
-	AllocationSourceId: number;
-	NumbofProjects: number;
-	TotalNumbPartners: number;
-	Budget: number;
-	TargetedMen: Beneficiaries;
-	TargetedWomen: Beneficiaries;
-	TargetedBoys: Beneficiaries;
-	TargetedGirls: Beneficiaries;
-	ReachedMen: Beneficiaries;
-	ReachedWomen: Beneficiaries;
-	ReachedBoys: Beneficiaries;
-	ReachedGirls: Beneficiaries;
-	DisabledMen: Beneficiaries;
-	DisabledWomen: Beneficiaries;
-	DisabledBoys: Beneficiaries;
-	DisabledGirls: Beneficiaries;
-	ReachedDisabledMen: Beneficiaries;
-	ReachedDisabledWomen: Beneficiaries;
-	ReachedDisabledBoys: Beneficiaries;
-	ReachedDisabledGirls: Beneficiaries;
-};
+import { ByDisabilityObj } from "./schemas";
 
-type ByLocationObj = {
-	PooledFundId: number;
-	AllocationYear: number;
-	ApprovedDate: Date;
-	LocationID: number;
-	AllocationtypeId: number;
-	AllocationSourceId: number;
-	TargetMen: Beneficiaries;
-	TargetWomen: Beneficiaries;
-	TargetBoys: Beneficiaries;
-	TargetGirls: Beneficiaries;
-	ReachedMen: Beneficiaries;
-	ReachedWomen: Beneficiaries;
-	ReachedBoys: Beneficiaries;
-	ReachedGirls: Beneficiaries;
-};
+import { ByLocationObj } from "./schemas";
 
-type ByTypeObj = {
-	PooledFundId: number;
-	AllocationYear: number;
-	ReportApprovedDate: Date;
-	BeneficiaryTypeId: number;
-	AllocationtypeId: number;
-	AllocationSourceId: number;
-	TargetMen: Beneficiaries;
-	TargetWomen: Beneficiaries;
-	TargetBoys: Beneficiaries;
-	TargetGirls: Beneficiaries;
-	ReachedMen: Beneficiaries;
-	ReachedWomen: Beneficiaries;
-	ReachedBoys: Beneficiaries;
-	ReachedGirls: Beneficiaries;
-};
+import { ByTypeObj } from "./schemas";
 
 type LocationMasterObj = {
 	LocationID: number;
@@ -166,11 +79,11 @@ type SectorsMasterObj = {
 	ClustCode: string;
 };
 
-type ListObj = {
+export type ListObj = {
 	[key: number]: string;
 };
 
-type ReversedNames = {
+export type ReversedNames = {
 	[key: string]: number;
 };
 
@@ -181,7 +94,7 @@ type LocationObj = {
 	};
 };
 
-type List = {
+export type List = {
 	fundNames: ListObj;
 	fundAbbreviatedNames: ListObj;
 	fundIsoCodes: ListObj;
@@ -193,7 +106,7 @@ type List = {
 	sectors: ListObj;
 };
 
-type RawData = {
+export type RawData = {
 	bySector: BySectorYear;
 	byDisability: ByDisabilityYear;
 	byLocation: ByLocationYear;
@@ -202,7 +115,7 @@ type RawData = {
 	allocatedTotals: ByDisabilityYear;
 };
 
-type MakeListParams = {
+export type MakeListParams = {
 	fundsMaster: FundsMasterObj[];
 	locationMaster: LocationMasterObj[];
 	beneficiariesMaster: BeneficiariesMasterObj[];
@@ -212,7 +125,7 @@ type MakeListParams = {
 	sectorsMaster: SectorsMasterObj[];
 };
 
-type InDataLists = {
+export type InDataLists = {
 	reportYears: Set<number>;
 	sectors: Set<number>;
 	allocationTypes: Set<number>;
@@ -221,26 +134,26 @@ type InDataLists = {
 	funds: Set<number>;
 };
 
-type GenericYear<TObj> = {
+export type GenericYear<TObj> = {
 	year: number;
 	values: TObj[];
 }[];
 
-type BySectorYear = GenericYear<BySectorObj>;
+export type BySectorYear = GenericYear<BySectorObj>;
 
-type ByDisabilityYear = GenericYear<ByDisabilityObj>;
+export type ByDisabilityYear = GenericYear<ByDisabilityObj>;
 
-type ByLocationYear = GenericYear<ByLocationObj>;
+export type ByLocationYear = GenericYear<ByLocationObj>;
 
-type ByTypeYear = GenericYear<ByTypeObj>;
+export type ByTypeYear = GenericYear<ByTypeObj>;
 
-type ApprovedSummary = {
+export type ApprovedSummary = {
 	year: number;
 	approved: number;
 	underApproval: number;
 };
 
-type PreProcessDataParams = {
+export type PreProcessDataParams = {
 	bySector: BySectorObj[];
 	byDisability: ByDisabilityObj[];
 	byLocation: ByLocationObj[];
@@ -248,11 +161,11 @@ type PreProcessDataParams = {
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
 };
 
-type AllocatedTotals = {
+export type AllocatedTotals = {
 	[key: string]: number;
 };
 
-type PreProcessDataReturn = {
+export type PreProcessDataReturn = {
 	bySectorYear: BySectorYear;
 	byDisabilityYear: ByDisabilityYear;
 	byLocationYear: ByLocationYear;
@@ -260,35 +173,20 @@ type PreProcessDataReturn = {
 	allocatedTotals: ByDisabilityYear;
 };
 
-type DataContext = {
+export type DataContextType = {
 	rawData: RawData;
 	lists: List;
 	inDataLists: InDataLists;
 };
 
-type SelectionContext = {
-	reportYear: number[];
-	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
-	year: number[] | null;
-	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
-	fund: number[];
-	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationSource: number[];
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	beneficiaryType: number[];
-	setBeneficiaryType: React.Dispatch<React.SetStateAction<number[]>>;
-};
-
-type YearSelectorProps = {
+export type YearSelectorProps = {
 	reportYear: number[];
 	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
 	reportYears: Set<number>;
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };
 
-type SummaryChartProps = {
+export type SummaryChartProps = {
 	dataSummary: SummaryData[];
 	year: number[] | null;
 	clickedDownload: DownloadStates;
@@ -297,7 +195,7 @@ type SummaryChartProps = {
 	fundsList: ListObj;
 };
 
-type SelectorsProps = {
+export type SelectorsProps = {
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationType: number[];
@@ -307,7 +205,7 @@ type SelectorsProps = {
 	inSelectionData: InSelectionObject;
 };
 
-type AccordionComponentProps = {
+export type AccordionComponentProps = {
 	type: string;
 	filterType: string;
 	dataProperty: DataProperties;
@@ -320,7 +218,7 @@ type AccordionComponentProps = {
 	inSelectionData: InSelectionObject;
 };
 
-type DropdownProps = {
+export type DropdownProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	names: number[];
@@ -331,7 +229,7 @@ type DropdownProps = {
 	fromQuickSelectors: boolean;
 };
 
-type SearchProps = {
+export type SearchProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	names: number[];
@@ -340,7 +238,7 @@ type SearchProps = {
 	dataProperty: DataProperties;
 };
 
-type CheckboxProps = {
+export type CheckboxProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	names: number[];
@@ -349,18 +247,18 @@ type CheckboxProps = {
 	dataProperty: DataProperties;
 };
 
-type SummaryData = {
+export type SummaryData = {
 	year: number;
 	allocations: number;
 	projects: number;
 	partners: number;
 };
 
-type SummaryRowProps = SummaryData & {
+export type SummaryRowProps = SummaryData & {
 	last: boolean;
 };
 
-type ProcessDataSummary = ({
+export type ProcessDataSummary = ({
 	rawData,
 	reportYear,
 	fund,
@@ -382,7 +280,7 @@ type ProcessDataSummary = ({
 	allocatedTotals: AllocatedTotals;
 };
 
-type ProcessDataBeneficiaryType = ({
+export type ProcessDataBeneficiaryType = ({
 	rawData,
 	reportYear,
 	fund,
@@ -398,13 +296,13 @@ type ProcessDataBeneficiaryType = ({
 	year: number[] | null;
 }) => BeneficiaryTypeData[];
 
-type BeneficiaryTypeData = {
+export type BeneficiaryTypeData = {
 	beneficiaryType: number;
 	targeted: number;
 	reached: number;
 };
 
-type ProcessDataSectors = ({
+export type ProcessDataSectors = ({
 	rawData,
 	reportYear,
 	fund,
@@ -420,13 +318,13 @@ type ProcessDataSectors = ({
 	year: number[] | null;
 }) => SectorsData[];
 
-type SectorsData = {
+export type SectorsData = {
 	sector: number;
 	targeted: number;
 	reached: number;
 };
 
-type ProcessDataMap = ({
+export type ProcessDataMap = ({
 	rawData,
 	reportYear,
 	fund,
@@ -444,14 +342,14 @@ type ProcessDataMap = ({
 	locationsList: LocationObj;
 }) => MapData[];
 
-type MapData = {
+export type MapData = {
 	locationId: number;
 	locationName: string;
 	coordinates: number[];
 	beneficiaries: PictogramData;
 };
 
-type InSelectionObject = {
+export type InSelectionObject = {
 	funds: Set<number>;
 	allocationSources: Set<number>;
 	allocationTypes: Set<number>;
@@ -459,7 +357,7 @@ type InSelectionObject = {
 
 type DataProperties = keyof InSelectionObject;
 
-type TopChartProps = {
+export type TopChartProps = {
 	year: number[] | null;
 	dataSummary: SummaryData[];
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
@@ -468,9 +366,9 @@ type TopChartProps = {
 	allocatedTotals: AllocatedTotals;
 };
 
-type ChartValue = "allocations" | "projects" | "partners";
+export type ChartValue = "allocations" | "projects" | "partners";
 
-type CreateTopChartParams = {
+export type CreateTopChartParams = {
 	height: number;
 	dataSummary: SummaryData[];
 	chartValue: ChartValue;
@@ -479,7 +377,7 @@ type CreateTopChartParams = {
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
 };
 
-type CreateDonutParams = {
+export type CreateDonutParams = {
 	size: number;
 	svgContainer: React.RefObject<SVGSVGElement>;
 	donutData: DonutData;
@@ -487,7 +385,7 @@ type CreateDonutParams = {
 	reportYear: number[];
 };
 
-type PictogramData = {
+export type PictogramData = {
 	targetedMen: number;
 	targetedWomen: number;
 	targetedBoys: number;
@@ -498,7 +396,7 @@ type PictogramData = {
 	reachedGirls: number;
 };
 
-type PictogramChartProps = {
+export type PictogramChartProps = {
 	dataPictogram: PictogramData;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
@@ -506,18 +404,18 @@ type PictogramChartProps = {
 	fundsList: ListObj;
 };
 
-type PictogramTypes = "girls" | "boys" | "women" | "men";
+export type PictogramTypes = "girls" | "boys" | "women" | "men";
 
-type PictogramTypesWithTotal = PictogramTypes | "total";
+export type PictogramTypesWithTotal = PictogramTypes | "total";
 
-type DownloadIconProps = {
+export type DownloadIconProps = {
 	handleDownloadClick: () => void;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	type: Charts;
 };
 
-type DownloadStates = {
+export type DownloadStates = {
 	summary: boolean;
 	pictogram: boolean;
 	beneficiaryTypes: boolean;
@@ -527,7 +425,7 @@ type DownloadStates = {
 
 type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors" | "map";
 
-type PictogramRowProps = {
+export type PictogramRowProps = {
 	type: PictogramTypes;
 	targeted: number;
 	reached: number;
@@ -535,7 +433,7 @@ type PictogramRowProps = {
 	maxValue: number;
 };
 
-type TypesAndSectorChartProps<DownloadType> = {
+export type TypesAndSectorChartProps<DownloadType> = {
 	data: BeneficiaryTypeData[] | SectorsData[];
 	list: List;
 	clickedDownload: DownloadStates;
@@ -545,9 +443,9 @@ type TypesAndSectorChartProps<DownloadType> = {
 	dataDownload: DownloadType[];
 };
 
-type DownloadType = ByTypeObj | BySectorObj;
+export type DownloadType = ByTypeObj | BySectorObj;
 
-type TypeAndSectorRowProps = {
+export type TypeAndSectorRowProps = {
 	type: number;
 	targeted: number;
 	reached: number;
@@ -555,21 +453,24 @@ type TypeAndSectorRowProps = {
 	maxValue: number;
 };
 
-type DownloadData = <T extends object>(data: T[], fileName: string) => void;
+export type DownloadData = <T extends object>(
+	data: T[],
+	fileName: string
+) => void;
 
-type SnackProps = {
+export type SnackProps = {
 	openSnack: boolean;
 	setOpenSnack: React.Dispatch<React.SetStateAction<boolean>>;
 	message: string;
 };
 
-type MapProps = {
+export type MapProps = {
 	data: MapData[];
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-type CreateMapParams = {
+export type CreateMapParams = {
 	data: MapData[];
 	svgGroupRef: React.RefObject<SVGGElement>;
 	maxCircleRadius: number;
@@ -577,7 +478,7 @@ type CreateMapParams = {
 	minCircleRadius: number;
 };
 
-type SVGOverlayComponentProps = {
+export type SVGOverlayComponentProps = {
 	data: MapData[];
 	maxZoomValue: number;
 	maxValue: number;
@@ -585,7 +486,7 @@ type SVGOverlayComponentProps = {
 	minCircleRadius: number;
 };
 
-type CreateSizeLegendParams = {
+export type CreateSizeLegendParams = {
 	svgRef: SVGSVGElement;
 	maxValue: number;
 	minValue: number;
@@ -595,7 +496,7 @@ type CreateSizeLegendParams = {
 	minCircleRadius: number;
 };
 
-type CreateColorLegendParams = {
+export type CreateColorLegendParams = {
 	svgRef: SVGSVGElement;
 	legendSvgWidth: number;
 	legendSvgHeight: number;
@@ -603,7 +504,7 @@ type CreateColorLegendParams = {
 
 type TFilterObj = BySectorObj | ByDisabilityObj | ByTypeObj;
 
-type FilterDownloadArray = <TFObj extends TFilterObj>(
+export type FilterDownloadArray = <TFObj extends TFilterObj>(
 	arr: GenericYear<TFObj>,
 	reportYear: number[],
 	fund: number[],
@@ -611,7 +512,7 @@ type FilterDownloadArray = <TFObj extends TFilterObj>(
 	allocationType: number[]
 ) => TFObj[];
 
-type ApprovedChartProps = {
+export type ApprovedChartProps = {
 	approvedData: ApprovedSummary[];
 	year: number[];
 	dataSummary: SummaryData[];
@@ -619,26 +520,21 @@ type ApprovedChartProps = {
 	allocatedTotals: AllocatedTotals;
 };
 
-type ApprovedAndUnder = {
-	approved: number;
-	underApproval: number;
-};
-
-type DonutDatum = {
+export type DonutDatum = {
 	type: DonutTypes;
 	value: number;
 };
 
-type DonutData = DonutDatum[];
+export type DonutData = DonutDatum[];
 
-type DonutTypes = "selected" | "allocated" | "underImplementation";
+export type DonutTypes = "selected" | "allocated" | "underImplementation";
 
-type arcObject = {
+export type ArcObject = {
 	startAngle: number;
 	endAngle: number;
 };
 
-type ScrollSpyProps = {
+export type ScrollSpyProps = {
 	inViewSummary: boolean;
 	inViewPictogram: boolean;
 	inViewBeneficiaryTypes: boolean;
@@ -651,7 +547,7 @@ type ScrollSpyProps = {
 	mapRef: string;
 };
 
-type TabProps = {
+export type TabProps = {
 	label: string;
 	inView: boolean;
 	reference: string;

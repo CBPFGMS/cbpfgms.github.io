@@ -1,3 +1,5 @@
+import { ProcessDataBeneficiaryType, BeneficiaryTypeData } from "../types";
+
 const processDataBeneficiaryType: ProcessDataBeneficiaryType = ({
 	allocationSource,
 	allocationType,

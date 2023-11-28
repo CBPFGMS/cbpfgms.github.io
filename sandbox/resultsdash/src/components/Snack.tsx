@@ -1,5 +1,6 @@
 import Snackbar from "@mui/material/Snackbar";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
+import { SnackProps } from "../types";
 
 function Snack({ openSnack, setOpenSnack, message }: SnackProps) {
 	return (

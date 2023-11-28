@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Unstable_Grid2";
+import { SelectorsProps } from "../types";
 
 function Selectors({
 	fund,
@@ -9,7 +10,7 @@ function Selectors({
 	setAllocationSource,
 	allocationType,
 	setAllocationType,
-	inSelectionData
+	inSelectionData,
 }: SelectorsProps) {
 	const [expanded, setExpanded] = useState<string | false>(false);
 

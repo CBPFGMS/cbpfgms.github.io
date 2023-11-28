@@ -10,6 +10,13 @@ import CheckboxLabel from "./Checkbox";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Search from "./Search";
+import {
+	AccordionComponentProps,
+	DataContextType,
+	InDataLists,
+	List,
+	ListObj,
+} from "../types";
 
 function AccordionComponent({
 	type,
@@ -24,7 +31,7 @@ function AccordionComponent({
 	const [boxHeight, setBoxHeight] = useState<number>(0);
 	const accordionRef = useRef<HTMLDivElement>(null);
 
-	const apiData = useContext(DataContext) as DataContext;
+	const apiData = useContext(DataContext) as DataContextType;
 	const lists = apiData.lists;
 	const dataArray = [
 		...apiData.inDataLists[dataProperty as keyof InDataLists],

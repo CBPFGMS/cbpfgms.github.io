@@ -2,6 +2,7 @@ import { useContext } from "react";
 import Box from "@mui/material/Box";
 import Dropdown from "./Dropdown";
 import DataContext from "../context/DataContext";
+import { SelectorsProps, DataContextType, ListObj } from "../types";
 
 function QuickSelectors({
 	allocationSource,
@@ -12,7 +13,7 @@ function QuickSelectors({
 	setAllocationType,
 	setFund,
 }: SelectorsProps) {
-	const apiData = useContext(DataContext) as DataContext;
+	const apiData = useContext(DataContext) as DataContextType;
 	const lists = apiData.lists;
 
 	const dataArrayFunds = [...apiData.inDataLists.funds];
