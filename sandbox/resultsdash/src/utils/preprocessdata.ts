@@ -5,6 +5,7 @@ import {
 	ByDisabilityYear,
 	ByLocationYear,
 	ByTypeYear,
+	ByOrganizationYear,
 	GenericYear,
 } from "../types.ts";
 import {
@@ -12,6 +13,7 @@ import {
 	byDisabilityObjSchema,
 	byLocationObjSchema,
 	byTypeObjSchema,
+	byOrganizationObjSchema,
 } from "../schemas.ts";
 import warnInvalidSchema from "./warninvalid.ts";
 
@@ -20,6 +22,7 @@ function preProcessData({
 	byDisability,
 	byLocation,
 	byType,
+	byOrganization,
 	setInDataLists,
 }: PreProcessDataParams): PreProcessDataReturn {
 	const reportYearsSet = new Set<number>();
@@ -28,15 +31,18 @@ function preProcessData({
 	const allocationSourcesSet = new Set<number>();
 	const beneficiaryTypesSet = new Set<number>();
 	const fundsSet = new Set<number>();
+	const organizationTypesSet = new Set<number>();
 
 	const bySectorYear: BySectorYear = [];
 	const byDisabilityYear: ByDisabilityYear = [];
 	const byLocationYear: ByLocationYear = [];
 	const byTypeYear: ByTypeYear = [];
+	const byOrganizationYear: ByOrganizationYear = [];
 	const allocatedTotals: ByDisabilityYear = [];
 
 	byDisability.forEach(row => {
-		if (byDisabilityObjSchema.safeParse(row).success) {
+		const parsedRow = byDisabilityObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			fundsSet.add(row.PooledFundId);
 			reportYearsSet.add(row.ReportApprovedDate.getFullYear());
 			allocationTypesSet.add(row.AllocationtypeId);
@@ -48,7 +54,7 @@ function preProcessData({
 			);
 			populateYear<typeof row>(row, allocatedTotals, row.AllocationYear);
 		} else {
-			warnInvalidSchema("ByGender_Disability", row);
+			warnInvalidSchema("ByGender_Disability", row, JSON.stringify(parsedRow.error));
 		}
 	});
 
@@ -90,6 +96,19 @@ function preProcessData({
 		}
 	});
 
+	byOrganization.forEach(row => {
+		if (byOrganizationObjSchema.safeParse(row).success) {
+			organizationTypesSet.add(row.OrganizationType);
+			populateYear<typeof row>(
+				row,
+				byOrganizationYear,
+				row.ReportApprovedDate.getFullYear()
+			);
+		} else {
+			warnInvalidSchema("ByOrganization", row);
+		}
+	});
+
 	setInDataLists({
 		reportYears: reportYearsSet,
 		sectors: sectorsSet,
@@ -97,18 +116,21 @@ function preProcessData({
 		allocationSources: allocationSourcesSet,
 		beneficiaryTypes: beneficiaryTypesSet,
 		funds: fundsSet,
+		organizationTypes: organizationTypesSet,
 	});
 
 	bySectorYear.sort((a, b) => a.year - b.year);
 	byDisabilityYear.sort((a, b) => a.year - b.year);
 	byLocationYear.sort((a, b) => a.year - b.year);
 	byTypeYear.sort((a, b) => a.year - b.year);
+	byOrganizationYear.sort((a, b) => a.year - b.year);
 
 	return {
 		bySectorYear,
 		byDisabilityYear,
 		byLocationYear,
 		byTypeYear,
+		byOrganizationYear,
 		allocatedTotals,
 	};
 }

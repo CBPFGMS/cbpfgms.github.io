@@ -99,6 +99,26 @@ export const byTypeObjSchema = z.object({
 	ReachedGirls: beneficiariesSchema,
 });
 
+export const byOrganizationObjSchema = z.object({
+	PooledFundId: z.number(),
+	AllocationYear: z.number(),
+	ReportApprovedDate: z.date(),
+	AllocationtypeId: z.number(),
+	AllocationSourceId: z.number(),
+	OrganizationType: z.number(),
+	NumbofProjects: z.number(),
+	TotalNumbPartners: z.number(),
+	Budget: z.number(),
+	TargetedMen: beneficiariesSchema,
+	TargetedWomen: beneficiariesSchema,
+	TargetedBoys: beneficiariesSchema,
+	TargetedGirls: beneficiariesSchema,
+	ReachedMen: beneficiariesSchema,
+	ReachedWomen: beneficiariesSchema,
+	ReachedBoys: beneficiariesSchema,
+	ReachedGirls: beneficiariesSchema,
+});
+
 export type ApprovedAllocationsObj = z.infer<
 	typeof ApprovedAllocationsObjSchema
 >;
@@ -110,3 +130,5 @@ export type ByDisabilityObj = z.infer<typeof byDisabilityObjSchema>;
 export type ByLocationObj = z.infer<typeof byLocationObjSchema>;
 
 export type ByTypeObj = z.infer<typeof byTypeObjSchema>;
+
+export type ByOrganizationObj = z.infer<typeof byOrganizationObjSchema>;

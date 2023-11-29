@@ -7,6 +7,7 @@ export type ReceiveDataArgs = [
 	ByDisabilityObj[],
 	ByLocationObj[],
 	ByTypeObj[],
+	ByOrganizationObj[],
 	LocationMasterObj[],
 	BeneficiariesMasterObj[],
 	AllocationTypeMasterObj[],
@@ -26,6 +27,8 @@ import { ByDisabilityObj } from "./schemas";
 import { ByLocationObj } from "./schemas";
 
 import { ByTypeObj } from "./schemas";
+
+import { ByOrganizationObj } from "./schemas";
 
 type LocationMasterObj = {
 	LocationID: number;
@@ -111,6 +114,7 @@ export type RawData = {
 	byDisability: ByDisabilityYear;
 	byLocation: ByLocationYear;
 	byType: ByTypeYear;
+	byOrganization: ByOrganizationYear;
 	approved: ApprovedAllocationsObj[];
 	allocatedTotals: ByDisabilityYear;
 };
@@ -132,6 +136,7 @@ export type InDataLists = {
 	allocationSources: Set<number>;
 	beneficiaryTypes: Set<number>;
 	funds: Set<number>;
+	organizationTypes: Set<number>;
 };
 
 export type GenericYear<TObj> = {
@@ -147,6 +152,8 @@ export type ByLocationYear = GenericYear<ByLocationObj>;
 
 export type ByTypeYear = GenericYear<ByTypeObj>;
 
+export type ByOrganizationYear = GenericYear<ByOrganizationObj>;
+
 export type ApprovedSummary = {
 	year: number;
 	approved: number;
@@ -158,6 +165,7 @@ export type PreProcessDataParams = {
 	byDisability: ByDisabilityObj[];
 	byLocation: ByLocationObj[];
 	byType: ByTypeObj[];
+	byOrganization: ByOrganizationObj[];
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
 };
 
@@ -170,6 +178,7 @@ export type PreProcessDataReturn = {
 	byDisabilityYear: ByDisabilityYear;
 	byLocationYear: ByLocationYear;
 	byTypeYear: ByTypeYear;
+	byOrganizationYear: ByOrganizationYear;
 	allocatedTotals: ByDisabilityYear;
 };
 

@@ -14,6 +14,8 @@ function useData() {
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByLocation.csv",
 		byTypeUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByType.csv",
+		byOrganizationUrl =
+			"https://cbpfgms.github.io/pfbi-data/cbpf/results/ByOrganization.csv",
 		locationMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/locationMst.csv",
 		beneficiariesMasterUrl =
@@ -43,6 +45,7 @@ function useData() {
 			fetchFile("byDisability", byDisabilityUrl, "csv"),
 			fetchFile("byLocation", byLocationUrl, "csv"),
 			fetchFile("byType", byTypeUrl, "csv"),
+			fetchFile("byOrganization", byOrganizationUrl, "csv"),
 			fetchFile("locationMaster", locationMasterUrl, "csv"),
 			fetchFile("beneficiariesMaster", beneficiariesMasterUrl, "csv"),
 			fetchFile("allocationTypeMaster", allocationTypeMasterUrl, "csv"),
@@ -67,6 +70,7 @@ function useData() {
 			byDisability,
 			byLocation,
 			byType,
+			byOrganization,
 			locationMaster,
 			beneficiariesMaster,
 			allocationTypeMaster,
@@ -91,12 +95,14 @@ function useData() {
 				byDisabilityYear,
 				byLocationYear,
 				byTypeYear,
+				byOrganizationYear,
 				allocatedTotals,
 			} = preProcessData({
 				bySector,
 				byDisability,
 				byLocation,
 				byType,
+				byOrganization,
 				setInDataLists,
 			});
 
@@ -110,6 +116,7 @@ function useData() {
 				byDisability: byDisabilityYear,
 				byLocation: byLocationYear,
 				byType: byTypeYear,
+				byOrganization: byOrganizationYear,
 				approved: processedApprovedAllocations,
 				allocatedTotals: allocatedTotals,
 			});
