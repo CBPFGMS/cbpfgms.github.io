@@ -12,11 +12,13 @@ function ScroolSpy({
 	inViewSummary,
 	inViewPictogram,
 	inViewBeneficiaryTypes,
+	inViewOrganizationTypes,
 	inViewSectors,
 	inViewMap,
 	summaryRef,
 	pictogramRef,
 	beneficiaryTypesRef,
+	organizationTypesRef,
 	sectorsRef,
 	mapRef,
 }: ScrollSpyProps) {
@@ -53,6 +55,13 @@ function ScroolSpy({
 				label="By Beneficiary Types"
 				inView={inViewBeneficiaryTypes}
 				reference={beneficiaryTypesRef}
+				handleOnClick={handleOnClick}
+				Icon={ListIcon}
+			/>
+			<Tab
+				label="By Organization"
+				inView={inViewOrganizationTypes}
+				reference={organizationTypesRef}
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
 			/>

@@ -54,12 +54,17 @@ function preProcessData({
 			);
 			populateYear<typeof row>(row, allocatedTotals, row.AllocationYear);
 		} else {
-			warnInvalidSchema("ByGender_Disability", row, JSON.stringify(parsedRow.error));
+			warnInvalidSchema(
+				"ByGender_Disability",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
 		}
 	});
 
 	bySector.forEach(row => {
-		if (bySectorObjSchema.safeParse(row).success) {
+		const parsedRow = bySectorObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			sectorsSet.add(row.ClusterId);
 			populateYear<typeof row>(
 				row,
@@ -67,24 +72,30 @@ function preProcessData({
 				row.ReportApprovedDate.getFullYear()
 			);
 		} else {
-			warnInvalidSchema("BySector", row);
+			warnInvalidSchema("BySector", row, JSON.stringify(parsedRow.error));
 		}
 	});
 
 	byLocation.forEach(row => {
-		if (byLocationObjSchema.safeParse(row).success) {
+		const parsedRow = byLocationObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			populateYear<typeof row>(
 				row,
 				byLocationYear,
 				row.ApprovedDate.getFullYear()
 			);
 		} else {
-			warnInvalidSchema("ByLocation", row);
+			warnInvalidSchema(
+				"ByLocation",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
 		}
 	});
 
 	byType.forEach(row => {
-		if (byTypeObjSchema.safeParse(row).success) {
+		const parsedRow = byTypeObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			beneficiaryTypesSet.add(row.BeneficiaryTypeId);
 			populateYear<typeof row>(
 				row,
@@ -92,12 +103,13 @@ function preProcessData({
 				row.ReportApprovedDate.getFullYear()
 			);
 		} else {
-			warnInvalidSchema("ByType", row);
+			warnInvalidSchema("ByType", row, JSON.stringify(parsedRow.error));
 		}
 	});
 
 	byOrganization.forEach(row => {
-		if (byOrganizationObjSchema.safeParse(row).success) {
+		const parsedRow = byOrganizationObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			organizationTypesSet.add(row.OrganizationType);
 			populateYear<typeof row>(
 				row,
@@ -105,7 +117,11 @@ function preProcessData({
 				row.ReportApprovedDate.getFullYear()
 			);
 		} else {
-			warnInvalidSchema("ByOrganization", row);
+			warnInvalidSchema(
+				"ByOrganization",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
 		}
 	});
 

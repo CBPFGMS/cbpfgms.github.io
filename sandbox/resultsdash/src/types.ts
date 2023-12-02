@@ -13,7 +13,7 @@ export type ReceiveDataArgs = [
 	AllocationTypeMasterObj[],
 	FundsMasterObj[],
 	AllocationSourcesMasterObj[],
-	PartnerTypesMasterObj[],
+	OrganizationTypesMasterObj[],
 	SectorsMasterObj[],
 	ApprovedAllocationsObj[]
 ];
@@ -71,7 +71,7 @@ type AllocationSourcesMasterObj = {
 	AllocationName: string;
 };
 
-type PartnerTypesMasterObj = {
+type OrganizationTypesMasterObj = {
 	id: number;
 	OrganizationTypeName: string;
 };
@@ -105,7 +105,7 @@ export type List = {
 	beneficiaryTypes: ListObj;
 	allocationTypes: ListObj;
 	allocationSources: ListObj;
-	partnerTypes: ListObj;
+	organizationTypes: ListObj;
 	sectors: ListObj;
 };
 
@@ -125,7 +125,7 @@ export type MakeListParams = {
 	beneficiariesMaster: BeneficiariesMasterObj[];
 	allocationTypeMaster: AllocationTypeMasterObj[];
 	allocationSourcesMaster: AllocationSourcesMasterObj[];
-	partnerTypesMaster: PartnerTypesMasterObj[];
+	organizationTypesMaster: OrganizationTypesMasterObj[];
 	sectorsMaster: SectorsMasterObj[];
 };
 
@@ -425,14 +425,16 @@ export type DownloadIconProps = {
 };
 
 export type DownloadStates = {
-	summary: boolean;
-	pictogram: boolean;
-	beneficiaryTypes: boolean;
-	sectors: boolean;
-	map: boolean;
+	[K in Charts]: boolean;
 };
 
-type Charts = "summary" | "pictogram" | "beneficiaryTypes" | "sectors" | "map";
+type Charts =
+	| "summary"
+	| "pictogram"
+	| "beneficiaryTypes"
+	| "sectors"
+	| "map"
+	| "organization";
 
 export type PictogramRowProps = {
 	type: PictogramTypes;
@@ -547,11 +549,13 @@ export type ScrollSpyProps = {
 	inViewSummary: boolean;
 	inViewPictogram: boolean;
 	inViewBeneficiaryTypes: boolean;
+	inViewOrganizationTypes: boolean;
 	inViewSectors: boolean;
 	inViewMap: boolean;
 	summaryRef: string;
 	pictogramRef: string;
 	beneficiaryTypesRef: string;
+	organizationTypesRef: string;
 	sectorsRef: string;
 	mapRef: string;
 };

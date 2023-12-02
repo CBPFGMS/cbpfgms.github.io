@@ -1,6 +1,7 @@
 import Alert from "@mui/material/Alert";
 
-function Error() {
+function Error({ error }: { error: string }) {
+	console.error(error);
 	return (
 		<div
 			style={{

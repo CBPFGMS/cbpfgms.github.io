@@ -26,7 +26,7 @@ function useData() {
 			"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 		allocationSourcesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",
-		partnerTypesMasterUrl =
+		organizationTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstOrganization.json",
 		sectorsMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json",
@@ -37,7 +37,7 @@ function useData() {
 		[lists, setLists] = useState<List | null>(null),
 		[inDataLists, setInDataLists] = useState<InDataLists | null>(null),
 		[loading, setLoading] = useState<boolean>(true),
-		[error, setError] = useState<unknown>(null);
+		[error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		Promise.all([
@@ -55,13 +55,21 @@ function useData() {
 				allocationSourcesMasterUrl,
 				"json"
 			),
-			fetchFile("partnerTypesMaster", partnerTypesMasterUrl, "json"),
+			fetchFile(
+				"organizationTypesMaster",
+				organizationTypesMasterUrl,
+				"json"
+			),
 			fetchFile("sectorsMaster", sectorsMasterUrl, "json"),
 			fetchFile("approvedAllocations", approvedAllocationsUrl, "csv"),
 		])
 			.then(receiveData)
-			.catch(error => {
-				setError(error);
+			.catch((error: unknown) => {
+				if (error instanceof Error) {
+					setError(error.message);
+				} else {
+					setError("An unknown error occurred");
+				}
 				setLoading(false);
 			});
 
@@ -76,7 +84,7 @@ function useData() {
 			allocationTypeMaster,
 			fundsMaster,
 			allocationSourcesMaster,
-			partnerTypesMaster,
+			organizationTypesMaster,
 			sectorsMaster,
 			approvedAllocations,
 		]: ReceiveDataArgs): void {
@@ -86,7 +94,7 @@ function useData() {
 				beneficiariesMaster,
 				allocationTypeMaster,
 				allocationSourcesMaster,
-				partnerTypesMaster,
+				organizationTypesMaster,
 				sectorsMaster,
 			});
 
@@ -111,6 +119,12 @@ function useData() {
 				listsObj
 			);
 
+			if (inDataLists?.reportYears.size === 0) {
+				setError("No data available");
+				setLoading(false);
+				return;
+			}
+
 			setRawData({
 				bySector: bySectorYear,
 				byDisability: byDisabilityYear,
@@ -123,6 +137,7 @@ function useData() {
 			setLists(listsObj);
 			setLoading(false);
 		}
+		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return { rawData, lists, inDataLists, loading, error };

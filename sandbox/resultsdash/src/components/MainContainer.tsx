@@ -38,6 +38,7 @@ const downloadStates: DownloadStates = {
 	beneficiaryTypes: false,
 	sectors: false,
 	map: false,
+	organization: false,
 };
 
 const queryStringValues = new URLSearchParams(location.search);
@@ -48,7 +49,7 @@ function MainContainer() {
 
 	const lastYear = [...apiData.inDataLists.reportYears].sort(
 		(a, b) => b - a
-	)[0];
+	)[0]!;
 
 	const [reportYear, setReportYear] = useState<number[]>([lastYear]);
 	const [year, setYear] = useState<number[] | null>(null);
@@ -79,12 +80,15 @@ function MainContainer() {
 	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
 	const [beneficiaryTypesRef, inViewBeneficiaryTypes] =
 		useInView(chartsThreshold);
+	const [organizationTypesRef, inViewOrganizationTypes] =
+		useInView(chartsThreshold);
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [mapRef, inViewMap] = useInView(chartsThreshold);
 
 	const summaryRefId = "summaryRefId",
 		pictogramRefId = "pictogramRefId",
 		beneficiaryTypesRefId = "beneficiaryTypesRefId",
+		organizationTypesRefId = "organizationTypesRefId",
 		sectorsRefId = "sectorsRefId",
 		mapRefId = "mapRefId";
 
@@ -377,11 +381,13 @@ function MainContainer() {
 					inViewSummary={inViewSummary}
 					inViewPictogram={inViewPictogram}
 					inViewBeneficiaryTypes={inViewBeneficiaryTypes}
+					inViewOrganizationTypes={inViewOrganizationTypes}
 					inViewSectors={inViewSectors}
 					inViewMap={inViewMap}
 					summaryRef={summaryRefId}
 					pictogramRef={pictogramRefId}
 					beneficiaryTypesRef={beneficiaryTypesRefId}
+					organizationTypesRef={organizationTypesRefId}
 					sectorsRef={sectorsRefId}
 					mapRef={mapRefId}
 				/>
@@ -622,6 +628,48 @@ function MainContainer() {
 						/>
 						<Grid
 							xs={6}
+							ref={organizationTypesRef}
+							id={organizationTypesRefId}
+						>
+							<Box
+								display={"flex"}
+								alignItems={"center"}
+								justifyContent={"center"}
+							>
+								<TypeAndSectorChart<BySectorObj>
+									data={dataSectors}
+									list={apiData.lists}
+									title="People targeted and reached by organization"
+									chartType="sectors"
+									clickedDownload={clickedDownload}
+									setClickedDownload={setClickedDownload}
+									dataDownload={bySectorDataDownload}
+								/>
+							</Box>
+						</Grid>
+					</Grid>
+					<Divider
+						orientation="horizontal"
+						flexItem
+						style={{
+							borderTop: "3px dotted #ccc",
+							borderBottom: "none",
+							width: "96%",
+							marginLeft: "2%",
+						}}
+					/>
+					<Grid
+						container
+						direction={"row"}
+						justifyContent={"center"}
+						spacing={1}
+						xs={12}
+						flexWrap={"nowrap"}
+						mt={3}
+						mb={3}
+					>
+						<Grid
+							xs={8}
 							ref={sectorsRef}
 							id={sectorsRefId}
 						>

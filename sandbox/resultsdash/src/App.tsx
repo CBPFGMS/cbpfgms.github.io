@@ -11,7 +11,7 @@ function App() {
 	return loading ? (
 		<Loading />
 	) : error ? (
-		<Error />
+		<Error error={error} />
 	) : (
 		<DataContext.Provider
 			value={{

@@ -6,7 +6,7 @@ function makeLists({
 	beneficiariesMaster,
 	allocationTypeMaster,
 	allocationSourcesMaster,
-	partnerTypesMaster,
+	organizationTypesMaster,
 	sectorsMaster,
 }: MakeListParams): List {
 	const lists: List = {
@@ -17,7 +17,7 @@ function makeLists({
 		beneficiaryTypes: {},
 		allocationTypes: {},
 		allocationSources: {},
-		partnerTypes: {},
+		organizationTypes: {},
 		sectors: {},
 	};
 
@@ -46,8 +46,8 @@ function makeLists({
 		lists.allocationSources[d.id] = d.AllocationName;
 	});
 
-	partnerTypesMaster.forEach(d => {
-		lists.partnerTypes[d.id] = d.OrganizationTypeName;
+	organizationTypesMaster.forEach(d => {
+		lists.organizationTypes[d.id] = d.OrganizationTypeName;
 	});
 
 	sectorsMaster.forEach(d => {

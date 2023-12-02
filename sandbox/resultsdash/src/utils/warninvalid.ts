@@ -3,7 +3,7 @@ const isProdSite = window.location.hostname === "cbpf.data.unocha.org";
 function warnInvalidSchema(
 	file: string,
 	row: Record<string, unknown>,
-	error?: string
+	error: string
 ) {
 	if (!isProdSite) {
 		console.warn(

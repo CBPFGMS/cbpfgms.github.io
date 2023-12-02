@@ -19,7 +19,8 @@ function processApproved(
 	const processedApprovedAllocations: ApprovedAllocationsObj[] = [];
 
 	approvedAllocations.forEach(row => {
-		if (ApprovedAllocationsObjSchema.safeParse(row).success) {
+		const parsedRow = ApprovedAllocationsObjSchema.safeParse(row);
+		if (parsedRow.success) {
 			const thisFund =
 				reversedNames[
 					row.PooledFundName.replace("(RhPF-WCA)", "").trim()
@@ -33,7 +34,11 @@ function processApproved(
 				processedApprovedAllocations.push(row);
 			}
 		} else {
-			warnInvalidSchema("Approved Allocations", row);
+			warnInvalidSchema(
+				"Approved Allocations",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
 		}
 	});
 
