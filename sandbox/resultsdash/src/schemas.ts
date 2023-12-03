@@ -27,16 +27,16 @@ export const ApprovedAllocationsObjSchema = z.object({
 	PipelineStandardBudget: z.number().min(0),
 	PipelineStandardBudgetPercentage: z.number().min(0).max(100),
 	PooledFundName: z.string(),
-	PooledFundId: z.number().max(numberOfFunds).optional(),
+	PooledFundId: z.number().min(1).max(numberOfFunds).optional(),
 });
 
 export const bySectorObjSchema = z.object({
-	PooledFundId: z.number().max(numberOfFunds),
+	PooledFundId: z.number().min(1).max(numberOfFunds),
 	AllocationYear: z.number(),
 	ReportApprovedDate: z.date(),
 	AllocationtypeId: z.number(),
-	AllocationSourceId: z.number().max(numberOfAllocationSources),
-	ClusterId: z.number().max(numberOfSectors),
+	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
+	ClusterId: z.number().min(1).max(numberOfSectors),
 	ClusterBudget: z.number().min(0),
 	TargetedMen: beneficiariesSchema,
 	TargetedWomen: beneficiariesSchema,
@@ -49,11 +49,11 @@ export const bySectorObjSchema = z.object({
 });
 
 export const byDisabilityObjSchema = z.object({
-	PooledFundId: z.number().max(numberOfFunds),
+	PooledFundId: z.number().min(1).max(numberOfFunds),
 	AllocationYear: z.number(),
 	ReportApprovedDate: z.date(),
 	AllocationtypeId: z.number(),
-	AllocationSourceId: z.number().max(numberOfAllocationSources),
+	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
 	NumbofProjects: z.number(),
 	TotalNumbPartners: z.number(),
 	Budget: z.number().min(0),
@@ -76,12 +76,12 @@ export const byDisabilityObjSchema = z.object({
 });
 
 export const byLocationObjSchema = z.object({
-	PooledFundId: z.number().max(numberOfFunds),
+	PooledFundId: z.number().min(1).max(numberOfFunds),
 	AllocationYear: z.number(),
 	ApprovedDate: z.date(),
 	LocationID: z.number(),
 	AllocationtypeId: z.number(),
-	AllocationSourceId: z.number().max(numberOfAllocationSources),
+	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
 	TargetMen: beneficiariesSchema,
 	TargetWomen: beneficiariesSchema,
 	TargetBoys: beneficiariesSchema,
@@ -93,12 +93,12 @@ export const byLocationObjSchema = z.object({
 });
 
 export const byTypeObjSchema = z.object({
-	PooledFundId: z.number().max(numberOfFunds),
+	PooledFundId: z.number().min(1).max(numberOfFunds),
 	AllocationYear: z.number(),
 	ReportApprovedDate: z.date(),
-	BeneficiaryTypeId: z.number().max(numberOfBeneficiaryTypes),
+	BeneficiaryTypeId: z.number().min(1).max(numberOfBeneficiaryTypes),
 	AllocationtypeId: z.number(),
-	AllocationSourceId: z.number().max(numberOfAllocationSources),
+	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
 	TargetMen: beneficiariesSchema,
 	TargetWomen: beneficiariesSchema,
 	TargetBoys: beneficiariesSchema,
@@ -110,12 +110,12 @@ export const byTypeObjSchema = z.object({
 });
 
 export const byOrganizationObjSchema = z.object({
-	PooledFundId: z.number().max(numberOfFunds),
+	PooledFundId: z.number().min(1).max(numberOfFunds),
 	AllocationYear: z.number(),
 	ReportApprovedDate: z.date(),
 	AllocationtypeId: z.number(),
-	AllocationSourceId: z.number().max(numberOfAllocationSources),
-	OrganizationType: z.number().max(numberOfOrganizationTypes),
+	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
+	OrganizationType: z.number().min(1).max(numberOfOrganizationTypes),
 	NumbofProjects: z.number(),
 	TotalNumbPartners: z.number(),
 	Budget: z.number().min(0),
