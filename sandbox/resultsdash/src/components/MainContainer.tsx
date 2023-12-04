@@ -13,9 +13,8 @@ import processDataSummary from "../utils/processdatasummary";
 import TopChart from "./TopChart";
 import PictogramChart from "./PictogramChart";
 import Typography from "@mui/material/Typography";
-import processDataBeneficiaryType from "../utils/processdatabytype";
 import TypeAndSectorChart from "./TypeAndSectorChart";
-import processDataSectors from "../utils/processdatasectors";
+import processData from "../utils/processdata.ts";
 import colors from "../utils/colors";
 import { useInView } from "react-intersection-observer";
 import QuickSelectors from "./QuickSelectors";
@@ -30,7 +29,12 @@ import {
 	DataContextType,
 	FilterDownloadArray,
 } from "../types.ts";
-import { BySectorObj, ByDisabilityObj, ByTypeObj } from "../schemas";
+import {
+	BySectorObj,
+	ByDisabilityObj,
+	ByTypeObj,
+	ByOrganizationObj,
+} from "../schemas";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -113,26 +117,42 @@ function MainContainer() {
 
 	const dataBeneficiaryTypes = useMemo(
 		() =>
-			processDataBeneficiaryType({
-				rawData,
+			processData({
+				originalData: rawData.byType,
 				reportYear,
 				fund,
 				allocationSource,
 				allocationType,
 				year,
+				dataProperty: "BeneficiaryTypeId",
 			}),
 		[rawData, reportYear, fund, allocationSource, allocationType, year]
 	);
 
 	const dataSectors = useMemo(
 		() =>
-			processDataSectors({
-				rawData,
+			processData({
+				originalData: rawData.bySector,
 				reportYear,
 				fund,
 				allocationSource,
 				allocationType,
 				year,
+				dataProperty: "ClusterId",
+			}),
+		[rawData, reportYear, fund, allocationSource, allocationType, year]
+	);
+
+	const dataOrganizationTypes = useMemo(
+		() =>
+			processData({
+				originalData: rawData.byOrganization,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType,
+				year,
+				dataProperty: "OrganizationType",
 			}),
 		[rawData, reportYear, fund, allocationSource, allocationType, year]
 	);
@@ -207,6 +227,18 @@ function MainContainer() {
 		() =>
 			filterDownloadArray<BySectorObj>(
 				rawData.bySector,
+				reportYear,
+				fund,
+				allocationSource,
+				allocationType
+			),
+		[rawData, reportYear, fund, allocationSource, allocationType]
+	);
+
+	const byOrganizationTypeDataDownload = useMemo(
+		() =>
+			filterDownloadArray<ByOrganizationObj>(
+				rawData.byOrganization,
 				reportYear,
 				fund,
 				allocationSource,
@@ -636,14 +668,16 @@ function MainContainer() {
 								alignItems={"center"}
 								justifyContent={"center"}
 							>
-								<TypeAndSectorChart<BySectorObj>
-									data={dataSectors}
+								<TypeAndSectorChart<ByOrganizationObj>
+									data={dataOrganizationTypes}
 									list={apiData.lists}
 									title="People targeted and reached by organization"
-									chartType="sectors"
+									chartType="organization"
 									clickedDownload={clickedDownload}
 									setClickedDownload={setClickedDownload}
-									dataDownload={bySectorDataDownload}
+									dataDownload={
+										byOrganizationTypeDataDownload
+									}
 								/>
 							</Box>
 						</Grid>

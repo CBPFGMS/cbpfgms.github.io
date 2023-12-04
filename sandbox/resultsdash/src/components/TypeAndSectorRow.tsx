@@ -8,6 +8,7 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import { TypeAndSectorRowProps } from "../types";
+import { clustersIconsData } from "../assets/clustericons";
 
 function TypeAndSectorRow({
 	list,
@@ -15,6 +16,7 @@ function TypeAndSectorRow({
 	reached,
 	targeted,
 	type,
+	chartType,
 }: TypeAndSectorRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 	const limitValue = 90;
@@ -30,9 +32,11 @@ function TypeAndSectorRow({
 		>
 			<Box
 				style={{
-					flex: "0 22%",
+					flex: chartType === "sectors" ? "0 26%" : "0 22%",
 					display: "flex",
 					alignItems: "center",
+					justifyContent: "flex-end",
+					textAlign: "right",
 					overflow: "hidden",
 				}}
 			>
@@ -44,10 +48,21 @@ function TypeAndSectorRow({
 				>
 					{list[type]}
 				</Typography>
+				{chartType === "sectors" && (
+					<img
+						src={clustersIconsData[type]}
+						style={{
+							width: "32px",
+							height: "32px",
+							marginLeft: "12px",
+							marginRight: "0px",
+						}}
+					/>
+				)}
 			</Box>
 			<Box
 				style={{
-					flex: "0 66%",
+					flex: chartType === "sectors" ? "0 62%" : "0 66%",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -70,7 +85,7 @@ function TypeAndSectorRow({
 					>
 						<Box
 							style={{
-								flex: "0 10%",
+								flex: chartType === "sectors" ? "0 8%" : "0 10%",
 								display: "flex",
 								flexDirection: "row",
 								justifyContent: "flex-end",
@@ -110,7 +125,7 @@ function TypeAndSectorRow({
 						</Box>
 						<Box
 							style={{
-								flex: "0 90%",
+								flex: chartType === "sectors" ? "0 92%" : "0 90%",
 								marginTop: "2px",
 								marginBottom: "2px",
 								display: "flex",

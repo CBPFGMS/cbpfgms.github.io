@@ -289,46 +289,33 @@ export type ProcessDataSummary = ({
 	allocatedTotals: AllocatedTotals;
 };
 
-export type ProcessDataBeneficiaryType = ({
-	rawData,
+type DataPropertyAccessor =
+	| "BeneficiaryTypeId"
+	| "ClusterId"
+	| "OrganizationType";
+
+export type ProcessData = <
+	T extends ByTypeYear | BySectorYear | ByOrganizationYear
+>({
+	originalData,
 	reportYear,
 	fund,
 	allocationSource,
 	allocationType,
 	year,
+	dataProperty,
 }: {
-	rawData: RawData;
+	originalData: T;
 	reportYear: number[];
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
 	year: number[] | null;
-}) => BeneficiaryTypeData[];
+	dataProperty: DataPropertyAccessor;
+}) => TypeData[];
 
-export type BeneficiaryTypeData = {
-	beneficiaryType: number;
-	targeted: number;
-	reached: number;
-};
-
-export type ProcessDataSectors = ({
-	rawData,
-	reportYear,
-	fund,
-	allocationSource,
-	allocationType,
-	year,
-}: {
-	rawData: RawData;
-	reportYear: number[];
-	fund: number[];
-	allocationSource: number[];
-	allocationType: number[];
-	year: number[] | null;
-}) => SectorsData[];
-
-export type SectorsData = {
-	sector: number;
+export type TypeData = {
+	type: number;
 	targeted: number;
 	reached: number;
 };
@@ -445,7 +432,7 @@ export type PictogramRowProps = {
 };
 
 export type TypesAndSectorChartProps<DownloadType> = {
-	data: BeneficiaryTypeData[] | SectorsData[];
+	data: TypeData[];
 	list: List;
 	clickedDownload: DownloadStates;
 	title: string;
@@ -462,6 +449,7 @@ export type TypeAndSectorRowProps = {
 	reached: number;
 	list: ListObj;
 	maxValue: number;
+	chartType: Charts;
 };
 
 export type DownloadData = <T extends object>(
@@ -513,7 +501,7 @@ export type CreateColorLegendParams = {
 	legendSvgHeight: number;
 };
 
-type TFilterObj = BySectorObj | ByDisabilityObj | ByTypeObj;
+type TFilterObj = BySectorObj | ByDisabilityObj | ByTypeObj | ByOrganizationObj;
 
 export type FilterDownloadArray = <TFObj extends TFilterObj>(
 	arr: GenericYear<TFObj>,

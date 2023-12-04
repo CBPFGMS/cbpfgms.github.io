@@ -34,11 +34,12 @@ function PictogramRow({
 			}}
 		>
 			<Box
-				style={{ flex: "0 15%", display: "flex", alignItems: "center" }}
+				style={{ flex: "0 12%", display: "flex", alignItems: "center", justifyContent: "flex-end" }}
 			>
 				<Typography
 					variant="body2"
 					fontWeight={500}
+					marginRight={0.5}
 					style={{ color: "#555", border: "none" }}
 				>
 					{type.toUpperCase()}
@@ -46,7 +47,7 @@ function PictogramRow({
 			</Box>
 			<Box
 				style={{
-					flex: "0 75%",
+					flex: "0 78%",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",

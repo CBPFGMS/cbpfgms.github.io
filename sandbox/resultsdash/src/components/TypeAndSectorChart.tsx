@@ -8,12 +8,8 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
-import {
-	TypesAndSectorChartProps,
-	BeneficiaryTypeData,
-	SectorsData,
-} from "../types";
-import { BySectorObj, ByTypeObj } from "../schemas";
+import { TypesAndSectorChartProps } from "../types";
+import { ByOrganizationObj, BySectorObj, ByTypeObj } from "../schemas";
 
 function TypeAndSectorChart<DownloadType>({
 	data,
@@ -27,6 +23,13 @@ function TypeAndSectorChart<DownloadType>({
 	const maxValue = max(
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
+
+	const listProperty =
+		chartType === "beneficiaryTypes"
+			? "beneficiaryTypes"
+			: chartType === "sectors"
+			? "sectors"
+			: "organizationTypes";
 
 	function handleDownloadClick() {
 		if (chartType === "beneficiaryTypes") {
@@ -47,7 +50,7 @@ function TypeAndSectorChart<DownloadType>({
 					(d.ReachedWomen || 0),
 			}));
 			downloadData<(typeof data)[number]>(data, "beneficiary_types");
-		} else {
+		} else if (chartType === "sectors") {
 			const data = (dataDownload as BySectorObj[]).map(d => ({
 				"Report date": d.ReportApprovedDate,
 				Year: d.AllocationYear,
@@ -65,6 +68,24 @@ function TypeAndSectorChart<DownloadType>({
 					(d.ReachedWomen || 0),
 			}));
 			downloadData<(typeof data)[number]>(data, "sectors");
+		} else if (chartType === "organization") {
+			const data = (dataDownload as ByOrganizationObj[]).map(d => ({
+				"Report date": d.ReportApprovedDate,
+				Year: d.AllocationYear,
+				Fund: list.fundAbbreviatedNames[d.PooledFundId],
+				Organization: list.organizationTypes[d.OrganizationType],
+				Targeted:
+					(d.TargetedBoys || 0) +
+					(d.TargetedGirls || 0) +
+					(d.TargetedMen || 0) +
+					(d.TargetedWomen || 0),
+				Reached:
+					(d.ReachedBoys || 0) +
+					(d.ReachedGirls || 0) +
+					(d.ReachedMen || 0) +
+					(d.ReachedWomen || 0),
+			}));
+			downloadData<(typeof data)[number]>(data, "organization_types");
 		}
 	}
 
@@ -169,24 +190,13 @@ function TypeAndSectorChart<DownloadType>({
 				</Box>
 				{data.map(d => (
 					<TypeAndSectorRow
-						key={
-							chartType === "beneficiaryTypes"
-								? (d as BeneficiaryTypeData).beneficiaryType
-								: (d as SectorsData).sector
-						}
-						type={
-							chartType === "beneficiaryTypes"
-								? (d as BeneficiaryTypeData).beneficiaryType
-								: (d as SectorsData).sector
-						}
+						key={d.type}
+						type={d.type}
 						targeted={d.targeted}
 						reached={d.reached}
 						maxValue={maxValue}
-						list={
-							chartType === "beneficiaryTypes"
-								? list.beneficiaryTypes
-								: list.sectors
-						}
+						list={list[listProperty]}
+						chartType={chartType}
 					/>
 				))}
 			</Box>
