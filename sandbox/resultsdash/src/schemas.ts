@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /*
 Constants from the Master files:
-These are constants coming from the master files, they are used to validate the data comming from the API. If the master files are changed, these constants should be changed as well.
+These are constants coming from the master files, they are used to validate the data coming from the API. If the master files are changed, these constants should be changed as well.
 */
 const numberOfFunds = 252,
 	numberOfAllocationSources = 4,
