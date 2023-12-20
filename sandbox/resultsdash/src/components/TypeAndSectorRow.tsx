@@ -52,10 +52,11 @@ function TypeAndSectorRow({
 					<img
 						src={clustersIconsData[type]}
 						style={{
-							width: "32px",
-							height: "32px",
+							width: "24px",
+							height: "24px",
 							marginLeft: "12px",
 							marginRight: "0px",
+							padding: "4px",
 						}}
 					/>
 				)}
