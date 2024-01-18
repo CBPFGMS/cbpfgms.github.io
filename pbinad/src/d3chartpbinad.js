@@ -434,7 +434,7 @@
 				.attr("transform", "translate(" + padding[3] + "," + (padding[0] + buttonsPanel.height + topPanel.height + 2 * panelHorizontalPadding) + ")"),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [40, 80, 44, 86]
+			padding: [40, 80, 44, 116]
 		};
 
 		const invisibleLayer = svg.append("g")
