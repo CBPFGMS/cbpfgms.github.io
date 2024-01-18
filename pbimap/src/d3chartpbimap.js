@@ -596,9 +596,14 @@
 					return d3.csv(file + yearParameter + year + csvFormatParameter);
 				});
 				return Promise.all(remainingPromises).then(function(rawData) {
-					processData(rawData[0], rawData[1]);
-					loadedYears.push(+year);
-					repopulateYearFilter();
+					if(!rawData[0].length || !rawData[1].length) {
+						yearsArrayString.splice(yearsArrayString.indexOf(year.toString()), 1);
+						removeYearFilter();
+					} else {
+						processData(rawData[0], rawData[1]);
+						loadedYears.push(+year);
+						repopulateYearFilter();
+					}
 				});
 			};
 
@@ -1396,6 +1401,16 @@
 			};
 
 			//end of createFilterDivs
+		};
+
+		function removeYearFilter() {
+			filtersDiv.selectAll(".pbimapDropdownUl")
+				.filter(function(d) {
+					return d === "Year";
+				}).selectAll("li")
+				.filter(function(d){
+					return yearsArrayString.indexOf(d) === -1;
+				}).remove();
 		};
 
 		function repopulateYearFilter() {
