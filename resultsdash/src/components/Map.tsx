@@ -74,6 +74,9 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 		if (mapRef.current) {
 			mapRef.current.removeControl(mapRef.current.attributionControl);
 		}
+	});
+
+	useEffect(() => {
 		if (colorSvgRef.current) {
 			createColorLegend({
 				svgRef: colorSvgRef.current,
