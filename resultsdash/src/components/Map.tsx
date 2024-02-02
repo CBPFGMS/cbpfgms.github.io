@@ -13,6 +13,7 @@ import createSizeLegend from "../charts/createsizelegend";
 import createColorLegend from "../charts/createcolorlegend";
 import downloadData from "../utils/downloaddata";
 import { MapProps } from "../types";
+import { Map as MapType } from "leaflet";
 
 function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	const maxZoomValue = 12;
@@ -25,6 +26,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 
 	const sizeSvgRef = useRef<SVGSVGElement | null>(null);
 	const colorSvgRef = useRef<SVGSVGElement | null>(null);
+	const mapRef = useRef<MapType | null>(null);
 
 	function handleDownloadClick() {
 		const csvData = data.map(d => ({
@@ -69,6 +71,9 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	}, [minMaxValue]);
 
 	useEffect(() => {
+		if (mapRef.current) {
+			mapRef.current.removeControl(mapRef.current.attributionControl);
+		}
 		if (colorSvgRef.current) {
 			createColorLegend({
 				svgRef: colorSvgRef.current,
@@ -116,6 +121,7 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 					center={[0, 0]}
 					zoom={minZoomValue}
 					scrollWheelZoom={false}
+					ref={mapRef}
 				>
 					<TileLayer
 						url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
