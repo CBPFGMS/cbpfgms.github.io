@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-type Beneficiaries = number | null;
-
 export type ReceiveDataArgs = [
 	BySectorObj[],
 	ByDisabilityObj[],

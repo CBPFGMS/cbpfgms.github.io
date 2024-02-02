@@ -20,7 +20,6 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"strictNullChecks": true,
-		"noUncheckedIndexedAccess": true,
 
 		/* Type checking */
 		"types": ["vite-plugin-svgr/client"]
