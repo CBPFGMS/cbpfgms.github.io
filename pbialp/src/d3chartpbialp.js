@@ -206,9 +206,10 @@
 			percentagePadding = 22,
 			percentagePadding2 = 10,
 			rfTooltipPadding = 12,
+			labelTextMaximumLength = 12,
 			underApprovalColor = "#E56A54",
 			unBlue = "#1F69B3",
-			highlightColor = "#F79A3B",
+			highlightColor = "sandybrown",
 			currentDate = new Date(),
 			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
@@ -1203,7 +1204,11 @@
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
-					.text(")")
+					.text(") \u2014 ")
+					.append("tspan")
+					.style("font-weight", "bold")
+					.style("fill", d3.color(highlightColor).darker(0.5))
+					.text("% of Partner")
 					.append("tspan")
 					.style("font-weight", "normal")
 					.style("fill", "#666")
@@ -1213,7 +1218,7 @@
 					.text("\u25B2")
 					.append("tspan")
 					.style("fill", "#666")
-					.text(") indicates the Under Approval amount.");
+					.text(") indicates Under Approval.");
 
 				const legendNetFunding = legendGroup
 					.append("text")
@@ -2397,41 +2402,136 @@
 										"underApproval-" +
 											chartState.selectedPartner
 								  ];
+						let thisPartner,
+							thisPartnerPercentage,
+							thisPartnerRoundPercentage;
+						if (chartState.selectedPartner !== "total") {
+							thisPartner = d.parallelData.find(
+								e => e.partner === chartState.selectedPartner
+							);
+							thisPartnerPercentage = thisPartner.percentage;
+							thisPartnerRoundPercentage =
+								thisPartner.roundPercentage;
+						}
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
 							d[chartState.selectedPartner]
 						);
-						if (thisUnderApproval === 0) {
-							return function (t) {
-								d3.select(node).text(
-									formatNumberSI(i(t)).replace("G", "B")
-								);
-							};
-						} else {
-							return function (t) {
-								d3.select(node)
-									.text(
+						return function (t) {
+							if (thisUnderApproval === 0) {
+								if (
+									chartState.selectedPartner === "total" ||
+									(chartState.selectedPartner !== "total" &&
+										thisPartnerPercentage === 0)
+								) {
+									d3.select(node).text(
 										formatNumberSI(i(t)).replace("G", "B")
-									)
-									.append("tspan")
-									.attr("class", "pbialpCbpfLabelPercentage")
-									.attr("dy", "-0.5px")
-									.text(" (")
-									.append("tspan")
-									.style("fill", underApprovalColor)
-									.text(
-										d3
-											.formatPrefix(
-												".0",
-												thisUnderApproval
-											)(thisUnderApproval)
-											.replace("G", "B")
-									)
-									.append("tspan")
-									.style("fill", "#aaa")
-									.text(")");
-							};
-						}
+									);
+								} else {
+									d3.select(node)
+										.text(
+											i(1)
+												? formatNumberSI(i(t)).replace(
+														"G",
+														"B"
+												  )
+												: 0
+										)
+										.append("tspan")
+										.text(" \u2014 ")
+										.append("tspan")
+										.attr(
+											"fill",
+											d3.color(highlightColor).darker(0.5)
+										)
+										.text(
+											thisPartnerRoundPercentage
+												? thisPartnerRoundPercentage +
+														"%"
+												: "<1%"
+										);
+								}
+							} else {
+								if (
+									chartState.selectedPartner === "total" ||
+									(chartState.selectedPartner !== "total" &&
+										thisPartnerPercentage === 0)
+								) {
+									d3.select(node)
+										.text(
+											formatNumberSI(i(t)).replace(
+												"G",
+												"B"
+											)
+										)
+										.append("tspan")
+										.attr(
+											"class",
+											"pbialpCbpfLabelPercentage"
+										)
+										.attr("dy", "-0.5px")
+										.text(" (")
+										.append("tspan")
+										.style("fill", underApprovalColor)
+										.text(
+											d3
+												.formatPrefix(
+													".0",
+													thisUnderApproval
+												)(thisUnderApproval)
+												.replace("G", "B")
+										)
+										.append("tspan")
+										.style("fill", "#aaa")
+										.text(")");
+								} else {
+									d3.select(node)
+										.text(
+											i(1)
+												? formatNumberSI(i(t)).replace(
+														"G",
+														"B"
+												  )
+												: 0
+										)
+										.append("tspan")
+										.attr(
+											"class",
+											"pbialpCbpfLabelPercentage"
+										)
+										.attr("dy", "-0.5px")
+										.text(" (")
+										.append("tspan")
+										.style("fill", underApprovalColor)
+										.text(
+											d3
+												.formatPrefix(
+													".0",
+													thisUnderApproval
+												)(thisUnderApproval)
+												.replace("G", "B")
+										)
+										.append("tspan")
+										.style("fill", "#aaa")
+										.text(")")
+										.append("tspan")
+										.attr("dy", null)
+										.style("font-size", "11px")
+										.text(" \u2014 ")
+										.append("tspan")
+										.attr(
+											"fill",
+											d3.color(highlightColor).darker(0.5)
+										)
+										.text(
+											thisPartnerRoundPercentage
+												? thisPartnerRoundPercentage +
+														"%"
+												: "<1%"
+										);
+								}
+							}
+						};
 					});
 
 				const cbpfTooltipRectangle = cbpfGroup.select(
@@ -3590,7 +3690,10 @@
 					.attr("class", "pbialpLabelText")
 					.attr("y", 4)
 					.text(function (d) {
-						return d.cbpf;
+						return d.cbpf.length > labelTextMaximumLength
+							? d.cbpf.substring(0, labelTextMaximumLength) +
+									"..."
+							: d.cbpf;
 					});
 
 				labelsGroup = labelsGroupEnter.merge(labelsGroup);
@@ -3643,6 +3746,11 @@
 					.attr("text-anchor", "middle");
 
 				percentagesText = percentagesTextEnter.merge(percentagesText);
+
+				percentagesText.style("fill", function (d) {
+					if (chartState.selectedPartner.indexOf(d.partner) > -1)
+						return d3.color(highlightColor).darker(0.5);
+				});
 
 				percentagesText
 					.text(function (d) {
@@ -3730,8 +3838,82 @@
 				//end of highlightParallel
 			}
 
+			function highlightSelectedParallel() {
+				const selectedPartnerGroups = parallelPanel.main
+					.selectAll(".pbialpgroupXAxisParallel .tick")
+					.filter(function (d) {
+						return chartState.selectedPartner.indexOf(d) > -1;
+					});
+
+				const unselectedPartnerGroups = parallelPanel.main
+					.selectAll(".pbialpgroupXAxisParallel .tick")
+					.filter(function (d) {
+						return chartState.selectedPartner.indexOf(d) === -1;
+					});
+
+				const selectedAverage = parallelPanel.main
+					.select(".pbialpCbpfParallelGroupAverage")
+					.selectAll("text")
+					.filter(function (d) {
+						return (
+							chartState.selectedPartner.indexOf(d.partner) > -1
+						);
+					});
+
+				const unselectedAverage = parallelPanel.main
+					.select(".pbialpCbpfParallelGroupAverage")
+					.selectAll("text")
+					.filter(function (d) {
+						return (
+							chartState.selectedPartner.indexOf(d.partner) === -1
+						);
+					});
+
+				const selectedPercentageText = parallelPanel.main
+					.selectAll(".pbialpPercentagesTextHighlight")
+					.filter(function (d) {
+						return (
+							chartState.selectedPartner.indexOf(d.partner) > -1
+						);
+					});
+
+				const unselectedPercentageText = parallelPanel.main
+					.selectAll(".pbialpPercentagesTextHighlight")
+					.filter(function (d) {
+						return (
+							chartState.selectedPartner.indexOf(d.partner) === -1
+						);
+					});
+
+				selectedPartnerGroups
+					.select("line")
+					.style("stroke", highlightColor);
+
+				selectedPartnerGroups
+					.select("text")
+					.style("fill", d3.color(highlightColor).darker(0.5));
+
+				selectedAverage.style(
+					"fill",
+					d3.color(highlightColor).darker(0.5)
+				);
+
+				selectedPercentageText.style("fill", highlightColor);
+
+				unselectedAverage.style("fill", null);
+
+				unselectedPartnerGroups.select("line").style("stroke", null);
+
+				unselectedPartnerGroups.select("text").style("fill", null);
+
+				unselectedPercentageText.style("fill", null);
+
+				//end of highlightSelectedParallel
+			}
+
 			function clickButtonsRects(d, singleSelection) {
 				if (singleSelection) {
+					if (chartState.selectedYear[0] === d) return;
 					chartState.selectedYear = [d];
 				} else {
 					const index = chartState.selectedYear.indexOf(d);
@@ -3806,6 +3988,8 @@
 			}
 
 			function clickButtonsPartnersRects(d) {
+				if (chartState.selectedPartner === d) return;
+
 				chartState.selectedPartner = d;
 
 				d3.selectAll(".pbialpbuttonsPartnersRects").style(
@@ -3837,6 +4021,8 @@
 				setDomains(data, chartState.selectedPartner);
 
 				createLollipopPanel(data);
+
+				highlightSelectedParallel();
 
 				//end of clickButtonsContributionsRects
 			}
