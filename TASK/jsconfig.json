@@ -3,7 +3,7 @@
 		"checkJs": true,
 		"target": "ES2022",
 		"allowUmdGlobalAccess": true,
-		"typeRoots": ["/Users/gerardofurtado//node_modules/@types"],
+		"typeRoots": ["./node_modules/@types"],
 		"types": ["d3"]
 	}
 }
