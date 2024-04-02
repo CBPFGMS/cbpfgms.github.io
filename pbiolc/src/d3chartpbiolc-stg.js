@@ -2576,7 +2576,6 @@
 						);
 					})
 					.tween("text", function (d) {
-						//START HERE
 						const node = this;
 						const percentOfTotalValue = formatPercent(
 							d[chartState.selectedModality] / totalAllocations
