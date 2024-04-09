@@ -27,6 +27,15 @@ type ListObj = {
 	[key: number]: string;
 };
 
+type MasterFilesNumbers = {
+	numberOfFundsInMaster: Set<number>;
+	numberOfAllocationTypesInMaster: Set<number>;
+	numberOfAllocationSourcesInMaster: Set<number>;
+	numberOfOrganizationTypesInMaster: Set<number>;
+	numberOfBeneficiaryTypesInMaster: Set<number>;
+	numberOfSectorsInMaster: Set<number>;
+};
+
 export type List = {
 	fundNames: ListObj;
 	fundAbbreviatedNames: ListObj;
@@ -36,6 +45,7 @@ export type List = {
 	allocationSources: ListObj;
 	organizationTypes: ListObj;
 	sectors: ListObj;
+	masterFilesNumbers: MasterFilesNumbers;
 };
 
 function makeLists({
@@ -55,6 +65,14 @@ function makeLists({
 		allocationSources: {},
 		organizationTypes: {},
 		sectors: {},
+		masterFilesNumbers: {
+			numberOfFundsInMaster: new Set(),
+			numberOfAllocationTypesInMaster: new Set(),
+			numberOfAllocationSourcesInMaster: new Set(),
+			numberOfOrganizationTypesInMaster: new Set(),
+			numberOfBeneficiaryTypesInMaster: new Set(),
+			numberOfSectorsInMaster: new Set(),
+		},
 	};
 
 	fundsMaster.forEach(d => {
@@ -63,6 +81,7 @@ function makeLists({
 			lists.fundNames[d.id] = d.PooledFundName;
 			lists.fundAbbreviatedNames[d.id] = d.PooledFundNameAbbrv;
 			lists.fundIsoCodes[d.id] = d.ISO2Code;
+			lists.masterFilesNumbers.numberOfFundsInMaster.add(d.id);
 		} else {
 			warnInvalidSchema(
 				"FundsMaster",
@@ -77,6 +96,9 @@ function makeLists({
 			beneficiariesMasterObjectSchema.safeParse(d);
 		if (parsedBeneficiariesMaster.success) {
 			lists.beneficiaryTypes[d.BeneficiaryTypeId] = d.BeneficiaryType;
+			lists.masterFilesNumbers.numberOfBeneficiaryTypesInMaster.add(
+				d.BeneficiaryTypeId
+			);
 		} else {
 			warnInvalidSchema(
 				"BeneficiariesMaster",
@@ -91,6 +113,9 @@ function makeLists({
 			allocationTypeMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
 			lists.allocationTypes[d.AllocationtypeId] = d.AllocationType;
+			lists.masterFilesNumbers.numberOfAllocationTypesInMaster.add(
+				d.AllocationtypeId
+			);
 		} else {
 			warnInvalidSchema(
 				"AllocationTypeMaster",
@@ -105,6 +130,9 @@ function makeLists({
 			allocationSourcesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationSourcesMaster.success) {
 			lists.allocationSources[d.id] = d.AllocationName;
+			lists.masterFilesNumbers.numberOfAllocationSourcesInMaster.add(
+				d.id
+			);
 		} else {
 			warnInvalidSchema(
 				"AllocationSourcesMaster",
@@ -119,6 +147,9 @@ function makeLists({
 			organizationTypesMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationTypesMaster.success) {
 			lists.organizationTypes[d.id] = d.OrganizationTypeName;
+			lists.masterFilesNumbers.numberOfOrganizationTypesInMaster.add(
+				d.id
+			);
 		} else {
 			warnInvalidSchema(
 				"OrganizationTypesMaster",
@@ -132,6 +163,7 @@ function makeLists({
 		const parsedSectorsMaster = sectorsMasterObjectSchema.safeParse(d);
 		if (parsedSectorsMaster.success) {
 			lists.sectors[d.id] = d.ClustNm;
+			lists.masterFilesNumbers.numberOfSectorsInMaster.add(d.id);
 		} else {
 			warnInvalidSchema(
 				"SectorsMaster",

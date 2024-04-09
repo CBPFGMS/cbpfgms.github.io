@@ -1,16 +1,16 @@
-import { z } from "zod";
+import { z, ZodSchema } from "zod";
 
 /*
 Constants from the Master files:
 These are constants coming from the master files, they are used to validate the data coming from the API. If the master files are changed, these constants should be changed as well.
 */
-const numberOfFunds = 252,
-	numberOfAllocationSources = 4,
-	numberOfOrganizationTypes = 4,
-	numberOfBeneficiaryTypes = 23,
-	numberOfSectors = 17;
+// const numberOfFunds = 252,
+// 	numberOfAllocationSources = 4,
+// 	numberOfOrganizationTypes = 4,
+// 	numberOfBeneficiaryTypes = 23,
+// 	numberOfSectors = 17;
 
-export const projectSummaryObjectSchema = z.object({
+export const projectSummaryV2ObjectSchema = z.object({
 	PFId: z.number(),
 	AllNm: z.string(),
 	PrjCode: z.string(),
@@ -96,11 +96,11 @@ export const fundsMasterObjectSchema = z.object({
 	ContinentName: z.string(),
 	CountryCode: z.string(),
 	ISO2Code: z.string(),
-	latitude: z.number(),
-	longitude: z.number(),
+	latitude: z.union([z.number(), z.literal("#N/A")]),
+	longitude: z.union([z.number(), z.literal("#N/A")]),
 	CBPFFundStatus: z.string(),
-	CBPFId: z.number(),
-	CERFId: z.number(),
+	CBPFId: z.union([z.number(), z.literal("")]),
+	CERFId: z.union([z.number(), z.literal("")]),
 	AreaType: z.string(),
 });
 
@@ -119,7 +119,7 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustNm: z.string(),
 });
 
-const projectSummarySchema = z.array(projectSummaryObjectSchema);
+const projectSummaryV2Schema = z.array(projectSummaryV2ObjectSchema);
 
 const arQuery18Schema = z.array(arQuery18ObjectSchema);
 
@@ -139,33 +139,33 @@ const organizationTypesMasterSchema = z.array(
 
 const sectorsMasterSchema = z.array(sectorsMasterObjectSchema);
 
-type ProjectSummaryObjectSchema = z.infer<typeof projectSummaryObjectSchema>;
+// type ProjectSummaryV2ObjectSchema = z.infer<
+// 	typeof projectSummaryV2ObjectSchema
+// >;
 
-type ArQuery18ObjectSchema = z.infer<typeof arQuery18ObjectSchema>;
+// type ArQuery18ObjectSchema = z.infer<typeof arQuery18ObjectSchema>;
 
-type BeneficiariesMasterObjectSchema = z.infer<
-	typeof beneficiariesMasterObjectSchema
->;
+// type BeneficiariesMasterObjectSchema = z.infer<
+// 	typeof beneficiariesMasterObjectSchema
+// >;
 
-type AllocationTypeMasterObjectSchema = z.infer<
-	typeof allocationTypeMasterObjectSchema
->;
+// type AllocationTypeMasterObjectSchema = z.infer<
+// 	typeof allocationTypeMasterObjectSchema
+// >;
 
-type FundsMasterObjectSchema = z.infer<typeof fundsMasterObjectSchema>;
+// type FundsMasterObjectSchema = z.infer<typeof fundsMasterObjectSchema>;
 
-type AllocationSourcesMasterObjectSchema = z.infer<
-	typeof allocationSourcesMasterObjectSchema
->;
+// type AllocationSourcesMasterObjectSchema = z.infer<
+// 	typeof allocationSourcesMasterObjectSchema
+// >;
 
-type OrganizationTypesMasterObjectSchema = z.infer<
-	typeof organizationTypesMasterObjectSchema
->;
+// type OrganizationTypesMasterObjectSchema = z.infer<
+// 	typeof organizationTypesMasterObjectSchema
+// >;
 
-type SectorsMasterObjectSchema = z.infer<
-	typeof sectorsMasterObjectSchema
->;
+// type SectorsMasterObjectSchema = z.infer<typeof sectorsMasterObjectSchema>;
 
-export type ProjectSummary = z.infer<typeof projectSummarySchema>;
+export type ProjectSummaryV2 = z.infer<typeof projectSummaryV2Schema>;
 
 export type ArQuery18 = z.infer<typeof arQuery18Schema>;
 
@@ -185,135 +185,35 @@ export type OrganizationTypesMaster = z.infer<
 
 export type SectorsMaster = z.infer<typeof sectorsMasterSchema>;
 
-// const beneficiariesSchema = z.number().nullable();
-
-// export const ApprovedAllocationsObjSchema = z.object({
-// 	AllocationYear: z.number(),
-// 	ApprovedBudget: z.number().min(0),
-// 	ApprovedReserveBudget: z.number().min(0),
-// 	ApprovedReserveBudgetPercentage: z.number().min(0).max(100),
-// 	ApprovedStandardBudget: z.number().min(0),
-// 	ApprovedStandardBudgetPercentage: z.number().min(0).max(100),
-// 	FundingType: z.number(),
-// 	OrganizationType: z.string(),
-// 	PipelineBudget: z.number().min(0),
-// 	PipelineReserveBudget: z.number().min(0),
-// 	PipelineReserveBudgetPercentage: z.number().min(0).max(100),
-// 	PipelineStandardBudget: z.number().min(0),
-// 	PipelineStandardBudgetPercentage: z.number().min(0).max(100),
-// 	PooledFundName: z.string(),
-// 	PooledFundId: z.number().min(1).max(numberOfFunds).optional(),
-// });
-
-// export const bySectorObjSchema = z.object({
-// 	PooledFundId: z.number().min(1).max(numberOfFunds),
-// 	AllocationYear: z.number(),
-// 	ReportApprovedDate: z.date(),
-// 	AllocationtypeId: z.number(),
-// 	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
-// 	ClusterId: z.number().min(1).max(numberOfSectors),
-// 	ClusterBudget: z.number().min(0),
-// 	TargetedMen: beneficiariesSchema,
-// 	TargetedWomen: beneficiariesSchema,
-// 	TargetedBoys: beneficiariesSchema,
-// 	TargetedGirls: beneficiariesSchema,
-// 	ReachedMen: beneficiariesSchema,
-// 	ReachedWomen: beneficiariesSchema,
-// 	ReachedBoys: beneficiariesSchema,
-// 	ReachedGirls: beneficiariesSchema,
-// });
-
-// export const byDisabilityObjSchema = z.object({
-// 	PooledFundId: z.number().min(1).max(numberOfFunds),
-// 	AllocationYear: z.number(),
-// 	ReportApprovedDate: z.date(),
-// 	AllocationtypeId: z.number(),
-// 	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
-// 	NumbofProjects: z.number(),
-// 	TotalNumbPartners: z.number(),
-// 	Budget: z.number().min(0),
-// 	TargetedMen: beneficiariesSchema,
-// 	TargetedWomen: beneficiariesSchema,
-// 	TargetedBoys: beneficiariesSchema,
-// 	TargetedGirls: beneficiariesSchema,
-// 	ReachedMen: beneficiariesSchema,
-// 	ReachedWomen: beneficiariesSchema,
-// 	ReachedBoys: beneficiariesSchema,
-// 	ReachedGirls: beneficiariesSchema,
-// 	DisabledMen: beneficiariesSchema,
-// 	DisabledWomen: beneficiariesSchema,
-// 	DisabledBoys: beneficiariesSchema,
-// 	DisabledGirls: beneficiariesSchema,
-// 	ReachedDisabledMen: beneficiariesSchema,
-// 	ReachedDisabledWomen: beneficiariesSchema,
-// 	ReachedDisabledBoys: beneficiariesSchema,
-// 	ReachedDisabledGirls: beneficiariesSchema,
-// });
-
-// export const byLocationObjSchema = z.object({
-// 	PooledFundId: z.number().min(1).max(numberOfFunds),
-// 	AllocationYear: z.number(),
-// 	ApprovedDate: z.date(),
-// 	LocationID: z.number(),
-// 	AllocationtypeId: z.number(),
-// 	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
-// 	TargetMen: beneficiariesSchema,
-// 	TargetWomen: beneficiariesSchema,
-// 	TargetBoys: beneficiariesSchema,
-// 	TargetGirls: beneficiariesSchema,
-// 	ReachedMen: beneficiariesSchema,
-// 	ReachedWomen: beneficiariesSchema,
-// 	ReachedBoys: beneficiariesSchema,
-// 	ReachedGirls: beneficiariesSchema,
-// });
-
-// export const byTypeObjSchema = z.object({
-// 	PooledFundId: z.number().min(1).max(numberOfFunds),
-// 	AllocationYear: z.number(),
-// 	ReportApprovedDate: z.date(),
-// 	BeneficiaryTypeId: z.number().min(1).max(numberOfBeneficiaryTypes),
-// 	AllocationtypeId: z.number(),
-// 	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
-// 	TargetMen: beneficiariesSchema,
-// 	TargetWomen: beneficiariesSchema,
-// 	TargetBoys: beneficiariesSchema,
-// 	TargetGirls: beneficiariesSchema,
-// 	ReachedMen: beneficiariesSchema,
-// 	ReachedWomen: beneficiariesSchema,
-// 	ReachedBoys: beneficiariesSchema,
-// 	ReachedGirls: beneficiariesSchema,
-// });
-
-// export const byOrganizationObjSchema = z.object({
-// 	PooledFundId: z.number().min(1).max(numberOfFunds),
-// 	AllocationYear: z.number(),
-// 	ReportApprovedDate: z.date(),
-// 	AllocationtypeId: z.number(),
-// 	AllocationSourceId: z.number().min(1).max(numberOfAllocationSources),
-// 	OrganizationType: z.number().min(1).max(numberOfOrganizationTypes),
-// 	NumbofProjects: z.number(),
-// 	TotalNumbPartners: z.number(),
-// 	Budget: z.number().min(0),
-// 	TargetedMen: beneficiariesSchema,
-// 	TargetedWomen: beneficiariesSchema,
-// 	TargetedBoys: beneficiariesSchema,
-// 	TargetedGirls: beneficiariesSchema,
-// 	ReachedMen: beneficiariesSchema,
-// 	ReachedWomen: beneficiariesSchema,
-// 	ReachedBoys: beneficiariesSchema,
-// 	ReachedGirls: beneficiariesSchema,
-// });
-
-// export type ApprovedAllocationsObj = z.infer<
-// 	typeof ApprovedAllocationsObjSchema
-// >;
-
-// export type BySectorObj = z.infer<typeof bySectorObjSchema>;
-
-// export type ByDisabilityObj = z.infer<typeof byDisabilityObjSchema>;
-
-// export type ByLocationObj = z.infer<typeof byLocationObjSchema>;
-
-// export type ByTypeObj = z.infer<typeof byTypeObjSchema>;
-
-// export type ByOrganizationObj = z.infer<typeof byOrganizationObjSchema>;
+export function createProjectSummaryV2ObjectSchema(
+	numberOfFunds: number,
+	numberOfAllocationSources: number,
+	numberOfOrganizationTypes: number
+): ZodSchema {
+	return z.object({
+		PFId: z.number().min(0).max(numberOfFunds),
+		AllNm: z.string(),
+		PrjCode: z.string(),
+		OPSCodeAgg: z.any(),
+		EmgAgg: z.any(),
+		AllYr: z.number(),
+		AllSrc: z.number().min(0).max(numberOfAllocationSources),
+		OrgNm: z.string(),
+		OrgTypeId: z.number().min(0).max(numberOfOrganizationTypes),
+		PrjTitle: z.string(),
+		AStrDt: z.string(),
+		AEndDt: z.string(),
+		PrjDur: z.any(),
+		PrgBdg: z.number().nonnegative(),
+		BgdDC: z.number().nullable(),
+		BdgSC: z.number().nullable(),
+		PrjSubDt: z.string(),
+		BenAgg: z.string().regex(/^\d+##\d+##\d+##\d+$/),
+		PrjGM: z.string().nullable(),
+		PrjStsNm: z.string(),
+		PrjStsId: z.number(),
+		PrjStsCode: z.string(),
+		PartCode: z.number().nullable(),
+		ApprDt: z.string(),
+	});
+}

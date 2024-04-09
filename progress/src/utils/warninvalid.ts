@@ -14,4 +14,19 @@ function warnInvalidSchema(
 	}
 }
 
+function warnProjectNotFound(
+	projectCode: string,
+	row: Record<string, unknown>
+) {
+	if (!isProdSite) {
+		console.warn(
+			`Project code not found in the reached data: ${projectCode}\nRow with project not found: ${JSON.stringify(
+				row
+			)}`
+		);
+	}
+}
+
+export { warnProjectNotFound };
+
 export default warnInvalidSchema;

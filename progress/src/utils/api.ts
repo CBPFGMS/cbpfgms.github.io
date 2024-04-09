@@ -3,8 +3,9 @@ import fetchFile from "./fetchfile";
 import makeLists, { List } from "./makelists";
 // import preProcessData from "./preprocessdata";
 // import proccessApproved from "./processapproved.ts";
+import processRawData, { Data } from "./processrawdata";
 import {
-	ProjectSummary,
+	ProjectSummaryV2,
 	ArQuery18,
 	BeneficiariesMaster,
 	AllocationTypeMaster,
@@ -15,7 +16,7 @@ import {
 } from "../schemas";
 
 type ReceiveDataArgs = [
-	ProjectSummary,
+	ProjectSummaryV2,
 	ArQuery18,
 	BeneficiariesMaster,
 	AllocationTypeMaster,
@@ -49,7 +50,7 @@ function useData() {
 
 	useEffect(() => {
 		Promise.all([
-			fetchFile<ProjectSummary>(
+			fetchFile<ProjectSummaryV2>(
 				"projectSummary",
 				projectSummaryV2Url,
 				"csv"
@@ -116,6 +117,12 @@ function useData() {
 				organizationTypesMaster,
 				sectorsMaster,
 			});
+
+			const data: Data = processRawData(
+				projectSummaryV2,
+				arQuery18,
+				listsObj
+			);
 			// const {
 			// 	bySectorYear,
 			// 	byDisabilityYear,
