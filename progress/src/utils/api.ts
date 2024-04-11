@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
+import { useEffect } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
 import makeLists, { List } from "./makelists";
 // import preProcessData from "./preprocessdata";
@@ -45,8 +46,8 @@ function useData() {
 	// const [rawData, setRawData] = useState<RawData | null>(null),
 	// 	[lists, setLists] = useState<List | null>(null),
 	// 	[inDataLists, setInDataLists] = useState<InDataLists | null>(null),
-	const [loading, setLoading] = useState<boolean>(true),
-		[error, setError] = useState<string | null>(null);
+	// const [loading, setLoading] = useState<boolean>(true),
+	// 	[error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		Promise.all([
@@ -78,16 +79,15 @@ function useData() {
 				"json"
 			),
 			fetchFile<SectorsMaster>("sectorsMaster", sectorsMasterUrl, "json"),
-		])
-			.then(receiveData)
-			.catch((error: unknown) => {
-				if (error instanceof Error) {
-					setError(error.message);
-				} else {
-					setError("An unknown error occurred");
-				}
-				setLoading(false);
-			});
+		]).then(receiveData);
+		// .catch((error: unknown) => {
+		// 	if (error instanceof Error) {
+		// 		setError(error.message);
+		// 	} else {
+		// 		setError("An unknown error occurred");
+		// 	}
+		// 	setLoading(false);
+		// });
 
 		function receiveData([
 			projectSummaryV2,
@@ -123,6 +123,8 @@ function useData() {
 				arQuery18,
 				listsObj
 			);
+
+			console.log(data);
 			// const {
 			// 	bySectorYear,
 			// 	byDisabilityYear,

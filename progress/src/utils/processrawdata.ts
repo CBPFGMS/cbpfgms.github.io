@@ -13,6 +13,14 @@ type Datum = {
 	targeted: BeneficiariesObject;
 	fund: number;
 	year: number;
+	projectCode: string;
+	allocationSource: number;
+	organizationType: number;
+	allocationType: string;
+	startDate: Date;
+	endDate: Date;
+	budget: number;
+	projectStatus: string;
 };
 
 export type Data = Datum[];
@@ -77,21 +85,51 @@ function processRawData(
 	projectSummaryV2.forEach(row => {
 		const parsedRow = dataSchema.safeParse(row);
 		if (parsedRow.success) {
-			// const objDatum: Datum = {
-			// 	foo: row.PrjCode,
-			// };
-			// const projectNumericValue = projectNameToValue.get(row.PrjCode);
-			// if (projectNumericValue !== undefined) {
-			// 	const index = binarySearch(
-			// 		arQuery18ProcessedData,
-			// 		projectNumericValue,
-			// 		"sortValue"
-			// 	);
-			// 	if (index !== -1) {
-			// 	}
-			// } else {
-			// 	//warnProjectNotFound(row.PrjCode, row);
-			// }
+			const objDatum: Datum = {
+				fund: row.PFId,
+				year: row.AllYr,
+				projectCode: row.PrjCode,
+				allocationSource: row.AllSrc,
+				organizationType: row.OrgTypeId,
+				allocationType: row.AllNm,
+				startDate: new Date(row.AStrDt),
+				endDate: new Date(row.AEndDt),
+				budget: row.PrgBdg,
+				projectStatus: row.PrjStsNm,
+				reached: {
+					men: 0,
+					women: 0,
+					boys: 0,
+					girls: 0,
+				},
+				targeted: {
+					men: 0,
+					women: 0,
+					boys: 0,
+					girls: 0,
+				},
+			};
+			const targetedPeopleArray = row.BenAgg.split("##");
+			objDatum.targeted.men = parseInt(targetedPeopleArray[0]);
+			objDatum.targeted.women = parseInt(targetedPeopleArray[1]);
+			objDatum.targeted.boys = parseInt(targetedPeopleArray[2]);
+			objDatum.targeted.girls = parseInt(targetedPeopleArray[3]);
+			const projectNumericValue = projectNameToValue.get(row.PrjCode);
+			if (projectNumericValue !== undefined) {
+				const index = binarySearch(
+					arQuery18ProcessedData,
+					projectNumericValue,
+					"sortValue"
+				);
+				if (index !== -1) {
+					objDatum.reached = {
+						...arQuery18ProcessedData[index].reached,
+					};
+				}
+			} else {
+				warnProjectNotFound(row.PrjCode, row);
+			}
+			data.push(objDatum);
 		} else {
 			warnInvalidSchema(
 				"projectSummaryV2",
