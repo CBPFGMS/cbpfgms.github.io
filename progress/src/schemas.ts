@@ -76,6 +76,22 @@ export const arQuery18ObjectSchema = z.object({
 	TotalReachedDisabilities: z.number(),
 });
 
+export const sectorsDataObjectSchema = z.object({
+	ChfId: z.number(),
+	ChfProjectCode: z.string(),
+	Percentage: z.number().min(0).max(100),
+	ClusterBudget: z.number().nonnegative(),
+	TarM: z.number().nullable(),
+	TarW: z.number().nullable(),
+	TarB: z.number().nullable(),
+	TarG: z.number().nullable(),
+	AchM: z.number().nullable(),
+	AchW: z.number().nullable(),
+	AchB: z.number().nullable(),
+	AchG: z.number().nullable(),
+	SectorId: z.number(),
+});
+
 export const beneficiariesMasterObjectSchema = z.object({
 	BeneficiaryTypeId: z.number(),
 	BeneficiaryType: z.string(),
@@ -123,6 +139,8 @@ const projectSummaryV2Schema = z.array(projectSummaryV2ObjectSchema);
 
 const arQuery18Schema = z.array(arQuery18ObjectSchema);
 
+const sectorsDataSchema = z.array(sectorsDataObjectSchema);
+
 const beneficiariesMasterSchema = z.array(beneficiariesMasterObjectSchema);
 
 const allocationTypeMasterSchema = z.array(allocationTypeMasterObjectSchema);
@@ -168,6 +186,8 @@ const sectorsMasterSchema = z.array(sectorsMasterObjectSchema);
 export type ProjectSummaryV2 = z.infer<typeof projectSummaryV2Schema>;
 
 export type ArQuery18 = z.infer<typeof arQuery18Schema>;
+
+export type SectorsData = z.infer<typeof sectorsDataSchema>;
 
 export type BeneficiariesMaster = z.infer<typeof beneficiariesMasterSchema>;
 

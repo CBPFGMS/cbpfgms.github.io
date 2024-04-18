@@ -1,13 +1,14 @@
 // import { useState, useEffect } from "react";
-import { useEffect } from "react"; //REMOVE LATER
+import { useEffect, useState } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
 import makeLists, { List } from "./makelists";
 // import preProcessData from "./preprocessdata";
 // import proccessApproved from "./processapproved.ts";
-import processRawData, { Data } from "./processrawdata";
+import processRawData, { Data, InDataLists } from "./processrawdata";
 import {
 	ProjectSummaryV2,
 	ArQuery18,
+	SectorsData,
 	BeneficiariesMaster,
 	AllocationTypeMaster,
 	FundsMaster,
@@ -19,6 +20,7 @@ import {
 type ReceiveDataArgs = [
 	ProjectSummaryV2,
 	ArQuery18,
+	SectorsData,
 	BeneficiariesMaster,
 	AllocationTypeMaster,
 	FundsMaster,
@@ -30,6 +32,7 @@ type ReceiveDataArgs = [
 function useData() {
 	const projectSummaryV2Url = "./data/ProjectSummaryV2.csv",
 		arQuery18Url = "./data/AR_QUERY_18.csv",
+		sectorsData = "./data/sectorsData.csv",
 		beneficiariesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		allocationTypeMasterUrl =
@@ -43,11 +46,11 @@ function useData() {
 		sectorsMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json";
 
-	// const [rawData, setRawData] = useState<RawData | null>(null),
-	// 	[lists, setLists] = useState<List | null>(null),
-	// 	[inDataLists, setInDataLists] = useState<InDataLists | null>(null),
-	// const [loading, setLoading] = useState<boolean>(true),
-	// 	[error, setError] = useState<string | null>(null);
+	const [data, setData] = useState<Data | null>(null),
+		[lists, setLists] = useState<List | null>(null),
+		[inDataLists, setInDataLists] = useState<InDataLists | null>(null);
+	const [loading, setLoading] = useState<boolean>(true),
+		[error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		Promise.all([
@@ -57,6 +60,7 @@ function useData() {
 				"csv"
 			),
 			fetchFile<ArQuery18>("arQuery18", arQuery18Url, "csv"),
+			fetchFile<SectorsData>("sectorsData", sectorsData, "csv"),
 			fetchFile<BeneficiariesMaster>(
 				"beneficiariesMaster",
 				beneficiariesMasterUrl,
@@ -79,19 +83,21 @@ function useData() {
 				"json"
 			),
 			fetchFile<SectorsMaster>("sectorsMaster", sectorsMasterUrl, "json"),
-		]).then(receiveData);
-		// .catch((error: unknown) => {
-		// 	if (error instanceof Error) {
-		// 		setError(error.message);
-		// 	} else {
-		// 		setError("An unknown error occurred");
-		// 	}
-		// 	setLoading(false);
-		// });
+		])
+			.then(receiveData)
+			.catch((error: unknown) => {
+				if (error instanceof Error) {
+					setError(error.message);
+				} else {
+					setError("An unknown error occurred");
+				}
+				setLoading(false);
+			});
 
 		function receiveData([
 			projectSummaryV2,
 			arQuery18,
+			sectorsData,
 			beneficiariesMaster,
 			allocationTypeMaster,
 			fundsMaster,
@@ -99,16 +105,6 @@ function useData() {
 			organizationTypesMaster,
 			sectorsMaster,
 		]: ReceiveDataArgs): void {
-			// console.log(
-			// 	projectSummaryV2,
-			// 	arQuery18,
-			// 	beneficiariesMaster,
-			// 	allocationTypeMaster,
-			// 	fundsMaster,
-			// 	allocationSourcesMaster,
-			// 	organizationTypesMaster,
-			// 	sectorsMaster
-			// );
 			const listsObj: List = makeLists({
 				fundsMaster,
 				beneficiariesMaster,
@@ -121,10 +117,13 @@ function useData() {
 			const data: Data = processRawData(
 				projectSummaryV2,
 				arQuery18,
-				listsObj
+				sectorsData,
+				listsObj,
+				setInDataLists
 			);
 
-			console.log(data);
+			//console.log(data);
+
 			// const {
 			// 	bySectorYear,
 			// 	byDisabilityYear,
@@ -144,27 +143,21 @@ function useData() {
 			// 	approvedAllocations,
 			// 	listsObj
 			// );
-			// if (inDataLists?.reportYears.size === 0) {
-			// 	setError("No data available");
-			// 	setLoading(false);
-			// 	return;
-			// }
-			// setRawData({
-			// 	bySector: bySectorYear,
-			// 	byDisability: byDisabilityYear,
-			// 	byLocation: byLocationYear,
-			// 	byType: byTypeYear,
-			// 	byOrganization: byOrganizationYear,
-			// 	approved: processedApprovedAllocations,
-			// 	allocatedTotals: allocatedTotals,
-			// });
-			// setLists(listsObj);
-			// setLoading(false);
+
+			if (inDataLists?.years.size === 0) {
+				setError("No data available");
+				setLoading(false);
+				return;
+			}
+
+			setData(data);
+			setLists(listsObj);
+			setLoading(false);
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	//return { rawData, lists, inDataLists, loading, error };
+	return { data, lists, inDataLists, loading, error };
 }
 
 export default useData;

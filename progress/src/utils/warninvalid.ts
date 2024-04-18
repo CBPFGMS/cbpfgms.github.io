@@ -1,4 +1,5 @@
-const isProdSite = window.location.hostname === "cbpf.data.unocha.org";
+//const isProdSite = window.location.hostname === "cbpf.data.unocha.org";
+const isProdSite = true;
 
 function warnInvalidSchema(
 	file: string,
