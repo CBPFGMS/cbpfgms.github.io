@@ -5,7 +5,7 @@ import {
 	arQuery18ObjectSchema,
 	createProjectSummaryV2ObjectSchema,
 	sectorsDataObjectSchema,
-} from "../schemas";
+} from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import binarySearch from "./binarysearch";

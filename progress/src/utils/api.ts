@@ -6,45 +6,47 @@ import makeLists, { List } from "./makelists";
 // import proccessApproved from "./processapproved.ts";
 import processRawData, { Data, InDataLists } from "./processrawdata";
 import {
-	ProjectSummaryV2,
-	ArQuery18,
-	SectorsData,
-	BeneficiariesMaster,
-	AllocationTypeMaster,
-	FundsMaster,
-	AllocationSourcesMaster,
-	OrganizationTypesMaster,
-	SectorsMaster,
-} from "../schemas";
+	AllocationSourcesMasterObject,
+	AllocationTypeMasterObject,
+	BeneficiaryTypesMasterObject,
+	OrganizationMasterObject,
+	OrganizationTypesMasterObject,
+	PooledFundsMasterObject,
+	ProjectStatusMasterObject,
+	ProjectSummaryObject,
+	SectorBeneficiaryObject,
+	SectorsMasterObject,
+} from "./schemas";
 
 type ReceiveDataArgs = [
-	ProjectSummaryV2,
-	ArQuery18,
-	SectorsData,
-	BeneficiariesMaster,
-	AllocationTypeMaster,
-	FundsMaster,
-	AllocationSourcesMaster,
-	OrganizationTypesMaster,
-	SectorsMaster
+	ProjectSummaryObject[],
+	SectorBeneficiaryObject[],
+	AllocationTypeMasterObject[],
+	OrganizationMasterObject[],
+	ProjectStatusMasterObject[],
+	BeneficiaryTypesMasterObject[],
+	PooledFundsMasterObject[],
+	AllocationSourcesMasterObject[],
+	OrganizationTypesMasterObject[],
+	SectorsMasterObject[]
 ];
 
 function useData() {
-	const projectSummaryV2Url = "./data/ProjectSummaryV2.csv",
-		arQuery18Url = "./data/AR_QUERY_18.csv",
-		sectorsData = "./data/sectorsData.csv",
-		beneficiariesMasterUrl =
+	const projectSummaryUrl = "./data/PFProjectSummary.csv",
+		organizationMasterUrl = "./data/PFOrganizationMasterSummary.csv",
+		sectorsDataUrl = "./data/ReportClusterBeneficiary.csv",
+		allocationTypeMasterUrl = "./data/AllocationTypes.csv",
+		projectStatusMasterUrl = "./data/PFGlobalStatus.csv",
+		beneficiaryTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
-		allocationTypeMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstAllocationType.csv",
-		fundsMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
+		pooledFundsMasterUrl =
+			"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 		allocationSourcesMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",
+			"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
 		organizationTypesMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/mst/MstOrganization.json",
+			"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 		sectorsMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json";
+			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv";
 
 	const [data, setData] = useState<Data | null>(null),
 		[lists, setLists] = useState<List | null>(null),
@@ -54,35 +56,56 @@ function useData() {
 
 	useEffect(() => {
 		Promise.all([
-			fetchFile<ProjectSummaryV2>(
+			fetchFile<ProjectSummaryObject[]>(
 				"projectSummary",
-				projectSummaryV2Url,
+				projectSummaryUrl,
 				"csv"
 			),
-			fetchFile<ArQuery18>("arQuery18", arQuery18Url, "csv"),
-			fetchFile<SectorsData>("sectorsData", sectorsData, "csv"),
-			fetchFile<BeneficiariesMaster>(
-				"beneficiariesMaster",
-				beneficiariesMasterUrl,
+			fetchFile<SectorBeneficiaryObject[]>(
+				"sectorsData",
+				sectorsDataUrl,
 				"csv"
 			),
-			fetchFile<AllocationTypeMaster>(
+			fetchFile<AllocationTypeMasterObject[]>(
 				"allocationTypeMaster",
 				allocationTypeMasterUrl,
 				"csv"
 			),
-			fetchFile<FundsMaster>("fundsMaster", fundsMasterUrl, "json"),
-			fetchFile<AllocationSourcesMaster>(
+			fetchFile<OrganizationMasterObject[]>(
+				"organizationMaster",
+				organizationMasterUrl,
+				"csv"
+			),
+			fetchFile<ProjectStatusMasterObject[]>(
+				"projectStatusMaster",
+				projectStatusMasterUrl,
+				"csv"
+			),
+			fetchFile<BeneficiaryTypesMasterObject[]>(
+				"beneficiaryTypesMaster",
+				beneficiaryTypesMasterUrl,
+				"csv"
+			),
+			fetchFile<PooledFundsMasterObject[]>(
+				"pooledFundsMaster",
+				pooledFundsMasterUrl,
+				"csv"
+			),
+			fetchFile<AllocationSourcesMasterObject[]>(
 				"allocationSourcesMaster",
 				allocationSourcesMasterUrl,
-				"json"
+				"csv"
 			),
-			fetchFile<OrganizationTypesMaster>(
+			fetchFile<OrganizationTypesMasterObject[]>(
 				"organizationTypesMaster",
 				organizationTypesMasterUrl,
-				"json"
+				"csv"
 			),
-			fetchFile<SectorsMaster>("sectorsMaster", sectorsMasterUrl, "json"),
+			fetchFile<SectorsMasterObject[]>(
+				"sectorsMaster",
+				sectorsMasterUrl,
+				"csv"
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -95,32 +118,35 @@ function useData() {
 			});
 
 		function receiveData([
-			projectSummaryV2,
-			arQuery18,
-			sectorsData,
-			beneficiariesMaster,
+			projectSummary,
+			sectorBeneficiary,
 			allocationTypeMaster,
-			fundsMaster,
+			organizationMaster,
+			projectStatusMaster,
+			beneficiaryTypesMaster,
+			pooledFundsMaster,
 			allocationSourcesMaster,
 			organizationTypesMaster,
 			sectorsMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
-				fundsMaster,
-				beneficiariesMaster,
 				allocationTypeMaster,
+				organizationMaster,
+				projectStatusMaster,
+				beneficiaryTypesMaster,
+				pooledFundsMaster,
 				allocationSourcesMaster,
 				organizationTypesMaster,
 				sectorsMaster,
 			});
 
-			const data: Data = processRawData(
-				projectSummaryV2,
-				arQuery18,
-				sectorsData,
-				listsObj,
-				setInDataLists
-			);
+			// const data: Data = processRawData(
+			// 	projectSummaryV2,
+			// 	arQuery18,
+			// 	sectorsData,
+			// 	listsObj,
+			// 	setInDataLists
+			// );
 
 			//console.log(data);
 
