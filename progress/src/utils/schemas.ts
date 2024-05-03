@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 const splitRegex = /^(\d*\|\d*\|\d*\|\d*\|\d*)$/,
-	dateRegex = /\b(0[1-9]|1[0-9]|2[0-9]|3[01])\/(0[1-9]|1[012])\/20\d\d\b/;
+	dateRegex =
+		/\b([1-9]|0[1-9]|1[012])\/([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])\/20\d\d\b/;
 
 // ********************
 // DATA SCHEMAS
@@ -21,34 +22,64 @@ export const projectSummaryObjectSchema = z.object({
 	BenW: z.number().int().nonnegative(),
 	BenB: z.number().int().nonnegative(),
 	BenG: z.number().int().nonnegative(),
-	GMId: z.string().nullable(),
+	GMId: z.union([z.number(), z.string()]).nullable(),
 	GAMId: z.number().nullable(),
 	GlbPrjStatusId: z.number().int().nonnegative(),
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
-	DisabilityMarkerId: z.number().int().nonnegative(),
-	GenderEqualityMarkerId: z.number().int().nonnegative(),
-	GBVMarkerId: z.number().int().nonnegative(),
-	GAMRefNumber: z.string(),
-	PartnerProjectRisk: z.string(),
-	PartnerRisk: z.string(),
-	DisabledM: z.number().int().nonnegative(),
-	DisabledW: z.number().int().nonnegative(),
-	DisabledB: z.number().int().nonnegative(),
-	DisabledG: z.number().int().nonnegative(),
-	AchM: z.number().int().nonnegative(),
-	AchW: z.number().int().nonnegative(),
-	AchB: z.number().int().nonnegative(),
-	AchG: z.number().int().nonnegative(),
-	BenMSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	BenWSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	BenBSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	BenGSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	BenTotSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	AchMSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	AchWSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	AchBSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	AchGSplit: z.string().regex(splitRegex, "Invalid split string format"),
-	AchTotSplit: z.string().regex(splitRegex, "Invalid split string format"),
+	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
+	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
+	GBVMarkerId: z.number().int().nonnegative().nullable(),
+	GAMRefNumber: z.string().nullable(),
+	PartnerProjectRisk: z.string().nullable(),
+	PartnerRisk: z.string().nullable(),
+	DisabledM: z.number().int().nonnegative().nullable(),
+	DisabledW: z.number().int().nonnegative().nullable(),
+	DisabledB: z.number().int().nonnegative().nullable(),
+	DisabledG: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
+	BenMSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	BenWSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	BenBSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	BenGSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	BenTotSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	AchMSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	AchWSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	AchBSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	AchGSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
+	AchTotSplit: z
+		.string()
+		.regex(splitRegex, "Invalid split string format")
+		.nullable(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
@@ -69,7 +100,7 @@ export const sectorBeneficiaryObjectSchema = z.object({
 	ActualWomen: z.number().int().nonnegative(),
 	ActualBoys: z.number().int().nonnegative(),
 	ActualGirls: z.number().int().nonnegative(),
-	GlobalInstanceStatusId: z.number().int().nonnegative(),
+	GlobalInstanceStatusId: z.number().int().nonnegative().nullable(),
 	SubmissionDate: z.string().regex(dateRegex, "Invalid date format"),
 });
 
@@ -83,16 +114,23 @@ export const allocationTypeMasterObjectSchema = z.object({
 	AllocationSource: z.string(),
 	AllocationSourceId: z.union([z.literal(1), z.literal(2)]),
 	TotalUSDPlanned: z.number().nonnegative(),
-	PlannedStartDate: z.string().regex(dateRegex, "Invalid date format"),
-	PlannedEndDate: z.string().regex(dateRegex, "Invalid date format"),
-	Documents: z.string(),
+	PlannedStartDate: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
+	PlannedEndDate: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
+	Documents: z.string().nullable(),
 	PooledFundId: z.number().int().nonnegative(),
 	PooledFundName: z.string(),
 	AllocationYear: z.number().int().nonnegative(),
-	HRPPlans: z.string(),
+	HRPPlans: z.string().nullable(),
 	AllocationHCLastProjectApprovalDate: z
 		.string()
-		.regex(dateRegex, "Invalid date format"),
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
 	TotalProjectsunderApproval: z.number().int().nonnegative(),
 	TotalUnderApprovalBudget: z.number().nonnegative(),
 	TotalProjectsApproved: z.number().int().nonnegative(),
@@ -116,18 +154,24 @@ export const organizationMasterObjectSchema = z.object({
 	]),
 	OrganizationTypeName: z.string(),
 	AlternateName: z.string().nullable(),
-	DueDiligenceStatus: z.string(),
-	IsEligible: z.string(),
-	EligibleSince: z.string().regex(dateRegex, "Invalid date format"),
-	FirstAllocationDate: z.string().regex(dateRegex, "Invalid date format"),
-	GlobalOrgId: z.number().int().nonnegative(),
+	DueDiligenceStatus: z.string().nullable(),
+	IsEligible: z.string().nullable(),
+	EligibleSince: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
+	FirstAllocationDate: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
+	GlobalOrgId: z.number().int().nonnegative().nullable(),
 	GlobalUniqueId: z.number().int().nonnegative(),
 	LocalizationMarker: z.string().nullable(),
-	OrgIsWLO: z.string(),
-	OrgIsWRO: z.string(),
-	OrgIsOPD: z.string(),
-	OrgIsYLO: z.string(),
-	UNPPId: z.number(),
+	OrgIsWLO: z.string().nullable(),
+	OrgIsWRO: z.string().nullable(),
+	OrgIsOPD: z.string().nullable(),
+	OrgIsYLO: z.string().nullable(),
+	UNPPId: z.union([z.number(), z.string()]).nullable(),
 });
 
 export const projectStatusMasterObjectSchema = z.object({

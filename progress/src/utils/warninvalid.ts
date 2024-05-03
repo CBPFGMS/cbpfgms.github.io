@@ -1,5 +1,5 @@
 //const isProdSite = window.location.hostname === "cbpf.data.unocha.org";
-const isProdSite = true;
+const isProdSite = false;
 
 function warnInvalidSchema(
 	file: string,
@@ -17,11 +17,12 @@ function warnInvalidSchema(
 
 function warnProjectNotFound(
 	projectCode: string,
-	row: Record<string, unknown>
+	row: Record<string, unknown>,
+	message: string
 ) {
 	if (!isProdSite) {
 		console.warn(
-			`Project code not found in the reached data: ${projectCode}\nRow with project not found: ${JSON.stringify(
+			`${message}: ${projectCode}\nRow with project not found: ${JSON.stringify(
 				row
 			)}`
 		);

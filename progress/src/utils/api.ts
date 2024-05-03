@@ -32,11 +32,15 @@ type ReceiveDataArgs = [
 ];
 
 function useData() {
-	const projectSummaryUrl = "./data/PFProjectSummary.csv",
-		organizationMasterUrl = "./data/PFOrganizationMasterSummary.csv",
-		sectorsDataUrl = "./data/ReportClusterBeneficiary.csv",
-		allocationTypeMasterUrl = "./data/AllocationTypes.csv",
-		projectStatusMasterUrl = "./data/PFGlobalStatus.csv",
+	const projectSummaryUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
+		sectorsDataUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
+		allocationTypeMasterUrl =
+			"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
+		organizationMasterUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=&$format=csv",
+		projectStatusMasterUrl = "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1&$format=csv",
 		beneficiaryTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		pooledFundsMasterUrl =
@@ -119,7 +123,7 @@ function useData() {
 
 		function receiveData([
 			projectSummary,
-			sectorBeneficiary,
+			sectorsData,
 			allocationTypeMaster,
 			organizationMaster,
 			projectStatusMaster,
@@ -140,13 +144,12 @@ function useData() {
 				sectorsMaster,
 			});
 
-			// const data: Data = processRawData(
-			// 	projectSummaryV2,
-			// 	arQuery18,
-			// 	sectorsData,
-			// 	listsObj,
-			// 	setInDataLists
-			// );
+			const data: Data = processRawData({
+				projectSummary,
+				sectorsData,
+				listsObj,
+				setInDataLists,
+			});
 
 			//console.log(data);
 

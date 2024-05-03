@@ -17,6 +17,9 @@ import {
 	projectStatusMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
+import constants from "./constants";
+
+const { allocationTypeIdSeparator } = constants;
 
 type MakeListParams = {
 	allocationTypeMaster: AllocationTypeMasterObject[];
@@ -33,8 +36,10 @@ type ListObj = {
 	[key: number]: string;
 };
 
+type AllocationId = `${number}${typeof allocationTypeIdSeparator}${number}`;
+
 type AllocationTypeListObj = {
-	[key: number]: AllocationTypeMasterObject;
+	[key: AllocationId]: AllocationTypeMasterObject;
 };
 
 type OrganizationListObj = {
@@ -110,7 +115,9 @@ function makeLists({
 		const parsedAllocationTypeMaster =
 			allocationTypeMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
-			lists.allocationTypes[d.AllocationTypeId] = d;
+			lists.allocationTypes[
+				`${d.PooledFundId}${allocationTypeIdSeparator}${d.AllocationTypeId}`
+			] = d;
 		} else {
 			warnInvalidSchema(
 				"AllocationTypeMaster",

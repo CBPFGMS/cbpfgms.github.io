@@ -1,133 +1,148 @@
 import {
-	ProjectSummaryV2,
-	ArQuery18,
-	SectorsData,
-	arQuery18ObjectSchema,
-	createProjectSummaryV2ObjectSchema,
-	sectorsDataObjectSchema,
+	ProjectSummaryObject,
+	SectorBeneficiaryObject,
+	projectSummaryObjectSchema,
+	sectorBeneficiaryObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
-import binarySearch from "./binarysearch";
+import constants from "./constants";
+
+const { beneficiariesSplitOrder, allocationTypeIdSeparator } = constants;
 
 type Datum = {
 	reached: BeneficiariesObject;
 	targeted: BeneficiariesObject;
+	reachedByBeneficiaryType: BeneficiaryTypes;
+	targetedByBeneficiaryType: BeneficiaryTypes;
+	disabled: BeneficiariesObject;
 	fund: number;
 	year: number;
 	projectCode: string;
+	projectId: number;
 	allocationSource: number;
 	organizationType: number;
-	allocationType: string;
-	startDate: Date;
+	organizationId: number;
+	allocationType: number;
 	endDate: Date;
 	budget: number;
 	projectStatus: string;
-	sector: number | null;
+	projectStatusId: number;
+	sectorData: SectorDatum[];
 };
 
 export type Data = Datum[];
 
-type BeneficiaryTypes = "girls" | "boys" | "women" | "men";
+type SectorDatum = {
+	sectorId: number;
+	percentage: number;
+	reached: BeneficiariesObject;
+	targeted: BeneficiariesObject;
+};
+
+type SectorMapValue = {
+	projectCode: string;
+	projectId: number;
+	sectors: SectorDatum[];
+};
+
+type BeneficiaryTypes = {
+	[K in (typeof beneficiariesSplitOrder)[number]]: BeneficiariesObject;
+};
+
+type Beneficiaries = "girls" | "boys" | "women" | "men";
 
 type BeneficiariesObject = {
-	[K in BeneficiaryTypes]: number;
+	[K in Beneficiaries]: number;
 };
-
-type ArQuery18ProcessedDatum = {
-	sortValue: number;
-	projectCode: string;
-	reached: BeneficiariesObject;
-	sectors: {
-		sectorId: number;
-		percentage: number;
-	}[];
-};
-
-type ArQuery18ProcessedData = ArQuery18ProcessedDatum[];
 
 export type InDataLists = {
 	years: Set<number>;
 	sectors: Set<number>;
-	allocationTypes: Set<string>;
+	allocationTypes: Set<number>;
 	allocationSources: Set<number>;
 	funds: Set<number>;
 	organizationTypes: Set<number>;
+	organizations: Set<number>;
 };
 
-function processRawData(
-	projectSummaryV2: ProjectSummaryV2,
-	arQuery18: ArQuery18,
-	sectorsData: SectorsData,
-	listsObj: List,
-	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>
-): Data {
+type ProcessRawDataParams = {
+	projectSummary: ProjectSummaryObject[];
+	sectorsData: SectorBeneficiaryObject[];
+	listsObj: List;
+	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
+};
+
+function processRawData({
+	projectSummary,
+	sectorsData,
+	listsObj,
+	setInDataLists,
+}: ProcessRawDataParams): Data {
 	const data: Data = [];
-	const arQuery18ProcessedData: ArQuery18ProcessedData = [];
+	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
 	const yearsSet = new Set<number>();
 	const sectorsSet = new Set<number>();
-	const allocationTypesSet = new Set<string>();
+	const allocationTypesSet = new Set<number>();
 	const allocationSourcesSet = new Set<number>();
 	const fundsSet = new Set<number>();
 	const organizationTypesSet = new Set<number>();
-
-	const projectNameToValue = new Map<string, number>();
-	let nextValue = 0;
-
-	const dataSchema = createProjectSummaryV2ObjectSchema(
-		listsObj.masterFilesNumbers.numberOfFundsInMaster.size,
-		listsObj.masterFilesNumbers.numberOfAllocationSourcesInMaster.size,
-		listsObj.masterFilesNumbers.numberOfOrganizationTypesInMaster.size
-	);
-
-	arQuery18.forEach(row => {
-		const parsedRow = arQuery18ObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			if (!projectNameToValue.has(row.ChfProjectCode)) {
-				projectNameToValue.set(row.ChfProjectCode, nextValue);
-				nextValue++;
-			}
-			arQuery18ProcessedData.push({
-				sortValue: projectNameToValue.get(row.ChfProjectCode)!,
-				projectCode: row.ChfProjectCode,
-				reached: {
-					men: row.Men,
-					women: row.Women,
-					boys: row.Boys,
-					girls: row.Girls,
-				},
-				sectors: [],
-			});
-		} else {
-			warnInvalidSchema(
-				"arQuery18",
-				row,
-				JSON.stringify(parsedRow.error)
-			);
-		}
-	});
+	const organizationsSet = new Set<number>();
 
 	sectorsData.forEach(row => {
-		const parsedRow = sectorsDataObjectSchema.safeParse(row);
+		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			const projectNumericValue = projectNameToValue.get(
-				row.ChfProjectCode
-			);
-			if (projectNumericValue !== undefined) {
-				const index = binarySearch(
-					arQuery18ProcessedData,
-					projectNumericValue,
-					"sortValue"
-				);
-				if (index !== -1) {
-					arQuery18ProcessedData[index].sectors.push({
-						sectorId: row.SectorId,
-						percentage: row.Percentage,
-					});
-				}
+			sectorsSet.add(row.GlobalClusterId);
+			if (!sectorsDataMap.has(row.ChfProjectCode)) {
+				sectorsDataMap.set(row.ChfProjectCode, {
+					projectCode: row.ChfProjectCode,
+					projectId: row.ChfId,
+					sectors: [
+						{
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage,
+							reached: {
+								girls: row.ActualGirls,
+								boys: row.ActualBoys,
+								women: row.ActualWomen,
+								men: row.ActualMen,
+							},
+							targeted: {
+								girls: row.TargetGirls,
+								boys: row.TargetBoys,
+								women: row.TargetWomen,
+								men: row.TargetMen,
+							},
+						},
+					],
+				});
 			} else {
-				warnProjectNotFound(row.ChfProjectCode, row);
+				const projectData = sectorsDataMap.get(row.ChfProjectCode);
+				if (projectData) {
+					projectData.sectors.push({
+						sectorId: row.GlobalClusterId,
+						percentage: row.Percentage,
+						reached: {
+							girls: row.ActualGirls,
+							boys: row.ActualBoys,
+							women: row.ActualWomen,
+							men: row.ActualMen,
+						},
+						targeted: {
+							girls: row.TargetGirls,
+							boys: row.TargetBoys,
+							women: row.TargetWomen,
+							men: row.TargetMen,
+						},
+					});
+				} else {
+					warnProjectNotFound(
+						row.ChfProjectCode,
+						row,
+						"Project not found in sectorsDataMap"
+					);
+				}
 			}
 		} else {
 			warnInvalidSchema(
@@ -138,98 +153,112 @@ function processRawData(
 		}
 	});
 
-	projectSummaryV2.forEach(row => {
-		const parsedRow = dataSchema.safeParse(row);
+	projectSummary.forEach(row => {
+		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			let onlyOneSector = true;
+			const thisAllocationType =
+				listsObj.allocationTypes[
+					`${row.PooledFundId}${allocationTypeIdSeparator}${row.AllocationtypeId}`
+				];
+			const thisOrganization =
+				listsObj.organizations[row.GlobalUniqueOrgId];
+			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
+			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
-			yearsSet.add(row.AllYr);
-			fundsSet.add(row.PFId);
-			allocationSourcesSet.add(row.AllSrc);
-			organizationTypesSet.add(row.OrgTypeId);
-			allocationTypesSet.add(row.AllNm);
-
-			const objDatum: Datum = {
-				fund: row.PFId,
-				year: row.AllYr,
-				projectCode: row.PrjCode,
-				allocationSource: row.AllSrc,
-				organizationType: row.OrgTypeId,
-				allocationType: row.AllNm,
-				startDate: new Date(row.AStrDt),
-				endDate: new Date(row.AEndDt),
-				budget: row.PrgBdg,
-				projectStatus: row.PrjStsNm,
-				reached: {
-					men: 0,
-					women: 0,
-					boys: 0,
-					girls: 0,
-				},
-				targeted: {
-					men: 0,
-					women: 0,
-					boys: 0,
-					girls: 0,
-				},
-				sector: null,
-			};
-			const targetedPeopleArray = row.BenAgg.split("##");
-			objDatum.targeted.men = parseInt(targetedPeopleArray[0]);
-			objDatum.targeted.women = parseInt(targetedPeopleArray[1]);
-			objDatum.targeted.boys = parseInt(targetedPeopleArray[2]);
-			objDatum.targeted.girls = parseInt(targetedPeopleArray[3]);
-			const projectNumericValue = projectNameToValue.get(row.PrjCode);
-			if (projectNumericValue !== undefined) {
-				const index = binarySearch(
-					arQuery18ProcessedData,
-					projectNumericValue,
-					"sortValue"
-				);
-				if (index !== -1) {
-					objDatum.reached = {
-						...arQuery18ProcessedData[index].reached,
-					};
-					const sectorsInProject =
-						arQuery18ProcessedData[index].sectors;
-					if (sectorsInProject.length === 1) {
-						objDatum.sector = sectorsInProject[0].sectorId;
-						sectorsSet.add(sectorsInProject[0].sectorId);
-					}
-					if (sectorsInProject.length > 1) {
-						onlyOneSector = false;
-						sectorsInProject.forEach(sector => {
-							sectorsSet.add(sector.sectorId);
-							const objDatumCopy = { ...objDatum };
-							objDatumCopy.sector = sector.sectorId;
-							const percentage = sector.percentage / 100;
-							objDatumCopy.budget *= percentage;
-							for (const beneficiary in objDatumCopy.reached) {
-								objDatumCopy.reached[
-									beneficiary as BeneficiaryTypes
-								] *= percentage;
-							}
-							for (const beneficiary in objDatumCopy.targeted) {
-								objDatumCopy.reached[
-									beneficiary as BeneficiaryTypes
-								] *= percentage;
-							}
-							data.push(objDatumCopy);
-						});
-					}
-				}
-			} else {
-				warnProjectNotFound(row.PrjCode, row);
+			if (!thisAllocationType) {
+				// warnProjectNotFound(
+				// 	row.ChfProjectCode,
+				// 	row,
+				// 	"Project not found in allocation types"
+				// );
 			}
-			if (onlyOneSector) {
+
+			if (!thisOrganization) {
+				// warnProjectNotFound(
+				// 	row.ChfProjectCode,
+				// 	row,
+				// 	"Project not found in organizations"
+				// );
+			}
+
+			if (!thisStatus) {
+				// warnProjectNotFound(
+				// 	row.ChfProjectCode,
+				// 	row,
+				// 	"Project not found in statuses"
+				// );
+			}
+
+			if (!thisSectorData) {
+				// warnProjectNotFound(
+				// 	row.ChfProjectCode,
+				// 	row,
+				// 	"Project not found in sectors data"
+				// );
+			}
+
+			if (
+				thisAllocationType &&
+				thisOrganization &&
+				thisStatus &&
+				thisSectorData
+			) {
+				yearsSet.add(thisAllocationType.AllocationYear);
+				fundsSet.add(row.PooledFundId);
+				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
+				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
+				organizationsSet.add(thisOrganization.OrganizationId);
+				allocationTypesSet.add(row.AllocationtypeId);
+
+				//GET THE VALUES FOR EACH PERSON!!!
+
+				const reachedByBeneficiaryType: BeneficiaryTypes =
+					generateBeneficiariesSplitObject(row, "Ach");
+				const targetedByBeneficiaryType: BeneficiaryTypes =
+					generateBeneficiariesSplitObject(row, "Ben");
+
+				// for (const type of beneficiariesSplitOrder) {
+				// 	reachedByBeneficiaryType[type] =
+				// 		generateBeneficiariesObject();
+				// 	targetedByBeneficiaryType[type] =
+				// 		generateBeneficiariesObject();
+				// }
+
+				const objDatum: Datum = {
+					fund: row.PooledFundId,
+					year: thisAllocationType.AllocationYear,
+					projectCode: row.ChfProjectCode,
+					projectId: row.ChfId,
+					allocationSource: thisAllocationType.AllocationSourceId,
+					organizationType: thisOrganization.OrganizationTypeId,
+					organizationId: thisOrganization.OrganizationId,
+					allocationType: row.AllocationtypeId,
+					endDate: new Date(row.EndDate),
+					budget: row.Budget,
+					projectStatus: thisStatus,
+					projectStatusId: row.GlbPrjStatusId,
+					sectorData: thisSectorData.sectors,
+					reached: generateBeneficiariesObjectSummary(row, "reached"),
+					targeted: generateBeneficiariesObjectSummary(
+						row,
+						"targeted"
+					),
+					disabled: generateBeneficiariesObjectSummary(
+						row,
+						"disabled"
+					),
+					reachedByBeneficiaryType,
+					targetedByBeneficiaryType,
+				};
+
 				data.push(objDatum);
 			}
 		} else {
-			warnInvalidSchema(
-				"projectSummaryV2",
-				row,
-				JSON.stringify(parsedRow.error)
-			);
+			// warnInvalidSchema(
+			// 	"projectSummary",
+			// 	row,
+			// 	JSON.stringify(parsedRow.error)
+			// );
 		}
 	});
 
@@ -240,9 +269,84 @@ function processRawData(
 		allocationSources: allocationSourcesSet,
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
+		organizations: organizationsSet,
 	});
 
 	return data;
+}
+
+function generateBeneficiariesSplitObject(
+	row: ProjectSummaryObject,
+	type: "Ach" | "Ben"
+): BeneficiaryTypes {
+	const zeroSplit = [0, 0, 0, 0, 0];
+	const girlsColumn = row[`${type}GSplit`],
+		boysColumn = row[`${type}BSplit`],
+		womenColumn = row[`${type}WSplit`],
+		menColumn = row[`${type}MSplit`];
+
+	const girlsSplit =
+		girlsColumn !== null ? girlsColumn.split("|").map(Number) : zeroSplit;
+
+	const boysSplit =
+		boysColumn !== null ? boysColumn.split("|").map(Number) : zeroSplit;
+
+	const womenSplit =
+		womenColumn !== null ? womenColumn.split("|").map(Number) : zeroSplit;
+
+	const menSplit =
+		menColumn !== null ? menColumn.split("|").map(Number) : zeroSplit;
+
+	const splitObj = {} as BeneficiaryTypes;
+
+	beneficiariesSplitOrder.forEach((type, index) => {
+		splitObj[type] = {
+			girls: girlsSplit[index],
+			boys: boysSplit[index],
+			women: womenSplit[index],
+			men: menSplit[index],
+		};
+	});
+
+	return splitObj;
+}
+
+function generateBeneficiariesObjectSummary(
+	row: ProjectSummaryObject,
+	type: "reached" | "targeted" | "disabled"
+): BeneficiariesObject {
+	let girls = 0,
+		boys = 0,
+		women = 0,
+		men = 0;
+
+	if (type === "reached") {
+		girls = row.AchG || 0;
+		boys = row.AchB || 0;
+		women = row.AchW || 0;
+		men = row.AchM || 0;
+	}
+
+	if (type === "targeted") {
+		girls = row.BenG || 0;
+		boys = row.BenB || 0;
+		women = row.BenW || 0;
+		men = row.BenM || 0;
+	}
+
+	if (type === "disabled") {
+		girls = row.DisabledG || 0;
+		boys = row.DisabledB || 0;
+		women = row.DisabledW || 0;
+		men = row.DisabledM || 0;
+	}
+
+	return {
+		girls,
+		boys,
+		women,
+		men,
+	};
 }
 
 export default processRawData;
