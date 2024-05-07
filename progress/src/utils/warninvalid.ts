@@ -1,5 +1,7 @@
-//const isProdSite = window.location.hostname === "cbpf.data.unocha.org";
-const isProdSite = false;
+//import { constants } from "./constants";
+
+//const { isProdSite } = constants;
+const isProdSite = true; //CHANGE
 
 function warnInvalidSchema(
 	file: string,

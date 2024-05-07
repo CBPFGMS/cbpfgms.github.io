@@ -70,7 +70,8 @@ type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
 	sectorsData: SectorBeneficiaryObject[];
 	listsObj: List;
-	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists | null>>;
+	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
+	defaultFundType: number | null;
 };
 
 function processRawData({
@@ -78,6 +79,7 @@ function processRawData({
 	sectorsData,
 	listsObj,
 	setInDataLists,
+	defaultFundType,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
@@ -164,44 +166,48 @@ function processRawData({
 				listsObj.organizations[row.GlobalUniqueOrgId];
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
+			const thisFundType = defaultFundType
+				? row.FundType === defaultFundType
+				: true;
 
 			if (!thisAllocationType) {
-				// warnProjectNotFound(
-				// 	row.ChfProjectCode,
-				// 	row,
-				// 	"Project not found in allocation types"
-				// );
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in allocation types"
+				);
 			}
 
 			if (!thisOrganization) {
-				// warnProjectNotFound(
-				// 	row.ChfProjectCode,
-				// 	row,
-				// 	"Project not found in organizations"
-				// );
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in organizations"
+				);
 			}
 
 			if (!thisStatus) {
-				// warnProjectNotFound(
-				// 	row.ChfProjectCode,
-				// 	row,
-				// 	"Project not found in statuses"
-				// );
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in statuses"
+				);
 			}
 
 			if (!thisSectorData) {
-				// warnProjectNotFound(
-				// 	row.ChfProjectCode,
-				// 	row,
-				// 	"Project not found in sectors data"
-				// );
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in sectors data"
+				);
 			}
 
 			if (
 				thisAllocationType &&
 				thisOrganization &&
 				thisStatus &&
-				thisSectorData
+				thisSectorData &&
+				thisFundType
 			) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);
@@ -262,7 +268,7 @@ function processRawData({
 		}
 	});
 
-	setInDataLists({
+	setInDataLists(() => ({
 		years: yearsSet,
 		sectors: sectorsSet,
 		allocationTypes: allocationTypesSet,
@@ -270,7 +276,7 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
-	});
+	}));
 
 	return data;
 }

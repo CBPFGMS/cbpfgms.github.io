@@ -1,51 +1,27 @@
 import useData from "./utils/api";
 import Loading from "./components/Loading";
 import Error from "./components/Error";
-//import DataContext from "./context/DataContext";
-//import MainContainer from "./components/MainContainer";
-// import { RawData, List, InDataLists } from "./types";
+import DataContext from "./context/DataContext";
+import MainContainer from "./components/MainContainer";
 
 type AppProps = {
 	defaultYear: number;
+	defaultFundType: number | null;
 };
 
-function App({ defaultYear }: AppProps) {
-	const { loading, error } = useData(); //remove this
-	//const { rawData, lists, inDataLists, loading, error } = useData();
+function App({ defaultYear, defaultFundType }: AppProps) {
+	const { data, lists, inDataLists, loading, error } =
+		useData(defaultFundType);
 
 	return loading ? (
 		<Loading />
 	) : error ? (
 		<Error error={error} />
 	) : (
-		<div
-			style={{
-				width: "100%",
-				height: "100%",
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-			}}
-		>
-			API calls and data processing finished
-		</div>
+		<DataContext.Provider value={{ data, lists, inDataLists }}>
+			<MainContainer defaultYear={defaultYear} />
+		</DataContext.Provider>
 	);
-
-	// return loading ? (
-	// 	<Loading />
-	// ) : error ? (
-	// 	<Error error={error} />
-	// ) : (
-	// 	<DataContext.Provider
-	// 		value={{
-	// 			rawData: rawData as RawData,
-	// 			lists: lists as List,
-	// 			inDataLists: inDataLists as InDataLists,
-	// 		}}
-	// 	>
-	// 		<MainContainer />
-	// 	</DataContext.Provider>
-	// );
 }
 
 export default App;

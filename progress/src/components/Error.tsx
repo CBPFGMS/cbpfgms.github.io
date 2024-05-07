@@ -1,7 +1,12 @@
 import Alert from "@mui/material/Alert";
+import constants from "../utils/constants";
+
+const { isProdSite } = constants;
 
 function Error({ error }: { error: string }) {
-	console.error(error);
+	if (!isProdSite) {
+		console.error(error);
+	}
 	return (
 		<div
 			style={{

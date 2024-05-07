@@ -31,7 +31,7 @@ type ReceiveDataArgs = [
 	SectorsMasterObject[]
 ];
 
-function useData() {
+function useData(defaultFundType: number | null) {
 	const projectSummaryUrl =
 			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
 		sectorsDataUrl =
@@ -40,7 +40,8 @@ function useData() {
 			"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 		organizationMasterUrl =
 			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=&$format=csv",
-		projectStatusMasterUrl = "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1&$format=csv",
+		projectStatusMasterUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1&$format=csv",
 		beneficiaryTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		pooledFundsMasterUrl =
@@ -52,9 +53,11 @@ function useData() {
 		sectorsMasterUrl =
 			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv";
 
-	const [data, setData] = useState<Data | null>(null),
-		[lists, setLists] = useState<List | null>(null),
-		[inDataLists, setInDataLists] = useState<InDataLists | null>(null);
+	const [data, setData] = useState<Data>([] as Data),
+		[lists, setLists] = useState<List>({} as List),
+		[inDataLists, setInDataLists] = useState<InDataLists>(
+			{} as InDataLists
+		);
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
 
@@ -149,31 +152,10 @@ function useData() {
 				sectorsData,
 				listsObj,
 				setInDataLists,
+				defaultFundType,
 			});
 
-			//console.log(data);
-
-			// const {
-			// 	bySectorYear,
-			// 	byDisabilityYear,
-			// 	byLocationYear,
-			// 	byTypeYear,
-			// 	byOrganizationYear,
-			// 	allocatedTotals,
-			// } = preProcessData({
-			// 	bySector,
-			// 	byDisability,
-			// 	byLocation,
-			// 	byType,
-			// 	byOrganization,
-			// 	setInDataLists,
-			// });
-			// const processedApprovedAllocations = proccessApproved(
-			// 	approvedAllocations,
-			// 	listsObj
-			// );
-
-			if (inDataLists?.years.size === 0) {
+			if (inDataLists?.years?.size === 0) {
 				setError("No data available");
 				setLoading(false);
 				return;
