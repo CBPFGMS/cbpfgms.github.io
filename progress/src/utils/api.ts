@@ -1,6 +1,7 @@
 // import { useState, useEffect } from "react";
 import { useEffect, useState } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
+import fetchFileDB from "./fetchfiledb";
 import makeLists, { List } from "./makelists";
 // import preProcessData from "./preprocessdata";
 // import proccessApproved from "./processapproved.ts";
@@ -63,12 +64,12 @@ function useData(defaultFundType: number | null) {
 
 	useEffect(() => {
 		Promise.all([
-			fetchFile<ProjectSummaryObject[]>(
+			fetchFileDB<ProjectSummaryObject[]>(
 				"projectSummary",
 				projectSummaryUrl,
 				"csv"
 			),
-			fetchFile<SectorBeneficiaryObject[]>(
+			fetchFileDB<SectorBeneficiaryObject[]>(
 				"sectorsData",
 				sectorsDataUrl,
 				"csv"

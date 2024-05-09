@@ -12,7 +12,7 @@ function fetchFile<T>(
 	const localData = localStorage.getItem(fileName);
 	if (
 		localData &&
-		JSON.parse(localData).timestamp >
+		JSON.parse(localData).timeStamp >
 			currentDate.getTime() - localStorageTime
 	) {
 		const fetchedData: T =
@@ -36,7 +36,7 @@ function fetchFile<T>(
 							method === "csv"
 								? csvFormat(fetchedData as object[])
 								: fetchedData,
-						timestamp: currentDate.getTime(),
+						timeStamp: currentDate.getTime(),
 					})
 				);
 			} catch (error) {

@@ -41,6 +41,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "npm:8.57.0"],\
           ["eslint-plugin-react-hooks", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:4.6.0"],\
           ["eslint-plugin-react-refresh", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:0.4.6"],\
+          ["idb", "npm:8.0.0"],\
           ["react", "npm:18.2.0"],\
           ["react-dom", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:18.2.0"],\
           ["react-intersection-observer", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:9.10.2"],\
@@ -3385,6 +3386,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["idb", [\
+      ["npm:8.0.0", {\
+        "packageLocation": "../../../../../.yarn/berry/cache/idb-npm-8.0.0-8b271946a3-10c0.zip/node_modules/idb/",\
+        "packageDependencies": [\
+          ["idb", "npm:8.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["ignore", [\
       ["npm:5.3.1", {\
         "packageLocation": "../../../../../.yarn/berry/cache/ignore-npm-5.3.1-f6947c5df7-10c0.zip/node_modules/ignore/",\
@@ -4142,6 +4152,7 @@ const RAW_RUNTIME_STATE =
           ["eslint", "npm:8.57.0"],\
           ["eslint-plugin-react-hooks", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:4.6.0"],\
           ["eslint-plugin-react-refresh", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:0.4.6"],\
+          ["idb", "npm:8.0.0"],\
           ["react", "npm:18.2.0"],\
           ["react-dom", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:18.2.0"],\
           ["react-intersection-observer", "virtual:aa63553005525e7318143e3db9f667ae282e6578b70c983e003941bf12899d7d09d3f4891d7bce50872a78db21a2ab8a6c0fb2693c349919293b2f8bfecfa122#npm:9.10.2"],\
