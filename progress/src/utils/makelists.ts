@@ -32,13 +32,13 @@ type MakeListParams = {
 	sectorsMaster: SectorsMasterObject[];
 };
 
-type ListObj = {
+export type ListObj = {
 	[key: number]: string;
 };
 
 type AllocationId = `${number}${typeof allocationTypeIdSeparator}${number}`;
 
-type AllocationTypeListObj = {
+export type AllocationTypeListObj = {
 	[key: AllocationId]: AllocationTypeMasterObject;
 };
 

@@ -20,7 +20,7 @@ function fetchFile<T>(
 				? csvParse(JSON.parse(localData).data, autoType)
 				: JSON.parse(localData).data;
 		console.info(
-			`%cInfo: data file ${fileName} retrieved from local storage`,
+			`%cInfo: data file ${fileName} retrieved from localStorage`,
 			consoleStyle
 		);
 		return Promise.resolve(fetchedData);
@@ -41,7 +41,7 @@ function fetchFile<T>(
 				);
 			} catch (error) {
 				console.warn(
-					`Error saving the file ${fileName} in the local storage. Error: ${error}.`
+					`Error saving the file ${fileName} in localStorage. Error: ${error}.`
 				);
 			}
 			console.info(

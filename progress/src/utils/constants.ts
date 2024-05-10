@@ -8,6 +8,14 @@ const constants = {
 	beneficiariesSplitOrder: [7, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	allocationTypeIdSeparator: "#",
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
+	charts: [
+		"summary",
+		"pictogram",
+		"beneficiaryTypes",
+		"sectors",
+		"organization",
+	],
+	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],
 } as const;
 
 export default constants;

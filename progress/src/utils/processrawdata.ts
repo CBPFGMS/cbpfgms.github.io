@@ -216,19 +216,10 @@ function processRawData({
 				organizationsSet.add(thisOrganization.OrganizationId);
 				allocationTypesSet.add(row.AllocationtypeId);
 
-				//GET THE VALUES FOR EACH PERSON!!!
-
 				const reachedByBeneficiaryType: BeneficiaryTypes =
 					generateBeneficiariesSplitObject(row, "Ach");
 				const targetedByBeneficiaryType: BeneficiaryTypes =
 					generateBeneficiariesSplitObject(row, "Ben");
-
-				// for (const type of beneficiariesSplitOrder) {
-				// 	reachedByBeneficiaryType[type] =
-				// 		generateBeneficiariesObject();
-				// 	targetedByBeneficiaryType[type] =
-				// 		generateBeneficiariesObject();
-				// }
 
 				const objDatum: Datum = {
 					fund: row.PooledFundId,
@@ -260,11 +251,11 @@ function processRawData({
 				data.push(objDatum);
 			}
 		} else {
-			// warnInvalidSchema(
-			// 	"projectSummary",
-			// 	row,
-			// 	JSON.stringify(parsedRow.error)
-			// );
+			warnInvalidSchema(
+				"projectSummary",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
 		}
 	});
 

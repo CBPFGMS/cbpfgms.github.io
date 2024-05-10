@@ -5,14 +5,14 @@ const localStorageTime = 60 * 60 * 1000, //1 hour
 	currentDate = new Date(),
 	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
 
-interface MyDatabase extends DBSchema {
+interface LocalDatabase extends DBSchema {
 	files: {
 		key: string;
 		value: { data: unknown; timeStamp: number };
 	};
 }
 
-const db = await openDB<MyDatabase>("localDatabase", 1, {
+const db = await openDB<LocalDatabase>("localDatabase", 1, {
 	upgrade(db) {
 		db.createObjectStore("files");
 	},
@@ -29,7 +29,7 @@ async function fetchFileDB<T>(fileName: string, url: string, method: string) {
 	) {
 		const fetchedData = localData.data as T;
 		console.info(
-			`%cInfo: data file ${fileName} retrieved from local database`,
+			`%cInfo: data file ${fileName} retrieved from indexedDB`,
 			consoleStyle
 		);
 		return Promise.resolve(fetchedData);
@@ -49,7 +49,7 @@ async function fetchFileDB<T>(fileName: string, url: string, method: string) {
 				);
 			} catch (error) {
 				console.warn(
-					`Error saving the file ${fileName} in the local database. Error: ${error}.`
+					`Error saving the file ${fileName} in indexedDB. Error: ${error}.`
 				);
 			}
 			console.info(

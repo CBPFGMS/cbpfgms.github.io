@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import Container from "@mui/material/Container";
 import { Tooltip } from "react-tooltip";
@@ -7,6 +7,12 @@ import constants from "../utils/constants";
 import TopPanel from "./TopPanel";
 import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
+import FiltersContainer from "./FiltersContainer";
+import processDataSummary from "../utils/processdatasummary";
+
+const { implementationStatuses, charts } = constants;
+
+type Charts = (typeof charts)[number];
 
 type MainContainerProps = {
 	defaultYear: number;
@@ -16,12 +22,9 @@ export type DownloadStates = {
 	[K in Charts]: boolean;
 };
 
-type Charts =
-	| "summary"
-	| "pictogram"
-	| "beneficiaryTypes"
-	| "sectors"
-	| "organization";
+type RefIds = {
+	[K in Charts as `${K}${typeof refIdSuffix}`]: string;
+};
 
 export type ImplementationStatuses =
 	| (typeof implementationStatuses)[number]
@@ -35,7 +38,12 @@ const downloadStates: DownloadStates = {
 	organization: false,
 } as const;
 
-const { implementationStatuses } = constants;
+const refIdSuffix = "RefId";
+
+const refIds = (Object.keys(downloadStates) as Charts[]).reduce((acc, curr) => {
+	acc[`${curr}${refIdSuffix}`] = `${curr}${refIdSuffix}`;
+	return acc;
+}, {} as RefIds);
 
 const queryStringValues = new URLSearchParams(location.search);
 
@@ -43,6 +51,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const { data, inDataLists, lists } = useContext(
 		DataContext
 	) as DataContextType;
+
+	console.log(data);
 
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
@@ -58,8 +68,38 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			useState<DownloadStates>(downloadStates);
 
 	const [titleRef, inViewTitle] = useInView({
-		threshold: 0.999,
-	});
+			threshold: 0.999,
+		}),
+		[menusRef, inViewMenus] = useInView({
+			threshold: 0,
+		});
+
+	//TODO 01: All the refs and inViews using useInView
+
+	//TODO 02: process data for all charts
+	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
+		() =>
+			processDataSummary({
+				data,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus,
+				lists,
+			}),
+		[
+			data,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			implementationStatus,
+			lists,
+		]
+	);
+
+	//TODO 03: create filterArrayDownload and the download data for all charts
 
 	useUpdateQueryString({
 		allocationSource,
@@ -94,8 +134,21 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			<TopPanel
 				titleRef={titleRef}
 				inViewTitle={inViewTitle}
+				inViewMenus={inViewMenus}
 			/>
 			<TopIntro />
+			<FiltersContainer
+				year={year}
+				setYear={setYear}
+				fund={fund}
+				setFund={setFund}
+				allocationSource={allocationSource}
+				setAllocationSource={setAllocationSource}
+				allocationType={allocationType}
+				setAllocationType={setAllocationType}
+				inSelectionData={inSelectionData}
+				menusRef={menusRef}
+			/>
 		</Container>
 	);
 }

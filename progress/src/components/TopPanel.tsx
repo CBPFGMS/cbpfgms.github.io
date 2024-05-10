@@ -6,9 +6,10 @@ import colors from "../utils/colors";
 type TopPanelProps = {
 	titleRef: (node?: Element | null | undefined) => void;
 	inViewTitle: boolean;
+	inViewMenus: boolean;
 };
 
-function TopPanel({ titleRef, inViewTitle }: TopPanelProps) {
+function TopPanel({ titleRef, inViewTitle, inViewMenus }: TopPanelProps) {
 	return (
 		<Grid
 			container

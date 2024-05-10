@@ -156,11 +156,12 @@ function useData(defaultFundType: number | null) {
 				defaultFundType,
 			});
 
-			if (inDataLists?.years?.size === 0) {
-				setError("No data available");
-				setLoading(false);
-				return;
-			}
+			//TEMPORARY FIX
+			// if (!inDataLists.years || inDataLists.years.size === 0) {
+			// 	setError("No data available");
+			// 	setLoading(false);
+			// 	return;
+			// }
 
 			setData(data);
 			setLists(listsObj);
