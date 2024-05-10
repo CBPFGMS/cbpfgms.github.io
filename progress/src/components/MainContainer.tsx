@@ -52,8 +52,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		DataContext
 	) as DataContextType;
 
-	console.log(data);
-
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[allocationType, setAllocationType] = useState<number[]>([

@@ -25,8 +25,8 @@ type ProcessDataSummaryParams = {
 type DatumSummary = {
 	year: number;
 	allocations: number;
-	projects: number;
-	partners: number;
+	projects: Set<number>;
+	partners: Set<number>;
 	underImplementation: number;
 };
 
@@ -79,6 +79,27 @@ function processDataSummary({
 
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum);
+		if (
+			implementationStatus === null ||
+			thisStatus.includes(implementationStatus)
+		) {
+			if (
+				year.includes(datum.year) &&
+				fund.includes(datum.fund) &&
+				allocationSource.includes(datum.allocationSource) &&
+				allocationType.includes(datum.allocationType)
+			) {
+				// dataSummary.push({
+				// 	year: datum.year,
+				// 	allocations: datum.,
+				// 	projects: datum.projects,
+				// 	partners: datum.partners,
+				// 	underImplementation: thisStatus.includes("Under Implementation")
+				// 		? 1
+				// 		: 0,
+				// });
+			}
+		}
 	});
 
 	return { dataSummary, dataPictogram, inSelectionData };
@@ -102,6 +123,7 @@ function processDataSummary({
 				}
 			}
 		}
+
 		return status;
 	}
 }

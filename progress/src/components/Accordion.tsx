@@ -161,7 +161,7 @@ function AccordionComponent({
 							fromQuickSelectors={false}
 						/>
 					)}
-					{filterType === "search" && (
+					{/* {filterType === "search" && (
 						<Search
 							value={value}
 							setValue={setValue}
@@ -170,7 +170,7 @@ function AccordionComponent({
 							inSelectionData={inSelectionData}
 							dataProperty={dataProperty}
 						/>
-					)}
+					)} */}
 					{filterType === "checkbox" && (
 						<CheckboxLabel
 							value={value}
