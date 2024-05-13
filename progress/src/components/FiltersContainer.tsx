@@ -4,6 +4,9 @@ import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
 import { InSelectionData } from "../utils/processdatasummary";
 import Selectors from "./Selectors";
+import Statuses from "./Statuses";
+import { ImplementationStatuses } from "./MainContainer";
+import { DataStatuses } from "../utils/processdatastatuses";
 
 type FiltersContainerProps = {
 	year: number[];
@@ -14,8 +17,13 @@ type FiltersContainerProps = {
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationType: number[];
 	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	implementationStatus: ImplementationStatuses[];
+	setImplementationStatus: React.Dispatch<
+		React.SetStateAction<ImplementationStatuses[]>
+	>;
 	inSelectionData: InSelectionData;
 	menusRef: (node?: Element | null | undefined) => void;
+	dataStatuses: DataStatuses;
 };
 
 function FiltersContainer({
@@ -29,6 +37,9 @@ function FiltersContainer({
 	setAllocationType,
 	inSelectionData,
 	menusRef,
+	implementationStatus,
+	setImplementationStatus,
+	dataStatuses,
 }: FiltersContainerProps) {
 	return (
 		<Grid
@@ -81,13 +92,11 @@ function FiltersContainer({
 					display={"flex"}
 					justifyContent={"flex-start"}
 				>
-					<Box
-						mt={1}
-						mb={1}
-						ml={0}
-					>
-						{/* Implementation boxes here */}
-					</Box>
+					<Statuses
+						dataStatuses={dataStatuses}
+						implementationStatus={implementationStatus}
+						setImplementationStatus={setImplementationStatus}
+					/>
 				</Grid>
 			</Paper>
 		</Grid>

@@ -27,9 +27,7 @@ type RefIds = {
 	[K in Charts as `${K}${typeof refIdSuffix}`]: string;
 };
 
-export type ImplementationStatuses =
-	| (typeof implementationStatuses)[number]
-	| null;
+export type ImplementationStatuses = (typeof implementationStatuses)[number];
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -49,7 +47,6 @@ const refIds = (Object.keys(downloadStates) as Charts[]).reduce((acc, curr) => {
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer({ defaultYear }: MainContainerProps) {
-	console.log("XXXXXXXXXXXXXXXXXXXXXXXXXX")
 	const { data, inDataLists, lists } = useContext(
 		DataContext
 	) as DataContextType;
@@ -62,8 +59,9 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		[allocationSource, setAllocationSource] = useState<number[]>([
 			...inDataLists.allocationSources,
 		]),
-		[implementationStatus, setImplementationStatus] =
-			useState<ImplementationStatuses>(null),
+		[implementationStatus, setImplementationStatus] = useState<
+			ImplementationStatuses[]
+		>([...implementationStatuses]),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 
@@ -159,8 +157,11 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setAllocationSource={setAllocationSource}
 				allocationType={allocationType}
 				setAllocationType={setAllocationType}
+				implementationStatus={implementationStatus}
+				setImplementationStatus={setImplementationStatus}
 				inSelectionData={inSelectionData}
 				menusRef={menusRef}
+				dataStatuses={dataStatuses}
 			/>
 		</Container>
 	);

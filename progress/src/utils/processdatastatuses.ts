@@ -1,10 +1,10 @@
 import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
-import { NonNullableImplementationStatuses } from "./calculatestatus";
+import { ImplementationStatuses } from "../components/MainContainer";
 
-export type DatumStatuses = {
-	[K in NonNullableImplementationStatuses]: number;
+export type DataStatuses = {
+	[K in ImplementationStatuses]: number;
 };
 
 type ProcessDataStatusesParams = {
@@ -23,8 +23,8 @@ function processDataStatuses({
 	allocationSource,
 	allocationType,
 	lists,
-}: ProcessDataStatusesParams): DatumStatuses {
-	const dataStatuses: DatumStatuses = {
+}: ProcessDataStatusesParams): DataStatuses {
+	const dataStatuses: DataStatuses = {
 		"Under Implementation": 0,
 		"Under Closure/Closed": 0,
 		Implemented: 0,

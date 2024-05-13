@@ -8,16 +8,11 @@ const currentDate = new Date().getTime();
 const { closedStatusNames } = constants;
 const closedStatusNamesWide: string[] = [...closedStatusNames];
 
-export type NonNullableImplementationStatuses = Exclude<
-	ImplementationStatuses,
-	null
->;
-
 function calculateStatus(
 	datum: Data[number],
 	lists: List
-): NonNullableImplementationStatuses {
-	let status: NonNullableImplementationStatuses;
+): ImplementationStatuses {
+	let status: ImplementationStatuses;
 	if (datum.endDate.getTime() > currentDate) {
 		status = "Under Implementation";
 	} else {

@@ -16,7 +16,7 @@ type ProcessDataSummaryParams = {
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
-	implementationStatus: ImplementationStatuses;
+	implementationStatus: ImplementationStatuses[];
 	lists: List;
 };
 
@@ -72,10 +72,7 @@ function processDataSummary({
 
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
-		if (
-			implementationStatus === null ||
-			thisStatus === implementationStatus
-		) {
+		if (implementationStatus.includes(thisStatus)) {
 			if (
 				year.includes(datum.year) &&
 				fund.includes(datum.fund) &&

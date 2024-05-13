@@ -13,7 +13,7 @@ type UpdateQueryStringParams = {
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	setImplementationStatus: React.Dispatch<
-		React.SetStateAction<ImplementationStatuses>
+		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	inDataLists: InDataLists;
@@ -21,7 +21,7 @@ type UpdateQueryStringParams = {
 	fund: number[];
 	allocationType: number[];
 	allocationSource: number[];
-	implementationStatus: ImplementationStatuses;
+	implementationStatus: ImplementationStatuses[];
 	downloadStates: DownloadStates;
 	defaultYear: number;
 };
@@ -50,7 +50,7 @@ function useUpdateQueryString({
 		const allocationSourcesParam = getNumericArrayParam("allocationSource");
 		const fundParam = getNumericArrayParam("fund");
 		const yearParam = getNumericArrayParam("year");
-		const implementationStatusParam = getStringParam(
+		const implementationStatusParam = getStringArrayParam(
 			"implementationStatus"
 		);
 
@@ -58,15 +58,8 @@ function useUpdateQueryString({
 		if (allocationSourcesParam) setAllocationSource(allocationSourcesParam);
 		if (fundParam) setFund(fundParam);
 		if (yearParam) setYear(yearParam);
-		if (
-			implementationStatusParam &&
-			implementationStatuses.includes(
-				implementationStatusParam as (typeof implementationStatuses)[number]
-			)
-		) {
-			setImplementationStatus(
-				implementationStatusParam as (typeof implementationStatuses)[number]
-			);
+		if (implementationStatusParam) {
+			setImplementationStatus(implementationStatusParam);
 		}
 		return () => {};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +80,7 @@ function useUpdateQueryString({
 		const yearParam =
 			year.length === 1 && year[0] === defaultYear ? "" : `&year=${year}`;
 		const implementationStatusParam =
-			implementationStatus === null
+			implementationStatus.length === implementationStatuses.length
 				? ""
 				: `&implementationStatus=${implementationStatus}`;
 		if (
@@ -112,8 +105,14 @@ function useUpdateQueryString({
 		return queryStringValues.get(param)?.split(",").map(Number) ?? null;
 	}
 
-	function getStringParam(param: string): string | null {
-		return queryStringValues.get(param) ?? null;
+	function getStringArrayParam(
+		param: string
+	): ImplementationStatuses[] | null {
+		return (
+			(queryStringValues
+				.get(param)
+				?.split(",") as ImplementationStatuses[]) ?? null
+		);
 	}
 }
 
