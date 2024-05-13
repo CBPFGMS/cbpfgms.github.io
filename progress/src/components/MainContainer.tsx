@@ -9,6 +9,7 @@ import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
 import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
+import processDataStatuses from "../utils/processdatastatuses";
 
 const { implementationStatuses, charts } = constants;
 
@@ -48,6 +49,7 @@ const refIds = (Object.keys(downloadStates) as Charts[]).reduce((acc, curr) => {
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer({ defaultYear }: MainContainerProps) {
+	console.log("XXXXXXXXXXXXXXXXXXXXXXXXXX")
 	const { data, inDataLists, lists } = useContext(
 		DataContext
 	) as DataContextType;
@@ -75,6 +77,19 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	//TODO 01: All the refs and inViews using useInView
 
 	//TODO 02: process data for all charts
+	const dataStatuses = useMemo(
+		() =>
+			processDataStatuses({
+				data,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				lists,
+			}),
+		[data, year, fund, allocationSource, allocationType, lists]
+	);
+
 	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
 		() =>
 			processDataSummary({

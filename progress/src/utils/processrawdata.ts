@@ -8,7 +8,7 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants from "./constants";
 
-const { beneficiariesSplitOrder, allocationTypeIdSeparator } = constants;
+const { beneficiariesSplitOrder } = constants;
 
 type Datum = {
 	reached: BeneficiariesObject;
@@ -24,6 +24,7 @@ type Datum = {
 	organizationType: number;
 	organizationId: number;
 	allocationType: number;
+	allocationTypeId: number;
 	endDate: Date;
 	budget: number;
 	projectStatus: string;
@@ -66,6 +67,12 @@ export type InDataLists = {
 	organizations: Set<number>;
 };
 
+type SetType<T> = {
+	[P in keyof T]: T[P] extends Set<infer U> ? U : never;
+};
+
+type InDataListsValues = SetType<InDataLists>;
+
 type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
 	sectorsData: SectorBeneficiaryObject[];
@@ -84,13 +91,16 @@ function processRawData({
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
-	const yearsSet = new Set<number>();
-	const sectorsSet = new Set<number>();
-	const allocationTypesSet = new Set<number>();
-	const allocationSourcesSet = new Set<number>();
-	const fundsSet = new Set<number>();
-	const organizationTypesSet = new Set<number>();
-	const organizationsSet = new Set<number>();
+	const yearsSet: Set<InDataListsValues["years"]> = new Set();
+	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
+	const allocationTypesSet: Set<InDataListsValues["allocationTypes"]> =
+		new Set();
+	const allocationSourcesSet: Set<InDataListsValues["allocationSources"]> =
+		new Set();
+	const fundsSet: Set<InDataListsValues["funds"]> = new Set();
+	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
+		new Set();
+	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -159,11 +169,11 @@ function processRawData({
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =
-				listsObj.allocationTypes[
-					`${row.PooledFundId}${allocationTypeIdSeparator}${row.AllocationtypeId}`
+				listsObj.allocationTypesCompleteList[
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				listsObj.organizations[row.GlobalUniqueOrgId];
+				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 			const thisFundType = defaultFundType
@@ -213,8 +223,10 @@ function processRawData({
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.OrganizationId);
-				allocationTypesSet.add(row.AllocationtypeId);
+				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				allocationTypesSet.add(
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+				);
 
 				const reachedByBeneficiaryType: BeneficiaryTypes =
 					generateBeneficiariesSplitObject(row, "Ach");
@@ -228,8 +240,11 @@ function processRawData({
 					projectId: row.ChfId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.OrganizationId,
-					allocationType: row.AllocationtypeId,
+					organizationId: thisOrganization.GlobalUniqueId,
+					allocationType: parseFloat(
+						`${row.PooledFundId}.${row.AllocationtypeId}`
+					),
+					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					budget: row.Budget,
 					projectStatus: thisStatus,

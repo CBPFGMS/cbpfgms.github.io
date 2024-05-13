@@ -7,7 +7,20 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
-import { DropdownProps } from "../types";
+import { ListObj } from "../utils/makelists";
+import { InSelectionData } from "../utils/processdatasummary";
+import { DataProperties, Type } from "./Accordion";
+
+type DropdownProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+	type: Type;
+	inSelectionData: InSelectionData;
+	dataProperty: DataProperties;
+	fromQuickSelectors: boolean;
+};
 
 function Dropdown({
 	value,
@@ -55,9 +68,11 @@ function Dropdown({
 	}
 
 	const namesListMemo = useMemo(() => {
-		names.sort((a, b) => namesList[a].localeCompare(namesList[b]));
+		names.sort((a, b) =>
+			type === "Year" ? b - a : namesList[a].localeCompare(namesList[b])
+		);
 		return names;
-	}, [names, namesList]);
+	}, [names, namesList, type]);
 
 	return (
 		<div ref={selectRef}>

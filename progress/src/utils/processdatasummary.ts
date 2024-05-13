@@ -1,9 +1,7 @@
 import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
-import constants from "./constants";
-
-type NonNullableImplementationStatuses = Exclude<ImplementationStatuses, null>;
+import calculateStatus from "./calculatestatus";
 
 export type InSelectionData = {
 	years: Set<number>;
@@ -41,11 +39,6 @@ type DatumPictogram = {
 	reachedGirls: number;
 };
 
-const currentDate = new Date().getTime();
-
-const { closedStatusNames } = constants;
-const closedStatusNamesWide: string[] = [...closedStatusNames];
-
 function processDataSummary({
 	data,
 	year,
@@ -78,10 +71,10 @@ function processDataSummary({
 	};
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum);
+		const thisStatus = calculateStatus(datum, lists);
 		if (
 			implementationStatus === null ||
-			thisStatus.includes(implementationStatus)
+			thisStatus === implementationStatus
 		) {
 			if (
 				year.includes(datum.year) &&
@@ -89,43 +82,63 @@ function processDataSummary({
 				allocationSource.includes(datum.allocationSource) &&
 				allocationType.includes(datum.allocationType)
 			) {
-				// dataSummary.push({
-				// 	year: datum.year,
-				// 	allocations: datum.,
-				// 	projects: datum.projects,
-				// 	partners: datum.partners,
-				// 	underImplementation: thisStatus.includes("Under Implementation")
-				// 		? 1
-				// 		: 0,
-				// });
-			}
-		}
-	});
-
-	return { dataSummary, dataPictogram, inSelectionData };
-
-	function calculateStatus(
-		datum: Data[number]
-	): NonNullableImplementationStatuses[] {
-		const status: NonNullableImplementationStatuses[] = [];
-		if (datum.endDate.getTime() > currentDate) {
-			status.push("Under Implementation");
-		} else {
-			if (datum.endDate.getTime() < currentDate) {
-				if (
-					closedStatusNamesWide.includes(
-						lists.statuses[datum.projectStatusId]
-					)
-				) {
-					status.push("Under Closure/Closed");
+				const foundYear = dataSummary.find(
+					summary => summary.year === datum.year
+				);
+				if (foundYear) {
+					foundYear.allocations += datum.budget;
+					foundYear.projects.add(datum.projectId);
+					foundYear.partners.add(datum.organizationId);
+					if (thisStatus.includes("Under Implementation")) {
+						foundYear.underImplementation += datum.budget;
+					}
 				} else {
-					status.push("Implemented");
+					dataSummary.push({
+						year: datum.year,
+						allocations: datum.budget,
+						projects: new Set([datum.projectId]),
+						partners: new Set([datum.organizationId]),
+						underImplementation: thisStatus.includes(
+							"Under Implementation"
+						)
+							? datum.budget
+							: 0,
+					});
 				}
 			}
 		}
 
-		return status;
-	}
+		if (
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource)
+		) {
+			inSelectionData.allocationTypes.add(datum.allocationType);
+		}
+		if (
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			inSelectionData.allocationSources.add(datum.allocationSource);
+		}
+		if (
+			year.includes(datum.year) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			inSelectionData.funds.add(datum.fund);
+		}
+		if (
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			inSelectionData.years.add(datum.year);
+		}
+	});
+
+	return { dataSummary, dataPictogram, inSelectionData };
 }
 
 export default processDataSummary;

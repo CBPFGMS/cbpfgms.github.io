@@ -17,9 +17,6 @@ import {
 	projectStatusMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import constants from "./constants";
-
-const { allocationTypeIdSeparator } = constants;
 
 type MakeListParams = {
 	allocationTypeMaster: AllocationTypeMasterObject[];
@@ -36,10 +33,8 @@ export type ListObj = {
 	[key: number]: string;
 };
 
-type AllocationId = `${number}${typeof allocationTypeIdSeparator}${number}`;
-
 export type AllocationTypeListObj = {
-	[key: AllocationId]: AllocationTypeMasterObject;
+	[key: number]: AllocationTypeMasterObject;
 };
 
 type OrganizationListObj = {
@@ -51,10 +46,12 @@ export type List = {
 	fundAbbreviatedNames: ListObj;
 	fundIsoCodes: ListObj;
 	beneficiaryTypes: ListObj;
-	allocationTypes: AllocationTypeListObj;
+	allocationTypes: ListObj;
+	allocationTypesCompleteList: AllocationTypeListObj;
 	allocationSources: ListObj;
 	organizationTypes: ListObj;
-	organizations: OrganizationListObj;
+	organizations: ListObj;
+	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	statuses: ListObj;
 };
@@ -75,9 +72,11 @@ function makeLists({
 		fundIsoCodes: {},
 		beneficiaryTypes: {},
 		allocationTypes: {},
+		allocationTypesCompleteList: {},
 		allocationSources: {},
 		organizationTypes: {},
 		organizations: {},
+		organizationsCompleteList: {},
 		sectors: {},
 		statuses: {},
 	};
@@ -116,7 +115,10 @@ function makeLists({
 			allocationTypeMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
 			lists.allocationTypes[
-				`${d.PooledFundId}${allocationTypeIdSeparator}${d.AllocationTypeId}`
+				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
+			] = d.AllocationTitle;
+			lists.allocationTypesCompleteList[
+				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
 			] = d;
 		} else {
 			warnInvalidSchema(
@@ -172,7 +174,8 @@ function makeLists({
 		const parsedOrganizationMaster =
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
-			lists.organizations[d.GlobalUniqueId] = d;
+			lists.organizations[d.GlobalUniqueId] = d.OrganizationName;
+			lists.organizationsCompleteList[d.GlobalUniqueId] = d;
 		} else {
 			warnInvalidSchema(
 				"OrganizationMaster",

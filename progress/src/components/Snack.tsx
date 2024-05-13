@@ -1,5 +1,6 @@
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import Portal from "@mui/material/Portal";
 
 type SnackProps = {
 	openSnack: boolean;
@@ -9,13 +10,16 @@ type SnackProps = {
 
 function Snack({ openSnack, setOpenSnack, message }: SnackProps) {
 	return (
-		<Snackbar
-			anchorOrigin={{ vertical: "top", horizontal: "center" }}
-			open={openSnack}
-			onClose={() => setOpenSnack(false)}
-		>
-			<Alert severity="warning">{message}</Alert>
-		</Snackbar>
+		<Portal>
+			<Snackbar
+				sx={{ zIndex: 9999 }}
+				anchorOrigin={{ vertical: "top", horizontal: "center" }}
+				open={openSnack}
+				onClose={() => setOpenSnack(false)}
+			>
+				<Alert severity="warning">{message}</Alert>
+			</Snackbar>
+		</Portal>
 	);
 }
 

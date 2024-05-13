@@ -12,14 +12,14 @@ import Box from "@mui/material/Box";
 import Search from "./Search";
 import { InSelectionData } from "../utils/processdatasummary";
 import { InDataLists } from "../utils/processrawdata";
-import { List, ListObj, AllocationTypeListObj } from "../utils/makelists";
+import { List, ListObj } from "../utils/makelists";
 import constants from "../utils/constants";
 
 const { filterTypes } = constants;
 
-type DataProperties = keyof InSelectionData;
+export type DataProperties = keyof InSelectionData;
 
-type Type = (typeof filterTypes)[number];
+export type Type = (typeof filterTypes)[number];
 
 type AccordionComponentProps = {
 	type: Type;
@@ -49,11 +49,11 @@ function AccordionComponent({
 
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 	const dataArray = [...inDataLists[dataProperty as keyof InDataLists]];
-	let namesList: ListObj | AllocationTypeListObj;
+	let namesList: ListObj;
 
 	switch (type) {
 		case "Fund":
-			namesList = lists.fundAbbreviatedNames;
+			namesList = lists.fundNames;
 			break;
 		case "Year":
 			namesList = makeYearsList(dataArray);
@@ -161,7 +161,7 @@ function AccordionComponent({
 							fromQuickSelectors={false}
 						/>
 					)}
-					{/* {filterType === "search" && (
+					{filterType === "search" && (
 						<Search
 							value={value}
 							setValue={setValue}
@@ -170,7 +170,7 @@ function AccordionComponent({
 							inSelectionData={inSelectionData}
 							dataProperty={dataProperty}
 						/>
-					)} */}
+					)}
 					{filterType === "checkbox" && (
 						<CheckboxLabel
 							value={value}
@@ -216,10 +216,7 @@ function makeYearsList(dataArray: number[]): ListObj {
 	return yearsList;
 }
 
-function isValidKey(
-	key: number,
-	obj: ListObj | AllocationTypeListObj
-): key is keyof typeof obj {
+function isValidKey(key: number, obj: ListObj): boolean {
 	return key in obj;
 }
 

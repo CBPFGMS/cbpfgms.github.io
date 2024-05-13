@@ -5,7 +5,18 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { SyntheticEvent, useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
-import { SearchProps } from "../types";
+import { ListObj } from "../utils/makelists";
+import { InSelectionData } from "../utils/processdatasummary";
+import { DataProperties } from "./Accordion";
+
+type SearchProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+	inSelectionData: InSelectionData;
+	dataProperty: DataProperties;
+};
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
