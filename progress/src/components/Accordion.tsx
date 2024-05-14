@@ -183,12 +183,21 @@ function AccordionComponent({
 					)}
 					{(filterType === "dropdowncheck" ||
 						filterType === "search") && (
-						<Box style={{ display: "flex", flexDirection: "row" }}>
+						<Box
+							style={{
+								display: "flex",
+								flexDirection:
+									type === "Year" ? "column" : "row",
+							}}
+						>
 							<Button
 								variant="contained"
 								size="small"
 								onClick={handleDeselectAll}
-								style={{ marginLeft: "8px" }}
+								style={{
+									marginLeft: "8px",
+									marginTop: type === "Year" ? "8px" : "0px",
+								}}
 							>
 								Deselect all
 							</Button>
@@ -196,7 +205,10 @@ function AccordionComponent({
 								variant="contained"
 								size="small"
 								onClick={handleSelectAll}
-								style={{ marginLeft: "8px" }}
+								style={{
+									marginLeft: "8px",
+									marginTop: type === "Year" ? "8px" : "0px",
+								}}
 							>
 								Select all
 							</Button>

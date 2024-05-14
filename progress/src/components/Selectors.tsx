@@ -38,7 +38,7 @@ function Selectors({
 			container
 			spacing={1}
 		>
-			<Grid xs={3}>
+			<Grid xs={2}>
 				<AccordionComponent
 					type="Year"
 					dataProperty="years"
@@ -50,7 +50,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs={3}>
+			<Grid xs>
 				<AccordionComponent
 					type="Fund"
 					dataProperty="funds"
@@ -62,7 +62,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs={3}>
+			<Grid xs>
 				<AccordionComponent
 					type="Allocation Type"
 					dataProperty="allocationTypes"
@@ -74,7 +74,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs={3}>
+			<Grid xs>
 				<AccordionComponent
 					type="Allocation Source"
 					dataProperty="allocationSources"
