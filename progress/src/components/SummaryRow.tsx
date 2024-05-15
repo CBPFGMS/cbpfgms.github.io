@@ -15,12 +15,13 @@ function SummaryRow({
 	allocations,
 	projects,
 	partners,
-	//underImplementation,
+	underImplementation,
 	last,
 }: SummaryRowProps) {
 	return (
 		<>
 			<Box
+				mb={1}
 				style={{
 					width: "100%",
 					display: "flex",
@@ -32,8 +33,6 @@ function SummaryRow({
 						fontSize: "0.8rem",
 						fontWeight: 900,
 						color: colors.unColor,
-						marginLeft: "7%",
-						marginBottom: "-0.4em",
 					}}
 				>
 					{year}
@@ -42,10 +41,15 @@ function SummaryRow({
 					style={{
 						display: "flex",
 						flexDirection: "row",
-						justifyContent: "space-evenly",
+						justifyContent: "space-between",
 					}}
 				>
-					{[allocations, projects.size, partners.size].map((d, i) => (
+					{[
+						allocations,
+						underImplementation,
+						projects.size,
+						partners.size,
+					].map((d, i) => (
 						<Box
 							key={i}
 							style={{
@@ -53,9 +57,16 @@ function SummaryRow({
 								flex: "0 24%",
 								flexDirection: "column",
 							}}
-							{...(!i && {
+							{...(i === 0 && {
 								"data-tooltip-id": "tooltip",
 								"data-tooltip-content": `Allocations: $${format(
+									",.2f"
+								)(d)}`,
+								"data-tooltip-place": "top",
+							})}
+							{...(i === 1 && {
+								"data-tooltip-id": "tooltip",
+								"data-tooltip-content": `Allocations under implementation: $${format(
 									",.2f"
 								)(d)}`,
 								"data-tooltip-place": "top",
@@ -93,9 +104,13 @@ function SummaryRow({
 									marginTop: "-0.4em",
 								}}
 							>
-								{["Allocation", "Project", "Partner"][
-									i
-								].toUpperCase() + (d > 1 ? "S" : "")}
+								{[
+									"Allocation",
+									"Under impl.",
+									"Project",
+									"Partner",
+								][i].toUpperCase() +
+									(d > 1 && i !== 1 ? "S" : "")}
 							</Box>
 						</Box>
 					))}

@@ -3,15 +3,17 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
-import { DatumSummary } from "../utils/processdatasummary";
+import { DatumSummary, DatumPictogram } from "../utils/processdatasummary";
 import { DownloadStates, RefIds } from "./MainContainer";
 import { ListObj } from "../utils/makelists";
 import SummaryChart from "./SummaryChart";
+import PictogramChart from "./PictogramChart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
 type ChartsContainerProps = {
 	dataSummary: DatumSummary[];
+	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	fundsList: ListObj;
@@ -22,6 +24,7 @@ type ChartsContainerProps = {
 
 function ChartsContainer({
 	dataSummary,
+	dataPictogram,
 	setClickedDownload,
 	clickedDownload,
 	fundsList,
@@ -99,13 +102,13 @@ function ChartsContainer({
 							alignItems={"center"}
 							justifyContent={"center"}
 						>
-							{/* <PictogramChart
+							<PictogramChart
 								dataPictogram={dataPictogram}
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
-								summaryDataDownload={summaryDataDownload}
-								fundsList={apiData.lists.fundAbbreviatedNames}
-							/> */}
+								//summaryDataDownload={summaryDataDownload}
+								fundsList={fundsList}
+							/>
 						</Box>
 					</Grid>
 				</Grid>

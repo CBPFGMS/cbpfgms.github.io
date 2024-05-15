@@ -28,7 +28,7 @@ export type DatumSummary = {
 	underImplementation: number;
 };
 
-type DatumPictogram = {
+export type DatumPictogram = {
 	targetedMen: number;
 	targetedWomen: number;
 	targetedBoys: number;
@@ -102,6 +102,15 @@ function processDataSummary({
 							: 0,
 					});
 				}
+
+				dataPictogram.targetedMen += datum.targeted.men;
+				dataPictogram.targetedWomen += datum.targeted.women;
+				dataPictogram.targetedBoys += datum.targeted.boys;
+				dataPictogram.targetedGirls += datum.targeted.girls;
+				dataPictogram.reachedMen += datum.reached.men;
+				dataPictogram.reachedWomen += datum.reached.women;
+				dataPictogram.reachedBoys += datum.reached.boys;
+				dataPictogram.reachedGirls += datum.reached.girls;
 			}
 		}
 

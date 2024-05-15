@@ -45,8 +45,6 @@ SummaryChartProps) {
 		totalProjects = sum(dataSummary, d => d.projects.size),
 		totalPartners = sum(dataSummary, d => d.partners.size);
 
-	console.log(dataSummary);
-
 	return (
 		<Container
 			disableGutters={true}
@@ -62,7 +60,7 @@ SummaryChartProps) {
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"center"}
-				gap={1}
+				gap={2}
 				marginBottom={4}
 				data-tooltip-id="tooltip"
 				data-tooltip-content={`Total allocations: $${format(",.2f")(
@@ -136,22 +134,10 @@ SummaryChartProps) {
 									border: "none",
 								}}
 							>
-								{thisValue < 1e3 ? (
-									<NumberAnimator
-										number={thisValue}
-										type="integer"
-									/>
-								) : (
-									<span>
-										<NumberAnimator
-											number={parseFloat(
-												formatSIFloat(thisValue)
-											)}
-											type="integer"
-										/>
-										{formatSIFloat(thisValue).slice(-1)}
-									</span>
-								)}
+								<NumberAnimator
+									number={thisValue}
+									type="integer"
+								/>
 							</Typography>
 							<Typography
 								style={{

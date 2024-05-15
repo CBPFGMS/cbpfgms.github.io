@@ -180,6 +180,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			/>
 			<ChartsContainer
 				dataSummary={dataSummary}
+				dataPictogram={dataPictogram}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				fundsList={lists.fundNames}

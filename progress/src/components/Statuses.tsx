@@ -74,10 +74,11 @@ function Statuses({
 					}
 					data-tooltip-place="top"
 					style={{
-						color: colors.unColor,
-						fontSize: "18px",
-						marginLeft: "0.2em",
+						color: "#666",
+						fontSize: "20px",
+						marginLeft: "0.1em",
 						alignSelf: "flex-start",
+						marginTop: "-0.1em",
 					}}
 				/>
 			</Grid>
