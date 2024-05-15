@@ -1,4 +1,4 @@
-import { openDB, DBSchema } from "idb";
+import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { json, csv, autoType } from "d3";
 
 const localStorageTime = 60 * 60 * 1000 * 48, //1 hour CHANGE!!!
@@ -12,13 +12,18 @@ interface LocalDatabase extends DBSchema {
 	};
 }
 
-const db = await openDB<LocalDatabase>("localDatabase", 1, {
-	upgrade(db) {
-		db.createObjectStore("files");
-	},
-});
+const dbPromise: Promise<IDBPDatabase<LocalDatabase>> = openDB<LocalDatabase>(
+	"localDatabase",
+	1,
+	{
+		upgrade(db) {
+			db.createObjectStore("files");
+		},
+	}
+);
 
 async function fetchFileDB<T>(fileName: string, url: string, method: string) {
+	const db = await dbPromise;
 	const tx = db.transaction("files", "readwrite");
 	const store = tx.objectStore("files");
 
