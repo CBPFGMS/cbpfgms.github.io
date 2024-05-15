@@ -2,6 +2,7 @@ import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import { ImplementationStatuses } from "../components/MainContainer";
+import constants from "./constants";
 
 export type DataStatuses = {
 	[K in ImplementationStatuses]: number;
@@ -16,6 +17,8 @@ type ProcessDataStatusesParams = {
 	lists: List;
 };
 
+const { implementationStatuses } = constants;
+
 function processDataStatuses({
 	data,
 	year,
@@ -24,11 +27,13 @@ function processDataStatuses({
 	allocationType,
 	lists,
 }: ProcessDataStatusesParams): DataStatuses {
-	const dataStatuses: DataStatuses = {
-		"Under Implementation": 0,
-		"Under Closure/Closed": 0,
-		Implemented: 0,
-	};
+	const dataStatuses: DataStatuses = implementationStatuses.reduce(
+		(acc, curr) => {
+			acc[curr] = 0;
+			return acc;
+		},
+		{} as DataStatuses
+	);
 
 	data.forEach(datum => {
 		const status = calculateStatus(datum, lists);

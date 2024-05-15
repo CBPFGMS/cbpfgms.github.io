@@ -13,6 +13,7 @@ import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
+import toLocaleFixed from "../utils/localefixed";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -196,6 +197,22 @@ function Status({
 							opacity: statusSelected ? 1 : 0.75,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`The total amount of allocations for ${status} projects is $${toLocaleFixed(
+							statusValue,
+							0,
+							2
+						)}, which represents ${(
+							(statusValue / total) *
+							100
+						).toFixed(
+							1
+						)}% of the total allocations for all statuses (${toLocaleFixed(
+							total,
+							0,
+							2
+						)}).`}
+						data-tooltip-place="top"
 					>
 						<Box
 							style={{

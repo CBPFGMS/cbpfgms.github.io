@@ -1,6 +1,7 @@
 import { useContext, useState, useMemo } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import { Tooltip } from "react-tooltip";
 import { useInView } from "react-intersection-observer";
 import constants from "../utils/constants";
@@ -10,6 +11,7 @@ import useUpdateQueryString from "../hooks/useupdatequerystring";
 import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
+import ChartsContainer from "./ChartsContainer";
 
 const { implementationStatuses, charts } = constants;
 
@@ -23,7 +25,7 @@ export type DownloadStates = {
 	[K in Charts]: boolean;
 };
 
-type RefIds = {
+export type RefIds = {
 	[K in Charts as `${K}${typeof refIdSuffix}`]: string;
 };
 
@@ -72,6 +74,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			threshold: 0,
 		});
 
+	const chartsThreshold = {
+		threshold: 0.9,
+	};
+
+	const [summaryRef, inViewSummary] = useInView(chartsThreshold);
+	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
+
 	//TODO 01: All the refs and inViews using useInView
 
 	//TODO 02: process data for all charts
@@ -111,6 +120,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	);
 
 	//TODO 03: create filterArrayDownload and the download data for all charts
+
+	//TODO 04: add the scrollspy for the top panel
 
 	useUpdateQueryString({
 		allocationSource,
@@ -162,6 +173,19 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inSelectionData={inSelectionData}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
+			/>
+			<Box
+				mt={4}
+				mb={4}
+			/>
+			<ChartsContainer
+				dataSummary={dataSummary}
+				setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
+				fundsList={lists.fundNames}
+				refIds={refIds}
+				summaryRef={summaryRef}
+				pictogramRef={pictogramRef}
 			/>
 		</Container>
 	);

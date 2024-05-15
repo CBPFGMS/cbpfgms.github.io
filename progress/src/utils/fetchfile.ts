@@ -1,6 +1,6 @@
 import { json, csv, csvParse, csvFormat, autoType } from "d3";
 
-const localStorageTime = 60 * 60 * 1000, //1 hour
+const localStorageTime = 60 * 60 * 1000 * 48, //1 hour CHANGE!!!
 	currentDate = new Date(),
 	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
 

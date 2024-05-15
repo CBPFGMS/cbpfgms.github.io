@@ -20,7 +20,7 @@ type ProcessDataSummaryParams = {
 	lists: List;
 };
 
-type DatumSummary = {
+export type DatumSummary = {
 	year: number;
 	allocations: number;
 	projects: Set<number>;
