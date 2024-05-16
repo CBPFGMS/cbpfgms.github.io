@@ -16,6 +16,7 @@ import { DatumPictogram } from "../utils/processdatasummary";
 import { DownloadStates } from "./MainContainer";
 import { ListObj } from "../utils/makelists";
 import constants from "../utils/constants";
+import capitalizeString from "../utils/capitalizestring";
 
 type PictogramChartProps = {
 	dataPictogram: DatumPictogram;
@@ -31,9 +32,9 @@ function PictogramChart({
 	dataPictogram,
 	clickedDownload,
 	setClickedDownload,
-	//summaryDataDownload,
-	//fundsList,
-}: PictogramChartProps) {
+}: //summaryDataDownload,
+//fundsList,
+PictogramChartProps) {
 	const totalTargeted =
 		dataPictogram.targetedBoys +
 		dataPictogram.targetedGirls +
@@ -326,10 +327,6 @@ function PictogramChart({
 			</Box>
 		</Container>
 	);
-}
-
-function capitalizeString(string: string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export default PictogramChart;

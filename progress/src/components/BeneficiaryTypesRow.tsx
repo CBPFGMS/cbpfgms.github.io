@@ -2,39 +2,30 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
-import Pictogram from "../assets/Pictogram";
 import { scaleLinear, format } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
-import constants from "../utils/constants";
-import capitalizeString from "../utils/capitalizestring";
+import { BeneficiaryTypesList } from "../utils/processdatabeneficiarybytype";
+import { ListObj } from "../utils/makelists";
 
-export type PictogramTypes = (typeof beneficiaryCategories)[number];
-
-type PictogramRowProps = {
-	type: PictogramTypes;
+type BeneficiaryTypesRowProps = {
+	type: BeneficiaryTypesList;
 	targeted: number;
 	reached: number;
-	maxNumberOfPictograms: number;
 	maxValue: number;
+	list: ListObj;
 };
 
-const { beneficiaryCategories } = constants;
-
-function PictogramRow({
-	type,
+function BeneficiaryTypesRow({
+	list,
+	maxValue,
 	reached,
 	targeted,
-	maxNumberOfPictograms,
-	maxValue,
-}: PictogramRowProps) {
-	const pictogramWidth = 12;
-	const numberOfPictogramsArray = Array.from(
-		Array(maxNumberOfPictograms).keys()
-	);
-
+	type,
+}: BeneficiaryTypesRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
+	const limitValue = 90;
 
 	return (
 		<Box
@@ -47,24 +38,26 @@ function PictogramRow({
 		>
 			<Box
 				style={{
-					flex: "0 12%",
+					flex: "0 22%",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "flex-end",
+					textAlign: "right",
+					overflow: "hidden",
 				}}
 			>
 				<Typography
 					variant="body2"
-					fontWeight={500}
-					marginRight={0.5}
-					style={{ color: "#555", border: "none" }}
+					fontWeight={400}
+					fontSize={13}
+					style={{ color: "#444", border: "none" }}
 				>
-					{type.toUpperCase()}
+					{list[type]}
 				</Typography>
 			</Box>
 			<Box
 				style={{
-					flex: "0 78%",
+					flex: "0 66%",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -80,14 +73,14 @@ function PictogramRow({
 						}}
 						key={i}
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`${capitalizeString(type)} ${
-							i ? "reached" : "targeted"
+						data-tooltip-content={`${
+							i ? "Reached" : "Targeted"
 						}: ${format(",.0f")(d)}`}
 						data-tooltip-place="top"
 					>
 						<Box
 							style={{
-								flex: "0 28%",
+								flex: "0 10%",
 								display: "flex",
 								flexDirection: "row",
 								justifyContent: "flex-end",
@@ -95,18 +88,6 @@ function PictogramRow({
 								marginRight: "12px",
 							}}
 						>
-							<Typography
-								variant="body2"
-								fontWeight={500}
-								fontSize={i ? 24 : 18}
-								style={{ color: "#222", border: "none" }}
-							>
-								<NumberAnimator
-									number={parseFloat(formatSIFloat(d))}
-									type="decimal"
-								/>
-								{formatSIFloat(d).slice(-1)}
-							</Typography>
 							<Typography
 								variant="body2"
 								fontWeight={400}
@@ -139,7 +120,7 @@ function PictogramRow({
 						</Box>
 						<Box
 							style={{
-								flex: "0 72%",
+								flex: "0 90%",
 								marginTop: "2px",
 								marginBottom: "2px",
 								display: "flex",
@@ -150,27 +131,42 @@ function PictogramRow({
 							<Box
 								style={{
 									width: scale(d) + "%",
-									overflow: "hidden",
-									display: "flex",
-									flexWrap: "nowrap",
+									minWidth: "1px",
+									height: "18px",
 									transitionProperty: "width",
 									transitionDuration: "0.75s",
+									display: "flex",
+									alignItems: "center",
+									backgroundColor: i
+										? colors.unColor
+										: colors.contrastColorLighter,
 								}}
 							>
-								{numberOfPictogramsArray.map((_, j) => (
-									<Pictogram
-										svgProps={{
-											style: {
-												width: pictogramWidth,
-												fill: i
-													? colors.unColor
-													: colors.contrastColorLighter,
-											},
-										}}
-										type={type}
-										key={j}
+								<Typography
+									fontSize={12}
+									fontWeight={700}
+									style={{
+										position: "relative",
+										left:
+											scale(d) < limitValue
+												? "3px"
+												: "-3px",
+										marginLeft:
+											scale(d) < limitValue
+												? "100%"
+												: "auto",
+										color:
+											scale(d) < limitValue
+												? "#444"
+												: "#fff",
+									}}
+								>
+									<NumberAnimator
+										number={parseFloat(formatSIFloat(d))}
+										type="decimal"
 									/>
-								))}
+									{formatSIFloat(d).slice(-1)}
+								</Typography>
 							</Box>
 						</Box>
 					</Box>
@@ -178,7 +174,7 @@ function PictogramRow({
 			</Box>
 			<Box
 				style={{
-					flex: "0 10%",
+					flex: "0 12%",
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
@@ -204,4 +200,4 @@ function PictogramRow({
 	);
 }
 
-export default PictogramRow;
+export default BeneficiaryTypesRow;

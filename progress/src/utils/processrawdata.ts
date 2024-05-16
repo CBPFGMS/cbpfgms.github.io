@@ -8,7 +8,7 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants from "./constants";
 
-const { beneficiariesSplitOrder } = constants;
+const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
 
 type Datum = {
 	reached: BeneficiariesObject;
@@ -51,9 +51,9 @@ type BeneficiaryTypes = {
 	[K in (typeof beneficiariesSplitOrder)[number]]: BeneficiariesObject;
 };
 
-type Beneficiaries = "girls" | "boys" | "women" | "men";
+type Beneficiaries = (typeof beneficiaryCategories)[number];
 
-type BeneficiariesObject = {
+export type BeneficiariesObject = {
 	[K in Beneficiaries]: number;
 };
 

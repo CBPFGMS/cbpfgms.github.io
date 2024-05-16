@@ -1,10 +1,20 @@
 import Box from "@mui/material/Box";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import FileDownloadDoneOutlinedIcon from "@mui/icons-material/FileDownloadDoneOutlined";
-import { DownloadIconProps } from "../types";
+import { DownloadStates } from "./MainContainer";
+import constants from "../utils/constants";
+
+type DownloadIconProps = {
+	//handleDownloadClick: () => void;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	type: (typeof charts)[number];
+};
+
+const { charts } = constants;
 
 function DownloadIcon({
-	handleDownloadClick,
+	//handleDownloadClick,
 	clickedDownload,
 	setClickedDownload,
 	type,

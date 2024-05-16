@@ -12,6 +12,7 @@ import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
+import processDataBeneficiaryByType from "../utils/processdatabeneficiarybytype";
 
 const { implementationStatuses, charts } = constants;
 
@@ -80,6 +81,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 
 	const [summaryRef, inViewSummary] = useInView(chartsThreshold);
 	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
+	const [beneficiaryTypesRef, inViewBeneficiaryTypes] =
+		useInView(chartsThreshold);
 
 	//TODO 01: All the refs and inViews using useInView
 
@@ -100,6 +103,28 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
 		() =>
 			processDataSummary({
+				data,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus,
+				lists,
+			}),
+		[
+			data,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			implementationStatus,
+			lists,
+		]
+	);
+
+	const dataBeneficiaryByType = useMemo(
+		() =>
+			processDataBeneficiaryByType({
 				data,
 				year,
 				fund,
@@ -181,12 +206,14 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			<ChartsContainer
 				dataSummary={dataSummary}
 				dataPictogram={dataPictogram}
+				dataBeneficiaryByType={dataBeneficiaryByType}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
-				fundsList={lists.fundNames}
+				lists={lists}
 				refIds={refIds}
 				summaryRef={summaryRef}
 				pictogramRef={pictogramRef}
+				beneficiaryTypesRef={beneficiaryTypesRef}
 			/>
 		</Container>
 	);

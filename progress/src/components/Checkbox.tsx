@@ -3,7 +3,18 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Snack from "./Snack";
 import { useState } from "react";
-import { CheckboxProps } from "../types";
+import { InSelectionData } from "../utils/processdatasummary";
+import { ListObj } from "../utils/makelists";
+import { DataProperties } from "./Accordion";
+
+type CheckboxProps = {
+	value: number[];
+	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	names: number[];
+	namesList: ListObj;
+	inSelectionData: InSelectionData;
+	dataProperty: DataProperties;
+};
 
 function CheckboxLabel({
 	value,

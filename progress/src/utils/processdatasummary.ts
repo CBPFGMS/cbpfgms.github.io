@@ -144,6 +144,8 @@ function processDataSummary({
 		}
 	});
 
+	dataSummary.sort((a, b) => b.year - a.year);
+
 	return { dataSummary, dataPictogram, inSelectionData };
 }
 
