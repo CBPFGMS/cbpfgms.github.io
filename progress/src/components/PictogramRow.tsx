@@ -7,20 +7,16 @@ import { scaleLinear, format } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
-import constants from "../utils/constants";
 import capitalizeString from "../utils/capitalizestring";
-
-export type PictogramTypes = (typeof beneficiaryCategories)[number];
+import { GenderAndAge } from "../utils/processdatabarchart";
 
 type PictogramRowProps = {
-	type: PictogramTypes;
+	type: GenderAndAge;
 	targeted: number;
 	reached: number;
 	maxNumberOfPictograms: number;
 	maxValue: number;
 };
-
-const { beneficiaryCategories } = constants;
 
 function PictogramRow({
 	type,

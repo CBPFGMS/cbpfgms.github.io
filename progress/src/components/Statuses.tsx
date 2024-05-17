@@ -5,15 +5,14 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
+import formatSIFloat from "../utils/formatsi";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -25,10 +24,20 @@ type StatusesProps = {
 
 type StatusProps = {
 	handleClick: (status: ImplementationStatuses) => void;
-	status: string;
+	status: ImplementationStatuses;
 	statusValue: number;
 	total: number;
 	implementationStatus: ImplementationStatuses[];
+};
+
+type StatusesDescription = {
+	[K in ImplementationStatuses]: string;
+};
+
+const statusesDescription: StatusesDescription = {
+	Implemented: "Help text for Implemented status here",
+	"Under Implementation": "Help text for Under Implementation status here",
+	"Under Closure/Closed": "Help text for Closed/Under Closure status here",
 };
 
 function Statuses({
@@ -70,7 +79,7 @@ function Statuses({
 				<InfoIcon
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
-						"These are the tree statuses of the projects: implemented, under implementation, and closed/under closure.<br>Click the minus (-) button to remove a status from the calculated values, or plus (+) to add it back."
+						"These are the tree statuses of the projects: implemented, under implementation, and closed/under closure.<br>Click 'Remove' to remove a status from the calculated values, or 'Add' to add it back."
 					}
 					data-tooltip-place="top"
 					style={{
@@ -90,7 +99,12 @@ function Statuses({
 					flexWrap: "nowrap",
 				}}
 			>
-				{Object.entries(dataStatuses).map(([status, statusValue]) => (
+				{(
+					Object.entries(dataStatuses) as [
+						keyof typeof dataStatuses,
+						number
+					][]
+				).map(([status, statusValue]) => (
 					<Status
 						key={status}
 						handleClick={handleClick}
@@ -118,9 +132,7 @@ function Status({
 
 	const limitValue = 90;
 
-	const statusSelected = implementationStatus.includes(
-		status as ImplementationStatuses
-	);
+	const statusSelected = implementationStatus.includes(status);
 
 	return (
 		<Grid xs={4}>
@@ -138,7 +150,10 @@ function Status({
 						container
 						alignItems={"center"}
 					>
-						<Grid xs={8}>
+						<Grid
+							xs={8}
+							container
+						>
 							<Typography
 								variant="h6"
 								fontSize={"1em"}
@@ -146,6 +161,20 @@ function Status({
 							>
 								{status}
 							</Typography>
+							<InfoIcon
+								data-tooltip-id="tooltip"
+								data-tooltip-content={
+									statusesDescription[status]
+								}
+								data-tooltip-place="top"
+								style={{
+									color: "#666",
+									fontSize: "16px",
+									marginLeft: "0.1em",
+									alignSelf: "flex-start",
+									marginTop: "-0.1em",
+								}}
+							/>
 						</Grid>
 						<Grid
 							container
@@ -154,39 +183,49 @@ function Status({
 							justifyContent={"flex-end"}
 						>
 							<CardActions>
-								<IconButton
+								<Button
 									size="small"
 									style={{
-										color: colors.unColor,
+										backgroundColor: "whitesmoke",
 									}}
-									onClick={() =>
-										handleClick(
-											status as ImplementationStatuses
-										)
-									}
+									variant="text"
+									onClick={() => handleClick(status)}
 								>
-									{statusSelected ? (
-										<RemoveCircleIcon />
-									) : (
-										<AddCircleIcon />
-									)}
-								</IconButton>
+									{statusSelected ? "Remove" : "Add"}
+								</Button>
 							</CardActions>
 						</Grid>
 					</Grid>
 					<Typography
-						variant="h4"
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
+						data-tooltip-place="top"
 						color={colors.unColor}
 						style={{
+							fontSize: "2.5em",
+							fontWeight: 500,
+							display: "inline-block",
 							opacity: statusSelected ? 1 : 0.75,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 					>
 						{"$"}
-						<NumberAnimator
-							number={Math.floor(statusValue)}
-							type="integer"
-						/>
+						{statusValue < 1e3 ? (
+							<NumberAnimator
+								number={Math.floor(statusValue)}
+								type="integer"
+							/>
+						) : (
+							<span>
+								<NumberAnimator
+									number={parseFloat(
+										formatSIFloat(statusValue)
+									)}
+									type="decimal"
+								/>
+								{formatSIFloat(statusValue).slice(-1)}
+							</span>
+						)}
 					</Typography>
 					<Box
 						mt={2}

@@ -12,11 +12,11 @@ import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
-import processDataBeneficiaryByType from "../utils/processdatabeneficiarybytype";
+import processDataBarChart from "../utils/processdatabarchart";
 
 const { implementationStatuses, charts } = constants;
 
-type Charts = (typeof charts)[number];
+export type Charts = (typeof charts)[number];
 
 type MainContainerProps = {
 	defaultYear: number;
@@ -37,7 +37,7 @@ const downloadStates: DownloadStates = {
 	pictogram: false,
 	beneficiaryTypes: false,
 	sectors: false,
-	organization: false,
+	organizations: false,
 } as const;
 
 const refIdSuffix = "RefId";
@@ -83,6 +83,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
 	const [beneficiaryTypesRef, inViewBeneficiaryTypes] =
 		useInView(chartsThreshold);
+	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
+	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
 
 	//TODO 01: All the refs and inViews using useInView
 
@@ -122,9 +124,9 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		]
 	);
 
-	const dataBeneficiaryByType = useMemo(
+	const { dataBeneficiaryByType, dataSector, dataOrganization } = useMemo(
 		() =>
-			processDataBeneficiaryByType({
+			processDataBarChart({
 				data,
 				year,
 				fund,
@@ -207,6 +209,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataSummary={dataSummary}
 				dataPictogram={dataPictogram}
 				dataBeneficiaryByType={dataBeneficiaryByType}
+				dataSector={dataSector}
+				dataOrganization={dataOrganization}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				lists={lists}
@@ -214,6 +218,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				summaryRef={summaryRef}
 				pictogramRef={pictogramRef}
 				beneficiaryTypesRef={beneficiaryTypesRef}
+				sectorsRef={sectorsRef}
+				organizationsRef={organizationsRef}
 			/>
 		</Container>
 	);

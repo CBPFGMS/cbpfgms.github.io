@@ -85,7 +85,7 @@ PictogramChartProps) {
 				flexDirection={"row"}
 				alignItems={"center"}
 				justifyContent={"center"}
-				gap={3}
+				gap={2}
 				marginBottom={2}
 				width={"90%"}
 			>
@@ -137,7 +137,7 @@ PictogramChartProps) {
 						style={{
 							marginTop: "-0.6em",
 							fontSize: 18,
-							color: "#444",
+							color: colors.contrastColorDarker,
 						}}
 					>
 						People Targeted
@@ -217,7 +217,7 @@ PictogramChartProps) {
 						style={{
 							marginTop: "-0.6em",
 							fontSize: 18,
-							color: "#444",
+							color: colors.unColor,
 						}}
 					>
 						People Reached

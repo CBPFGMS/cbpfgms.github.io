@@ -1,8 +1,8 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 import pathAttributes from "./pathAttributes";
-import { PictogramTypes } from "../components/PictogramRow";
+import { GenderAndAge } from "../utils/processdatabarchart";
 
-type PictogramTypesWithTotal = PictogramTypes | "total";
+type PictogramTypesWithTotal = GenderAndAge | "total";
 
 function Pictogram({
 	svgProps,

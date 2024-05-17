@@ -2,22 +2,31 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
-import { scaleLinear } from "d3-scale";
-import { format } from "d3-format";
+import { scaleLinear, format } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
-import { TypeAndSectorRowProps } from "../types";
+import { ListObj } from "../utils/makelists";
+import { Charts } from "./MainContainer";
 import { clustersIconsData } from "../assets/clustericons";
 
-function TypeAndSectorRow({
+type BarChartRowProps = {
+	type: number;
+	targeted: number;
+	reached: number;
+	maxValue: number;
+	list: ListObj;
+	chartType: Charts;
+};
+
+function BarChartRow({
 	list,
 	maxValue,
 	reached,
 	targeted,
 	type,
 	chartType,
-}: TypeAndSectorRowProps) {
+}: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 	const limitValue = 90;
 
@@ -86,7 +95,8 @@ function TypeAndSectorRow({
 					>
 						<Box
 							style={{
-								flex: chartType === "sectors" ? "0 8%" : "0 10%",
+								flex:
+									chartType === "sectors" ? "0 8%" : "0 10%",
 								display: "flex",
 								flexDirection: "row",
 								justifyContent: "flex-end",
@@ -126,7 +136,8 @@ function TypeAndSectorRow({
 						</Box>
 						<Box
 							style={{
-								flex: chartType === "sectors" ? "0 92%" : "0 90%",
+								flex:
+									chartType === "sectors" ? "0 92%" : "0 90%",
 								marginTop: "2px",
 								marginBottom: "2px",
 								display: "flex",
@@ -169,6 +180,7 @@ function TypeAndSectorRow({
 								>
 									<NumberAnimator
 										number={parseFloat(formatSIFloat(d))}
+										type="decimal"
 									/>
 									{formatSIFloat(d).slice(-1)}
 								</Typography>
@@ -194,11 +206,15 @@ function TypeAndSectorRow({
 						fontStyle: "italic",
 					}}
 				>
-					<NumberAnimator number={~~((reached * 100) / targeted)} />%
+					<NumberAnimator
+						number={~~((reached * 100) / targeted)}
+						type="integer"
+					/>
+					%
 				</Typography>
 			</Box>
 		</Box>
 	);
 }
 
-export default TypeAndSectorRow;
+export default BarChartRow;

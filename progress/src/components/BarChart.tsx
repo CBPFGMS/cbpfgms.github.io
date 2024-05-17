@@ -8,29 +8,28 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 //import downloadData from "../utils/downloaddata";
-import {
-	DatumBeneficiaryByType,
-	BeneficiaryTypesList,
-} from "../utils/processdatabeneficiarybytype";
 import { List } from "../utils/makelists";
 import constants from "../utils/constants";
-import { DownloadStates } from "./MainContainer";
+import { DownloadStates, Charts } from "./MainContainer";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import BeneficiaryTypesRow from "./BeneficiaryTypesRow";
+import BarChartRow from "./BarChartRow";
 import capitalizeString from "../utils/capitalizestring";
 import Snack from "./Snack";
+import { DatumBarChart } from "../utils/processdatabarchart";
 
-type BeneficiaryTypesChartProps = {
-	dataBeneficiaryByType: DatumBeneficiaryByType[];
+type BarChartProps = {
+	originalData: DatumBarChart[];
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	title: string;
+	chartType: Charts;
 };
 
 type Data = {
-	type: BeneficiaryTypesList;
+	type: number;
 	targeted: number;
 	reached: number;
 };
@@ -39,19 +38,30 @@ type BeneficiaryCategory = (typeof beneficiaryCategories)[number];
 
 const { beneficiaryCategories } = constants;
 
-function BeneficiaryTypesChart({
-	dataBeneficiaryByType,
+function BarChart({
+	originalData,
 	lists,
 	clickedDownload,
 	setClickedDownload,
-}: BeneficiaryTypesChartProps) {
+	title,
+	chartType,
+}: BarChartProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const [beneficiaryCategoryArray, setBeneficiaryCategoryArray] = useState<
 		BeneficiaryCategory[]
 	>([...beneficiaryCategories]);
 
-	const data: Data[] = dataBeneficiaryByType.map(d => {
+	const listProperty: keyof List =
+		chartType === "beneficiaryTypes"
+			? "beneficiaryTypes"
+			: chartType === "sectors"
+			? "sectors"
+			: chartType === "organizations"
+			? "organizationTypes"
+			: ("" as never);
+
+	const data: Data[] = originalData.map(d => {
 		const targeted = Object.entries(d.targeted).reduce(
 			(acc, [key, value]) => {
 				if (
@@ -195,7 +205,7 @@ function BeneficiaryTypesChart({
 						textTransform: "uppercase",
 					}}
 				>
-					{"People targeted and reached by type"}
+					{title}
 				</Typography>
 				<Typography
 					style={{
@@ -302,13 +312,14 @@ function BeneficiaryTypesChart({
 					</Typography>
 				</Box>
 				{data.map(d => (
-					<BeneficiaryTypesRow
+					<BarChartRow
 						key={d.type}
 						type={d.type}
 						targeted={d.targeted}
 						reached={d.reached}
 						maxValue={maxValue}
-						list={lists.beneficiaryTypes}
+						list={lists[listProperty]}
+						chartType={chartType}
 					/>
 				))}
 			</Box>
@@ -316,4 +327,4 @@ function BeneficiaryTypesChart({
 	);
 }
 
-export default BeneficiaryTypesChart;
+export default BarChart;

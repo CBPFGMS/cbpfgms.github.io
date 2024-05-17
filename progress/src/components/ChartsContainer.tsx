@@ -8,15 +8,17 @@ import { DownloadStates, RefIds } from "./MainContainer";
 import { List } from "../utils/makelists";
 import SummaryChart from "./SummaryChart";
 import PictogramChart from "./PictogramChart";
-import { DatumBeneficiaryByType } from "../utils/processdatabeneficiarybytype";
-import BeneficiaryTypesChart from "./BeneficiaryTypesChart";
+import BarChart from "./BarChart";
+import { DatumBarChart } from "../utils/processdatabarchart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
 type ChartsContainerProps = {
 	dataSummary: DatumSummary[];
 	dataPictogram: DatumPictogram;
-	dataBeneficiaryByType: DatumBeneficiaryByType[];
+	dataBeneficiaryByType: DatumBarChart[];
+	dataSector: DatumBarChart[];
+	dataOrganization: DatumBarChart[];
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -24,12 +26,16 @@ type ChartsContainerProps = {
 	summaryRef: Ref;
 	pictogramRef: Ref;
 	beneficiaryTypesRef: Ref;
+	sectorsRef: Ref;
+	organizationsRef: Ref;
 };
 
 function ChartsContainer({
 	dataSummary,
 	dataPictogram,
 	dataBeneficiaryByType,
+	dataSector,
+	dataOrganization,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -37,6 +43,8 @@ function ChartsContainer({
 	summaryRef,
 	pictogramRef,
 	beneficiaryTypesRef,
+	sectorsRef,
+	organizationsRef,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -103,19 +111,13 @@ function ChartsContainer({
 						ref={pictogramRef}
 						id={refIds.pictogramRefId}
 					>
-						<Box
-							display={"flex"}
-							alignItems={"center"}
-							justifyContent={"center"}
-						>
-							<PictogramChart
-								dataPictogram={dataPictogram}
-								clickedDownload={clickedDownload}
-								setClickedDownload={setClickedDownload}
-								//summaryDataDownload={summaryDataDownload}
-								fundsList={lists.fundNames}
-							/>
-						</Box>
+						<PictogramChart
+							dataPictogram={dataPictogram}
+							clickedDownload={clickedDownload}
+							setClickedDownload={setClickedDownload}
+							//summaryDataDownload={summaryDataDownload}
+							fundsList={lists.fundNames}
+						/>
 					</Grid>
 				</Grid>
 				<Divider
@@ -142,11 +144,13 @@ function ChartsContainer({
 						ref={beneficiaryTypesRef}
 						id={refIds.beneficiaryTypesRefId}
 					>
-						<BeneficiaryTypesChart
-							dataBeneficiaryByType={dataBeneficiaryByType}
+						<BarChart
+							originalData={dataBeneficiaryByType}
 							lists={lists}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
+							title={"People targeted and reached by type"}
+							chartType={"beneficiaryTypes"}
 							//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
 						/>
 					</Grid>
@@ -160,14 +164,62 @@ function ChartsContainer({
 					/>
 					<Grid
 						xs={6}
-						ref={pictogramRef}
-						id={refIds.pictogramRefId}
+						ref={organizationsRef}
+						id={refIds.organizationsRefId}
+					>
+						<BarChart
+							originalData={dataOrganization}
+							lists={lists}
+							clickedDownload={clickedDownload}
+							setClickedDownload={setClickedDownload}
+							title={
+								"People targeted and reached by organization"
+							}
+							chartType={"organizations"}
+							//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
+						/>
+					</Grid>
+				</Grid>
+				<Divider
+					orientation="horizontal"
+					flexItem
+					style={{
+						borderTop: "3px dotted #ccc",
+						borderBottom: "none",
+						width: "96%",
+						marginLeft: "2%",
+					}}
+				/>
+				<Grid
+					container
+					direction={"row"}
+					justifyContent={"center"}
+					spacing={1}
+					xs={12}
+					flexWrap={"nowrap"}
+					mt={3}
+					mb={3}
+				>
+					<Grid
+						xs={8}
+						ref={sectorsRef}
+						id={refIds.sectorsRefId}
 					>
 						<Box
 							display={"flex"}
 							alignItems={"center"}
 							justifyContent={"center"}
-						></Box>
+						>
+							<BarChart
+								originalData={dataSector}
+								lists={lists}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								title={"People targeted and reached by sector"}
+								chartType={"sectors"}
+								//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
+							/>
+						</Box>
 					</Grid>
 				</Grid>
 			</Paper>
