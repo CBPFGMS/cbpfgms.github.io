@@ -2,14 +2,32 @@ import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
 import colors from "../utils/colors";
+import { RefIds } from "./MainContainer";
+import ScrollSpy from "./ScrollSpy";
 
 type TopPanelProps = {
 	titleRef: (node?: Element | null | undefined) => void;
 	inViewTitle: boolean;
 	inViewMenus: boolean;
+	inViewSummary: boolean;
+	inViewPictogram: boolean;
+	inViewBeneficiaryTypes: boolean;
+	inViewOrganizations: boolean;
+	inViewSectors: boolean;
+	refIds: RefIds;
 };
 
-function TopPanel({ titleRef, inViewTitle, inViewMenus }: TopPanelProps) {
+function TopPanel({
+	titleRef,
+	inViewTitle,
+	//inViewMenus,
+	inViewSummary,
+	inViewPictogram,
+	inViewBeneficiaryTypes,
+	inViewOrganizations,
+	inViewSectors,
+	refIds,
+}: TopPanelProps) {
 	return (
 		<Grid
 			container
@@ -77,6 +95,14 @@ function TopPanel({ titleRef, inViewTitle, inViewMenus }: TopPanelProps) {
 				/>
 			)} */}
 			</Grid>
+			<ScrollSpy
+				inViewSummary={inViewSummary}
+				inViewPictogram={inViewPictogram}
+				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
+				inViewOrganizations={inViewOrganizations}
+				inViewSectors={inViewSectors}
+				refIds={refIds}
+			/>
 		</Grid>
 	);
 }

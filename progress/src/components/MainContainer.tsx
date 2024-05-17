@@ -86,9 +86,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
 
-	//TODO 01: All the refs and inViews using useInView
-
-	//TODO 02: process data for all charts
 	const dataStatuses = useMemo(
 		() =>
 			processDataStatuses({
@@ -184,6 +181,12 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				titleRef={titleRef}
 				inViewTitle={inViewTitle}
 				inViewMenus={inViewMenus}
+				inViewSummary={inViewSummary}
+				inViewPictogram={inViewPictogram}
+				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
+				inViewOrganizations={inViewOrganizations}
+				inViewSectors={inViewSectors}
+				refIds={refIds}
 			/>
 			<TopIntro />
 			<FiltersContainer
