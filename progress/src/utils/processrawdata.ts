@@ -8,7 +8,11 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants from "./constants";
 
-const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
+const {
+	beneficiariesSplitOrder,
+	beneficiaryCategories,
+	organizationLeadership,
+} = constants;
 
 type Datum = {
 	reached: BeneficiariesObject;
@@ -30,6 +34,13 @@ type Datum = {
 	projectStatus: string;
 	projectStatusId: number;
 	sectorData: SectorDatum[];
+	leadership: LeadershipObject;
+};
+
+export type Leadership = (typeof organizationLeadership)[number];
+
+export type LeadershipObject = {
+	[K in Leadership]: boolean;
 };
 
 export type Data = Datum[];
@@ -228,6 +239,13 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				);
 
+				const leadership: LeadershipObject = {
+					wlo: checkBoolean(thisOrganization.OrgIsWLO),
+					rlo: checkBoolean(thisOrganization.OrgIsWRO),
+					opd: checkBoolean(thisOrganization.OrgIsOPD),
+					ylo: checkBoolean(thisOrganization.OrgIsYLO),
+				};
+
 				const reachedByBeneficiaryType: BeneficiaryTypes =
 					generateBeneficiariesSplitObject(row, "Ach");
 				const targetedByBeneficiaryType: BeneficiaryTypes =
@@ -261,6 +279,7 @@ function processRawData({
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
+					leadership,
 				};
 
 				data.push(objDatum);
@@ -321,6 +340,10 @@ function generateBeneficiariesSplitObject(
 	});
 
 	return splitObj;
+}
+
+function checkBoolean(value: string | null): boolean {
+	return value?.toLocaleLowerCase() === "true";
 }
 
 function generateBeneficiariesObjectSummary(

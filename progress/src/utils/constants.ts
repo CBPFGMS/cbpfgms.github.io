@@ -13,9 +13,11 @@ const constants = {
 		"beneficiaryTypes",
 		"sectors",
 		"organizations",
+		"leadership",
 	],
 	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],
 	beneficiaryCategories: ["women", "men", "girls", "boys"],
+	organizationLeadership: ["wlo", "rlo", "opd", "ylo"],
 } as const;
 
 export default constants;
