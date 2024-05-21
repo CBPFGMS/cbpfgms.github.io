@@ -1,5 +1,6 @@
 import { useContext, useRef, useEffect, useState } from "react";
 import Accordion from "@mui/material/Accordion";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
@@ -27,10 +28,6 @@ type AccordionComponentProps = {
 	dataProperty: DataProperties;
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
-	expanded: string | false;
-	handleAccordionExpand: (
-		panel: string
-	) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
 	inSelectionData: InSelectionData;
 };
 
@@ -40,16 +37,43 @@ function AccordionComponent({
 	filterType,
 	value,
 	setValue,
-	expanded,
-	handleAccordionExpand,
 	inSelectionData,
 }: AccordionComponentProps) {
+	const [expanded, setExpanded] = useState<string | false>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
+	const [isClickedInside, setIsClickedInside] = useState(false);
 	const accordionRef = useRef<HTMLDivElement>(null);
 
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 	const dataArray = [...inDataLists[dataProperty as keyof InDataLists]];
 	let namesList: ListObj;
+
+	const handleAccordionExpand =
+		(panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+			setExpanded(isExpanded ? panel : false);
+		};
+
+	function handleDeselectAll() {
+		setValue([]);
+	}
+
+	function handleSelectAll() {
+		setValue(dataArray);
+	}
+
+	const handleMouseDown = () => {
+		setIsClickedInside(true);
+	};
+
+	const handleMouseUp = () => {
+		setTimeout(() => setIsClickedInside(false), 0);
+	};
+
+	function handleClickAway() {
+		if (!isClickedInside) {
+			setExpanded(false);
+		}
+	}
 
 	switch (type) {
 		case "Fund":
@@ -68,14 +92,6 @@ function AccordionComponent({
 			namesList = lists[dataProperty as keyof List] as never;
 	}
 
-	function handleDeselectAll() {
-		setValue([]);
-	}
-
-	function handleSelectAll() {
-		setValue(dataArray);
-	}
-
 	useEffect(() => {
 		if (accordionRef.current) {
 			setBoxHeight(accordionRef.current.clientHeight);
@@ -89,133 +105,139 @@ function AccordionComponent({
 				height: boxHeight + "px",
 			}}
 		>
-			<Accordion
-				expanded={expanded === type}
-				onChange={handleAccordionExpand(type)}
-				style={{
-					backgroundColor: "#ffffff",
-					position: "absolute",
-					zIndex: 1000,
-					maxWidth: "100%",
-				}}
-				ref={accordionRef}
-			>
-				<AccordionSummary
-					expandIcon={<ExpandMoreIcon />}
-					sx={{
-						width: "100%",
-						height: "66px",
-						overflow: "hidden",
+			<ClickAwayListener onClickAway={handleClickAway}>
+				<Accordion
+					onMouseDown={handleMouseDown}
+					onMouseUp={handleMouseUp}
+					expanded={expanded === type}
+					onChange={handleAccordionExpand(type)}
+					style={{
+						backgroundColor: "#ffffff",
+						position: "absolute",
+						zIndex: 1000,
+						maxWidth: "100%",
 					}}
+					ref={accordionRef}
 				>
-					<Typography
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon />}
 						sx={{
-							color: "#144372",
-							fontWeight: "bold",
-							fontSize: "1rem",
-							width: "30%",
-							alignSelf: "center",
+							width: "100%",
+							height: "66px",
+							overflow: "hidden",
 						}}
 					>
-						{type + ":"}
-					</Typography>
-					<Typography sx={{ flexGrow: 1 }} />
-					<Typography
-						sx={{
-							color: "text.secondary",
-							alignSelf: "center",
-							justifySelf: "flex-end",
-							fontSize: "0.8rem",
-							width: "45%",
-							textAlign: "center",
-						}}
-					>
-						{value.length === dataArray.length
-							? `All ${type}s selected`
-							: value.length === 1
-							? isValidKey(value[0], namesList)
-								? namesList[value[0]]
-								: value[0].toString()
-							: `${value.length} ${type}s selected`}
-					</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography
-						variant="body2"
-						m={1}
-						mb={2}
-					>
-						Select the {type.toLocaleLowerCase()}
-						{filterType === "dropdowncheck" &&
-							`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
-					</Typography>
-					{filterType === "dropdowncheck" && (
-						<Dropdown
-							value={value}
-							setValue={setValue}
-							names={dataArray}
-							namesList={namesList as ListObj}
-							type={type}
-							inSelectionData={inSelectionData}
-							dataProperty={dataProperty}
-							fromQuickSelectors={false}
-						/>
-					)}
-					{filterType === "search" && (
-						<Search
-							value={value}
-							setValue={setValue}
-							names={dataArray}
-							namesList={namesList as ListObj}
-							inSelectionData={inSelectionData}
-							dataProperty={dataProperty}
-						/>
-					)}
-					{filterType === "checkbox" && (
-						<CheckboxLabel
-							value={value}
-							setValue={setValue}
-							names={dataArray}
-							namesList={namesList as ListObj}
-							inSelectionData={inSelectionData}
-							dataProperty={dataProperty}
-						/>
-					)}
-					{(filterType === "dropdowncheck" ||
-						filterType === "search") && (
-						<Box
-							style={{
-								display: "flex",
-								flexDirection:
-									type === "Year" ? "column" : "row",
+						<Typography
+							sx={{
+								color: "#144372",
+								fontWeight: "bold",
+								fontSize: "1rem",
+								width: "30%",
+								alignSelf: "center",
 							}}
 						>
-							<Button
-								variant="contained"
-								size="small"
-								onClick={handleDeselectAll}
+							{type + ":"}
+						</Typography>
+						<Typography sx={{ flexGrow: 1 }} />
+						<Typography
+							sx={{
+								color: "text.secondary",
+								alignSelf: "center",
+								justifySelf: "flex-end",
+								fontSize: "0.8rem",
+								width: "45%",
+								textAlign: "center",
+							}}
+						>
+							{value.length === dataArray.length
+								? `All ${type}s selected`
+								: value.length === 1
+								? isValidKey(value[0], namesList)
+									? namesList[value[0]]
+									: value[0].toString()
+								: `${value.length} ${type}s selected`}
+						</Typography>
+					</AccordionSummary>
+					<AccordionDetails>
+						<Typography
+							variant="body2"
+							m={1}
+							mb={2}
+						>
+							Select the {type.toLocaleLowerCase()}
+							{filterType === "dropdowncheck" &&
+								`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
+						</Typography>
+						{filterType === "dropdowncheck" && (
+							<Dropdown
+								value={value}
+								setValue={setValue}
+								names={dataArray}
+								namesList={namesList as ListObj}
+								type={type}
+								inSelectionData={inSelectionData}
+								dataProperty={dataProperty}
+								fromQuickSelectors={false}
+							/>
+						)}
+						{filterType === "search" && (
+							<Search
+								value={value}
+								setValue={setValue}
+								names={dataArray}
+								namesList={namesList as ListObj}
+								inSelectionData={inSelectionData}
+								dataProperty={dataProperty}
+							/>
+						)}
+						{filterType === "checkbox" && (
+							<CheckboxLabel
+								value={value}
+								setValue={setValue}
+								names={dataArray}
+								namesList={namesList as ListObj}
+								inSelectionData={inSelectionData}
+								dataProperty={dataProperty}
+							/>
+						)}
+						{(filterType === "dropdowncheck" ||
+							filterType === "search") && (
+							<Box
 								style={{
-									marginLeft: "8px",
-									marginTop: type === "Year" ? "8px" : "0px",
+									display: "flex",
+									flexDirection:
+										type === "Year" ? "column" : "row",
 								}}
 							>
-								Deselect all
-							</Button>
-							<Button
-								variant="contained"
-								size="small"
-								onClick={handleSelectAll}
-								style={{
-									marginLeft: "8px",
-									marginTop: type === "Year" ? "8px" : "0px",
-								}}
-							>
-								Select all
-							</Button>
-						</Box>
-					)}
-				</AccordionDetails>
-			</Accordion>
+								<Button
+									variant="contained"
+									size="small"
+									onClick={handleDeselectAll}
+									style={{
+										marginLeft: "8px",
+										marginTop:
+											type === "Year" ? "8px" : "0px",
+									}}
+								>
+									Deselect all
+								</Button>
+								<Button
+									variant="contained"
+									size="small"
+									onClick={handleSelectAll}
+									style={{
+										marginLeft: "8px",
+										marginTop:
+											type === "Year" ? "8px" : "0px",
+									}}
+								>
+									Select all
+								</Button>
+							</Box>
+						)}
+					</AccordionDetails>
+				</Accordion>
+			</ClickAwayListener>
 		</Box>
 	);
 }
