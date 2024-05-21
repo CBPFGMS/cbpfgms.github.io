@@ -13,7 +13,7 @@ type DownloadIconProps = {
 function DownloadIcon({
 	//handleDownloadClick,
 	clickedDownload,
-	setClickedDownload,
+	//setClickedDownload,
 	type,
 }: DownloadIconProps) {
 	return (

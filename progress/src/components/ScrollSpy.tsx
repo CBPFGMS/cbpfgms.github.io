@@ -5,10 +5,9 @@ import colors from "../utils/colors";
 import ListIcon from "@mui/icons-material/List";
 import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
-import GroupsIcon from '@mui/icons-material/Groups';
-import BusinessIcon from '@mui/icons-material/Business';
-import PieChartIcon from '@mui/icons-material/PieChart';
-import HandshakeIcon from '@mui/icons-material/Handshake';
+import GroupsIcon from "@mui/icons-material/Groups";
+import BusinessIcon from "@mui/icons-material/Business";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 import { RefIds } from "./MainContainer";
 
 type ScrollSpyProps = {
