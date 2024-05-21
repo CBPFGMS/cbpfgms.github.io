@@ -74,6 +74,8 @@ function processDataLeadership({
 		}
 	});
 
+	dataLeadership.leadershipData.sort((a, b) => b.allocations - a.allocations);
+
 	return dataLeadership;
 }
 

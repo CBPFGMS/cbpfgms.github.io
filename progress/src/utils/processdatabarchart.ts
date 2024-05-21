@@ -4,6 +4,7 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import calculateStatus from "./calculatestatus";
 import { BeneficiariesObject } from "./processrawdata";
 import constants from "./constants";
+import { sum } from "d3";
 
 export type DatumBarChart = {
 	type: number;
@@ -183,6 +184,16 @@ function processDataBarChart({
 			}
 		}
 	});
+
+	dataBeneficiaryByType.sort(
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+	);
+	dataOrganization.sort(
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+	);
+	dataSector.sort(
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+	);
 
 	return { dataBeneficiaryByType, dataOrganization, dataSector };
 }
