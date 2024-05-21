@@ -27,7 +27,7 @@ function TopPanel({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
-	//inViewLeadership,
+	inViewLeadership,
 	refIds,
 }: TopPanelProps) {
 	return (
@@ -103,6 +103,7 @@ function TopPanel({
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
+				inViewLeadership={inViewLeadership}
 				refIds={refIds}
 			/>
 		</Grid>

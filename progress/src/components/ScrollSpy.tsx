@@ -5,6 +5,10 @@ import colors from "../utils/colors";
 import ListIcon from "@mui/icons-material/List";
 import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
+import GroupsIcon from '@mui/icons-material/Groups';
+import BusinessIcon from '@mui/icons-material/Business';
+import PieChartIcon from '@mui/icons-material/PieChart';
+import HandshakeIcon from '@mui/icons-material/Handshake';
 import { RefIds } from "./MainContainer";
 
 type ScrollSpyProps = {
@@ -13,6 +17,7 @@ type ScrollSpyProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
+	inViewLeadership: boolean;
 	refIds: RefIds;
 };
 
@@ -30,6 +35,7 @@ function ScroolSpy({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
+	inViewLeadership,
 	refIds,
 }: ScrollSpyProps) {
 	function handleOnClick(reference: string) {
@@ -55,7 +61,7 @@ function ScroolSpy({
 				Icon={PaidIcon}
 			/>
 			<Tab
-				label="By Gender and Age"
+				label="By Gender/Age"
 				inView={inViewPictogram}
 				reference={refIds.pictogramRefId}
 				handleOnClick={handleOnClick}
@@ -66,14 +72,14 @@ function ScroolSpy({
 				inView={inViewBeneficiaryTypes}
 				reference={refIds.beneficiaryTypesRefId}
 				handleOnClick={handleOnClick}
-				Icon={ListIcon}
+				Icon={GroupsIcon}
 			/>
 			<Tab
 				label="By Organization"
 				inView={inViewOrganizations}
 				reference={refIds.organizationsRefId}
 				handleOnClick={handleOnClick}
-				Icon={ListIcon}
+				Icon={BusinessIcon}
 			/>
 			<Tab
 				label="By Sectors"
@@ -81,6 +87,13 @@ function ScroolSpy({
 				reference={refIds.sectorsRefId}
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
+			/>
+			<Tab
+				label="By Leadership"
+				inView={inViewLeadership}
+				reference={refIds.leadershipRefId}
+				handleOnClick={handleOnClick}
+				Icon={HandshakeIcon}
 			/>
 		</Box>
 	);
@@ -108,7 +121,7 @@ function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
 				<Icon
 					htmlColor={colors.unColor}
 					fontSize="medium"
-					{...(label === "By Gender and Age" && {
+					{...(label === "By Gender/Age" && {
 						type: "total",
 						svgProps: {
 							style: {
