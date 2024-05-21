@@ -117,6 +117,7 @@ function Dropdown({
 								marginTop: "8px",
 							},
 						},
+						disablePortal: true,
 					}}
 				>
 					{namesListMemo.map(name => (

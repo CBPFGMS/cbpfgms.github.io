@@ -41,7 +41,6 @@ function AccordionComponent({
 }: AccordionComponentProps) {
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
-	const [isClickedInside, setIsClickedInside] = useState(false);
 	const accordionRef = useRef<HTMLDivElement>(null);
 
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
@@ -61,18 +60,8 @@ function AccordionComponent({
 		setValue(dataArray);
 	}
 
-	const handleMouseDown = () => {
-		setIsClickedInside(true);
-	};
-
-	const handleMouseUp = () => {
-		setTimeout(() => setIsClickedInside(false), 0);
-	};
-
 	function handleClickAway() {
-		if (!isClickedInside) {
-			setExpanded(false);
-		}
+		setExpanded(false);
 	}
 
 	switch (type) {
@@ -107,8 +96,6 @@ function AccordionComponent({
 		>
 			<ClickAwayListener onClickAway={handleClickAway}>
 				<Accordion
-					onMouseDown={handleMouseDown}
-					onMouseUp={handleMouseUp}
 					expanded={expanded === type}
 					onChange={handleAccordionExpand(type)}
 					style={{
