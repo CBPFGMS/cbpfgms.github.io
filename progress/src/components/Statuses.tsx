@@ -35,9 +35,9 @@ type StatusesDescription = {
 };
 
 const statusesDescription: StatusesDescription = {
-	Implemented: "Help text for Implemented status here",
+	"Programmatically Closed": "Help text for Programmatically Closed status here",
 	"Under Implementation": "Help text for Under Implementation status here",
-	"Under Closure/Closed": "Help text for Closed/Under Closure status here",
+	"Financially Closed": "Help text for Financially Closed status here",
 };
 
 function Statuses({

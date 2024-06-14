@@ -7,11 +7,14 @@ import MainContainer from "./components/MainContainer";
 type AppProps = {
 	defaultYear: number;
 	defaultFundType: number | null;
+	startYear: number | null;
 };
 
-function App({ defaultYear, defaultFundType }: AppProps) {
-	const { data, lists, inDataLists, loading, error } =
-		useData(defaultFundType);
+function App({ defaultYear, defaultFundType, startYear }: AppProps) {
+	const { data, lists, inDataLists, loading, error } = useData(
+		defaultFundType,
+		startYear
+	);
 
 	return loading ? (
 		<Loading />

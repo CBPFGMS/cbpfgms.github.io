@@ -1,7 +1,7 @@
 //import { constants } from "./constants";
 
 //const { isProdSite } = constants;
-const isProdSite = false; //CHANGE
+const isProdSite = true; //CHANGE
 
 function warnInvalidSchema(
 	file: string,

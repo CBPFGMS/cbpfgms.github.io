@@ -2,8 +2,8 @@ const constants = {
 	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
 	implementationStatuses: [
 		"Under Implementation",
-		"Implemented",
-		"Under Closure/Closed",
+		"Programmatically Closed",
+		"Financially Closed",
 	],
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",

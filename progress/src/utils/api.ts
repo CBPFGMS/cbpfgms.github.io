@@ -32,7 +32,7 @@ type ReceiveDataArgs = [
 	SectorsMasterObject[]
 ];
 
-function useData(defaultFundType: number | null) {
+function useData(defaultFundType: number | null, startYear: number | null) {
 	const projectSummaryUrl =
 			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
 		sectorsDataUrl =
@@ -154,6 +154,7 @@ function useData(defaultFundType: number | null) {
 				listsObj,
 				setInDataLists,
 				defaultFundType,
+				startYear,
 			});
 
 			//TEMPORARY FIX

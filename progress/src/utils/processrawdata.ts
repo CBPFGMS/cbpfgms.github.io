@@ -90,6 +90,7 @@ type ProcessRawDataParams = {
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	defaultFundType: number | null;
+	startYear: number | null;
 };
 
 function processRawData({
@@ -98,6 +99,7 @@ function processRawData({
 	listsObj,
 	setInDataLists,
 	defaultFundType,
+	startYear,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
@@ -187,9 +189,12 @@ function processRawData({
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
-			const thisFundType = defaultFundType
-				? row.FundType === defaultFundType
-				: true;
+			const thisFundType =
+				!defaultFundType || row.FundType === defaultFundType;
+			const thisValidYear =
+				!startYear ||
+				(thisAllocationType &&
+					thisAllocationType.AllocationYear >= startYear);
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -228,7 +233,8 @@ function processRawData({
 				thisOrganization &&
 				thisStatus &&
 				thisSectorData &&
-				thisFundType
+				thisFundType &&
+				thisValidYear
 			) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);

@@ -21,9 +21,9 @@ function calculateStatus(
 				lists.statuses[datum.projectStatusId]
 			)
 		) {
-			status = "Under Closure/Closed";
+			status = "Financially Closed";
 		} else {
-			status = "Implemented";
+			status = "Programmatically Closed";
 		}
 	}
 	return status;
