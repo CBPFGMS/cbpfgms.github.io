@@ -110,7 +110,7 @@ export const sectorBeneficiaryObjectSchema = z.object({
 
 export const allocationTypeMasterObjectSchema = z.object({
 	AllocationTitle: z.string(),
-	AllocationSummary: z.string(),
+	AllocationSummary: z.string().nullable(),
 	AllocationSource: z.string(),
 	AllocationSourceId: z.union([z.literal(1), z.literal(2)]),
 	TotalUSDPlanned: z.number().nonnegative(),
