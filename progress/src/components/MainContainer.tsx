@@ -190,6 +190,18 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		defaultYear,
 	});
 
+	const filterProps = {
+		year,
+		setYear,
+		fund,
+		setFund,
+		allocationSource,
+		setAllocationSource,
+		allocationType,
+		setAllocationType,
+		inSelectionData,
+	};
+
 	return (
 		<Container
 			disableGutters={true}
@@ -203,6 +215,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
 			<TopPanel
+				{...filterProps}
 				titleRef={titleRef}
 				inViewTitle={inViewTitle}
 				inViewMenus={inViewMenus}
@@ -216,17 +229,9 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			/>
 			<TopIntro />
 			<FiltersContainer
-				year={year}
-				setYear={setYear}
-				fund={fund}
-				setFund={setFund}
-				allocationSource={allocationSource}
-				setAllocationSource={setAllocationSource}
-				allocationType={allocationType}
-				setAllocationType={setAllocationType}
+				{...filterProps}
 				implementationStatus={implementationStatus}
 				setImplementationStatus={setImplementationStatus}
-				inSelectionData={inSelectionData}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
 			/>

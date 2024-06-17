@@ -4,6 +4,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import colors from "../utils/colors";
 import { RefIds } from "./MainContainer";
 import ScrollSpy from "./ScrollSpy";
+import { InSelectionData } from "../utils/processdatasummary";
+import QuickSelectors from "./QuickSelectors";
 
 type TopPanelProps = {
 	titleRef: (node?: Element | null | undefined) => void;
@@ -16,12 +18,21 @@ type TopPanelProps = {
 	inViewSectors: boolean;
 	inViewLeadership: boolean;
 	refIds: RefIds;
+	year: number[];
+	setYear: React.Dispatch<React.SetStateAction<number[]>>;
+	fund: number[];
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationSource: number[];
+	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: number[];
+	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	inSelectionData: InSelectionData;
 };
 
 function TopPanel({
 	titleRef,
 	inViewTitle,
-	//inViewMenus,
+	inViewMenus,
 	inViewSummary,
 	inViewPictogram,
 	inViewBeneficiaryTypes,
@@ -29,6 +40,15 @@ function TopPanel({
 	inViewSectors,
 	inViewLeadership,
 	refIds,
+	year,
+	setYear,
+	fund,
+	setFund,
+	allocationSource,
+	setAllocationSource,
+	allocationType,
+	setAllocationType,
+	inSelectionData,
 }: TopPanelProps) {
 	return (
 		<Grid
@@ -61,11 +81,11 @@ function TopPanel({
 					variant={"h4"}
 					style={{
 						fontFamily: "Montserrat",
-						// fontSize: inViewMenus ? "40px" : "18px",
-						fontSize: "40px",
+						fontSize: inViewMenus ? "40px" : "24px",
+						// fontSize: "40px",
 						fontWeight: 700,
-						// marginLeft: inViewMenus ? "1em" : "2em",
-						marginLeft: "1em",
+						marginLeft: inViewMenus ? "1em" : "2em",
+						// marginLeft: "1em",
 					}}
 				>
 					Allocation Progress Dashboard
@@ -78,24 +98,25 @@ function TopPanel({
 					data-tooltip-place="top"
 					style={{
 						color: colors.unColor,
-						// fontSize: inViewMenus ? "26px" : "18px",
-						fontSize: "26px",
+						fontSize: inViewMenus ? "26px" : "18px",
+						// fontSize: "26px",
 						marginLeft: "0.1em",
-						// alignSelf: inViewMenus ? "flex-start" : "center",
 						alignSelf: "flex-start",
 					}}
 				/>
-				{/* {!inViewMenus && (
-				<QuickSelectors
-					fund={fund}
-					setFund={setFund}
-					allocationSource={allocationSource}
-					setAllocationSource={setAllocationSource}
-					allocationType={allocationType}
-					setAllocationType={setAllocationType}
-					inSelectionData={inSelectionData}
-				/>
-			)} */}
+				{!inViewMenus && (
+					<QuickSelectors
+						year={year}
+						setYear={setYear}
+						fund={fund}
+						setFund={setFund}
+						allocationSource={allocationSource}
+						setAllocationSource={setAllocationSource}
+						allocationType={allocationType}
+						setAllocationType={setAllocationType}
+						inSelectionData={inSelectionData}
+					/>
+				)}
 			</Grid>
 			<ScrollSpy
 				inViewSummary={inViewSummary}

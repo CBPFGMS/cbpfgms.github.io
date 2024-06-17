@@ -15,6 +15,7 @@ import { InSelectionData } from "../utils/processdatasummary";
 import { InDataLists } from "../utils/processrawdata";
 import { List, ListObj } from "../utils/makelists";
 import constants from "../utils/constants";
+import { makeYearsList } from "../utils/makeyearslist";
 
 const { filterTypes } = constants;
 
@@ -160,7 +161,7 @@ function AccordionComponent({
 								value={value}
 								setValue={setValue}
 								names={dataArray}
-								namesList={namesList as ListObj}
+								namesList={namesList}
 								type={type}
 								inSelectionData={inSelectionData}
 								dataProperty={dataProperty}
@@ -172,7 +173,7 @@ function AccordionComponent({
 								value={value}
 								setValue={setValue}
 								names={dataArray}
-								namesList={namesList as ListObj}
+								namesList={namesList}
 								inSelectionData={inSelectionData}
 								dataProperty={dataProperty}
 							/>
@@ -182,7 +183,7 @@ function AccordionComponent({
 								value={value}
 								setValue={setValue}
 								names={dataArray}
-								namesList={namesList as ListObj}
+								namesList={namesList}
 								inSelectionData={inSelectionData}
 								dataProperty={dataProperty}
 							/>
@@ -227,14 +228,6 @@ function AccordionComponent({
 			</ClickAwayListener>
 		</Box>
 	);
-}
-
-function makeYearsList(dataArray: number[]): ListObj {
-	const yearsList: ListObj = {};
-	dataArray.forEach(year => {
-		yearsList[year] = year.toString();
-	});
-	return yearsList;
 }
 
 function isValidKey(key: number, obj: ListObj): boolean {
