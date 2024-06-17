@@ -92,28 +92,31 @@ export const sectorBeneficiaryObjectSchema = z.object({
 	GlobalClusterId: z.number().int().nonnegative(),
 	Percentage: z.number().nonnegative(),
 	CALCBudgetByCluster: z.number().nonnegative(),
-	TargetMen: z.number().int().nonnegative(),
-	TargetWomen: z.number().int().nonnegative(),
-	TargetBoys: z.number().int().nonnegative(),
-	TargetGirls: z.number().int().nonnegative(),
-	ActualMen: z.number().int().nonnegative(),
-	ActualWomen: z.number().int().nonnegative(),
-	ActualBoys: z.number().int().nonnegative(),
-	ActualGirls: z.number().int().nonnegative(),
+	TargetMen: z.number().int().nonnegative().nullable(),
+	TargetWomen: z.number().int().nonnegative().nullable(),
+	TargetBoys: z.number().int().nonnegative().nullable(),
+	TargetGirls: z.number().int().nonnegative().nullable(),
+	ActualMen: z.number().int().nonnegative().nullable(),
+	ActualWomen: z.number().int().nonnegative().nullable(),
+	ActualBoys: z.number().int().nonnegative().nullable(),
+	ActualGirls: z.number().int().nonnegative().nullable(),
 	GlobalInstanceStatusId: z.number().int().nonnegative().nullable(),
-	SubmissionDate: z.string().regex(dateRegex, "Invalid date format"),
+	SubmissionDate: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
 });
 
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
 
-export const allocationTypeMasterObjectSchema = z.object({
+export const allocationTypesMasterObjectSchema = z.object({
 	AllocationTitle: z.string(),
 	AllocationSummary: z.string().nullable(),
 	AllocationSource: z.string(),
-	AllocationSourceId: z.union([z.literal(1), z.literal(2)]),
-	TotalUSDPlanned: z.number().nonnegative(),
+	AllocationSourceId: z.number().int().nonnegative(),
+	TotalUSDPlanned: z.number().nonnegative().nullable(),
 	PlannedStartDate: z
 		.string()
 		.regex(dateRegex, "Invalid date format")
@@ -233,8 +236,8 @@ export type SectorBeneficiaryObject = z.infer<
 	typeof sectorBeneficiaryObjectSchema
 >;
 
-export type AllocationTypeMasterObject = z.infer<
-	typeof allocationTypeMasterObjectSchema
+export type AllocationTypesMasterObject = z.infer<
+	typeof allocationTypesMasterObjectSchema
 >;
 
 export type OrganizationMasterObject = z.infer<

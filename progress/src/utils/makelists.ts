@@ -1,6 +1,6 @@
 import {
 	AllocationSourcesMasterObject,
-	AllocationTypeMasterObject,
+	AllocationTypesMasterObject,
 	BeneficiaryTypesMasterObject,
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
@@ -9,7 +9,7 @@ import {
 	SectorsMasterObject,
 	pooledFundsMasterObjectSchema,
 	beneficiaryTypesMasterObjectSchema,
-	allocationTypeMasterObjectSchema,
+	allocationTypesMasterObjectSchema,
 	allocationSourcesMasterObjectSchema,
 	organizationTypesMasterObjectSchema,
 	sectorsMasterObjectSchema,
@@ -19,7 +19,7 @@ import {
 import warnInvalidSchema from "./warninvalid";
 
 type MakeListParams = {
-	allocationTypeMaster: AllocationTypeMasterObject[];
+	allocationTypesMaster: AllocationTypesMasterObject[];
 	organizationMaster: OrganizationMasterObject[];
 	projectStatusMaster: ProjectStatusMasterObject[];
 	beneficiaryTypesMaster: BeneficiaryTypesMasterObject[];
@@ -34,7 +34,7 @@ export type ListObj = {
 };
 
 export type AllocationTypeListObj = {
-	[key: number]: AllocationTypeMasterObject;
+	[key: number]: AllocationTypesMasterObject;
 };
 
 type OrganizationListObj = {
@@ -57,7 +57,7 @@ export type List = {
 };
 
 function makeLists({
-	allocationTypeMaster,
+	allocationTypesMaster,
 	organizationMaster,
 	projectStatusMaster,
 	beneficiaryTypesMaster,
@@ -110,9 +110,9 @@ function makeLists({
 		}
 	});
 
-	allocationTypeMaster.forEach(d => {
+	allocationTypesMaster.forEach(d => {
 		const parsedAllocationTypeMaster =
-			allocationTypeMasterObjectSchema.safeParse(d);
+			allocationTypesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
 			lists.allocationTypes[
 				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)

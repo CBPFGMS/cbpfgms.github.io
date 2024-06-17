@@ -89,8 +89,6 @@ type ProcessRawDataParams = {
 	sectorsData: SectorBeneficiaryObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
-	defaultFundType: number | null;
-	startYear: number | null;
 };
 
 function processRawData({
@@ -98,8 +96,6 @@ function processRawData({
 	sectorsData,
 	listsObj,
 	setInDataLists,
-	defaultFundType,
-	startYear,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
@@ -128,16 +124,16 @@ function processRawData({
 							sectorId: row.GlobalClusterId,
 							percentage: row.Percentage,
 							reached: {
-								girls: row.ActualGirls,
-								boys: row.ActualBoys,
-								women: row.ActualWomen,
-								men: row.ActualMen,
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
 							},
 							targeted: {
-								girls: row.TargetGirls,
-								boys: row.TargetBoys,
-								women: row.TargetWomen,
-								men: row.TargetMen,
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
 							},
 						},
 					],
@@ -149,16 +145,16 @@ function processRawData({
 						sectorId: row.GlobalClusterId,
 						percentage: row.Percentage,
 						reached: {
-							girls: row.ActualGirls,
-							boys: row.ActualBoys,
-							women: row.ActualWomen,
-							men: row.ActualMen,
+							girls: row.ActualGirls || 0,
+							boys: row.ActualBoys || 0,
+							women: row.ActualWomen || 0,
+							men: row.ActualMen || 0,
 						},
 						targeted: {
-							girls: row.TargetGirls,
-							boys: row.TargetBoys,
-							women: row.TargetWomen,
-							men: row.TargetMen,
+							girls: row.TargetGirls || 0,
+							boys: row.TargetBoys || 0,
+							women: row.TargetWomen || 0,
+							men: row.TargetMen || 0,
 						},
 					});
 				} else {
@@ -189,12 +185,6 @@ function processRawData({
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
-			const thisFundType =
-				!defaultFundType || row.FundType === defaultFundType;
-			const thisValidYear =
-				!startYear ||
-				(thisAllocationType &&
-					thisAllocationType.AllocationYear >= startYear);
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -232,9 +222,7 @@ function processRawData({
 				thisAllocationType &&
 				thisOrganization &&
 				thisStatus &&
-				thisSectorData &&
-				thisFundType &&
-				thisValidYear
+				thisSectorData
 			) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);

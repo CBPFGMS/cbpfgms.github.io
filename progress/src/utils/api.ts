@@ -3,12 +3,10 @@ import { useEffect, useState } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import makeLists, { List } from "./makelists";
-// import preProcessData from "./preprocessdata";
-// import proccessApproved from "./processapproved.ts";
 import processRawData, { Data, InDataLists } from "./processrawdata";
 import {
 	AllocationSourcesMasterObject,
-	AllocationTypeMasterObject,
+	AllocationTypesMasterObject,
 	BeneficiaryTypesMasterObject,
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
@@ -22,7 +20,7 @@ import {
 type ReceiveDataArgs = [
 	ProjectSummaryObject[],
 	SectorBeneficiaryObject[],
-	AllocationTypeMasterObject[],
+	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
 	ProjectStatusMasterObject[],
 	BeneficiaryTypesMasterObject[],
@@ -33,16 +31,14 @@ type ReceiveDataArgs = [
 ];
 
 function useData(defaultFundType: number | null, startYear: number | null) {
-	const projectSummaryUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
-		sectorsDataUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=&$format=csv",
-		allocationTypeMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
-		organizationMasterUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=&$format=csv",
-		projectStatusMasterUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1&$format=csv",
+	const fundType = defaultFundType ? defaultFundType : "",
+		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
+
+	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
+		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
+		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
+		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
+		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
 		beneficiaryTypesMasterUrl =
 			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		pooledFundsMasterUrl =
@@ -74,9 +70,9 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				sectorsDataUrl,
 				"csv"
 			),
-			fetchFile<AllocationTypeMasterObject[]>(
-				"allocationTypeMaster",
-				allocationTypeMasterUrl,
+			fetchFile<AllocationTypesMasterObject[]>(
+				"allocationTypesMaster",
+				allocationTypesMasterUrl,
 				"csv"
 			),
 			fetchFile<OrganizationMasterObject[]>(
@@ -128,7 +124,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 		function receiveData([
 			projectSummary,
 			sectorsData,
-			allocationTypeMaster,
+			allocationTypesMaster,
 			organizationMaster,
 			projectStatusMaster,
 			beneficiaryTypesMaster,
@@ -138,7 +134,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			sectorsMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
-				allocationTypeMaster,
+				allocationTypesMaster,
 				organizationMaster,
 				projectStatusMaster,
 				beneficiaryTypesMaster,
@@ -153,8 +149,6 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				sectorsData,
 				listsObj,
 				setInDataLists,
-				defaultFundType,
-				startYear,
 			});
 
 			//TEMPORARY FIX
