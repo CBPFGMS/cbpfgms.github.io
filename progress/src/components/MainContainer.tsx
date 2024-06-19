@@ -168,10 +168,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		]
 	);
 
-	//TODO 03: create filterArrayDownload and the download data for all charts
-
-	//TODO 04: add the scrollspy for the top panel
-
 	useUpdateQueryString({
 		allocationSource,
 		allocationType,

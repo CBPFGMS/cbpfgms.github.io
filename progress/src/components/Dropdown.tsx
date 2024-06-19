@@ -125,16 +125,10 @@ function Dropdown({
 							key={name}
 							value={name}
 							disabled={!inSelectionData[dataProperty].has(name)}
-							style={
-								!inSelectionData[dataProperty].has(name)
-									? {
-											display: "none",
-									  }
-									: {
-											whiteSpace: "normal",
-											padding: "1px",
-									  }
-							}
+							style={{
+								whiteSpace: "normal",
+								padding: "1px",
+							}}
 						>
 							<Checkbox
 								checked={value.includes(name)}
