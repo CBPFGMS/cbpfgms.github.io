@@ -1,5 +1,7 @@
+import { useContext } from "react";
+import DataContext, { DataContextType } from "../context/DataContext";
 import { DataLeadership } from "../utils/processdataorganizationleadership";
-import { DownloadStates } from "./MainContainer";
+import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "./DownloadIcon";
@@ -9,11 +11,18 @@ import { format } from "d3";
 import formatSIFloat from "../utils/formatsi";
 import LeadershipRow from "./LeadershipRow";
 import constants from "../utils/constants";
+import { processLeadershipDownload } from "../utils/processdownload";
+import downloadData from "../utils/downloaddata";
 
 type LeadershipChartProps = {
 	dataLeadership: DataLeadership;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	implementationStatus: ImplementationStatuses[];
 };
 
 const { organizationLeadership } = constants;
@@ -22,7 +31,30 @@ function LeadershipChart({
 	dataLeadership,
 	clickedDownload,
 	setClickedDownload,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
 }: LeadershipChartProps) {
+	const { data, lists } = useContext(DataContext) as DataContextType;
+
+	function handleDownloadClick() {
+		const dataLeadershipDownload = processLeadershipDownload({
+			data,
+			lists,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			implementationStatus,
+		});
+		downloadData<(typeof dataLeadershipDownload)[number]>(
+			dataLeadershipDownload,
+			"leadership_type"
+		);
+	}
+
 	const leadershipData = dataLeadership.leadershipData.sort((a, b) => {
 		const indexA = organizationLeadership.indexOf(a.type);
 		const indexB = organizationLeadership.indexOf(b.type);
@@ -37,7 +69,7 @@ function LeadershipChart({
 			}}
 		>
 			<DownloadIcon
-				//handleDownloadClick={handleDownloadClick}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="leadership"
@@ -214,6 +246,7 @@ function LeadershipTotal({
 									color: "#fff",
 								}}
 							>
+								{"$"}
 								<NumberAnimator
 									number={parseFloat(
 										formatSIFloat(

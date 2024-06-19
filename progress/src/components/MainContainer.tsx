@@ -256,6 +256,11 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
 				leadershipRef={leadershipRef}
+				year={year}
+				fund={fund}
+				allocationSource={allocationSource}
+				allocationType={allocationType}
+				implementationsStatus={implementationStatus}
 			/>
 		</Container>
 	);

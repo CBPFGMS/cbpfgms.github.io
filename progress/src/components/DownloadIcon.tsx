@@ -4,16 +4,16 @@ import FileDownloadDoneOutlinedIcon from "@mui/icons-material/FileDownloadDoneOu
 import { DownloadStates, Charts } from "./MainContainer";
 
 type DownloadIconProps = {
-	//handleDownloadClick: () => void;
+	handleDownloadClick: () => void;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	type: Charts;
 };
 
 function DownloadIcon({
-	//handleDownloadClick,
+	handleDownloadClick,
 	clickedDownload,
-	//setClickedDownload,
+	setClickedDownload,
 	type,
 }: DownloadIconProps) {
 	return (
@@ -26,10 +26,10 @@ function DownloadIcon({
 				cursor: "pointer",
 				zIndex: 1000,
 			}}
-			// onClick={() => {
-			// 	setClickedDownload(prev => ({ ...prev, [type]: true }));
-			// 	//handleDownloadClick();
-			// }}
+			onClick={() => {
+				setClickedDownload(prev => ({ ...prev, [type]: true }));
+				handleDownloadClick();
+			}}
 		>
 			{clickedDownload[type] ? (
 				<FileDownloadDoneOutlinedIcon
@@ -46,8 +46,7 @@ function DownloadIcon({
 					fontSize="large"
 					style={{ color: "dimgray" }}
 					data-tooltip-id="tooltip"
-					//data-tooltip-content="Download CSV data file"
-					data-tooltip-html="<div style='text-align:center;'>Feature coming soon:<br />Download CSV data file</div>"
+					data-tooltip-content="Download CSV data file"
 					data-tooltip-place="bottom"
 				/>
 			)}

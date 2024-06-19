@@ -145,6 +145,7 @@ function LeadershipRow({
 											: "#fff",
 								}}
 							>
+								{"$"}
 								<NumberAnimator
 									number={parseFloat(formatSIFloat(value))}
 									type="decimal"

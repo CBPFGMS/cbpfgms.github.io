@@ -79,6 +79,7 @@ function SummaryRow({
 									color: "#222",
 								}}
 							>
+								{i > 1 ? "" : "$"}
 								{d < 1e4 ? (
 									<NumberAnimator
 										number={d}
@@ -86,7 +87,6 @@ function SummaryRow({
 									/>
 								) : (
 									<span>
-										{i ? "" : "$"}
 										<NumberAnimator
 											number={parseFloat(
 												formatSIFloat(d)

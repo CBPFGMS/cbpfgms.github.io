@@ -4,7 +4,11 @@ import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
 import { DatumSummary, DatumPictogram } from "../utils/processdatasummary";
-import { DownloadStates, RefIds } from "./MainContainer";
+import {
+	DownloadStates,
+	RefIds,
+	ImplementationStatuses,
+} from "./MainContainer";
 import { List } from "../utils/makelists";
 import SummaryChart from "./SummaryChart";
 import PictogramChart from "./PictogramChart";
@@ -32,6 +36,11 @@ type ChartsContainerProps = {
 	sectorsRef: Ref;
 	organizationsRef: Ref;
 	leadershipRef: Ref;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	implementationsStatus: ImplementationStatuses[];
 };
 
 function ChartsContainer({
@@ -51,6 +60,11 @@ function ChartsContainer({
 	sectorsRef,
 	organizationsRef,
 	leadershipRef,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationsStatus,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -100,8 +114,11 @@ function ChartsContainer({
 							dataSummary={dataSummary}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
-							//summaryDataDownload={summaryDataDownload}
-							fundsList={lists.fundNames}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
 						/>
 					</Grid>
 					<Divider
@@ -121,8 +138,11 @@ function ChartsContainer({
 							dataPictogram={dataPictogram}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
-							//summaryDataDownload={summaryDataDownload}
-							fundsList={lists.fundNames}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
 						/>
 					</Grid>
 				</Grid>
@@ -157,7 +177,11 @@ function ChartsContainer({
 							setClickedDownload={setClickedDownload}
 							title={"People targeted and reached by type"}
 							chartType={"beneficiaryTypes"}
-							//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
 						/>
 					</Grid>
 					<Divider
@@ -182,7 +206,11 @@ function ChartsContainer({
 								"People targeted and reached by organization"
 							}
 							chartType={"organizations"}
-							//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
 						/>
 					</Grid>
 				</Grid>
@@ -223,7 +251,11 @@ function ChartsContainer({
 								setClickedDownload={setClickedDownload}
 								title={"People targeted and reached by sector"}
 								chartType={"sectors"}
-								//beneficiaryTypesDataDownload={beneficiaryTypesDataDownload}
+								year={year}
+								fund={fund}
+								allocationSource={allocationSource}
+								allocationType={allocationType}
+								implementationStatus={implementationsStatus}
 							/>
 						</Box>
 					</Grid>
@@ -262,6 +294,11 @@ function ChartsContainer({
 								dataLeadership={dataLeadership}
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
+								year={year}
+								fund={fund}
+								allocationSource={allocationSource}
+								allocationType={allocationType}
+								implementationStatus={implementationsStatus}
 							/>
 						</Box>
 					</Grid>

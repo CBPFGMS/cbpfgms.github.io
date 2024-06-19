@@ -43,31 +43,30 @@ function processDataLeadership({
 
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
-		if (implementationStatus.includes(thisStatus)) {
-			if (
-				year.includes(datum.year) &&
-				fund.includes(datum.fund) &&
-				allocationSource.includes(datum.allocationSource) &&
-				allocationType.includes(datum.allocationType)
-			) {
-				dataLeadership.totalAllocations += datum.budget;
-				dataLeadership.totalPartners.add(datum.organizationId);
+		if (
+			implementationStatus.includes(thisStatus) &&
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			dataLeadership.totalAllocations += datum.budget;
+			dataLeadership.totalPartners.add(datum.organizationId);
 
-				for (const leader in datum.leadership) {
-					if (datum.leadership[leader as Leadership]) {
-						const foundLeader = dataLeadership.leadershipData.find(
-							leaderData => leaderData.type === leader
-						);
-						if (foundLeader) {
-							foundLeader.allocations += datum.budget;
-							foundLeader.partners.add(datum.organizationId);
-						} else {
-							dataLeadership.leadershipData.push({
-								type: leader as Leadership,
-								allocations: datum.budget,
-								partners: new Set([datum.organizationId]),
-							});
-						}
+			for (const leader in datum.leadership) {
+				if (datum.leadership[leader as Leadership]) {
+					const foundLeader = dataLeadership.leadershipData.find(
+						leaderData => leaderData.type === leader
+					);
+					if (foundLeader) {
+						foundLeader.allocations += datum.budget;
+						foundLeader.partners.add(datum.organizationId);
+					} else {
+						dataLeadership.leadershipData.push({
+							type: leader as Leadership,
+							allocations: datum.budget,
+							partners: new Set([datum.organizationId]),
+						});
 					}
 				}
 			}

@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import DataContext, { DataContextType } from "../context/DataContext";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -7,10 +9,14 @@ import { max } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
-//import downloadData from "../utils/downloaddata";
+import downloadData from "../utils/downloaddata";
 import { List } from "../utils/makelists";
 import constants from "../utils/constants";
-import { DownloadStates, Charts } from "./MainContainer";
+import {
+	DownloadStates,
+	Charts,
+	ImplementationStatuses,
+} from "./MainContainer";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
@@ -18,6 +24,11 @@ import BarChartRow from "./BarChartRow";
 import capitalizeString from "../utils/capitalizestring";
 import Snack from "./Snack";
 import { DatumBarChart } from "../utils/processdatabarchart";
+import {
+	processSectorsDownload,
+	processBeneficiaryTypesDownload,
+	processOrganizationsDownload,
+} from "../utils/processdownload";
 
 type BarChartProps = {
 	originalData: DatumBarChart[];
@@ -26,6 +37,11 @@ type BarChartProps = {
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	title: string;
 	chartType: Charts;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	implementationStatus: ImplementationStatuses[];
 };
 
 type Data = {
@@ -45,7 +61,14 @@ function BarChart({
 	setClickedDownload,
 	title,
 	chartType,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
 }: BarChartProps) {
+	const { data: completeData } = useContext(DataContext) as DataContextType;
+
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const [beneficiaryCategoryArray, setBeneficiaryCategoryArray] = useState<
@@ -95,63 +118,51 @@ function BarChart({
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
 
-	// function handleDownloadClick() {
-	// 	if (chartType === "beneficiaryTypes") {
-	// 		const data = (dataDownload as ByTypeObj[]).map(d => ({
-	// 			"Report date": d.ReportApprovedDate,
-	// 			Year: d.AllocationYear,
-	// 			Fund: list.fundAbbreviatedNames[d.PooledFundId],
-	// 			"Beneficiary Type": list.beneficiaryTypes[d.BeneficiaryTypeId],
-	// 			Targeted:
-	// 				(d.TargetBoys || 0) +
-	// 				(d.TargetGirls || 0) +
-	// 				(d.TargetMen || 0) +
-	// 				(d.TargetWomen || 0),
-	// 			Reached:
-	// 				(d.ReachedBoys || 0) +
-	// 				(d.ReachedGirls || 0) +
-	// 				(d.ReachedMen || 0) +
-	// 				(d.ReachedWomen || 0),
-	// 		}));
-	// 		downloadData<(typeof data)[number]>(data, "beneficiary_types");
-	// 	} else if (chartType === "sectors") {
-	// 		const data = (dataDownload as BySectorObj[]).map(d => ({
-	// 			"Report date": d.ReportApprovedDate,
-	// 			Year: d.AllocationYear,
-	// 			Fund: list.fundAbbreviatedNames[d.PooledFundId],
-	// 			Sector: list.sectors[d.ClusterId],
-	// 			Targeted:
-	// 				(d.TargetedBoys || 0) +
-	// 				(d.TargetedGirls || 0) +
-	// 				(d.TargetedMen || 0) +
-	// 				(d.TargetedWomen || 0),
-	// 			Reached:
-	// 				(d.ReachedBoys || 0) +
-	// 				(d.ReachedGirls || 0) +
-	// 				(d.ReachedMen || 0) +
-	// 				(d.ReachedWomen || 0),
-	// 		}));
-	// 		downloadData<(typeof data)[number]>(data, "sectors");
-	// 	} else if (chartType === "organization") {
-	// 		const data = (dataDownload as ByOrganizationObj[]).map(d => ({
-	// 			"Report date": d.ReportApprovedDate,
-	// 			Year: d.AllocationYear,
-	// 			Fund: list.fundAbbreviatedNames[d.PooledFundId],
-	// 			Organization: list.organizationTypes[d.OrganizationType],
-	// 			Targeted:
-	// 				(d.TargetedBoys || 0) +
-	// 				(d.TargetedGirls || 0) +
-	// 				(d.TargetedMen || 0) +
-	// 				(d.TargetedWomen || 0),
-	// 			Reached:
-	// 				(d.ReachedBoys || 0) +
-	// 				(d.ReachedGirls || 0) +
-	// 				(d.ReachedMen || 0) +
-	// 				(d.ReachedWomen || 0),
-	// 		}));
-	// 		downloadData<(typeof data)[number]>(data, "organization_types");
-	// 	}
-	// }
+	function handleDownloadClick() {
+		if (chartType === "beneficiaryTypes") {
+			const dataBeneficiariesDownload = processBeneficiaryTypesDownload({
+				data: completeData,
+				lists,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus,
+			});
+			downloadData<(typeof dataBeneficiariesDownload)[number]>(
+				dataBeneficiariesDownload,
+				"beneficiary_types"
+			);
+		} else if (chartType === "sectors") {
+			const dataSectorsDownload = processSectorsDownload({
+				data: completeData,
+				lists,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus,
+			});
+			downloadData<(typeof dataSectorsDownload)[number]>(
+				dataSectorsDownload,
+				"sectors"
+			);
+		} else if (chartType === "organizations") {
+			const dataOrganizationsDownload = processOrganizationsDownload({
+				data: completeData,
+				lists,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus,
+			});
+			downloadData<(typeof dataOrganizationsDownload)[number]>(
+				dataOrganizationsDownload,
+				"organizations"
+			);
+		}
+	}
 
 	function handleOnChange(category: BeneficiaryCategory) {
 		if (beneficiaryCategoryArray.includes(category)) {
@@ -183,7 +194,7 @@ function BarChart({
 				message={`At least one beneficiary must be selected`}
 			/>
 			<DownloadIcon
-				//handleDownloadClick={handleDownloadClick}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="beneficiaryTypes"

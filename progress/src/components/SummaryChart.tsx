@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import DataContext, { DataContextType } from "../context/DataContext";
 import { sum, format } from "d3";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -7,39 +9,52 @@ import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import DownloadIcon from "./DownloadIcon";
 import colors from "../utils/colors";
-//import downloadData from "../utils/downloaddata";
+import downloadData from "../utils/downloaddata";
 import SummaryRow from "./SummaryRow";
 import { DatumSummary } from "../utils/processdatasummary";
 import { DownloadStates } from "./MainContainer";
-import { ListObj } from "../utils/makelists";
 import Divider from "@mui/material/Divider";
+import { processSummaryDownload } from "../utils/processdownload";
+import { ImplementationStatuses } from "./MainContainer";
 
 type SummaryChartProps = {
 	dataSummary: DatumSummary[];
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
-	//summaryDataDownload: ByDisabilityObj[];
-	fundsList: ListObj;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	implementationStatus: ImplementationStatuses[];
 };
 
 function SummaryChart({
 	dataSummary,
 	clickedDownload,
 	setClickedDownload,
-}: //summaryDataDownload,
-//fundsList,
-SummaryChartProps) {
-	// function handleDownloadClick() {
-	// 	const data = summaryDataDownload.map(d => ({
-	// 		"Report date": d.ReportApprovedDate,
-	// 		Year: d.AllocationYear,
-	// 		Allocation: d.Budget,
-	// 		Fund: fundsList[d.PooledFundId],
-	// 		"Number of Projects": d.NumbofProjects,
-	// 		"Number of Partners": d.TotalNumbPartners,
-	// 	}));
-	// 	downloadData<(typeof data)[number]>(data, "summary");
-	// }
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+}: SummaryChartProps) {
+	const { data, lists } = useContext(DataContext) as DataContextType;
+
+	function handleDownloadClick() {
+		const dataSummaryDownload = processSummaryDownload({
+			data,
+			lists,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			implementationStatus,
+		});
+		downloadData<(typeof dataSummaryDownload)[number]>(
+			dataSummaryDownload,
+			"summary"
+		);
+	}
 
 	const total = sum(dataSummary, d => d.allocations),
 		totalProjects = sum(dataSummary, d => d.projects.size),
@@ -51,7 +66,7 @@ SummaryChartProps) {
 			style={{ position: "relative" }}
 		>
 			<DownloadIcon
-				//handleDownloadClick={handleDownloadClick}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="summary"
@@ -161,7 +176,7 @@ SummaryChartProps) {
 			>
 				{dataSummary.map((d, i) => (
 					<SummaryRow
-						key={i}
+						key={d.year}
 						year={d.year}
 						allocations={d.allocations}
 						projects={d.projects}

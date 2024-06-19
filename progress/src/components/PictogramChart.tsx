@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import DataContext, { DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
@@ -11,19 +13,22 @@ import PictogramRow from "./PictogramRow";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
-//import downloadData from "../utils/downloaddata";
+import downloadData from "../utils/downloaddata";
 import { DatumPictogram } from "../utils/processdatasummary";
-import { DownloadStates } from "./MainContainer";
-import { ListObj } from "../utils/makelists";
+import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import capitalizeString from "../utils/capitalizestring";
+import { processPictogramDownload } from "../utils/processdownload";
 
 type PictogramChartProps = {
 	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
-	//summaryDataDownload: ByDisabilityObj[];
-	fundsList: ListObj;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	implementationStatus: ImplementationStatuses[];
 };
 
 const { beneficiaryCategories } = constants;
@@ -32,9 +37,14 @@ function PictogramChart({
 	dataPictogram,
 	clickedDownload,
 	setClickedDownload,
-}: //summaryDataDownload,
-//fundsList,
-PictogramChartProps) {
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+}: PictogramChartProps) {
+	const { data, lists } = useContext(DataContext) as DataContextType;
+
 	const totalTargeted =
 		dataPictogram.targetedBoys +
 		dataPictogram.targetedGirls +
@@ -50,22 +60,21 @@ PictogramChartProps) {
 	const maxValue = max(Object.values(dataPictogram)) || 0;
 	const maxNumberOfPictograms = 22;
 
-	// function handleDownloadClick() {
-	// 	const data = summaryDataDownload.map(d => ({
-	// 		"Report date": d.ReportApprovedDate,
-	// 		Year: d.AllocationYear,
-	// 		Fund: fundsList[d.PooledFundId],
-	// 		"Targeted women": d.TargetedWomen || 0,
-	// 		"Targeted men": d.TargetedMen || 0,
-	// 		"Targeted girls": d.TargetedGirls || 0,
-	// 		"Targeted boys": d.TargetedBoys || 0,
-	// 		"Reached women": d.ReachedWomen || 0,
-	// 		"Reached men": d.ReachedMen || 0,
-	// 		"Reached girls": d.ReachedGirls || 0,
-	// 		"Reached boys": d.ReachedBoys || 0,
-	// 	}));
-	// 	downloadData<(typeof data)[number]>(data, "people_targeted_reached");
-	// }
+	function handleDownloadClick() {
+		const dataPictogramDownload = processPictogramDownload({
+			data,
+			lists,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			implementationStatus,
+		});
+		downloadData<(typeof dataPictogramDownload)[number]>(
+			dataPictogramDownload,
+			"people_targeted_reached"
+		);
+	}
 
 	return (
 		<Container
@@ -75,7 +84,7 @@ PictogramChartProps) {
 			}}
 		>
 			<DownloadIcon
-				//handleDownloadClick={handleDownloadClick}
+				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="pictogram"
