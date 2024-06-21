@@ -35,9 +35,12 @@ type StatusesDescription = {
 };
 
 const statusesDescription: StatusesDescription = {
-	"Programmatically Closed": "Help text for Programmatically Closed status here",
-	"Under Implementation": "Help text for Under Implementation status here",
-	"Financially Closed": "Help text for Financially Closed status here",
+	"Programmatically Closed":
+		"Project(s) which have completed the implementation and their project end date is over",
+	"Under Implementation":
+		"Project(s) which are still under implementation stage where Project Implementation End date is greater than today",
+	"Financially Closed":
+		"Project(s) which have closed all stage of Final Report(s) and other financial transaction(s). Based on the new Global guidance of CBPF, the audit for non-UN projects are due after 9 months of implementation. Final financial reports for UN Project(s) are due for end of June of the following year after the programmatic implementation",
 };
 
 function Statuses({

@@ -25,7 +25,7 @@ function TopIntro() {
 					implementation statuses for active Country-Based Pooled Fund
 					(CBPF) allocations. Here, you can visualise the progress of
 					each allocation, including the percentage of funds
-					disbursed, the beneficiearies targeted and reached, the
+					disbursed, the people targeted and reached, the
 					number of partners engaged, and the sectors covered. Explore
 					the data using the available filters to gain insights into
 					the advancement of humanitarian efforts across various funds
