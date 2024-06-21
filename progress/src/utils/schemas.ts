@@ -227,6 +227,33 @@ export const sectorsMasterObjectSchema = z.object({
 });
 
 // ********************
+// GLOBAL INDICATOR SCHEMA
+// ********************
+
+export const globalIndicatorObjectSchema = z.object({
+	organizationname: z.string(),
+	organisationtype: z.string(),
+	chfid: z.number(),
+	chfprojectcode: z.string(),
+	Cluster: z.string(),
+	outcomecode: z.string(),
+	outcomedescription: z.string(),
+	OutputCode: z.string(),
+	OutputDesc: z.string(),
+	GlobalIndicator: z.string(),
+	endcycleboys: z.number(),
+	endcyclegirls: z.number(),
+	endcyclemen: z.number(),
+	endcyclewomen: z.number(),
+	EndCycleTarget: z.number(),
+	Baseline: z.string().nullable(),
+	InNeed: z.string().nullable(),
+	Comments: z.string().nullable(),
+	MeansOfVerification: z.string(),
+	ProjectStatus: z.string(),
+});
+
+// ********************
 // TYPES
 // ********************
 
@@ -265,3 +292,5 @@ export type OrganizationTypesMasterObject = z.infer<
 >;
 
 export type SectorsMasterObject = z.infer<typeof sectorsMasterObjectSchema>;
+
+export type GlobalIndicatorObject = z.infer<typeof globalIndicatorObjectSchema>;

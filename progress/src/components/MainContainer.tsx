@@ -14,6 +14,7 @@ import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
 import processDataLeadership from "../utils/processdataorganizationleadership";
+import IndicatorsContainer from "./IndicatorsContainer";
 
 const { implementationStatuses, charts } = constants;
 
@@ -77,9 +78,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			threshold: 0,
 		});
 
-	const chartsThreshold = {
-		threshold: 0.9,
-	};
+	const chartsThreshold = useMemo(() => ({ threshold: 0.9 }), []);
 
 	const [summaryRef, inViewSummary] = useInView(chartsThreshold);
 	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
@@ -257,6 +256,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
+			/>
+			<IndicatorsContainer
+				year={year}
+				fund={fund}
+				allocationSource={allocationSource}
+				allocationType={allocationType}
+				implementationStatus={implementationStatus}
 			/>
 		</Container>
 	);
