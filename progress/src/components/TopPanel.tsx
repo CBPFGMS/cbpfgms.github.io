@@ -6,6 +6,7 @@ import { RefIds } from "./MainContainer";
 import ScrollSpy from "./ScrollSpy";
 import { InSelectionData } from "../utils/processdatasummary";
 import QuickSelectors from "./QuickSelectors";
+import React from "react";
 
 type TopPanelProps = {
 	titleRef: (node?: Element | null | undefined) => void;
@@ -131,4 +132,6 @@ function TopPanel({
 	);
 }
 
-export default TopPanel;
+const MemoizedTopPanel = React.memo(TopPanel);
+
+export default MemoizedTopPanel;

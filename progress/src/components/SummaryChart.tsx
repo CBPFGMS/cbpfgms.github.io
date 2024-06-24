@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { sum, format } from "d3";
 import Container from "@mui/material/Container";
@@ -190,4 +190,6 @@ function SummaryChart({
 	);
 }
 
-export default SummaryChart;
+const MemoizedSummaryChart = React.memo(SummaryChart);
+
+export default MemoizedSummaryChart;

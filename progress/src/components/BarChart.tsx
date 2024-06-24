@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { useState } from "react";
 import Box from "@mui/material/Box";
@@ -338,4 +338,6 @@ function BarChart({
 	);
 }
 
-export default BarChart;
+const MemoizedBarChart = React.memo(BarChart);
+
+export default MemoizedBarChart;

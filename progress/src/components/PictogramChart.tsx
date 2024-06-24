@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -338,4 +338,6 @@ function PictogramChart({
 	);
 }
 
-export default PictogramChart;
+const MemoizedPictogramChart = React.memo(PictogramChart);
+
+export default MemoizedPictogramChart;

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { DataLeadership } from "../utils/processdataorganizationleadership";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
@@ -290,4 +290,6 @@ function LeadershipTotal({
 	);
 }
 
-export default LeadershipChart;
+const MemoizedLeadershipChart = React.memo(LeadershipChart);
+
+export default MemoizedLeadershipChart;

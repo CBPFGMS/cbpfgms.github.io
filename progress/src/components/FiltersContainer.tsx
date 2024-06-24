@@ -7,6 +7,7 @@ import Selectors from "./Selectors";
 import Statuses from "./Statuses";
 import { ImplementationStatuses } from "./MainContainer";
 import { DataStatuses } from "../utils/processdatastatuses";
+import React from "react";
 
 type FiltersContainerProps = {
 	year: number[];
@@ -103,4 +104,6 @@ function FiltersContainer({
 	);
 }
 
-export default FiltersContainer;
+const MemoizedFiltersContainer = React.memo(FiltersContainer);
+
+export default MemoizedFiltersContainer;

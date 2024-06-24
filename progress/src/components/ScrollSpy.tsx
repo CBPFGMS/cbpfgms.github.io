@@ -9,6 +9,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessIcon from "@mui/icons-material/Business";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import { RefIds } from "./MainContainer";
+import React from "react";
 
 type ScrollSpyProps = {
 	inViewSummary: boolean;
@@ -145,4 +146,6 @@ function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
 	);
 }
 
-export default ScroolSpy;
+const MemoizedScroolSpy = React.memo(ScroolSpy);
+
+export default MemoizedScroolSpy;
