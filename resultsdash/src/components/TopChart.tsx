@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import Radio from "@mui/material/Radio";
 import Button from "@mui/material/Button";
@@ -241,4 +241,6 @@ function TopChart({
 	);
 }
 
-export default TopChart;
+const MemoizedTopChart = React.memo(TopChart);
+
+export default MemoizedTopChart;

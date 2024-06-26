@@ -1,3 +1,4 @@
+import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
@@ -316,5 +317,6 @@ function PictogramChart({
 function capitalizeString(string: string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
+const MemoizedPictogramChart = React.memo(PictogramChart);
 
-export default PictogramChart;
+export default MemoizedPictogramChart;

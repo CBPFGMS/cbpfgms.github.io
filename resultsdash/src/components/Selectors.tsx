@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Unstable_Grid2";
 import { SelectorsProps } from "../types";
@@ -64,4 +64,6 @@ function Selectors({
 	);
 }
 
-export default Selectors;
+const MemoizedSelectors = React.memo(Selectors);
+
+export default MemoizedSelectors;

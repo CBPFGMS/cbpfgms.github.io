@@ -1,3 +1,4 @@
+import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "./DownloadIcon";
@@ -204,4 +205,8 @@ function TypeAndSectorChart<DownloadType>({
 	);
 }
 
-export default TypeAndSectorChart;
+const MemoizedTypeAndSectorChart = React.memo(
+	TypeAndSectorChart
+) as typeof TypeAndSectorChart;
+
+export default MemoizedTypeAndSectorChart;

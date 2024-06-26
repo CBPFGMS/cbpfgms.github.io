@@ -1,3 +1,4 @@
+import React, { useRef, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -5,7 +6,6 @@ import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import { MapContainer, TileLayer } from "react-leaflet";
 import DownloadIcon from "./DownloadIcon";
-import { useRef, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { extent } from "d3-array";
 import SVGOverlayComponent from "./SVGOverlayComponent";
@@ -237,4 +237,6 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 	);
 }
 
-export default Map;
+const MemoizedMap = React.memo(Map);
+
+export default MemoizedMap;

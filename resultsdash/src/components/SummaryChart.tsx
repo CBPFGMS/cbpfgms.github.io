@@ -1,3 +1,4 @@
+import React from "react";
 import { sum } from "d3-array";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -119,4 +120,6 @@ function SummaryChart({
 	);
 }
 
-export default SummaryChart;
+const MemoizedSummaryChart = React.memo(SummaryChart);
+
+export default MemoizedSummaryChart;
