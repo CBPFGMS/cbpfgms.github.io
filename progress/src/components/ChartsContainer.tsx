@@ -14,8 +14,6 @@ import SummaryChart from "./SummaryChart";
 import PictogramChart from "./PictogramChart";
 import BarChart from "./BarChart";
 import { DatumBarChart } from "../utils/processdatabarchart";
-import { DataLeadership } from "../utils/processdataorganizationleadership";
-import LeadershipChart from "./Leadership";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -25,7 +23,6 @@ type ChartsContainerProps = {
 	dataBeneficiaryByType: DatumBarChart[];
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
-	dataLeadership: DataLeadership;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -35,7 +32,6 @@ type ChartsContainerProps = {
 	beneficiaryTypesRef: Ref;
 	sectorsRef: Ref;
 	organizationsRef: Ref;
-	leadershipRef: Ref;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
@@ -49,7 +45,6 @@ function ChartsContainer({
 	dataBeneficiaryByType,
 	dataSector,
 	dataOrganization,
-	dataLeadership,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -59,7 +54,6 @@ function ChartsContainer({
 	beneficiaryTypesRef,
 	sectorsRef,
 	organizationsRef,
-	leadershipRef,
 	year,
 	fund,
 	allocationSource,
@@ -251,49 +245,6 @@ function ChartsContainer({
 								setClickedDownload={setClickedDownload}
 								title={"People targeted and reached by sector"}
 								chartType={"sectors"}
-								year={year}
-								fund={fund}
-								allocationSource={allocationSource}
-								allocationType={allocationType}
-								implementationStatus={implementationsStatus}
-							/>
-						</Box>
-					</Grid>
-				</Grid>
-				<Divider
-					orientation="horizontal"
-					flexItem
-					style={{
-						borderTop: "3px dotted #ccc",
-						borderBottom: "none",
-						width: "96%",
-						marginLeft: "2%",
-					}}
-				/>
-				<Grid
-					container
-					direction={"row"}
-					justifyContent={"center"}
-					spacing={1}
-					xs={12}
-					flexWrap={"nowrap"}
-					mt={3}
-					mb={3}
-				>
-					<Grid
-						xs={8}
-						ref={leadershipRef}
-						id={refIds.leadershipRefId}
-					>
-						<Box
-							display={"flex"}
-							alignItems={"center"}
-							justifyContent={"center"}
-						>
-							<LeadershipChart
-								dataLeadership={dataLeadership}
-								clickedDownload={clickedDownload}
-								setClickedDownload={setClickedDownload}
 								year={year}
 								fund={fund}
 								allocationSource={allocationSource}

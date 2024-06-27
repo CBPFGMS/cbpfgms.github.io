@@ -1,11 +1,10 @@
 import { BeneficiariesObject, Data } from "./processrawdata";
 import { ImplementationStatuses } from "../components/MainContainer";
-import { Leadership } from "./processrawdata";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import constants from "./constants";
 
-const { beneficiariesSplitOrder, organizationLeadership } = constants;
+const { beneficiariesSplitOrder } = constants;
 
 type BaseDownloadDatum = {
 	Year: number;
@@ -48,10 +47,6 @@ type OrganizationsDatumDownload = BaseDownloadDatum &
 	BeneficiaryDownloadTypes & {
 		Organization: string;
 	};
-
-type LeadershipDatumDownload = BaseDownloadDatum & {
-	"Leadership Type": Leadership;
-};
 
 type ProcessDownloadParams = {
 	data: Data;
@@ -310,46 +305,6 @@ export function processOrganizationsDownload({
 	});
 
 	return organizationsDataDownload;
-}
-
-export function processLeadershipDownload({
-	data,
-	lists,
-	year,
-	fund,
-	allocationSource,
-	allocationType,
-	implementationStatus,
-}: ProcessDownloadParams): LeadershipDatumDownload[] {
-	const leadershipDataDownload: LeadershipDatumDownload[] = [];
-
-	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
-		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
-		) {
-			const baseDownloadDatum = populateBaseDownloadDatum(
-				datum,
-				lists,
-				thisStatus
-			);
-
-			organizationLeadership.forEach(leader => {
-				if (datum.leadership[leader]) {
-					leadershipDataDownload.push({
-						...baseDownloadDatum,
-						"Leadership Type": leader,
-					});
-				}
-			});
-		}
-	});
-
-	return leadershipDataDownload;
 }
 
 function checkIfNonZero(obj: BeneficiariesObject): boolean {

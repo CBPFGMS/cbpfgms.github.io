@@ -21,6 +21,7 @@ function IndicatorsContainer({
 	allocationSource,
 	allocationType,
 }: IndicatorsContainerProps) {
+	// @ts-expect-error data not implemented
 	const [rawDataIndicators, setRawDataIndicators] = useState<
 			GlobalIndicatorObject[] | null
 		>(null),

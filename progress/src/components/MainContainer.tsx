@@ -13,8 +13,7 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
-import processDataLeadership from "../utils/processdataorganizationleadership";
-import IndicatorsContainer from "./IndicatorsContainer";
+// import IndicatorsContainer from "./IndicatorsContainer";
 
 const { implementationStatuses, charts } = constants;
 
@@ -40,7 +39,6 @@ const downloadStates: DownloadStates = {
 	beneficiaryTypes: false,
 	sectors: false,
 	organizations: false,
-	leadership: false,
 } as const;
 
 const refIdSuffix = "RefId";
@@ -86,7 +84,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		useInView(chartsThreshold);
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
-	const [leadershipRef, inViewLeadership] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -126,28 +123,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const { dataBeneficiaryByType, dataSector, dataOrganization } = useMemo(
 		() =>
 			processDataBarChart({
-				data,
-				year,
-				fund,
-				allocationSource,
-				allocationType,
-				implementationStatus,
-				lists,
-			}),
-		[
-			data,
-			year,
-			fund,
-			allocationSource,
-			allocationType,
-			implementationStatus,
-			lists,
-		]
-	);
-
-	const dataLeadership = useMemo(
-		() =>
-			processDataLeadership({
 				data,
 				year,
 				fund,
@@ -219,7 +194,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
-				inViewLeadership={inViewLeadership}
 				refIds={refIds}
 			/>
 			<TopIntro />
@@ -240,7 +214,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
-				dataLeadership={dataLeadership}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				lists={lists}
@@ -250,20 +223,19 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				beneficiaryTypesRef={beneficiaryTypesRef}
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
-				leadershipRef={leadershipRef}
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
 			/>
-			<IndicatorsContainer
+			{/* <IndicatorsContainer
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationStatus={implementationStatus}
-			/>
+			/> */}
 		</Container>
 	);
 }
