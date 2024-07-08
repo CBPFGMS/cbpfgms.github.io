@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
-import { ImplementationStatuses } from "./MainContainer";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import Loading from "./Loading";
 import Button from "@mui/material/Button";
-import { GlobalIndicatorObject } from "../utils/schemas";
+import { GlobalIndicatorsObject } from "../utils/schemas";
 import indicatorsApi from "../utils/indicatorsapi";
+import { RefIds } from "./MainContainer";
 
 type IndicatorsContainerProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
-	implementationStatus: ImplementationStatuses[];
+	indicatorsRef: (node?: Element | null | undefined) => void;
+	refIds: RefIds;
 };
 
 function IndicatorsContainer({
@@ -20,10 +21,12 @@ function IndicatorsContainer({
 	fund,
 	allocationSource,
 	allocationType,
+	indicatorsRef,
+	refIds,
 }: IndicatorsContainerProps) {
 	// @ts-expect-error data not implemented
 	const [rawDataIndicators, setRawDataIndicators] = useState<
-			GlobalIndicatorObject[] | null
+			GlobalIndicatorsObject[] | null
 		>(null),
 		[loading, setLoading] = useState<boolean>(false),
 		[error, setError] = useState<string | null>(null),
@@ -49,7 +52,11 @@ function IndicatorsContainer({
 			mt={6}
 			justifyContent={"center"}
 		>
-			<Grid xs={12}>
+			<Grid
+				xs={12}
+				ref={indicatorsRef}
+				id={refIds.indicatorsRefId}
+			>
 				<Typography
 					variant="h4"
 					style={{

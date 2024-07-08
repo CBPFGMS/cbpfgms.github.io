@@ -15,6 +15,7 @@ import {
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	SectorsMasterObject,
+	GlobalIndicatorsMasterObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -27,7 +28,8 @@ type ReceiveDataArgs = [
 	PooledFundsMasterObject[],
 	AllocationSourcesMasterObject[],
 	OrganizationTypesMasterObject[],
-	SectorsMasterObject[]
+	SectorsMasterObject[],
+	GlobalIndicatorsMasterObject[]
 ];
 
 function useData(defaultFundType: number | null, startYear: number | null) {
@@ -48,7 +50,8 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 		organizationTypesMasterUrl =
 			"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 		sectorsMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv";
+			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
+		globalIndicatorsMasterUrl = "../data/fake_indicatorsmaster.csv";
 
 	const [data, setData] = useState<Data>([] as Data),
 		[lists, setLists] = useState<List>({} as List),
@@ -110,6 +113,11 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				sectorsMasterUrl,
 				"csv"
 			),
+			fetchFile<GlobalIndicatorsMasterObject[]>(
+				"globalIndicatorsMaster",
+				globalIndicatorsMasterUrl,
+				"csv"
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -132,6 +140,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			allocationSourcesMaster,
 			organizationTypesMaster,
 			sectorsMaster,
+			globalIndicatorsMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -142,6 +151,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				allocationSourcesMaster,
 				organizationTypesMaster,
 				sectorsMaster,
+				globalIndicatorsMaster,
 			});
 
 			const data: Data = processRawData({

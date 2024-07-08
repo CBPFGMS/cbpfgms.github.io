@@ -7,6 +7,7 @@ import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessIcon from "@mui/icons-material/Business";
+import PublicIcon from "@mui/icons-material/Public";
 import { RefIds } from "./MainContainer";
 import React from "react";
 
@@ -16,6 +17,7 @@ type ScrollSpyProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
+	inViewIndicators: boolean;
 	refIds: RefIds;
 };
 
@@ -33,6 +35,7 @@ function ScroolSpy({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
+	inViewIndicators,
 	refIds,
 }: ScrollSpyProps) {
 	function handleOnClick(reference: string) {
@@ -84,6 +87,13 @@ function ScroolSpy({
 				reference={refIds.sectorsRefId}
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
+			/>
+			<Tab
+				label="Global Indicators"
+				inView={inViewIndicators}
+				reference={refIds.indicatorsRefId}
+				handleOnClick={handleOnClick}
+				Icon={PublicIcon}
 			/>
 		</Box>
 	);

@@ -7,6 +7,7 @@ import {
 	PooledFundsMasterObject,
 	ProjectStatusMasterObject,
 	SectorsMasterObject,
+	GlobalIndicatorsMasterObject,
 	pooledFundsMasterObjectSchema,
 	beneficiaryTypesMasterObjectSchema,
 	allocationTypesMasterObjectSchema,
@@ -15,6 +16,7 @@ import {
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
 	projectStatusMasterObjectSchema,
+	globalIndicatorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 
@@ -27,6 +29,7 @@ type MakeListParams = {
 	allocationSourcesMaster: AllocationSourcesMasterObject[];
 	organizationTypesMaster: OrganizationTypesMasterObject[];
 	sectorsMaster: SectorsMasterObject[];
+	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
 };
 
 export type ListObj = {
@@ -54,6 +57,7 @@ export type List = {
 	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	statuses: ListObj;
+	globalIndicators: ListObj;
 };
 
 function makeLists({
@@ -65,6 +69,7 @@ function makeLists({
 	allocationSourcesMaster,
 	organizationTypesMaster,
 	sectorsMaster,
+	globalIndicatorsMaster,
 }: MakeListParams): List {
 	const lists: List = {
 		fundNames: {},
@@ -79,6 +84,7 @@ function makeLists({
 		organizationsCompleteList: {},
 		sectors: {},
 		statuses: {},
+		globalIndicators: {},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -195,6 +201,20 @@ function makeLists({
 				"ProjectStatusMaster",
 				d,
 				JSON.stringify(parsedProjectStatusMaster.error)
+			);
+		}
+	});
+
+	globalIndicatorsMaster.forEach(d => {
+		const parsedGlobalIndicatorsMaster =
+			globalIndicatorsMasterObjectSchema.safeParse(d);
+		if (parsedGlobalIndicatorsMaster.success) {
+			lists.globalIndicators[d.IndicatorId] = d.IndicatorName;
+		} else {
+			warnInvalidSchema(
+				"GlobalIndicatorsMaster",
+				d,
+				JSON.stringify(parsedGlobalIndicatorsMaster.error)
 			);
 		}
 	});

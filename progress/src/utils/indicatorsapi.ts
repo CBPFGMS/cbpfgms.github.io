@@ -1,10 +1,13 @@
 import { csv, autoType } from "d3";
-import { GlobalIndicatorObject, globalIndicatorObjectSchema } from "./schemas";
+import {
+	GlobalIndicatorsObject,
+	globalIndicatorsObjectSchema,
+} from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 
 type IndicatorsApiParams = {
 	setRawDataIndicators: React.Dispatch<
-		React.SetStateAction<GlobalIndicatorObject[] | null>
+		React.SetStateAction<GlobalIndicatorsObject[] | null>
 	>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	setError: React.Dispatch<React.SetStateAction<string | null>>;
@@ -19,11 +22,11 @@ function indicatorsApi({
 }: IndicatorsApiParams) {
 	const globalIndicatorsUrl = "../data/global_indicators.csv";
 	setLoading(true);
-	csv<GlobalIndicatorObject>(globalIndicatorsUrl, autoType)
+	csv<GlobalIndicatorsObject>(globalIndicatorsUrl, autoType)
 		.then(rawData => {
-			const data: GlobalIndicatorObject[] = [];
+			const data: GlobalIndicatorsObject[] = [];
 			rawData.forEach(row => {
-				const parsedRow = globalIndicatorObjectSchema.safeParse(row);
+				const parsedRow = globalIndicatorsObjectSchema.safeParse(row);
 				if (parsedRow.success) {
 					data.push(parsedRow.data);
 				} else {

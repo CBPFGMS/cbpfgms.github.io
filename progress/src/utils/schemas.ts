@@ -226,32 +226,60 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustCode: z.string(),
 });
 
+export const globalIndicatorsMasterObjectSchema = z.object({
+	IndicatorName: z.string(),
+	IndicatorId: z.number().int().nonnegative(),
+});
+
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
 
-export const globalIndicatorObjectSchema = z.object({
-	organizationname: z.string(),
-	organisationtype: z.string(),
-	chfid: z.number(),
-	chfprojectcode: z.string(),
-	Cluster: z.string(),
-	outcomecode: z.string(),
-	outcomedescription: z.string(),
-	OutputCode: z.string(),
-	OutputDesc: z.string(),
-	GlobalIndicator: z.string(),
-	endcycleboys: z.number(),
-	endcyclegirls: z.number(),
-	endcyclemen: z.number(),
-	endcyclewomen: z.number(),
-	EndCycleTarget: z.number(),
-	Baseline: z.string().nullable(),
-	InNeed: z.string().nullable(),
-	Comments: z.string().nullable(),
-	MeansOfVerification: z.string(),
-	ProjectStatus: z.string(),
-});
+export const globalIndicatorsObjectSchema = z
+	.object({
+		Outcome: z.string(),
+		Sector: z.number().int().nonnegative(),
+		IndicatorId: z.number().int().nonnegative(),
+		Unit: z.union([z.literal("p"), z.literal("i")]),
+		TargetedWomen: z.number().nonnegative().nullable(),
+		TargetedMen: z.number().nonnegative().nullable(),
+		TargetedBoys: z.number().nonnegative().nullable(),
+		TargetedGirls: z.number().nonnegative().nullable(),
+		ReachedWomen: z.number().nonnegative().nullable(),
+		ReachedMen: z.number().nonnegative().nullable(),
+		ReachedBoys: z.number().nonnegative().nullable(),
+		ReachedGirls: z.number().nonnegative().nullable(),
+	})
+	.refine(data => {
+		const keys = [
+			"TargetedWomen",
+			"TargetedMen",
+			"TargetedBoys",
+			"TargetedGirls",
+			"ReachedWomen",
+			"ReachedMen",
+			"ReachedBoys",
+			"ReachedGirls",
+		];
+
+		return keys.every(key =>
+			isValidGlobalIndicatorValue(
+				data[key as keyof typeof data],
+				data.Unit
+			)
+		);
+	});
+
+function isValidGlobalIndicatorValue(
+	value: number | null | string,
+	unit: string
+) {
+	if (typeof value === "string") return false;
+	if (value === null) return true;
+	if (unit === "i") return Number.isInteger(value);
+	if (unit === "p") return value > 0 && value < 1;
+	return false;
+}
 
 // ********************
 // TYPES
@@ -293,4 +321,10 @@ export type OrganizationTypesMasterObject = z.infer<
 
 export type SectorsMasterObject = z.infer<typeof sectorsMasterObjectSchema>;
 
-export type GlobalIndicatorObject = z.infer<typeof globalIndicatorObjectSchema>;
+export type GlobalIndicatorsObject = z.infer<
+	typeof globalIndicatorsObjectSchema
+>;
+
+export type GlobalIndicatorsMasterObject = z.infer<
+	typeof globalIndicatorsMasterObjectSchema
+>;

@@ -13,7 +13,7 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
-// import IndicatorsContainer from "./IndicatorsContainer";
+import IndicatorsContainer from "./IndicatorsContainer";
 
 const { implementationStatuses, charts } = constants;
 
@@ -39,6 +39,7 @@ const downloadStates: DownloadStates = {
 	beneficiaryTypes: false,
 	sectors: false,
 	organizations: false,
+	indicators: false,
 } as const;
 
 const refIdSuffix = "RefId";
@@ -76,7 +77,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			threshold: 0,
 		});
 
-	const chartsThreshold = useMemo(() => ({ threshold: 0.9 }), []);
+	const chartsThreshold = { threshold: 0.9 };
 
 	const [summaryRef, inViewSummary] = useInView(chartsThreshold);
 	const [pictogramRef, inViewPictogram] = useInView(chartsThreshold);
@@ -84,6 +85,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		useInView(chartsThreshold);
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
+	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -194,6 +196,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
+				inViewIndicators={inViewIndicators}
 				refIds={refIds}
 			/>
 			<TopIntro />
@@ -229,13 +232,14 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
 			/>
-			{/* <IndicatorsContainer
+			<IndicatorsContainer
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}
 				allocationType={allocationType}
-				implementationStatus={implementationStatus}
-			/> */}
+				indicatorsRef={indicatorsRef}
+				refIds={refIds}
+			/>
 		</Container>
 	);
 }

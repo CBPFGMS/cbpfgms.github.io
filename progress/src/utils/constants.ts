@@ -13,6 +13,7 @@ const constants = {
 		"beneficiaryTypes",
 		"sectors",
 		"organizations",
+		"indicators",
 	],
 	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],
 	beneficiaryCategories: ["women", "men", "girls", "boys"],
