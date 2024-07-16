@@ -3,9 +3,10 @@ import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 import Loading from "./Loading";
 import Button from "@mui/material/Button";
-import { GlobalIndicatorsObject } from "../utils/schemas";
+import { DatumIndicators } from "../utils/processdataindicators";
 import indicatorsApi from "../utils/indicatorsapi";
 import { RefIds } from "./MainContainer";
+import Carousel from "./Carousel";
 
 type IndicatorsContainerProps = {
 	year: number[];
@@ -24,9 +25,8 @@ function IndicatorsContainer({
 	indicatorsRef,
 	refIds,
 }: IndicatorsContainerProps) {
-	// @ts-expect-error data not implemented
-	const [rawDataIndicators, setRawDataIndicators] = useState<
-			GlobalIndicatorsObject[] | null
+	const [indicatorsData, setIndicatorsData] = useState<
+			DatumIndicators[] | null
 		>(null),
 		[loading, setLoading] = useState<boolean>(false),
 		[error, setError] = useState<string | null>(null),
@@ -34,7 +34,7 @@ function IndicatorsContainer({
 
 	function handleClick() {
 		indicatorsApi({
-			setRawDataIndicators,
+			setIndicatorsData,
 			setLoading,
 			setError,
 			setHasFetchedData,
@@ -112,6 +112,7 @@ function IndicatorsContainer({
 			>
 				{loading && <Loading />}
 				{error && <Typography variant="body1">{error}</Typography>}
+				{indicatorsData && <Carousel data={indicatorsData} />}
 			</Grid>
 		</Grid>
 	);

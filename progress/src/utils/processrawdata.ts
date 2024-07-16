@@ -51,7 +51,7 @@ type BeneficiaryTypes = {
 	[K in (typeof beneficiariesSplitOrder)[number]]: BeneficiariesObject;
 };
 
-type Beneficiaries = (typeof beneficiaryCategories)[number];
+export type Beneficiaries = (typeof beneficiaryCategories)[number];
 
 export type BeneficiariesObject = {
 	[K in Beneficiaries]: number;
