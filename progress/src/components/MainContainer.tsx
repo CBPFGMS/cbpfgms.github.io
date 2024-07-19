@@ -239,6 +239,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType={allocationType}
 				indicatorsRef={indicatorsRef}
 				refIds={refIds}
+				lists={lists}
 			/>
 		</Container>
 	);

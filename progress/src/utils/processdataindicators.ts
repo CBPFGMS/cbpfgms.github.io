@@ -8,14 +8,16 @@ export type DatumIndicators = {
 	sectorData: SectorDatum[];
 };
 
-type SectorDatum = {
+export type SectorDatum = {
 	outcome: string;
 	indicatorId: number;
 	unit: GlobalIndicatorsObject["Unit"];
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
-	temporaryTargeted?: BeneficiariesObjectWithArrays;
-	temporaryReached?: BeneficiariesObjectWithArrays;
+	targetedTotal: number;
+	reachedTotal: number;
+	targetedTemporary?: BeneficiariesObjectWithArrays;
+	reachedTemporary?: BeneficiariesObjectWithArrays;
 };
 
 type BeneficiariesObjectWithArrays = {
@@ -26,7 +28,9 @@ type ProcessDataIndicatorsParams = {
 	data: GlobalIndicatorsObject[];
 };
 
-const { beneficiaryCategories } = constants;
+type StatusKey = "Targeted" | "Reached";
+
+const { beneficiaryCategories, beneficiariesStatuses } = constants;
 
 function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 	const dataIndicators: DatumIndicators[] = [];
@@ -42,12 +46,12 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 			);
 			if (foundIndicator) {
 				updateTemporaryData(
-					foundIndicator.temporaryTargeted!,
+					foundIndicator.targetedTemporary!,
 					row,
 					"Targeted"
 				);
 				updateTemporaryData(
-					foundIndicator.temporaryReached!,
+					foundIndicator.reachedTemporary!,
 					row,
 					"Reached"
 				);
@@ -58,8 +62,10 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 					unit: row.Unit,
 					targeted: fillWithZeroes(),
 					reached: fillWithZeroes(),
-					temporaryTargeted: populateTemporaryData(row, "Targeted"),
-					temporaryReached: populateTemporaryData(row, "Reached"),
+					targetedTotal: 0,
+					reachedTotal: 0,
+					targetedTemporary: populateTemporaryData(row, "Targeted"),
+					reachedTemporary: populateTemporaryData(row, "Reached"),
 				});
 			}
 		} else {
@@ -72,11 +78,13 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 						unit: row.Unit,
 						targeted: fillWithZeroes(),
 						reached: fillWithZeroes(),
-						temporaryTargeted: populateTemporaryData(
+						targetedTotal: 0,
+						reachedTotal: 0,
+						targetedTemporary: populateTemporaryData(
 							row,
 							"Targeted"
 						),
-						temporaryReached: populateTemporaryData(row, "Reached"),
+						reachedTemporary: populateTemporaryData(row, "Reached"),
 					},
 				],
 			});
@@ -85,35 +93,32 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 
 	dataIndicators.forEach(sectorDatum => {
 		sectorDatum.sectorData.forEach(datum => {
-			processObject(datum.temporaryTargeted!, datum.targeted, datum.unit);
-			processObject(datum.temporaryReached!, datum.reached, datum.unit);
+			processObject(datum);
 
-			delete datum.temporaryTargeted;
-			delete datum.temporaryReached;
+			delete datum.targetedTemporary;
+			delete datum.reachedTemporary;
 		});
 	});
-
-	console.log(dataIndicators);
 
 	return dataIndicators;
 }
 
-function processObject(
-	temporaryData: BeneficiariesObjectWithArrays,
-	targetData: BeneficiariesObject,
-	unit: GlobalIndicatorsObject["Unit"]
-) {
-	const operation = unit === "p" ? mean : sum;
-	for (const key in temporaryData) {
-		targetData[key as keyof typeof targetData] =
-			operation(temporaryData[key as keyof typeof temporaryData]) ?? 0;
-	}
+function processObject(datum: SectorDatum) {
+	const operation = datum.unit === "p" ? mean : sum;
+	beneficiariesStatuses.forEach(status => {
+		const targetData = datum[status],
+			temporaryData = datum[`${status}Temporary`]!;
+		for (const key in datum[`${status}Temporary`]) {
+			targetData[key as keyof typeof targetData] =
+				operation(temporaryData[key as keyof typeof temporaryData]) ??
+				0;
+			datum[`${status}Total`] +=
+				targetData[key as keyof typeof targetData];
+		}
+	});
 }
 
-function populateTemporaryData(
-	row: GlobalIndicatorsObject,
-	type: "Targeted" | "Reached"
-) {
+function populateTemporaryData(row: GlobalIndicatorsObject, type: StatusKey) {
 	const obj = {} as BeneficiariesObjectWithArrays;
 	beneficiaryCategories.forEach(beneficiary => {
 		obj[beneficiary] = [
@@ -133,7 +138,7 @@ function populateTemporaryData(
 function updateTemporaryData(
 	temporaryObject: BeneficiariesObjectWithArrays,
 	row: GlobalIndicatorsObject,
-	type: "Targeted" | "Reached"
+	type: StatusKey
 ) {
 	beneficiaryCategories.forEach(beneficiary => {
 		temporaryObject[beneficiary].push(

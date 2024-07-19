@@ -6,7 +6,8 @@ import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
 import indicatorsApi from "../utils/indicatorsapi";
 import { RefIds } from "./MainContainer";
-import Carousel from "./Carousel";
+import IndicatorsCarousel from "./IndicatorsCarousel";
+import { List } from "../utils/makelists";
 
 type IndicatorsContainerProps = {
 	year: number[];
@@ -15,6 +16,7 @@ type IndicatorsContainerProps = {
 	allocationType: number[];
 	indicatorsRef: (node?: Element | null | undefined) => void;
 	refIds: RefIds;
+	lists: List;
 };
 
 function IndicatorsContainer({
@@ -24,6 +26,7 @@ function IndicatorsContainer({
 	allocationType,
 	indicatorsRef,
 	refIds,
+	lists,
 }: IndicatorsContainerProps) {
 	const [indicatorsData, setIndicatorsData] = useState<
 			DatumIndicators[] | null
@@ -112,7 +115,12 @@ function IndicatorsContainer({
 			>
 				{loading && <Loading />}
 				{error && <Typography variant="body1">{error}</Typography>}
-				{indicatorsData && <Carousel data={indicatorsData} />}
+				{indicatorsData && (
+					<IndicatorsCarousel
+						data={indicatorsData}
+						lists={lists}
+					/>
+				)}
 			</Grid>
 		</Grid>
 	);
