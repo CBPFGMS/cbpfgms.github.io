@@ -17,17 +17,19 @@ type IndicatorTableHeadProps = {
 	setSortingCriterion: React.Dispatch<React.SetStateAction<SortingCriterion>>;
 	sortingOrder: SortingOrder;
 	setSortingOrder: React.Dispatch<React.SetStateAction<SortingOrder>>;
+	expanded: boolean;
+	showTotal: boolean;
 };
 
-const { indicatorsHeader } = constants;
-
-const columnWidths = ["16%", "52%", "16%", "16%"];
+const { indicatorsHeader, columnWidths, columnWidthsExpanded } = constants;
 
 function IndicatorTableHead({
 	setSortingCriterion,
 	setSortingOrder,
 	sortingCriterion,
 	sortingOrder,
+	expanded,
+	showTotal,
 }: IndicatorTableHeadProps) {
 	function handleClick(header: SortingCriterion) {
 		if (sortingCriterion === header) {
@@ -46,7 +48,10 @@ function IndicatorTableHead({
 						key={header}
 						style={{
 							cursor: "pointer",
-							width: columnWidths[index],
+							width:
+								expanded && !showTotal
+									? columnWidthsExpanded[index]
+									: columnWidths[index],
 						}}
 						sx={{ backgroundColor: "#f3f3f3" }}
 						onClick={() => handleClick(header)}
@@ -58,6 +63,13 @@ function IndicatorTableHead({
 							sx={{
 								display: "flex",
 								alignItems: "center",
+								justifyContent:
+									header === "reached" ||
+									header === "targeted"
+										? expanded
+											? "center"
+											: "flex-end"
+										: "flex-start",
 							}}
 						>
 							{header === "targeted" && (

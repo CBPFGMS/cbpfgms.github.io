@@ -115,7 +115,7 @@ function IndicatorsContainer({
 			>
 				{loading && <Loading />}
 				{error && <Typography variant="body1">{error}</Typography>}
-				{indicatorsData && (
+				{indicatorsData && hasFetchedData && (
 					<IndicatorsCarousel
 						data={indicatorsData}
 						lists={lists}

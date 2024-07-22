@@ -13,10 +13,26 @@ import TableContainer from "@mui/material/TableContainer";
 import IndicatorTableHead from "./IndicatorTableHead";
 import { SortingCriterion } from "./IndicatorTableHead";
 import IndicatorsTableBody from "./IndicatorTableBody";
+import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
 
 type IndicatorCardProps = {
 	datumIndicator: DatumIndicators;
 	lists: List;
+};
+
+type IndicatorCardContentProps = {
+	datumIndicator: DatumIndicators;
+	lists: List;
+	sortedData: SectorDatum[];
+	sortingCriterion: SortingCriterion;
+	setSortingCriterion: React.Dispatch<React.SetStateAction<SortingCriterion>>;
+	sortingOrder: SortingOrder;
+	setSortingOrder: React.Dispatch<React.SetStateAction<SortingOrder>>;
+	showTotal: boolean;
+	handleSwitchChange: () => void;
+	expanded: boolean;
+	toggleExpanded: () => void;
 };
 
 export type SortingOrder = "asc" | "desc";
@@ -27,7 +43,8 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("indicator"),
 		[sortingOrder, setSortingOrder] = useState<SortingOrder>("asc"),
-		[showTotal, setShowTotal] = useState<boolean>(false);
+		[showTotal, setShowTotal] = useState<boolean>(false),
+		[expanded, setExpanded] = useState<boolean>(false);
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
 		sortAccessor: SortAccessor = e => {
@@ -48,15 +65,73 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 		setShowTotal(!showTotal);
 	}
 
+	function toggleExpanded() {
+		setExpanded(!expanded);
+	}
+
+	return (
+		<>
+			<Modal
+				open={expanded}
+				onClose={toggleExpanded}
+			>
+				<Box>
+					<IndicatorCardContent
+						datumIndicator={datumIndicator}
+						lists={lists}
+						sortedData={sortedData}
+						sortingCriterion={sortingCriterion}
+						setSortingCriterion={setSortingCriterion}
+						sortingOrder={sortingOrder}
+						setSortingOrder={setSortingOrder}
+						showTotal={showTotal}
+						handleSwitchChange={handleSwitchChange}
+						expanded={expanded}
+						toggleExpanded={toggleExpanded}
+					/>
+				</Box>
+			</Modal>
+			<IndicatorCardContent
+				datumIndicator={datumIndicator}
+				lists={lists}
+				sortedData={sortedData}
+				sortingCriterion={sortingCriterion}
+				setSortingCriterion={setSortingCriterion}
+				sortingOrder={sortingOrder}
+				setSortingOrder={setSortingOrder}
+				showTotal={showTotal}
+				handleSwitchChange={handleSwitchChange}
+				expanded={expanded}
+				toggleExpanded={toggleExpanded}
+			/>
+		</>
+	);
+}
+
+function IndicatorCardContent({
+	datumIndicator,
+	lists,
+	sortedData,
+	sortingCriterion,
+	setSortingCriterion,
+	sortingOrder,
+	setSortingOrder,
+	showTotal,
+	handleSwitchChange,
+	expanded,
+	toggleExpanded,
+}: IndicatorCardContentProps) {
 	return (
 		<Paper
 			elevation={0}
 			style={{
-				width: "100%",
+				width: expanded ? "90%" : "100%",
+				position: expanded ? "absolute" : "relative",
+				top: expanded ? "5%" : "0",
+				left: expanded ? "5%" : "0",
 				padding: "1em",
 				backgroundColor: "#f3f3f3",
 				borderRadius: "8px",
-				position: "relative",
 			}}
 		>
 			<Box
@@ -86,6 +161,16 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 					>
 						{lists.sectors[datumIndicator.sector]}
 					</Typography>
+					<Button
+						onClick={toggleExpanded}
+						style={{
+							position: "absolute",
+							right: "1em",
+							top: "1em",
+						}}
+					>
+						{expanded ? "Close" : "Expand"}
+					</Button>
 				</Box>
 				<Box
 					display="flex"
@@ -112,9 +197,9 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 					</Typography>
 				</Box>
 				<Box sx={{ width: "100%	" }}>
-					<TableContainer sx={{ maxHeight: 600 }}>
+					<TableContainer sx={{ maxHeight: expanded ? "90vh" : 600 }}>
 						<Table
-							size="medium"
+							size={expanded ? "small" : "medium"}
 							stickyHeader
 						>
 							<IndicatorTableHead
@@ -122,11 +207,14 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 								setSortingCriterion={setSortingCriterion}
 								sortingOrder={sortingOrder}
 								setSortingOrder={setSortingOrder}
+								expanded={expanded}
+								showTotal={showTotal}
 							/>
 							<IndicatorsTableBody
 								data={sortedData}
 								lists={lists}
 								showTotal={showTotal}
+								expanded={expanded}
 							/>
 						</Table>
 					</TableContainer>

@@ -14,11 +14,13 @@ type IndicatorsTableBodyProps = {
 	data: SectorDatum[];
 	lists: List;
 	showTotal: boolean;
+	expanded: boolean;
 };
 
 type CellValuesProps = {
 	row: SectorDatum;
 	header: "targeted" | "reached";
+	expanded?: boolean;
 };
 
 const { indicatorsHeader, beneficiaryCategories } = constants;
@@ -29,6 +31,7 @@ function IndicatorsTableBody({
 	data,
 	lists,
 	showTotal,
+	expanded,
 }: IndicatorsTableBodyProps) {
 	return (
 		<TableBody>
@@ -60,6 +63,7 @@ function IndicatorsTableBody({
 									key={index}
 									row={row}
 									header={header}
+									expanded={expanded}
 								/>
 							);
 						}
@@ -82,14 +86,18 @@ function CellValues({ row, header }: CellValuesProps) {
 	);
 }
 
-function CellBeneficiariesBreakdown({ row, header }: CellValuesProps) {
+function CellBeneficiariesBreakdown({
+	row,
+	header,
+	expanded,
+}: CellValuesProps) {
 	return (
 		<TableCell>
 			<Box
 				style={{
-					width: "100%",
+					width: expanded ? "100%" : "90%",
 					display: "flex",
-					flexDirection: "column",
+					flexDirection: expanded ? "row" : "column",
 				}}
 			>
 				{beneficiaryCategories.map((category, index) => (
@@ -108,7 +116,7 @@ function CellBeneficiariesBreakdown({ row, header }: CellValuesProps) {
 								display: "flex",
 								justifyContent: "flex-end",
 								alignItems: "center",
-								paddingRight: "6px",
+								paddingRight: expanded ? "2px" : "6px",
 							}}
 						>
 							<Pictogram
@@ -139,8 +147,10 @@ function CellBeneficiariesBreakdown({ row, header }: CellValuesProps) {
 							style={{
 								flex: "0 40%",
 								display: "flex",
-								justifyContent: "flex-end",
-								paddingLeft: "6px",
+								justifyContent: expanded
+									? "flex-start"
+									: "flex-end",
+								paddingLeft: expanded ? "2px" : "6px",
 							}}
 						>
 							{row.unit === "p"

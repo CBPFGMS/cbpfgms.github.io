@@ -19,6 +19,8 @@ const constants = {
 	beneficiaryCategories: ["women", "men", "girls", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],
 	indicatorsHeader: ["outcome", "indicator", "targeted", "reached"],
+	columnWidths: ["16%", "48%", "18%", "18%"],
+	columnWidthsExpanded: ["8%", "24%", "34%", "34%"],
 } as const;
 
 export default constants;
