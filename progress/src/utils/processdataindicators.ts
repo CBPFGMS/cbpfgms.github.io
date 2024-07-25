@@ -112,8 +112,14 @@ function processObject(datum: SectorDatum) {
 			targetData[key as keyof typeof targetData] =
 				operation(temporaryData[key as keyof typeof temporaryData]) ??
 				0;
-			datum[`${status}Total`] +=
-				targetData[key as keyof typeof targetData];
+			if (datum.unit === "i") {
+				datum[`${status}Total`] +=
+					targetData[key as keyof typeof targetData];
+			}
+		}
+		if (datum.unit === "p") {
+			datum[`${status}Total`] =
+				mean(Object.values(targetData) as number[]) ?? 0;
 		}
 	});
 }
