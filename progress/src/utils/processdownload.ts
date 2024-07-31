@@ -48,6 +48,8 @@ type OrganizationsDatumDownload = BaseDownloadDatum &
 		Organization: string;
 	};
 
+type DisabilityDatumDownload = BaseDownloadDatum & BeneficiaryDownloadTypes;
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
@@ -135,6 +137,49 @@ export function processPictogramDownload({
 	});
 
 	return pictogramDataDownload;
+}
+
+export function processDisabilityDownload({
+	data,
+	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+}: ProcessDownloadParams): DisabilityDatumDownload[] {
+	const disabilityDataDownload: DisabilityDatumDownload[] = [];
+
+	data.forEach(datum => {
+		const thisStatus = calculateStatus(datum, lists);
+		if (
+			implementationStatus.includes(thisStatus) &&
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			const baseDownloadDatum = populateBaseDownloadDatum(
+				datum,
+				lists,
+				thisStatus
+			);
+
+			disabilityDataDownload.push({
+				...baseDownloadDatum,
+				"Targeted Women": datum.disabledTargeted.women,
+				"Targeted Men": datum.disabledTargeted.men,
+				"Targeted Girls": datum.disabledTargeted.girls,
+				"Targeted Boys": datum.disabledTargeted.boys,
+				"Reached Women": datum.disabledReached.women,
+				"Reached Men": datum.disabledReached.men,
+				"Reached Girls": datum.disabledReached.girls,
+				"Reached Boys": datum.disabledReached.boys,
+			});
+		}
+	});
+
+	return disabilityDataDownload;
 }
 
 export function processBeneficiaryTypesDownload({

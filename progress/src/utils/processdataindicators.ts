@@ -1,5 +1,5 @@
 import { GlobalIndicatorsObject } from "./schemas";
-import { BeneficiariesObject, Beneficiaries } from "./processrawdata";
+import { BeneficiariesObject, GenderAndAge } from "./processrawdata";
 import { sum, mean } from "d3";
 import constants from "./constants";
 
@@ -21,7 +21,7 @@ export type SectorDatum = {
 };
 
 type BeneficiariesObjectWithArrays = {
-	[K in Beneficiaries]: number[];
+	[K in GenderAndAge]: number[];
 };
 
 type ProcessDataIndicatorsParams = {

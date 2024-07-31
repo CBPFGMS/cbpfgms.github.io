@@ -29,6 +29,7 @@ import {
 	processBeneficiaryTypesDownload,
 	processOrganizationsDownload,
 } from "../utils/processdownload";
+import { GenderAndAge } from "../utils/processrawdata";
 
 type BarChartProps = {
 	originalData: DatumBarChart[];
@@ -50,8 +51,6 @@ type Data = {
 	reached: number;
 };
 
-type BeneficiaryCategory = (typeof beneficiaryCategories)[number];
-
 const { beneficiaryCategories } = constants;
 
 function BarChart({
@@ -72,7 +71,7 @@ function BarChart({
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const [beneficiaryCategoryArray, setBeneficiaryCategoryArray] = useState<
-		BeneficiaryCategory[]
+		GenderAndAge[]
 	>([...beneficiaryCategories]);
 
 	const listProperty: keyof List =
@@ -87,11 +86,7 @@ function BarChart({
 	const data: Data[] = originalData.map(d => {
 		const targeted = Object.entries(d.targeted).reduce(
 			(acc, [key, value]) => {
-				if (
-					beneficiaryCategoryArray.includes(
-						key as BeneficiaryCategory
-					)
-				) {
+				if (beneficiaryCategoryArray.includes(key as GenderAndAge)) {
 					acc += value;
 				}
 				return acc;
@@ -100,11 +95,7 @@ function BarChart({
 		);
 		const reached = Object.entries(d.reached).reduce(
 			(acc, [key, value]) => {
-				if (
-					beneficiaryCategoryArray.includes(
-						key as BeneficiaryCategory
-					)
-				) {
+				if (beneficiaryCategoryArray.includes(key as GenderAndAge)) {
 					acc += value;
 				}
 				return acc;
@@ -164,7 +155,7 @@ function BarChart({
 		}
 	}
 
-	function handleOnChange(category: BeneficiaryCategory) {
+	function handleOnChange(category: GenderAndAge) {
 		if (beneficiaryCategoryArray.includes(category)) {
 			if (beneficiaryCategoryArray.length === 1) {
 				setOpenSnack(true);

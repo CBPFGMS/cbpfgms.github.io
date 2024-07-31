@@ -15,7 +15,8 @@ type Datum = {
 	targeted: BeneficiariesObject;
 	reachedByBeneficiaryType: BeneficiaryTypes;
 	targetedByBeneficiaryType: BeneficiaryTypes;
-	disabled: BeneficiariesObject;
+	disabledReached: BeneficiariesObject;
+	disabledTargeted: BeneficiariesObject;
 	fund: number;
 	year: number;
 	projectCode: string;
@@ -27,6 +28,9 @@ type Datum = {
 	allocationTypeId: number;
 	endDate: Date;
 	budget: number;
+	budgetGBV: number;
+	targetedGBV: number;
+	reachedGBV: number;
 	projectStatus: string;
 	projectStatusId: number;
 	sectorData: SectorDatum[];
@@ -51,10 +55,10 @@ type BeneficiaryTypes = {
 	[K in (typeof beneficiariesSplitOrder)[number]]: BeneficiariesObject;
 };
 
-export type Beneficiaries = (typeof beneficiaryCategories)[number];
+export type GenderAndAge = (typeof beneficiaryCategories)[number];
 
 export type BeneficiariesObject = {
-	[K in Beneficiaries]: number;
+	[K in GenderAndAge]: number;
 };
 
 export type InDataLists = {
@@ -249,12 +253,19 @@ function processRawData({
 						row,
 						"targeted"
 					),
-					disabled: generateBeneficiariesObjectSummary(
+					disabledReached: generateBeneficiariesObjectSummary(
 						row,
-						"disabled"
+						"disabledReached"
+					),
+					disabledTargeted: generateBeneficiariesObjectSummary(
+						row,
+						"disabledTargeted"
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
+					budgetGBV: row.GBVBudget,
+					targetedGBV: row.GBVBen || 0,
+					reachedGBV: row.GBVAch || 0,
 				};
 
 				data.push(objDatum);
@@ -319,7 +330,7 @@ function generateBeneficiariesSplitObject(
 
 function generateBeneficiariesObjectSummary(
 	row: ProjectSummaryObject,
-	type: "reached" | "targeted" | "disabled"
+	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted"
 ): BeneficiariesObject {
 	let girls = 0,
 		boys = 0,
@@ -340,7 +351,14 @@ function generateBeneficiariesObjectSummary(
 		men = row.BenM || 0;
 	}
 
-	if (type === "disabled") {
+	if (type === "disabledReached") {
+		girls = row.DisabledAchG || 0;
+		boys = row.DisabledAchB || 0;
+		women = row.DisabledAchW || 0;
+		men = row.DisabledAchM || 0;
+	}
+
+	if (type === "disabledTargeted") {
 		girls = row.DisabledG || 0;
 		boys = row.DisabledB || 0;
 		women = row.DisabledW || 0;

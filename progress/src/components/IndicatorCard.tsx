@@ -197,7 +197,8 @@ function IndicatorCardContent({
 					</Typography>
 				</Box>
 				<Box sx={{ width: "100%	" }}>
-					<TableContainer sx={{ maxHeight: expanded ? "90vh" : 600 }}>
+					{/* try moving this up the components */}
+					<TableContainer sx={{ maxHeight: expanded ? "80vh" : 600 }}>
 						<Table
 							size={expanded ? "small" : "medium"}
 							stickyHeader

@@ -18,6 +18,7 @@ type ScrollSpyProps = {
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
 	inViewIndicators: boolean;
+	inViewDisability: boolean;
 	refIds: RefIds;
 };
 
@@ -36,6 +37,7 @@ function ScroolSpy({
 	inViewOrganizations,
 	inViewSectors,
 	inViewIndicators,
+	inViewDisability,
 	refIds,
 }: ScrollSpyProps) {
 	function handleOnClick(reference: string) {

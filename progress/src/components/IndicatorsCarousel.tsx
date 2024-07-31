@@ -104,7 +104,7 @@ function IndicatorsCarousel({ data, lists }: IndicatorsCarouselProps) {
 											style={{
 												width: "16px",
 												height: "16px",
-												paddingLeft: "8px", //TRY TO FIND A PROPER SOLUTION!!!
+												marginLeft: "8px", //TRY TO FIND A PROPER SOLUTION!!!
 												filter:
 													index === activeStep
 														? "brightness(0.1) invert(1)"

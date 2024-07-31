@@ -39,6 +39,7 @@ const downloadStates: DownloadStates = {
 	beneficiaryTypes: false,
 	sectors: false,
 	organizations: false,
+	disability: false,
 	indicators: false,
 } as const;
 
@@ -85,6 +86,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		useInView(chartsThreshold);
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
+	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
 	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
@@ -100,7 +102,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		[data, year, fund, allocationSource, allocationType, lists]
 	);
 
-	const { dataSummary, dataPictogram, inSelectionData } = useMemo(
+	const {
+		dataSummary,
+		dataPictogram,
+		dataDisability,
+		dataGBV,
+		inSelectionData,
+	} = useMemo(
 		() =>
 			processDataSummary({
 				data,
@@ -197,6 +205,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
 				inViewIndicators={inViewIndicators}
+				inViewDisability={inViewDisability}
 				refIds={refIds}
 			/>
 			<TopIntro />
@@ -217,6 +226,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
+				dataDisability={dataDisability}
+				dataGBV={dataGBV}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				lists={lists}
@@ -226,6 +237,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				beneficiaryTypesRef={beneficiaryTypesRef}
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
+				disabilityRef={disabilityRef}
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}

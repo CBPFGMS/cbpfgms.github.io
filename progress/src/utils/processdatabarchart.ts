@@ -5,6 +5,7 @@ import calculateStatus from "./calculatestatus";
 import { BeneficiariesObject } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";
+import { GenderAndAge } from "./processrawdata";
 
 export type DatumBarChart = {
 	type: number;
@@ -13,8 +14,6 @@ export type DatumBarChart = {
 };
 
 export type BeneficiaryTypesList = (typeof beneficiariesSplitOrder)[number];
-
-export type GenderAndAge = (typeof beneficiaryCategories)[number];
 
 type ProcessDataBarChartParams = {
 	data: Data;

@@ -80,6 +80,13 @@ export const projectSummaryObjectSchema = z.object({
 		.string()
 		.regex(splitRegex, "Invalid split string format")
 		.nullable(),
+	DisabledAchM: z.number().int().nonnegative().nullable(),
+	DisabledAchW: z.number().int().nonnegative().nullable(),
+	DisabledAchB: z.number().int().nonnegative().nullable(),
+	DisabledAchG: z.number().int().nonnegative().nullable(),
+	GBVBudget: z.number().nonnegative(),
+	GBVBen: z.number().int().nonnegative().nullable(),
+	GBVAch: z.number().int().nonnegative().nullable(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({

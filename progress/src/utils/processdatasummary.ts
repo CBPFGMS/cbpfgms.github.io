@@ -2,6 +2,9 @@ import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import calculateStatus from "./calculatestatus";
+import constants from "./constants";
+import capitalizeString from "./capitalizestring";
+import { GenderAndAge } from "./processrawdata";
 
 export type InSelectionData = {
 	years: Set<number>;
@@ -29,15 +32,23 @@ export type DatumSummary = {
 };
 
 export type DatumPictogram = {
-	targetedMen: number;
-	targetedWomen: number;
-	targetedBoys: number;
-	targetedGirls: number;
-	reachedMen: number;
-	reachedWomen: number;
-	reachedBoys: number;
-	reachedGirls: number;
+	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
 };
+
+export type DatumDisability = {
+	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
+};
+
+export type DatumGBV = {
+	allocations: number;
+	allocationsGBV: number;
+	targeted: number;
+	targetedGBV: number;
+	reached: number;
+	reachedGBV: number;
+};
+
+const { beneficiariesStatuses, beneficiaryCategories } = constants;
 
 function processDataSummary({
 	data,
@@ -50,6 +61,8 @@ function processDataSummary({
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataPictogram: DatumPictogram;
+	dataDisability: DatumDisability;
+	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
 } {
 	const dataSummary: DatumSummary[] = [];
@@ -62,6 +75,24 @@ function processDataSummary({
 		reachedWomen: 0,
 		reachedBoys: 0,
 		reachedGirls: 0,
+	};
+	const dataDisability: DatumDisability = {
+		targetedMen: 0,
+		targetedWomen: 0,
+		targetedBoys: 0,
+		targetedGirls: 0,
+		reachedMen: 0,
+		reachedWomen: 0,
+		reachedBoys: 0,
+		reachedGirls: 0,
+	};
+	const dataGBV: DatumGBV = {
+		allocations: 0,
+		allocationsGBV: 0,
+		targeted: 0,
+		targetedGBV: 0,
+		reached: 0,
+		reachedGBV: 0,
 	};
 	const inSelectionData: InSelectionData = {
 		years: new Set(),
@@ -103,14 +134,38 @@ function processDataSummary({
 				});
 			}
 
-			dataPictogram.targetedMen += datum.targeted.men;
-			dataPictogram.targetedWomen += datum.targeted.women;
-			dataPictogram.targetedBoys += datum.targeted.boys;
-			dataPictogram.targetedGirls += datum.targeted.girls;
-			dataPictogram.reachedMen += datum.reached.men;
-			dataPictogram.reachedWomen += datum.reached.women;
-			dataPictogram.reachedBoys += datum.reached.boys;
-			dataPictogram.reachedGirls += datum.reached.girls;
+			beneficiariesStatuses.forEach(status => {
+				const disabledKey = `disabled${capitalizeString(
+					status
+				)}` as keyof typeof datum;
+				beneficiaryCategories.forEach(category => {
+					dataPictogram[
+						`${status}${capitalizeString(
+							category
+						)}` as keyof DatumPictogram
+					] += datum[status][category];
+					dataDisability[
+						`${status}${capitalizeString(
+							category
+						)}` as keyof DatumDisability
+					] += (datum[disabledKey] as Record<GenderAndAge, number>)[
+						category
+					];
+				});
+			});
+
+			dataGBV.allocations += datum.budget;
+			dataGBV.allocationsGBV += datum.budgetGBV;
+			dataGBV.targeted += Object.values(datum.targeted).reduce(
+				(acc, curr) => acc + curr,
+				0
+			);
+			dataGBV.targetedGBV += datum.targetedGBV;
+			dataGBV.reached += Object.values(datum.reached).reduce(
+				(acc, curr) => acc + curr,
+				0
+			);
+			dataGBV.reachedGBV += datum.reachedGBV;
 		}
 
 		if (
@@ -145,7 +200,13 @@ function processDataSummary({
 
 	dataSummary.sort((a, b) => b.year - a.year);
 
-	return { dataSummary, dataPictogram, inSelectionData };
+	return {
+		dataSummary,
+		dataPictogram,
+		dataDisability,
+		dataGBV,
+		inSelectionData,
+	};
 }
 
 export default processDataSummary;

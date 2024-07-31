@@ -3,7 +3,12 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
-import { DatumSummary, DatumPictogram } from "../utils/processdatasummary";
+import {
+	DatumSummary,
+	DatumPictogram,
+	DatumDisability,
+	DatumGBV,
+} from "../utils/processdatasummary";
 import {
 	DownloadStates,
 	RefIds,
@@ -14,6 +19,7 @@ import SummaryChart from "./SummaryChart";
 import PictogramChart from "./PictogramChart";
 import BarChart from "./BarChart";
 import { DatumBarChart } from "../utils/processdatabarchart";
+import DisabilityChart from "./DisabilityChart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -23,6 +29,8 @@ type ChartsContainerProps = {
 	dataBeneficiaryByType: DatumBarChart[];
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
+	dataDisability: DatumDisability;
+	dataGBV: DatumGBV;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -32,6 +40,7 @@ type ChartsContainerProps = {
 	beneficiaryTypesRef: Ref;
 	sectorsRef: Ref;
 	organizationsRef: Ref;
+	disabilityRef: Ref;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
@@ -45,6 +54,8 @@ function ChartsContainer({
 	dataBeneficiaryByType,
 	dataSector,
 	dataOrganization,
+	dataDisability,
+	dataGBV,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -54,6 +65,7 @@ function ChartsContainer({
 	beneficiaryTypesRef,
 	sectorsRef,
 	organizationsRef,
+	disabilityRef,
 	year,
 	fund,
 	allocationSource,
@@ -253,6 +265,55 @@ function ChartsContainer({
 							/>
 						</Box>
 					</Grid>
+				</Grid>
+				<Divider
+					orientation="horizontal"
+					flexItem
+					style={{
+						borderTop: "3px dotted #ccc",
+						borderBottom: "none",
+						width: "96%",
+						marginLeft: "2%",
+					}}
+				/>
+				<Grid
+					container
+					direction={"row"}
+					spacing={1}
+					xs={12}
+					flexWrap={"nowrap"}
+					mt={3}
+					mb={3}
+				>
+					<Grid
+						xs={6}
+						ref={disabilityRef}
+						id={refIds.disabilityRefId}
+					>
+						<DisabilityChart
+							dataDisability={dataDisability}
+							clickedDownload={clickedDownload}
+							setClickedDownload={setClickedDownload}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
+						/>
+					</Grid>
+					<Divider
+						orientation="vertical"
+						flexItem
+						style={{
+							borderLeft: "3px dotted #ccc",
+							borderRight: "none",
+						}}
+					/>
+					<Grid
+					// xs={6}
+					// ref={}
+					// id={}
+					></Grid>
 				</Grid>
 			</Paper>
 		</Grid>
