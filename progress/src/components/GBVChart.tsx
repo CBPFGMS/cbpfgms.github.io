@@ -14,6 +14,8 @@ import NumberAnimator from "./NumberAnimator";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import Donut from "./GBVDonut";
+import formatSIFloat from "../utils/formatsi";
+import { format } from "d3";
 
 type GBVChartProps = {
 	dataGBV: DatumGBV;
@@ -29,6 +31,15 @@ type GBVChartProps = {
 export type DonutDatum = {
 	value: number;
 	type: "total" | "GBV";
+};
+
+type GBVCellProps = {
+	title: string;
+	totalSlice: number;
+	GBVSlice: number;
+	totalColor: string;
+	GBVColor: string;
+	CaptionIcon: React.ReactElement;
 };
 
 function GBVChart({
@@ -122,185 +133,156 @@ function GBVChart({
 				alignItems={"center"}
 				gap={1}
 				width={"100%"}
-				style={{ aspectRatio: "16/9" }}
+				style={{ aspectRatio: "4/3" }}
 			>
-				<Box
-					display={"flex"}
-					flex={"0 60%"}
-					height={"100%"}
-					style={{ backgroundColor: "tomato" }}
-					flexDirection={"column"}
-					alignItems={"center"}
-					justifyContent={"center"}
-				>
-					<Typography
-						mt={1}
-						mb={1}
-						variant="subtitle1"
-					>
-						GBV Budget
-					</Typography>
-					<Box
-						display={"flex"}
-						width={"100%"}
-						height={"100%"}
-					>
-						<Donut
-							totalSlice={dataGBV.allocations}
-							totalColor={colors.unColorLighter}
-							GBVSlice={dataGBV.allocationsGBVPlanned}
-							GBVColor={colors.unColorDarker}
-							main={true}
-						/>
-					</Box>
-					<Box
-						display={"flex"}
-						width={"100%"}
-						flexDirection={"row"}
-						alignItems={"center"}
-						justifyContent={"center"}
-						mt={1}
-						mb={1}
-					>
-						<Typography variant="caption">
-							{"$"}
-							<NumberAnimator
-								number={Math.round(
-									dataGBV.allocationsGBVPlanned
-								)}
-								type="integer"
-							/>
-						</Typography>
-					</Box>
-				</Box>
-				<Box
-					display={"flex"}
-					flexDirection={"column"}
-					flex={"0 40%"}
-					gap={1}
-					height={"100%"}
-				>
-					<Box
-						display={"flex"}
-						flex={"0 50%"}
-						style={{ backgroundColor: "skyblue" }}
-						flexDirection={"column"}
-						alignItems={"center"}
-						justifyContent={"center"}
-					>
-						<Typography
-							mb={0.5}
-							variant="subtitle1"
-						>
-							Targeted People
-						</Typography>
-						<Box
-							display={"flex"}
-							width={"100%"}
-							height={"100%"}
-						>
-							<Donut
-								totalSlice={dataGBV.targeted}
-								totalColor={colors.unColorLighter}
-								GBVSlice={dataGBV.targetedGBV}
-								GBVColor={colors.unColorDarker}
-								main={false}
-							/>
-						</Box>
-						<Box
-							display={"flex"}
-							width={"100%"}
-							flexDirection={"row"}
-							alignItems={"center"}
-							justifyContent={"center"}
-							mt={0.5}
-							mb={0.5}
-						>
-							<Typography
-								variant="caption"
+				<GBVColumn>
+					<GBVCell
+						title={"GBV Planned Budget"}
+						totalSlice={dataGBV.allocations}
+						totalColor={colors.unColorLighter}
+						GBVSlice={dataGBV.allocationsGBVPlanned}
+						GBVColor={colors.unColorDarker}
+						CaptionIcon={
+							<Typography variant="caption">{"$"}</Typography>
+						}
+					/>
+					<GBVCell
+						title={"GBV Reached Budget"}
+						totalSlice={dataGBV.allocations}
+						totalColor={colors.contrastColorLighter}
+						GBVSlice={dataGBV.allocationsGBVReached}
+						GBVColor={colors.contrastColorDarker}
+						CaptionIcon={
+							<Typography variant="caption">{"$"}</Typography>
+						}
+					/>
+				</GBVColumn>
+				<GBVColumn>
+					<GBVCell
+						title={"GBV Targeted People"}
+						totalSlice={dataGBV.targeted}
+						totalColor={colors.unColorLighter}
+						GBVSlice={dataGBV.targetedGBV}
+						GBVColor={colors.unColorDarker}
+						CaptionIcon={
+							<AdsClickIcon
 								style={{
-									display: "flex",
-									alignItems: "center",
+									fontSize: 18,
+									marginLeft: 3,
+									marginRight: 3,
+									color: "#777",
+									opacity: 0.6,
 								}}
-							>
-								<AdsClickIcon
-									style={{
-										fontSize: 18,
-										marginLeft: 3,
-										marginRight: 3,
-										color: "#777",
-										opacity: 0.6,
-									}}
-								/>
-								<NumberAnimator
-									number={dataGBV.targetedGBV}
-									type="integer"
-								/>
-							</Typography>
-						</Box>
-					</Box>
-					<Box
-						display={"flex"}
-						flex={"0 50%"}
-						style={{ backgroundColor: "skyblue" }}
-						flexDirection={"column"}
-						alignItems={"center"}
-						justifyContent={"center"}
-					>
-						<Typography
-							mb={0.5}
-							variant="subtitle1"
-						>
-							Reached People
-						</Typography>
-						<Box
-							display={"flex"}
-							width={"100%"}
-							height={"100%"}
-						>
-							<Donut
-								totalSlice={dataGBV.reached}
-								totalColor={colors.contrastColorLighter}
-								GBVSlice={dataGBV.reachedGBV}
-								GBVColor={colors.contrastColorDarker}
-								main={false}
 							/>
-						</Box>
-						<Box
-							display={"flex"}
-							width={"100%"}
-							flexDirection={"row"}
-							alignItems={"center"}
-							justifyContent={"center"}
-							mt={0.5}
-							mb={0.5}
-						>
-							<Typography
-								variant="caption"
+						}
+					/>
+					<GBVCell
+						title={"GBV Reached People"}
+						totalSlice={dataGBV.reached}
+						totalColor={colors.contrastColorLighter}
+						GBVSlice={dataGBV.reachedGBV}
+						GBVColor={colors.contrastColorDarker}
+						CaptionIcon={
+							<DoneIcon
 								style={{
-									display: "flex",
-									alignItems: "center",
+									fontSize: 18,
+									marginLeft: 3,
+									marginRight: 3,
+									color: "#777",
+									opacity: 0.6,
 								}}
-							>
-								<DoneIcon
-									style={{
-										fontSize: 18,
-										marginLeft: 3,
-										marginRight: 3,
-										color: "#777",
-										opacity: 0.6,
-									}}
-								/>
-								<NumberAnimator
-									number={dataGBV.reachedGBV}
-									type="integer"
-								/>
-							</Typography>
-						</Box>
-					</Box>
-				</Box>
+							/>
+						}
+					/>
+				</GBVColumn>
 			</Box>
 		</Container>
+	);
+}
+
+function GBVColumn({ children }: { children: React.ReactNode[] }) {
+	return (
+		<Box
+			display={"flex"}
+			flex={"0 50%"}
+			height={"100%"}
+			gap={3}
+			flexDirection={"column"}
+		>
+			{children[0]}
+			{children[1]}
+		</Box>
+	);
+}
+
+function GBVCell({
+	title,
+	totalSlice,
+	totalColor,
+	GBVSlice,
+	GBVColor,
+	CaptionIcon,
+}: GBVCellProps) {
+	return (
+		<Box
+			display={"flex"}
+			flex={"0 50%"}
+			flexDirection={"column"}
+			alignItems={"center"}
+			justifyContent={"center"}
+			data-tooltip-id="tooltip"
+			data-tooltip-html={`<div style='text-align:center;'>${title}: ${
+				title.toLowerCase().includes("budget") ? "$" : ""
+			}${format(",.0f")(GBVSlice)}<br />(${
+				~~((GBVSlice * 10000) / totalSlice) / 100
+			}% of ${title.toLowerCase().includes("budget") ? "$" : ""}${format(
+				",.0f"
+			)(totalSlice)})</div>`}
+			data-tooltip-place="top"
+		>
+			<Typography
+				mb={0.5}
+				variant="subtitle1"
+			>
+				{title}
+			</Typography>
+			<Box
+				display={"flex"}
+				width={"100%"}
+				height={"100%"}
+			>
+				<Donut
+					totalSlice={totalSlice}
+					totalColor={totalColor}
+					GBVSlice={GBVSlice}
+					GBVColor={GBVColor}
+				/>
+			</Box>
+			<Box
+				display={"flex"}
+				width={"100%"}
+				flexDirection={"row"}
+				alignItems={"center"}
+				justifyContent={"center"}
+				mt={1}
+			>
+				<Typography
+					variant="caption"
+					style={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					{CaptionIcon}
+					<NumberAnimator
+						number={parseFloat(formatSIFloat(GBVSlice))}
+						type="decimal"
+					/>
+					{formatSIFloat(GBVSlice).slice(-1)}
+				</Typography>
+			</Box>
+		</Box>
 	);
 }
 

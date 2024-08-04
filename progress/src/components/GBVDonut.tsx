@@ -12,20 +12,13 @@ type DonutProps = {
 	GBVSlice: number;
 	totalColor: string;
 	GBVColor: string;
-	main: boolean;
 };
 
 const pieGenerator = pie<void, DonutDatum>()
 	.value(d => d.value)
 	.sort(a => (a.type === "GBV" ? -1 : 1));
 
-function Donut({
-	totalSlice,
-	totalColor,
-	GBVSlice,
-	GBVColor,
-	main,
-}: DonutProps) {
+function Donut({ totalSlice, totalColor, GBVSlice, GBVColor }: DonutProps) {
 	const parentRef = useRef<HTMLDivElement>(null);
 	const [parentWidth, setParentWidth] = useState<number>(0);
 	const [parentHeight, setParentHeight] = useState<number>(0);
@@ -61,7 +54,6 @@ function Donut({
 			justifyContent={"center"}
 			alignItems={"center"}
 			position={"relative"}
-			style={{ backgroundColor: "wheat" }}
 		>
 			<Box
 				width={`${diameter}px`}
@@ -92,10 +84,10 @@ function Donut({
 				justifyContent={"center"}
 				alignItems={"center"}
 			>
-				<Typography style={{ fontSize: main ? "1.2em" : "0.9em" }}>
+				<Typography style={{ fontSize: "0.9em", fontWeight: "bold" }}>
 					<NumberAnimator
-						number={~~((GBVSlice * 100) / totalSlice)}
-						type="integer"
+						number={~~((GBVSlice * 1000) / totalSlice) / 10}
+						type="decimal"
 					/>
 					%
 				</Typography>
