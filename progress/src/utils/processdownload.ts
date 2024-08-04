@@ -50,6 +50,13 @@ type OrganizationsDatumDownload = BaseDownloadDatum &
 
 type DisabilityDatumDownload = BaseDownloadDatum & BeneficiaryDownloadTypes;
 
+type GBVDatumDownload = BaseDownloadDatum & {
+	"GBV budget planned": number;
+	"GBV budget reached": number;
+	"GBV targeted people": number;
+	"GBV reached people": number;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
@@ -74,11 +81,15 @@ export function processSummaryDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -110,11 +121,15 @@ export function processPictogramDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -153,11 +168,15 @@ export function processDisabilityDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -182,6 +201,49 @@ export function processDisabilityDownload({
 	return disabilityDataDownload;
 }
 
+export function processGBVDownload({
+	data,
+	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+}: ProcessDownloadParams): GBVDatumDownload[] {
+	const gbvDataDownload: GBVDatumDownload[] = [];
+
+	data.forEach(datum => {
+		const thisStatus = calculateStatus(datum, lists);
+		if (
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
+		) {
+			const baseDownloadDatum = populateBaseDownloadDatum(
+				datum,
+				lists,
+				thisStatus
+			);
+
+			gbvDataDownload.push({
+				...baseDownloadDatum,
+				"GBV budget planned": datum.budgetGBVPlanned,
+				"GBV budget reached": datum.budgetGBVReached,
+				"GBV targeted people": datum.targetedGBV,
+				"GBV reached people": datum.reachedGBV,
+			});
+		}
+	});
+
+	return gbvDataDownload;
+}
+
 export function processBeneficiaryTypesDownload({
 	data,
 	lists,
@@ -196,11 +258,15 @@ export function processBeneficiaryTypesDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -276,11 +342,15 @@ export function processSectorsDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -322,11 +392,15 @@ export function processOrganizationsDownload({
 	data.forEach(datum => {
 		const thisStatus = calculateStatus(datum, lists);
 		if (
-			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
@@ -370,4 +444,22 @@ function populateBaseDownloadDatum(
 		"Project Code": datum.projectCode,
 		Budget: datum.budget,
 	};
+}
+
+function checkRow(
+	thisStatus: ImplementationStatuses,
+	datum: Data[number],
+	year: number[],
+	fund: number[],
+	allocationSource: number[],
+	allocationType: number[],
+	implementationStatus: ImplementationStatuses[]
+): boolean {
+	return (
+		implementationStatus.includes(thisStatus) &&
+		year.includes(datum.year) &&
+		fund.includes(datum.fund) &&
+		allocationSource.includes(datum.allocationSource) &&
+		allocationType.includes(datum.allocationType)
+	);
 }

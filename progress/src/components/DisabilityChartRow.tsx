@@ -91,6 +91,8 @@ function DisabilityChartRow({
 								fontWeight={400}
 								style={{
 									border: "none",
+									display: "flex",
+									alignItems: "center",
 								}}
 							>
 								{i ? (
@@ -100,7 +102,6 @@ function DisabilityChartRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-2px",
 										}}
 									/>
 								) : (
@@ -110,7 +111,6 @@ function DisabilityChartRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-3px",
 										}}
 									/>
 								)}

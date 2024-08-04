@@ -28,7 +28,7 @@ function DownloadIcon({
 			}}
 			onClick={() => {
 				setClickedDownload(prev => ({ ...prev, [type]: true }));
-				handleDownloadClick();
+				if (!clickedDownload[type]) handleDownloadClick();
 			}}
 		>
 			{clickedDownload[type] ? (

@@ -212,6 +212,8 @@ function BarChart({
 				<Typography
 					style={{
 						fontSize: "0.8rem",
+						display: "flex",
+						alignItems: "center",
 					}}
 				>
 					{"("}
@@ -219,9 +221,9 @@ function BarChart({
 						style={{
 							fontSize: 18,
 							marginLeft: 3,
+							marginRight: 3,
 							color: "#777",
 							opacity: 0.6,
-							marginBottom: "-3px",
 						}}
 					/>
 					{
@@ -234,9 +236,9 @@ function BarChart({
 						style={{
 							fontSize: 18,
 							marginLeft: 3,
+							marginRight: 3,
 							color: "#777",
 							opacity: 0.6,
-							marginBottom: "-3px",
 						}}
 					/>
 					{<span style={{ color: colors.unColor }}> reached)</span>}

@@ -109,6 +109,8 @@ function BarChartRow({
 								fontWeight={400}
 								style={{
 									border: "none",
+									display: "flex",
+									alignItems: "center",
 								}}
 							>
 								{i ? (
@@ -118,7 +120,6 @@ function BarChartRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-2px",
 										}}
 									/>
 								) : (
@@ -128,7 +129,6 @@ function BarChartRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-3px",
 										}}
 									/>
 								)}

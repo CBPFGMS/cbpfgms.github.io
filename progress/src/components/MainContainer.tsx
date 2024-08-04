@@ -33,15 +33,10 @@ export type RefIds = {
 
 export type ImplementationStatuses = (typeof implementationStatuses)[number];
 
-const downloadStates: DownloadStates = {
-	summary: false,
-	pictogram: false,
-	beneficiaryTypes: false,
-	sectors: false,
-	organizations: false,
-	disability: false,
-	indicators: false,
-} as const;
+const downloadStates = charts.reduce(
+	(acc, chart) => ((acc[chart] = false), acc),
+	{} as DownloadStates
+);
 
 const refIdSuffix = "RefId";
 
@@ -87,6 +82,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
 	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
+	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
 	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
@@ -206,6 +202,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewSectors={inViewSectors}
 				inViewIndicators={inViewIndicators}
 				inViewDisability={inViewDisability}
+				inViewGBV={inViewGBV}
 				refIds={refIds}
 			/>
 			<TopIntro />
@@ -238,6 +235,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
 				disabilityRef={disabilityRef}
+				gbvRef={gbvRef}
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}

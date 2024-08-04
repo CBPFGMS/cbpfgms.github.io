@@ -41,7 +41,8 @@ export type DatumDisability = {
 
 export type DatumGBV = {
 	allocations: number;
-	allocationsGBV: number;
+	allocationsGBVPlanned: number;
+	allocationsGBVReached: number;
 	targeted: number;
 	targetedGBV: number;
 	reached: number;
@@ -88,7 +89,8 @@ function processDataSummary({
 	};
 	const dataGBV: DatumGBV = {
 		allocations: 0,
-		allocationsGBV: 0,
+		allocationsGBVPlanned: 0,
+		allocationsGBVReached: 0,
 		targeted: 0,
 		targetedGBV: 0,
 		reached: 0,
@@ -155,7 +157,8 @@ function processDataSummary({
 			});
 
 			dataGBV.allocations += datum.budget;
-			dataGBV.allocationsGBV += datum.budgetGBV;
+			dataGBV.allocationsGBVPlanned += datum.budgetGBVPlanned;
+			dataGBV.allocationsGBVReached += datum.budgetGBVReached;
 			dataGBV.targeted += Object.values(datum.targeted).reduce(
 				(acc, curr) => acc + curr,
 				0

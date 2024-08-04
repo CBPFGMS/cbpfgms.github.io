@@ -14,6 +14,7 @@ const constants = {
 		"sectors",
 		"organizations",
 		"disability",
+		"gbv",
 		"indicators",
 	],
 	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],

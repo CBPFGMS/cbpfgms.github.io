@@ -8,6 +8,8 @@ import PaidIcon from "@mui/icons-material/Paid";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessIcon from "@mui/icons-material/Business";
 import PublicIcon from "@mui/icons-material/Public";
+import AccessibleIcon from "@mui/icons-material/Accessible";
+import SafetyDividerIcon from "@mui/icons-material/SafetyDivider";
 import { RefIds } from "./MainContainer";
 import React from "react";
 
@@ -19,6 +21,7 @@ type ScrollSpyProps = {
 	inViewSectors: boolean;
 	inViewIndicators: boolean;
 	inViewDisability: boolean;
+	inViewGBV: boolean;
 	refIds: RefIds;
 };
 
@@ -38,6 +41,7 @@ function ScroolSpy({
 	inViewSectors,
 	inViewIndicators,
 	inViewDisability,
+	inViewGBV,
 	refIds,
 }: ScrollSpyProps) {
 	function handleOnClick(reference: string) {
@@ -70,7 +74,7 @@ function ScroolSpy({
 				Icon={Pictogram}
 			/>
 			<Tab
-				label="By Beneficiary Types"
+				label="By Type"
 				inView={inViewBeneficiaryTypes}
 				reference={refIds.beneficiaryTypesRefId}
 				handleOnClick={handleOnClick}
@@ -84,11 +88,25 @@ function ScroolSpy({
 				Icon={BusinessIcon}
 			/>
 			<Tab
-				label="By Sectors"
+				label="By Sector"
 				inView={inViewSectors}
 				reference={refIds.sectorsRefId}
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
+			/>
+			<Tab
+				label="Disability"
+				inView={inViewDisability}
+				reference={refIds.disabilityRefId}
+				handleOnClick={handleOnClick}
+				Icon={AccessibleIcon}
+			/>
+			<Tab
+				label="GBV"
+				inView={inViewGBV}
+				reference={refIds.gbvRefId}
+				handleOnClick={handleOnClick}
+				Icon={SafetyDividerIcon}
 			/>
 			<Tab
 				label="Global Indicators"

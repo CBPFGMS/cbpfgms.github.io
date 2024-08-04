@@ -20,6 +20,7 @@ import PictogramChart from "./PictogramChart";
 import BarChart from "./BarChart";
 import { DatumBarChart } from "../utils/processdatabarchart";
 import DisabilityChart from "./DisabilityChart";
+import GBVChart from "./GBVChart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -41,6 +42,7 @@ type ChartsContainerProps = {
 	sectorsRef: Ref;
 	organizationsRef: Ref;
 	disabilityRef: Ref;
+	gbvRef: Ref;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
@@ -66,6 +68,7 @@ function ChartsContainer({
 	sectorsRef,
 	organizationsRef,
 	disabilityRef,
+	gbvRef,
 	year,
 	fund,
 	allocationSource,
@@ -310,10 +313,21 @@ function ChartsContainer({
 						}}
 					/>
 					<Grid
-					// xs={6}
-					// ref={}
-					// id={}
-					></Grid>
+						xs={6}
+						ref={gbvRef}
+						id={refIds.gbvRefId}
+					>
+						<GBVChart
+							dataGBV={dataGBV}
+							clickedDownload={clickedDownload}
+							setClickedDownload={setClickedDownload}
+							year={year}
+							fund={fund}
+							allocationSource={allocationSource}
+							allocationType={allocationType}
+							implementationStatus={implementationsStatus}
+						/>
+					</Grid>
 				</Grid>
 			</Paper>
 		</Grid>

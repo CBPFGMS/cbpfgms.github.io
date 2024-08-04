@@ -147,6 +147,8 @@ function PictogramChart({
 							marginTop: "-0.6em",
 							fontSize: 18,
 							color: colors.contrastColorDarker,
+							display: "flex",
+							alignItems: "center",
 						}}
 					>
 						People Targeted
@@ -156,7 +158,6 @@ function PictogramChart({
 								marginLeft: 4,
 								color: "#777",
 								opacity: 0.6,
-								marginBottom: "-3px",
 							}}
 						/>
 					</Typography>
@@ -227,6 +228,8 @@ function PictogramChart({
 							marginTop: "-0.6em",
 							fontSize: 18,
 							color: colors.unColor,
+							display: "flex",
+							alignItems: "center",
 						}}
 					>
 						People Reached
@@ -236,7 +239,6 @@ function PictogramChart({
 								marginLeft: 4,
 								color: "#777",
 								opacity: 0.6,
-								marginBottom: "-2px",
 							}}
 						/>
 					</Typography>
@@ -304,8 +306,18 @@ function PictogramChart({
 			<Box
 				marginLeft={"3%"}
 				marginTop={4}
+				display={"flex"}
+				alignItems={"center"}
 			>
-				<Typography style={{ color: "#666", fontSize: 12 }}>
+				<Typography
+					style={{
+						color: "#666",
+						fontSize: 12,
+						display: "flex",
+						alignItems: "center",
+						whiteSpace: "pre",
+					}}
+				>
 					{"Each symbol ("}
 					{
 						<Pictogram
@@ -313,7 +325,6 @@ function PictogramChart({
 								style: {
 									fontSize: 14,
 									fill: "#666",
-									marginBottom: "-3px",
 								},
 							}}
 							type="total"

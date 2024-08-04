@@ -19,6 +19,7 @@ type TopPanelProps = {
 	inViewSectors: boolean;
 	inViewIndicators: boolean;
 	inViewDisability: boolean;
+	inViewGBV: boolean;
 	refIds: RefIds;
 	year: number[];
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
@@ -42,6 +43,7 @@ function TopPanel({
 	inViewSectors,
 	inViewIndicators,
 	inViewDisability,
+	inViewGBV,
 	refIds,
 	year,
 	setYear,
@@ -129,6 +131,7 @@ function TopPanel({
 				inViewSectors={inViewSectors}
 				inViewIndicators={inViewIndicators}
 				inViewDisability={inViewDisability}
+				inViewGBV={inViewGBV}
 				refIds={refIds}
 			/>
 		</Grid>

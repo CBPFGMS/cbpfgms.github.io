@@ -28,7 +28,8 @@ type Datum = {
 	allocationTypeId: number;
 	endDate: Date;
 	budget: number;
-	budgetGBV: number;
+	budgetGBVPlanned: number;
+	budgetGBVReached: number;
 	targetedGBV: number;
 	reachedGBV: number;
 	projectStatus: string;
@@ -263,7 +264,8 @@ function processRawData({
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
-					budgetGBV: row.GBVBudget,
+					budgetGBVPlanned: row.GBVBudgetPlanned || 0,
+					budgetGBVReached: row.GBVBudgetReached || 0,
 					targetedGBV: row.GBVBen || 0,
 					reachedGBV: row.GBVAch || 0,
 				};

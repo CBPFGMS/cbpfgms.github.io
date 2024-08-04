@@ -8,7 +8,7 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import capitalizeString from "../utils/capitalizestring";
-import { GenderAndAge } from "../utils/processdatabarchart";
+import { GenderAndAge } from "../utils/processrawdata";
 
 type PictogramRowProps = {
 	type: GenderAndAge;
@@ -108,6 +108,8 @@ function PictogramRow({
 								fontWeight={400}
 								style={{
 									border: "none",
+									display: "flex",
+									alignItems: "center",
 								}}
 							>
 								{i ? (
@@ -117,7 +119,6 @@ function PictogramRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-2px",
 										}}
 									/>
 								) : (
@@ -127,7 +128,6 @@ function PictogramRow({
 											marginLeft: 3,
 											color: "#777",
 											opacity: 0.6,
-											marginBottom: "-3px",
 										}}
 									/>
 								)}
