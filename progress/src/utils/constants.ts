@@ -20,9 +20,9 @@ const constants = {
 	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],
 	beneficiaryCategories: ["women", "girls", "men", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],
-	indicatorsHeader: ["outcome", "indicator", "targeted", "reached"],
-	columnWidths: ["16%", "48%", "18%", "18%"],
-	columnWidthsExpanded: ["8%", "24%", "34%", "34%"],
+	indicatorsHeader: ["indicator", "targeted", "reached"],
+	columnWidths: ["60%", "20%", "20%"],
+	columnWidthsExpanded: ["32%", "34%", "34%"],
 } as const;
 
 export default constants;

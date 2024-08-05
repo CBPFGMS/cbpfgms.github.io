@@ -35,6 +35,11 @@ const { beneficiaryCategories, beneficiariesStatuses } = constants;
 function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 	const dataIndicators: DatumIndicators[] = [];
 
+	const allSectors: DatumIndicators = {
+		sector: 0,
+		sectorData: [],
+	};
+
 	rawData.forEach(row => {
 		const foundSector = dataIndicators.find(
 			datum => datum.sector === row.Sector
@@ -89,6 +94,35 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 				],
 			});
 		}
+
+		const foundIndicatorAllSectors = allSectors.sectorData.find(
+			sectorDatum => sectorDatum.indicatorId === row.IndicatorId
+		);
+
+		if (foundIndicatorAllSectors) {
+			updateTemporaryData(
+				foundIndicatorAllSectors.targetedTemporary!,
+				row,
+				"Targeted"
+			);
+			updateTemporaryData(
+				foundIndicatorAllSectors.reachedTemporary!,
+				row,
+				"Reached"
+			);
+		} else {
+			allSectors.sectorData.push({
+				outcome: row.Outcome,
+				indicatorId: row.IndicatorId,
+				unit: row.Unit,
+				targeted: fillWithZeroes(),
+				reached: fillWithZeroes(),
+				targetedTotal: 0,
+				reachedTotal: 0,
+				targetedTemporary: populateTemporaryData(row, "Targeted"),
+				reachedTemporary: populateTemporaryData(row, "Reached"),
+			});
+		}
 	});
 
 	dataIndicators.forEach(sectorDatum => {
@@ -99,6 +133,15 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 			delete datum.reachedTemporary;
 		});
 	});
+
+	allSectors.sectorData.forEach(datum => {
+		processObject(datum);
+
+		delete datum.targetedTemporary;
+		delete datum.reachedTemporary;
+	});
+
+	dataIndicators.unshift(allSectors);
 
 	return dataIndicators;
 }

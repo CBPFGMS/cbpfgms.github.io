@@ -5,7 +5,7 @@ import Loading from "./Loading";
 import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
 import indicatorsApi from "../utils/indicatorsapi";
-import { RefIds } from "./MainContainer";
+import { DownloadStates, RefIds } from "./MainContainer";
 import IndicatorsCarousel from "./IndicatorsCarousel";
 import { List } from "../utils/makelists";
 
@@ -17,6 +17,8 @@ type IndicatorsContainerProps = {
 	indicatorsRef: (node?: Element | null | undefined) => void;
 	refIds: RefIds;
 	lists: List;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 function IndicatorsContainer({
@@ -27,6 +29,8 @@ function IndicatorsContainer({
 	indicatorsRef,
 	refIds,
 	lists,
+	clickedDownload,
+	setClickedDownload,
 }: IndicatorsContainerProps) {
 	const [indicatorsData, setIndicatorsData] = useState<
 			DatumIndicators[] | null
@@ -109,16 +113,15 @@ function IndicatorsContainer({
 					Generate Table
 				</Button>
 			</Grid>
-			<Grid
-				xs={12}
-				mt={3}
-			>
+			<Grid xs={12}>
 				{loading && <Loading />}
 				{error && <Typography variant="body1">{error}</Typography>}
 				{indicatorsData && hasFetchedData && (
 					<IndicatorsCarousel
 						data={indicatorsData}
 						lists={lists}
+						clickedDownload={clickedDownload}
+						setClickedDownload={setClickedDownload}
 					/>
 				)}
 			</Grid>

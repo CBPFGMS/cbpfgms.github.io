@@ -11,13 +11,26 @@ import IndicatorCard from "./IndicatorCard";
 import SwipeableViews from "@gromy/react-swipeable-views";
 import { List } from "../utils/makelists";
 import { clustersIconsData } from "../assets/clustericons";
+import { Typography } from "@mui/material";
+import colors from "../utils/colors";
+import DownloadIcon from "./DownloadIcon";
+import { DownloadStates } from "./MainContainer";
+import downloadData from "../utils/downloaddata";
+import { processIndicatorsDownload } from "../utils/processdownload";
 
 type IndicatorsCarouselProps = {
 	data: DatumIndicators[];
 	lists: List;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-function IndicatorsCarousel({ data, lists }: IndicatorsCarouselProps) {
+function IndicatorsCarousel({
+	data,
+	lists,
+	clickedDownload,
+	setClickedDownload,
+}: IndicatorsCarouselProps) {
 	const [activeStep, setActiveStep] = useState<number>(0),
 		[visibleRange, setVisibleRange] = useState<number[]>([0, 1, 2]),
 		maxSteps = data.length;
@@ -49,6 +62,19 @@ function IndicatorsCarousel({ data, lists }: IndicatorsCarouselProps) {
 		setActiveStep(step);
 	}
 
+	const allSectorsData = data.find(datum => datum.sector === 0)!;
+
+	function handleDownloadClick() {
+		const dataIndicatorsDownload = processIndicatorsDownload({
+			allSectorsData,
+			lists,
+		});
+		downloadData<(typeof dataIndicatorsDownload)[number]>(
+			dataIndicatorsDownload,
+			"global_indicators"
+		);
+	}
+
 	return (
 		<Box
 			display="flex"
@@ -56,7 +82,14 @@ function IndicatorsCarousel({ data, lists }: IndicatorsCarouselProps) {
 			alignItems="center"
 			flexDirection="column"
 			width="100%"
+			position={"relative"}
 		>
+			<DownloadIcon
+				handleDownloadClick={handleDownloadClick}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				type="indicators"
+			/>
 			<Box
 				display="flex"
 				justifyContent="center"
@@ -97,20 +130,38 @@ function IndicatorsCarousel({ data, lists }: IndicatorsCarouselProps) {
 										alignItems: "center",
 									}}
 									icon={
-										<img
-											src={
-												clustersIconsData[datum.sector]
-											}
-											style={{
-												width: "16px",
-												height: "16px",
-												marginLeft: "8px", //TRY TO FIND A PROPER SOLUTION!!!
-												filter:
-													index === activeStep
-														? "brightness(0.1) invert(1)"
-														: "none",
-											}}
-										/>
+										datum.sector === 0 ? (
+											<Typography
+												variant="caption"
+												style={{
+													fontWeight: "bold",
+													marginLeft: "8px", //TRY TO FIND A PROPER SOLUTION!!!
+													color:
+														index === activeStep
+															? "white"
+															: colors.unColor,
+												}}
+											>
+												All
+											</Typography>
+										) : (
+											<img
+												src={
+													clustersIconsData[
+														datum.sector
+													]
+												}
+												style={{
+													width: "16px",
+													height: "16px",
+													marginLeft: "8px", //TRY TO FIND A PROPER SOLUTION!!!
+													filter:
+														index === activeStep
+															? "brightness(0.1) invert(1)"
+															: "none",
+												}}
+											/>
+										)
 									}
 								></StepButton>
 							</Box>

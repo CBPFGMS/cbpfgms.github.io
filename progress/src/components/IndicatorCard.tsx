@@ -101,7 +101,7 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 				setSortingOrder={setSortingOrder}
 				showTotal={showTotal}
 				handleSwitchChange={handleSwitchChange}
-				expanded={expanded}
+				expanded={false}
 				toggleExpanded={toggleExpanded}
 			/>
 		</>
@@ -146,20 +146,24 @@ function IndicatorCardContent({
 					justifyContent="center"
 					alignItems="center"
 				>
-					<Box
-						width="36px"
-						height="36px"
-					>
-						<img
-							src={clustersIconsData[datumIndicator.sector]}
-							width="100%"
-						/>
-					</Box>
+					{datumIndicator.sector !== 0 && (
+						<Box
+							width="36px"
+							height="36px"
+						>
+							<img
+								src={clustersIconsData[datumIndicator.sector]}
+								width="100%"
+							/>
+						</Box>
+					)}
 					<Typography
 						variant="h6"
 						style={{ marginLeft: "1em", fontSize: "1.4em" }}
 					>
-						{lists.sectors[datumIndicator.sector]}
+						{datumIndicator.sector === 0
+							? "All Sectors"
+							: lists.sectors[datumIndicator.sector]}
 					</Typography>
 					<Button
 						onClick={toggleExpanded}
@@ -197,7 +201,6 @@ function IndicatorCardContent({
 					</Typography>
 				</Box>
 				<Box sx={{ width: "100%	" }}>
-					{/* try moving this up the components */}
 					<TableContainer sx={{ maxHeight: expanded ? "80vh" : 600 }}>
 						<Table
 							size={expanded ? "small" : "medium"}

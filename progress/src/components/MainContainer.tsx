@@ -250,6 +250,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				indicatorsRef={indicatorsRef}
 				refIds={refIds}
 				lists={lists}
+				setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
 			/>
 		</Container>
 	);

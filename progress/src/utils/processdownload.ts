@@ -3,6 +3,7 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import constants from "./constants";
+import { DatumIndicators } from "./processdataindicators";
 
 const { beneficiariesSplitOrder } = constants;
 
@@ -57,6 +58,11 @@ type GBVDatumDownload = BaseDownloadDatum & {
 	"GBV reached people": number;
 };
 
+type IndicatorsDatumDownload = BeneficiaryDownloadTypes & {
+	Indicator: string;
+	Outcome: string;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
@@ -65,6 +71,11 @@ type ProcessDownloadParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
+};
+
+type ProcessIndicatorsDownloadParams = {
+	allSectorsData: DatumIndicators;
+	lists: List;
 };
 
 export function processSummaryDownload({
@@ -424,6 +435,30 @@ export function processOrganizationsDownload({
 	});
 
 	return organizationsDataDownload;
+}
+
+export function processIndicatorsDownload({
+	allSectorsData,
+	lists,
+}: ProcessIndicatorsDownloadParams): IndicatorsDatumDownload[] {
+	const indicatorsDataDownload: IndicatorsDatumDownload[] = [];
+
+	allSectorsData.sectorData.forEach(sector => {
+		indicatorsDataDownload.push({
+			Indicator: lists.globalIndicators[sector.indicatorId],
+			Outcome: sector.outcome,
+			"Targeted Women": sector.targeted.women,
+			"Targeted Men": sector.targeted.men,
+			"Targeted Girls": sector.targeted.girls,
+			"Targeted Boys": sector.targeted.boys,
+			"Reached Women": sector.reached.women,
+			"Reached Men": sector.reached.men,
+			"Reached Girls": sector.reached.girls,
+			"Reached Boys": sector.reached.boys,
+		});
+	});
+
+	return indicatorsDataDownload;
 }
 
 function checkIfNonZero(obj: BeneficiariesObject): boolean {

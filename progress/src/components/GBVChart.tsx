@@ -196,6 +196,20 @@ function GBVChart({
 					/>
 				</GBVColumn>
 			</Box>
+			<Box
+				width={"100%"}
+				display={"flex"}
+				justifyContent={"center"}
+				mt={3}
+			>
+				<Typography
+					variant="caption"
+					sx={{ lineHeight: 1.2, width: "80%" }}
+				>
+					The GBV reached data is solely captured in final reports and
+					is based on a given percentage of those reports.
+				</Typography>
+			</Box>
 		</Container>
 	);
 }
