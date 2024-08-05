@@ -41,7 +41,7 @@ function IndicatorsTableBody({
 					hover
 				>
 					{indicatorsHeader.map((header, index) => {
-						if (header === "indicator" || header === "outcome") {
+						if (header === "indicator") {
 							return (
 								<TableCell key={index}>
 									{header === "indicator"
