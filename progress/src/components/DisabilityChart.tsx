@@ -182,6 +182,21 @@ function DisabilityChart({
 					/>
 				))}
 			</Box>
+			<Box
+				width={"100%"}
+				display={"flex"}
+				justifyContent={"center"}
+				mt={5}
+			>
+				<Typography
+					variant="caption"
+					sx={{ lineHeight: 1.2, width: "80%", fontStyle: "italic" }}
+				>
+					The data on people with disabilities reached, as reported in
+					the latest programmatic reports, was identified from X% of
+					the projects.
+				</Typography>
+			</Box>
 		</Container>
 	);
 }

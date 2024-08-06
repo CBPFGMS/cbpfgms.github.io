@@ -104,9 +104,7 @@ function GBVChart({
 				</Typography>
 				<InfoIcon
 					data-tooltip-id="tooltip"
-					data-tooltip-content={
-						"Loren ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, purus nec ultricies."
-					}
+					data-tooltip-content={"Gender-Based Violence"}
 					data-tooltip-place="top"
 					style={{
 						color: "#666",
@@ -204,10 +202,12 @@ function GBVChart({
 			>
 				<Typography
 					variant="caption"
-					sx={{ lineHeight: 1.2, width: "80%" }}
+					sx={{ lineHeight: 1.2, width: "80%", fontStyle: "italic" }}
 				>
-					The GBV reached data is solely captured in final reports and
-					is based on a given percentage of those reports.
+					The data on GBV reached, as reported only in the final
+					reports was identified from X% of the projects. Possible
+					many project(s) have not reached the due date of final
+					reports based on the selected filters.
 				</Typography>
 			</Box>
 		</Container>

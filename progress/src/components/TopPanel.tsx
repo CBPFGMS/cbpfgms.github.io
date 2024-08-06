@@ -75,7 +75,7 @@ function TopPanel({
 			}}
 		>
 			<Grid
-				pb={2}
+				pb={3}
 				pt={2}
 				xs={12}
 				display={"flex"}

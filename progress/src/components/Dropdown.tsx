@@ -105,6 +105,8 @@ function Dropdown({
 						fromQuickSelectors
 							? isAllSelected
 								? "All selected"
+								: type === "Year" && selected.length === 1
+								? selected
 								: `${selected.length} selected`
 							: (selected as number[])
 									.map(d => namesList[d])
