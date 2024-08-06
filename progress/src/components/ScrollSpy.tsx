@@ -1,3 +1,4 @@
+import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
@@ -5,13 +6,14 @@ import colors from "../utils/colors";
 import ListIcon from "@mui/icons-material/List";
 import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
-import GroupsIcon from "@mui/icons-material/Groups";
-import BusinessIcon from "@mui/icons-material/Business";
 import PublicIcon from "@mui/icons-material/Public";
-import AccessibleIcon from "@mui/icons-material/Accessible";
-import SafetyDividerIcon from "@mui/icons-material/SafetyDivider";
 import { RefIds } from "./MainContainer";
-import React from "react";
+import {
+	GBVIcon,
+	DisabilityIcon,
+	ByTypeIcon,
+	OrgIcon,
+} from "../assets/OchaIcons";
 
 type ScrollSpyProps = {
 	inViewSummary: boolean;
@@ -31,6 +33,7 @@ type TabProps = {
 	reference: string;
 	handleOnClick: (reference: string) => void;
 	Icon: React.ElementType;
+	ochaIcon?: boolean;
 };
 
 function ScroolSpy({
@@ -78,14 +81,16 @@ function ScroolSpy({
 				inView={inViewBeneficiaryTypes}
 				reference={refIds.beneficiaryTypesRefId}
 				handleOnClick={handleOnClick}
-				Icon={GroupsIcon}
+				Icon={ByTypeIcon}
+				ochaIcon={true}
 			/>
 			<Tab
 				label="By Organization"
 				inView={inViewOrganizations}
 				reference={refIds.organizationsRefId}
 				handleOnClick={handleOnClick}
-				Icon={BusinessIcon}
+				Icon={OrgIcon}
+				ochaIcon={true}
 			/>
 			<Tab
 				label="By Sector"
@@ -99,14 +104,16 @@ function ScroolSpy({
 				inView={inViewDisability}
 				reference={refIds.disabilityRefId}
 				handleOnClick={handleOnClick}
-				Icon={AccessibleIcon}
+				Icon={DisabilityIcon}
+				ochaIcon={true}
 			/>
 			<Tab
 				label="GBV"
 				inView={inViewGBV}
 				reference={refIds.gbvRefId}
 				handleOnClick={handleOnClick}
-				Icon={SafetyDividerIcon}
+				Icon={GBVIcon}
+				ochaIcon={true}
 			/>
 			<Tab
 				label="Global Indicators"
@@ -119,7 +126,14 @@ function ScroolSpy({
 	);
 }
 
-function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
+function Tab({
+	label,
+	inView,
+	reference,
+	handleOnClick,
+	Icon,
+	ochaIcon,
+}: TabProps) {
 	return (
 		<Paper
 			elevation={1}
@@ -146,6 +160,14 @@ function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
 						svgProps: {
 							style: {
 								width: 12,
+								fill: colors.unColor,
+							},
+						},
+					})}
+					{...(ochaIcon && {
+						svgProps: {
+							style: {
+								width: 20,
 								fill: colors.unColor,
 							},
 						},
