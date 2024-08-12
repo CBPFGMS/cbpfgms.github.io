@@ -80,14 +80,23 @@ export const projectSummaryObjectSchema = z.object({
 		.string()
 		.regex(splitRegex, "Invalid split string format")
 		.nullable(),
-	DisabledAchM: z.number().int().nonnegative().nullable(),
-	DisabledAchW: z.number().int().nonnegative().nullable(),
-	DisabledAchB: z.number().int().nonnegative().nullable(),
-	DisabledAchG: z.number().int().nonnegative().nullable(),
-	GBVBudgetPlanned: z.number().nonnegative(),
-	GBVBudgetReached: z.number().nonnegative(),
-	GBVBen: z.number().int().nonnegative().nullable(),
-	GBVAch: z.number().int().nonnegative().nullable(),
+	AchDisabledM: z.number().int().nonnegative().nullable(),
+	AchDisabledW: z.number().int().nonnegative().nullable(),
+	AchDisabledB: z.number().int().nonnegative().nullable(),
+	AchDisabledG: z.number().int().nonnegative().nullable(),
+	GBVBudget: z.number().nonnegative().nullable(),
+	AchGBVBudget: z.number().nonnegative().nullable(),
+	GBVPeopleTgt: z.number().int().nonnegative().nullable(),
+	AchGBVPeople: z.number().int().nonnegative().nullable(),
+	GendEqBudget: z.number().nonnegative().nullable(),
+	AchGendEqBudget: z.number().nonnegative().nullable(),
+	GendEqPeopleTgt: z.number().int().nonnegative().nullable(),
+	AchGendEqPeople: z.number().int().nonnegative().nullable(),
+	ProtBudget: z.number().nonnegative().nullable(),
+	AchProtBudget: z.number().nonnegative().nullable(),
+	ProtPeopleTgt: z.number().int().nonnegative().nullable(),
+	AchProtPeople: z.number().int().nonnegative().nullable(),
+	RptCode: z.union([z.literal(1), z.literal(2)]).nullable(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({

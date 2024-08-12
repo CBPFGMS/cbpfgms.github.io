@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
-import { max } from "d3";
+import { max, format } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
@@ -193,8 +193,12 @@ function DisabilityChart({
 					sx={{ lineHeight: 1.2, width: "80%", fontStyle: "italic" }}
 				>
 					The data on people with disabilities reached, as reported in
-					the latest programmatic reports, was identified from X% of
-					the projects.
+					the latest programmatic reports, was identified from{" "}
+					{format(".1~%")(
+						dataDisability.reportsWithData /
+							dataDisability.totalReports
+					)}{" "}
+					of the projects.
 				</Typography>
 			</Box>
 		</Container>

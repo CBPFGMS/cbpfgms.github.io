@@ -8,7 +8,8 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants from "./constants";
 
-const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
+const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
+	constants;
 
 type Datum = {
 	reached: BeneficiariesObject;
@@ -35,7 +36,10 @@ type Datum = {
 	projectStatus: string;
 	projectStatusId: number;
 	sectorData: SectorDatum[];
+	reportType: ReportType;
 };
+
+type ReportType = (typeof reportTypes)[number];
 
 export type Data = Datum[];
 
@@ -264,10 +268,11 @@ function processRawData({
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
-					budgetGBVPlanned: row.GBVBudgetPlanned || 0,
-					budgetGBVReached: row.GBVBudgetReached || 0,
-					targetedGBV: row.GBVBen || 0,
-					reachedGBV: row.GBVAch || 0,
+					budgetGBVPlanned: row.GBVBudget || 0,
+					budgetGBVReached: row.AchGBVBudget || 0,
+					targetedGBV: row.GBVPeopleTgt || 0,
+					reachedGBV: row.AchGBVPeople || 0,
+					reportType: row.RptCode ?? 0,
 				};
 
 				data.push(objDatum);
@@ -354,10 +359,10 @@ function generateBeneficiariesObjectSummary(
 	}
 
 	if (type === "disabledReached") {
-		girls = row.DisabledAchG || 0;
-		boys = row.DisabledAchB || 0;
-		women = row.DisabledAchW || 0;
-		men = row.DisabledAchM || 0;
+		girls = row.AchDisabledG || 0;
+		boys = row.AchDisabledB || 0;
+		women = row.AchDisabledW || 0;
+		men = row.AchDisabledM || 0;
 	}
 
 	if (type === "disabledTargeted") {

@@ -11,15 +11,18 @@ function clipSlice(
 
 	const pathGenerator = path();
 
+	const startAngle = GBVSlice.startAngle - rotationAdjustment;
+
+	let endAngle = GBVSlice.endAngle - rotationAdjustment;
+
+	console.log(radius, startAngle, endAngle);
+
+	if (startAngle === endAngle) {
+		endAngle += 1e-5;
+	}
+
 	pathGenerator.moveTo(radius, radius);
-	pathGenerator.arc(
-		radius,
-		radius,
-		radius,
-		GBVSlice.startAngle - rotationAdjustment,
-		GBVSlice.endAngle - rotationAdjustment,
-		false
-	);
+	pathGenerator.arc(radius, radius, radius, startAngle, endAngle, false);
 	pathGenerator.closePath();
 
 	return pathGenerator.toString();

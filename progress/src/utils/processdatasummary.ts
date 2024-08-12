@@ -37,7 +37,7 @@ export type DatumPictogram = {
 
 export type DatumDisability = {
 	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
-};
+} & Report;
 
 export type DatumGBV = {
 	allocations: number;
@@ -47,9 +47,19 @@ export type DatumGBV = {
 	targetedGBV: number;
 	reached: number;
 	reachedGBV: number;
+} & Report;
+
+export type Report = {
+	totalReports: number;
+	reportsWithData: number;
 };
 
-const { beneficiariesStatuses, beneficiaryCategories } = constants;
+const {
+	beneficiariesStatuses,
+	beneficiaryCategories,
+	reportsForDisability,
+	reportsForGBV,
+} = constants;
 
 function processDataSummary({
 	data,
@@ -86,6 +96,8 @@ function processDataSummary({
 		reachedWomen: 0,
 		reachedBoys: 0,
 		reachedGirls: 0,
+		totalReports: 0,
+		reportsWithData: 0,
 	};
 	const dataGBV: DatumGBV = {
 		allocations: 0,
@@ -95,6 +107,8 @@ function processDataSummary({
 		targetedGBV: 0,
 		reached: 0,
 		reachedGBV: 0,
+		totalReports: 0,
+		reportsWithData: 0,
 	};
 	const inSelectionData: InSelectionData = {
 		years: new Set(),
@@ -155,6 +169,14 @@ function processDataSummary({
 					];
 				});
 			});
+			dataDisability.totalReports += 1;
+			if (
+				reportsForDisability.includes(
+					datum.reportType as (typeof reportsForDisability)[number]
+				)
+			) {
+				dataDisability.reportsWithData += 1;
+			}
 
 			dataGBV.allocations += datum.budget;
 			dataGBV.allocationsGBVPlanned += datum.budgetGBVPlanned;
@@ -169,6 +191,14 @@ function processDataSummary({
 				0
 			);
 			dataGBV.reachedGBV += datum.reachedGBV;
+			dataGBV.totalReports += 1;
+			if (
+				reportsForGBV.includes(
+					datum.reportType as (typeof reportsForGBV)[number]
+				)
+			) {
+				dataGBV.reportsWithData += 1;
+			}
 		}
 
 		if (

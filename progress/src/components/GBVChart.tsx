@@ -205,9 +205,12 @@ function GBVChart({
 					sx={{ lineHeight: 1.2, width: "80%", fontStyle: "italic" }}
 				>
 					The data on GBV reached, as reported only in the final
-					reports was identified from X% of the projects. Possible
-					many project(s) have not reached the due date of final
-					reports based on the selected filters.
+					reports was identified from{" "}
+					{format(".1~%")(
+						dataGBV.reportsWithData / dataGBV.totalReports
+					)}{" "}
+					of the projects. Possible many project(s) have not reached
+					the due date of final reports based on the selected filters.
 				</Typography>
 			</Box>
 		</Container>
@@ -293,7 +296,9 @@ function GBVCell({
 						number={parseFloat(formatSIFloat(GBVSlice))}
 						type="decimal"
 					/>
-					{formatSIFloat(GBVSlice).slice(-1)}
+					{isNaN(+formatSIFloat(GBVSlice).slice(-1))
+						? formatSIFloat(GBVSlice).slice(-1)
+						: ""}
 				</Typography>
 			</Box>
 		</Box>

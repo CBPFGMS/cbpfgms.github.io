@@ -23,6 +23,9 @@ const constants = {
 	indicatorsHeader: ["indicator", "targeted", "reached"],
 	columnWidths: ["60%", "20%", "20%"],
 	columnWidthsExpanded: ["32%", "34%", "34%"],
+	reportTypes: [0, 1, 2],
+	reportsForDisability: [1, 2],
+	reportsForGBV: [2],
 } as const;
 
 export default constants;
