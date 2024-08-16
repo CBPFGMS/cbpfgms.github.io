@@ -6,6 +6,7 @@ import {
 import warnInvalidSchema from "./warninvalid";
 import processDataIndicators from "./processdataindicators";
 import { DatumIndicators } from "./processdataindicators";
+import { List } from "./makelists";
 
 type IndicatorsApiParams = {
 	setIndicatorsData: React.Dispatch<
@@ -14,6 +15,7 @@ type IndicatorsApiParams = {
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	setError: React.Dispatch<React.SetStateAction<string | null>>;
 	setHasFetchedData: React.Dispatch<React.SetStateAction<boolean>>;
+	lists: List;
 };
 
 function indicatorsApi({
@@ -21,6 +23,7 @@ function indicatorsApi({
 	setLoading,
 	setError,
 	setHasFetchedData,
+	lists,
 }: IndicatorsApiParams) {
 	const globalIndicatorsUrl = "../data/fake_indicatorsdata.csv";
 	setLoading(true);
@@ -39,7 +42,7 @@ function indicatorsApi({
 					);
 				}
 			});
-			const dataIndicators = processDataIndicators({ data });
+			const dataIndicators = processDataIndicators({ data, lists });
 			setIndicatorsData(dataIndicators);
 			setHasFetchedData(true);
 			setLoading(false);

@@ -1,4 +1,3 @@
-// import { useState, useEffect } from "react";
 import { useEffect, useState } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";

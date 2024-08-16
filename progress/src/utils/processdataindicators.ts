@@ -1,38 +1,57 @@
-import { GlobalIndicatorsObject } from "./schemas";
+import {
+	GlobalIndicatorsObject,
+	GlobalIndicatorsMasterObject,
+} from "./schemas";
 import { BeneficiariesObject, GenderAndAge } from "./processrawdata";
 import { sum, mean } from "d3";
 import constants from "./constants";
+import { List, GlobalIndicatorsDetails } from "./makelists";
+import { warnProjectNotFound } from "./warninvalid";
 
 export type DatumIndicators = {
 	sector: number;
 	sectorData: SectorDatum[];
 };
 
-export type SectorDatum = {
-	outcome: string;
-	indicatorId: number;
-	unit: GlobalIndicatorsObject["Unit"];
-	targeted: BeneficiariesObject;
-	reached: BeneficiariesObject;
-	targetedTotal: number;
-	reachedTotal: number;
-	targetedTemporary?: BeneficiariesObjectWithArrays;
-	reachedTemporary?: BeneficiariesObjectWithArrays;
+type Nullable<T> = {
+	[P in keyof T]: T[P] | null;
 };
+
+type NullableBeneficiariesObject = Nullable<BeneficiariesObject>;
 
 type BeneficiariesObjectWithArrays = {
 	[K in GenderAndAge]: number[];
 };
 
-type ProcessDataIndicatorsParams = {
-	data: GlobalIndicatorsObject[];
+type NullableBeneficiariesObjectWithArrays =
+	Nullable<BeneficiariesObjectWithArrays>;
+
+export type SectorDatum = {
+	indicatorId: number;
+	unit: GlobalIndicatorsMasterObject["UnitAb"];
+	targeted: NullableBeneficiariesObject;
+	reached: NullableBeneficiariesObject;
+	targetedTotal: number;
+	reachedTotal: number;
+	targetedTemporary?: NullableBeneficiariesObjectWithArrays;
+	reachedTemporary?: NullableBeneficiariesObjectWithArrays;
+	targetedTotalTemporary?: number[];
+	reachedTotalTemporary?: number[];
 };
 
-type StatusKey = "Targeted" | "Reached";
+type ProcessDataIndicatorsParams = {
+	data: GlobalIndicatorsObject[];
+	lists: List;
+};
+
+type StatusKey = "Tgt" | "Ach";
 
 const { beneficiaryCategories, beneficiariesStatuses } = constants;
 
-function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
+function processDataIndicators({
+	data: rawData,
+	lists,
+}: ProcessDataIndicatorsParams): DatumIndicators[] {
 	const dataIndicators: DatumIndicators[] = [];
 
 	const allSectors: DatumIndicators = {
@@ -41,86 +60,130 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 	};
 
 	rawData.forEach(row => {
+		const thisIndicator = lists.globalIndicatorsDetails.get(row.GlbIndicId),
+			thisSector = thisIndicator?.sector;
+
+		if (!thisSector) {
+			warnProjectNotFound(
+				row.ChfProjectCode,
+				row,
+				"Global indicator not found in global indicators master"
+			);
+			return;
+		}
+
 		const foundSector = dataIndicators.find(
-			datum => datum.sector === row.Sector
+			datum => datum.sector === thisSector
 		);
 
 		if (foundSector) {
 			const foundIndicator = foundSector.sectorData.find(
-				sectorDatum => sectorDatum.indicatorId === row.IndicatorId
+				sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
 			);
 			if (foundIndicator) {
 				updateTemporaryData(
 					foundIndicator.targetedTemporary!,
 					row,
-					"Targeted"
+					thisIndicator,
+					"Tgt"
 				);
 				updateTemporaryData(
 					foundIndicator.reachedTemporary!,
 					row,
-					"Reached"
+					thisIndicator,
+					"Ach"
 				);
+				foundIndicator.targetedTotalTemporary!.push(row.TgtTotal);
+				foundIndicator.reachedTotalTemporary!.push(row.AchTotal);
 			} else {
 				foundSector.sectorData.push({
-					outcome: row.Outcome,
-					indicatorId: row.IndicatorId,
-					unit: row.Unit,
+					indicatorId: row.GlbIndicId,
+					unit: thisIndicator.unit,
 					targeted: fillWithZeroes(),
 					reached: fillWithZeroes(),
 					targetedTotal: 0,
 					reachedTotal: 0,
-					targetedTemporary: populateTemporaryData(row, "Targeted"),
-					reachedTemporary: populateTemporaryData(row, "Reached"),
+					targetedTemporary: populateTemporaryData(
+						row,
+						thisIndicator,
+						"Tgt"
+					),
+					reachedTemporary: populateTemporaryData(
+						row,
+						thisIndicator,
+						"Ach"
+					),
+					targetedTotalTemporary: [row.TgtTotal],
+					reachedTotalTemporary: [row.AchTotal],
 				});
 			}
 		} else {
 			dataIndicators.push({
-				sector: row.Sector,
+				sector: thisSector,
 				sectorData: [
 					{
-						outcome: row.Outcome,
-						indicatorId: row.IndicatorId,
-						unit: row.Unit,
+						indicatorId: row.GlbIndicId,
+						unit: thisIndicator.unit,
 						targeted: fillWithZeroes(),
 						reached: fillWithZeroes(),
 						targetedTotal: 0,
 						reachedTotal: 0,
 						targetedTemporary: populateTemporaryData(
 							row,
-							"Targeted"
+							thisIndicator,
+							"Tgt"
 						),
-						reachedTemporary: populateTemporaryData(row, "Reached"),
+						reachedTemporary: populateTemporaryData(
+							row,
+							thisIndicator,
+							"Ach"
+						),
+						targetedTotalTemporary: [row.TgtTotal],
+						reachedTotalTemporary: [row.AchTotal],
 					},
 				],
 			});
 		}
 
 		const foundIndicatorAllSectors = allSectors.sectorData.find(
-			sectorDatum => sectorDatum.indicatorId === row.IndicatorId
+			sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
 		);
 
 		if (foundIndicatorAllSectors) {
 			updateTemporaryData(
 				foundIndicatorAllSectors.targetedTemporary!,
 				row,
-				"Targeted"
+				thisIndicator,
+				"Tgt"
 			);
 			updateTemporaryData(
 				foundIndicatorAllSectors.reachedTemporary!,
 				row,
-				"Reached"
+				thisIndicator,
+				"Ach"
 			);
+			foundIndicatorAllSectors.targetedTotalTemporary!.push(row.TgtTotal);
+			foundIndicatorAllSectors.reachedTotalTemporary!.push(row.AchTotal);
 		} else {
 			allSectors.sectorData.push({
-				outcome: row.Outcome,
-				indicatorId: row.IndicatorId,
-				unit: row.Unit,
+				indicatorId: row.GlbIndicId,
+				unit: thisIndicator.unit,
 				targeted: fillWithZeroes(),
 				reached: fillWithZeroes(),
 				targetedTotal: 0,
 				reachedTotal: 0,
-				targetedTemporary: populateTemporaryData(row, "Targeted"),
-				reachedTemporary: populateTemporaryData(row, "Reached"),
+				targetedTemporary: populateTemporaryData(
+					row,
+					thisIndicator,
+					"Tgt"
+				),
+				reachedTemporary: populateTemporaryData(
+					row,
+					thisIndicator,
+					"Ach"
+				),
+				targetedTotalTemporary: [row.TgtTotal],
+				reachedTotalTemporary: [row.AchTotal],
 			});
 		}
 	});
@@ -131,6 +194,8 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 
 			delete datum.targetedTemporary;
 			delete datum.reachedTemporary;
+			delete datum.targetedTotalTemporary;
+			delete datum.reachedTotalTemporary;
 		});
 	});
 
@@ -139,6 +204,8 @@ function processDataIndicators({ data: rawData }: ProcessDataIndicatorsParams) {
 
 		delete datum.targetedTemporary;
 		delete datum.reachedTemporary;
+		delete datum.targetedTotalTemporary;
+		delete datum.reachedTotalTemporary;
 	});
 
 	dataIndicators.unshift(allSectors);
@@ -151,55 +218,70 @@ function processObject(datum: SectorDatum) {
 	beneficiariesStatuses.forEach(status => {
 		const targetData = datum[status],
 			temporaryData = datum[`${status}Temporary`]!;
+
 		for (const key in datum[`${status}Temporary`]) {
-			targetData[key as keyof typeof targetData] =
-				operation(temporaryData[key as keyof typeof temporaryData]) ??
-				0;
-			if (datum.unit === "i") {
-				datum[`${status}Total`] +=
-					targetData[key as keyof typeof targetData];
+			const tempDataValue =
+				temporaryData[key as keyof typeof temporaryData];
+
+			if (tempDataValue) {
+				targetData[key as keyof typeof targetData] =
+					operation(tempDataValue) ?? 0;
+			} else {
+				targetData[key as keyof typeof targetData] = null;
 			}
 		}
-		if (datum.unit === "p") {
-			datum[`${status}Total`] =
-				mean(Object.values(targetData) as number[]) ?? 0;
-		}
+
+		//IMPORTANT
+		//discuss how to correctly calculate the total when the unit is percentage
+		datum[`${status}Total`] =
+			datum.unit === "p"
+				? mean(datum[`${status}TotalTemporary`] as number[]) ?? 0
+				: sum(datum[`${status}TotalTemporary`] as number[]) ?? 0;
 	});
 }
 
-function populateTemporaryData(row: GlobalIndicatorsObject, type: StatusKey) {
-	const obj = {} as BeneficiariesObjectWithArrays;
+function populateTemporaryData(
+	row: GlobalIndicatorsObject,
+	thisIndicator: GlobalIndicatorsDetails,
+	type: StatusKey
+) {
+	const obj = {} as NullableBeneficiariesObjectWithArrays;
 	beneficiaryCategories.forEach(beneficiary => {
-		obj[beneficiary] = [
-			Number(
-				row[
-					`${type}${
-						beneficiary.charAt(0).toUpperCase() +
-						beneficiary.slice(1)
-					}` as keyof GlobalIndicatorsObject
-				]
-			) || 0,
-		];
+		obj[beneficiary] = thisIndicator[beneficiary]
+			? [
+					Number(
+						row[
+							`${type}${beneficiary
+								.charAt(0)
+								.toUpperCase()}` as keyof GlobalIndicatorsObject
+						]
+					) || 0,
+			  ]
+			: null;
 	});
 	return obj;
 }
 
 function updateTemporaryData(
-	temporaryObject: BeneficiariesObjectWithArrays,
+	temporaryObject: NullableBeneficiariesObjectWithArrays,
 	row: GlobalIndicatorsObject,
+	thisIndicator: GlobalIndicatorsDetails,
 	type: StatusKey
 ) {
 	beneficiaryCategories.forEach(beneficiary => {
-		temporaryObject[beneficiary].push(
-			Number(
-				row[
-					`${type}${
-						beneficiary.charAt(0).toUpperCase() +
-						beneficiary.slice(1)
-					}` as keyof GlobalIndicatorsObject
-				]
-			) || 0
-		);
+		if (thisIndicator[beneficiary]) {
+			temporaryObject[beneficiary]!.push(
+				Number(
+					row[
+						`${type}${beneficiary
+							.charAt(0)
+							.toUpperCase()}` as keyof GlobalIndicatorsObject
+					]
+				) || 0
+			);
+		} else {
+			temporaryObject[beneficiary] = null;
+		}
 	});
 }
 

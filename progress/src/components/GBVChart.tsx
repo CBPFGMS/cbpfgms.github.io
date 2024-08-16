@@ -137,9 +137,9 @@ function GBVChart({
 					<GBVCell
 						title={"GBV Planned Budget"}
 						totalSlice={dataGBV.allocations}
-						totalColor={colors.unColorLighter}
+						totalColor={colors.contrastColorLighter}
 						GBVSlice={dataGBV.allocationsGBVPlanned}
-						GBVColor={colors.unColorDarker}
+						GBVColor={colors.contrastColorDarker}
 						CaptionIcon={
 							<Typography variant="caption">{"$"}</Typography>
 						}
@@ -147,9 +147,9 @@ function GBVChart({
 					<GBVCell
 						title={"GBV Reached Budget"}
 						totalSlice={dataGBV.allocations}
-						totalColor={colors.contrastColorLighter}
+						totalColor={colors.unColorLighter}
 						GBVSlice={dataGBV.allocationsGBVReached}
-						GBVColor={colors.contrastColorDarker}
+						GBVColor={colors.unColorDarker}
 						CaptionIcon={
 							<Typography variant="caption">{"$"}</Typography>
 						}
@@ -159,9 +159,9 @@ function GBVChart({
 					<GBVCell
 						title={"GBV Targeted People"}
 						totalSlice={dataGBV.targeted}
-						totalColor={colors.unColorLighter}
+						totalColor={colors.contrastColorLighter}
 						GBVSlice={dataGBV.targetedGBV}
-						GBVColor={colors.unColorDarker}
+						GBVColor={colors.contrastColorDarker}
 						CaptionIcon={
 							<AdsClickIcon
 								style={{
@@ -177,9 +177,9 @@ function GBVChart({
 					<GBVCell
 						title={"GBV Reached People"}
 						totalSlice={dataGBV.reached}
-						totalColor={colors.contrastColorLighter}
+						totalColor={colors.unColorLighter}
 						GBVSlice={dataGBV.reachedGBV}
-						GBVColor={colors.contrastColorDarker}
+						GBVColor={colors.unColorDarker}
 						CaptionIcon={
 							<DoneIcon
 								style={{

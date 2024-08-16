@@ -15,8 +15,6 @@ function clipSlice(
 
 	let endAngle = GBVSlice.endAngle - rotationAdjustment;
 
-	console.log(radius, startAngle, endAngle);
-
 	if (startAngle === endAngle) {
 		endAngle += 1e-5;
 	}

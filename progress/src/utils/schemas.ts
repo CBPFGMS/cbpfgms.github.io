@@ -243,60 +243,83 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustCode: z.string(),
 });
 
-export const globalIndicatorsMasterObjectSchema = z.object({
-	IndicatorName: z.string(),
-	IndicatorId: z.number().int().nonnegative(),
-});
+// export const globalIndicatorsMasterObjectSchema = z.object({
+// 	IndicatorName: z.string(),
+// 	IndicatorId: z.number().int().nonnegative(),
+// });
 
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
 
-export const globalIndicatorsObjectSchema = z
-	.object({
-		Outcome: z.string(),
-		Sector: z.number().int().nonnegative(),
-		IndicatorId: z.number().int().nonnegative(),
-		Unit: z.union([z.literal("p"), z.literal("i")]),
-		TargetedWomen: z.number().nonnegative().nullable(),
-		TargetedMen: z.number().nonnegative().nullable(),
-		TargetedBoys: z.number().nonnegative().nullable(),
-		TargetedGirls: z.number().nonnegative().nullable(),
-		ReachedWomen: z.number().nonnegative().nullable(),
-		ReachedMen: z.number().nonnegative().nullable(),
-		ReachedBoys: z.number().nonnegative().nullable(),
-		ReachedGirls: z.number().nonnegative().nullable(),
-	})
-	.refine(data => {
-		const keys = [
-			"TargetedWomen",
-			"TargetedMen",
-			"TargetedBoys",
-			"TargetedGirls",
-			"ReachedWomen",
-			"ReachedMen",
-			"ReachedBoys",
-			"ReachedGirls",
-		];
+// export const globalIndicatorsObjectSchema = z
+// 	.object({
+// 		Outcome: z.string(),
+// 		Sector: z.number().int().nonnegative(),
+// 		IndicatorId: z.number().int().nonnegative(),
+// 		Unit: z.union([z.literal("p"), z.literal("i")]),
+// 		TargetedWomen: z.number().nonnegative().nullable(),
+// 		TargetedMen: z.number().nonnegative().nullable(),
+// 		TargetedBoys: z.number().nonnegative().nullable(),
+// 		TargetedGirls: z.number().nonnegative().nullable(),
+// 		ReachedWomen: z.number().nonnegative().nullable(),
+// 		ReachedMen: z.number().nonnegative().nullable(),
+// 		ReachedBoys: z.number().nonnegative().nullable(),
+// 		ReachedGirls: z.number().nonnegative().nullable(),
+// 	})
+// 	.refine(data => {
+// 		const keys = [
+// 			"TargetedWomen",
+// 			"TargetedMen",
+// 			"TargetedBoys",
+// 			"TargetedGirls",
+// 			"ReachedWomen",
+// 			"ReachedMen",
+// 			"ReachedBoys",
+// 			"ReachedGirls",
+// 		];
 
-		return keys.every(key =>
-			isValidGlobalIndicatorValue(
-				data[key as keyof typeof data],
-				data.Unit
-			)
-		);
-	});
+// 		return keys.every(key =>
+// 			isValidGlobalIndicatorValue(
+// 				data[key as keyof typeof data],
+// 				data.Unit
+// 			)
+// 		);
+// 	});
 
-function isValidGlobalIndicatorValue(
-	value: number | null | string,
-	unit: string
-) {
-	if (typeof value === "string") return false;
-	if (value === null) return true;
-	if (unit === "i") return Number.isInteger(value);
-	if (unit === "p") return value > 0 && value < 1;
-	return false;
-}
+export const globalIndicatorsObjectSchema = z.object({
+	PooledFundId: z.number().int().nonnegative(),
+	ChfId: z.number().int().nonnegative(),
+	ChfProjectCode: z.string(),
+	ClstrId: z.number().int().nonnegative(),
+	GlbIndicId: z.number().int().nonnegative(),
+	GlbIndicType: z.union([z.literal(1), z.literal(2)]).nullable(),
+	TgtM: z.number().nonnegative().nullable(),
+	TgtW: z.number().nonnegative().nullable(),
+	TgtB: z.number().nonnegative().nullable(),
+	TgtG: z.number().nonnegative().nullable(),
+	TgtTotal: z.number().nonnegative(),
+	AchM: z.number().nonnegative().nullable(),
+	AchW: z.number().nonnegative().nullable(),
+	AchB: z.number().nonnegative().nullable(),
+	AchG: z.number().nonnegative().nullable(),
+	AchTotal: z.number().nonnegative(),
+});
+
+export const globalIndicatorsMasterObjectSchema = z.object({
+	Id: z.number().int().nonnegative(),
+	Name: z.string(),
+	HasM: z.boolean(),
+	HasW: z.boolean(),
+	HasB: z.boolean(),
+	HasG: z.boolean(),
+	UnitNm: z.string(),
+	UnitAb: z.union([z.literal("p"), z.literal("i")]),
+	GlClstrId: z.number().int().nonnegative(),
+	CommClstrId: z.number().int().nonnegative(),
+	Active: z.boolean(),
+	Code: z.string(),
+});
 
 // ********************
 // TYPES

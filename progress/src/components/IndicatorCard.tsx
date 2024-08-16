@@ -50,7 +50,6 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 		sortAccessor: SortAccessor = e => {
 			const criteriaMap = {
 				indicator: lists.globalIndicators[e.indicatorId],
-				outcome: e.outcome,
 				targeted: e.targetedTotal,
 				reached: e.reachedTotal,
 			};

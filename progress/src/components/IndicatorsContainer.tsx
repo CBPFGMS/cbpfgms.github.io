@@ -45,6 +45,7 @@ function IndicatorsContainer({
 			setLoading,
 			setError,
 			setHasFetchedData,
+			lists,
 		});
 	}
 

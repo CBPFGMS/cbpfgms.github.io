@@ -2,7 +2,7 @@ import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 import pathAttributes from "./pathAttributes";
 import { GenderAndAge } from "../utils/processrawdata";
 
-type PictogramTypesWithTotal = GenderAndAge | "total";
+export type PictogramTypesWithTotal = GenderAndAge | "total";
 
 function Pictogram({
 	svgProps,

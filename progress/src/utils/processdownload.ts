@@ -58,9 +58,12 @@ type GBVDatumDownload = BaseDownloadDatum & {
 	"GBV reached people": number;
 };
 
-type IndicatorsDatumDownload = BeneficiaryDownloadTypes & {
+type Nullable<T> = {
+	[P in keyof T]: T[P] | null;
+};
+
+type IndicatorsDatumDownload = Nullable<BeneficiaryDownloadTypes> & {
 	Indicator: string;
-	Outcome: string;
 };
 
 type ProcessDownloadParams = {
@@ -446,7 +449,6 @@ export function processIndicatorsDownload({
 	allSectorsData.sectorData.forEach(sector => {
 		indicatorsDataDownload.push({
 			Indicator: lists.globalIndicators[sector.indicatorId],
-			Outcome: sector.outcome,
 			"Targeted Women": sector.targeted.women,
 			"Targeted Men": sector.targeted.men,
 			"Targeted Girls": sector.targeted.girls,

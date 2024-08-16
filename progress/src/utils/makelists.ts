@@ -19,6 +19,7 @@ import {
 	globalIndicatorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
+import { GenderAndAge } from "./processrawdata";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -44,6 +45,13 @@ type OrganizationListObj = {
 	[key: number]: OrganizationMasterObject;
 };
 
+export type GlobalIndicatorsDetails = {
+	[K in GenderAndAge]: boolean;
+} & {
+	unit: GlobalIndicatorsMasterObject["UnitAb"];
+	sector: number;
+};
+
 export type List = {
 	fundNames: ListObj;
 	fundAbbreviatedNames: ListObj;
@@ -58,6 +66,7 @@ export type List = {
 	sectors: ListObj;
 	statuses: ListObj;
 	globalIndicators: ListObj;
+	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 };
 
 function makeLists({
@@ -85,6 +94,7 @@ function makeLists({
 		sectors: {},
 		statuses: {},
 		globalIndicators: {},
+		globalIndicatorsDetails: new Map(),
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -209,7 +219,15 @@ function makeLists({
 		const parsedGlobalIndicatorsMaster =
 			globalIndicatorsMasterObjectSchema.safeParse(d);
 		if (parsedGlobalIndicatorsMaster.success) {
-			lists.globalIndicators[d.IndicatorId] = d.IndicatorName;
+			lists.globalIndicators[d.Id] = d.Name;
+			lists.globalIndicatorsDetails.set(d.Id, {
+				women: d.HasW,
+				men: d.HasM,
+				girls: d.HasG,
+				boys: d.HasB,
+				unit: d.UnitAb,
+				sector: d.GlClstrId,
+			});
 		} else {
 			warnInvalidSchema(
 				"GlobalIndicatorsMaster",
