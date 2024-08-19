@@ -58,12 +58,15 @@ type GBVDatumDownload = BaseDownloadDatum & {
 	"GBV reached people": number;
 };
 
-type Nullable<T> = {
-	[P in keyof T]: T[P] | null;
+type NoValue<T> = {
+	[P in keyof T]: T[P] | typeof notApplicable;
 };
 
-type IndicatorsDatumDownload = Nullable<BeneficiaryDownloadTypes> & {
+type IndicatorsDatumDownload = NoValue<BeneficiaryDownloadTypes> & {
 	Indicator: string;
+	"Unit of values": "percentage" | "number of people";
+	"Targeted Total": number | typeof notApplicable;
+	"Reached Total": number | typeof notApplicable;
 };
 
 type ProcessDownloadParams = {
@@ -80,6 +83,8 @@ type ProcessIndicatorsDownloadParams = {
 	allSectorsData: DatumIndicators;
 	lists: List;
 };
+
+const notApplicable = "N/A";
 
 export function processSummaryDownload({
 	data,
@@ -449,14 +454,18 @@ export function processIndicatorsDownload({
 	allSectorsData.sectorData.forEach(sector => {
 		indicatorsDataDownload.push({
 			Indicator: lists.globalIndicators[sector.indicatorId],
-			"Targeted Women": sector.targeted.women,
-			"Targeted Men": sector.targeted.men,
-			"Targeted Girls": sector.targeted.girls,
-			"Targeted Boys": sector.targeted.boys,
-			"Reached Women": sector.reached.women,
-			"Reached Men": sector.reached.men,
-			"Reached Girls": sector.reached.girls,
-			"Reached Boys": sector.reached.boys,
+			"Unit of values":
+				sector.unit === "p" ? "percentage" : "number of people",
+			"Targeted Women": sector.targeted.women ?? notApplicable,
+			"Targeted Men": sector.targeted.men ?? notApplicable,
+			"Targeted Girls": sector.targeted.girls ?? notApplicable,
+			"Targeted Boys": sector.targeted.boys ?? notApplicable,
+			"Targeted Total": sector.targetedTotal ?? notApplicable,
+			"Reached Women": sector.reached.women ?? notApplicable,
+			"Reached Men": sector.reached.men ?? notApplicable,
+			"Reached Girls": sector.reached.girls ?? notApplicable,
+			"Reached Boys": sector.reached.boys ?? notApplicable,
+			"Reached Total": sector.reachedTotal ?? notApplicable,
 		});
 	});
 

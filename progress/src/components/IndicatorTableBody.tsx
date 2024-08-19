@@ -27,6 +27,7 @@ type CellValuesProps = {
 
 type CellRowProps = CellValuesProps & {
 	category: PictogramTypesWithTotal;
+	cellIndex?: number;
 };
 
 const { indicatorsHeader, beneficiaryCategories } = constants;
@@ -99,6 +100,8 @@ function CellBeneficiariesBreakdown({
 		category => row[header][category] === null
 	);
 
+	let cellIndex = 0;
+
 	return (
 		<TableCell>
 			<Box
@@ -124,6 +127,7 @@ function CellBeneficiariesBreakdown({
 								header={header}
 								expanded={expanded}
 								category={category}
+								cellIndex={cellIndex++}
 							/>
 						)
 					)
@@ -133,7 +137,7 @@ function CellBeneficiariesBreakdown({
 	);
 }
 
-function CellRow({ row, header, expanded, category }: CellRowProps) {
+function CellRow({ row, header, expanded, category, cellIndex }: CellRowProps) {
 	return (
 		<Box
 			style={{
@@ -141,6 +145,8 @@ function CellRow({ row, header, expanded, category }: CellRowProps) {
 				display: "flex",
 				flexDirection: "row",
 				alignItems: "center",
+				borderTop:
+					cellIndex && !expanded ? "1px solid #e2e2e2" : "none",
 			}}
 		>
 			<Box
