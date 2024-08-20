@@ -3,7 +3,7 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import constants from "./constants";
-import { DatumIndicators } from "./processdataindicators";
+import { AllSectorsDatum } from "./processdataindicators";
 
 const { beneficiariesSplitOrder } = constants;
 
@@ -64,7 +64,8 @@ type NoValue<T> = {
 
 type IndicatorsDatumDownload = NoValue<BeneficiaryDownloadTypes> & {
 	Indicator: string;
-	"Unit of values": "percentage" | "number of people";
+	sector: string;
+	"Unit of values": "percentage" | string;
 	"Targeted Total": number | typeof notApplicable;
 	"Reached Total": number | typeof notApplicable;
 };
@@ -80,7 +81,7 @@ type ProcessDownloadParams = {
 };
 
 type ProcessIndicatorsDownloadParams = {
-	allSectorsData: DatumIndicators;
+	allSectorsData: AllSectorsDatum;
 	lists: List;
 };
 
@@ -454,8 +455,9 @@ export function processIndicatorsDownload({
 	allSectorsData.sectorData.forEach(sector => {
 		indicatorsDataDownload.push({
 			Indicator: lists.globalIndicators[sector.indicatorId],
+			sector: lists.sectors[sector.sector],
 			"Unit of values":
-				sector.unit === "p" ? "percentage" : "number of people",
+				sector.unit === "%" ? "percentage" : sector.unitName,
 			"Targeted Women": sector.targeted.women ?? notApplicable,
 			"Targeted Men": sector.targeted.men ?? notApplicable,
 			"Targeted Girls": sector.targeted.girls ?? notApplicable,

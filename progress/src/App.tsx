@@ -22,7 +22,10 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		<Error error={error} />
 	) : (
 		<DataContext.Provider value={{ data, lists, inDataLists }}>
-			<MainContainer defaultYear={defaultYear} />
+			<MainContainer
+				defaultYear={defaultYear}
+				defaultFundType={defaultFundType}
+			/>
 		</DataContext.Provider>
 	);
 }

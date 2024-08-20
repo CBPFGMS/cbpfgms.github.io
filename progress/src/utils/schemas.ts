@@ -288,11 +288,14 @@ export const sectorsMasterObjectSchema = z.object({
 // 	});
 
 export const globalIndicatorsObjectSchema = z.object({
+	FundTypeId: z.union([z.literal(1), z.literal(2)]),
 	PooledFundId: z.number().int().nonnegative(),
-	ChfId: z.number().int().nonnegative(),
-	ChfProjectCode: z.string(),
-	ClstrId: z.number().int().nonnegative(),
+	CHFId: z.number().int().nonnegative(),
+	CHFProjectCode: z.string(),
+	ClstrId: z.number().int().nonnegative().nullable(),
+	GlbClstrId: z.number().int().nonnegative(),
 	GlbIndicId: z.number().int().nonnegative(),
+	CommClstrId: z.number().int().nonnegative().nullable(),
 	GlbIndicType: z.union([z.literal(1), z.literal(2)]).nullable(),
 	TgtM: z.number().nonnegative().nullable(),
 	TgtW: z.number().nonnegative().nullable(),
@@ -303,22 +306,22 @@ export const globalIndicatorsObjectSchema = z.object({
 	AchW: z.number().nonnegative().nullable(),
 	AchB: z.number().nonnegative().nullable(),
 	AchG: z.number().nonnegative().nullable(),
-	AchTotal: z.number().nonnegative(),
+	AchTotal: z.number().nonnegative().nullable(),
 });
 
 export const globalIndicatorsMasterObjectSchema = z.object({
 	Id: z.number().int().nonnegative(),
 	Name: z.string(),
-	HasM: z.boolean(),
-	HasW: z.boolean(),
-	HasB: z.boolean(),
-	HasG: z.boolean(),
+	HasM: z.union([z.literal(0), z.literal(1)]),
+	HasW: z.union([z.literal(0), z.literal(1)]),
+	HasB: z.union([z.literal(0), z.literal(1)]),
+	HasG: z.union([z.literal(0), z.literal(1)]),
 	UnitNm: z.string(),
-	UnitAb: z.union([z.literal("p"), z.literal("i")]),
-	GlClstrId: z.number().int().nonnegative(),
-	CommClstrId: z.number().int().nonnegative(),
-	Active: z.boolean(),
+	UnitAb: z.string(),
+	CommClstrId: z.number().int().nonnegative().nullable(),
+	Active: z.number().int().nonnegative().nullable(),
 	Code: z.string(),
+	TypeId: z.number().int().nonnegative().nullable(),
 });
 
 // ********************

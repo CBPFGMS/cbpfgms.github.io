@@ -19,6 +19,7 @@ type IndicatorsContainerProps = {
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	defaultFundType: number | null;
 };
 
 function IndicatorsContainer({
@@ -31,27 +32,33 @@ function IndicatorsContainer({
 	lists,
 	clickedDownload,
 	setClickedDownload,
+	defaultFundType,
 }: IndicatorsContainerProps) {
 	const [indicatorsData, setIndicatorsData] = useState<
 			DatumIndicators[] | null
 		>(null),
 		[loading, setLoading] = useState<boolean>(false),
 		[error, setError] = useState<string | null>(null),
-		[hasFetchedData, setHasFetchedData] = useState<boolean>(false);
+		[generateTable, setGenerateTable] = useState<boolean>(false);
 
 	function handleClick() {
+		setGenerateTable(true);
+	}
+
+	useEffect(() => {
+		setGenerateTable(false);
 		indicatorsApi({
 			setIndicatorsData,
 			setLoading,
 			setError,
-			setHasFetchedData,
 			lists,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			defaultFundType,
 		});
-	}
-
-	useEffect(() => {
-		setHasFetchedData(false);
-	}, [year, fund, allocationSource, allocationType]);
+	}, [year, fund, allocationSource, allocationType, defaultFundType, lists]);
 
 	return (
 		<Grid
@@ -107,17 +114,19 @@ function IndicatorsContainer({
 					}
 					data-tooltip-place="top"
 					variant="contained"
-					disabled={hasFetchedData}
+					disabled={generateTable || !indicatorsData?.length}
 					onClick={handleClick}
 					style={{ marginTop: "2em", alignSelf: "center" }}
 				>
-					Generate Table
+					{indicatorsData?.length
+						? "Generate Table"
+						: "No Global Indicators for the filters selected"}
 				</Button>
 			</Grid>
 			<Grid xs={12}>
 				{loading && <Loading />}
 				{error && <Typography variant="body1">{error}</Typography>}
-				{indicatorsData && hasFetchedData && (
+				{indicatorsData && generateTable && (
 					<IndicatorsCarousel
 						data={indicatorsData}
 						lists={lists}

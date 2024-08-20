@@ -40,6 +40,7 @@ type GBVCellProps = {
 	totalColor: string;
 	GBVColor: string;
 	CaptionIcon: React.ReactElement;
+	noData?: boolean;
 };
 
 function GBVChart({
@@ -153,6 +154,11 @@ function GBVChart({
 						CaptionIcon={
 							<Typography variant="caption">{"$"}</Typography>
 						}
+						noData={
+							dataGBV.allocationsGBVReached === 0 &&
+							year.length === 1 &&
+							year[0] === new Date().getFullYear()
+						}
 					/>
 				</GBVColumn>
 				<GBVColumn>
@@ -190,6 +196,11 @@ function GBVChart({
 									opacity: 0.6,
 								}}
 							/>
+						}
+						noData={
+							dataGBV.reachedGBV === 0 &&
+							year.length === 1 &&
+							year[0] === new Date().getFullYear()
 						}
 					/>
 				</GBVColumn>
@@ -239,6 +250,7 @@ function GBVCell({
 	GBVSlice,
 	GBVColor,
 	CaptionIcon,
+	noData = false,
 }: GBVCellProps) {
 	return (
 		<Box
@@ -268,12 +280,16 @@ function GBVCell({
 				width={"100%"}
 				height={"100%"}
 			>
-				<Donut
-					totalSlice={totalSlice}
-					totalColor={totalColor}
-					GBVSlice={GBVSlice}
-					GBVColor={GBVColor}
-				/>
+				{noData ? (
+					<NoData />
+				) : (
+					<Donut
+						totalSlice={totalSlice}
+						totalColor={totalColor}
+						GBVSlice={GBVSlice}
+						GBVColor={GBVColor}
+					/>
+				)}
 			</Box>
 			<Box
 				display={"flex"}
@@ -283,22 +299,48 @@ function GBVCell({
 				justifyContent={"center"}
 				mt={1}
 			>
+				{!noData && (
+					<Typography
+						variant="caption"
+						style={{
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						{CaptionIcon}
+						<NumberAnimator
+							number={parseFloat(formatSIFloat(GBVSlice))}
+							type="decimal"
+						/>
+						{isNaN(+formatSIFloat(GBVSlice).slice(-1))
+							? formatSIFloat(GBVSlice).slice(-1)
+							: ""}
+					</Typography>
+				)}
+			</Box>
+		</Box>
+	);
+}
+
+function NoData() {
+	return (
+		<Box
+			style={{
+				width: "100%",
+				height: "100%",
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+			}}
+		>
+			<Box width={"50%"}>
 				<Typography
-					variant="caption"
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-					}}
+					variant="body2"
+					textAlign="center"
 				>
-					{CaptionIcon}
-					<NumberAnimator
-						number={parseFloat(formatSIFloat(GBVSlice))}
-						type="decimal"
-					/>
-					{isNaN(+formatSIFloat(GBVSlice).slice(-1))
-						? formatSIFloat(GBVSlice).slice(-1)
-						: ""}
+					Data not yet available; report due dates have not been
+					reached.
 				</Typography>
 			</Box>
 		</Box>

@@ -34,7 +34,7 @@ const { indicatorsHeader, beneficiaryCategories } = constants;
 
 const pictogramWidth = 12;
 
-const percentFormat = format(".1~%");
+const percentFormat = format(".1~f");
 
 function IndicatorsTableBody({
 	data,
@@ -54,6 +54,15 @@ function IndicatorsTableBody({
 							return (
 								<TableCell key={index}>
 									{lists.globalIndicators[row.indicatorId]}
+								</TableCell>
+							);
+						} else if (header === "projects") {
+							return (
+								<TableCell
+									key={index}
+									align="center"
+								>
+									{row.projects.size.toLocaleString()}
 								</TableCell>
 							);
 						} else {
@@ -84,8 +93,8 @@ function CellValues({ row, header }: CellValuesProps) {
 	const thisValue = header === "targeted" ? targetedTotal : reachedTotal;
 	return (
 		<TableCell align="right">
-			{row.unit === "p"
-				? percentFormat(thisValue)
+			{row.unit === "%"
+				? percentFormat(thisValue) + "%"
 				: thisValue.toLocaleString()}
 		</TableCell>
 	);
@@ -190,10 +199,10 @@ function CellRow({ row, header, expanded, category, cellIndex }: CellRowProps) {
 					paddingLeft: expanded ? "2px" : "6px",
 				}}
 			>
-				{row.unit === "p"
-					? category === "total"
-						? percentFormat(row[`${header}Total`])
-						: percentFormat(row[header][category]!)
+				{row.unit === "%"
+					? (category === "total"
+							? percentFormat(row[`${header}Total`])
+							: percentFormat(row[header][category]!)) + "%"
 					: category === "total"
 					? row[`${header}Total`].toLocaleString()
 					: row[header][category]!.toLocaleString()}

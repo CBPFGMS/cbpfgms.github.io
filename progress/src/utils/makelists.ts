@@ -49,7 +49,14 @@ export type GlobalIndicatorsDetails = {
 	[K in GenderAndAge]: boolean;
 } & {
 	unit: GlobalIndicatorsMasterObject["UnitAb"];
-	sector: number;
+	unitName: GlobalIndicatorsMasterObject["UnitNm"];
+};
+
+type ProjectDetails = {
+	year: number;
+	fund: number;
+	allocationSource: number;
+	allocationType: number;
 };
 
 export type List = {
@@ -67,6 +74,7 @@ export type List = {
 	statuses: ListObj;
 	globalIndicators: ListObj;
 	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
+	projectDetails: Map<number, ProjectDetails>;
 };
 
 function makeLists({
@@ -95,6 +103,7 @@ function makeLists({
 		statuses: {},
 		globalIndicators: {},
 		globalIndicatorsDetails: new Map(),
+		projectDetails: new Map(),
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -221,12 +230,12 @@ function makeLists({
 		if (parsedGlobalIndicatorsMaster.success) {
 			lists.globalIndicators[d.Id] = d.Name;
 			lists.globalIndicatorsDetails.set(d.Id, {
-				women: d.HasW,
-				men: d.HasM,
-				girls: d.HasG,
-				boys: d.HasB,
+				women: Boolean(d.HasW),
+				men: Boolean(d.HasM),
+				girls: Boolean(d.HasG),
+				boys: Boolean(d.HasB),
 				unit: d.UnitAb,
-				sector: d.GlClstrId,
+				unitName: d.UnitNm,
 			});
 		} else {
 			warnInvalidSchema(

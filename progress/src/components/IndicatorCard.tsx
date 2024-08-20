@@ -50,6 +50,7 @@ function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 		sortAccessor: SortAccessor = e => {
 			const criteriaMap = {
 				indicator: lists.globalIndicators[e.indicatorId],
+				projects: e.projects.size,
 				targeted: e.targetedTotal,
 				reached: e.reachedTotal,
 			};
@@ -153,12 +154,17 @@ function IndicatorCardContent({
 							<img
 								src={clustersIconsData[datumIndicator.sector]}
 								width="100%"
+								height="100%"
 							/>
 						</Box>
 					)}
 					<Typography
 						variant="h6"
-						style={{ marginLeft: "1em", fontSize: "1.4em" }}
+						style={{
+							marginLeft:
+								datumIndicator.sector !== 0 ? "0.6em" : 0,
+							fontSize: "1.4em",
+						}}
 					>
 						{datumIndicator.sector === 0
 							? "All Sectors"
@@ -174,6 +180,24 @@ function IndicatorCardContent({
 					>
 						{expanded ? "Close" : "Expand"}
 					</Button>
+				</Box>
+				<Box
+					display="flex"
+					flexDirection="row"
+					alignItems="center"
+					justifyContent="center"
+					mt={datumIndicator.sector !== 0 ? 0.5 : 0}
+				>
+					<Typography
+						variant="body1"
+						style={{
+							fontSize: "1em",
+							color: "#666",
+						}}
+					>
+						From a total of {datumIndicator.totalProjects.size}{" "}
+						project{datumIndicator.totalProjects.size > 1 && "s"}
+					</Typography>
 				</Box>
 				<Box
 					display="flex"
@@ -212,6 +236,9 @@ function IndicatorCardContent({
 								setSortingOrder={setSortingOrder}
 								expanded={expanded}
 								showTotal={showTotal}
+								numberOfIndicators={
+									datumIndicator.sectorData.length
+								}
 							/>
 							<IndicatorsTableBody
 								data={sortedData}

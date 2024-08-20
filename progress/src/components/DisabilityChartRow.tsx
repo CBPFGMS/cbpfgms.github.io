@@ -163,7 +163,9 @@ function DisabilityChartRow({
 										number={parseFloat(formatSIFloat(d))}
 										type="decimal"
 									/>
-									{formatSIFloat(d).slice(-1)}
+									{isNaN(+formatSIFloat(d).slice(-1))
+										? formatSIFloat(d).slice(-1)
+										: ""}
 								</Typography>
 							</Box>
 						</Box>

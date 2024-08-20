@@ -231,6 +231,15 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				);
 
+				listsObj.projectDetails.set(row.ChfId, {
+					year: thisAllocationType.AllocationYear,
+					fund: row.PooledFundId,
+					allocationSource: thisAllocationType.AllocationSourceId,
+					allocationType: parseFloat(
+						`${row.PooledFundId}.${row.AllocationtypeId}`
+					),
+				});
+
 				const reachedByBeneficiaryType: BeneficiaryTypes =
 					generateBeneficiariesSplitObject(row, "Ach");
 				const targetedByBeneficiaryType: BeneficiaryTypes =

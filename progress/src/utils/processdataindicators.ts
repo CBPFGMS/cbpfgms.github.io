@@ -10,7 +10,12 @@ import { warnProjectNotFound } from "./warninvalid";
 
 export type DatumIndicators = {
 	sector: number;
+	totalProjects: Set<number>;
 	sectorData: SectorDatum[];
+};
+
+export type AllSectorsDatum = Omit<DatumIndicators, "sectorData"> & {
+	sectorData: SectorDatumWithSector[];
 };
 
 type Nullable<T> = {
@@ -29,6 +34,8 @@ type NullableBeneficiariesObjectWithArrays =
 export type SectorDatum = {
 	indicatorId: number;
 	unit: GlobalIndicatorsMasterObject["UnitAb"];
+	unitName: GlobalIndicatorsMasterObject["UnitNm"];
+	projects: Set<number>;
 	targeted: NullableBeneficiariesObject;
 	reached: NullableBeneficiariesObject;
 	targetedTotal: number;
@@ -39,9 +46,17 @@ export type SectorDatum = {
 	reachedTotalTemporary?: number[];
 };
 
+type SectorDatumWithSector = SectorDatum & {
+	sector: number;
+};
+
 type ProcessDataIndicatorsParams = {
 	data: GlobalIndicatorsObject[];
 	lists: List;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
 };
 
 type StatusKey = "Tgt" | "Ach";
@@ -51,79 +66,79 @@ const { beneficiaryCategories, beneficiariesStatuses } = constants;
 function processDataIndicators({
 	data: rawData,
 	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
 }: ProcessDataIndicatorsParams): DatumIndicators[] {
 	const dataIndicators: DatumIndicators[] = [];
 
-	const allSectors: DatumIndicators = {
+	const allSectors: AllSectorsDatum = {
 		sector: 0,
+		totalProjects: new Set(),
 		sectorData: [],
 	};
 
 	rawData.forEach(row => {
-		const thisIndicator = lists.globalIndicatorsDetails.get(row.GlbIndicId),
-			thisSector = thisIndicator?.sector;
+		const thisIndicator = lists.globalIndicatorsDetails.get(row.GlbIndicId);
+		const thisProjectDetails = lists.projectDetails.get(row.CHFId);
 
-		if (!thisSector) {
+		if (!thisIndicator) {
 			warnProjectNotFound(
-				row.ChfProjectCode,
+				row.CHFProjectCode,
 				row,
 				"Global indicator not found in global indicators master"
 			);
 			return;
 		}
 
-		const foundSector = dataIndicators.find(
-			datum => datum.sector === thisSector
-		);
-
-		if (foundSector) {
-			const foundIndicator = foundSector.sectorData.find(
-				sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
+		if (!thisProjectDetails) {
+			warnProjectNotFound(
+				row.CHFProjectCode,
+				row,
+				"Global indicator without corresponding project ID"
 			);
-			if (foundIndicator) {
-				updateTemporaryData(
-					foundIndicator.targetedTemporary!,
-					row,
-					thisIndicator,
-					"Tgt"
+			return;
+		}
+		if (
+			year.includes(thisProjectDetails.year) &&
+			fund.includes(thisProjectDetails.fund) &&
+			allocationSource.includes(thisProjectDetails.allocationSource) &&
+			allocationType.includes(thisProjectDetails.allocationType)
+		) {
+			const foundSector = dataIndicators.find(
+				datum => datum.sector === row.GlbClstrId
+			);
+
+			if (foundSector) {
+				foundSector.totalProjects.add(row.CHFId);
+				const foundIndicator = foundSector.sectorData.find(
+					sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
 				);
-				updateTemporaryData(
-					foundIndicator.reachedTemporary!,
-					row,
-					thisIndicator,
-					"Ach"
-				);
-				foundIndicator.targetedTotalTemporary!.push(row.TgtTotal);
-				foundIndicator.reachedTotalTemporary!.push(row.AchTotal);
-			} else {
-				foundSector.sectorData.push({
-					indicatorId: row.GlbIndicId,
-					unit: thisIndicator.unit,
-					targeted: fillWithZeroes(),
-					reached: fillWithZeroes(),
-					targetedTotal: 0,
-					reachedTotal: 0,
-					targetedTemporary: populateTemporaryData(
+				if (foundIndicator) {
+					updateTemporaryData(
+						foundIndicator.targetedTemporary!,
 						row,
 						thisIndicator,
 						"Tgt"
-					),
-					reachedTemporary: populateTemporaryData(
+					);
+					updateTemporaryData(
+						foundIndicator.reachedTemporary!,
 						row,
 						thisIndicator,
 						"Ach"
-					),
-					targetedTotalTemporary: [row.TgtTotal],
-					reachedTotalTemporary: [row.AchTotal],
-				});
-			}
-		} else {
-			dataIndicators.push({
-				sector: thisSector,
-				sectorData: [
-					{
+					);
+					foundIndicator.targetedTotalTemporary!.push(row.TgtTotal);
+					foundIndicator.reachedTotalTemporary!.push(
+						row.AchTotal ?? 0
+					);
+					foundIndicator.projects.add(row.CHFId);
+				} else {
+					foundSector.sectorData.push({
 						indicatorId: row.GlbIndicId,
 						unit: thisIndicator.unit,
+						unitName: thisIndicator.unitName,
+						projects: new Set([row.CHFId]),
 						targeted: fillWithZeroes(),
 						reached: fillWithZeroes(),
 						targetedTotal: 0,
@@ -139,52 +154,91 @@ function processDataIndicators({
 							"Ach"
 						),
 						targetedTotalTemporary: [row.TgtTotal],
-						reachedTotalTemporary: [row.AchTotal],
-					},
-				],
-			});
-		}
+						reachedTotalTemporary: [row.AchTotal ?? 0],
+					});
+				}
+			} else {
+				dataIndicators.push({
+					sector: row.GlbClstrId,
+					totalProjects: new Set([row.CHFId]),
+					sectorData: [
+						{
+							indicatorId: row.GlbIndicId,
+							unit: thisIndicator.unit,
+							unitName: thisIndicator.unitName,
+							projects: new Set([row.CHFId]),
+							targeted: fillWithZeroes(),
+							reached: fillWithZeroes(),
+							targetedTotal: 0,
+							reachedTotal: 0,
+							targetedTemporary: populateTemporaryData(
+								row,
+								thisIndicator,
+								"Tgt"
+							),
+							reachedTemporary: populateTemporaryData(
+								row,
+								thisIndicator,
+								"Ach"
+							),
+							targetedTotalTemporary: [row.TgtTotal],
+							reachedTotalTemporary: [row.AchTotal ?? 0],
+						},
+					],
+				});
+			}
 
-		const foundIndicatorAllSectors = allSectors.sectorData.find(
-			sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
-		);
+			allSectors.totalProjects.add(row.CHFId);
 
-		if (foundIndicatorAllSectors) {
-			updateTemporaryData(
-				foundIndicatorAllSectors.targetedTemporary!,
-				row,
-				thisIndicator,
-				"Tgt"
+			const foundIndicatorAllSectors = allSectors.sectorData.find(
+				sectorDatum => sectorDatum.indicatorId === row.GlbIndicId
 			);
-			updateTemporaryData(
-				foundIndicatorAllSectors.reachedTemporary!,
-				row,
-				thisIndicator,
-				"Ach"
-			);
-			foundIndicatorAllSectors.targetedTotalTemporary!.push(row.TgtTotal);
-			foundIndicatorAllSectors.reachedTotalTemporary!.push(row.AchTotal);
-		} else {
-			allSectors.sectorData.push({
-				indicatorId: row.GlbIndicId,
-				unit: thisIndicator.unit,
-				targeted: fillWithZeroes(),
-				reached: fillWithZeroes(),
-				targetedTotal: 0,
-				reachedTotal: 0,
-				targetedTemporary: populateTemporaryData(
+
+			if (foundIndicatorAllSectors) {
+				updateTemporaryData(
+					foundIndicatorAllSectors.targetedTemporary!,
 					row,
 					thisIndicator,
 					"Tgt"
-				),
-				reachedTemporary: populateTemporaryData(
+				);
+				updateTemporaryData(
+					foundIndicatorAllSectors.reachedTemporary!,
 					row,
 					thisIndicator,
 					"Ach"
-				),
-				targetedTotalTemporary: [row.TgtTotal],
-				reachedTotalTemporary: [row.AchTotal],
-			});
+				);
+				foundIndicatorAllSectors.targetedTotalTemporary!.push(
+					row.TgtTotal
+				);
+				foundIndicatorAllSectors.reachedTotalTemporary!.push(
+					row.AchTotal ?? 0
+				);
+				foundIndicatorAllSectors.projects.add(row.CHFId);
+			} else {
+				allSectors.sectorData.push({
+					indicatorId: row.GlbIndicId,
+					sector: row.GlbClstrId,
+					unit: thisIndicator.unit,
+					unitName: thisIndicator.unitName,
+					projects: new Set([row.CHFId]),
+					targeted: fillWithZeroes(),
+					reached: fillWithZeroes(),
+					targetedTotal: 0,
+					reachedTotal: 0,
+					targetedTemporary: populateTemporaryData(
+						row,
+						thisIndicator,
+						"Tgt"
+					),
+					reachedTemporary: populateTemporaryData(
+						row,
+						thisIndicator,
+						"Ach"
+					),
+					targetedTotalTemporary: [row.TgtTotal],
+					reachedTotalTemporary: [row.AchTotal ?? 0],
+				});
+			}
 		}
 	});
 
@@ -208,13 +262,13 @@ function processDataIndicators({
 		delete datum.reachedTotalTemporary;
 	});
 
-	dataIndicators.unshift(allSectors);
+	if (dataIndicators.length) dataIndicators.unshift(allSectors);
 
 	return dataIndicators;
 }
 
 function processObject(datum: SectorDatum) {
-	const operation = datum.unit === "p" ? mean : sum;
+	const operation = datum.unit === "%" ? mean : sum;
 	beneficiariesStatuses.forEach(status => {
 		const targetData = datum[status],
 			temporaryData = datum[`${status}Temporary`]!;
@@ -231,10 +285,8 @@ function processObject(datum: SectorDatum) {
 			}
 		}
 
-		//IMPORTANT
-		//discuss how to correctly calculate the total when the unit is percentage
 		datum[`${status}Total`] =
-			datum.unit === "p"
+			datum.unit === "%"
 				? mean(datum[`${status}TotalTemporary`] as number[]) ?? 0
 				: sum(datum[`${status}TotalTemporary`] as number[]) ?? 0;
 	});

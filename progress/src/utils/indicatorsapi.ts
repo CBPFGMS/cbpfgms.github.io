@@ -1,4 +1,3 @@
-import { csv, autoType } from "d3";
 import {
 	GlobalIndicatorsObject,
 	globalIndicatorsObjectSchema,
@@ -7,6 +6,7 @@ import warnInvalidSchema from "./warninvalid";
 import processDataIndicators from "./processdataindicators";
 import { DatumIndicators } from "./processdataindicators";
 import { List } from "./makelists";
+import fetchFileDB from "./fetchfiledb";
 
 type IndicatorsApiParams = {
 	setIndicatorsData: React.Dispatch<
@@ -14,20 +14,33 @@ type IndicatorsApiParams = {
 	>;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	setError: React.Dispatch<React.SetStateAction<string | null>>;
-	setHasFetchedData: React.Dispatch<React.SetStateAction<boolean>>;
 	lists: List;
+	year: number[];
+	fund: number[];
+	allocationSource: number[];
+	allocationType: number[];
+	defaultFundType: number | null;
 };
 
 function indicatorsApi({
 	setIndicatorsData,
 	setLoading,
 	setError,
-	setHasFetchedData,
 	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	defaultFundType,
 }: IndicatorsApiParams) {
-	const globalIndicatorsUrl = "../data/fake_indicatorsdata.csv";
+	const globalIndicatorsUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${defaultFundType}&$format=csv`;
 	setLoading(true);
-	csv<GlobalIndicatorsObject>(globalIndicatorsUrl, autoType)
+
+	fetchFileDB<GlobalIndicatorsObject[]>(
+		"globalIndicators",
+		globalIndicatorsUrl,
+		"csv"
+	)
 		.then(rawData => {
 			const data: GlobalIndicatorsObject[] = [];
 			rawData.forEach(row => {
@@ -42,9 +55,15 @@ function indicatorsApi({
 					);
 				}
 			});
-			const dataIndicators = processDataIndicators({ data, lists });
+			const dataIndicators = processDataIndicators({
+				data,
+				lists,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+			});
 			setIndicatorsData(dataIndicators);
-			setHasFetchedData(true);
 			setLoading(false);
 		})
 		.catch((error: unknown) => {
@@ -53,7 +72,6 @@ function indicatorsApi({
 			} else {
 				setError("An unknown error occurred");
 			}
-			setHasFetchedData(false);
 			setLoading(false);
 		});
 }

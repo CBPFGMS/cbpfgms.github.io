@@ -50,7 +50,8 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 		sectorsMasterUrl =
 			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
-		globalIndicatorsMasterUrl = "../data/fake_indicatorsmaster.csv";
+		globalIndicatorsMasterUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv";
 
 	const [data, setData] = useState<Data>([] as Data),
 		[lists, setLists] = useState<List>({} as List),

@@ -9,6 +9,7 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import { Box } from "@mui/material";
 import colors from "../utils/colors";
+import InfoIcon from "@mui/icons-material/Info";
 
 export type SortingCriterion = (typeof indicatorsHeader)[number];
 
@@ -19,6 +20,7 @@ type IndicatorTableHeadProps = {
 	setSortingOrder: React.Dispatch<React.SetStateAction<SortingOrder>>;
 	expanded: boolean;
 	showTotal: boolean;
+	numberOfIndicators: number;
 };
 
 const { indicatorsHeader, columnWidths, columnWidthsExpanded } = constants;
@@ -30,6 +32,7 @@ function IndicatorTableHead({
 	sortingOrder,
 	expanded,
 	showTotal,
+	numberOfIndicators,
 }: IndicatorTableHeadProps) {
 	function handleClick(header: SortingCriterion) {
 		if (sortingCriterion === header) {
@@ -109,7 +112,38 @@ function IndicatorTableHead({
 								}}
 								//onClick={createSortHandler(headCell.id)} MAYBE NEEDED?
 							>
-								{capitalizeString(header)}
+								{header === "projects" ? (
+									<Box
+										style={{
+											display: "flex",
+											alignItems: "center",
+										}}
+									>
+										Projects
+										<InfoIcon
+											data-tooltip-id="tooltip"
+											data-tooltip-content={
+												"Number of projects mapped to the indicator"
+											}
+											data-tooltip-place="top"
+											style={{
+												color: "#666",
+												fontSize: "16px",
+												marginLeft: "0.1em",
+												marginTop: "-0.6em",
+											}}
+										/>
+									</Box>
+								) : (
+									capitalizeString(header) +
+									(header === "indicator"
+										? `${
+												numberOfIndicators > 1
+													? "s"
+													: ""
+										  } (${numberOfIndicators})`
+										: "")
+								)}
 							</TableSortLabel>
 						</Box>
 					</TableCell>

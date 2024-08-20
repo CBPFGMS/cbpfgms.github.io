@@ -46,7 +46,11 @@ function DownloadIcon({
 					fontSize="large"
 					style={{ color: "dimgray" }}
 					data-tooltip-id="tooltip"
-					data-tooltip-content="Download CSV data file"
+					data-tooltip-html={`<div style='text-align:center;'>${
+						type === "indicators"
+							? "Download CSV data file<br />for all sectors"
+							: "Download CSV data file"
+					}</div>`}
 					data-tooltip-place="bottom"
 				/>
 			)}
