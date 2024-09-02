@@ -20,16 +20,16 @@ function TopIntro() {
 						textAlign: "center",
 					}}
 				>
-					Welcome to the Allocation Progress Dashboard, a
-					comprehensive tool that provides an overview of the ongoing
-					implementation statuses for active Country-Based Pooled Fund
-					(CBPF) allocations. Here, you can visualise the progress of
-					each allocation, including the percentage of funds
-					disbursed, the people targeted and reached, the
-					number of partners engaged, and the sectors covered. Explore
-					the data using the available filters to gain insights into
-					the advancement of humanitarian efforts across various funds
-					and allocation types.
+					Welcome to the Country Based Pooled Fund (CBPF) Allocation
+					Progress Dashboard, a comprehensive tool that provides an
+					overview of the Targeted vs Achieved statuses for funded
+					projects. Here, you can visualize the progress of each
+					project, including the percentage of people targeted and
+					reached by type of partners engaged, sectors covered,
+					categorization of people, by disability and by Gender based
+					violence (GBV) category. Additionally this dashboard for the
+					first time explore the achievements against the targeted
+					Global Indicators across funds.
 				</Typography>
 			</Grid>
 		</Grid>
