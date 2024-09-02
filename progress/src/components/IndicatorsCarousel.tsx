@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { DatumIndicators } from "../utils/processdataindicators";
+import {
+	DatumIndicators,
+	AllSectorsDatum,
+} from "../utils/processdataindicators";
 import Button from "@mui/material/Button";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -24,6 +27,10 @@ type IndicatorsCarouselProps = {
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
+
+function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
+	return datum && datum.sector === 0;
+}
 
 function IndicatorsCarousel({
 	data,
@@ -62,7 +69,7 @@ function IndicatorsCarousel({
 		setActiveStep(step);
 	}
 
-	const allSectorsData = data.find(datum => datum.sector === 0)!;
+	const allSectorsData = data.find(isAllSectorsDatum)!;
 
 	function handleDownloadClick() {
 		const dataIndicatorsDownload = processIndicatorsDownload({
