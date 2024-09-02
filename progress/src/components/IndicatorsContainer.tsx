@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
-import Loading from "./Loading";
 import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
-import indicatorsApi from "../utils/indicatorsapi";
+import { GlobalIndicatorsObject } from "../utils/schemas";
 import { DownloadStates, RefIds } from "./MainContainer";
 import IndicatorsCarousel from "./IndicatorsCarousel";
 import { List } from "../utils/makelists";
+import processDataIndicators from "../utils/processdataindicators";
 
 type IndicatorsContainerProps = {
+	dataIndicators: GlobalIndicatorsObject[];
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
@@ -19,10 +20,10 @@ type IndicatorsContainerProps = {
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
-	defaultFundType: number | null;
 };
 
 function IndicatorsContainer({
+	dataIndicators,
 	year,
 	fund,
 	allocationSource,
@@ -32,13 +33,10 @@ function IndicatorsContainer({
 	lists,
 	clickedDownload,
 	setClickedDownload,
-	defaultFundType,
 }: IndicatorsContainerProps) {
-	const [indicatorsData, setIndicatorsData] = useState<
-			DatumIndicators[] | null
-		>(null),
-		[loading, setLoading] = useState<boolean>(false),
-		[error, setError] = useState<string | null>(null),
+	const [indicatorsFilteredData, setIndicatorsFilteredData] = useState<
+			DatumIndicators[]
+		>([]),
 		[generateTable, setGenerateTable] = useState<boolean>(false);
 
 	function handleClick() {
@@ -46,19 +44,16 @@ function IndicatorsContainer({
 	}
 
 	useEffect(() => {
-		setGenerateTable(false);
-		indicatorsApi({
-			setIndicatorsData,
-			setLoading,
-			setError,
+		const filteredIndicators = processDataIndicators({
+			dataIndicators,
 			lists,
 			year,
 			fund,
 			allocationSource,
 			allocationType,
-			defaultFundType,
 		});
-	}, [year, fund, allocationSource, allocationType, defaultFundType, lists]);
+		setIndicatorsFilteredData(filteredIndicators);
+	}, [dataIndicators, year, fund, allocationSource, allocationType, lists]);
 
 	return (
 		<Grid
@@ -114,21 +109,19 @@ function IndicatorsContainer({
 					}
 					data-tooltip-place="top"
 					variant="contained"
-					disabled={generateTable || !indicatorsData?.length}
+					disabled={generateTable || !indicatorsFilteredData?.length}
 					onClick={handleClick}
 					style={{ marginTop: "2em", alignSelf: "center" }}
 				>
-					{indicatorsData?.length
+					{indicatorsFilteredData?.length
 						? "Generate Table"
 						: "No Global Indicators for the filters selected"}
 				</Button>
 			</Grid>
 			<Grid xs={12}>
-				{loading && <Loading />}
-				{error && <Typography variant="body1">{error}</Typography>}
-				{indicatorsData && generateTable && (
+				{indicatorsFilteredData && generateTable && (
 					<IndicatorsCarousel
-						data={indicatorsData}
+						data={indicatorsFilteredData}
 						lists={lists}
 						clickedDownload={clickedDownload}
 						setClickedDownload={setClickedDownload}

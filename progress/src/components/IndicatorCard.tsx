@@ -132,6 +132,9 @@ function IndicatorCardContent({
 				padding: "1em",
 				backgroundColor: "#f3f3f3",
 				borderRadius: "8px",
+				maxHeight: expanded ? "90vh" : "",
+				overflowY: "hidden",
+				boxSizing: "border-box",
 			}}
 		>
 			<Box

@@ -51,7 +51,7 @@ type SectorDatumWithSector = SectorDatum & {
 };
 
 type ProcessDataIndicatorsParams = {
-	data: GlobalIndicatorsObject[];
+	dataIndicators: GlobalIndicatorsObject[];
 	lists: List;
 	year: number[];
 	fund: number[];
@@ -64,14 +64,14 @@ type StatusKey = "Tgt" | "Ach";
 const { beneficiaryCategories, beneficiariesStatuses } = constants;
 
 function processDataIndicators({
-	data: rawData,
+	dataIndicators,
 	lists,
 	year,
 	fund,
 	allocationSource,
 	allocationType,
 }: ProcessDataIndicatorsParams): DatumIndicators[] {
-	const dataIndicators: DatumIndicators[] = [];
+	const filteredDataIndicators: DatumIndicators[] = [];
 
 	const allSectors: AllSectorsDatum = {
 		sector: 0,
@@ -79,7 +79,7 @@ function processDataIndicators({
 		sectorData: [],
 	};
 
-	rawData.forEach(row => {
+	dataIndicators.forEach(row => {
 		const thisIndicator = lists.globalIndicatorsDetails.get(row.GlbIndicId);
 		const thisProjectDetails = lists.projectDetails.get(row.CHFId);
 
@@ -106,7 +106,7 @@ function processDataIndicators({
 			allocationSource.includes(thisProjectDetails.allocationSource) &&
 			allocationType.includes(thisProjectDetails.allocationType)
 		) {
-			const foundSector = dataIndicators.find(
+			const foundSector = filteredDataIndicators.find(
 				datum => datum.sector === row.GlbClstrId
 			);
 
@@ -158,7 +158,7 @@ function processDataIndicators({
 					});
 				}
 			} else {
-				dataIndicators.push({
+				filteredDataIndicators.push({
 					sector: row.GlbClstrId,
 					totalProjects: new Set([row.CHFId]),
 					sectorData: [
@@ -242,7 +242,7 @@ function processDataIndicators({
 		}
 	});
 
-	dataIndicators.forEach(sectorDatum => {
+	filteredDataIndicators.forEach(sectorDatum => {
 		sectorDatum.sectorData.forEach(datum => {
 			processObject(datum);
 
@@ -262,9 +262,10 @@ function processDataIndicators({
 		delete datum.reachedTotalTemporary;
 	});
 
-	if (dataIndicators.length) dataIndicators.unshift(allSectors);
+	if (filteredDataIndicators.length)
+		filteredDataIndicators.unshift(allSectors);
 
-	return dataIndicators;
+	return filteredDataIndicators;
 }
 
 function processObject(datum: SectorDatum) {

@@ -21,7 +21,6 @@ export type Charts = (typeof charts)[number];
 
 type MainContainerProps = {
 	defaultYear: number;
-	defaultFundType: number | null;
 };
 
 export type DownloadStates = {
@@ -48,8 +47,8 @@ const refIds = (Object.keys(downloadStates) as Charts[]).reduce((acc, curr) => {
 
 const queryStringValues = new URLSearchParams(location.search);
 
-function MainContainer({ defaultYear, defaultFundType }: MainContainerProps) {
-	const { data, inDataLists, lists } = useContext(
+function MainContainer({ defaultYear }: MainContainerProps) {
+	const { data, dataIndicators, inDataLists, lists } = useContext(
 		DataContext
 	) as DataContextType;
 
@@ -244,6 +243,7 @@ function MainContainer({ defaultYear, defaultFundType }: MainContainerProps) {
 				implementationsStatus={implementationStatus}
 			/>
 			<IndicatorsContainer
+				dataIndicators={dataIndicators}
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}
@@ -253,7 +253,6 @@ function MainContainer({ defaultYear, defaultFundType }: MainContainerProps) {
 				lists={lists}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
-				defaultFundType={defaultFundType}
 			/>
 		</Container>
 	);
