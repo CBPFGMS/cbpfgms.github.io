@@ -52,6 +52,9 @@ function IndicatorsContainer({
 			allocationSource,
 			allocationType,
 		});
+		if (filteredIndicators.length === 0) {
+			setGenerateTable(false);
+		}
 		setIndicatorsFilteredData(filteredIndicators);
 	}, [dataIndicators, year, fund, allocationSource, allocationType, lists]);
 
@@ -119,7 +122,7 @@ function IndicatorsContainer({
 				</Button>
 			</Grid>
 			<Grid xs={12}>
-				{indicatorsFilteredData && generateTable && (
+				{indicatorsFilteredData.length > 0 && generateTable && (
 					<IndicatorsCarousel
 						data={indicatorsFilteredData}
 						lists={lists}
