@@ -3581,6 +3581,7 @@
 						) {
 							return e.RFundName.includes(fundName);
 						});
+						if (!regionalFund) return;
 						const foundFund = regionalData.find(function (e) {
 							return e.rfCode === regionalFund.RFundAbbrv;
 						});

@@ -15,7 +15,9 @@ function Error({ error }: { error: string }) {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
+				justifySelf: "center",
 				alignItems: "center",
+				alignSelf: "center",
 			}}
 		>
 			<Alert severity="error">

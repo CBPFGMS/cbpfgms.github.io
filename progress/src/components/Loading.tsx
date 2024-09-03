@@ -11,7 +11,9 @@ function Loading() {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
+				justifySelf: "center",
 				alignItems: "center",
+				alignSelf: "center",
 			}}
 		>
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
