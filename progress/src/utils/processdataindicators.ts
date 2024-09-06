@@ -7,6 +7,8 @@ import { sum, mean } from "d3";
 import constants from "./constants";
 import { List, GlobalIndicatorsDetails } from "./makelists";
 import { warnProjectNotFound } from "./warninvalid";
+import { ImplementationStatuses } from "../components/MainContainer";
+import calculateStatus from "./calculatestatus";
 
 export type DatumIndicators = {
 	sector: number;
@@ -57,6 +59,7 @@ type ProcessDataIndicatorsParams = {
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
+	implementationsStatus: ImplementationStatuses[];
 };
 
 type StatusKey = "Tgt" | "Ach";
@@ -70,6 +73,7 @@ function processDataIndicators({
 	fund,
 	allocationSource,
 	allocationType,
+	implementationsStatus,
 }: ProcessDataIndicatorsParams): DatumIndicators[] {
 	const filteredDataIndicators: DatumIndicators[] = [];
 
@@ -100,11 +104,15 @@ function processDataIndicators({
 			);
 			return;
 		}
+
+		const thisStatus = calculateStatus(thisProjectDetails, lists);
+
 		if (
 			year.includes(thisProjectDetails.year) &&
 			fund.includes(thisProjectDetails.fund) &&
 			allocationSource.includes(thisProjectDetails.allocationSource) &&
-			allocationType.includes(thisProjectDetails.allocationType)
+			allocationType.includes(thisProjectDetails.allocationType) &&
+			implementationsStatus.includes(thisStatus)
 		) {
 			const foundSector = filteredDataIndicators.find(
 				datum => datum.sector === row.GlbClstrId

@@ -4,7 +4,11 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
 import { GlobalIndicatorsObject } from "../utils/schemas";
-import { DownloadStates, RefIds } from "./MainContainer";
+import {
+	DownloadStates,
+	ImplementationStatuses,
+	RefIds,
+} from "./MainContainer";
 import IndicatorsCarousel from "./IndicatorsCarousel";
 import { List } from "../utils/makelists";
 import processDataIndicators from "../utils/processdataindicators";
@@ -20,6 +24,7 @@ type IndicatorsContainerProps = {
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	implementationsStatus: ImplementationStatuses[];
 };
 
 function IndicatorsContainer({
@@ -33,6 +38,7 @@ function IndicatorsContainer({
 	lists,
 	clickedDownload,
 	setClickedDownload,
+	implementationsStatus,
 }: IndicatorsContainerProps) {
 	const [indicatorsFilteredData, setIndicatorsFilteredData] = useState<
 			DatumIndicators[]
@@ -51,12 +57,21 @@ function IndicatorsContainer({
 			fund,
 			allocationSource,
 			allocationType,
+			implementationsStatus,
 		});
 		if (filteredIndicators.length === 0) {
 			setGenerateTable(false);
 		}
 		setIndicatorsFilteredData(filteredIndicators);
-	}, [dataIndicators, year, fund, allocationSource, allocationType, lists]);
+	}, [
+		dataIndicators,
+		year,
+		fund,
+		allocationSource,
+		allocationType,
+		lists,
+		implementationsStatus,
+	]);
 
 	return (
 		<Grid

@@ -253,6 +253,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				lists={lists}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
+				implementationsStatus={implementationStatus}
 			/>
 		</Container>
 	);

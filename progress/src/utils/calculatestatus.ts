@@ -1,7 +1,8 @@
 import constants from "./constants";
 import { ImplementationStatuses } from "../components/MainContainer";
-import { Data } from "./processrawdata";
+import { Datum } from "./processrawdata";
 import { List } from "./makelists";
+import { ProjectDetails } from "./makelists";
 
 const currentDate = new Date().getTime();
 
@@ -9,7 +10,7 @@ const { closedStatusNames } = constants;
 const closedStatusNamesWide: string[] = [...closedStatusNames];
 
 function calculateStatus(
-	datum: Data[number],
+	datum: Datum | ProjectDetails,
 	lists: List
 ): ImplementationStatuses {
 	let status: ImplementationStatuses;

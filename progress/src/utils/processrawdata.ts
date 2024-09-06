@@ -11,7 +11,7 @@ import constants from "./constants";
 const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
 	constants;
 
-type Datum = {
+export type Datum = {
 	reached: BeneficiariesObject;
 	targeted: BeneficiariesObject;
 	reachedByBeneficiaryType: BeneficiaryTypes;
@@ -238,6 +238,8 @@ function processRawData({
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`
 					),
+					endDate: new Date(row.EndDate),
+					projectStatusId: row.GlbPrjStatusId,
 				});
 
 				const reachedByBeneficiaryType: BeneficiaryTypes =

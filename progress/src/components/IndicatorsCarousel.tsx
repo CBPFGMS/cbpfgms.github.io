@@ -91,12 +91,26 @@ function IndicatorsCarousel({
 			width="100%"
 			position={"relative"}
 		>
-			<DownloadIcon
-				handleDownloadClick={handleDownloadClick}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
-				type="indicators"
-			/>
+			<Box
+				style={{
+					position: "absolute",
+					top: "0",
+					right: "0",
+					paddingTop: "1.2em",
+					paddingRight: "1.5em",
+					cursor: "pointer",
+					zIndex: 1000,
+					display: "flex",
+					flexDirection: "column",
+				}}
+			>
+				<DownloadIcon
+					handleDownloadClick={handleDownloadClick}
+					clickedDownload={clickedDownload}
+					setClickedDownload={setClickedDownload}
+					type="indicators"
+				/>
+			</Box>
 			<Box
 				display="flex"
 				justifyContent="center"

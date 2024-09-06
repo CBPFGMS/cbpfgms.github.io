@@ -52,11 +52,13 @@ export type GlobalIndicatorsDetails = {
 	unitName: GlobalIndicatorsMasterObject["UnitNm"];
 };
 
-type ProjectDetails = {
+export type ProjectDetails = {
 	year: number;
 	fund: number;
 	allocationSource: number;
 	allocationType: number;
+	endDate: Date;
+	projectStatusId: number;
 };
 
 export type List = {
