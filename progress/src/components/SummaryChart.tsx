@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { sum, format } from "d3";
 import Container from "@mui/material/Container";
@@ -7,7 +7,6 @@ import MoneyBag from "../assets/MoneyBag";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
-import DownloadIcon from "./DownloadIcon";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
 import SummaryRow from "./SummaryRow";
@@ -16,6 +15,7 @@ import { DownloadStates } from "./MainContainer";
 import Divider from "@mui/material/Divider";
 import { processSummaryDownload } from "../utils/processdownload";
 import { ImplementationStatuses } from "./MainContainer";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type SummaryChartProps = {
 	dataSummary: DatumSummary[];
@@ -39,6 +39,8 @@ function SummaryChart({
 	implementationStatus,
 }: SummaryChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	function handleDownloadClick() {
 		const dataSummaryDownload = processSummaryDownload({
@@ -64,12 +66,15 @@ function SummaryChart({
 		<Container
 			disableGutters={true}
 			style={{ position: "relative" }}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="summary"
+				refElement={ref}
+				fileName="summary"
 			/>
 			<Box
 				display={"flex"}

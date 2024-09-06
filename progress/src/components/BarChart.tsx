@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import { max } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
@@ -30,6 +29,7 @@ import {
 	processOrganizationsDownload,
 } from "../utils/processdownload";
 import { GenderAndAge } from "../utils/processrawdata";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type BarChartProps = {
 	originalData: DatumBarChart[];
@@ -67,6 +67,8 @@ function BarChart({
 	implementationStatus,
 }: BarChartProps) {
 	const { data: completeData } = useContext(DataContext) as DataContextType;
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
@@ -178,17 +180,20 @@ function BarChart({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
 			<Snack
 				openSnack={openSnack}
 				setOpenSnack={setOpenSnack}
 				message={`At least one beneficiary must be selected`}
 			/>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
-				type="beneficiaryTypes"
+				type={chartType}
+				refElement={ref}
+				fileName={chartType}
 			/>
 			<Box
 				style={{

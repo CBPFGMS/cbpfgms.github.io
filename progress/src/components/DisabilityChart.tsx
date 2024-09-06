@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { DatumDisability } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import DataContext, { DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import { max, format } from "d3";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
@@ -15,6 +14,7 @@ import DisabilityChartRow from "./DisabilityChartRow";
 import capitalizeString from "../utils/capitalizestring";
 import { processDisabilityDownload } from "../utils/processdownload";
 import downloadData from "../utils/downloaddata";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type DisabilityChartProps = {
 	dataDisability: DatumDisability;
@@ -41,6 +41,8 @@ function DisabilityChart({
 }: DisabilityChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
+	const ref = useRef<HTMLDivElement>(null);
+
 	const maxValue = max(Object.values(dataDisability)) || 0;
 
 	function handleDownloadClick() {
@@ -65,12 +67,15 @@ function DisabilityChart({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="disability"
+				refElement={ref}
+				fileName="people_with_disability"
 			/>
 			<Box
 				style={{
@@ -80,7 +85,7 @@ function DisabilityChart({
 					height: "58px",
 					flexDirection: "column",
 				}}
-				mb={2}
+				mb={3}
 			>
 				<Typography
 					style={{

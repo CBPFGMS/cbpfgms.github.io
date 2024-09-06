@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import DataContext, { DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -7,7 +7,6 @@ import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
 import Divider from "@mui/material/Divider";
 import { format, max } from "d3";
-import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import PictogramRow from "./PictogramRow";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
@@ -19,6 +18,7 @@ import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import capitalizeString from "../utils/capitalizestring";
 import { processPictogramDownload } from "../utils/processdownload";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type PictogramChartProps = {
 	dataPictogram: DatumPictogram;
@@ -44,6 +44,8 @@ function PictogramChart({
 	implementationStatus,
 }: PictogramChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	const totalTargeted =
 		dataPictogram.targetedBoys +
@@ -82,12 +84,15 @@ function PictogramChart({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="pictogram"
+				refElement={ref}
+				fileName="people_targeted_reached"
 			/>
 			<Box
 				display={"flex"}

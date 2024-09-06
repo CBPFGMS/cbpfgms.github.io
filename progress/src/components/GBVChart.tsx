@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { DatumGBV } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import DataContext, { DataContextType } from "../context/DataContext";
@@ -6,7 +6,6 @@ import downloadData from "../utils/downloaddata";
 import { processGBVDownload } from "../utils/processdownload";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DownloadIcon from "./DownloadIcon";
 import Container from "@mui/material/Container";
 import colors from "../utils/colors";
 import InfoIcon from "@mui/icons-material/Info";
@@ -16,6 +15,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import Donut from "./GBVDonut";
 import formatSIFloat from "../utils/formatsi";
 import { format } from "d3";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type GBVChartProps = {
 	dataGBV: DatumGBV;
@@ -55,6 +55,8 @@ function GBVChart({
 }: GBVChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
+	const ref = useRef<HTMLDivElement>(null);
+
 	function handleDownloadClick() {
 		const dataGBVDownload = processGBVDownload({
 			data,
@@ -77,12 +79,15 @@ function GBVChart({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="gbv"
+				refElement={ref}
+				fileName="Gender_Based_Violence"
 			/>
 			<Box
 				style={{
@@ -144,6 +149,7 @@ function GBVChart({
 						CaptionIcon={
 							<Typography variant="caption">{"$"}</Typography>
 						}
+						noData={dataGBV.allocationsGBVPlanned === 0}
 					/>
 					<GBVCell
 						title={"GBV Reached Budget"}
@@ -154,11 +160,7 @@ function GBVChart({
 						CaptionIcon={
 							<Typography variant="caption">{"$"}</Typography>
 						}
-						noData={
-							dataGBV.allocationsGBVReached === 0 &&
-							year.length === 1 &&
-							year[0] === new Date().getFullYear()
-						}
+						noData={dataGBV.allocationsGBVReached === 0}
 					/>
 				</GBVColumn>
 				<GBVColumn>
@@ -179,6 +181,7 @@ function GBVChart({
 								}}
 							/>
 						}
+						noData={dataGBV.targetedGBV === 0}
 					/>
 					<GBVCell
 						title={"GBV Reached People"}
@@ -197,11 +200,7 @@ function GBVChart({
 								}}
 							/>
 						}
-						noData={
-							dataGBV.reachedGBV === 0 &&
-							year.length === 1 &&
-							year[0] === new Date().getFullYear()
-						}
+						noData={dataGBV.reachedGBV === 0}
 					/>
 				</GBVColumn>
 			</Box>
@@ -340,7 +339,7 @@ function NoData() {
 					textAlign="center"
 				>
 					Data not yet available; report due dates have not been
-					reached.
+					reached or the selected year(s) do not have GBV data.
 				</Typography>
 			</Box>
 		</Box>

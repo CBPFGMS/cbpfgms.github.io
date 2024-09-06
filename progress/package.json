@@ -17,6 +17,7 @@
 		"@mui/material": "^5.15.16",
 		"@react-spring/web": "^9.7.3",
 		"d3": "^7.9.0",
+		"html-to-image": "^1.11.11",
 		"idb": "^8.0.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
