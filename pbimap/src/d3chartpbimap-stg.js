@@ -239,6 +239,7 @@
 			tooltipDuration = 250,
 			tooltipMargin = 2,
 			heightProgressSVG = heightLeafletMap + heightTopSvg,
+			rectProgressWidth = 300,
 			windowHeight = window.innerHeight,
 			brighterFactor = 0.3,
 			currentYear = new Date().getFullYear(),
@@ -481,11 +482,9 @@
 			.append("div")
 			.attr("class", "pbimapListContainerDiv");
 
-		createProgressWheel(
-			null,
+		const { rectProgress, progressText, bytesText } = createProgressBar(
 			width,
-			heightProgressSVG,
-			"Loading visualisation..."
+			heightProgressSVG
 		);
 
 		const leafletMap = L.map("pbimapContainerDiv", {
@@ -670,26 +669,193 @@
 
 		apiFiles.forEach(function (file) {
 			promises.push(
-				d3.csv(
-					file +
-						yearParameter +
-						chartState.selectedYear[0] +
-						csvFormatParameter
-				)
+				file +
+					yearParameter +
+					chartState.selectedYear[0] +
+					csvFormatParameter
 			);
 		});
 
-		promises.push(d3.csv(cbpfListFile));
-		promises.push(d3.csv(clustersListFile));
-		promises.push(d3.csv(partnersListFile));
-		promises.push(d3.csv(modalitiesListFile));
-		promises.push(d3.csv(launchedAllocationsDataFile));
+		promises.push(cbpfListFile);
+		promises.push(clustersListFile);
+		promises.push(partnersListFile);
+		promises.push(modalitiesListFile);
+		promises.push(launchedAllocationsDataFile);
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		Promise.all(promises).then(function (rawData) {
+		// Custom progress-tracking wrapper for d3.csv
+		function csvWithProgress(url, onProgress) {
+			return new Promise((resolve, reject) => {
+				const xhr = new XMLHttpRequest();
+				xhr.open("GET", url, true);
+				xhr.responseType = "arraybuffer";
+
+				xhr.onprogress = event => {
+					onProgress(event.loaded, false);
+				};
+
+				xhr.onload = function () {
+					if (this.status >= 200 && this.status < 300) {
+						const decoder = new TextDecoder("utf-8");
+						const csv = decoder.decode(this.response);
+						try {
+							const parsedData = d3.csvParse(csv);
+							onProgress(0, true);
+							resolve(parsedData);
+						} catch (error) {
+							reject(
+								new Error("CSV Parsing Error: " + error.message)
+							);
+						}
+					} else {
+						reject(new Error(xhr.statusText));
+					}
+				};
+
+				xhr.onerror = () => {
+					onProgress(0); // Reset progress on error
+					reject(new Error("Network Error"));
+				};
+
+				xhr.send();
+			});
+		}
+
+		// Function to load multiple CSVs with overall progress tracking
+		function loadMultipleCSVs(urls, progressCallback) {
+			const totalRequests = urls.length;
+			let totalProgress = 0;
+			let totalBytes = 0;
+
+			const updateOverallProgress = bytes => {
+				progressCallback(totalProgress, totalRequests, bytes);
+			};
+
+			const promises = urls.map(url =>
+				csvWithProgress(url, (bytes, completed) => {
+					if (completed) totalProgress += 1;
+					totalBytes += bytes;
+					updateOverallProgress(totalBytes);
+				})
+			);
+
+			return Promise.all(promises);
+		}
+
+		async function loadDataWithProgress() {
+			try {
+				const dataArrays = await loadMultipleCSVs(
+					promises,
+					(totalProgress, totalRequests, bytes) => {
+						rectProgress
+							.transition()
+							.duration(500)
+							.attr(
+								"width",
+								rectProgressWidth *
+									(totalProgress / totalRequests)
+							);
+						progressText.text(
+							`${totalProgress} files out of ${totalRequests}`
+						);
+						bytesText.text(
+							`${(~~(bytes / 1000)).toLocaleString()} kB loaded`
+						);
+					}
+				);
+				receiveInitialData(dataArrays);
+			} catch (error) {
+				console.error("Error loading data:", error);
+			}
+		}
+
+		loadDataWithProgress();
+
+		// // Custom progress-tracking wrapper for d3.csv
+		// async function csvWithProgress(url, onProgress) {
+		// 	const response = await fetch(url);
+		// 	const reader = response.body.getReader();
+		// 	const contentLength = +response.headers.get("Content-Length");
+		// 	console.log(contentLength, url);
+
+		// 	let receivedLength = 0;
+		// 	let chunks = [];
+
+		// 	while (true) {
+		// 		const { done, value } = await reader.read();
+
+		// 		if (done) {
+		// 			break;
+		// 		}
+
+		// 		chunks.push(value);
+		// 		receivedLength += value.length;
+		// 		if (contentLength !== 0) {
+		// 			onProgress((receivedLength / contentLength) * 100);
+		// 		}
+		// 	}
+
+		// 	const allChunks = new Uint8Array(receivedLength);
+		// 	let position = 0;
+		// 	for (const chunk of chunks) {
+		// 		allChunks.set(chunk, position);
+		// 		position += chunk.length;
+		// 	}
+
+		// 	const text = new TextDecoder("utf-8").decode(allChunks);
+		// 	return d3.csvParse(text);
+		// }
+
+		// // Function to load multiple CSVs with overall progress tracking
+		// function loadMultipleCSVs(urls, progressCallback) {
+		// 	const totalRequests = urls.length;
+		// 	const progressValues = new Array(totalRequests).fill(0);
+
+		// 	const updateOverallProgress = () => {
+		// 		const totalProgress = progressValues.reduce(
+		// 			(sum, value) => sum + value,
+		// 			0
+		// 		);
+		// 		const overallProgress = totalProgress / totalRequests;
+		// 		progressCallback(overallProgress);
+		// 	};
+
+		// 	const promises = urls.map((url, index) =>
+		// 		csvWithProgress(url, progress => {
+		// 			progressValues[index] = progress;
+		// 			updateOverallProgress();
+		// 		})
+		// 	);
+
+		// 	return Promise.all(promises);
+		// }
+
+		// // Usage example
+		// async function loadDataWithProgress() {
+		// 	try {
+		// 		const dataArrays = await loadMultipleCSVs(
+		// 			promises,
+		// 			progress => {
+		// 				console.log(
+		// 					`Overall loading progress: ${progress.toFixed(2)}%`
+		// 				);
+		// 				// Update your progress bar here
+		// 			}
+		// 		);
+
+		// 		console.log("All data loaded:", dataArrays);
+		// 		receiveInitialData(dataArrays);
+		// 	} catch (error) {
+		// 		console.error("Error loading data:", error);
+		// 	}
+		// }
+
+		// loadDataWithProgress();
+
+		function receiveInitialData(rawData) {
 			removeProgressWheel();
 
 			rawData[6].forEach(function (row) {
@@ -783,7 +949,7 @@
 			loadAllDataFiles(remainingYears);
 
 			//end of Promise.all
-		});
+		}
 
 		function draw() {
 			const data = filterData();
@@ -5024,6 +5190,75 @@
 			});
 
 			//end of downloadSnapshotPdf
+		}
+
+		function createProgressBar(thiswidth, thisheight) {
+			const overDiv = containerDiv
+				.append("div")
+				.attr("class", "pbimapOverDiv");
+
+			const progressSvg = overDiv
+				.append("svg")
+				.attr("viewBox", "0 0 " + thiswidth + " " + thisheight);
+
+			wheelGroup = progressSvg
+				.append("g")
+				.attr("class", "pbimapd3chartwheelGroup")
+				.attr(
+					"transform",
+					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
+				);
+
+			const loadingText = wheelGroup
+				.append("text")
+				.attr("text-anchor", "middle")
+				.style("font-family", "Roboto")
+				.style("font-weight", "bold")
+				.style("font-size", "18px")
+				.attr("y", 50)
+				.attr("class", "contributionColorFill")
+				.text("Loading data...");
+
+			const outerRect = wheelGroup
+				.append("rect")
+				.attr("width", rectProgressWidth + 4)
+				.attr("height", 24)
+				.attr("x", -rectProgressWidth / 2 - 2)
+				.attr("y", 78)
+				.attr("rx", 3)
+				.attr("ry", 3)
+				.style("fill", "none")
+				.style("stroke", "#888")
+				.style("stroke-width", "1px");
+
+			const rectProgress = wheelGroup
+				.append("rect")
+				.attr("width", 0)
+				.attr("height", 20)
+				.attr("x", -rectProgressWidth / 2)
+				.attr("y", 80)
+				.attr("rx", 2)
+				.attr("ry", 2)
+				.style("fill", "#bbb");
+
+			const progressText = wheelGroup
+				.append("text")
+				.style("font-family", "Roboto")
+				.style("dominant-baseline", "middle")
+				.style("font-size", "12px")
+				.attr("x", rectProgressWidth / 2 + 10)
+				.attr("y", 90);
+
+			const bytesText = wheelGroup
+				.append("text")
+				.style("font-family", "Roboto")
+				.style("text-anchor", "middle")
+				.style("font-size", "14px")
+				.attr("y", 120);
+
+			return { rectProgress, progressText, bytesText };
+
+			//end of createProgressBar
 		}
 
 		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
