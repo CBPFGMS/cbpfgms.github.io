@@ -686,7 +686,6 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		// Custom progress-tracking wrapper for d3.csv
 		function csvWithProgress(url, onProgress) {
 			return new Promise((resolve, reject) => {
 				const xhr = new XMLHttpRequest();
@@ -724,21 +723,16 @@
 			});
 		}
 
-		// Function to load multiple CSVs with overall progress tracking
 		function loadMultipleCSVs(urls, progressCallback) {
 			const totalRequests = urls.length;
 			let totalProgress = 0;
 			let totalBytes = 0;
 
-			const updateOverallProgress = bytes => {
-				progressCallback(totalProgress, totalRequests, bytes);
-			};
-
 			const promises = urls.map(url =>
 				csvWithProgress(url, (bytes, completed) => {
 					if (completed) totalProgress += 1;
 					totalBytes += bytes;
-					updateOverallProgress(totalBytes);
+					progressCallback(totalProgress, totalRequests, totalBytes);
 				})
 			);
 
@@ -759,7 +753,7 @@
 									(totalProgress / totalRequests)
 							);
 						progressText.text(
-							`${totalProgress} files out of ${totalRequests}`
+							`${totalProgress}/${totalRequests} files`
 						);
 						bytesText.text(
 							`${(~~(bytes / 1000)).toLocaleString()} kB loaded`
@@ -773,87 +767,6 @@
 		}
 
 		loadDataWithProgress();
-
-		// // Custom progress-tracking wrapper for d3.csv
-		// async function csvWithProgress(url, onProgress) {
-		// 	const response = await fetch(url);
-		// 	const reader = response.body.getReader();
-		// 	const contentLength = +response.headers.get("Content-Length");
-		// 	console.log(contentLength, url);
-
-		// 	let receivedLength = 0;
-		// 	let chunks = [];
-
-		// 	while (true) {
-		// 		const { done, value } = await reader.read();
-
-		// 		if (done) {
-		// 			break;
-		// 		}
-
-		// 		chunks.push(value);
-		// 		receivedLength += value.length;
-		// 		if (contentLength !== 0) {
-		// 			onProgress((receivedLength / contentLength) * 100);
-		// 		}
-		// 	}
-
-		// 	const allChunks = new Uint8Array(receivedLength);
-		// 	let position = 0;
-		// 	for (const chunk of chunks) {
-		// 		allChunks.set(chunk, position);
-		// 		position += chunk.length;
-		// 	}
-
-		// 	const text = new TextDecoder("utf-8").decode(allChunks);
-		// 	return d3.csvParse(text);
-		// }
-
-		// // Function to load multiple CSVs with overall progress tracking
-		// function loadMultipleCSVs(urls, progressCallback) {
-		// 	const totalRequests = urls.length;
-		// 	const progressValues = new Array(totalRequests).fill(0);
-
-		// 	const updateOverallProgress = () => {
-		// 		const totalProgress = progressValues.reduce(
-		// 			(sum, value) => sum + value,
-		// 			0
-		// 		);
-		// 		const overallProgress = totalProgress / totalRequests;
-		// 		progressCallback(overallProgress);
-		// 	};
-
-		// 	const promises = urls.map((url, index) =>
-		// 		csvWithProgress(url, progress => {
-		// 			progressValues[index] = progress;
-		// 			updateOverallProgress();
-		// 		})
-		// 	);
-
-		// 	return Promise.all(promises);
-		// }
-
-		// // Usage example
-		// async function loadDataWithProgress() {
-		// 	try {
-		// 		const dataArrays = await loadMultipleCSVs(
-		// 			promises,
-		// 			progress => {
-		// 				console.log(
-		// 					`Overall loading progress: ${progress.toFixed(2)}%`
-		// 				);
-		// 				// Update your progress bar here
-		// 			}
-		// 		);
-
-		// 		console.log("All data loaded:", dataArrays);
-		// 		receiveInitialData(dataArrays);
-		// 	} catch (error) {
-		// 		console.error("Error loading data:", error);
-		// 	}
-		// }
-
-		// loadDataWithProgress();
 
 		function receiveInitialData(rawData) {
 			removeProgressWheel();
@@ -5247,14 +5160,60 @@
 				.style("dominant-baseline", "middle")
 				.style("font-size", "12px")
 				.attr("x", rectProgressWidth / 2 + 10)
-				.attr("y", 90);
+				.attr("y", 90)
+				.text("0/0 files");
 
 			const bytesText = wheelGroup
 				.append("text")
 				.style("font-family", "Roboto")
 				.style("text-anchor", "middle")
 				.style("font-size", "14px")
-				.attr("y", 120);
+				.attr("y", 128)
+				.text("0 kB loaded");
+
+			const arc = d3.arc().outerRadius(20).innerRadius(15);
+
+			const wheel = wheelGroup
+				.append("path")
+				.datum({
+					startAngle: 0,
+					endAngle: 0,
+				})
+				.classed("contributionColorFill", true)
+				.attr("d", arc);
+
+			transitionIn();
+
+			function transitionIn() {
+				wheel
+					.transition()
+					.duration(1000)
+					.attrTween("d", function (d) {
+						const interpolate = d3.interpolate(0, Math.PI * 2);
+						return function (t) {
+							d.endAngle = interpolate(t);
+							return arc(d);
+						};
+					})
+					.on("end", transitionOut);
+			}
+
+			function transitionOut() {
+				wheel
+					.transition()
+					.duration(1000)
+					.attrTween("d", function (d) {
+						const interpolate = d3.interpolate(0, Math.PI * 2);
+						return function (t) {
+							d.startAngle = interpolate(t);
+							return arc(d);
+						};
+					})
+					.on("end", function (d) {
+						d.startAngle = 0;
+						transitionIn();
+					});
+			}
 
 			return { rectProgress, progressText, bytesText };
 
