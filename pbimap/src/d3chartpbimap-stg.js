@@ -752,9 +752,10 @@
 								rectProgressWidth *
 									(totalProgress / totalRequests)
 							);
-						progressText.text(
-							`${totalProgress}/${totalRequests} files`
-						);
+						// no file count for the time being
+						// progressText.text(
+						// 	`${totalProgress}/${totalRequests} files`
+						// );
 						bytesText.text(
 							`${(~~(bytes / 1000)).toLocaleString()} kB loaded`
 						);
@@ -5160,8 +5161,8 @@
 				.style("dominant-baseline", "middle")
 				.style("font-size", "12px")
 				.attr("x", rectProgressWidth / 2 + 10)
-				.attr("y", 90)
-				.text("0/0 files");
+				.attr("y", 90);
+			// .text("0/0 files"); //no file count for the time being
 
 			const bytesText = wheelGroup
 				.append("text")
