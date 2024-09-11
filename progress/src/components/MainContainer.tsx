@@ -192,6 +192,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			/>
 			<TopPanel
 				{...filterProps}
+				implementationStatus={implementationStatus}
+				setImplementationStatus={setImplementationStatus}
 				titleRef={titleRef}
 				inViewTitle={inViewTitle}
 				inViewMenus={inViewMenus}

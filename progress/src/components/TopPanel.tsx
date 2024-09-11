@@ -5,6 +5,7 @@ import colors from "../utils/colors";
 import { RefIds } from "./MainContainer";
 import ScrollSpy from "./ScrollSpy";
 import { InSelectionData } from "../utils/processdatasummary";
+import { ImplementationStatuses } from "./MainContainer";
 import QuickSelectors from "./QuickSelectors";
 import React from "react";
 
@@ -29,6 +30,10 @@ type TopPanelProps = {
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationType: number[];
 	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	implementationStatus: ImplementationStatuses[];
+	setImplementationStatus: React.Dispatch<
+		React.SetStateAction<ImplementationStatuses[]>
+	>;
 	inSelectionData: InSelectionData;
 };
 
@@ -53,6 +58,8 @@ function TopPanel({
 	setAllocationSource,
 	allocationType,
 	setAllocationType,
+	implementationStatus,
+	setImplementationStatus,
 	inSelectionData,
 }: TopPanelProps) {
 	return (
@@ -93,7 +100,9 @@ function TopPanel({
 						// marginLeft: "1em",
 					}}
 				>
-					Allocation Progress Dashboard
+					{inViewMenus
+						? "Allocation Progress Dashboard"
+						: "Allocation Progress"}
 				</Typography>
 				<InfoIcon
 					data-tooltip-id="tooltip"
@@ -119,6 +128,8 @@ function TopPanel({
 						setAllocationSource={setAllocationSource}
 						allocationType={allocationType}
 						setAllocationType={setAllocationType}
+						implementationStatus={implementationStatus}
+						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}
 					/>
 				)}

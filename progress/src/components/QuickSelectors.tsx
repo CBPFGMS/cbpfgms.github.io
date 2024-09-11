@@ -4,6 +4,11 @@ import Dropdown from "./Dropdown";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { InSelectionData } from "../utils/processdatasummary";
 import { makeYearsList } from "../utils/makeyearslist";
+import { ImplementationStatuses } from "./MainContainer";
+import constants from "../utils/constants";
+import DropdownStatus from "./DropdownStatus";
+
+const { implementationStatuses } = constants;
 
 type SelectorsProps = {
 	year: number[];
@@ -14,6 +19,10 @@ type SelectorsProps = {
 	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	implementationStatus: ImplementationStatuses[];
+	setImplementationStatus: React.Dispatch<
+		React.SetStateAction<ImplementationStatuses[]>
+	>;
 	inSelectionData: InSelectionData;
 };
 
@@ -22,11 +31,13 @@ function QuickSelectors({
 	allocationType,
 	fund,
 	year,
+	implementationStatus,
 	inSelectionData,
 	setAllocationSource,
 	setAllocationType,
 	setFund,
 	setYear,
+	setImplementationStatus,
 }: SelectorsProps) {
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 
@@ -34,6 +45,9 @@ function QuickSelectors({
 	const dataArrayFunds = [...inDataLists.funds];
 	const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
 	const dataArrayAllocationSources = [...inDataLists.allocationSources];
+	const dataArrayImplementationStatuses: ImplementationStatuses[] = [
+		...implementationStatuses,
+	];
 
 	const yearsList = makeYearsList(dataArrayYears);
 	const namesListFunds = lists.fundNames;
@@ -86,6 +100,11 @@ function QuickSelectors({
 				inSelectionData={inSelectionData}
 				dataProperty={"allocationSources"}
 				fromQuickSelectors={true}
+			/>
+			<DropdownStatus
+				value={implementationStatus}
+				setValue={setImplementationStatus}
+				names={dataArrayImplementationStatuses}
 			/>
 		</Box>
 	);

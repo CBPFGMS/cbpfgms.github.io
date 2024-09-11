@@ -82,7 +82,7 @@ function Statuses({
 				<InfoIcon
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
-						"These are the tree statuses of the projects: implemented, under implementation, and closed/under closure.<br>Click 'Remove' to remove a status from the calculated values, or 'Add' to add it back."
+						"Projects can fall into three implementation statuses: Under Implementation, Programmatically Closed, and Financially Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
 					}
 					data-tooltip-place="top"
 					style={{
