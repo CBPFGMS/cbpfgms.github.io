@@ -76,13 +76,13 @@ function Search({
 			<Snack
 				openSnack={openSnack}
 				setOpenSnack={setOpenSnack}
-				message={`At least one allocation type must be selected`}
+				message={`At least one allocation name must be selected`}
 			/>
 			<Autocomplete
 				onMouseEnter={calculateHeight}
 				multiple
 				clearIcon={null}
-				id="allocation-types-search"
+				id="allocation-names-search"
 				options={namesListMemo}
 				value={value}
 				onChange={handleChange}
@@ -121,7 +121,7 @@ function Search({
 				renderInput={params => (
 					<TextField
 						{...params}
-						label="Allocation Type"
+						label="Allocation Name"
 						placeholder="Start typing or use the menu"
 					/>
 				)}

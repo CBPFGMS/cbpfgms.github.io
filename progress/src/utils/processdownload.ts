@@ -11,7 +11,7 @@ type BaseDownloadDatum = {
 	Year: number;
 	Fund: string;
 	"Allocation Source": string;
-	"Allocation Type": string;
+	"Allocation Name": string;
 	"Implementation Status": ImplementationStatuses;
 	"Project Code": string;
 	Budget: number;
@@ -487,7 +487,7 @@ function populateBaseDownloadDatum(
 		Year: datum.year,
 		Fund: lists.fundNames[datum.fund],
 		"Allocation Source": lists.allocationSources[datum.allocationSource],
-		"Allocation Type": lists.allocationTypes[datum.allocationType],
+		"Allocation Name": lists.allocationTypes[datum.allocationType],
 		"Implementation Status": thisStatus,
 		"Project Code": datum.projectCode,
 		Budget: datum.budget,

@@ -75,7 +75,7 @@ function AccordionComponent({
 		case "Allocation Source":
 			namesList = lists.allocationSources;
 			break;
-		case "Allocation Type":
+		case "Allocation Name":
 			namesList = lists.allocationTypes;
 			break;
 		default:
@@ -138,12 +138,14 @@ function AccordionComponent({
 							}}
 						>
 							{value.length === dataArray.length
-								? `All ${type}s selected`
+								? `All ${type.toLocaleLowerCase()}s selected`
 								: value.length === 1
 								? isValidKey(value[0], namesList)
 									? namesList[value[0]]
 									: value[0].toString()
-								: `${value.length} ${type}s selected`}
+								: `${
+										value.length
+								  } ${type.toLocaleLowerCase()}s selected`}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>

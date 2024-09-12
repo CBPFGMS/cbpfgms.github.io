@@ -52,7 +52,7 @@ function Selectors({
 			</Grid>
 			<Grid xs>
 				<AccordionComponent
-					type="Allocation Type"
+					type="Allocation Name"
 					dataProperty="allocationTypes"
 					filterType="search"
 					value={allocationType}

@@ -17,7 +17,7 @@ const constants = {
 		"gbv",
 		"indicators",
 	],
-	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Type"],
+	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Name"],
 	beneficiaryCategories: ["women", "girls", "men", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],
 	indicatorsHeader: ["indicator", "projects", "targeted", "reached"],

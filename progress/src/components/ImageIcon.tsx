@@ -6,7 +6,6 @@ import Box from "@mui/material/Box";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import generateImage from "../utils/generateimage";
 import Snackbar from "@mui/material/Snackbar";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Portal from "@mui/material/Portal";
 
 type ImageIconProps = {
@@ -72,75 +71,69 @@ function ImageIcon({ refElement, iconsRef, fileName }: ImageIconProps) {
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 			/>
-			<ClickAwayListener onClickAway={handleClose}>
-				<Popper
-					id={id}
-					open={open}
-					anchorEl={anchorEl}
-					sx={{ opacity: 0.9 }}
-					placement="left"
-					onMouseEnter={handleMouseEnterPopper}
-					onMouseLeave={handleClose}
+			<Popper
+				id={id}
+				open={open}
+				anchorEl={anchorEl}
+				sx={{ opacity: 0.9 }}
+				placement="left"
+				onMouseEnter={handleMouseEnterPopper}
+				onMouseLeave={handleClose}
+			>
+				<Box
+					sx={{
+						display: "flex",
+						flexDirection: "column",
+					}}
+					gap={0.2}
 				>
-					<Box
+					<Button
+						size="small"
 						sx={{
-							display: "flex",
-							flexDirection: "column",
+							p: 2,
+							backgroundColor: "#222",
+							color: "white",
+							"&:hover": { backgroundColor: "#444" },
 						}}
-						gap={0.2}
+						onClick={() => {
+							generateImage(
+								refElement,
+								iconsRef,
+								"download",
+								fileName
+							)
+								.then(() => handleClose())
+								.catch(() => handleClose());
+						}}
 					>
-						<Button
-							size="small"
-							sx={{
-								p: 2,
-								backgroundColor: "#222",
-								color: "white",
-								"&:hover": { backgroundColor: "#444" },
-							}}
-							onClick={() => {
-								generateImage(
-									refElement,
-									iconsRef,
-									"download",
-									fileName
-								)
-									.then(() => handleClose())
-									.catch(() => handleClose());
-							}}
-						>
-							<Typography fontSize={14}>
-								Download as PNG
-							</Typography>
-						</Button>
-						<Button
-							size="small"
-							sx={{
-								p: 2,
-								backgroundColor: "#222",
-								color: "white",
-								"&:hover": { backgroundColor: "#444" },
-							}}
-							onClick={() => {
-								generateImage(
-									refElement,
-									iconsRef,
-									"copy",
-									fileName
-								)
-									.then(() => {
-										setOpenSnackbar(true);
-										handleClose();
-									})
-									.catch(() => handleClose());
-							}}
-						>
-							<Typography fontSize={14}>
-								Copy to clipboard
-							</Typography>
-						</Button>
-					</Box>
-				</Popper>
-			</ClickAwayListener>
+						<Typography fontSize={14}>Download as PNG</Typography>
+					</Button>
+					<Button
+						size="small"
+						sx={{
+							p: 2,
+							backgroundColor: "#222",
+							color: "white",
+							"&:hover": { backgroundColor: "#444" },
+						}}
+						onClick={() => {
+							generateImage(
+								refElement,
+								iconsRef,
+								"copy",
+								fileName
+							)
+								.then(() => {
+									setOpenSnackbar(true);
+									handleClose();
+								})
+								.catch(() => handleClose());
+						}}
+					>
+						<Typography fontSize={14}>Copy to clipboard</Typography>
+					</Button>
+				</Box>
+			</Popper>
 		</Box>
 	);
 }

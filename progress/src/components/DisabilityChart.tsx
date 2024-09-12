@@ -94,7 +94,7 @@ function DisabilityChart({
 						textTransform: "uppercase",
 					}}
 				>
-					People with Disability, Targeted and Reached
+					Persons with disabilities, Targeted and Reached
 				</Typography>
 				<Typography
 					style={{
