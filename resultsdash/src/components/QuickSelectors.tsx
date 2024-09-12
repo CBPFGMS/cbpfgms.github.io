@@ -48,7 +48,7 @@ function QuickSelectors({
 				setValue={setAllocationType}
 				names={dataArrayAllocationTypes}
 				namesList={namesListAllocationTypes as ListObj}
-				type={"Allocation Type"}
+				type={"Allocation Name"}
 				inSelectionData={inSelectionData}
 				dataProperty={"allocationTypes"}
 				fromQuickSelectors={true}

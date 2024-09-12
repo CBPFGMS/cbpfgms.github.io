@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Unstable_Grid2";
 import { SelectorsProps } from "../types";
@@ -12,13 +12,6 @@ function Selectors({
 	setAllocationType,
 	inSelectionData,
 }: SelectorsProps) {
-	const [expanded, setExpanded] = useState<string | false>(false);
-
-	const handleAccordionExpand =
-		(panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-			setExpanded(isExpanded ? panel : false);
-		};
-
 	return (
 		<Grid
 			container
@@ -31,20 +24,16 @@ function Selectors({
 					filterType="dropdowncheck"
 					value={fund}
 					setValue={setFund}
-					expanded={expanded}
-					handleAccordionExpand={handleAccordionExpand}
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
 			<Grid xs={4}>
 				<AccordionComponent
-					type="Allocation Type"
+					type="Allocation Name"
 					dataProperty="allocationTypes"
 					filterType="search"
 					value={allocationType}
 					setValue={setAllocationType}
-					expanded={expanded}
-					handleAccordionExpand={handleAccordionExpand}
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
@@ -55,8 +44,6 @@ function Selectors({
 					filterType="checkbox"
 					value={allocationSource}
 					setValue={setAllocationSource}
-					expanded={expanded}
-					handleAccordionExpand={handleAccordionExpand}
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>

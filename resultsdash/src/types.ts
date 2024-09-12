@@ -216,10 +216,6 @@ export type AccordionComponentProps = {
 	dataProperty: DataProperties;
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
-	expanded: string | false;
-	handleAccordionExpand: (
-		panel: string
-	) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
 	inSelectionData: InSelectionObject;
 };
 

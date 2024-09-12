@@ -110,7 +110,7 @@ function Search({
 				renderInput={params => (
 					<TextField
 						{...params}
-						label="Allocation Type"
+						label="Allocation Name"
 						placeholder="Start typing or use the menu"
 					/>
 				)}

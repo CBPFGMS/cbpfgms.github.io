@@ -35,6 +35,7 @@ import {
 	ByTypeObj,
 	ByOrganizationObj,
 } from "../schemas";
+import NoData from "./NoData.tsx";
 
 const downloadStates: DownloadStates = {
 	summary: false,
@@ -562,168 +563,191 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
-					<Grid
-						container
-						direction={"row"}
-						spacing={1}
-						xs={12}
-						flexWrap={"nowrap"}
-						mt={3}
-						mb={3}
-					>
-						<Grid
-							xs={6}
-							ref={summaryRef}
-							id={summaryRefId}
-						>
-							<SummaryChart
-								dataSummary={dataSummary}
-								year={year}
-								clickedDownload={clickedDownload}
-								setClickedDownload={setClickedDownload}
-								summaryDataDownload={summaryDataDownload}
-								fundsList={apiData.lists.fundAbbreviatedNames}
+					{dataSummary.length === 0 ? (
+						<NoData />
+					) : (
+						<Box>
+							<Grid
+								container
+								direction={"row"}
+								spacing={1}
+								xs={12}
+								flexWrap={"nowrap"}
+								mt={3}
+								mb={3}
+							>
+								<Grid
+									xs={6}
+									ref={summaryRef}
+									id={summaryRefId}
+								>
+									<SummaryChart
+										dataSummary={dataSummary}
+										year={year}
+										clickedDownload={clickedDownload}
+										setClickedDownload={setClickedDownload}
+										summaryDataDownload={
+											summaryDataDownload
+										}
+										fundsList={
+											apiData.lists.fundAbbreviatedNames
+										}
+									/>
+								</Grid>
+								<Divider
+									orientation="vertical"
+									flexItem
+									style={{
+										borderLeft: "3px dotted #ccc",
+										borderRight: "none",
+									}}
+								/>
+								<Grid
+									xs={6}
+									ref={pictogramRef}
+									id={pictogramRefId}
+								>
+									<Box
+										display={"flex"}
+										alignItems={"center"}
+										justifyContent={"center"}
+									>
+										<PictogramChart
+											dataPictogram={dataPictogram}
+											clickedDownload={clickedDownload}
+											setClickedDownload={
+												setClickedDownload
+											}
+											summaryDataDownload={
+												summaryDataDownload
+											}
+											fundsList={
+												apiData.lists
+													.fundAbbreviatedNames
+											}
+										/>
+									</Box>
+								</Grid>
+							</Grid>
+							<Divider
+								orientation="horizontal"
+								flexItem
+								style={{
+									borderTop: "3px dotted #ccc",
+									borderBottom: "none",
+									width: "96%",
+									marginLeft: "2%",
+								}}
 							/>
-						</Grid>
-						<Divider
-							orientation="vertical"
-							flexItem
-							style={{
-								borderLeft: "3px dotted #ccc",
-								borderRight: "none",
-							}}
-						/>
-						<Grid
-							xs={6}
-							ref={pictogramRef}
-							id={pictogramRefId}
-						>
-							<Box
-								display={"flex"}
-								alignItems={"center"}
+							<Grid
+								container
+								direction={"row"}
+								spacing={1}
+								xs={12}
+								flexWrap={"nowrap"}
+								mt={3}
+								mb={3}
+							>
+								<Grid xs={6}>
+									<Box
+										ref={beneficiaryTypesRef}
+										id={beneficiaryTypesRefId}
+									>
+										<TypeAndSectorChart<ByTypeObj>
+											data={dataBeneficiaryTypes}
+											list={apiData.lists}
+											title="People targeted and reached by type"
+											chartType="beneficiaryTypes"
+											clickedDownload={clickedDownload}
+											setClickedDownload={
+												setClickedDownload
+											}
+											dataDownload={
+												byBeneficiaryTypeDataDownload
+											}
+										/>
+									</Box>
+								</Grid>
+								<Divider
+									orientation="vertical"
+									flexItem
+									style={{
+										borderLeft: "3px dotted #ccc",
+										borderRight: "none",
+									}}
+								/>
+								<Grid
+									xs={6}
+									ref={organizationTypesRef}
+									id={organizationTypesRefId}
+								>
+									<Box
+										display={"flex"}
+										alignItems={"center"}
+										justifyContent={"center"}
+									>
+										<TypeAndSectorChart<ByOrganizationObj>
+											data={dataOrganizationTypes}
+											list={apiData.lists}
+											title="People targeted and reached by organization"
+											chartType="organization"
+											clickedDownload={clickedDownload}
+											setClickedDownload={
+												setClickedDownload
+											}
+											dataDownload={
+												byOrganizationTypeDataDownload
+											}
+										/>
+									</Box>
+								</Grid>
+							</Grid>
+							<Divider
+								orientation="horizontal"
+								flexItem
+								style={{
+									borderTop: "3px dotted #ccc",
+									borderBottom: "none",
+									width: "96%",
+									marginLeft: "2%",
+								}}
+							/>
+							<Grid
+								container
+								direction={"row"}
 								justifyContent={"center"}
+								spacing={1}
+								xs={12}
+								flexWrap={"nowrap"}
+								mt={3}
+								mb={3}
 							>
-								<PictogramChart
-									dataPictogram={dataPictogram}
-									clickedDownload={clickedDownload}
-									setClickedDownload={setClickedDownload}
-									summaryDataDownload={summaryDataDownload}
-									fundsList={
-										apiData.lists.fundAbbreviatedNames
-									}
-								/>
-							</Box>
-						</Grid>
-					</Grid>
-					<Divider
-						orientation="horizontal"
-						flexItem
-						style={{
-							borderTop: "3px dotted #ccc",
-							borderBottom: "none",
-							width: "96%",
-							marginLeft: "2%",
-						}}
-					/>
-					<Grid
-						container
-						direction={"row"}
-						spacing={1}
-						xs={12}
-						flexWrap={"nowrap"}
-						mt={3}
-						mb={3}
-					>
-						<Grid xs={6}>
-							<Box
-								ref={beneficiaryTypesRef}
-								id={beneficiaryTypesRefId}
-							>
-								<TypeAndSectorChart<ByTypeObj>
-									data={dataBeneficiaryTypes}
-									list={apiData.lists}
-									title="People targeted and reached by type"
-									chartType="beneficiaryTypes"
-									clickedDownload={clickedDownload}
-									setClickedDownload={setClickedDownload}
-									dataDownload={byBeneficiaryTypeDataDownload}
-								/>
-							</Box>
-						</Grid>
-						<Divider
-							orientation="vertical"
-							flexItem
-							style={{
-								borderLeft: "3px dotted #ccc",
-								borderRight: "none",
-							}}
-						/>
-						<Grid
-							xs={6}
-							ref={organizationTypesRef}
-							id={organizationTypesRefId}
-						>
-							<Box
-								display={"flex"}
-								alignItems={"center"}
-								justifyContent={"center"}
-							>
-								<TypeAndSectorChart<ByOrganizationObj>
-									data={dataOrganizationTypes}
-									list={apiData.lists}
-									title="People targeted and reached by organization"
-									chartType="organization"
-									clickedDownload={clickedDownload}
-									setClickedDownload={setClickedDownload}
-									dataDownload={
-										byOrganizationTypeDataDownload
-									}
-								/>
-							</Box>
-						</Grid>
-					</Grid>
-					<Divider
-						orientation="horizontal"
-						flexItem
-						style={{
-							borderTop: "3px dotted #ccc",
-							borderBottom: "none",
-							width: "96%",
-							marginLeft: "2%",
-						}}
-					/>
-					<Grid
-						container
-						direction={"row"}
-						justifyContent={"center"}
-						spacing={1}
-						xs={12}
-						flexWrap={"nowrap"}
-						mt={3}
-						mb={3}
-					>
-						<Grid
-							xs={8}
-							ref={sectorsRef}
-							id={sectorsRefId}
-						>
-							<Box
-								display={"flex"}
-								alignItems={"center"}
-								justifyContent={"center"}
-							>
-								<TypeAndSectorChart<BySectorObj>
-									data={dataSectors}
-									list={apiData.lists}
-									title="People targeted and reached by sector"
-									chartType="sectors"
-									clickedDownload={clickedDownload}
-									setClickedDownload={setClickedDownload}
-									dataDownload={bySectorDataDownload}
-								/>
-							</Box>
-						</Grid>
-					</Grid>
+								<Grid
+									xs={8}
+									ref={sectorsRef}
+									id={sectorsRefId}
+								>
+									<Box
+										display={"flex"}
+										alignItems={"center"}
+										justifyContent={"center"}
+									>
+										<TypeAndSectorChart<BySectorObj>
+											data={dataSectors}
+											list={apiData.lists}
+											title="People targeted and reached by sector"
+											chartType="sectors"
+											clickedDownload={clickedDownload}
+											setClickedDownload={
+												setClickedDownload
+											}
+											dataDownload={bySectorDataDownload}
+										/>
+									</Box>
+								</Grid>
+							</Grid>
+						</Box>
+					)}
 				</Paper>
 			</Grid>
 			<Grid
@@ -745,19 +769,23 @@ function MainContainer() {
 					}}
 				>
 					<GradientPaper />
-					<Grid
-						direction={"column"}
-						spacing={2}
-						xs={12}
-						ref={mapRef}
-						id={mapRefId}
-					>
-						<Map
-							data={dataMap}
-							clickedDownload={clickedDownload}
-							setClickedDownload={setClickedDownload}
-						/>
-					</Grid>
+					{dataMap.length === 0 ? (
+						<NoData />
+					) : (
+						<Grid
+							direction={"column"}
+							spacing={2}
+							xs={12}
+							ref={mapRef}
+							id={mapRefId}
+						>
+							<Map
+								data={dataMap}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+							/>
+						</Grid>
+					)}
 				</Paper>
 			</Grid>
 		</Container>
