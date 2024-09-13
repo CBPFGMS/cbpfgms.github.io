@@ -750,28 +750,26 @@ function MainContainer() {
 					)}
 				</Paper>
 			</Grid>
-			<Grid
-				container
-				spacing={2}
-				mt={6}
-				mb={6}
-			>
-				<Paper
-					elevation={0}
-					style={{
-						width: "100%",
-						paddingTop: "1em",
-						paddingBottom: "1em",
-						backgroundColor: "#f5f8ff",
-						borderRadius: "6px",
-						position: "relative",
-						overflow: "hidden",
-					}}
+			{dataMap.length > 0 && (
+				<Grid
+					container
+					spacing={2}
+					mt={6}
+					mb={6}
 				>
-					<GradientPaper />
-					{dataMap.length === 0 ? (
-						<NoData />
-					) : (
+					<Paper
+						elevation={0}
+						style={{
+							width: "100%",
+							paddingTop: "1em",
+							paddingBottom: "1em",
+							backgroundColor: "#f5f8ff",
+							borderRadius: "6px",
+							position: "relative",
+							overflow: "hidden",
+						}}
+					>
+						<GradientPaper />
 						<Grid
 							direction={"column"}
 							spacing={2}
@@ -785,9 +783,9 @@ function MainContainer() {
 								setClickedDownload={setClickedDownload}
 							/>
 						</Grid>
-					)}
-				</Paper>
-			</Grid>
+					</Paper>
+				</Grid>
+			)}
 		</Container>
 	);
 }
