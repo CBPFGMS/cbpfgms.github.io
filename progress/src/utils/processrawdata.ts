@@ -39,7 +39,7 @@ export type Datum = {
 	reportType: ReportType;
 };
 
-type ReportType = (typeof reportTypes)[number];
+export type ReportType = (typeof reportTypes)[number];
 
 export type Data = Datum[];
 
@@ -240,6 +240,7 @@ function processRawData({
 					),
 					endDate: new Date(row.EndDate),
 					projectStatusId: row.GlbPrjStatusId,
+					reportType: row.RptCode ?? 0,
 				});
 
 				const reachedByBeneficiaryType: BeneficiaryTypes =

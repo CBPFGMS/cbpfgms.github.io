@@ -24,6 +24,7 @@ type UpdateQueryStringParams = {
 	implementationStatus: ImplementationStatuses[];
 	downloadStates: DownloadStates;
 	defaultYear: number;
+	showFinanciallyClosed: boolean;
 };
 
 const { implementationStatuses } = constants;
@@ -44,7 +45,14 @@ function useUpdateQueryString({
 	year,
 	downloadStates,
 	defaultYear,
+	showFinanciallyClosed,
 }: UpdateQueryStringParams): void {
+	const implementationStatusesFiltered = showFinanciallyClosed
+		? implementationStatuses
+		: implementationStatuses.filter(
+				status => status !== "Financially Closed"
+		  );
+
 	useEffect(() => {
 		const allocationTypesParam = getNumericArrayParam("allocationType");
 		const allocationSourcesParam = getNumericArrayParam("allocationSource");
@@ -70,31 +78,42 @@ function useUpdateQueryString({
 		const allocationTypesParam =
 			allocationType.length === inDataLists.allocationTypes.size
 				? ""
-				: `&allocationType=${allocationType}`;
+				: `allocationType=${allocationType}`;
 		const allocationSourcesParam =
 			allocationSource.length === inDataLists.allocationSources.size
 				? ""
-				: `&allocationSource=${allocationSource}`;
+				: `allocationSource=${allocationSource}`;
 		const fundParam =
-			fund.length === inDataLists.funds.size ? "" : `&fund=${fund}`;
+			fund.length === inDataLists.funds.size ? "" : `fund=${fund}`;
 		const yearParam =
-			year.length === 1 && year[0] === defaultYear ? "" : `&year=${year}`;
+			year.length === 1 && year[0] === defaultYear ? "" : `year=${year}`;
 		const implementationStatusParam =
-			implementationStatus.length === implementationStatuses.length
+			implementationStatus.length ===
+			implementationStatusesFiltered.length
 				? ""
-				: `&implementationStatus=${implementationStatus}`;
+				: `implementationStatus=${implementationStatus}`;
+		const showFinanciallyClosedParam = showFinanciallyClosed
+			? "showFinanciallyClosed"
+			: "";
+
 		if (
 			allocationTypesParam ||
 			allocationSourcesParam ||
 			fundParam ||
 			yearParam ||
-			implementationStatusParam
+			implementationStatusParam ||
+			showFinanciallyClosed
 		) {
-			window.history.replaceState(
-				{},
-				"",
-				`?${allocationTypesParam}${allocationSourcesParam}${fundParam}${yearParam}${implementationStatusParam}`
-			);
+			const params = buildQueryStringParams([
+				allocationTypesParam,
+				allocationSourcesParam,
+				fundParam,
+				yearParam,
+				implementationStatusParam,
+				showFinanciallyClosedParam,
+			]);
+
+			window.history.replaceState({}, "", `?${params}`);
 		} else {
 			window.history.replaceState({}, "", window.location.pathname);
 		}
@@ -113,6 +132,10 @@ function useUpdateQueryString({
 				.get(param)
 				?.split(",") as ImplementationStatuses[]) ?? null
 		);
+	}
+
+	function buildQueryStringParams(params: string[]): string {
+		return params.filter(param => param).join("&");
 	}
 }
 

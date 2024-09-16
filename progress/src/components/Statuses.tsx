@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { DataStatuses } from "../utils/processdatastatuses";
 import { ImplementationStatuses } from "./MainContainer";
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -13,6 +14,7 @@ import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
+import Snack from "./Snack";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -20,6 +22,7 @@ type StatusesProps = {
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
+	showFinanciallyClosed: boolean;
 };
 
 type StatusProps = {
@@ -47,13 +50,23 @@ function Statuses({
 	dataStatuses,
 	implementationStatus,
 	setImplementationStatus,
+	showFinanciallyClosed,
 }: StatusesProps) {
+	const [openSnack, setOpenSnack] = useState<boolean>(false);
+
 	const total = Object.values(dataStatuses).reduce(
 		(acc, curr) => acc + curr,
 		0
 	);
 
 	function handleClick(status: ImplementationStatuses) {
+		if (
+			implementationStatus.length === 1 &&
+			implementationStatus.includes(status)
+		) {
+			setOpenSnack(true);
+			return;
+		}
 		setImplementationStatus(
 			implementationStatus.includes(status)
 				? implementationStatus.filter(e => status !== e)
@@ -63,10 +76,15 @@ function Statuses({
 
 	return (
 		<Box sx={{ width: "100%", zIndex: 100 }}>
+			<Snack
+				openSnack={openSnack}
+				setOpenSnack={setOpenSnack}
+				message={`At least one implementation status must be selected`}
+			/>
 			<Grid
 				pb={2}
 				pt={2}
-				xs={12}
+				size={12}
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"flex-start"}
@@ -82,7 +100,9 @@ function Statuses({
 				<InfoIcon
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
-						"Projects can fall into three implementation statuses: Under Implementation, Programmatically Closed, and Financially Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
+						showFinanciallyClosed
+							? "Projects can fall into three implementation statuses: Under Implementation, Programmatically Closed, and Financially Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
+							: "Projects can fall into two implementation statuses: Under Implementation and Programmatically Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
 					}
 					data-tooltip-place="top"
 					style={{
@@ -138,7 +158,7 @@ function Status({
 	const statusSelected = implementationStatus.includes(status);
 
 	return (
-		<Grid xs={4}>
+		<Grid size={6}>
 			<Card
 				key={status}
 				variant="outlined"
@@ -154,7 +174,7 @@ function Status({
 						alignItems={"center"}
 					>
 						<Grid
-							xs={8}
+							size={8}
 							container
 						>
 							<Typography
@@ -181,7 +201,7 @@ function Status({
 						</Grid>
 						<Grid
 							container
-							xs={4}
+							size={4}
 							alignSelf={"flex-start"}
 							justifyContent={"flex-end"}
 						>

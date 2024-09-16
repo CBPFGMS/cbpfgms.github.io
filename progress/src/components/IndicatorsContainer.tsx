@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
@@ -25,6 +25,7 @@ type IndicatorsContainerProps = {
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	implementationsStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 function IndicatorsContainer({
@@ -39,6 +40,7 @@ function IndicatorsContainer({
 	clickedDownload,
 	setClickedDownload,
 	implementationsStatus,
+	showFinanciallyClosed,
 }: IndicatorsContainerProps) {
 	const [indicatorsFilteredData, setIndicatorsFilteredData] = useState<
 			DatumIndicators[]
@@ -58,6 +60,7 @@ function IndicatorsContainer({
 			allocationSource,
 			allocationType,
 			implementationsStatus,
+			showFinanciallyClosed,
 		});
 		if (filteredIndicators.length === 0) {
 			setGenerateTable(false);
@@ -71,6 +74,7 @@ function IndicatorsContainer({
 		allocationType,
 		lists,
 		implementationsStatus,
+		showFinanciallyClosed,
 	]);
 
 	return (
@@ -81,7 +85,7 @@ function IndicatorsContainer({
 			justifyContent={"center"}
 		>
 			<Grid
-				xs={12}
+				size={12}
 				ref={indicatorsRef}
 				id={refIds.indicatorsRefId}
 			>
@@ -97,7 +101,7 @@ function IndicatorsContainer({
 				</Typography>
 			</Grid>
 			<Grid
-				xs={10}
+				size={10}
 				mb={3}
 				justifyContent={"center"}
 				display={"flex"}
@@ -136,7 +140,7 @@ function IndicatorsContainer({
 						: "No Global Indicators for the filters selected"}
 				</Button>
 			</Grid>
-			<Grid xs={12}>
+			<Grid size={12}>
 				{indicatorsFilteredData.length > 0 && generateTable && (
 					<IndicatorsCarousel
 						data={indicatorsFilteredData}

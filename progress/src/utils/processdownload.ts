@@ -78,6 +78,7 @@ type ProcessDownloadParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 type ProcessIndicatorsDownloadParams = {
@@ -95,11 +96,12 @@ export function processSummaryDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): SummaryDatumDownload[] {
 	const summaryDataDownload: SummaryDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -135,11 +137,12 @@ export function processPictogramDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): PictogramDatumDownload[] {
 	const pictogramDataDownload: PictogramDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -182,11 +185,12 @@ export function processDisabilityDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): DisabilityDatumDownload[] {
 	const disabilityDataDownload: DisabilityDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -229,11 +233,12 @@ export function processGBVDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): GBVDatumDownload[] {
 	const gbvDataDownload: GBVDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -272,11 +277,12 @@ export function processBeneficiaryTypesDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): BeneficiaryTypesDatumDownload[] {
 	const beneficiaryTypesDataDownload: BeneficiaryTypesDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -356,11 +362,12 @@ export function processSectorsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): SectorsDatumDownload[] {
 	const sectorsDataDownload: SectorsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,
@@ -406,11 +413,12 @@ export function processOrganizationsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: ProcessDownloadParams): OrganizationsDatumDownload[] {
 	const organizationsDataDownload: OrganizationsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			checkRow(
 				thisStatus,

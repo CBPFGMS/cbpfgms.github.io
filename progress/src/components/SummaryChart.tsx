@@ -26,6 +26,7 @@ type SummaryChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 function SummaryChart({
@@ -37,6 +38,7 @@ function SummaryChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: SummaryChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -51,6 +53,7 @@ function SummaryChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
+			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataSummaryDownload)[number]>(
 			dataSummaryDownload,

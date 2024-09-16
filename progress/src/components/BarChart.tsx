@@ -43,6 +43,7 @@ type BarChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 type Data = {
@@ -65,6 +66,7 @@ function BarChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	showFinanciallyClosed,
 }: BarChartProps) {
 	const { data: completeData } = useContext(DataContext) as DataContextType;
 
@@ -121,6 +123,7 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
+				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataBeneficiariesDownload)[number]>(
 				dataBeneficiariesDownload,
@@ -135,6 +138,7 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
+				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataSectorsDownload)[number]>(
 				dataSectorsDownload,
@@ -149,6 +153,7 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
+				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataOrganizationsDownload)[number]>(
 				dataOrganizationsDownload,

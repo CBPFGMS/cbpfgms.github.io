@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
 import colors from "../utils/colors";
@@ -35,6 +35,7 @@ type TopPanelProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
+	showFinanciallyClosed: boolean;
 };
 
 function TopPanel({
@@ -61,6 +62,7 @@ function TopPanel({
 	implementationStatus,
 	setImplementationStatus,
 	inSelectionData,
+	showFinanciallyClosed,
 }: TopPanelProps) {
 	return (
 		<Grid
@@ -84,7 +86,7 @@ function TopPanel({
 			<Grid
 				pb={3}
 				pt={2}
-				xs={12}
+				size={12}
 				display={"flex"}
 				alignItems={"center"}
 				justifyContent={"center"}
@@ -131,6 +133,7 @@ function TopPanel({
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}
+						showFinanciallyClosed={showFinanciallyClosed}
 					/>
 				)}
 			</Grid>

@@ -23,6 +23,7 @@ type ProcessDataBarChartParams = {
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
+	showFinanciallyClosed: boolean;
 };
 
 type BeneficiariesEntry = [
@@ -40,6 +41,7 @@ function processDataBarChart({
 	allocationType,
 	implementationStatus,
 	lists,
+	showFinanciallyClosed,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -64,7 +66,7 @@ function processDataBarChart({
 	});
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			implementationStatus.includes(thisStatus) &&
 			year.includes(datum.year) &&

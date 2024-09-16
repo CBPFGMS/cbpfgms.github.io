@@ -19,7 +19,7 @@ import {
 	globalIndicatorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import { GenderAndAge } from "./processrawdata";
+import { GenderAndAge, ReportType } from "./processrawdata";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -59,6 +59,7 @@ export type ProjectDetails = {
 	allocationType: number;
 	endDate: Date;
 	projectStatusId: number;
+	reportType: ReportType;
 };
 
 export type List = {

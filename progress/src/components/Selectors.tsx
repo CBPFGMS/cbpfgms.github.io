@@ -1,5 +1,5 @@
 import AccordionComponent from "./Accordion";
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import { InSelectionData } from "../utils/processdatasummary";
 
 type SelectorsProps = {
@@ -30,7 +30,7 @@ function Selectors({
 			container
 			spacing={1}
 		>
-			<Grid xs={2}>
+			<Grid size={2}>
 				<AccordionComponent
 					type="Year"
 					dataProperty="years"
@@ -40,7 +40,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs>
+			<Grid sx={{ flexGrow: 1 }}>
 				<AccordionComponent
 					type="Fund"
 					dataProperty="funds"
@@ -50,7 +50,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs>
+			<Grid sx={{ flexGrow: 1 }}>
 				<AccordionComponent
 					type="Allocation Name"
 					dataProperty="allocationTypes"
@@ -60,7 +60,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid xs>
+			<Grid sx={{ flexGrow: 1 }}>
 				<AccordionComponent
 					type="Allocation Source"
 					dataProperty="allocationSources"

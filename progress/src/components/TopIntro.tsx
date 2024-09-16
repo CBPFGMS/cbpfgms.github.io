@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from '@mui/material/Grid2';
 import Typography from "@mui/material/Typography";
 
 function TopIntro() {
@@ -9,7 +9,7 @@ function TopIntro() {
 			justifyContent={"center"}
 		>
 			<Grid
-				xs={10}
+				size={10}
 				mb={3}
 			>
 				<Typography

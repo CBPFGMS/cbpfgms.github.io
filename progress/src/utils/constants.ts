@@ -26,6 +26,7 @@ const constants = {
 	reportTypes: [0, 1, 2],
 	reportsForDisability: [1, 2],
 	reportsForGBV: [2],
+	finalReportCode: 2,
 } as const;
 
 export default constants;

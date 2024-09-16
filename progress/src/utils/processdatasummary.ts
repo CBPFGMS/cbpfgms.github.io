@@ -21,6 +21,7 @@ type ProcessDataSummaryParams = {
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
+	showFinanciallyClosed: boolean;
 };
 
 export type DatumSummary = {
@@ -69,6 +70,7 @@ function processDataSummary({
 	allocationType,
 	implementationStatus,
 	lists,
+	showFinanciallyClosed,
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataPictogram: DatumPictogram;
@@ -118,7 +120,7 @@ function processDataSummary({
 	};
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists);
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
 		if (
 			implementationStatus.includes(thisStatus) &&
 			year.includes(datum.year) &&

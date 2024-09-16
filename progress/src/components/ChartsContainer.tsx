@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
@@ -48,6 +48,7 @@ type ChartsContainerProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationsStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 function ChartsContainer({
@@ -74,6 +75,7 @@ function ChartsContainer({
 	allocationSource,
 	allocationType,
 	implementationsStatus,
+	showFinanciallyClosed,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -109,13 +111,13 @@ function ChartsContainer({
 					container
 					direction={"row"}
 					spacing={1}
-					xs={12}
+					size={12}
 					flexWrap={"nowrap"}
 					mt={3}
 					mb={3}
 				>
 					<Grid
-						xs={6}
+						size={6}
 						ref={summaryRef}
 						id={refIds.summaryRefId}
 					>
@@ -128,6 +130,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -139,7 +142,7 @@ function ChartsContainer({
 						}}
 					/>
 					<Grid
-						xs={6}
+						size={6}
 						ref={pictogramRef}
 						id={refIds.pictogramRefId}
 					>
@@ -152,6 +155,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -169,13 +173,13 @@ function ChartsContainer({
 					container
 					direction={"row"}
 					spacing={1}
-					xs={12}
+					size={12}
 					flexWrap={"nowrap"}
 					mt={3}
 					mb={3}
 				>
 					<Grid
-						xs={6}
+						size={6}
 						ref={beneficiaryTypesRef}
 						id={refIds.beneficiaryTypesRefId}
 					>
@@ -191,6 +195,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -202,7 +207,7 @@ function ChartsContainer({
 						}}
 					/>
 					<Grid
-						xs={6}
+						size={6}
 						ref={organizationsRef}
 						id={refIds.organizationsRefId}
 					>
@@ -220,6 +225,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -238,13 +244,13 @@ function ChartsContainer({
 					direction={"row"}
 					justifyContent={"center"}
 					spacing={1}
-					xs={12}
+					size={12}
 					flexWrap={"nowrap"}
 					mt={3}
 					mb={3}
 				>
 					<Grid
-						xs={8}
+						size={8}
 						ref={sectorsRef}
 						id={refIds.sectorsRefId}
 					>
@@ -265,6 +271,7 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
+								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>
@@ -283,13 +290,13 @@ function ChartsContainer({
 					container
 					direction={"row"}
 					spacing={1}
-					xs={12}
+					size={12}
 					flexWrap={"nowrap"}
 					mt={3}
 					mb={3}
 				>
 					<Grid
-						xs={6}
+						size={6}
 						ref={disabilityRef}
 						id={refIds.disabilityRefId}
 					>
@@ -302,6 +309,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -313,7 +321,7 @@ function ChartsContainer({
 						}}
 					/>
 					<Grid
-						xs={6}
+						size={6}
 						ref={gbvRef}
 						id={refIds.gbvRefId}
 					>
@@ -326,6 +334,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>

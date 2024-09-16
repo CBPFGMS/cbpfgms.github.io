@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from '@mui/material/Grid2';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
@@ -25,6 +25,7 @@ type FiltersContainerProps = {
 	inSelectionData: InSelectionData;
 	menusRef: (node?: Element | null | undefined) => void;
 	dataStatuses: DataStatuses;
+	showFinanciallyClosed: boolean;
 };
 
 function FiltersContainer({
@@ -41,6 +42,7 @@ function FiltersContainer({
 	implementationStatus,
 	setImplementationStatus,
 	dataStatuses,
+	showFinanciallyClosed,
 }: FiltersContainerProps) {
 	return (
 		<Grid
@@ -74,7 +76,7 @@ function FiltersContainer({
 				</Box>
 				<Grid
 					ref={menusRef}
-					xs={12}
+					size={12}
 				>
 					<Selectors
 						year={year}
@@ -89,7 +91,7 @@ function FiltersContainer({
 					/>
 				</Grid>
 				<Grid
-					xs={12}
+					size={12}
 					display={"flex"}
 					justifyContent={"flex-start"}
 				>
@@ -97,6 +99,7 @@ function FiltersContainer({
 						dataStatuses={dataStatuses}
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
+						showFinanciallyClosed={showFinanciallyClosed}
 					/>
 				</Grid>
 			</Paper>

@@ -60,6 +60,7 @@ type ProcessDataIndicatorsParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationsStatus: ImplementationStatuses[];
+	showFinanciallyClosed: boolean;
 };
 
 type StatusKey = "Tgt" | "Ach";
@@ -74,6 +75,7 @@ function processDataIndicators({
 	allocationSource,
 	allocationType,
 	implementationsStatus,
+	showFinanciallyClosed,
 }: ProcessDataIndicatorsParams): DatumIndicators[] {
 	const filteredDataIndicators: DatumIndicators[] = [];
 
@@ -105,7 +107,11 @@ function processDataIndicators({
 			return;
 		}
 
-		const thisStatus = calculateStatus(thisProjectDetails, lists);
+		const thisStatus = calculateStatus(
+			thisProjectDetails,
+			lists,
+			showFinanciallyClosed
+		);
 
 		if (
 			year.includes(thisProjectDetails.year) &&
