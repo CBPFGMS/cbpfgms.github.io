@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import Box from "@mui/material/Box";
 import ArrowCircleLeftOutlinedIcon from "@mui/icons-material/ArrowCircleLeftOutlined";
 import ArrowCircleRightOutlinedIcon from "@mui/icons-material/ArrowCircleRightOutlined";
@@ -5,19 +6,26 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { YearSelectorProps } from "../types";
+import DataContext from "../context/DataContext";
+import { DataContextType, YearSelectorProps } from "../types";
 
 function YearSelector({
 	reportYear,
 	setReportYear,
 	reportYears,
 	setYear,
+	setFund,
+	setAllocationSource,
+	setAllocationType,
 }: YearSelectorProps) {
+	const apiData = useContext(DataContext) as DataContextType;
+
 	function handleLeftClick() {
 		setYear(null);
 		setReportYear(prev =>
 			reportYears.has(prev[0] - 1) ? [prev[0] - 1] : prev
 		);
+		resetFilters();
 	}
 
 	function handleRightClick() {
@@ -25,11 +33,19 @@ function YearSelector({
 		setReportYear(prev =>
 			reportYears.has(prev[0] + 1) ? [prev[0] + 1] : prev
 		);
+		resetFilters();
+	}
+
+	function resetFilters() {
+		setAllocationType([...apiData.inDataLists.allocationTypes]);
+		setFund([...apiData.inDataLists.funds]);
+		setAllocationSource([...apiData.inDataLists.allocationSources]);
 	}
 
 	const handleChange = (event: SelectChangeEvent) => {
 		setYear(null);
 		setReportYear([+event.target.value]);
+		resetFilters();
 	};
 
 	return (

@@ -189,6 +189,9 @@ export type YearSelectorProps = {
 	setReportYear: React.Dispatch<React.SetStateAction<number[]>>;
 	reportYears: Set<number>;
 	setYear: React.Dispatch<React.SetStateAction<number[] | null>>;
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export type SummaryChartProps = {

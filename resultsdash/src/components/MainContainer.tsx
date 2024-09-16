@@ -342,7 +342,7 @@ function MainContainer() {
 		>
 			<Tooltip
 				id="tooltip"
-				style={{ zIndex: 9999 }}
+				style={{ zIndex: 9999, textAlign: "center" }}
 			/>
 			<Grid
 				container
@@ -375,6 +375,9 @@ function MainContainer() {
 						setReportYear={setReportYear}
 						reportYears={apiData.inDataLists.reportYears}
 						setYear={setYear}
+						setFund={setFund}
+						setAllocationSource={setAllocationSource}
+						setAllocationType={setAllocationType}
 					/>
 					<Typography
 						variant={"h4"}
@@ -389,7 +392,7 @@ function MainContainer() {
 					</Typography>
 					<InfoIcon
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`The results aggregates data from all final Narrative Reports approved in ${reportYear[0]}.`}
+						data-tooltip-html={`The results aggregates data from all final Narrative Reports approved in ${reportYear[0]}.<br />Note: changing the report year resets the filters (fund, allocation name and allocation source).`}
 						data-tooltip-place="top"
 						style={{
 							color: colors.unColor,
