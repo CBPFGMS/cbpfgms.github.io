@@ -1,8 +1,10 @@
 import {
+	EmergenciesObject,
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
+	emergenciesObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -37,6 +39,7 @@ export type Datum = {
 	projectStatusId: number;
 	sectorData: SectorDatum[];
 	reportType: ReportType;
+	emergenciesData: EmergencyDatum[];
 };
 
 export type ReportType = (typeof reportTypes)[number];
@@ -54,6 +57,11 @@ type SectorMapValue = {
 	projectCode: string;
 	projectId: number;
 	sectors: SectorDatum[];
+};
+
+type EmergencyDatum = {
+	emergencyId: number;
+	percentage: number;
 };
 
 type BeneficiaryTypes = {
@@ -85,6 +93,7 @@ type InDataListsValues = SetType<InDataLists>;
 type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
 	sectorsData: SectorBeneficiaryObject[];
+	emergenciesData: EmergenciesObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 };
@@ -92,11 +101,13 @@ type ProcessRawDataParams = {
 function processRawData({
 	projectSummary,
 	sectorsData,
+	emergenciesData,
 	listsObj,
 	setInDataLists,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
+	const emergenciesDataMap: Map<number, EmergencyDatum[]> = new Map();
 
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
@@ -172,6 +183,40 @@ function processRawData({
 		}
 	});
 
+	emergenciesData.forEach(row => {
+		const parsedRow = emergenciesObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			if (!emergenciesDataMap.has(row.CHFId)) {
+				emergenciesDataMap.set(row.CHFId, [
+					{
+						emergencyId: row.EmergencyTypeId,
+						percentage: row.EmergencyPercent,
+					},
+				]);
+			} else {
+				const emergencyData = emergenciesDataMap.get(row.CHFId);
+				if (emergencyData) {
+					emergencyData.push({
+						emergencyId: row.EmergencyTypeId,
+						percentage: row.EmergencyPercent,
+					});
+				} else {
+					warnProjectNotFound(
+						row.CHFId.toString(),
+						row,
+						"Emergency not found in emergenciesDataMap"
+					);
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"emergenciesData",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
+		}
+	});
+
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -183,6 +228,7 @@ function processRawData({
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
+			const thisEmergenciesData = emergenciesDataMap.get(row.ChfId);
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -215,6 +261,15 @@ function processRawData({
 					"Project not found in sectors data"
 				);
 			}
+
+			//In case we need to check what projects are missing from emergencies data
+			// if (!thisEmergenciesData) {
+			// 	warnProjectNotFound(
+			// 		row.ChfProjectCode,
+			// 		row,
+			// 		"Project not found in emergencies data"
+			// 	);
+			// }
 
 			if (
 				thisAllocationType &&
@@ -265,6 +320,7 @@ function processRawData({
 					projectStatus: thisStatus,
 					projectStatusId: row.GlbPrjStatusId,
 					sectorData: thisSectorData.sectors,
+					emergenciesData: thisEmergenciesData ?? [],
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
 						row,

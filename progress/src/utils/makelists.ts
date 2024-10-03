@@ -17,6 +17,8 @@ import {
 	organizationMasterObjectSchema,
 	projectStatusMasterObjectSchema,
 	globalIndicatorsMasterObjectSchema,
+	EmergenciesMasterObject,
+	emergenciesMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { GenderAndAge, ReportType } from "./processrawdata";
@@ -31,6 +33,7 @@ type MakeListParams = {
 	organizationTypesMaster: OrganizationTypesMasterObject[];
 	sectorsMaster: SectorsMasterObject[];
 	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
+	emergenciesMaster: EmergenciesMasterObject[];
 };
 
 export type ListObj = {
@@ -62,6 +65,23 @@ export type ProjectDetails = {
 	reportType: ReportType;
 };
 
+type EmergencyTypes = {
+	[key: number]: {
+		emergencyCategory: number;
+		emergencyGroup: number;
+	};
+};
+
+type EmergencyCategories = {
+	emergencyTypes: Set<number>;
+	emergencyGroup: number;
+};
+
+type EmergencyGroups = {
+	emergencyTypes: Set<number>;
+	emergencyCategories: Set<number>;
+};
+
 export type List = {
 	fundNames: ListObj;
 	fundAbbreviatedNames: ListObj;
@@ -78,6 +98,14 @@ export type List = {
 	globalIndicators: ListObj;
 	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
+	emergencyTypeNames: ListObj;
+	emergencyGroupNames: ListObj;
+	emergencyCategoryNames: ListObj;
+	emergencyDetails: {
+		emergencyTypes: EmergencyTypes;
+		emergencyGroups: Map<number, EmergencyGroups>;
+		emergencyCategories: Map<number, EmergencyCategories>;
+	};
 };
 
 function makeLists({
@@ -90,6 +118,7 @@ function makeLists({
 	organizationTypesMaster,
 	sectorsMaster,
 	globalIndicatorsMaster,
+	emergenciesMaster,
 }: MakeListParams): List {
 	const lists: List = {
 		fundNames: {},
@@ -107,6 +136,14 @@ function makeLists({
 		globalIndicators: {},
 		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
+		emergencyTypeNames: {},
+		emergencyGroupNames: {},
+		emergencyCategoryNames: {},
+		emergencyDetails: {
+			emergencyTypes: {},
+			emergencyGroups: new Map(),
+			emergencyCategories: new Map(),
+		},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -245,6 +282,62 @@ function makeLists({
 				"GlobalIndicatorsMaster",
 				d,
 				JSON.stringify(parsedGlobalIndicatorsMaster.error)
+			);
+		}
+	});
+
+	emergenciesMaster.forEach(d => {
+		const parsedEmergenciesMaster =
+			emergenciesMasterObjectSchema.safeParse(d);
+		if (parsedEmergenciesMaster.success) {
+			lists.emergencyTypeNames[d.EmergencyTypeId] = d.EmergencyTypeName;
+			lists.emergencyGroupNames[d.EmergencyGroupId] =
+				d.EmergencyGroupName;
+			lists.emergencyCategoryNames[d.EmergencyCategoryId] =
+				d.EmergencyCategoryName;
+
+			if (!lists.emergencyDetails.emergencyTypes[d.EmergencyTypeId]) {
+				lists.emergencyDetails.emergencyTypes[d.EmergencyTypeId] = {
+					emergencyCategory: d.EmergencyCategoryId,
+					emergencyGroup: d.EmergencyGroupId,
+				};
+			}
+
+			const emergencyGroup = lists.emergencyDetails.emergencyGroups.get(
+				d.EmergencyGroupId
+			);
+
+			if (!emergencyGroup) {
+				lists.emergencyDetails.emergencyGroups.set(d.EmergencyGroupId, {
+					emergencyTypes: new Set([d.EmergencyTypeId]),
+					emergencyCategories: new Set([d.EmergencyCategoryId]),
+				});
+			} else {
+				emergencyGroup.emergencyTypes.add(d.EmergencyTypeId);
+				emergencyGroup.emergencyCategories.add(d.EmergencyCategoryId);
+			}
+
+			const emergencyCategory =
+				lists.emergencyDetails.emergencyCategories.get(
+					d.EmergencyCategoryId
+				);
+
+			if (!emergencyCategory) {
+				lists.emergencyDetails.emergencyCategories.set(
+					d.EmergencyCategoryId,
+					{
+						emergencyTypes: new Set([d.EmergencyTypeId]),
+						emergencyGroup: d.EmergencyGroupId,
+					}
+				);
+			} else {
+				emergencyCategory.emergencyTypes.add(d.EmergencyTypeId);
+			}
+		} else {
+			warnInvalidSchema(
+				"EmergenciesMaster",
+				d,
+				JSON.stringify(parsedEmergenciesMaster.error)
 			);
 		}
 	});

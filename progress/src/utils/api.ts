@@ -16,12 +16,15 @@ import {
 	SectorsMasterObject,
 	GlobalIndicatorsMasterObject,
 	GlobalIndicatorsObject,
+	EmergenciesMasterObject,
+	EmergenciesObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
 	ProjectSummaryObject[],
 	SectorBeneficiaryObject[],
 	GlobalIndicatorsObject[],
+	EmergenciesObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
 	ProjectStatusMasterObject[],
@@ -30,7 +33,8 @@ type ReceiveDataArgs = [
 	AllocationSourcesMasterObject[],
 	OrganizationTypesMasterObject[],
 	SectorsMasterObject[],
-	GlobalIndicatorsMasterObject[]
+	GlobalIndicatorsMasterObject[],
+	EmergenciesMasterObject[]
 ];
 
 function useData(defaultFundType: number | null, startYear: number | null) {
@@ -40,6 +44,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		globalIndicatorsUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${fundType}&$format=csv`,
+		emergenciesDataUrl = "../data/hardcoded_emergency_2.csv",
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
 		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
@@ -54,7 +59,9 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 		sectorsMasterUrl =
 			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 		globalIndicatorsMasterUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv";
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
+		emergenciesMasterUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST&$format=csv";
 
 	const [data, setData] = useState<Data>([] as Data),
 		[dataIndicators, setDataIndicators] = useState<
@@ -82,6 +89,11 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			fetchFileDB<GlobalIndicatorsObject[]>(
 				"globalIndicators",
 				globalIndicatorsUrl,
+				"csv"
+			),
+			fetchFileDB<EmergenciesObject[]>(
+				"emergenciesData",
+				emergenciesDataUrl,
 				"csv"
 			),
 			fetchFile<AllocationTypesMasterObject[]>(
@@ -129,6 +141,11 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				globalIndicatorsMasterUrl,
 				"csv"
 			),
+			fetchFile<EmergenciesMasterObject[]>(
+				"emergenciesMaster",
+				emergenciesMasterUrl,
+				"csv"
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -144,6 +161,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			projectSummary,
 			sectorsData,
 			globalIndicatorsData,
+			emergenciesData,
 			allocationTypesMaster,
 			organizationMaster,
 			projectStatusMaster,
@@ -153,6 +171,7 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 			organizationTypesMaster,
 			sectorsMaster,
 			globalIndicatorsMaster,
+			emergenciesMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -164,11 +183,13 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 				organizationTypesMaster,
 				sectorsMaster,
 				globalIndicatorsMaster,
+				emergenciesMaster,
 			});
 
 			const data: Data = processRawData({
 				projectSummary,
 				sectorsData,
+				emergenciesData,
 				listsObj,
 				setInDataLists,
 			});

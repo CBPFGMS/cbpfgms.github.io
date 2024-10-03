@@ -8,6 +8,7 @@ import {
 	DatumPictogram,
 	DatumDisability,
 	DatumGBV,
+	DatumEmergency,
 } from "../utils/processdatasummary";
 import {
 	DownloadStates,
@@ -31,6 +32,7 @@ type ChartsContainerProps = {
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
 	dataDisability: DatumDisability;
+	dataEmergency: DatumEmergency[];
 	dataGBV: DatumGBV;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
@@ -58,6 +60,7 @@ function ChartsContainer({
 	dataSector,
 	dataOrganization,
 	dataDisability,
+	dataEmergency,
 	dataGBV,
 	setClickedDownload,
 	clickedDownload,

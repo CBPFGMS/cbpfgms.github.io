@@ -124,6 +124,12 @@ export const sectorBeneficiaryObjectSchema = z.object({
 		.nullable(),
 });
 
+export const emergenciesObjectSchema = z.object({
+	CHFId: z.number().int().nonnegative(),
+	EmergencyTypeId: z.number().int().nonnegative(),
+	EmergencyPercent: z.number().nonnegative().max(100),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -243,49 +249,27 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustCode: z.string(),
 });
 
-// export const globalIndicatorsMasterObjectSchema = z.object({
-// 	IndicatorName: z.string(),
-// 	IndicatorId: z.number().int().nonnegative(),
-// });
+export const emergenciesMasterObjectSchema = z.object({
+	EmergencyTypeId: z.number().int().nonnegative(),
+	EmergencyTypeName: z.string(),
+	EmergencyCategoryId: z.number().int().nonnegative(),
+	EmergencyCategoryName: z.string(),
+	EmergencyGroupId: z.number().int().nonnegative(),
+	EmergencyGroupName: z.string(),
+});
+
+// {
+//     "EmergencyTypeId": 27,
+//     "EmergencyTypeName": "Climate / natural disaster - Drought",
+//     "EmergencyCategoryId": 5,
+//     "EmergencyCategoryName": "Drought",
+//     "EmergencyGroupId": 4,
+//     "EmergencyGroupName": "Climate / natural disaster"
+//   },
 
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
-
-// export const globalIndicatorsObjectSchema = z
-// 	.object({
-// 		Outcome: z.string(),
-// 		Sector: z.number().int().nonnegative(),
-// 		IndicatorId: z.number().int().nonnegative(),
-// 		Unit: z.union([z.literal("p"), z.literal("i")]),
-// 		TargetedWomen: z.number().nonnegative().nullable(),
-// 		TargetedMen: z.number().nonnegative().nullable(),
-// 		TargetedBoys: z.number().nonnegative().nullable(),
-// 		TargetedGirls: z.number().nonnegative().nullable(),
-// 		ReachedWomen: z.number().nonnegative().nullable(),
-// 		ReachedMen: z.number().nonnegative().nullable(),
-// 		ReachedBoys: z.number().nonnegative().nullable(),
-// 		ReachedGirls: z.number().nonnegative().nullable(),
-// 	})
-// 	.refine(data => {
-// 		const keys = [
-// 			"TargetedWomen",
-// 			"TargetedMen",
-// 			"TargetedBoys",
-// 			"TargetedGirls",
-// 			"ReachedWomen",
-// 			"ReachedMen",
-// 			"ReachedBoys",
-// 			"ReachedGirls",
-// 		];
-
-// 		return keys.every(key =>
-// 			isValidGlobalIndicatorValue(
-// 				data[key as keyof typeof data],
-// 				data.Unit
-// 			)
-// 		);
-// 	});
 
 export const globalIndicatorsObjectSchema = z.object({
 	FundTypeId: z.union([z.literal(1), z.literal(2)]),
@@ -370,4 +354,10 @@ export type GlobalIndicatorsObject = z.infer<
 
 export type GlobalIndicatorsMasterObject = z.infer<
 	typeof globalIndicatorsMasterObjectSchema
+>;
+
+export type EmergenciesObject = z.infer<typeof emergenciesObjectSchema>;
+
+export type EmergenciesMasterObject = z.infer<
+	typeof emergenciesMasterObjectSchema
 >;

@@ -55,6 +55,14 @@ export type Report = {
 	reportsWithData: number;
 };
 
+export type DatumEmergency = {
+	emergencyType: number;
+	emergencyCategory: number;
+	emergencyGroup: number;
+	allocations: number;
+	date: Date;
+};
+
 const {
 	beneficiariesStatuses,
 	beneficiaryCategories,
@@ -73,12 +81,14 @@ function processDataSummary({
 	showFinanciallyClosed,
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
+	dataEmergency: DatumEmergency[];
 	dataPictogram: DatumPictogram;
 	dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
 } {
 	const dataSummary: DatumSummary[] = [];
+	const dataEmergency: DatumEmergency[] = [];
 	const dataPictogram: DatumPictogram = {
 		targetedMen: 0,
 		targetedWomen: 0,
@@ -201,6 +211,32 @@ function processDataSummary({
 			) {
 				dataGBV.reportsWithData += 1;
 			}
+
+			datum.emergenciesData.forEach(emergency => {
+				const foundEmergency = dataEmergency.find(
+					datumEmergency =>
+						datumEmergency.emergencyType === emergency.emergencyId
+				);
+				if (foundEmergency) {
+					foundEmergency.allocations +=
+						(emergency.percentage / 100) * datum.budget;
+				} else {
+					dataEmergency.push({
+						emergencyType: emergency.emergencyId,
+						emergencyCategory:
+							lists.emergencyDetails.emergencyTypes[
+								emergency.emergencyId
+							].emergencyCategory,
+						emergencyGroup:
+							lists.emergencyDetails.emergencyTypes[
+								emergency.emergencyId
+							].emergencyGroup,
+						allocations:
+							(emergency.percentage / 100) * datum.budget,
+						date: datum.endDate,
+					});
+				}
+			});
 		}
 
 		if (
@@ -237,6 +273,7 @@ function processDataSummary({
 
 	return {
 		dataSummary,
+		dataEmergency,
 		dataPictogram,
 		dataDisability,
 		dataGBV,
