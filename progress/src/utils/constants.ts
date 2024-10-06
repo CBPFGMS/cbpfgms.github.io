@@ -14,6 +14,7 @@ const constants = {
 		"sectors",
 		"organizations",
 		"disability",
+		"emergency",
 		"gbv",
 		"indicators",
 	],

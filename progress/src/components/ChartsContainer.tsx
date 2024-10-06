@@ -22,6 +22,7 @@ import BarChart from "./BarChart";
 import { DatumBarChart } from "../utils/processdatabarchart";
 import DisabilityChart from "./DisabilityChart";
 import GBVChart from "./GBVChart";
+import EmergencyChart from "./EmergencyChart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -43,6 +44,7 @@ type ChartsContainerProps = {
 	beneficiaryTypesRef: Ref;
 	sectorsRef: Ref;
 	organizationsRef: Ref;
+	emergenciesRef: Ref;
 	disabilityRef: Ref;
 	gbvRef: Ref;
 	year: number[];
@@ -71,6 +73,7 @@ function ChartsContainer({
 	beneficiaryTypesRef,
 	sectorsRef,
 	organizationsRef,
+	emergenciesRef,
 	disabilityRef,
 	gbvRef,
 	year,
@@ -339,6 +342,50 @@ function ChartsContainer({
 							implementationStatus={implementationsStatus}
 							showFinanciallyClosed={showFinanciallyClosed}
 						/>
+					</Grid>
+				</Grid>
+				<Divider
+					orientation="horizontal"
+					flexItem
+					style={{
+						borderTop: "3px dotted #ccc",
+						borderBottom: "none",
+						width: "96%",
+						marginLeft: "2%",
+					}}
+				/>
+				<Grid
+					container
+					direction={"row"}
+					justifyContent={"center"}
+					spacing={1}
+					size={12}
+					flexWrap={"nowrap"}
+					mt={3}
+					mb={3}
+				>
+					<Grid
+						size={12}
+						ref={emergenciesRef}
+						id={refIds.emergencyRefId}
+					>
+						<Box
+							display={"flex"}
+							alignItems={"center"}
+							justifyContent={"center"}
+						>
+							<EmergencyChart
+								dataEmergency={dataEmergency}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								year={year}
+								fund={fund}
+								allocationSource={allocationSource}
+								allocationType={allocationType}
+								implementationStatus={implementationsStatus}
+								showFinanciallyClosed={showFinanciallyClosed}
+							/>
+						</Box>
 					</Grid>
 				</Grid>
 			</Paper>

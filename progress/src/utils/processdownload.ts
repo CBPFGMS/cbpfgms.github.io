@@ -70,6 +70,14 @@ type IndicatorsDatumDownload = NoValue<BeneficiaryDownloadTypes> & {
 	"Reached Total": number | typeof notApplicable;
 };
 
+type EmergenciesDatumDownload = BaseDownloadDatum & {
+	"Emergency Type": string;
+	"Emergency Category": string;
+	"Emergency Group": string;
+	"Percent of Total Budget": number;
+	"Emergency Budget": number;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
@@ -175,6 +183,67 @@ export function processPictogramDownload({
 	});
 
 	return pictogramDataDownload;
+}
+
+export function processEmergenciesDownload({
+	data,
+	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+	showFinanciallyClosed,
+}: ProcessDownloadParams) {
+	const emergenciesDataDownload: EmergenciesDatumDownload[] = [];
+
+	data.forEach(datum => {
+		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		if (
+			checkRow(
+				thisStatus,
+				datum,
+				year,
+				fund,
+				allocationSource,
+				allocationType,
+				implementationStatus
+			)
+		) {
+			const baseDownloadDatum = populateBaseDownloadDatum(
+				datum,
+				lists,
+				thisStatus
+			);
+
+			if (datum.emergenciesData.length > 0) {
+				datum.emergenciesData.forEach(emergency => {
+					emergenciesDataDownload.push({
+						...baseDownloadDatum,
+						"Emergency Type":
+							lists.emergencyTypeNames[emergency.emergencyId],
+						"Emergency Category":
+							lists.emergencyCategoryNames[
+								lists.emergencyDetails.emergencyTypes[
+									emergency.emergencyId
+								].emergencyCategory
+							],
+						"Emergency Group":
+							lists.emergencyGroupNames[
+								lists.emergencyDetails.emergencyTypes[
+									emergency.emergencyId
+								].emergencyGroup
+							],
+						"Percent of Total Budget": emergency.percentage,
+						"Emergency Budget":
+							datum.budget * (emergency.percentage / 100),
+					});
+				});
+			}
+		}
+	});
+
+	return emergenciesDataDownload;
 }
 
 export function processDisabilityDownload({

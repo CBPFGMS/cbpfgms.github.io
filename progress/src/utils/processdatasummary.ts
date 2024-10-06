@@ -270,6 +270,7 @@ function processDataSummary({
 	});
 
 	dataSummary.sort((a, b) => b.year - a.year);
+	dataEmergency.sort((a, b) => b.date.getTime() - a.date.getTime());
 
 	return {
 		dataSummary,

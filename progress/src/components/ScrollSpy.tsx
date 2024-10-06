@@ -13,6 +13,7 @@ import {
 	DisabilityIcon,
 	ByTypeIcon,
 	OrgIcon,
+	EmergencyIcon,
 } from "../assets/OchaIcons";
 
 type ScrollSpyProps = {
@@ -21,6 +22,7 @@ type ScrollSpyProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
+	inViewEmergencies: boolean;
 	inViewIndicators: boolean;
 	inViewDisability: boolean;
 	inViewGBV: boolean;
@@ -42,6 +44,7 @@ function ScroolSpy({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
+	inViewEmergencies,
 	inViewIndicators,
 	inViewDisability,
 	inViewGBV,
@@ -70,14 +73,14 @@ function ScroolSpy({
 				Icon={PaidIcon}
 			/>
 			<Tab
-				label="By Gender/Age"
+				label="Gender/Age"
 				inView={inViewPictogram}
 				reference={refIds.pictogramRefId}
 				handleOnClick={handleOnClick}
 				Icon={Pictogram}
 			/>
 			<Tab
-				label="By Type"
+				label="Type"
 				inView={inViewBeneficiaryTypes}
 				reference={refIds.beneficiaryTypesRefId}
 				handleOnClick={handleOnClick}
@@ -85,7 +88,7 @@ function ScroolSpy({
 				ochaIcon={true}
 			/>
 			<Tab
-				label="By Organization"
+				label="Org."
 				inView={inViewOrganizations}
 				reference={refIds.organizationsRefId}
 				handleOnClick={handleOnClick}
@@ -93,7 +96,7 @@ function ScroolSpy({
 				ochaIcon={true}
 			/>
 			<Tab
-				label="By Sector"
+				label="Sector"
 				inView={inViewSectors}
 				reference={refIds.sectorsRefId}
 				handleOnClick={handleOnClick}
@@ -116,7 +119,15 @@ function ScroolSpy({
 				ochaIcon={true}
 			/>
 			<Tab
-				label="Global Indicators"
+				label="Emergencies"
+				inView={inViewEmergencies}
+				reference={refIds.emergencyRefId}
+				handleOnClick={handleOnClick}
+				Icon={EmergencyIcon}
+				ochaIcon={true}
+			/>
+			<Tab
+				label="Indicators"
 				inView={inViewIndicators}
 				reference={refIds.indicatorsRefId}
 				handleOnClick={handleOnClick}
@@ -155,7 +166,7 @@ function Tab({
 				<Icon
 					htmlColor={colors.unColor}
 					fontSize="medium"
-					{...(label === "By Gender/Age" && {
+					{...(label === "Gender/Age" && {
 						type: "total",
 						svgProps: {
 							style: {
