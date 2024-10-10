@@ -60,3 +60,9 @@
 .hiddenElement {
 	display: none !important;
 }
+
+.overviewValue {
+	font-size: 13px;
+	font-weight: 600;
+	dominant-baseline: central;
+}

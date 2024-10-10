@@ -235,8 +235,9 @@ export function processEmergenciesDownload({
 								].emergencyGroup
 							],
 						"Percent of Total Budget": emergency.percentage,
-						"Emergency Budget":
-							datum.budget * (emergency.percentage / 100),
+						"Emergency Budget": Math.floor(
+							datum.budget * (emergency.percentage / 100)
+						),
 					});
 				});
 			}

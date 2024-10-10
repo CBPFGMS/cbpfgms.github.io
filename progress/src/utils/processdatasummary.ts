@@ -218,8 +218,9 @@ function processDataSummary({
 						datumEmergency.emergencyType === emergency.emergencyId
 				);
 				if (foundEmergency) {
-					foundEmergency.allocations +=
-						(emergency.percentage / 100) * datum.budget;
+					foundEmergency.allocations += Math.floor(
+						(emergency.percentage / 100) * datum.budget
+					);
 				} else {
 					dataEmergency.push({
 						emergencyType: emergency.emergencyId,
@@ -231,8 +232,9 @@ function processDataSummary({
 							lists.emergencyDetails.emergencyTypes[
 								emergency.emergencyId
 							].emergencyGroup,
-						allocations:
-							(emergency.percentage / 100) * datum.budget,
+						allocations: Math.floor(
+							(emergency.percentage / 100) * datum.budget
+						),
 						date: datum.endDate,
 					});
 				}
