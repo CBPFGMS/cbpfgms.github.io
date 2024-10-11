@@ -31,11 +31,12 @@ const constants = {
 	emergencyChartTypes: ["overview", "timeline"],
 	emergencyChartModes: ["aggregated", "byGroup"],
 	emergencyTimelineGroupHeight: 240,
-	emergencyOverviewRowHeight: 28,
+	emergencyOverviewAggregatedRowHeight: 44,
+	emergencyOverviewByGroupRowHeight: 38,
 	emergencyOverviewGap: 12,
 	emergencyChartMargins: { top: 10, right: 6, bottom: 10, left: 6 },
-	emergencyOverviewLeftMarginAggregated: 100,
-	emergencyOverviewLeftMarginByGroup: 200,
+	emergencyOverviewLeftMarginAggregated: 150,
+	emergencyOverviewLeftMarginByGroup: 350,
 	emergencyTimelineLeftMargin: 100,
 	emergencyColors: {
 		1: "#7fc97f",
@@ -62,6 +63,12 @@ const constants = {
 	],
 	emergencyOverviewDomainPadding: 1,
 	emergencyTimelineDomainPadding: 1.1,
+	overviewIconSize: 24,
+	overviewIconSizeByGroup: 32,
+	overviewScalePaddingInner: 0.4,
+	overviewScalePaddingOuter: 0.5,
+	overviewAxisWidth: 100,
+	overviewAxisByGroupWidth: 160,
 } as const;
 
 export default constants;
