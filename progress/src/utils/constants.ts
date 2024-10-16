@@ -34,10 +34,10 @@ const constants = {
 	emergencyOverviewAggregatedRowHeight: 44,
 	emergencyOverviewByGroupRowHeight: 38,
 	emergencyOverviewGap: 12,
-	emergencyChartMargins: { top: 10, right: 6, bottom: 10, left: 6 },
+	emergencyChartMargins: { top: 6, right: 12, bottom: 6, left: 6 },
 	emergencyOverviewLeftMarginAggregated: 150,
 	emergencyOverviewLeftMarginByGroup: 350,
-	emergencyTimelineLeftMargin: 100,
+	emergencyTimelineLeftMargin: 200,
 	emergencyColors: {
 		1: "#7fc97f",
 		2: "#beaed4",
@@ -69,6 +69,22 @@ const constants = {
 	overviewScalePaddingOuter: 0.5,
 	overviewAxisWidth: 100,
 	overviewAxisByGroupWidth: 160,
+	idString: "id_",
+	stackGap: 2,
+	fullMonthNames: {
+		Jan: "January",
+		Feb: "February",
+		Mar: "March",
+		Apr: "April",
+		May: "May",
+		Jun: "June",
+		Jul: "July",
+		Aug: "August",
+		Sep: "September",
+		Oct: "October",
+		Nov: "November",
+		Dec: "December",
+	},
 } as const;
 
 export default constants;

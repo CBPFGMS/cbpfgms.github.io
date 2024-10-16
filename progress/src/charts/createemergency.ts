@@ -9,7 +9,10 @@ import {
 	interpolateHsl,
 	rgb,
 	axisLeft,
-	sum,
+	area,
+	curveBumpX,
+	Series,
+	axisBottom,
 } from "d3";
 import { DatumEmergency } from "../utils/processdatasummary";
 import {
@@ -25,13 +28,22 @@ import constants from "../utils/constants";
 import { emergencyIcons } from "../assets/emergencyicons";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
-import { wrapText } from "./emergencyutils";
+import {
+	wrapText,
+	calculateHeightOverview,
+	calculateHeightTimeline,
+	calculateOverviewRange,
+	dispatchTooltipEvent,
+	getMaxValue,
+	createTooltipString,
+} from "./emergencyutils";
+import { createLegendGroup } from "./emergencylegend";
 
 type ChartDatum = {
 	group: number | null;
 };
 
-type OverviewDatumValues = {
+export type OverviewDatumValues = {
 	id: number;
 	value: number;
 	parentGroup?: number;
@@ -42,13 +54,23 @@ export type OverviewDatum = ChartDatum & {
 	values: OverviewDatumValues[];
 };
 
-type TimelineValues = {
-	id: number;
-	values: { value: number; month: Month }[];
+export type TimelineEmergencyProperty = {
+	[key: `${typeof idString}${number}`]: number;
 };
 
+export type TimelineDatumValues = {
+	month: Month;
+	total: number;
+} & TimelineEmergencyProperty;
+
+type StackedDatum = Series<
+	TimelineDatumValues,
+	keyof TimelineEmergencyProperty
+>;
+
 export type TimelineDatum = ChartDatum & {
-	values: TimelineValues[];
+	values: TimelineDatumValues[];
+	stackedData: StackedDatum[];
 };
 
 type CreateEmergencyParams = {
@@ -60,9 +82,15 @@ type CreateEmergencyParams = {
 	type: EmergencyChartTypes;
 };
 
+export type Margins = {
+	top: number;
+	right: number;
+	bottom: number;
+	left: number;
+};
+
 const {
 	emergencyOverviewGap,
-	duration,
 	emergencyChartMargins,
 	emergencyOverviewAggregatedRowHeight,
 	emergencyTimelineGroupHeight,
@@ -79,7 +107,8 @@ const {
 	emergencyOverviewByGroupRowHeight,
 	overviewAxisWidth,
 	overviewAxisByGroupWidth,
-	overviewIconSizeByGroup,
+	idString,
+	stackGap,
 } = constants;
 
 const xScaleOverview = scaleLinear<number, number>(),
@@ -88,12 +117,29 @@ const xScaleOverview = scaleLinear<number, number>(),
 const xScaleTimeline = scalePoint<string>().domain(monthsArray),
 	yScaleInnerTimeline = scaleLinear<number, number>(),
 	yScaleOuterTimeline = scaleBand<number>()
-		.paddingInner(0.1)
+		.paddingInner(0.2)
 		.paddingOuter(0.1);
 
 const localYScale = local<d3.ScaleBand<number>>();
 const localColorScale = local<d3.ScaleOrdinal<number, string>>();
+const localColorScaleTimeline =
+	local<d3.ScaleOrdinal<keyof TimelineEmergencyProperty, string>>();
 const localAxis = local<d3.Axis<number>>();
+const localTimelineDatum = local<TimelineDatum>();
+
+const areaGenerator = area<StackedDatum[number]>()
+	.x(d => xScaleTimeline(d.data.month)!)
+	.curve(curveBumpX);
+// areaGeneratorZero = area<StackedDatum[number]>()
+// 	.x(d => xScaleTimeline(d.data.month)!)
+// 	.y0(() => yScaleInnerTimeline(0))
+// 	.y1(() => yScaleInnerTimeline(0))
+// 	.curve(curveBumpX);
+
+const timelineXAxis = axisBottom<string>(xScaleTimeline);
+const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
+	.ticks(3)
+	.tickFormat(formatSIFloat);
 
 const limitValue = 0.9;
 
@@ -111,7 +157,9 @@ function createEmergency({
 		type === "overview" ? processOverviewData(dataEmergency, mode) : [];
 
 	const timelineData: TimelineDatum[] | [] =
-		type === "timeline" ? processTimelineData(dataEmergency, mode) : [];
+		type === "timeline"
+			? processTimelineData(dataEmergency, mode, lists)
+			: [];
 
 	const emergencyOverviewRowHeight =
 		mode === "aggregated"
@@ -120,8 +168,17 @@ function createEmergency({
 
 	const svgHeight =
 		type === "overview"
-			? calculateHeightOverview(overviewData, emergencyOverviewRowHeight)
-			: calculateHeightTimeline(timelineData);
+			? calculateHeightOverview(
+					overviewData,
+					emergencyOverviewRowHeight,
+					emergencyChartMargins,
+					emergencyOverviewGap
+			  )
+			: calculateHeightTimeline(
+					timelineData,
+					emergencyChartMargins,
+					emergencyTimelineGroupHeight
+			  );
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
 
@@ -139,10 +196,10 @@ function createEmergency({
 	);
 
 	const maxValueOverview =
-		type === "overview" ? getMaxValueOverview(overviewData) : 0;
+		type === "overview" ? getMaxValue(overviewData, type) : 0;
 
 	const maxValueTimeline =
-		type === "timeline" ? getMaxValueTimeline(timelineData) : 0;
+		type === "timeline" ? getMaxValue(timelineData, type) : 0;
 
 	xScaleOverview
 		.domain([0, maxValueOverview * emergencyOverviewDomainPadding])
@@ -159,11 +216,24 @@ function createEmergency({
 			),
 		]);
 
+	xScaleTimeline.range([
+		0,
+		Math.max(
+			svgContainerWidth -
+				emergencyChartMargins.left -
+				emergencyChartMargins.right -
+				emergencyTimelineLeftMargin,
+			0
+		),
+	]);
+
 	yScaleOuterTimeline
 		.domain(timelineData.map(d => d.group ?? 0))
 		.range([
 			emergencyChartMargins.top,
-			svgHeight - emergencyChartMargins.bottom,
+			svgHeight -
+				emergencyChartMargins.bottom -
+				emergencyChartMargins.top,
 		]);
 
 	yScaleInnerTimeline
@@ -172,460 +242,485 @@ function createEmergency({
 
 	const overviewRange =
 		type === "overview"
-			? calculateOverviewRange(overviewData, emergencyOverviewRowHeight)
+			? calculateOverviewRange(
+					overviewData,
+					emergencyOverviewRowHeight,
+					emergencyChartMargins,
+					emergencyOverviewGap
+			  )
 			: [0];
 
 	yScaleOuterOverview
 		.domain(overviewData.map(d => d.group ?? 0))
 		.range(overviewRange);
 
+	timelineYAxis.tickSizeOuter(0).tickSizeInner(-xScaleTimeline.range()[1]);
+
+	createOverview();
+	createTimeline();
+
 	//overview
 
-	let overviewGroup = svg
-		.selectAll<SVGGElement, OverviewDatum>(".overviewGroup")
-		.data<OverviewDatum>(overviewData, d => `${d.group}`);
+	function createOverview(): void {
+		let overviewGroup = svg
+			.selectAll<SVGGElement, OverviewDatum>(".overviewGroup")
+			.data<OverviewDatum>(overviewData, d => `${d.group}`);
 
-	overviewGroup.exit().remove();
+		overviewGroup.exit().remove();
 
-	const overviewGroupEnter = overviewGroup
-		.enter()
-		.append("g")
-		.attr("class", "overviewGroup");
+		const overviewGroupEnter = overviewGroup
+			.enter()
+			.append("g")
+			.attr("class", "overviewGroup");
 
-	overviewGroup = overviewGroupEnter.merge(overviewGroup);
+		overviewGroup = overviewGroupEnter.merge(overviewGroup);
 
-	overviewGroup
-		.attr(
-			"transform",
-			d =>
-				`translate(${
-					emergencyChartMargins.left +
-					(mode === "aggregated"
-						? emergencyOverviewLeftMarginAggregated
-						: emergencyOverviewLeftMarginByGroup)
-				},${yScaleOuterOverview(d.group ?? 0)})`
-		)
-		.each((d, i, n) => {
-			if (mode === "byGroup") {
-				d.values.forEach(e => (e.parentGroup = d.group!));
-			}
-			const thisScale = scaleBand<number>()
-				.domain(d.values.map(e => e.id))
-				.range([0, d.values.length * emergencyOverviewRowHeight])
-				.paddingInner(overviewScalePaddingInner)
-				.paddingOuter(overviewScalePaddingOuter);
+		overviewGroup
+			.attr(
+				"transform",
+				d =>
+					`translate(${
+						emergencyChartMargins.left +
+						(mode === "aggregated"
+							? emergencyOverviewLeftMarginAggregated
+							: emergencyOverviewLeftMarginByGroup)
+					},${yScaleOuterOverview(d.group ?? 0)})`
+			)
+			.each((d, i, n) => {
+				if (mode === "byGroup") {
+					d.values.forEach(e => (e.parentGroup = d.group!));
 
-			const baseColor =
-				emergencyColors[d.group as keyof typeof emergencyColors];
-			const thisScaleColor = scaleOrdinal<number, string>()
-				.domain(d.values.map(e => e.id))
-				.range(
-					d.values.map((_, i, values) => {
-						const t = i / (values.length - 1);
-						return interpolateHsl(
-							rgb(baseColor).darker(
-								(~~d.values.length / 2) * 0.2
-							),
-							rgb(baseColor).brighter(
-								(~~d.values.length / 2) * 0.2
-							)
-						)(t);
-					})
+					const baseColor =
+						emergencyColors[
+							d.group as keyof typeof emergencyColors
+						];
+					const thisScaleColor = scaleOrdinal<number, string>()
+						.domain(d.values.map(e => e.id))
+						.range(
+							d.values.map((_, i, values) => {
+								const t = i / (values.length - 1);
+								return interpolateHsl(
+									rgb(baseColor).darker(
+										(~~d.values.length / 2) * 0.2
+									),
+									rgb(baseColor).brighter(
+										(~~d.values.length / 2) * 0.2
+									)
+								)(t);
+							})
+						);
+
+					localColorScale.set(n[i], thisScaleColor);
+				}
+
+				const thisScale = scaleBand<number>()
+					.domain(d.values.map(e => e.id))
+					.range([0, d.values.length * emergencyOverviewRowHeight])
+					.paddingInner(overviewScalePaddingInner)
+					.paddingOuter(overviewScalePaddingOuter);
+
+				const thisAxis = axisLeft(thisScale)
+					.tickSize(0)
+					.tickPadding(
+						mode === "aggregated" ? overviewIconSize + 12 : 6
+					)
+					.tickFormat(e =>
+						mode === "aggregated"
+							? lists.emergencyGroupNames[
+									e as keyof typeof lists.emergencyGroupNames
+							  ]
+							: lists.emergencyTypeNames[
+									e as keyof typeof lists.emergencyTypeNames
+							  ]
+					);
+
+				localYScale.set(n[i], thisScale);
+
+				localAxis.set(n[i], thisAxis);
+			});
+
+		let overviewBar = overviewGroup
+			.selectAll<SVGRectElement, OverviewDatumValues>(".overviewBar")
+			.data<OverviewDatumValues>(
+				d => d.values,
+				d => `${d.id}`
+			);
+
+		overviewBar.exit().remove();
+
+		const overviewBarEnter = overviewBar
+			.enter()
+			.append("rect")
+			.attr("class", "overviewBar")
+			.attr("x", 0)
+			.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
+			.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
+			.attr("width", 0)
+			.style("fill", (d, i, n) =>
+				mode === "aggregated"
+					? emergencyColors[d.id as keyof typeof emergencyColors]
+					: localColorScale.get(n[i])!(d.id)
+			)
+			.attr("data-tooltip-id", "tooltip")
+			.attr("data-tooltip-content", d => `$${format(",.0f")(d.value)}`)
+			.attr("data-tooltip-place", "top");
+
+		overviewBar = overviewBarEnter.merge(overviewBar);
+
+		overviewBar
+			.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
+			.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
+			.attr("width", d => xScaleOverview(d.value));
+
+		let overviewValue = overviewGroup
+			.selectAll<SVGTextElement, OverviewDatumValues>(".overviewValue")
+			.data<OverviewDatumValues>(
+				d => d.values,
+				d => `${d.id}`
+			);
+
+		overviewValue.exit().remove();
+
+		const overviewValueEnter = overviewValue
+			.enter()
+			.append("text")
+			.attr("class", "overviewValue")
+			.attr("x", 0)
+			.attr("y", (d, i, n) => {
+				const thisScale = localYScale.get(n[i])!;
+				return thisScale(d.id)! + thisScale.bandwidth() / 2;
+			})
+			.text(d => formatSIFloat(d.value));
+
+		overviewValue = overviewValueEnter.merge(overviewValue);
+
+		overviewValue
+			.attr("y", (d, i, n) => {
+				const thisScale = localYScale.get(n[i])!;
+				return thisScale(d.id)! + thisScale.bandwidth() / 2;
+			})
+			.each(
+				d =>
+					(d.overLimit =
+						xScaleOverview(d.value) /
+							xScaleOverview(maxValueOverview) >
+						limitValue)
+			)
+			.attr("x", d => xScaleOverview(d.value) + (d.overLimit ? -4 : 4))
+			.attr("text-anchor", d => (d.overLimit ? "end" : "start"))
+			.style("fill", d => (d.overLimit ? "white" : "#444"))
+			.text(d => formatSIFloat(d.value));
+
+		let overviewTooltipBar = overviewGroup
+			.selectAll<SVGRectElement, OverviewDatumValues>(
+				".overviewTooltipBar"
+			)
+			.data<OverviewDatumValues>(
+				d => d.values,
+				d => `${d.id}`
+			);
+
+		overviewTooltipBar.exit().remove();
+
+		const overviewTooltipBarEnter = overviewTooltipBar
+			.enter()
+			.append("rect")
+			.attr("class", "overviewTooltipBar")
+			.attr("x", 0);
+
+		overviewTooltipBar = overviewTooltipBarEnter.merge(overviewTooltipBar);
+
+		overviewTooltipBar
+			.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
+			.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
+			.attr("width", xScaleOverview(maxValueOverview))
+			.style("fill", "none")
+			.style("pointer-events", "all")
+			.on("mouseover", (e: PointerEvent, d) => {
+				dispatchTooltipEvent(e, d, "mouseover");
+			})
+			.on("mouseout", (e: PointerEvent, d) => {
+				dispatchTooltipEvent(e, d, "mouseout");
+			});
+
+		let overviewAggregatedIcon = overviewGroup
+			.selectAll<SVGUseElement, OverviewDatumValues>(".icon")
+			.data<OverviewDatumValues>(
+				mode === "aggregated" ? d => d.values : [],
+				d => d.id
+			);
+
+		overviewAggregatedIcon.exit().remove();
+
+		const overviewAggregatedIconEnter = overviewAggregatedIcon
+			.enter()
+			.append("use")
+			.attr("class", "icon")
+			.attr("href", d => `#emergencyIcon${d.id}`)
+			.attr("x", -overviewIconSize - 6)
+			.attr("width", overviewIconSize)
+			.attr("height", overviewIconSize)
+			.attr("y", (d, i, n) => {
+				const thisScale = localYScale.get(n[i])!;
+				return (
+					thisScale(d.id)! +
+					thisScale.bandwidth() / 2 -
+					overviewIconSize / 2
 				);
-			const thisAxis = axisLeft(thisScale)
-				.tickSize(0)
-				.tickPadding(mode === "aggregated" ? overviewIconSize + 12 : 6)
-				.tickFormat(e =>
-					mode === "aggregated"
-						? lists.emergencyGroupNames[
-								e as keyof typeof lists.emergencyGroupNames
-						  ]
-						: lists.emergencyTypeNames[
-								e as keyof typeof lists.emergencyTypeNames
-						  ]
-				);
+			})
+			.style(
+				"fill",
+				d => emergencyColors[d.id as keyof typeof emergencyColors]
+			);
 
-			localYScale.set(n[i], thisScale);
-			localColorScale.set(n[i], thisScaleColor);
-			localAxis.set(n[i], thisAxis);
-		});
-
-	let overviewBar = overviewGroup
-		.selectAll<SVGRectElement, OverviewDatumValues>(".overviewBar")
-		.data<OverviewDatumValues>(
-			d => d.values,
-			d => `${d.id}`
+		overviewAggregatedIcon = overviewAggregatedIconEnter.merge(
+			overviewAggregatedIcon
 		);
 
-	overviewBar.exit().remove();
-
-	const overviewBarEnter = overviewBar
-		.enter()
-		.append("rect")
-		.attr("class", "overviewBar")
-		.attr("x", 0)
-		.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
-		.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
-		.attr("width", 0)
-		.style("fill", (d, i, n) =>
-			mode === "aggregated"
-				? emergencyColors[d.id as keyof typeof emergencyColors]
-				: localColorScale.get(n[i])!(d.id)
-		)
-		.attr("data-tooltip-id", "tooltip")
-		.attr("data-tooltip-content", d => `$${format(",.0f")(d.value)}`)
-		.attr("data-tooltip-place", "top");
-
-	overviewBar = overviewBarEnter.merge(overviewBar);
-
-	overviewBar
-		.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
-		.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
-		.attr("width", d => xScaleOverview(d.value));
-
-	let overviewValue = overviewGroup
-		.selectAll<SVGTextElement, OverviewDatumValues>(".overviewValue")
-		.data<OverviewDatumValues>(
-			d => d.values,
-			d => `${d.id}`
-		);
-
-	overviewValue.exit().remove();
-
-	const overviewValueEnter = overviewValue
-		.enter()
-		.append("text")
-		.attr("class", "overviewValue")
-		.attr("x", 0)
-		.attr("y", (d, i, n) => {
-			const thisScale = localYScale.get(n[i])!;
-			return thisScale(d.id)! + thisScale.bandwidth() / 2;
-		})
-		.text(d => formatSIFloat(d.value));
-
-	overviewValue = overviewValueEnter.merge(overviewValue);
-
-	overviewValue
-		.attr("y", (d, i, n) => {
-			const thisScale = localYScale.get(n[i])!;
-			return thisScale(d.id)! + thisScale.bandwidth() / 2;
-		})
-		.each(
-			d =>
-				(d.overLimit =
-					xScaleOverview(d.value) / xScaleOverview(maxValueOverview) >
-					limitValue)
-		)
-		.attr("x", d => xScaleOverview(d.value) + (d.overLimit ? -4 : 4))
-		.attr("text-anchor", d => (d.overLimit ? "end" : "start"))
-		.style("fill", d => (d.overLimit ? "white" : "#444"))
-		.text(d => formatSIFloat(d.value));
-
-	let overviewTooltipBar = overviewGroup
-		.selectAll<SVGRectElement, OverviewDatumValues>(".overviewTooltipBar")
-		.data<OverviewDatumValues>(
-			d => d.values,
-			d => `${d.id}`
-		);
-
-	overviewTooltipBar.exit().remove();
-
-	const overviewTooltipBarEnter = overviewTooltipBar
-		.enter()
-		.append("rect")
-		.attr("class", "overviewTooltipBar")
-		.attr("x", 0);
-
-	overviewTooltipBar = overviewTooltipBarEnter.merge(overviewTooltipBar);
-
-	overviewTooltipBar
-		.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
-		.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
-		.attr("width", xScaleOverview(maxValueOverview))
-		.style("fill", "none")
-		.style("pointer-events", "all")
-		.on("mouseover", (e: PointerEvent, d) => {
-			dispatchTooltipEvent(e, d, "mouseover");
-		})
-		.on("mouseout", (e: PointerEvent, d) => {
-			dispatchTooltipEvent(e, d, "mouseout");
-		});
-
-	let overviewAggregatedIcon = overviewGroup
-		.selectAll<SVGUseElement, OverviewDatumValues>(".icon")
-		.data<OverviewDatumValues>(
-			mode === "aggregated" ? d => d.values : [],
-			d => d.id
-		);
-
-	overviewAggregatedIcon.exit().remove();
-
-	const overviewAggregatedIconEnter = overviewAggregatedIcon
-		.enter()
-		.append("use")
-		.attr("class", "icon")
-		.attr("href", d => `#emergencyIcon${d.id}`)
-		.attr("x", -overviewIconSize - 6)
-		.attr("width", overviewIconSize)
-		.attr("height", overviewIconSize)
-		.attr("y", (d, i, n) => {
+		overviewAggregatedIcon.attr("y", (d, i, n) => {
 			const thisScale = localYScale.get(n[i])!;
 			return (
 				thisScale(d.id)! +
 				thisScale.bandwidth() / 2 -
 				overviewIconSize / 2
 			);
-		})
-		.style(
-			"fill",
-			d => emergencyColors[d.id as keyof typeof emergencyColors]
-		);
+		});
 
-	overviewAggregatedIcon = overviewAggregatedIconEnter.merge(
-		overviewAggregatedIcon
-	);
+		let overviewAxis = overviewGroup
+			.selectAll<SVGGElement, boolean>(".overviewAxis")
+			.data<boolean>([true]);
 
-	overviewAggregatedIcon.attr("y", (d, i, n) => {
-		const thisScale = localYScale.get(n[i])!;
-		return (
-			thisScale(d.id)! + thisScale.bandwidth() / 2 - overviewIconSize / 2
-		);
-	});
+		overviewAxis.exit().remove();
 
-	let overviewAxis = overviewGroup
-		.selectAll<SVGGElement, boolean>(".overviewAxis")
-		.data<boolean>([true]);
+		overviewAxis = overviewAxis
+			.enter()
+			.append("g")
+			.attr("class", "overviewAxis")
+			.attr("transform", `translate(0,0)`)
+			.merge(overviewAxis);
 
-	overviewAxis.exit().remove();
+		overviewAxis.each((_, i, n) => {
+			select(n[i])
+				.call(localAxis.get(n[i])!)
+				.selectAll<SVGTextElement, boolean>(".tick text")
+				.style("font-size", mode === "aggregated" ? "13px" : "11px")
+				.style("font-weight", mode === "aggregated" ? "bold" : "normal")
+				.call(
+					wrapText,
+					mode === "aggregated"
+						? overviewAxisWidth
+						: overviewAxisByGroupWidth
+				);
+		});
 
-	overviewAxis = overviewAxis
-		.enter()
-		.append("g")
-		.attr("class", "overviewAxis")
-		.attr("transform", `translate(0,0)`)
-		.merge(overviewAxis);
-
-	overviewAxis.each((_, i, n) => {
-		select(n[i])
-			.call(localAxis.get(n[i])!)
-			.selectAll<SVGTextElement, boolean>(".tick text")
-			.style("font-size", mode === "aggregated" ? "13px" : "11px")
-			.style("font-weight", mode === "aggregated" ? "bold" : "normal")
-			.call(
-				wrapText,
-				mode === "aggregated"
-					? overviewAxisWidth
-					: overviewAxisByGroupWidth
+		if (mode === "byGroup") {
+			createLegendGroup<OverviewDatum>(
+				overviewGroup,
+				lists,
+				type,
+				emergencyOverviewRowHeight
 			);
-	});
-
-	if (mode === "byGroup") {
-		overviewGroup.call(createLegendGroup);
+		}
 	}
 
 	//timeline
 
-	//helper functions
-	function createLegendGroup(
-		selection: d3.Selection<
-			SVGGElement,
-			OverviewDatum,
-			SVGSVGElement,
-			unknown
-		>
-	): void {
-		let legendGroup = selection
-			.selectAll<SVGGElement, OverviewDatum>(".legendGroup")
-			.data<OverviewDatum>(
-				d => [d],
-				d => d.group!
-			);
+	function createTimeline(): void {
+		let timelineGroup = svg
+			.selectAll<SVGGElement, TimelineDatum>(".timelineGroup")
+			.data<TimelineDatum>(timelineData, d => `${d.group}`);
 
-		legendGroup.exit().remove();
+		timelineGroup.exit().remove();
 
-		const legendGroupEnter = legendGroup
+		const timelineGroupEnter = timelineGroup
 			.enter()
 			.append("g")
-			.attr("class", "legendGroup");
+			.attr("class", "timelineGroup");
 
-		legendGroupEnter
-			.append("text")
-			.attr("class", "legendGroupValue")
-			.attr("x", overviewIconSizeByGroup + 8)
-			.attr("y", "0")
-			.text(d => "$" + formatSIFloat(sum(d.values, e => e.value)));
+		timelineGroup = timelineGroupEnter.merge(timelineGroup);
 
-		legendGroupEnter
-			.append("text")
-			.attr("class", "legendGroupName")
-			.attr("x", overviewIconSizeByGroup + 8)
-			.attr("y", "24px")
-			.text(
-				d =>
-					lists.emergencyGroupNames[
-						d.group as keyof typeof lists.emergencyGroupNames
-					]
-			)
-			.call(
-				wrapText,
-				emergencyOverviewLeftMarginByGroup -
-					overviewAxisByGroupWidth -
-					overviewIconSizeByGroup,
-				false
-			);
-
-		legendGroupEnter
-			.append("use")
-			.attr("href", d => `#emergencyIcon${d.group}`)
-			.attr("x", 0)
-			.attr("width", overviewIconSizeByGroup)
-			.attr("height", overviewIconSizeByGroup)
-			.attr("y", 0)
-			.style(
-				"fill",
-				d => emergencyColors[d.group as keyof typeof emergencyColors]
-			);
-
-		legendGroup = legendGroupEnter.merge(legendGroup);
-
-		legendGroup.each((d, i, n) => {
-			const gElement = select(n[i]);
-			const bbox = gElement.node()!.getBBox();
-			const translateY = bbox.height / 2;
-
-			gElement.attr(
-				"transform",
-				`translate(${-emergencyOverviewLeftMarginByGroup},${
-					(d.values.length * emergencyOverviewRowHeight) / 2 -
-					translateY
-				})`
-			);
-		});
-
-		legendGroup
-			.attr("data-tooltip-id", "tooltip")
+		timelineGroup
 			.attr(
-				"data-tooltip-content",
-				d => `$${format(",.0f")(sum(d.values, e => e.value))}`
+				"transform",
+				d =>
+					`translate(${
+						emergencyChartMargins.left + emergencyTimelineLeftMargin
+					},${yScaleOuterTimeline(d.group ?? 0)})`
 			)
-			.attr("data-tooltip-place", "top")
-			// 	.style(
-			// 		"cursor",
-			// 		chartState.selectedView === viewOptions[0]
-			// 			? "pointer"
-			// 			: "default"
-			// 	)
-			// 	.transition(syncTransition)
-			// 	.attr(
-			// 		"transform",
-			// 		d =>
-			// 			"translate(0," +
-			// 			(groupScale(d) +
-			// 				(chartState.selectedView === viewOptions[0]
-			// 					? groupScale.bandwidth() / 2
-			// 					: stackedPaddingByGroup[0] +
-			// 					  legendGroupPaddingByGroup)) +
-			// 			")"
-			// 	)
-			// 	.select("." + classPrefix + "legendGroupValue")
-			// 	.tween("text", (d, i, n) => {
-			// 		const node = n[i];
-			// 		const interpolator = d3.interpolate(
-			// 			reverseFormat(node.textContent.substring(1)) || 0,
-			// 			legendTotalData[d]
-			// 		);
-			// 		return t =>
-			// 			(node.textContent = "$" + formatSIFloat(interpolator(t)));
-			// 	});
-			.select(".legendGroupValue")
-			.text(d => "$" + formatSIFloat(sum(d.values, e => e.value)));
-	}
-}
+			.each((d, i, n) => {
+				localTimelineDatum.set(n[i], d);
+				if (mode === "byGroup") {
+					const baseColor =
+						emergencyColors[
+							d.group as keyof typeof emergencyColors
+						];
+					const thisScaleColor = scaleOrdinal<
+						keyof TimelineEmergencyProperty,
+						string
+					>()
+						.domain(d.stackedData!.map(e => e.key))
+						.range(
+							d.stackedData.map((_, i, values) => {
+								const t = i / (values.length - 1);
+								return interpolateHsl(
+									rgb(baseColor).darker(
+										(~~d.stackedData.length / 2) * 0.2
+									),
+									rgb(baseColor).brighter(
+										(~~d.stackedData.length / 2) * 0.2
+									)
+								)(t);
+							})
+						);
 
-function dispatchTooltipEvent(
-	e: PointerEvent,
-	d: OverviewDatumValues,
-	type: "mouseover" | "mouseout"
-): void {
-	const thisElement = e.currentTarget as SVGRectElement;
-	select(thisElement.parentNode as SVGGElement)
-		.selectAll<SVGRectElement, OverviewDatumValues>(".overviewBar")
-		.filter(f => f.id === d.id)
-		.dispatch(type);
-}
+					localColorScaleTimeline.set(n[i], thisScaleColor);
+				}
+			});
 
-function calculateHeightOverview(
-	data: OverviewDatum[],
-	emergencyOverviewRowHeight: number
-): number {
-	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
+		let timelineXAxisGroup = timelineGroup
+			.selectAll<SVGGElement, boolean>(".timelineXAxisGroup")
+			.data<boolean>([true]);
 
-	data.forEach((d, i) => {
-		height +=
-			d.values.length * emergencyOverviewRowHeight +
-			(i < data.length - 1 ? emergencyOverviewGap : 0);
-	});
-
-	return height;
-}
-
-function calculateHeightTimeline(data: TimelineDatum[]): number {
-	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
-
-	height += data.length * emergencyTimelineGroupHeight;
-
-	return height;
-}
-
-function calculateOverviewRange(
-	data: OverviewDatum[],
-	emergencyOverviewRowHeight: number
-): number[] {
-	const range: number[] = [emergencyChartMargins.top];
-
-	data.forEach((d, i) => {
-		if (i < data.length - 1) {
-			range.push(
-				range[i] +
-					d.values.length * emergencyOverviewRowHeight +
-					emergencyOverviewGap
+		timelineXAxisGroup = timelineXAxisGroup
+			.enter()
+			.append("g")
+			.attr("class", "timelineXAxisGroup")
+			.merge(timelineXAxisGroup)
+			.attr(
+				"transform",
+				`translate(0,${yScaleOuterTimeline.bandwidth()})`
 			);
-		}
-	});
 
-	return range;
-}
+		timelineXAxisGroup.call(timelineXAxis);
 
-function getMaxValueOverview(data: OverviewDatum[]): number {
-	return data.reduce(
-		(acc, curr) =>
-			Math.max(
-				acc,
-				curr.values.reduce((acc, curr) => Math.max(acc, curr.value), 0)
-			),
-		0
-	);
-}
+		timelineXAxisGroup
+			.selectAll<SVGLineElement, Month>(".gridline")
+			.data(monthsArray)
+			.enter()
+			.append("line")
+			.attr("class", "gridline")
+			.attr("x1", d => xScaleTimeline(d)!)
+			.attr("x2", d => xScaleTimeline(d)!)
+			.attr("y1", 0)
+			.attr("y2", -yScaleOuterTimeline.bandwidth());
 
-function getMaxValueTimeline(data: TimelineDatum[]): number {
-	return data.reduce(
-		(acc, curr) =>
-			Math.max(
-				acc,
-				curr.values.reduce(
-					(acc, curr) =>
-						Math.max(
-							acc,
-							curr.values.reduce(
-								(acc, curr) => Math.max(acc, curr.value),
-								0
+		let timelineYAxisGroup = timelineGroup
+			.selectAll<SVGGElement, boolean>(".timelineYAxisGroup")
+			.data<boolean>([true]);
+
+		timelineYAxisGroup = timelineYAxisGroup
+			.enter()
+			.append("g")
+			.attr("class", "timelineYAxisGroup")
+			.merge(timelineYAxisGroup)
+			.attr("transform", `translate(0,0)`);
+
+		timelineYAxisGroup.call(timelineYAxis);
+
+		timelineYAxisGroup
+			.selectAll(".tick")
+			.filter(d => d === 0)
+			.remove();
+
+		let timelineArea = timelineGroup
+			.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
+			.data<StackedDatum>(
+				d => d.stackedData!,
+				d => d.key
+			);
+
+		timelineArea.exit().remove();
+
+		const timelineAreaEnter = timelineArea
+			.enter()
+			.append("path")
+			.attr("class", "timelineArea");
+
+		timelineArea = timelineAreaEnter.merge(timelineArea);
+
+		timelineArea
+			.attr("d", (d, i, n) => {
+				const timelineDatum = localTimelineDatum.get(n[i])!;
+				const thisIndex: number[] = [];
+				areaGenerator
+					.y0((e, j) => {
+						for (let index = 0; index < d.index; index++) {
+							const foundData = timelineDatum.stackedData.find(
+								e => e.index === index
+							)!;
+							if (
+								foundData[j][0] !== foundData[j][1] ||
+								(foundData[j - 1] &&
+									foundData[j - 1][0] !==
+										foundData[j - 1][1]) ||
+								(foundData[j + 1] &&
+									foundData[j + 1][0] !== foundData[j + 1][1])
 							)
-						),
-					0
-				)
-			),
-		0
-	);
+								thisIndex[j] = (thisIndex[j] || 0) + 1;
+						}
+						return (
+							yScaleInnerTimeline(e[0]) -
+							stackGap * (thisIndex[j] || 0)
+						);
+					})
+					.y1(
+						(e, j) =>
+							yScaleInnerTimeline(e[1]) -
+							stackGap * (thisIndex[j] || 0)
+					);
+				return areaGenerator(d);
+			})
+			.style("fill", (d, i, n) =>
+				mode === "aggregated"
+					? emergencyColors[
+							d.key[3] as unknown as keyof typeof emergencyColors
+					  ]
+					: localColorScaleTimeline.get(n[i])!(d.key)
+			);
+
+		//create rectangles as bars
+		let timelineTooltipBars = timelineGroup
+			.selectAll<SVGRectElement, TimelineDatumValues>(
+				".timelineTooltipBars"
+			)
+			.data<TimelineDatumValues>(
+				d => d.values,
+				d => `${d.month}`
+			);
+
+		timelineTooltipBars.exit().remove();
+
+		const timelineTooltipBarsEnter = timelineTooltipBars
+			.enter()
+			.append("rect")
+			.attr("class", "timelineTooltipBars");
+
+		timelineTooltipBars =
+			timelineTooltipBarsEnter.merge(timelineTooltipBars);
+
+		timelineTooltipBars
+			.attr("x", (d, i) =>
+				i === 0
+					? xScaleTimeline(d.month)!
+					: xScaleTimeline(d.month)! - xScaleTimeline.step() / 2
+			)
+			.attr("y", 0)
+			.attr("width", (_, i, n) =>
+				i === 0 || i === n.length - 1
+					? xScaleTimeline.step() / 2
+					: xScaleTimeline.step()
+			)
+			.attr("height", yScaleOuterTimeline.bandwidth())
+			.style("fill", "none")
+			.style("stroke", "none")
+			.style("pointer-events", "all")
+			.attr("data-tooltip-id", "tooltip")
+			.attr("data-tooltip-place", "left")
+			.attr("data-tooltip-html", (d, i, n) => {
+				const thisGroup = localTimelineDatum.get(n[i])!;
+				return createTooltipString(d, thisGroup, lists);
+			});
+	}
 }
 
 export default createEmergency;

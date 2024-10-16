@@ -63,7 +63,7 @@ function EmergencyChart({
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [type, setType] = useState<EmergencyChartTypes>("overview"); //CHANGE THIS TO TIMELINE
+	const [type, setType] = useState<EmergencyChartTypes>("timeline");
 	const [mode, setMode] = useState<EmergencyChartModes>("aggregated");
 
 	const ref = useRef<HTMLDivElement>(null);

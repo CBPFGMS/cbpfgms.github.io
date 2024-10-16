@@ -89,5 +89,32 @@
 	dominant-baseline: hanging;
 	font-size: 16px;
 	font-weight: normal;
-	fill: #444
+	fill: #444;
+}
+
+.timelineXAxisGroup text {
+	fill: #444;
+	font-size: 11px;
+}
+
+.timelineYAxisGroup text {
+	fill: #444;
+	font-weight: bold;
+}
+
+.timelineXAxisGroup path {
+	stroke: none;
+}
+
+.timelineYAxisGroup path {
+	stroke: none;
+}
+
+.timelineYAxisGroup line {
+	stroke: #ccc;
+}
+
+.gridline {
+	stroke: #f1f1f1;
+	stroke-dasharray: 4, 4;
 }

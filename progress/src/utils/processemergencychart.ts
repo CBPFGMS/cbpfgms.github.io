@@ -1,14 +1,30 @@
 import { DatumEmergency } from "../utils/processdatasummary";
 import { EmergencyChartModes } from "../components/EmergencyChart";
-import { OverviewDatum, TimelineDatum } from "../charts/createemergency";
-import { sum, timeFormat } from "d3";
+import {
+	OverviewDatum,
+	TimelineDatum,
+	TimelineDatumValues,
+	TimelineEmergencyProperty,
+} from "../charts/createemergency";
+import { sum, timeFormat, stack, stackOrderDescending } from "d3";
 import constants from "../utils/constants";
+import { List } from "./makelists";
 
 export type Month = (typeof monthsArray)[number];
 
-const { monthsArray } = constants;
+type EmergencyTypesPerGroup = {
+	[key: number]: number[];
+};
+
+const { monthsArray, idString } = constants;
 
 const formatMonth = timeFormat("%b");
+
+const stackGenerator = stack<
+	TimelineDatumValues,
+	keyof TimelineEmergencyProperty
+>().order(stackOrderDescending);
+//.order(stackCustomOrder);
 
 function processOverviewData(
 	dataEmergency: DatumEmergency[],
@@ -50,60 +66,80 @@ function processOverviewData(
 
 function processTimelineData(
 	dataEmergency: DatumEmergency[],
-	mode: EmergencyChartModes
+	mode: EmergencyChartModes,
+	lists: List
 ): TimelineDatum[] {
+	const groupsIds = Object.keys(lists.emergencyGroupNames).map(Number);
+	const emergencyTypesPerGroup: EmergencyTypesPerGroup = groupsIds.reduce(
+		(acc, curr) => {
+			acc[curr] = Array.from(
+				lists.emergencyDetails.emergencyGroups.get(curr)!.emergencyTypes
+			).map(Number);
+			return acc;
+		},
+		{} as EmergencyTypesPerGroup
+	);
+
+	const emergenciesInData = new Set<number>();
+	dataEmergency.forEach(d => emergenciesInData.add(d.emergencyType));
+
 	const data: TimelineDatum[] = dataEmergency.reduce((acc, curr) => {
 		const groupId = mode === "aggregated" ? null : curr.emergencyGroup;
 		const valueId =
 			mode === "aggregated" ? curr.emergencyGroup : curr.emergencyType;
+		const thisMonth = formatMonth(curr.date) as Month;
 
 		let group = acc.find(d => d.group === groupId);
 
 		if (!group) {
-			group = { group: groupId, values: [] };
+			const ids = (
+				mode === "aggregated"
+					? groupsIds
+					: emergencyTypesPerGroup[groupId!]
+			).reduce((acc, curr) => {
+				if (mode === "aggregated" || emergenciesInData.has(curr)) {
+					acc[`${idString}${curr}`] = 0;
+				}
+				return acc;
+			}, {} as TimelineEmergencyProperty);
+			group = {
+				group: groupId,
+				values: monthsArray.map(d => ({ total: 0, month: d, ...ids })),
+				stackedData: [],
+			};
 			acc.push(group);
 		}
 
-		let value = group.values.find(d => d.id === valueId);
+		const month = group.values.find(d => d.month === thisMonth);
 
-		if (!value) {
-			value = {
-				id: valueId,
-				values: monthsArray.map(d => ({ value: 0, month: d })),
-			};
-			group.values.push(value);
+		if (month) {
+			month.total += curr.allocations;
+			month[`${idString}${valueId}`] =
+				(month[`${idString}${valueId}`] || 0) + curr.allocations;
 		}
-
-		let monthValue = value.values.find(
-			d => d.month === formatMonth(curr.date)
-		);
-
-		if (!monthValue) {
-			monthValue = { month: formatMonth(curr.date) as Month, value: 0 };
-			value.values.push(monthValue);
-		}
-
-		monthValue.value += curr.allocations;
 
 		return acc;
 	}, [] as TimelineDatum[]);
 
-	// data.forEach(group =>
-	// 	group.values.forEach(d =>
-	// 		d.values.sort(
-	// 			(a, b) =>
-	// 				monthsArray.indexOf(a.month) - monthsArray.indexOf(b.month)
-	// 		)
-	// 	)
-	// );
-
 	if (data.length > 1) {
 		data.sort(
-			(a, b) =>
-				sum(b.values, d => sum(d.values, e => e.value)) -
-				sum(a.values, d => sum(d.values, e => e.value))
+			(a, b) => sum(b.values, d => d.total) - sum(a.values, d => d.total)
 		);
 	}
+
+	data.forEach(group => {
+		stackGenerator.keys(
+			group.group === null
+				? Object.keys(lists.emergencyGroupNames).map(
+						d =>
+							`${idString}${d}` as keyof TimelineEmergencyProperty
+				  )
+				: (Object.keys(group.values[0]).filter(d =>
+						d.includes(idString)
+				  ) as (keyof TimelineEmergencyProperty)[])
+		);
+		group.stackedData = stackGenerator(group.values);
+	});
 
 	return data;
 }
