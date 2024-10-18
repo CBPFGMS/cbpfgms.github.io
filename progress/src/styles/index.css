@@ -81,13 +81,11 @@
 
 .legendGroupValue {
 	dominant-baseline: hanging;
-	font-size: 20px;
 	font-weight: 600;
 }
 
 .legendGroupName {
 	dominant-baseline: hanging;
-	font-size: 16px;
 	font-weight: normal;
 	fill: #444;
 }
@@ -117,4 +115,9 @@
 .gridline {
 	stroke: #f1f1f1;
 	stroke-dasharray: 4, 4;
+}
+
+.emergencyTypesGroupValue {
+	font-size: 12px;
+	fill: #222;
 }

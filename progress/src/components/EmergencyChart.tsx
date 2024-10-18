@@ -73,7 +73,7 @@ function EmergencyChart({
 	const [svgContainerWidth, setSvgContainerWidth] = useState<number>(0);
 
 	const handleType = (
-		event: React.MouseEvent<HTMLElement>,
+		_: React.MouseEvent<HTMLElement>,
 		newType: EmergencyChartTypes | null
 	) => {
 		if (newType !== null) {
@@ -82,7 +82,7 @@ function EmergencyChart({
 	};
 
 	const handleMode = (
-		event: React.MouseEvent<HTMLElement>,
+		_: React.MouseEvent<HTMLElement>,
 		newMode: EmergencyChartModes | null
 	) => {
 		if (newMode !== null) {
@@ -258,8 +258,8 @@ function EmergencyChart({
 			>
 				<Box
 					width={"96%"}
-					style={{ outline: "1px solid green" }}
 					ref={svgContainerRef}
+					mt={2}
 				>
 					<svg ref={svgRef}></svg>
 				</Box>

@@ -6,11 +6,22 @@ import {
 	TimelineDatum,
 	Margins,
 } from "./createemergency";
-import { EmergencyChartTypes } from "../components/EmergencyChart";
+import {
+	EmergencyChartModes,
+	EmergencyChartTypes,
+} from "../components/EmergencyChart";
 import constants from "../utils/constants";
 import { List } from "../utils/makelists";
+import formatSIFloat from "../utils/formatsi";
 
-const { fullMonthNames, idString } = constants;
+const {
+	fullMonthNames,
+	idString,
+	emergencyChartMargins,
+	emergencyTimelineAggregatedGroupHeight,
+	emergencyTimelineGroupHeight,
+	emergencyOverviewGap,
+} = constants;
 
 type Emergencies = {
 	key: number;
@@ -18,7 +29,7 @@ type Emergencies = {
 };
 
 function wrapText<T>(
-	text: d3.Selection<SVGTextElement, T, SVGGElement, unknown>,
+	text: d3.Selection<SVGTextElement, T, SVGGElement | null, unknown>,
 	width: number,
 	fromAxis: boolean = true
 ) {
@@ -79,9 +90,7 @@ function dispatchTooltipEvent(
 
 function calculateHeightOverview(
 	data: OverviewDatum[],
-	emergencyOverviewRowHeight: number,
-	emergencyChartMargins: Margins,
-	emergencyOverviewGap: number
+	emergencyOverviewRowHeight: number
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
@@ -96,12 +105,14 @@ function calculateHeightOverview(
 
 function calculateHeightTimeline(
 	data: TimelineDatum[],
-	emergencyChartMargins: Margins,
-	emergencyTimelineGroupHeight: number
+	mode: EmergencyChartModes
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
-	height += data.length * emergencyTimelineGroupHeight;
+	height +=
+		mode === "aggregated"
+			? emergencyTimelineAggregatedGroupHeight
+			: data.length * emergencyTimelineGroupHeight;
 
 	return height;
 }
@@ -153,7 +164,7 @@ function getMaxValue(
 		curr: OverviewDatumValues | TimelineDatumValues,
 		type: EmergencyChartTypes
 	): curr is OverviewDatumValues {
-		return type === "overview";
+		return type === "overview" && "id" in curr;
 	}
 }
 
@@ -217,7 +228,7 @@ function createTooltipString(
 		<div style="flex: 0 70%;display:flex;flex-wrap:nowrap;align-items:flex-end;text-align:right;justify-content:flex-end;padding-right:12px;">${
 			group === null
 				? lists.emergencyGroupNames[d.key]
-				: lists.emergencyCategoryNames[d.key]
+				: trimEmergencyName(lists.emergencyTypeNames[d.key])
 		}:</div>
 		<div style="flex: 0 30%;display:flex;align-items:flex-end;text-align:right;">$${tooltipFormat(
 			d.value
@@ -225,15 +236,25 @@ function createTooltipString(
 		</div>`
 	);
 
-	const string = `<span style="font-weight:bold;">${
+	const string = `<div style="display:flex;flex-direction:row;width:100%;justify-content:center;align-items:center;">
+	<div style="flex: 0 40%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:1.8em;font-weight:bold;">$${formatSIFloat(
+		datum.total
+	)}</div>
+	<div style="flex: 0 60%;display:flex;align-items:flex-start;justify-content:flex-start;line-height:1.2;text-transform:uppercase;opacity:0.7;font-size:0.9em;text-align:left;">Total allocations in ${
 		fullMonthNames[datum.month]
-	}</span><br>
+	}</div>
+	</div>
 	<div style="max-width:300px;width:100%;display:flex;flex-direction:column;margin-top:10px;">${emergenciesList.join(
 		""
 	)}</div>
 	`;
 
 	return string;
+}
+
+function trimEmergencyName(str: string): string {
+	const trimmed = str.split(" - ")[1].trim();
+	return trimmed;
 }
 
 export {
@@ -244,5 +265,6 @@ export {
 	calculateOverviewRange,
 	getMaxValue,
 	createTooltipString,
+	trimEmergencyName,
 	// stackCustomOrder,
 };

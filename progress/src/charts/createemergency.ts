@@ -37,7 +37,7 @@ import {
 	getMaxValue,
 	createTooltipString,
 } from "./emergencyutils";
-import { createLegendGroup } from "./emergencylegend";
+import { createLegendGroup, createLegendAggregated } from "./emergencylegend";
 
 type ChartDatum = {
 	group: number | null;
@@ -63,7 +63,7 @@ export type TimelineDatumValues = {
 	total: number;
 } & TimelineEmergencyProperty;
 
-type StackedDatum = Series<
+export type StackedDatum = Series<
 	TimelineDatumValues,
 	keyof TimelineEmergencyProperty
 >;
@@ -93,6 +93,7 @@ const {
 	emergencyOverviewGap,
 	emergencyChartMargins,
 	emergencyOverviewAggregatedRowHeight,
+	emergencyTimelineAggregatedGroupHeight,
 	emergencyTimelineGroupHeight,
 	monthsArray,
 	emergencyOverviewDomainPadding,
@@ -116,13 +117,11 @@ const xScaleOverview = scaleLinear<number, number>(),
 
 const xScaleTimeline = scalePoint<string>().domain(monthsArray),
 	yScaleInnerTimeline = scaleLinear<number, number>(),
-	yScaleOuterTimeline = scaleBand<number>()
-		.paddingInner(0.2)
-		.paddingOuter(0.1);
+	yScaleOuterTimeline = scaleBand<number>();
 
 const localYScale = local<d3.ScaleBand<number>>();
 const localColorScale = local<d3.ScaleOrdinal<number, string>>();
-const localColorScaleTimeline =
+export const localColorScaleTimeline =
 	local<d3.ScaleOrdinal<keyof TimelineEmergencyProperty, string>>();
 const localAxis = local<d3.Axis<number>>();
 const localTimelineDatum = local<TimelineDatum>();
@@ -139,7 +138,7 @@ const areaGenerator = area<StackedDatum[number]>()
 const timelineXAxis = axisBottom<string>(xScaleTimeline);
 const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
 	.ticks(3)
-	.tickFormat(formatSIFloat);
+	.tickFormat(d => `$${formatSIFloat(d)}`);
 
 const limitValue = 0.9;
 
@@ -168,17 +167,8 @@ function createEmergency({
 
 	const svgHeight =
 		type === "overview"
-			? calculateHeightOverview(
-					overviewData,
-					emergencyOverviewRowHeight,
-					emergencyChartMargins,
-					emergencyOverviewGap
-			  )
-			: calculateHeightTimeline(
-					timelineData,
-					emergencyChartMargins,
-					emergencyTimelineGroupHeight
-			  );
+			? calculateHeightOverview(overviewData, emergencyOverviewRowHeight)
+			: calculateHeightTimeline(timelineData, mode);
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
 
@@ -234,7 +224,9 @@ function createEmergency({
 			svgHeight -
 				emergencyChartMargins.bottom -
 				emergencyChartMargins.top,
-		]);
+		])
+		.paddingInner(mode === "aggregated" ? 0.1 : 0.25)
+		.paddingOuter(mode === "aggregated" ? 0 : 0.05);
 
 	yScaleInnerTimeline
 		.domain([0, maxValueTimeline * emergencyTimelineDomainPadding])
@@ -254,7 +246,10 @@ function createEmergency({
 		.domain(overviewData.map(d => d.group ?? 0))
 		.range(overviewRange);
 
-	timelineYAxis.tickSizeOuter(0).tickSizeInner(-xScaleTimeline.range()[1]);
+	timelineYAxis
+		.tickSizeOuter(0)
+		.tickSizeInner(-xScaleTimeline.range()[1])
+		.tickPadding(6);
 
 	createOverview();
 	createTimeline();
@@ -593,12 +588,15 @@ function createEmergency({
 
 		timelineXAxisGroup.call(timelineXAxis);
 
-		timelineXAxisGroup
+		const gridlines = timelineXAxisGroup
 			.selectAll<SVGLineElement, Month>(".gridline")
-			.data(monthsArray)
+			.data(monthsArray);
+
+		gridlines
 			.enter()
 			.append("line")
 			.attr("class", "gridline")
+			.merge(gridlines)
 			.attr("x1", d => xScaleTimeline(d)!)
 			.attr("x2", d => xScaleTimeline(d)!)
 			.attr("y1", 0)
@@ -673,7 +671,9 @@ function createEmergency({
 			.style("fill", (d, i, n) =>
 				mode === "aggregated"
 					? emergencyColors[
-							d.key[3] as unknown as keyof typeof emergencyColors
+							d.key.substring(
+								idString.length
+							) as unknown as keyof typeof emergencyColors
 					  ]
 					: localColorScaleTimeline.get(n[i])!(d.key)
 			);
@@ -720,6 +720,24 @@ function createEmergency({
 				const thisGroup = localTimelineDatum.get(n[i])!;
 				return createTooltipString(d, thisGroup, lists);
 			});
+
+		if (mode === "byGroup") {
+			createLegendGroup<TimelineDatum>(
+				timelineGroup,
+				lists,
+				type,
+				emergencyTimelineGroupHeight,
+				true
+			);
+		} else {
+			createLegendAggregated(
+				timelineGroup,
+				lists,
+				mode === "aggregated"
+					? emergencyTimelineAggregatedGroupHeight
+					: emergencyTimelineGroupHeight
+			);
+		}
 	}
 }
 

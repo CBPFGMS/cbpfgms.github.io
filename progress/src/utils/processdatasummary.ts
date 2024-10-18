@@ -215,7 +215,10 @@ function processDataSummary({
 			datum.emergenciesData.forEach(emergency => {
 				const foundEmergency = dataEmergency.find(
 					datumEmergency =>
-						datumEmergency.emergencyType === emergency.emergencyId
+						datumEmergency.emergencyType ===
+							emergency.emergencyId &&
+						datumEmergency.date.getMonth() ===
+							datum.endDate.getMonth()
 				);
 				if (foundEmergency) {
 					foundEmergency.allocations += Math.floor(

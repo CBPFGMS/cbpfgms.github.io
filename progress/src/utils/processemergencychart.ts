@@ -69,7 +69,14 @@ function processTimelineData(
 	mode: EmergencyChartModes,
 	lists: List
 ): TimelineDatum[] {
-	const groupsIds = Object.keys(lists.emergencyGroupNames).map(Number);
+	const emergenciesInData = new Set<number>();
+	const groupsInData = new Set<number>();
+	dataEmergency.forEach(d => {
+		emergenciesInData.add(d.emergencyType);
+		groupsInData.add(d.emergencyGroup);
+	});
+
+	const groupsIds = Array.from(groupsInData);
 	const emergencyTypesPerGroup: EmergencyTypesPerGroup = groupsIds.reduce(
 		(acc, curr) => {
 			acc[curr] = Array.from(
@@ -79,9 +86,6 @@ function processTimelineData(
 		},
 		{} as EmergencyTypesPerGroup
 	);
-
-	const emergenciesInData = new Set<number>();
-	dataEmergency.forEach(d => emergenciesInData.add(d.emergencyType));
 
 	const data: TimelineDatum[] = dataEmergency.reduce((acc, curr) => {
 		const groupId = mode === "aggregated" ? null : curr.emergencyGroup;
@@ -130,7 +134,7 @@ function processTimelineData(
 	data.forEach(group => {
 		stackGenerator.keys(
 			group.group === null
-				? Object.keys(lists.emergencyGroupNames).map(
+				? groupsIds.map(
 						d =>
 							`${idString}${d}` as keyof TimelineEmergencyProperty
 				  )
