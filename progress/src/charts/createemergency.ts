@@ -317,6 +317,7 @@ function createEmergency({
 						.domain(d.values.map(e => e.id))
 						.range(
 							d.values.map((_, i, values) => {
+								if (values.length === 1) return baseColor;
 								const t = i / (values.length - 1);
 								return interpolateHsl(
 									rgb(baseColor).darker(
@@ -582,6 +583,7 @@ function createEmergency({
 						.domain(d.stackedData!.map(e => e.key))
 						.range(
 							d.stackedData.map((_, i, values) => {
+								if (values.length === 1) return baseColor;
 								const t = i / (values.length - 1);
 								return interpolateHsl(
 									rgb(baseColor).darker(
