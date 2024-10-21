@@ -37,7 +37,7 @@ const constants = {
 	emergencyOverviewGap: 12,
 	emergencyChartMargins: { top: 6, right: 12, bottom: 6, left: 6 },
 	emergencyOverviewLeftMarginAggregated: 150,
-	emergencyOverviewLeftMarginByGroup: 350,
+	emergencyOverviewLeftMarginByGroup: 280,
 	emergencyTimelineLeftMargin: 282,
 	emergencyColors: {
 		1: "#7fc97f",
@@ -69,7 +69,7 @@ const constants = {
 	overviewScalePaddingInner: 0.4,
 	overviewScalePaddingOuter: 0.5,
 	overviewAxisWidth: 100,
-	overviewAxisByGroupWidth: 160,
+	overviewAxisByGroupWidth: 110,
 	emergencyTypesGroupRowHeight: 20,
 	emergencyTypesGroupCircleRadius: 6,
 	idString: "id_",

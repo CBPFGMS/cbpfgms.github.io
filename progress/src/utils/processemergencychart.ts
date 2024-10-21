@@ -6,9 +6,10 @@ import {
 	TimelineDatumValues,
 	TimelineEmergencyProperty,
 } from "../charts/createemergency";
-import { sum, timeFormat, stack, stackOrderDescending } from "d3";
+import { sum, timeFormat, stack, stackOrderDescending, Series } from "d3";
 import constants from "../utils/constants";
 import { List } from "./makelists";
+import { stackCustomOrder } from "../charts/emergencyutils";
 
 export type Month = (typeof monthsArray)[number];
 
@@ -23,8 +24,7 @@ const formatMonth = timeFormat("%b");
 const stackGenerator = stack<
 	TimelineDatumValues,
 	keyof TimelineEmergencyProperty
->().order(stackOrderDescending);
-//.order(stackCustomOrder);
+>();
 
 function processOverviewData(
 	dataEmergency: DatumEmergency[],
@@ -67,7 +67,8 @@ function processOverviewData(
 function processTimelineData(
 	dataEmergency: DatumEmergency[],
 	mode: EmergencyChartModes,
-	lists: List
+	lists: List,
+	baselineGroup?: keyof TimelineEmergencyProperty
 ): TimelineDatum[] {
 	const emergenciesInData = new Set<number>();
 	const groupsInData = new Set<number>();
@@ -132,16 +133,29 @@ function processTimelineData(
 	}
 
 	data.forEach(group => {
-		stackGenerator.keys(
-			group.group === null
-				? groupsIds.map(
-						d =>
-							`${idString}${d}` as keyof TimelineEmergencyProperty
-				  )
-				: (Object.keys(group.values[0]).filter(d =>
-						d.includes(idString)
-				  ) as (keyof TimelineEmergencyProperty)[])
-		);
+		stackGenerator
+			.keys(
+				group.group === null
+					? groupsIds.map(
+							d =>
+								`${idString}${d}` as keyof TimelineEmergencyProperty
+					  )
+					: (Object.keys(group.values[0]).filter(d =>
+							d.includes(idString)
+					  ) as (keyof TimelineEmergencyProperty)[])
+			)
+			.order(
+				baselineGroup
+					? d =>
+							stackCustomOrder(
+								d as unknown as Series<
+									TimelineDatumValues,
+									keyof TimelineEmergencyProperty
+								>[],
+								baselineGroup
+							)
+					: stackOrderDescending
+			);
 		group.stackedData = stackGenerator(group.values);
 	});
 

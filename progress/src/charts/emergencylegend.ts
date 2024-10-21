@@ -137,20 +137,17 @@ function createEmergencyTypesGroup(
 	lists: List,
 	datum: TimelineDatum
 ): void {
-	const typesData = datum.stackedData.sort(
-		(a, b) => sum(b, e => e.data[b.key]) - sum(a, e => e.data[a.key])
-	);
-
 	let emergencyTypesGroup = selection
 		.selectAll<SVGGElement, StackedDatum>(".emergencyTypesGroup")
-		.data<StackedDatum>(typesData, d => d.key);
+		.data<StackedDatum>(datum.stackedData, d => d.key);
 
 	emergencyTypesGroup.exit().remove();
 
 	const emergencyTypesGroupEnter = emergencyTypesGroup
 		.enter()
 		.append("g")
-		.attr("class", "emergencyTypesGroup");
+		.attr("class", "emergencyTypesGroup")
+		.style("cursor", "pointer");
 
 	emergencyTypesGroupEnter
 		.append("text")
@@ -178,10 +175,11 @@ function createEmergencyTypesGroup(
 	emergencyTypesGroup
 		.attr(
 			"transform",
-			(_, i) =>
+			d =>
 				`translate(${overviewIconSizeByGroup + 8},${
 					overviewIconSizeByGroup * 2 +
-					i * emergencyTypesGroupRowHeight
+					(datum.stackedData.length - 1 - d.index) *
+						emergencyTypesGroupRowHeight
 				})`
 		)
 		.attr("data-tooltip-id", "tooltip")
@@ -211,7 +209,7 @@ function createLegendAggregated(
 	selection: d3.Selection<SVGGElement, TimelineDatum, SVGSVGElement, unknown>,
 	lists: List,
 	rowHeight: number
-): void {
+): d3.Selection<SVGGElement, StackedDatum, SVGGElement, TimelineDatum> {
 	let legendGroup = selection
 		.selectAll<SVGGElement, StackedDatum>(".legendGroup")
 		.data<StackedDatum>(
@@ -225,6 +223,7 @@ function createLegendAggregated(
 		.enter()
 		.append("g")
 		.attr("class", "legendGroup")
+		.style("cursor", "pointer")
 		.each((d, i, n) => {
 			const total = sum(d, e => e.data[d.key]);
 			const group = +d.key.substring(idString.length);
@@ -244,11 +243,7 @@ function createLegendAggregated(
 
 	const legendData = legendGroup.data();
 
-	legendData.sort(
-		(a, b) => sum(b, e => e.data[b.key]) - sum(a, e => e.data[a.key])
-	);
-
-	//verify space and VERIFY DATA!!!
+	legendData.sort((a, b) => b.index! - a.index!);
 
 	aggregatedScale.domain(legendData.map(d => d.key)).range([0, rowHeight]);
 
@@ -286,6 +281,8 @@ function createLegendAggregated(
 					) as keyof typeof emergencyColors
 				]
 		);
+
+	return legendGroup;
 }
 
 function drawLegendHeader(
@@ -336,7 +333,14 @@ function drawLegendHeader(
 
 	selection
 		.attr("data-tooltip-id", "tooltip")
-		.attr("data-tooltip-content", `$${format(",.0f")(total)}`)
+		.attr(
+			"data-tooltip-html",
+			`<span>$${format(",.0f")(total)}</span>${
+				fromAggregate
+					? "<br><span style='font-size:11px;'>(click for sending this group to baseline)</span>"
+					: ""
+			}`
+		)
 		.attr("data-tooltip-place", "top");
 	// 	.style(
 	// 		"cursor",

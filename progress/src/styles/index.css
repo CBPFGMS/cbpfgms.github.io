@@ -121,3 +121,8 @@
 	font-size: 12px;
 	fill: #222;
 }
+
+.legendGroup:focus,
+.emergencyTypesGroup:focus {
+	outline: none;
+}

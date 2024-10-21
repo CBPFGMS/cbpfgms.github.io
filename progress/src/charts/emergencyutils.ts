@@ -1,10 +1,11 @@
-import { select, format } from "d3";
+import { select, format, Series } from "d3";
 import {
 	OverviewDatumValues,
 	TimelineDatumValues,
 	OverviewDatum,
 	TimelineDatum,
 	Margins,
+	TimelineEmergencyProperty,
 } from "./createemergency";
 import {
 	EmergencyChartModes,
@@ -168,31 +169,43 @@ function getMaxValue(
 	}
 }
 
-// function stackCustomOrder(series: Series, baseline: number) {
-// 	function sum(series) {
-// 		const n = series.length;
-// 		let s = 0,
-// 			i = -1,
-// 			v;
-// 		while (++i < n) {
-// 			if ((v = +series[i][1])) s += v;
-// 		}
-// 		return s;
-// 	}
+function stackCustomOrder(
+	series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>[],
+	baseline: keyof TimelineEmergencyProperty
+): number[] {
+	function sum(
+		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>
+	) {
+		const n = series.length;
+		let s = 0,
+			i = -1,
+			v;
+		while (++i < n) {
+			if ((v = +series[i][1])) s += v;
+		}
+		return s;
+	}
 
-// 	function none(series) {
-// 		let n = series.length;
-// 		const o = new Array(n);
-// 		while (--n >= 0) o[n] = n;
-// 		return o;
-// 	}
-// 	const sums = series.map(sum);
-// 	return none(series)
-// 		.sort(function (a, b) {
-// 			return a === baseline ? 1 : b === baseline ? -1 : sums[a] - sums[b];
-// 		})
-// 		.reverse();
-// }
+	function none(
+		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>[]
+	): { value: number; key: keyof TimelineEmergencyProperty }[] {
+		let n = series.length;
+		const o = new Array(n);
+		while (--n >= 0) o[n] = { value: n, key: series[n].key };
+		return o;
+	}
+	const sums = series.map(e => sum(e));
+	const result = none(series)
+		.sort(function (a, b) {
+			return a.key === baseline
+				? 1
+				: b.key === baseline
+				? -1
+				: sums[a.value] - sums[b.value];
+		})
+		.reverse();
+	return result.map(d => d.value);
+}
 
 function createTooltipString(
 	datum: TimelineDatumValues,
@@ -266,5 +279,5 @@ export {
 	getMaxValue,
 	createTooltipString,
 	trimEmergencyName,
-	// stackCustomOrder,
+	stackCustomOrder,
 };

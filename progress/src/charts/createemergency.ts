@@ -1,5 +1,6 @@
 import {
 	select,
+	selectAll,
 	scaleLinear,
 	scaleOrdinal,
 	scaleBand,
@@ -36,6 +37,7 @@ import {
 	dispatchTooltipEvent,
 	getMaxValue,
 	createTooltipString,
+	trimEmergencyName,
 } from "./emergencyutils";
 import { createLegendGroup, createLegendAggregated } from "./emergencylegend";
 
@@ -142,6 +144,8 @@ const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
 
 const limitValue = 0.9;
 
+const parser = new DOMParser();
+
 function createEmergency({
 	svgRef,
 	svgContainerWidth,
@@ -173,17 +177,37 @@ function createEmergency({
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
 
 	const defs = svg
-		.selectAll<SVGDefsElement, null>("defs")
+		.selectAll<SVGDefsElement, boolean>("defs")
 		.data<boolean>([true])
 		.enter()
 		.append("defs");
 
-	defs.html(
-		Object.keys(lists.emergencyGroupNames).reduce(
-			(acc, key) => acc + emergencyIcons[+key],
-			""
-		)
+	const svgElements = Object.keys(lists.emergencyGroupNames).reduce(
+		(acc, key) => {
+			const svgString = emergencyIcons[+key];
+			const doc = parser.parseFromString(svgString, "image/svg+xml");
+			const svgElement = doc.documentElement;
+
+			const emergencyIconGroup = svgElement.querySelector(
+				`.emergencyIcon${key}`
+			);
+			if (emergencyIconGroup) {
+				emergencyIconGroup.setAttribute(
+					"style",
+					`fill: ${
+						emergencyColors[+key as keyof typeof emergencyColors]
+					}`
+				);
+			}
+
+			acc.appendChild(svgElement);
+
+			return acc;
+		},
+		document.createDocumentFragment()
 	);
+
+	defs.append(() => svgElements as unknown as SVGElement);
 
 	const maxValueOverview =
 		type === "overview" ? getMaxValue(overviewData, type) : 0;
@@ -252,7 +276,7 @@ function createEmergency({
 		.tickPadding(6);
 
 	createOverview();
-	createTimeline();
+	createTimeline(timelineData);
 
 	//overview
 
@@ -324,9 +348,11 @@ function createEmergency({
 							? lists.emergencyGroupNames[
 									e as keyof typeof lists.emergencyGroupNames
 							  ]
-							: lists.emergencyTypeNames[
-									e as keyof typeof lists.emergencyTypeNames
-							  ]
+							: trimEmergencyName(
+									lists.emergencyTypeNames[
+										e as keyof typeof lists.emergencyTypeNames
+									]
+							  )
 					);
 
 				localYScale.set(n[i], thisScale);
@@ -462,11 +488,11 @@ function createEmergency({
 					thisScale.bandwidth() / 2 -
 					overviewIconSize / 2
 				);
-			})
-			.style(
-				"fill",
-				d => emergencyColors[d.id as keyof typeof emergencyColors]
-			);
+			});
+		// .style(
+		// 	"fill",
+		// 	d => emergencyColors[d.id as keyof typeof emergencyColors]
+		// );
 
 		overviewAggregatedIcon = overviewAggregatedIconEnter.merge(
 			overviewAggregatedIcon
@@ -520,7 +546,7 @@ function createEmergency({
 
 	//timeline
 
-	function createTimeline(): void {
+	function createTimeline(timelineData: TimelineDatum[]): void {
 		let timelineGroup = svg
 			.selectAll<SVGGElement, TimelineDatum>(".timelineGroup")
 			.data<TimelineDatum>(timelineData, d => `${d.group}`);
@@ -729,14 +755,47 @@ function createEmergency({
 				emergencyTimelineGroupHeight,
 				true
 			);
+
+			const legendGroupByGroup = selectAll<SVGGElement, StackedDatum>(
+				".emergencyTypesGroup"
+			);
+
+			legendGroupByGroup.on(
+				"click",
+				(_: PointerEvent, d: StackedDatum) => {
+					const timelineData: TimelineDatum[] = processTimelineData(
+						dataEmergency,
+						mode,
+						lists,
+						d.key as keyof TimelineEmergencyProperty
+					);
+					createTimeline(timelineData);
+				}
+			);
 		} else {
-			createLegendAggregated(
+			const legendGroupAggregated = createLegendAggregated(
 				timelineGroup,
 				lists,
 				mode === "aggregated"
 					? emergencyTimelineAggregatedGroupHeight
 					: emergencyTimelineGroupHeight
 			);
+
+			if (legendGroupAggregated) {
+				legendGroupAggregated.on(
+					"click",
+					(_: PointerEvent, d: StackedDatum) => {
+						const timelineData: TimelineDatum[] =
+							processTimelineData(
+								dataEmergency,
+								mode,
+								lists,
+								d.key as keyof TimelineEmergencyProperty
+							);
+						createTimeline(timelineData);
+					}
+				);
+			}
 		}
 	}
 }
