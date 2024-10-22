@@ -184,6 +184,8 @@
 			legendScalePadding = 420,
 			buttonsPanelHeight = 30,
 			buttonsNumber = 8,
+			minimumRectWidth = 4,
+			weekInMilliseconds = 7 * 24 * 60 * 60 * 1000,
 			yearsArray = [],
 			allYearsOption = "All",
 			windowHeight = window.innerHeight,
@@ -648,6 +650,12 @@
 			xScaleMain.domain([minDateOffset, maxDateOffset]);
 
 			xScaleBrush.domain([minDateOffset, maxDateOffset]);
+
+			zoom.scaleExtent([
+				1,
+				(xScaleMain.domain()[1] - xScaleMain.domain()[0]) /
+					weekInMilliseconds,
+			]);
 
 			if (!lazyLoad) {
 				draw(data);
@@ -1787,6 +1795,12 @@
 
 				xScaleMain.domain([offsetStartDate, offsetEndDate]);
 
+				zoom.scaleExtent([
+					1,
+					(xScaleMain.domain()[1] - xScaleMain.domain()[0]) /
+						weekInMilliseconds,
+				]);
+
 				brushPanel.main
 					.select(".pbiuacBrushGroup")
 					.call(brush.move, [
@@ -1914,9 +1928,10 @@
 					return xScaleMain(d.PlannedStartDate);
 				})
 				.attr("width", function (d) {
-					return (
+					return Math.max(
+						minimumRectWidth,
 						xScaleMain(d.PlannedEndDate) -
-						xScaleMain(d.PlannedStartDate)
+							xScaleMain(d.PlannedStartDate)
 					);
 				})
 				.attr("y", function (d) {
@@ -2492,9 +2507,10 @@
 					return xScaleMain(d.PlannedStartDate);
 				})
 				.attr("width", function (d) {
-					return (
+					return Math.max(
+						minimumRectWidth,
 						xScaleMain(d.PlannedEndDate) -
-						xScaleMain(d.PlannedStartDate)
+							xScaleMain(d.PlannedStartDate)
 					);
 				});
 			mainPanel.main
@@ -2538,9 +2554,10 @@
 					return xScaleMain(d.PlannedStartDate);
 				})
 				.attr("width", function (d) {
-					return (
+					return Math.max(
+						minimumRectWidth,
 						xScaleMain(d.PlannedEndDate) -
-						xScaleMain(d.PlannedStartDate)
+							xScaleMain(d.PlannedStartDate)
 					);
 				});
 			mainPanel.main
@@ -2982,7 +2999,7 @@
 			}
 			d.PlannedStartDateTimestamp = d.PlannedStartDate.getTime();
 			d.PlannedEndDateTimestamp = d.PlannedEndDate.getTime();
-			if (d.PlannedStartDateTimestamp < d.PlannedEndDateTimestamp)
+			if (d.PlannedStartDateTimestamp <= d.PlannedEndDateTimestamp)
 				return d;
 		}
 
