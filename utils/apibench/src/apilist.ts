@@ -1,6 +1,13 @@
 import { Datum } from "./schemas";
 
-type ApiList = Omit<Datum, "date" | "dataReceived" | "downloadTime">[];
+type ApiListDatum = Pick<
+	Datum,
+	"apiName" | "url" | "queryString" | "charts" | "apiType"
+> & { maxTimeout?: number };
+
+export type ApiList = readonly ApiListDatum[];
+
+const currentYear = new Date().getFullYear();
 
 export const apiList: ApiList = [
 	{
@@ -48,6 +55,8 @@ export const apiList: ApiList = [
 			"Allocations_timeline",
 			"Sectors",
 			"Gender_with_age_marker",
+			"Progress_dashboard",
+			"Allocations_overview",
 		],
 		apiType: "data",
 	},
@@ -69,14 +78,22 @@ export const apiList: ApiList = [
 		apiName: "masterPooledFunds",
 		url: "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund",
 		queryString: "?$format=csv",
-		charts: ["Allocation_flow"],
+		charts: [
+			"Allocation_flow",
+			"Progress_dashboard",
+			"Allocations_overview",
+		],
 		apiType: "master",
 	},
 	{
 		apiName: "masterPartners",
 		url: "https://cbpfapi.unocha.org/vo2/odata/MstOrgType",
 		queryString: "?$format=csv",
-		charts: ["Allocation_flow"],
+		charts: [
+			"Allocation_flow",
+			"Progress_dashboard",
+			"Allocations_overview",
+		],
 		apiType: "master",
 	},
 	{
@@ -195,91 +212,94 @@ export const apiList: ApiList = [
 		apiName: "masterBeneficiaryType",
 		url: "https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 		queryString: null,
-		charts: ["Results_dashboard"],
+		charts: ["Results_dashboard", "Progress_dashboard"],
 		apiType: "master",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "projectSummaryProgress",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: `?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${currentYear}&FundTypeId=1&$format=csv`,
+		charts: ["Progress_dashboard"],
 		apiType: "data",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "sectorsData",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: `?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${currentYear}&FundTypeId=1&$format=csv`,
+		charts: ["Progress_dashboard"],
 		apiType: "data",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "globalIndicators",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=1&$format=csv",
+		charts: ["Progress_dashboard"],
 		apiType: "data",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "masterOrganizationsProgress",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=1&$format=csv",
+		charts: ["Progress_dashboard"],
+		apiType: "master",
+	},
+	{
+		apiName: "projectStatusMaster",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1&$format=csv",
+		charts: ["Progress_dashboard"],
+		apiType: "master",
+	},
+	{
+		apiName: "masterAllocationSource",
+		url: "https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource",
+		queryString: "?$format=csv",
+		charts: ["Progress_dashboard", "Allocations_overview"],
+		apiType: "master",
+	},
+	{
+		apiName: "masterSectorsVo2",
+		url: "https://cbpfapi.unocha.org/vo2/odata/MstClusters",
+		queryString: "?$format=csv",
+		charts: ["Progress_dashboard", "Allocations_overview"],
+		apiType: "master",
+	},
+	{
+		apiName: "masterGlobalIndicators",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: "?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
+		charts: ["Progress_dashboard"],
+		apiType: "master",
+	},
+	{
+		apiName: "masterEmergencies",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: "?SPCode=EMERG_TYPE_MST&$format=csv",
+		charts: ["Progress_dashboard"],
+		apiType: "master",
+	},
+	{
+		apiName: "projectSummary",
+		url: "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2",
+		queryString: `?AllocationYear=${currentYear}&$format=csv`,
+		charts: ["Allocations_overview"],
 		apiType: "data",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "projectSummaryAggregate",
+		url: "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2",
+		queryString: `?AllocationYear=${currentYear}&$format=csv`,
+		charts: ["Allocations_overview"],
 		apiType: "data",
 	},
 	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
-		apiType: "data",
-	},
-	{
-		apiName: "",
-		url: "",
-		queryString: "",
-		charts: [],
+		apiName: "HRPSummary",
+		url: "https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary",
+		queryString: "?PoolfundCodeAbbrv=&$format=csv",
+		charts: ["CBPF_vs_HRP"],
 		apiType: "data",
 	},
 ] as const;

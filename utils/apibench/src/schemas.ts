@@ -19,15 +19,21 @@ const charts = z.enum([
 
 const apiTypes = z.enum(["data", "master"]);
 
-const datum = z.object({
+const datumSchema = z.object({
 	url: z.string().url(),
 	queryString: z.string().nullable(),
 	apiName: z.string(),
-	charts: z.array(charts),
+	charts: z.union([z.array(charts), z.string()]),
 	apiType: apiTypes,
 	date: z.date(),
 	dataReceived: z.boolean(),
-	downloadTime: z.number().nonnegative(),
+	downloadTime: z.number().nonnegative().nullable(),
+	responseTime: z.number().nonnegative().nullable(),
+	totalTime: z.number().nonnegative().nullable(),
+	contentSize: z.number().nonnegative().nullable(),
+	error: z.string().nullable(),
 });
 
-export type Datum = z.infer<typeof datum>;
+export const dataSchema = z.array(datumSchema);
+
+export type Datum = z.infer<typeof datumSchema>;

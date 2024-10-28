@@ -8,4 +8,5 @@ build({
 	outdir: "dist",
 	sourcemap: true, // Optional: generates source maps
 	minify: true, // Optional: minifies the output
+	format: "esm",
 }).catch(() => process.exit(1));
