@@ -42,7 +42,8 @@ const benchmarkSingleEndpoint = async (
 		if (!response.ok) {
 			clearTimeout(timeoutId);
 			return {
-				...datum,
+				id: datum.id,
+				apiName: datum.apiName,
 				...errorObj,
 				error: `Request failed with status ${response.status}`,
 			};
@@ -54,7 +55,8 @@ const benchmarkSingleEndpoint = async (
 		clearTimeout(timeoutId);
 
 		return {
-			...datum,
+			id: datum.id,
+			apiName: datum.apiName,
 			dataReceived: true,
 			responseTime,
 			downloadTime,
@@ -67,7 +69,8 @@ const benchmarkSingleEndpoint = async (
 		clearTimeout(timeoutId);
 
 		return {
-			...datum,
+			id: datum.id,
+			apiName: datum.apiName,
 			...errorObj,
 			error:
 				error instanceof Error

@@ -22,6 +22,12 @@ const parsedData = dataSchema.safeParse(data);
 
 const results = await runBenchmark(apiList);
 
+results.forEach(result => {
+	if (!result.dataReceived) {
+		console.error(`Error: No data received for ${result.apiName}`);
+	}
+});
+
 if (parsedData.success) {
 	parsedData.data.push(...results);
 	saveCsvFile(DIRECTORY_PATH, csvFormat(parsedData.data), "benchmark");
