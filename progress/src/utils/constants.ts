@@ -88,6 +88,7 @@ const constants = {
 		Nov: "November",
 		Dec: "December",
 	},
+	timelineOpacity: 0.4,
 } as const;
 
 export default constants;

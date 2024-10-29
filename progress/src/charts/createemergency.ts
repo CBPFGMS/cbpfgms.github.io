@@ -8,12 +8,14 @@ import {
 	local,
 	format,
 	interpolateHsl,
+	interpolate,
 	rgb,
 	axisLeft,
 	area,
 	curveBumpX,
 	Series,
 	axisBottom,
+	transition,
 } from "d3";
 import { DatumEmergency } from "../utils/processdatasummary";
 import {
@@ -30,7 +32,6 @@ import { emergencyIcons } from "../assets/emergencyicons";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
 import {
-	wrapText,
 	calculateHeightOverview,
 	calculateHeightTimeline,
 	calculateOverviewRange,
@@ -40,6 +41,7 @@ import {
 	trimEmergencyName,
 } from "./emergencyutils";
 import { createLegendGroup, createLegendAggregated } from "./emergencylegend";
+import { reverseFormat } from "../utils/reverseformat";
 
 type ChartDatum = {
 	group: number | null;
@@ -108,10 +110,10 @@ const {
 	overviewScalePaddingInner,
 	overviewScalePaddingOuter,
 	emergencyOverviewByGroupRowHeight,
-	overviewAxisWidth,
-	overviewAxisByGroupWidth,
 	idString,
 	stackGap,
+	duration,
+	timelineOpacity,
 } = constants;
 
 const xScaleOverview = scaleLinear<number, number>(),
@@ -127,15 +129,16 @@ export const localColorScaleTimeline =
 	local<d3.ScaleOrdinal<keyof TimelineEmergencyProperty, string>>();
 const localAxis = local<d3.Axis<number>>();
 const localTimelineDatum = local<TimelineDatum>();
+const localLabel = local<string>();
 
 const areaGenerator = area<StackedDatum[number]>()
-	.x(d => xScaleTimeline(d.data.month)!)
-	.curve(curveBumpX);
-// areaGeneratorZero = area<StackedDatum[number]>()
-// 	.x(d => xScaleTimeline(d.data.month)!)
-// 	.y0(() => yScaleInnerTimeline(0))
-// 	.y1(() => yScaleInnerTimeline(0))
-// 	.curve(curveBumpX);
+		.x(d => xScaleTimeline(d.data.month)!)
+		.curve(curveBumpX),
+	areaGeneratorZero = area<StackedDatum[number]>()
+		.x(d => xScaleTimeline(d.data.month)!)
+		.y0(() => yScaleInnerTimeline(0))
+		.y1(() => yScaleInnerTimeline(0))
+		.curve(curveBumpX);
 
 const timelineXAxis = axisBottom<string>(xScaleTimeline);
 const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
@@ -145,6 +148,8 @@ const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
 const limitValue = 0.9;
 
 const parser = new DOMParser();
+
+let isMouseMoving = true;
 
 function createEmergency({
 	svgRef,
@@ -278,9 +283,13 @@ function createEmergency({
 	createOverview();
 	createTimeline(timelineData);
 
-	//overview
+	// ********
+	// overview
+	// ********
 
 	function createOverview(): void {
+		const syncTransition = transition().duration(duration);
+
 		let overviewGroup = svg
 			.selectAll<SVGGElement, OverviewDatum>(".overviewGroup")
 			.data<OverviewDatum>(overviewData, d => `${d.group}`);
@@ -290,11 +299,7 @@ function createEmergency({
 		const overviewGroupEnter = overviewGroup
 			.enter()
 			.append("g")
-			.attr("class", "overviewGroup");
-
-		overviewGroup = overviewGroupEnter.merge(overviewGroup);
-
-		overviewGroup
+			.attr("class", "overviewGroup")
 			.attr(
 				"transform",
 				d =>
@@ -304,62 +309,74 @@ function createEmergency({
 							? emergencyOverviewLeftMarginAggregated
 							: emergencyOverviewLeftMarginByGroup)
 					},${yScaleOuterOverview(d.group ?? 0)})`
-			)
-			.each((d, i, n) => {
-				if (mode === "byGroup") {
-					d.values.forEach(e => (e.parentGroup = d.group!));
+			);
 
-					const baseColor =
-						emergencyColors[
-							d.group as keyof typeof emergencyColors
-						];
-					const thisScaleColor = scaleOrdinal<number, string>()
-						.domain(d.values.map(e => e.id))
-						.range(
-							d.values.map((_, i, values) => {
-								if (values.length === 1) return baseColor;
-								const t = i / (values.length - 1);
-								return interpolateHsl(
-									rgb(baseColor).darker(
-										(~~d.values.length / 2) * 0.2
-									),
-									rgb(baseColor).brighter(
-										(~~d.values.length / 2) * 0.2
-									)
-								)(t);
-							})
-						);
+		overviewGroup = overviewGroupEnter.merge(overviewGroup);
 
-					localColorScale.set(n[i], thisScaleColor);
-				}
+		overviewGroup.each((d, i, n) => {
+			if (mode === "byGroup") {
+				d.values.forEach(e => (e.parentGroup = d.group!));
 
-				const thisScale = scaleBand<number>()
+				const baseColor =
+					emergencyColors[d.group as keyof typeof emergencyColors];
+				const thisScaleColor = scaleOrdinal<number, string>()
 					.domain(d.values.map(e => e.id))
-					.range([0, d.values.length * emergencyOverviewRowHeight])
-					.paddingInner(overviewScalePaddingInner)
-					.paddingOuter(overviewScalePaddingOuter);
-
-				const thisAxis = axisLeft(thisScale)
-					.tickSize(0)
-					.tickPadding(
-						mode === "aggregated" ? overviewIconSize + 12 : 6
-					)
-					.tickFormat(e =>
-						mode === "aggregated"
-							? lists.emergencyGroupNames[
-									e as keyof typeof lists.emergencyGroupNames
-							  ]
-							: trimEmergencyName(
-									lists.emergencyTypeNames[
-										e as keyof typeof lists.emergencyTypeNames
-									]
-							  )
+					.range(
+						d.values.map((_, i, values) => {
+							if (values.length === 1) return baseColor;
+							const t = i / (values.length - 1);
+							return interpolateHsl(
+								rgb(baseColor).darker(
+									(~~d.values.length / 2) * 0.2
+								),
+								rgb(baseColor).brighter(
+									(~~d.values.length / 2) * 0.2
+								)
+							)(t);
+						})
 					);
 
-				localYScale.set(n[i], thisScale);
+				localColorScale.set(n[i], thisScaleColor);
+			}
 
-				localAxis.set(n[i], thisAxis);
-			});
+			const thisScale = scaleBand<number>()
+				.domain(d.values.map(e => e.id))
+				.range([0, d.values.length * emergencyOverviewRowHeight])
+				.paddingInner(overviewScalePaddingInner)
+				.paddingOuter(overviewScalePaddingOuter);
+
+			const thisAxis = axisLeft(thisScale)
+				.tickSize(0)
+				.tickPadding(mode === "aggregated" ? overviewIconSize + 12 : 6)
+				.tickFormat(e =>
+					mode === "aggregated"
+						? lists.emergencyGroupNames[
+								e as keyof typeof lists.emergencyGroupNames
+						  ]
+						: trimEmergencyName(
+								lists.emergencyTypeNames[
+									e as keyof typeof lists.emergencyTypeNames
+								]
+						  )
+				);
+
+			localYScale.set(n[i], thisScale);
+
+			localAxis.set(n[i], thisAxis);
+		});
+
+		overviewGroup
+			.transition(syncTransition)
+			.attr(
+				"transform",
+				d =>
+					`translate(${
+						emergencyChartMargins.left +
+						(mode === "aggregated"
+							? emergencyOverviewLeftMarginAggregated
+							: emergencyOverviewLeftMarginByGroup)
+					},${yScaleOuterOverview(d.group ?? 0)})`
+			);
 
 		let overviewBar = overviewGroup
 			.selectAll<SVGRectElement, OverviewDatumValues>(".overviewBar")
@@ -390,6 +407,7 @@ function createEmergency({
 		overviewBar = overviewBarEnter.merge(overviewBar);
 
 		overviewBar
+			.transition(syncTransition)
 			.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
 			.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
 			.attr("width", d => xScaleOverview(d.value));
@@ -417,6 +435,7 @@ function createEmergency({
 		overviewValue = overviewValueEnter.merge(overviewValue);
 
 		overviewValue
+			.transition(syncTransition)
 			.attr("y", (d, i, n) => {
 				const thisScale = localYScale.get(n[i])!;
 				return thisScale(d.id)! + thisScale.bandwidth() / 2;
@@ -431,7 +450,13 @@ function createEmergency({
 			.attr("x", d => xScaleOverview(d.value) + (d.overLimit ? -4 : 4))
 			.attr("text-anchor", d => (d.overLimit ? "end" : "start"))
 			.style("fill", d => (d.overLimit ? "white" : "#444"))
-			.text(d => formatSIFloat(d.value));
+			.textTween((d, i, n) => {
+				const interpolator = interpolate(
+					reverseFormat(n[i].textContent) || 0,
+					d.value
+				);
+				return t => formatSIFloat(+interpolator(t));
+			});
 
 		let overviewTooltipBar = overviewGroup
 			.selectAll<SVGRectElement, OverviewDatumValues>(
@@ -490,10 +515,6 @@ function createEmergency({
 					overviewIconSize / 2
 				);
 			});
-		// .style(
-		// 	"fill",
-		// 	d => emergencyColors[d.id as keyof typeof emergencyColors]
-		// );
 
 		overviewAggregatedIcon = overviewAggregatedIconEnter.merge(
 			overviewAggregatedIcon
@@ -522,18 +543,64 @@ function createEmergency({
 			.merge(overviewAxis);
 
 		overviewAxis.each((_, i, n) => {
-			select(n[i])
-				.call(localAxis.get(n[i])!)
-				.selectAll<SVGTextElement, boolean>(".tick text")
+			select<SVGGElement, OverviewDatum>(n[i])
 				.style("font-size", mode === "aggregated" ? "13px" : "11px")
 				.style("font-weight", mode === "aggregated" ? "bold" : "normal")
-				.call(
-					wrapText,
-					mode === "aggregated"
-						? overviewAxisWidth
-						: overviewAxisByGroupWidth
-				);
+				.transition(syncTransition)
+				.call(customAxis, localAxis.get(n[i])!);
 		});
+
+		function customAxis(
+			group: d3.Transition<SVGGElement, OverviewDatum, null, undefined>,
+			thisAxis: d3.Axis<number>
+		) {
+			const sel = group.selection();
+			group.call(thisAxis);
+			sel.selectAll<SVGTextElement, number>(".tick text")
+				.filter((d, i, n) => {
+					const thisLabel =
+						mode === "aggregated"
+							? lists.emergencyGroupNames[
+									d as keyof typeof lists.emergencyGroupNames
+							  ]
+							: trimEmergencyName(
+									lists.emergencyTypeNames[
+										d as keyof typeof lists.emergencyTypeNames
+									]
+							  );
+					localLabel.set(n[i], thisLabel);
+					return thisLabel.includes(" ");
+				})
+				.text((_, i, n) => {
+					const label = localLabel.get(n[i])!;
+					if (mode === "aggregated" && label.includes("/")) {
+						return label.split("/")[0].trim() + "/";
+					} else {
+						return label.split(" ")[0];
+					}
+				})
+				.attr("x", -(thisAxis.tickPadding() + thisAxis.tickSize()))
+				.attr("dy", "-0.6em")
+				.append("tspan")
+				.attr("dy", "1.2em")
+				.attr("x", -(thisAxis.tickPadding() + thisAxis.tickSize()))
+				.text((_, i, n) => {
+					const label = localLabel.get(n[i])!;
+					if (mode === "aggregated" && label.includes("/")) {
+						return label.split("/")[1];
+					} else {
+						return label.substring(label.indexOf(" ") + 1);
+					}
+				});
+
+			group
+				.selectAll<SVGTextElement, number>(".tick text")
+				.filter((_, i, n) => {
+					const thisLabel = localLabel.get(n[i])!;
+					return thisLabel.includes(" ");
+				})
+				.tween("text", null);
+		}
 
 		if (mode === "byGroup") {
 			createLegendGroup<OverviewDatum>(
@@ -545,9 +612,13 @@ function createEmergency({
 		}
 	}
 
-	//timeline
+	// ********
+	// timeline
+	// ********
 
 	function createTimeline(timelineData: TimelineDatum[]): void {
+		const syncTransition = transition().duration(duration);
+
 		let timelineGroup = svg
 			.selectAll<SVGGElement, TimelineDatum>(".timelineGroup")
 			.data<TimelineDatum>(timelineData, d => `${d.group}`);
@@ -557,48 +628,55 @@ function createEmergency({
 		const timelineGroupEnter = timelineGroup
 			.enter()
 			.append("g")
-			.attr("class", "timelineGroup");
-
-		timelineGroup = timelineGroupEnter.merge(timelineGroup);
-
-		timelineGroup
+			.attr("class", "timelineGroup")
 			.attr(
 				"transform",
 				d =>
 					`translate(${
 						emergencyChartMargins.left + emergencyTimelineLeftMargin
 					},${yScaleOuterTimeline(d.group ?? 0)})`
-			)
-			.each((d, i, n) => {
-				localTimelineDatum.set(n[i], d);
-				if (mode === "byGroup") {
-					const baseColor =
-						emergencyColors[
-							d.group as keyof typeof emergencyColors
-						];
-					const thisScaleColor = scaleOrdinal<
-						keyof TimelineEmergencyProperty,
-						string
-					>()
-						.domain(d.stackedData!.map(e => e.key))
-						.range(
-							d.stackedData.map((_, i, values) => {
-								if (values.length === 1) return baseColor;
-								const t = i / (values.length - 1);
-								return interpolateHsl(
-									rgb(baseColor).darker(
-										(~~d.stackedData.length / 2) * 0.2
-									),
-									rgb(baseColor).brighter(
-										(~~d.stackedData.length / 2) * 0.2
-									)
-								)(t);
-							})
-						);
+			);
 
-					localColorScaleTimeline.set(n[i], thisScaleColor);
-				}
-			});
+		timelineGroup = timelineGroupEnter.merge(timelineGroup);
+
+		timelineGroup.each((d, i, n) => {
+			localTimelineDatum.set(n[i], d);
+			if (mode === "byGroup") {
+				const baseColor =
+					emergencyColors[d.group as keyof typeof emergencyColors];
+				const thisScaleColor = scaleOrdinal<
+					keyof TimelineEmergencyProperty,
+					string
+				>()
+					.domain(d.stackedData!.map(e => e.key))
+					.range(
+						d.stackedData.map((_, i, values) => {
+							if (values.length === 1) return baseColor;
+							const t = i / (values.length - 1);
+							return interpolateHsl(
+								rgb(baseColor).darker(
+									(~~d.stackedData.length / 2) * 0.2
+								),
+								rgb(baseColor).brighter(
+									(~~d.stackedData.length / 2) * 0.2
+								)
+							)(t);
+						})
+					);
+
+				localColorScaleTimeline.set(n[i], thisScaleColor);
+			}
+		});
+
+		timelineGroup
+			.transition(syncTransition)
+			.attr(
+				"transform",
+				d =>
+					`translate(${
+						emergencyChartMargins.left + emergencyTimelineLeftMargin
+					},${yScaleOuterTimeline(d.group ?? 0)})`
+			);
 
 		let timelineXAxisGroup = timelineGroup
 			.selectAll<SVGGElement, boolean>(".timelineXAxisGroup")
@@ -641,7 +719,7 @@ function createEmergency({
 			.merge(timelineYAxisGroup)
 			.attr("transform", `translate(0,0)`);
 
-		timelineYAxisGroup.call(timelineYAxis);
+		timelineYAxisGroup.transition(syncTransition).call(timelineYAxis);
 
 		timelineYAxisGroup
 			.selectAll(".tick")
@@ -660,42 +738,7 @@ function createEmergency({
 		const timelineAreaEnter = timelineArea
 			.enter()
 			.append("path")
-			.attr("class", "timelineArea");
-
-		timelineArea = timelineAreaEnter.merge(timelineArea);
-
-		timelineArea
-			.attr("d", (d, i, n) => {
-				const timelineDatum = localTimelineDatum.get(n[i])!;
-				const thisIndex: number[] = [];
-				areaGenerator
-					.y0((e, j) => {
-						for (let index = 0; index < d.index; index++) {
-							const foundData = timelineDatum.stackedData.find(
-								e => e.index === index
-							)!;
-							if (
-								foundData[j][0] !== foundData[j][1] ||
-								(foundData[j - 1] &&
-									foundData[j - 1][0] !==
-										foundData[j - 1][1]) ||
-								(foundData[j + 1] &&
-									foundData[j + 1][0] !== foundData[j + 1][1])
-							)
-								thisIndex[j] = (thisIndex[j] || 0) + 1;
-						}
-						return (
-							yScaleInnerTimeline(e[0]) -
-							stackGap * (thisIndex[j] || 0)
-						);
-					})
-					.y1(
-						(e, j) =>
-							yScaleInnerTimeline(e[1]) -
-							stackGap * (thisIndex[j] || 0)
-					);
-				return areaGenerator(d);
-			})
+			.attr("class", "timelineArea")
 			.style("fill", (d, i, n) =>
 				mode === "aggregated"
 					? emergencyColors[
@@ -704,7 +747,41 @@ function createEmergency({
 							) as unknown as keyof typeof emergencyColors
 					  ]
 					: localColorScaleTimeline.get(n[i])!(d.key)
-			);
+			)
+			.attr("d", areaGeneratorZero);
+
+		timelineArea = timelineAreaEnter.merge(timelineArea);
+
+		timelineArea.transition(syncTransition).attr("d", (d, i, n) => {
+			const timelineDatum = localTimelineDatum.get(n[i])!;
+			const thisIndex: number[] = [];
+			areaGenerator
+				.y0((e, j) => {
+					for (let index = 0; index < d.index; index++) {
+						const foundData = timelineDatum.stackedData.find(
+							e => e.index === index
+						)!;
+						if (
+							foundData[j][0] !== foundData[j][1] ||
+							(foundData[j - 1] &&
+								foundData[j - 1][0] !== foundData[j - 1][1]) ||
+							(foundData[j + 1] &&
+								foundData[j + 1][0] !== foundData[j + 1][1])
+						)
+							thisIndex[j] = (thisIndex[j] || 0) + 1;
+					}
+					return (
+						yScaleInnerTimeline(e[0]) -
+						stackGap * (thisIndex[j] || 0)
+					);
+				})
+				.y1(
+					(e, j) =>
+						yScaleInnerTimeline(e[1]) -
+						stackGap * (thisIndex[j] || 0)
+				);
+			return areaGenerator(d);
+		});
 
 		//create rectangles as bars
 		let timelineTooltipBars = timelineGroup
@@ -762,9 +839,22 @@ function createEmergency({
 				".emergencyTypesGroup"
 			);
 
-			legendGroupByGroup.on(
-				"click",
-				(_: PointerEvent, d: StackedDatum) => {
+			legendGroupByGroup
+				.on(
+					"mousemove",
+					() => {
+						isMouseMoving = true;
+					},
+					{ once: true }
+				)
+				.on("click", (_: PointerEvent, d: StackedDatum) => {
+					isMouseMoving = false;
+					timelineGroup
+						.selectAll<SVGPathElement, StackedDatum>(
+							".timelineArea"
+						)
+						.style("filter", null)
+						.style("opacity", 1);
 					const timelineData: TimelineDatum[] = processTimelineData(
 						dataEmergency,
 						mode,
@@ -772,15 +862,39 @@ function createEmergency({
 						d.key as keyof TimelineEmergencyProperty
 					);
 					createTimeline(timelineData);
-				}
-			);
+				})
+				.on("mouseover", (_: PointerEvent, d) => {
+					if (!isMouseMoving) return;
+					const thisKey = d.key as keyof TimelineEmergencyProperty;
+					const thisKeyNumber = +d.key.substring(idString.length);
+					const thisGroup =
+						lists.emergencyDetails.emergencyTypes[thisKeyNumber]
+							.emergencyGroup;
+					timelineGroup
+						.filter(e => e.group === thisGroup)
+						.selectAll<SVGPathElement, StackedDatum>(
+							".timelineArea"
+						)
+						.style("filter", e =>
+							e.key === thisKey ? null : "grayscale(1)"
+						)
+						.style("opacity", e =>
+							e.key === thisKey ? 1 : timelineOpacity
+						);
+				})
+				.on("mouseout", () => {
+					timelineGroup
+						.selectAll<SVGPathElement, StackedDatum>(
+							".timelineArea"
+						)
+						.style("filter", null)
+						.style("opacity", 1);
+				});
 		} else {
 			const legendGroupAggregated = createLegendAggregated(
 				timelineGroup,
 				lists,
-				mode === "aggregated"
-					? emergencyTimelineAggregatedGroupHeight
-					: emergencyTimelineGroupHeight
+				emergencyTimelineAggregatedGroupHeight
 			);
 
 			if (legendGroupAggregated) {

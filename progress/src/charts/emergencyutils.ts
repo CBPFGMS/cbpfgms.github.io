@@ -1,4 +1,4 @@
-import { select, format, Series } from "d3";
+import { select, format, Series, interpolate } from "d3";
 import {
 	OverviewDatumValues,
 	TimelineDatumValues,
@@ -270,6 +270,43 @@ function trimEmergencyName(str: string): string {
 	return trimmed;
 }
 
+function pathTween(
+	newPath: string,
+	precision: number,
+	self: SVGPathElement
+): () => (t: number) => string {
+	return function () {
+		const path0 = self,
+			path1 = path0.cloneNode() as SVGPathElement,
+			n0 = path0.getTotalLength(),
+			n1 = (path1.setAttribute("d", newPath), path1).getTotalLength();
+
+		const distances = [0],
+			dt = precision / Math.max(n0, n1);
+
+		let i = 0;
+
+		while ((i += dt) < 1) distances.push(i);
+		distances.push(1);
+
+		const points = distances.map(function (t) {
+			const p0 = path0.getPointAtLength(t * n0),
+				p1 = path1.getPointAtLength(t * n1);
+			return interpolate([p0.x, p0.y], [p1.x, p1.y]);
+		});
+
+		return (t: number) =>
+			t < 1
+				? "M" +
+				  points
+						.map(function (p) {
+							return p(t);
+						})
+						.join("L")
+				: newPath;
+	};
+}
+
 export {
 	wrapText,
 	dispatchTooltipEvent,
@@ -280,4 +317,5 @@ export {
 	createTooltipString,
 	trimEmergencyName,
 	stackCustomOrder,
+	pathTween,
 };
