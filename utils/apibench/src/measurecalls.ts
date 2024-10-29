@@ -38,6 +38,7 @@ const benchmarkSingleEndpoint = async (
 		});
 
 		const responseTime = performance.now() - startTime;
+		const roundedResponseTime = parseFloat(responseTime.toFixed(2));
 
 		if (!response.ok) {
 			clearTimeout(timeoutId);
@@ -51,6 +52,7 @@ const benchmarkSingleEndpoint = async (
 
 		const buffer = await response.arrayBuffer();
 		const downloadTime = performance.now() - startTime - responseTime;
+		const roundedDownloadTime = parseFloat(downloadTime.toFixed(2));
 
 		clearTimeout(timeoutId);
 
@@ -58,8 +60,8 @@ const benchmarkSingleEndpoint = async (
 			id: datum.id,
 			apiName: datum.apiName,
 			dataReceived: true,
-			responseTime,
-			downloadTime,
+			responseTime: roundedResponseTime,
+			downloadTime: roundedDownloadTime,
 			totalTime: responseTime + downloadTime,
 			contentSize: buffer.byteLength,
 			date,

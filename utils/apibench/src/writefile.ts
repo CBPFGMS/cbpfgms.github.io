@@ -22,6 +22,8 @@ function saveCsvFile(
 		const filePath = path.join(directoryPath, fullFilename);
 
 		writeFile(filePath, content, { encoding: "utf-8" });
+
+		console.log(`File saved at ${filePath}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(`Error saving CSV file: ${error.message}`);
