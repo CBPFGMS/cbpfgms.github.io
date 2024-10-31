@@ -361,4 +361,13 @@ export const apiList: ApiList = [
 		charts: ["CBPF_vs_HRP"],
 		apiType: "data",
 	},
+	{
+		id: 39,
+		apiName: "emergencySummary",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&$format=csv",
+		charts: ["Progress_dashboard"],
+		apiType: "data",
+	},
 ] as const;
