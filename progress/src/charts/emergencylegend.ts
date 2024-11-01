@@ -1,5 +1,5 @@
 import formatSIFloat from "../utils/formatsi";
-import { select, sum, format, scaleBand, transition } from "d3";
+import { select, sum, format, scaleBand, transition, interpolate } from "d3";
 import {
 	OverviewDatum,
 	TimelineDatum,
@@ -13,6 +13,7 @@ import constants from "../utils/constants";
 import { List } from "../utils/makelists";
 import { EmergencyChartTypes } from "../components/EmergencyChart";
 import { wrapText, trimEmergencyName } from "./emergencyutils";
+import { reverseFormat } from "../utils/reverseformat";
 
 const {
 	emergencyOverviewLeftMarginByGroup,
@@ -83,7 +84,18 @@ function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
 				  overviewIconSizeByGroup
 				: emergencyTimelineLeftMargin - overviewIconSizeByGroup * 3;
 		const thisSelection = select(n[i]);
-		thisSelection.select(".legendGroupValue").text(formatSIFloat(total));
+		thisSelection
+			.select<SVGTextElement>(".legendGroupValue")
+			.transition()
+			.duration(duration)
+			.textTween((_, i, n) => {
+				const interpolator = interpolate(
+					reverseFormat(n[i].textContent) || 0,
+					total
+				);
+				return t => `$${formatSIFloat(+interpolator(t))}`;
+			});
+
 		thisSelection
 			.select(".legendGroupName")
 			.text(lists.emergencyGroupNames[d.group!]);
@@ -97,6 +109,10 @@ function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
 				"fill",
 				emergencyColors[d.group! as keyof typeof emergencyColors]
 			);
+		thisSelection.attr(
+			"data-tooltip-html",
+			`<span>$${format(",.0f")(total)}</span>`
+		);
 	});
 
 	if (createEmergencyTypes) {
@@ -255,14 +271,7 @@ function createLegendAggregated(
 				textWidth,
 				true
 			);
-		})
-		.attr(
-			"transform",
-			d =>
-				`translate(${-emergencyTimelineLeftMargin},${aggregatedScale(
-					d.key
-				)})`
-		);
+		});
 
 	legendGroup = legendGroupEnter.merge(legendGroup);
 
@@ -272,19 +281,25 @@ function createLegendAggregated(
 
 	aggregatedScale.domain(legendData.map(d => d.key)).range([0, rowHeight]);
 
-	legendGroup
-		.transition(syncTransition)
-		.attr(
-			"transform",
-			d =>
-				`translate(${-emergencyTimelineLeftMargin},${aggregatedScale(
-					d.key
-				)})`
-		);
+	legendGroupEnter.attr(
+		"transform",
+		d =>
+			`translate(${-emergencyTimelineLeftMargin},${aggregatedScale(
+				d.key
+			)})`
+	);
 
 	legendGroup
-		.select(".legendGroupValue")
-		.text(d => formatSIFloat(sum(d, e => e.data[d.key])));
+		.select<SVGTextElement>(".legendGroupValue")
+		.transition()
+		.duration(duration)
+		.textTween((d, i, n) => {
+			const interpolator = interpolate(
+				reverseFormat(n[i].textContent) || 0,
+				sum(d, e => e.data[d.key])
+			);
+			return t => `$${formatSIFloat(+interpolator(t))}`;
+		});
 	legendGroup.select(".legendGroupName").text(d => {
 		const group = +d.key.substring(idString.length);
 		return lists.emergencyGroupNames[group];
@@ -309,6 +324,23 @@ function createLegendAggregated(
 				]
 		);
 
+	legendGroup
+		.attr(
+			"data-tooltip-html",
+			d =>
+				`<span>$${format(",.0f")(
+					sum(d, e => e.data[d.key])
+				)}</span>"<br><span style='font-size:11px;'>(click for sending this group to baseline)</span>"`
+		)
+		.transition(syncTransition)
+		.attr(
+			"transform",
+			d =>
+				`translate(${-emergencyTimelineLeftMargin},${aggregatedScale(
+					d.key
+				)})`
+		);
+
 	return legendGroup;
 }
 
@@ -329,7 +361,7 @@ function drawLegendHeader(
 		)
 		.attr("y", "0")
 		.style("font-size", fromAggregate ? "16px" : "20px")
-		.text(formatSIFloat(total));
+		.text(`$${formatSIFloat(total)}`);
 
 	selection
 		.append("text")

@@ -401,12 +401,13 @@ function createEmergency({
 					: localColorScale.get(n[i])!(d.id)
 			)
 			.attr("data-tooltip-id", "tooltip")
-			.attr("data-tooltip-content", d => `$${format(",.0f")(d.value)}`)
+
 			.attr("data-tooltip-place", "top");
 
 		overviewBar = overviewBarEnter.merge(overviewBar);
 
 		overviewBar
+			.attr("data-tooltip-content", d => `$${format(",.0f")(d.value)}`)
 			.transition(syncTransition)
 			.attr("y", (d, i, n) => localYScale.get(n[i])!(d.id)!)
 			.attr("height", (_, i, n) => localYScale.get(n[i])!.bandwidth())
@@ -430,7 +431,7 @@ function createEmergency({
 				const thisScale = localYScale.get(n[i])!;
 				return thisScale(d.id)! + thisScale.bandwidth() / 2;
 			})
-			.text(d => formatSIFloat(d.value));
+			.text(d => `$${formatSIFloat(d.value)}`);
 
 		overviewValue = overviewValueEnter.merge(overviewValue);
 
@@ -455,7 +456,7 @@ function createEmergency({
 					reverseFormat(n[i].textContent) || 0,
 					d.value
 				);
-				return t => formatSIFloat(+interpolator(t));
+				return t => `$${formatSIFloat(+interpolator(t))}`;
 			});
 
 		let overviewTooltipBar = overviewGroup

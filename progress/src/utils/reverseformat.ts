@@ -1,5 +1,7 @@
 function reverseFormat(s: string | null): number {
-	if (s === null || +s === 0) return 0;
+	if (s === null) return 0;
+	if (s[0] === "$") s = s.slice(1);
+	if (+s === 0) return 0;
 	let returnValue: number = 0;
 	const transformation = {
 		Y: Math.pow(10, 24),
