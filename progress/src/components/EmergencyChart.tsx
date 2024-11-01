@@ -261,7 +261,21 @@ function EmergencyChart({
 					ref={svgContainerRef}
 					mt={2}
 				>
-					<svg ref={svgRef}></svg>
+					{dataEmergency.length === 0 ? (
+						<Box
+							style={{
+								display: "flex",
+								justifyContent: "center",
+								alignItems: "center",
+							}}
+						>
+							<Typography variant="body1">
+								No data available for the selected filters
+							</Typography>
+						</Box>
+					) : (
+						<svg ref={svgRef}></svg>
+					)}
 				</Box>
 			</Grid>
 		</Container>
