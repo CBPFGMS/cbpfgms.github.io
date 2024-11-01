@@ -6,6 +6,7 @@ import { Datum, dataSchema } from "./schemas";
 import { saveCsvFile } from "./writefile";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import { notifyError } from "./notification";
 
 const _dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +26,7 @@ const results = await runBenchmark(apiList);
 results.forEach(result => {
 	if (!result.dataReceived) {
 		console.error(`Error: No data received for ${result.apiName}`);
+		notifyError(result);
 	}
 });
 

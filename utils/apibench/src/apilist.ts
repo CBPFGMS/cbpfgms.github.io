@@ -366,7 +366,7 @@ export const apiList: ApiList = [
 		apiName: "emergencySummary",
 		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
 		queryString:
-			"?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&$format=csv",
+			"?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1&$format=csv",
 		charts: ["Progress_dashboard"],
 		apiType: "data",
 	},
