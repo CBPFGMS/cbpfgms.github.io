@@ -330,7 +330,7 @@ function createLegendAggregated(
 			d =>
 				`<span>$${format(",.0f")(
 					sum(d, e => e.data[d.key])
-				)}</span>"<br><span style='font-size:11px;'>(click for sending this group to baseline)</span>"`
+				)}</span><br><span style='font-size:11px;'>(click for sending this group to baseline)</span>`
 		)
 		.transition(syncTransition)
 		.attr(
