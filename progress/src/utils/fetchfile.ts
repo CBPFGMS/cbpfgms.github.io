@@ -1,13 +1,15 @@
-import { json, csv, csvParse, csvFormat, autoType } from "d3";
+import { csvParse, csvFormat, autoType } from "d3";
+import { fetchWithProgress } from "./fetchwithprogress";
 
 const localStorageTime = 60 * 60 * 1000, //1 hour
 	currentDate = new Date(),
 	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
 
-function fetchFile<T>(
+async function fetchFile<T extends object[]>(
 	fileName: string,
 	url: string,
-	method: string
+	method: string,
+	setProgress: React.Dispatch<React.SetStateAction<number>>
 ): Promise<T> {
 	const localData = localStorage.getItem(fileName);
 	if (
@@ -23,11 +25,20 @@ function fetchFile<T>(
 			`%cInfo: data file ${fileName} retrieved from localStorage`,
 			consoleStyle
 		);
-		return Promise.resolve(fetchedData);
+		return fetchedData;
 	} else {
-		const fetchMethod =
-			method === "csv" ? () => csv(url, autoType) : () => json(url);
-		return fetchMethod().then(fetchedData => {
+		try {
+			const response = await fetchWithProgress(url, setProgress);
+
+			let fetchedData: T;
+
+			if (method === "csv") {
+				const text = await response.text();
+				fetchedData = csvParse(text, autoType) as unknown as T;
+			} else {
+				fetchedData = await response.json();
+			}
+
 			try {
 				localStorage.setItem(
 					fileName,
@@ -48,8 +59,14 @@ function fetchFile<T>(
 				`%cInfo: data file ${fileName} obtained from API call`,
 				consoleStyle
 			);
-			return fetchedData as T;
-		});
+
+			return fetchedData;
+		} catch (error) {
+			console.warn(
+				`Error fetching the file ${fileName} from API. Error: ${error}.`
+			);
+			return Promise.reject(error);
+		}
 	}
 }
 

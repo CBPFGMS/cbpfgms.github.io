@@ -11,11 +11,18 @@ type AppProps = {
 };
 
 function App({ defaultYear, defaultFundType, startYear }: AppProps) {
-	const { data, dataIndicators, lists, inDataLists, loading, error } =
-		useData(defaultFundType, startYear);
+	const {
+		data,
+		dataIndicators,
+		lists,
+		inDataLists,
+		loading,
+		error,
+		progress,
+	} = useData(defaultFundType, startYear);
 
 	return loading ? (
-		<Loading />
+		<Loading progress={progress} />
 	) : error ? (
 		<Error error={error} />
 	) : (

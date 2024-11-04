@@ -1,5 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { json, csv, autoType } from "d3";
+import { csvParse, autoType } from "d3";
+import { fetchWithProgress } from "./fetchwithprogress";
 
 const localStorageTime = 60 * 60 * 1000, //1 hour
 	currentDate = new Date(),
@@ -22,7 +23,12 @@ const dbPromise: Promise<IDBPDatabase<LocalDatabase>> = openDB<LocalDatabase>(
 	}
 );
 
-async function fetchFileDB<T>(fileName: string, url: string, method: string) {
+async function fetchFileDB<T>(
+	fileName: string,
+	url: string,
+	method: string,
+	setProgress: React.Dispatch<React.SetStateAction<number>>
+): Promise<T> {
 	const db = await dbPromise;
 	const tx = db.transaction("files", "readwrite");
 	const store = tx.objectStore("files");
@@ -37,11 +43,20 @@ async function fetchFileDB<T>(fileName: string, url: string, method: string) {
 			`%cInfo: data file ${fileName} retrieved from indexedDB`,
 			consoleStyle
 		);
-		return Promise.resolve(fetchedData);
+		return fetchedData;
 	} else {
-		const fetchMethod =
-			method === "csv" ? () => csv(url, autoType) : () => json(url);
-		return fetchMethod().then(fetchedData => {
+		try {
+			const response = await fetchWithProgress(url, setProgress);
+
+			let fetchedData: T;
+
+			if (method === "csv") {
+				const text = await response.text();
+				fetchedData = csvParse(text, autoType) as unknown as T;
+			} else {
+				fetchedData = await response.json();
+			}
+
 			try {
 				const tx = db.transaction("files", "readwrite");
 				const store = tx.objectStore("files");
@@ -62,7 +77,12 @@ async function fetchFileDB<T>(fileName: string, url: string, method: string) {
 				consoleStyle
 			);
 			return fetchedData as T;
-		});
+		} catch (error) {
+			console.warn(
+				`Error fetching the file ${fileName} from API. Error: ${error}.`
+			);
+			return Promise.reject(error);
+		}
 	}
 }
 

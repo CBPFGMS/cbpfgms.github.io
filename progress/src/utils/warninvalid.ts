@@ -1,7 +1,6 @@
-//import { constants } from "./constants";
+import constants from "./constants";
 
-//const { isProdSite } = constants;
-const isProdSite = false; //CHANGE
+const { isProdSite } = constants;
 
 function warnInvalidSchema(
 	file: string,
@@ -31,6 +30,12 @@ function warnProjectNotFound(
 	}
 }
 
-export { warnProjectNotFound };
+function warnFetchError(url: string, message: string) {
+	if (!isProdSite) {
+		console.warn(`${message}, API: ${url}`);
+	}
+}
+
+export { warnProjectNotFound, warnFetchError };
 
 export default warnInvalidSchema;

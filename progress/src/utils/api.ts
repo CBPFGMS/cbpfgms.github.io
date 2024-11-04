@@ -37,7 +37,18 @@ type ReceiveDataArgs = [
 	EmergenciesMasterObject[]
 ];
 
-function useData(defaultFundType: number | null, startYear: number | null) {
+function useData(
+	defaultFundType: number | null,
+	startYear: number | null
+): {
+	data: Data;
+	dataIndicators: GlobalIndicatorsObject[];
+	lists: List;
+	inDataLists: InDataLists;
+	loading: boolean;
+	error: string | null;
+	progress: number;
+} {
 	const fundType = defaultFundType ? defaultFundType : "",
 		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
 
@@ -74,77 +85,93 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
 
+	const [progress, setProgress] = useState<number>(0); //REMOVE LATER
+
 	useEffect(() => {
 		Promise.all([
 			fetchFileDB<ProjectSummaryObject[]>(
 				"projectSummary",
 				projectSummaryUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFileDB<SectorBeneficiaryObject[]>(
 				"sectorsData",
 				sectorsDataUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFileDB<GlobalIndicatorsObject[]>(
 				"globalIndicators",
 				globalIndicatorsUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFileDB<EmergenciesObject[]>(
 				"emergenciesData",
 				emergenciesDataUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<AllocationTypesMasterObject[]>(
 				"allocationTypesMaster",
 				allocationTypesMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<OrganizationMasterObject[]>(
 				"organizationMaster",
 				organizationMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<ProjectStatusMasterObject[]>(
 				"projectStatusMaster",
 				projectStatusMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<BeneficiaryTypesMasterObject[]>(
 				"beneficiaryTypesMaster",
 				beneficiaryTypesMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<PooledFundsMasterObject[]>(
 				"pooledFundsMaster",
 				pooledFundsMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<AllocationSourcesMasterObject[]>(
 				"allocationSourcesMaster",
 				allocationSourcesMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<OrganizationTypesMasterObject[]>(
 				"organizationTypesMaster",
 				organizationTypesMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<SectorsMasterObject[]>(
 				"sectorsMaster",
 				sectorsMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<GlobalIndicatorsMasterObject[]>(
 				"globalIndicatorsMaster",
 				globalIndicatorsMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 			fetchFile<EmergenciesMasterObject[]>(
 				"emergenciesMaster",
 				emergenciesMasterUrl,
-				"csv"
+				"csv",
+				setProgress
 			),
 		])
 			.then(receiveData)
@@ -209,7 +236,15 @@ function useData(defaultFundType: number | null, startYear: number | null) {
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	return { data, dataIndicators, lists, inDataLists, loading, error };
+	return {
+		data,
+		dataIndicators,
+		lists,
+		inDataLists,
+		loading,
+		error,
+		progress,
+	};
 }
 
 export default useData;
