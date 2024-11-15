@@ -47,32 +47,32 @@ type ChartDatum = {
 	group: number | null;
 };
 
-export type OverviewDatumValues = {
+type OverviewDatumValues = {
 	id: number;
 	value: number;
 	parentGroup?: number;
 	overLimit?: boolean;
 };
 
-export type OverviewDatum = ChartDatum & {
-	values: OverviewDatumValues[];
-};
+// type OverviewDatum = ChartDatum & {
+// 	values: OverviewDatumValues[];
+// };
 
-export type TimelineEmergencyProperty = {
+type TimelineEmergencyProperty = {
 	[key: `${typeof idString}${number}`]: number;
 };
 
-export type TimelineDatumValues = {
+type TimelineDatumValues = {
 	month: Month;
 	total: number;
 } & TimelineEmergencyProperty;
 
-export type StackedDatum = Series<
+type StackedDatum = Series<
 	TimelineDatumValues,
 	keyof TimelineEmergencyProperty
 >;
 
-export type TimelineDatum = ChartDatum & {
+type TimelineDatum = ChartDatum & {
 	values: TimelineDatumValues[];
 	stackedData: StackedDatum[];
 };
@@ -86,7 +86,7 @@ type CreateEmergencyParams = {
 	type: EmergencyChartTypes;
 };
 
-export type Margins = {
+type Margins = {
 	top: number;
 	right: number;
 	bottom: number;
@@ -125,7 +125,7 @@ const xScaleTimeline = scalePoint<string>().domain(monthsArray),
 
 const localYScale = local<d3.ScaleBand<number>>();
 const localColorScale = local<d3.ScaleOrdinal<number, string>>();
-export const localColorScaleTimeline =
+const localColorScaleTimeline =
 	local<d3.ScaleOrdinal<keyof TimelineEmergencyProperty, string>>();
 const localAxis = local<d3.Axis<number>>();
 const localTimelineDatum = local<TimelineDatum>();
@@ -917,4 +917,4 @@ function createEmergency({
 	}
 }
 
-export default createEmergency;
+default createEmergency;

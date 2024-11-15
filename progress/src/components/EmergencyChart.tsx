@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useMemo } from "react";
 import { DatumEmergency } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
@@ -17,7 +17,13 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import CategoryIcon from "@mui/icons-material/Category";
 import ListIcon from "@mui/icons-material/List";
-import createEmergency from "../charts/createemergency";
+import {
+	processOverviewData,
+	OverviewDatum,
+} from "../utils/processemergencyoverview";
+import { createEmergencyOverview } from "../charts/createemergencyoverview";
+//import { processOverviewData, } from "../utils/processemergencychart";
+//import createEmergency from "../charts/createemergency";
 
 export type EmergencyChartModes = (typeof emergencyChartModes)[number];
 
@@ -63,21 +69,29 @@ function EmergencyChart({
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [type, setType] = useState<EmergencyChartTypes>("timeline");
+	const [chartType, setChartType] = useState<EmergencyChartTypes>("timeline");
 	const [mode, setMode] = useState<EmergencyChartModes>("aggregated");
 
 	const ref = useRef<HTMLDivElement>(null);
-	const svgRef = useRef<SVGSVGElement>(null);
+	const svgRefOverview = useRef<SVGSVGElement>(null);
 	const svgContainerRef = useRef<HTMLDivElement>(null);
 
 	const [svgContainerWidth, setSvgContainerWidth] = useState<number>(0);
+
+	const overviewData: OverviewDatum[] | null = useMemo(
+		() =>
+			chartType === "overview"
+				? processOverviewData(dataEmergency, mode)
+				: null,
+		[dataEmergency, mode, chartType]
+	);
 
 	const handleType = (
 		_: React.MouseEvent<HTMLElement>,
 		newType: EmergencyChartTypes | null
 	) => {
 		if (newType !== null) {
-			setType(newType);
+			setChartType(newType);
 		}
 	};
 
@@ -114,17 +128,40 @@ function EmergencyChart({
 	}, []);
 
 	useEffect(() => {
-		if (svgRef.current) {
-			createEmergency({
-				svgRef,
+		if (
+			svgRefOverview.current &&
+			chartType === "overview" &&
+			overviewData
+		) {
+			createEmergencyOverview({
+				svgRef: svgRefOverview,
 				svgContainerWidth,
-				dataEmergency,
+				overviewData,
 				lists,
 				mode,
-				type,
 			});
 		}
-	}, [svgContainerWidth, dataEmergency, mode, type, lists]);
+	}, [
+		svgContainerWidth,
+		dataEmergency,
+		mode,
+		chartType,
+		lists,
+		overviewData,
+	]);
+
+	useEffect(() => {
+		if (svgRefOverview.current && chartType === "timeline") {
+			// createEmergency({
+			// 	svgRef,
+			// 	svgContainerWidth,
+			// 	dataEmergency,
+			// 	lists,
+			// 	mode,
+			// 	type,
+			// });
+		}
+	}, [svgContainerWidth, dataEmergency, mode, chartType, lists]);
 
 	return (
 		<Container
@@ -185,7 +222,7 @@ function EmergencyChart({
 						Select the chart type:
 					</Typography>
 					<ToggleButtonGroup
-						value={type}
+						value={chartType}
 						exclusive
 						onChange={handleType}
 						size="small"
@@ -262,23 +299,31 @@ function EmergencyChart({
 					mt={2}
 				>
 					{dataEmergency.length === 0 ? (
-						<Box
-							style={{
-								display: "flex",
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-						>
-							<Typography variant="body1">
-								No data available for the selected filters
-							</Typography>
-						</Box>
+						<NoData />
+					) : chartType === "overview" ? (
+						<svg ref={svgRefOverview}></svg>
 					) : (
-						<svg ref={svgRef}></svg>
+						<></>
 					)}
 				</Box>
 			</Grid>
 		</Container>
+	);
+}
+
+function NoData() {
+	return (
+		<Box
+			style={{
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+			}}
+		>
+			<Typography variant="body1">
+				No data available for the selected filters
+			</Typography>
+		</Box>
 	);
 }
 

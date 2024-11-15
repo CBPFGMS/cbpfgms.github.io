@@ -1,28 +1,31 @@
 import { select, format, Series, interpolate } from "d3";
-import {
-	OverviewDatumValues,
-	TimelineDatumValues,
-	OverviewDatum,
-	TimelineDatum,
-	Margins,
-	TimelineEmergencyProperty,
-} from "./createemergency";
+// import {
+// 	OverviewDatumValues,
+// 	TimelineDatumValues,
+// 	TimelineDatum,
+// 	TimelineEmergencyProperty,
+// } from "./createemergency";
 import {
 	EmergencyChartModes,
 	EmergencyChartTypes,
 } from "../components/EmergencyChart";
-import constants from "../utils/constants";
+// import constants from "../utils/constants";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
+import {
+	OverviewDatum,
+	GroupDatum,
+	GroupValuesDatum,
+} from "../utils/processemergencyoverview";
+import { Margins } from "./createemergencyoverview";
 
-const {
-	fullMonthNames,
-	idString,
-	emergencyChartMargins,
-	emergencyTimelineAggregatedGroupHeight,
-	emergencyTimelineGroupHeight,
-	emergencyOverviewGap,
-} = constants;
+// const {
+// 	fullMonthNames,
+// 	idString,
+// 	emergencyChartMargins,
+// 	emergencyTimelineAggregatedGroupHeight,
+// 	emergencyTimelineGroupHeight,
+// } = constants;
 
 type Emergencies = {
 	key: number;
@@ -91,14 +94,17 @@ function dispatchTooltipEvent(
 
 function calculateHeightOverview(
 	data: OverviewDatum[],
-	emergencyOverviewRowHeight: number
+	rowHeight: number,
+	emergencyChartMargins: Margins,
+	emergencyOverviewGap: number
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
-	data.forEach((d, i) => {
-		height +=
-			d.values.length * emergencyOverviewRowHeight +
-			(i < data.length - 1 ? emergencyOverviewGap : 0);
+	data.forEach((group, i) => {
+		group.groupData.forEach(d => {
+			height += d.values.length * rowHeight;
+		});
+		height += i < data.length - 1 ? emergencyOverviewGap : 0;
 	});
 
 	return height;
@@ -120,24 +126,43 @@ function calculateHeightTimeline(
 
 function calculateOverviewRange(
 	data: OverviewDatum[],
-	emergencyOverviewRowHeight: number,
+	rowHeight: number,
 	emergencyChartMargins: Margins,
 	emergencyOverviewGap: number
 ): number[] {
 	const range: number[] = [emergencyChartMargins.top];
 
-	data.forEach((d, i) => {
+	data.forEach((group, i) => {
 		if (i < data.length - 1) {
-			range.push(
-				range[i] +
-					d.values.length * emergencyOverviewRowHeight +
-					emergencyOverviewGap
-			);
+			let height = 0;
+			group.groupData.forEach(d => {
+				height += d.values.length * rowHeight;
+			});
+			height += emergencyOverviewGap;
+			range.push(range[i] + height);
 		}
 	});
 
 	return range;
 }
+
+const getMaxFromValues = (values: GroupValuesDatum[]): number => {
+	return Math.max(...values.map(v => v.value), 0);
+};
+
+const getMaxFromGroupData = (groupData: GroupDatum[]): number => {
+	return Math.max(
+		...groupData.map(group => getMaxFromValues(group.values)),
+		0
+	);
+};
+
+const getMaxValueOverview = (data: OverviewDatum[]): number => {
+	return Math.max(
+		...data.map(item => getMaxFromGroupData(item.groupData)),
+		0
+	);
+};
 
 function getMaxValue(
 	data: OverviewDatum[] | TimelineDatum[],
@@ -314,6 +339,7 @@ export {
 	calculateHeightTimeline,
 	calculateOverviewRange,
 	getMaxValue,
+	getMaxValueOverview,
 	createTooltipString,
 	trimEmergencyName,
 	stackCustomOrder,
