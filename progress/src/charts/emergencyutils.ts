@@ -82,32 +82,47 @@ function wrapText<T>(
 
 function dispatchTooltipEvent(
 	e: PointerEvent,
-	d: OverviewDatumValues,
+	d: GroupValuesDatum,
 	type: "mouseover" | "mouseout"
 ): void {
 	const thisElement = e.currentTarget as SVGRectElement;
 	select(thisElement.parentNode as SVGGElement)
-		.selectAll<SVGRectElement, OverviewDatumValues>(".overviewBar")
-		.filter(f => f.id === d.id)
+		.selectAll<SVGRectElement, GroupValuesDatum>(".overviewBar")
+		.filter(f => f.year === d.year)
 		.dispatch(type);
 }
 
 function calculateHeightOverview(
 	data: OverviewDatum[],
-	rowHeight: number,
+	yearScaleRowHeight: number,
 	emergencyChartMargins: Margins,
 	emergencyOverviewGap: number
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
-	data.forEach((group, i) => {
+	data.forEach(group => {
 		group.groupData.forEach(d => {
-			height += d.values.length * rowHeight;
+			height += d.values.length * yearScaleRowHeight;
 		});
-		height += i < data.length - 1 ? emergencyOverviewGap : 0;
+		height += emergencyOverviewGap;
 	});
 
 	return height;
+}
+
+function calculateYearScaleRange(
+	size: number,
+	itemCount: number,
+	paddingInner: number,
+	paddingOuter: number
+): number {
+	if (itemCount === 0) return 0;
+
+	const innerPaddingTotal = (paddingInner * (itemCount - 1)) / itemCount;
+	const outerPaddingTotal = (paddingOuter * 2) / itemCount;
+	const rangeMultiplier = 1 + innerPaddingTotal + outerPaddingTotal;
+
+	return size * itemCount * rangeMultiplier;
 }
 
 function calculateHeightTimeline(
@@ -126,7 +141,7 @@ function calculateHeightTimeline(
 
 function calculateOverviewRange(
 	data: OverviewDatum[],
-	rowHeight: number,
+	yearScaleRowHeight: number,
 	emergencyChartMargins: Margins,
 	emergencyOverviewGap: number
 ): number[] {
@@ -136,7 +151,7 @@ function calculateOverviewRange(
 		if (i < data.length - 1) {
 			let height = 0;
 			group.groupData.forEach(d => {
-				height += d.values.length * rowHeight;
+				height += d.values.length * yearScaleRowHeight;
 			});
 			height += emergencyOverviewGap;
 			range.push(range[i] + height);
@@ -338,6 +353,7 @@ export {
 	calculateHeightOverview,
 	calculateHeightTimeline,
 	calculateOverviewRange,
+	calculateYearScaleRange,
 	getMaxValue,
 	getMaxValueOverview,
 	createTooltipString,

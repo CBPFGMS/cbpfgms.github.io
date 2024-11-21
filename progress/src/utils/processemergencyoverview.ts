@@ -21,6 +21,7 @@ export type GroupValuesDatum = {
 
 function processOverviewData(
 	dataEmergency: DatumEmergency[],
+	year: number[],
 	mode: EmergencyChartModes
 ): OverviewDatum[] {
 	const data: OverviewDatum[] = dataEmergency.reduce((acc, curr) => {
@@ -57,9 +58,11 @@ function processOverviewData(
 		return acc;
 	}, [] as OverviewDatum[]);
 
+	fillZeroYears(data, year);
+
 	data.forEach(group =>
-		group.groupData.forEach(groupData =>
-			groupData.values.sort((a, b) => b.value - a.value)
+		group.groupData.sort(
+			(a, b) => sum(b.values, d => d.value) - sum(a.values, d => d.value)
 		)
 	);
 
@@ -70,6 +73,23 @@ function processOverviewData(
 	);
 
 	return data;
+}
+
+function fillZeroYears(data: OverviewDatum[], year: number[]): void {
+	data.forEach(group => {
+		group.groupData.forEach(groupDatum => {
+			year.forEach(year => {
+				const foundYear = groupDatum.values.find(d => d.year === year);
+				if (!foundYear) {
+					groupDatum.values.push({
+						year: year,
+						value: 0,
+						overLimit: false,
+					});
+				}
+			});
+		});
+	});
 }
 
 export { processOverviewData };

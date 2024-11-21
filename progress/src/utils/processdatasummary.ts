@@ -213,34 +213,29 @@ function processDataSummary({
 			}
 
 			datum.emergenciesData.forEach(emergency => {
-				const foundEmergency = dataEmergency.find(
-					datumEmergency =>
-						datumEmergency.emergencyType ===
-							emergency.emergencyId &&
-						datumEmergency.date.getMonth() ===
-							datum.endDate.getMonth()
-				);
-				if (foundEmergency) {
-					foundEmergency.allocations += Math.floor(
+				const approvalYear = datum.approvalDate.getFullYear();
+				const thisDate =
+					approvalYear === datum.year
+						? datum.approvalDate
+						: approvalYear > datum.year
+						? new Date(datum.year, 11, 31)
+						: new Date(datum.year, 0, 1);
+
+				dataEmergency.push({
+					emergencyType: emergency.emergencyId,
+					emergencyCategory:
+						lists.emergencyDetails.emergencyTypes[
+							emergency.emergencyId
+						].emergencyCategory,
+					emergencyGroup:
+						lists.emergencyDetails.emergencyTypes[
+							emergency.emergencyId
+						].emergencyGroup,
+					allocations: Math.floor(
 						(emergency.percentage / 100) * datum.budget
-					);
-				} else {
-					dataEmergency.push({
-						emergencyType: emergency.emergencyId,
-						emergencyCategory:
-							lists.emergencyDetails.emergencyTypes[
-								emergency.emergencyId
-							].emergencyCategory,
-						emergencyGroup:
-							lists.emergencyDetails.emergencyTypes[
-								emergency.emergencyId
-							].emergencyGroup,
-						allocations: Math.floor(
-							(emergency.percentage / 100) * datum.budget
-						),
-						date: datum.endDate,
-					});
-				}
+					),
+					date: thisDate,
+				});
 			});
 		}
 

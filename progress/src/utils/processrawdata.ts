@@ -30,6 +30,7 @@ export type Datum = {
 	allocationType: number;
 	allocationTypeId: number;
 	endDate: Date;
+	approvalDate: Date;
 	budget: number;
 	budgetGBVPlanned: number;
 	budgetGBVReached: number;
@@ -294,6 +295,7 @@ function processRawData({
 						`${row.PooledFundId}.${row.AllocationtypeId}`
 					),
 					endDate: new Date(row.EndDate),
+					approvalDate: new Date(row.PrjApprDate),
 					projectStatusId: row.GlbPrjStatusId,
 					reportType: row.RptCode ?? 0,
 				});
@@ -316,6 +318,7 @@ function processRawData({
 					),
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
+					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
 					projectStatus: thisStatus,
 					projectStatusId: row.GlbPrjStatusId,

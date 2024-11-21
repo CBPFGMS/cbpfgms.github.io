@@ -1,19 +1,18 @@
 import formatSIFloat from "../utils/formatsi";
-import { select, sum, format, scaleBand, transition, interpolate } from "d3";
 import {
-	OverviewDatum,
-	TimelineDatum,
-	OverviewDatumValues,
-	TimelineDatumValues,
-	StackedDatum,
-	TimelineEmergencyProperty,
-	localColorScaleTimeline,
-} from "./createemergency";
+	select,
+	sum,
+	format,
+	scaleBand,
+	transition,
+	interpolate,
+	local,
+} from "d3";
 import constants from "../utils/constants";
 import { List } from "../utils/makelists";
-import { EmergencyChartTypes } from "../components/EmergencyChart";
 import { wrapText, trimEmergencyName } from "./emergencyutils";
 import { reverseFormat } from "../utils/reverseformat";
+import { OverviewDatum } from "../utils/processemergencyoverview";
 
 const {
 	emergencyOverviewLeftMarginByGroup,
@@ -28,22 +27,22 @@ const {
 	duration,
 } = constants;
 
+const localPreviousValue = local<number>();
+
 const aggregatedScale = scaleBand<keyof TimelineEmergencyProperty>()
 	.paddingInner(0)
 	.paddingOuter(0);
 
-function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
-	selection: d3.Selection<SVGGElement, T, SVGSVGElement, unknown>,
+function createLegendGroupOverview(
+	selection: d3.Selection<SVGGElement, OverviewDatum, SVGSVGElement, unknown>,
 	lists: List,
-	type: EmergencyChartTypes,
-	rowHeight: number,
-	createEmergencyTypes: boolean = false
+	rowHeight: number
 ): void {
 	let legendGroup = selection
-		.selectAll<SVGGElement, T>(".legendGroup")
-		.data<T>(
+		.selectAll<SVGGElement, OverviewDatum>(".legendGroup")
+		.data<OverviewDatum>(
 			d => [d],
-			d => d.group!
+			d => d.group
 		);
 
 	legendGroup.exit().remove();
@@ -53,46 +52,32 @@ function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
 		.append("g")
 		.attr("class", "legendGroup")
 		.each((d, i, n) => {
-			let total;
-			if (type === "overview") {
-				total = sum(d.values as OverviewDatumValues[], e => e.value);
-			} else {
-				total = sum(d.values as TimelineDatumValues[], e => e.total);
-			}
+			const total = sum(d.groupData, e => sum(e.values, f => f.value));
+			localPreviousValue.set(n[i], total);
 			const textWidth =
-				type === "overview"
-					? emergencyOverviewLeftMarginByGroup -
-					  overviewAxisByGroupWidth -
-					  overviewIconSizeByGroup
-					: emergencyTimelineLeftMargin - overviewIconSizeByGroup * 3;
+				emergencyOverviewLeftMarginByGroup -
+				overviewAxisByGroupWidth -
+				overviewIconSizeByGroup;
 			drawLegendHeader(select(n[i]), d.group!, total, lists, textWidth);
 		});
 
 	legendGroup = legendGroupEnter.merge(legendGroup);
 
 	legendGroup.each((d, i, n) => {
-		let total;
-		if (type === "overview") {
-			total = sum(d.values as OverviewDatumValues[], e => e.value);
-		} else {
-			total = sum(d.values as TimelineDatumValues[], e => e.total);
-		}
+		const total = sum(d.groupData, e => sum(e.values, f => f.value));
 		const textWidth =
-			type === "overview"
-				? emergencyOverviewLeftMarginByGroup -
-				  overviewAxisByGroupWidth -
-				  overviewIconSizeByGroup
-				: emergencyTimelineLeftMargin - overviewIconSizeByGroup * 3;
+			emergencyOverviewLeftMarginByGroup -
+			overviewAxisByGroupWidth -
+			overviewIconSizeByGroup;
 		const thisSelection = select(n[i]);
 		thisSelection
 			.select<SVGTextElement>(".legendGroupValue")
 			.transition()
 			.duration(duration)
 			.textTween((_, i, n) => {
-				const interpolator = interpolate(
-					reverseFormat(n[i].textContent) || 0,
-					total
-				);
+				const previousValue = localPreviousValue.get(n[i]);
+				const interpolator = interpolate(previousValue || 0, total);
+				localPreviousValue.set(n[i], total);
 				return t => `$${formatSIFloat(+interpolator(t))}`;
 			});
 
@@ -115,14 +100,6 @@ function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
 		);
 	});
 
-	if (createEmergencyTypes) {
-		legendGroup.each((d, i, n) => {
-			if (isTimelineDatum(d)) {
-				createEmergencyTypesGroup(select(n[i]), lists, d);
-			}
-		});
-	}
-
 	legendGroup.each((d, i, n) => {
 		const gElement = select(n[i]);
 		const bbox = gElement.node()!.getBBox();
@@ -130,14 +107,8 @@ function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
 
 		gElement.attr(
 			"transform",
-			`translate(${-(type === "overview"
-				? emergencyOverviewLeftMarginByGroup
-				: emergencyTimelineLeftMargin)},${
-				(type === "overview"
-					? d.values.length * rowHeight
-					: rowHeight) /
-					2 -
-				translateY
+			`translate(${-emergencyOverviewLeftMarginByGroup},${
+				(d.groupData.length * rowHeight) / 2 - translateY
 			})`
 		);
 	});
@@ -403,4 +374,115 @@ function drawLegendHeader(
 		.attr("data-tooltip-place", "top");
 }
 
-export { createLegendGroup, createLegendAggregated };
+export { createLegendGroupOverview, createLegendAggregated };
+
+// function createLegendGroup<T extends OverviewDatum | TimelineDatum>(
+// 	selection: d3.Selection<SVGGElement, T, SVGSVGElement, unknown>,
+// 	lists: List,
+// 	type: EmergencyChartTypes,
+// 	rowHeight: number,
+// 	createEmergencyTypes: boolean = false
+// ): void {
+// 	let legendGroup = selection
+// 		.selectAll<SVGGElement, T>(".legendGroup")
+// 		.data<T>(
+// 			d => [d],
+// 			d => d.group!
+// 		);
+
+// 	legendGroup.exit().remove();
+
+// 	const legendGroupEnter = legendGroup
+// 		.enter()
+// 		.append("g")
+// 		.attr("class", "legendGroup")
+// 		.each((d, i, n) => {
+// 			let total;
+// 			if (type === "overview") {
+// 				total = sum(d.values as OverviewDatumValues[], e => e.value);
+// 			} else {
+// 				total = sum(d.values as TimelineDatumValues[], e => e.total);
+// 			}
+// 			const textWidth =
+// 				type === "overview"
+// 					? emergencyOverviewLeftMarginByGroup -
+// 					  overviewAxisByGroupWidth -
+// 					  overviewIconSizeByGroup
+// 					: emergencyTimelineLeftMargin - overviewIconSizeByGroup * 3;
+// 			drawLegendHeader(select(n[i]), d.group!, total, lists, textWidth);
+// 		});
+
+// 	legendGroup = legendGroupEnter.merge(legendGroup);
+
+// 	legendGroup.each((d, i, n) => {
+// 		let total;
+// 		if (type === "overview") {
+// 			total = sum(d.values as OverviewDatumValues[], e => e.value);
+// 		} else {
+// 			total = sum(d.values as TimelineDatumValues[], e => e.total);
+// 		}
+// 		const textWidth =
+// 			type === "overview"
+// 				? emergencyOverviewLeftMarginByGroup -
+// 				  overviewAxisByGroupWidth -
+// 				  overviewIconSizeByGroup
+// 				: emergencyTimelineLeftMargin - overviewIconSizeByGroup * 3;
+// 		const thisSelection = select(n[i]);
+// 		thisSelection
+// 			.select<SVGTextElement>(".legendGroupValue")
+// 			.transition()
+// 			.duration(duration)
+// 			.textTween((_, i, n) => {
+// 				const interpolator = interpolate(
+// 					reverseFormat(n[i].textContent) || 0,
+// 					total
+// 				);
+// 				return t => `$${formatSIFloat(+interpolator(t))}`;
+// 			});
+
+// 		thisSelection
+// 			.select(".legendGroupName")
+// 			.text(lists.emergencyGroupNames[d.group!]);
+// 		thisSelection
+// 			.select<SVGTextElement>(".legendGroupName")
+// 			.call(wrapText, textWidth, false);
+// 		thisSelection
+// 			.select("use")
+// 			.attr("href", `#emergencyIcon${d.group}`)
+// 			.style(
+// 				"fill",
+// 				emergencyColors[d.group! as keyof typeof emergencyColors]
+// 			);
+// 		thisSelection.attr(
+// 			"data-tooltip-html",
+// 			`<span>$${format(",.0f")(total)}</span>`
+// 		);
+// 	});
+
+// 	if (createEmergencyTypes) {
+// 		legendGroup.each((d, i, n) => {
+// 			if (isTimelineDatum(d)) {
+// 				createEmergencyTypesGroup(select(n[i]), lists, d);
+// 			}
+// 		});
+// 	}
+
+// 	legendGroup.each((d, i, n) => {
+// 		const gElement = select(n[i]);
+// 		const bbox = gElement.node()!.getBBox();
+// 		const translateY = bbox.height / 2;
+
+// 		gElement.attr(
+// 			"transform",
+// 			`translate(${-(type === "overview"
+// 				? emergencyOverviewLeftMarginByGroup
+// 				: emergencyTimelineLeftMargin)},${
+// 				(type === "overview"
+// 					? d.values.length * rowHeight
+// 					: rowHeight) /
+// 					2 -
+// 				translateY
+// 			})`
+// 		);
+// 	});
+// }

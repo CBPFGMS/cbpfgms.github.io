@@ -97,6 +97,8 @@ export const projectSummaryObjectSchema = z.object({
 	ProtPeopleTgt: z.number().int().nonnegative().nullable(),
 	AchProtPeople: z.number().int().nonnegative().nullable(),
 	RptCode: z.union([z.literal(1), z.literal(2)]).nullable(),
+	StartDate: z.string().regex(dateRegex, "Invalid date format"),
+	PrjApprDate: z.string().regex(dateRegex, "Invalid date format"),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
@@ -127,7 +129,18 @@ export const sectorBeneficiaryObjectSchema = z.object({
 export const emergenciesObjectSchema = z.object({
 	CHFId: z.number().int().nonnegative(),
 	EmergencyTypeId: z.number().int().nonnegative(),
-	EmergencyPercent: z.number().nonnegative().max(100),
+	EmergencyPercent: z.number().min(0).max(100),
+	PooledFundId: z.number().int().nonnegative(),
+	PooledFundName: z.string(),
+	CHFProjectCode: z.string(),
+	OrganizationName: z.string().nullable(),
+	OrganizationAcronym: z.string().nullable(),
+	OrganizationType: z.string().nullable(),
+	AllocationTypeName: z.string().nullable(),
+	AllocationYear: z.number().int().nonnegative(),
+	ProjectStatus: z.string().nullable(),
+	ProjectBudget: z.number().nonnegative(),
+	EmergencyTypeName: z.string().nullable(),
 });
 
 // ********************
@@ -257,15 +270,6 @@ export const emergenciesMasterObjectSchema = z.object({
 	EmergencyGroupId: z.number().int().nonnegative(),
 	EmergencyGroupName: z.string(),
 });
-
-// {
-//     "EmergencyTypeId": 27,
-//     "EmergencyTypeName": "Climate / natural disaster - Drought",
-//     "EmergencyCategoryId": 5,
-//     "EmergencyCategoryName": "Drought",
-//     "EmergencyGroupId": 4,
-//     "EmergencyGroupName": "Climate / natural disaster"
-//   },
 
 // ********************
 // GLOBAL INDICATOR SCHEMA

@@ -26,7 +26,7 @@ import {
 	processOverviewData,
 	processTimelineData,
 	Month,
-} from "../utils/processemergencychart";
+} from "../utils/processemergencychart-old";
 import constants from "../utils/constants";
 import { emergencyIcons } from "../assets/emergencyicons";
 import { List } from "../utils/makelists";
@@ -40,7 +40,7 @@ import {
 	createTooltipString,
 	trimEmergencyName,
 } from "./emergencyutils";
-import { createLegendGroup, createLegendAggregated } from "./emergencylegend";
+import { createLegendGroup, createLegendAggregated } from "./emergencylegend-old";
 import { reverseFormat } from "../utils/reverseformat";
 
 type ChartDatum = {

@@ -126,3 +126,13 @@
 .emergencyTypesGroup:focus {
 	outline: none;
 }
+
+.yearAxisGroup text {
+	fill: #666;
+	font-size: 10px;
+}
+
+.yearAxisGroup path,
+.yearAxisGroup line {
+	stroke: none;
+}

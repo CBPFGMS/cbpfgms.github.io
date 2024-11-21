@@ -69,7 +69,7 @@ function EmergencyChart({
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [chartType, setChartType] = useState<EmergencyChartTypes>("timeline");
+	const [chartType, setChartType] = useState<EmergencyChartTypes>("overview"); //IMPORTANT: CHANGE TO TIMELINE FOR PRODUCTION
 	const [mode, setMode] = useState<EmergencyChartModes>("aggregated");
 
 	const ref = useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ function EmergencyChart({
 	const overviewData: OverviewDatum[] | null = useMemo(
 		() =>
 			chartType === "overview"
-				? processOverviewData(dataEmergency, mode)
+				? processOverviewData(dataEmergency, year, mode)
 				: null,
 		[dataEmergency, mode, chartType]
 	);
@@ -138,6 +138,7 @@ function EmergencyChart({
 				svgContainerWidth,
 				overviewData,
 				lists,
+				year,
 				mode,
 			});
 		}
@@ -148,6 +149,7 @@ function EmergencyChart({
 		chartType,
 		lists,
 		overviewData,
+		year,
 	]);
 
 	useEffect(() => {
