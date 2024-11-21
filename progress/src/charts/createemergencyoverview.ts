@@ -27,7 +27,6 @@ import {
 	dispatchTooltipEvent,
 	calculateYearScaleRange,
 } from "./emergencyutils";
-import { emergencyIcons } from "../assets/emergencyicons";
 import formatSIFloat from "../utils/formatsi";
 import { createLegendGroupOverview } from "./emergencylegends";
 
@@ -78,8 +77,6 @@ const localYScale = local<d3.ScaleBand<string>>(),
 
 const yearAxis = axisLeft(yScaleYear).tickSize(0).tickPadding(3);
 
-const parser = new DOMParser();
-
 function createEmergencyOverview({
 	svgRef,
 	svgContainerWidth,
@@ -116,39 +113,6 @@ function createEmergencyOverview({
 	);
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
-
-	const defs = svg
-		.selectAll<SVGDefsElement, boolean>("defs")
-		.data<boolean>([true])
-		.enter()
-		.append("defs");
-
-	const svgElements = Object.keys(lists.emergencyGroupNames).reduce(
-		(acc, key) => {
-			const svgString = emergencyIcons[+key];
-			const doc = parser.parseFromString(svgString, "image/svg+xml");
-			const svgElement = doc.documentElement;
-
-			const emergencyIconGroup = svgElement.querySelector(
-				`.emergencyIcon${key}`
-			);
-			if (emergencyIconGroup) {
-				emergencyIconGroup.setAttribute(
-					"style",
-					`fill: ${
-						emergencyColors[+key as keyof typeof emergencyColors]
-					}`
-				);
-			}
-
-			acc.appendChild(svgElement);
-
-			return acc;
-		},
-		document.createDocumentFragment()
-	);
-
-	defs.append(() => svgElements as unknown as SVGElement);
 
 	const maxValue = getMaxValueOverview(overviewData);
 

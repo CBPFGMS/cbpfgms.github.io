@@ -21,9 +21,12 @@ import {
 	processOverviewData,
 	OverviewDatum,
 } from "../utils/processemergencyoverview";
+import {
+	processTimelineData,
+	TimelineDatum,
+} from "../utils/processemergencytimeline";
 import { createEmergencyOverview } from "../charts/createemergencyoverview";
-//import { processOverviewData, } from "../utils/processemergencychart";
-//import createEmergency from "../charts/createemergency";
+import { createEmergencyDefs } from "../charts/createEmergencyDefs";
 
 export type EmergencyChartModes = (typeof emergencyChartModes)[number];
 
@@ -69,12 +72,14 @@ function EmergencyChart({
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [chartType, setChartType] = useState<EmergencyChartTypes>("overview"); //IMPORTANT: CHANGE TO TIMELINE FOR PRODUCTION
+	const [chartType, setChartType] = useState<EmergencyChartTypes>("overview");
 	const [mode, setMode] = useState<EmergencyChartModes>("aggregated");
 
-	const ref = useRef<HTMLDivElement>(null);
-	const svgRefOverview = useRef<SVGSVGElement>(null);
-	const svgContainerRef = useRef<HTMLDivElement>(null);
+	const ref = useRef<HTMLDivElement>(null),
+		svgRefOverview = useRef<SVGSVGElement>(null),
+		svgContainerRef = useRef<HTMLDivElement>(null),
+		svgTimelineRefs = useRef<(SVGSVGElement | null)[]>([]),
+		svgDefsRef = useRef<SVGSVGElement>(null);
 
 	const [svgContainerWidth, setSvgContainerWidth] = useState<number>(0);
 
@@ -83,7 +88,15 @@ function EmergencyChart({
 			chartType === "overview"
 				? processOverviewData(dataEmergency, year, mode)
 				: null,
-		[dataEmergency, mode, chartType]
+		[dataEmergency, mode, chartType, year]
+	);
+
+	const timelineData: TimelineDatum[] | null = useMemo(
+		() =>
+			chartType === "timeline"
+				? processTimelineData(dataEmergency, mode, lists)
+				: null,
+		[dataEmergency, mode, chartType, lists]
 	);
 
 	const handleType = (
@@ -153,17 +166,33 @@ function EmergencyChart({
 	]);
 
 	useEffect(() => {
-		if (svgRefOverview.current && chartType === "timeline") {
-			// createEmergency({
-			// 	svgRef,
-			// 	svgContainerWidth,
-			// 	dataEmergency,
-			// 	lists,
-			// 	mode,
-			// 	type,
-			// });
+		if (chartType === "timeline" && timelineData) {
+			timelineData.forEach((timelineDatum, i) => {
+				if (svgTimelineRefs.current[i]) {
+					// createEmergencyTimeline({
+					// 	svgRef: svgTimelineRefs.current[i]!,
+					// 	svgContainerWidth,
+					// 	timelineDatum,
+					// 	lists,
+					// 	mode,
+					// });
+				}
+			});
 		}
-	}, [svgContainerWidth, dataEmergency, mode, chartType, lists]);
+	}, [
+		svgContainerWidth,
+		dataEmergency,
+		mode,
+		chartType,
+		lists,
+		timelineData,
+	]);
+
+	useEffect(() => {
+		if (svgDefsRef.current) {
+			createEmergencyDefs(svgDefsRef, lists);
+		}
+	});
 
 	return (
 		<Container
@@ -300,12 +329,29 @@ function EmergencyChart({
 					ref={svgContainerRef}
 					mt={2}
 				>
+					{" "}
+					{
+						<svg
+							ref={svgDefsRef}
+							id="defsContainer"
+							style={{ display: "none" }}
+						></svg>
+					}
 					{dataEmergency.length === 0 ? (
 						<NoData />
 					) : chartType === "overview" ? (
 						<svg ref={svgRefOverview}></svg>
 					) : (
-						<></>
+						timelineData!.map((d, i) => (
+							<Box key={i}>
+								<Typography variant="body1">
+									{d.group ?? "Aggregated"}{" "}
+								</Typography>
+								<svg
+									ref={r => (svgTimelineRefs.current[i] = r)}
+								></svg>
+							</Box>
+						))
 					)}
 				</Box>
 			</Grid>

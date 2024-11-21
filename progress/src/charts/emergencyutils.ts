@@ -1,15 +1,5 @@
 import { select, format, Series, interpolate } from "d3";
-// import {
-// 	OverviewDatumValues,
-// 	TimelineDatumValues,
-// 	TimelineDatum,
-// 	TimelineEmergencyProperty,
-// } from "./createemergency";
-import {
-	EmergencyChartModes,
-	EmergencyChartTypes,
-} from "../components/EmergencyChart";
-// import constants from "../utils/constants";
+import { EmergencyChartModes } from "../components/EmergencyChart";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
 import {
@@ -18,14 +8,12 @@ import {
 	GroupValuesDatum,
 } from "../utils/processemergencyoverview";
 import { Margins } from "./createemergencyoverview";
-
-// const {
-// 	fullMonthNames,
-// 	idString,
-// 	emergencyChartMargins,
-// 	emergencyTimelineAggregatedGroupHeight,
-// 	emergencyTimelineGroupHeight,
-// } = constants;
+import {
+	TimelineDatum,
+	TimelineDatumValues,
+	TimelineEmergencyProperty,
+	TimelineYearValues,
+} from "../utils/processemergencytimeline";
 
 type Emergencies = {
 	key: number;
@@ -179,34 +167,15 @@ const getMaxValueOverview = (data: OverviewDatum[]): number => {
 	);
 };
 
-function getMaxValue(
-	data: OverviewDatum[] | TimelineDatum[],
-	type: EmergencyChartTypes
-): number {
-	return data.reduce(
+function getMaxValueTimeline(data: TimelineDatum): number {
+	return data.yearsData.reduce(
 		(acc, curr) =>
 			Math.max(
 				acc,
-				curr.values.reduce(
-					(acc, curr) =>
-						Math.max(
-							acc,
-							isOverviewDatumValues(curr, type)
-								? curr.value
-								: curr.total
-						),
-					0
-				)
+				curr.values.reduce((acc, curr) => Math.max(acc, curr.total), 0)
 			),
 		0
 	);
-
-	function isOverviewDatumValues(
-		curr: OverviewDatumValues | TimelineDatumValues,
-		type: EmergencyChartTypes
-	): curr is OverviewDatumValues {
-		return type === "overview" && "id" in curr;
-	}
 }
 
 function stackCustomOrder(
@@ -249,7 +218,7 @@ function stackCustomOrder(
 
 function createTooltipString(
 	datum: TimelineDatumValues,
-	thisGroup: TimelineDatum,
+	thisGroup: TimelineYearValues,
 	lists: List
 ): string {
 	const tooltipFormat = format(",");
@@ -354,7 +323,7 @@ export {
 	calculateHeightTimeline,
 	calculateOverviewRange,
 	calculateYearScaleRange,
-	getMaxValue,
+	getMaxValueTimeline,
 	getMaxValueOverview,
 	createTooltipString,
 	trimEmergencyName,
