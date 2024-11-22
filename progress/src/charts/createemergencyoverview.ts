@@ -96,6 +96,9 @@ function createEmergencyOverview({
 
 	const rowHeight = yearScaleRange / year.length;
 
+	const rowGap =
+		mode === "aggregated" ? emergencyOverviewGap / 2 : emergencyOverviewGap;
+
 	const leftMargin =
 		mode === "aggregated"
 			? emergencyOverviewLeftMarginAggregated
@@ -109,7 +112,7 @@ function createEmergencyOverview({
 		overviewData,
 		rowHeight,
 		emergencyChartMargins,
-		emergencyOverviewGap
+		rowGap
 	);
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
@@ -133,7 +136,7 @@ function createEmergencyOverview({
 		overviewData,
 		rowHeight,
 		emergencyChartMargins,
-		emergencyOverviewGap
+		rowGap
 	);
 
 	yScaleOuter.domain(overviewData.map(d => d.group)).range(yScaleOuterRange);
@@ -452,10 +455,10 @@ function createEmergencyOverview({
 	divider
 		.attr("x1", -leftMargin)
 		.attr("x2", xScale(maxValue))
-		.attr("y1", -emergencyOverviewGap / 2)
-		.attr("y2", -emergencyOverviewGap / 2)
-		.style("stroke", "#e1e1e1")
-		.style("stroke-width", 1);
+		.attr("y1", -rowGap / 2)
+		.attr("y2", -rowGap / 2)
+		.style("stroke", "#fff")
+		.style("stroke-width", 6);
 
 	if (mode === "byGroup") {
 		createLegendGroupOverview(emergencyGroup, lists, yearScaleRange);

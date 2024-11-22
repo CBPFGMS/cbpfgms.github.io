@@ -351,7 +351,10 @@ function EmergencyChart({
 										mt={3}
 										mb={2}
 									>
-										<Divider />
+										<Divider
+											variant="middle"
+											sx={{ borderColor: "white", borderWidth: "3px" }}
+										/>
 									</Box>
 								)}
 								<svg

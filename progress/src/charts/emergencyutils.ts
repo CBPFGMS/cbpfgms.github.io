@@ -90,11 +90,11 @@ function calculateHeightOverview(
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
-	data.forEach(group => {
+	data.forEach((group, i) => {
 		group.groupData.forEach(d => {
 			height += d.values.length * yearScaleRowHeight;
 		});
-		height += emergencyOverviewGap;
+		if (i < data.length - 1) height += emergencyOverviewGap;
 	});
 
 	return height;

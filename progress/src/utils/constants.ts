@@ -34,7 +34,7 @@ const constants = {
 	emergencyTimelineGroupHeight: 256,
 	emergencyTimelineAggregatedGroupHeight: 296,
 	emergencyOverviewRowHeight: 26,
-	emergencyOverviewGap: 16,
+	emergencyOverviewGap: 32,
 	emergencyChartMargins: { top: 6, right: 12, bottom: 6, left: 6 },
 	emergencyTimelineMargins: { top: 6, right: 12, bottom: 22, left: 6 },
 	emergencyOverviewLeftMarginAggregated: 182,
