@@ -109,11 +109,12 @@
 }
 
 .timelineYAxisGroup line {
-	stroke: #ccc;
+	stroke: #e1e1e1;
+	stroke-width: 1px;
 }
 
 .gridline {
-	stroke: #f1f1f1;
+	stroke: #f3f3f3;
 	stroke-dasharray: 4, 4;
 }
 
@@ -135,4 +136,13 @@
 .yearAxisGroup path,
 .yearAxisGroup line {
 	stroke: none;
+}
+
+.timelineYearLabel {
+	font-size: 15px;
+	font-weight: bold;
+	fill: #888;
+	text-transform: uppercase;
+	text-anchor: middle;
+	dominant-baseline: central;
 }

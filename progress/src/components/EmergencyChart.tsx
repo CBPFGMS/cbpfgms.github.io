@@ -17,6 +17,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import CategoryIcon from "@mui/icons-material/Category";
 import ListIcon from "@mui/icons-material/List";
+import Divider from "@mui/material/Divider";
 import {
 	processOverviewData,
 	OverviewDatum,
@@ -26,6 +27,7 @@ import {
 	TimelineDatum,
 } from "../utils/processemergencytimeline";
 import { createEmergencyOverview } from "../charts/createemergencyoverview";
+import { createEmergencyTimeline } from "../charts/createemergencytimeline";
 import { createEmergencyDefs } from "../charts/createEmergencyDefs";
 
 export type EmergencyChartModes = (typeof emergencyChartModes)[number];
@@ -72,7 +74,7 @@ function EmergencyChart({
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [chartType, setChartType] = useState<EmergencyChartTypes>("overview");
+	const [chartType, setChartType] = useState<EmergencyChartTypes>("timeline");
 	const [mode, setMode] = useState<EmergencyChartModes>("aggregated");
 
 	const ref = useRef<HTMLDivElement>(null),
@@ -169,13 +171,13 @@ function EmergencyChart({
 		if (chartType === "timeline" && timelineData) {
 			timelineData.forEach((timelineDatum, i) => {
 				if (svgTimelineRefs.current[i]) {
-					// createEmergencyTimeline({
-					// 	svgRef: svgTimelineRefs.current[i]!,
-					// 	svgContainerWidth,
-					// 	timelineDatum,
-					// 	lists,
-					// 	mode,
-					// });
+					createEmergencyTimeline({
+						svgElement: svgTimelineRefs.current[i]!,
+						svgContainerWidth,
+						data: timelineDatum,
+						lists,
+						mode,
+					});
 				}
 			});
 		}
@@ -342,11 +344,16 @@ function EmergencyChart({
 					) : chartType === "overview" ? (
 						<svg ref={svgRefOverview}></svg>
 					) : (
-						timelineData!.map((d, i) => (
+						timelineData!.map((_, i) => (
 							<Box key={i}>
-								<Typography variant="body1">
-									{d.group ?? "Aggregated"}{" "}
-								</Typography>
+								{i > 0 && (
+									<Box
+										mt={3}
+										mb={2}
+									>
+										<Divider />
+									</Box>
+								)}
 								<svg
 									ref={r => (svgTimelineRefs.current[i] = r)}
 								></svg>

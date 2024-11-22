@@ -15,5 +15,13 @@ module.exports = {
 			{ allowConstantExport: true },
 		],
 		"no-mixed-spaces-and-tabs": "off",
+		"no-unused-vars": [
+			"error",
+			{
+				vars: "all",
+				args: "all",
+				argsIgnorePattern: "^_",
+			},
+		],
 	},
 };

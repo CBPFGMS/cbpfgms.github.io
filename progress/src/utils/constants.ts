@@ -36,6 +36,7 @@ const constants = {
 	emergencyOverviewRowHeight: 26,
 	emergencyOverviewGap: 16,
 	emergencyChartMargins: { top: 6, right: 12, bottom: 6, left: 6 },
+	emergencyTimelineMargins: { top: 6, right: 12, bottom: 22, left: 6 },
 	emergencyOverviewLeftMarginAggregated: 182,
 	emergencyOverviewLeftMarginByGroup: 312,
 	emergencyTimelineLeftMargin: 282,
@@ -93,6 +94,7 @@ const constants = {
 	yearScaleInnerPadding: 0.2,
 	yearScaleOuterPadding: 0.35,
 	zeroValueOpacity: 0.5,
+	yearTimelinePadding: 22,
 } as const;
 
 export default constants;

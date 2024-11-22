@@ -3,7 +3,6 @@ import { EmergencyChartModes } from "../components/EmergencyChart";
 import { sum, timeFormat, stack, stackOrderDescending, Series } from "d3";
 import constants from "./constants";
 import { List } from "./makelists";
-import { stackCustomOrder } from "../charts/emergencyutils";
 
 export type TimelineDatum = {
 	group: null | number;
@@ -41,7 +40,7 @@ const { monthsArray } = constants;
 
 const formatMonth = timeFormat("%b");
 
-const stackGenerator = stack<
+export const stackGenerator = stack<
 	TimelineDatumValues,
 	keyof TimelineEmergencyProperty
 >();
@@ -49,8 +48,7 @@ const stackGenerator = stack<
 function processTimelineData(
 	dataEmergency: DatumEmergency[],
 	mode: EmergencyChartModes,
-	lists: List,
-	baselineGroup?: keyof TimelineEmergencyProperty
+	lists: List
 ): TimelineDatum[] {
 	const emergenciesInData = new Set<number>();
 	const groupsInData = new Set<number>();
@@ -142,20 +140,18 @@ function processTimelineData(
 				.keys(
 					yearDatum.parentGroup === null
 						? groupsIds
-						: Object.keys(group.yearsData[0].values[0]).map(d => +d)
+						: Object.keys(group.yearsData[0].values[0]).reduce(
+								(acc, curr) => {
+									const num = +curr;
+									if (num === num) {
+										acc.push(num);
+									}
+									return acc;
+								},
+								[] as number[]
+						  )
 				)
-				.order(
-					baselineGroup
-						? d =>
-								stackCustomOrder(
-									d as unknown as Series<
-										TimelineDatumValues,
-										keyof TimelineEmergencyProperty
-									>[],
-									baselineGroup
-								)
-						: stackOrderDescending
-				);
+				.order(stackOrderDescending);
 			yearDatum.stackedData = stackGenerator(yearDatum.values);
 		});
 	});

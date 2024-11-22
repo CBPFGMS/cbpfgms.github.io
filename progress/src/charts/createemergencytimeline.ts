@@ -12,12 +12,17 @@ import {
 	curveBumpX,
 	axisBottom,
 	transition,
+	Series,
 } from "d3";
 import { EmergencyChartModes } from "../components/EmergencyChart";
 import constants from "../utils/constants";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
-import { getMaxValueTimeline, createTooltipString } from "./emergencyutils";
+import {
+	getMaxValueTimeline,
+	createTooltipString,
+	stackCustomOrder,
+} from "./emergencyutils";
 import {
 	TimelineDatum,
 	Month,
@@ -25,10 +30,15 @@ import {
 	TimelineDatumValues,
 	TimelineEmergencyProperty,
 	TimelineYearValues,
+	stackGenerator,
 } from "../utils/processemergencytimeline";
+import {
+	createLegendAggregatedTimeline,
+	createLegendByGroupTimeline,
+} from "./emergencylegends";
 
 type CreateEmergencyTimelineParams = {
-	svgRef: React.RefObject<SVGSVGElement>;
+	svgElement: SVGSVGElement;
 	svgContainerWidth: number;
 	data: TimelineDatum;
 	lists: List;
@@ -45,13 +55,15 @@ const {
 	emergencyColors,
 	stackGap,
 	duration,
+	yearTimelinePadding,
+	timelineOpacity,
 } = constants;
 
 const xScale = scalePoint<string>().domain(monthsArray),
 	yScaleInnerTimeline = scaleLinear<number, number>(),
 	yScaleOuterTimeline = scaleBand<number>();
 
-const localColorScaleTimeline =
+export const localColorScaleTimeline =
 	local<d3.ScaleOrdinal<keyof TimelineEmergencyProperty, string>>();
 const localTimelineDatum = local<TimelineYearValues>();
 
@@ -69,21 +81,29 @@ const timelineYAxis = axisLeft<number>(yScaleInnerTimeline)
 	.ticks(3)
 	.tickFormat(d => `$${formatSIFloat(d)}`);
 
+let isMouseMoving = true;
+
 function createEmergencyTimeline({
-	svgRef,
+	svgElement,
 	svgContainerWidth,
 	data,
 	lists,
 	mode,
 }: CreateEmergencyTimelineParams): void {
-	const svg = select<SVGSVGElement, unknown>(svgRef.current!);
+	const svg = select<SVGSVGElement, unknown>(svgElement);
 
 	const rowHeight =
 		mode === "aggregated"
 			? emergencyTimelineAggregatedGroupHeight
 			: emergencyTimelineGroupHeight;
 
-	const svgHeight = rowHeight * data.yearsData.length;
+	const hasMultipleYears = data.yearsData.length > 1;
+	const paddingHeight = hasMultipleYears ? yearTimelinePadding : 0;
+
+	const svgHeight =
+		(rowHeight + paddingHeight) * data.yearsData.length +
+		emergencyChartMargins.top +
+		emergencyChartMargins.bottom;
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
 
@@ -108,12 +128,12 @@ function createEmergencyTimeline({
 				emergencyChartMargins.bottom -
 				emergencyChartMargins.top,
 		])
-		.paddingInner(mode === "aggregated" ? 0.1 : 0.25)
-		.paddingOuter(mode === "aggregated" ? 0 : 0.05);
+		.paddingInner(mode === "aggregated" ? 0.2 : 0.25)
+		.paddingOuter(mode === "aggregated" ? 0.05 : 0.1);
 
 	yScaleInnerTimeline
 		.domain([0, maxValue * emergencyTimelineDomainPadding])
-		.range([yScaleOuterTimeline.bandwidth(), 0]);
+		.range([yScaleOuterTimeline.bandwidth(), paddingHeight]);
 
 	timelineYAxis
 		.tickSizeOuter(0)
@@ -137,8 +157,15 @@ function createEmergencyTimeline({
 			d =>
 				`translate(${
 					emergencyChartMargins.left + emergencyTimelineLeftMargin
-				},${yScaleOuterTimeline(d.year)})`
+				},${yScaleOuterTimeline(d.year)!})`
 		);
+
+	timelineGroupEnter
+		.append("text")
+		.attr("class", "timelineYearLabel")
+		.attr("x", (xScale.range()[0] + xScale.range()[1]) / 2)
+		.attr("y", paddingHeight / 2)
+		.text(d => (hasMultipleYears ? d.year : null));
 
 	timelineGroup = timelineGroupEnter.merge(timelineGroup);
 
@@ -170,6 +197,12 @@ function createEmergencyTimeline({
 			localColorScaleTimeline.set(n[i], thisScaleColor);
 		}
 	});
+
+	timelineGroup
+		.select(".timelineYearLabel")
+		.attr("x", (xScale.range()[0] + xScale.range()[1]) / 2)
+		.attr("y", paddingHeight / 2)
+		.text(d => (hasMultipleYears ? d.year : null));
 
 	timelineGroup
 		.transition(syncTransition)
@@ -207,24 +240,6 @@ function createEmergencyTimeline({
 		.attr("x2", d => xScale(d)!)
 		.attr("y1", 0)
 		.attr("y2", -yScaleOuterTimeline.bandwidth());
-
-	let timelineYAxisGroup = timelineGroup
-		.selectAll<SVGGElement, boolean>(".timelineYAxisGroup")
-		.data<boolean>([true]);
-
-	timelineYAxisGroup = timelineYAxisGroup
-		.enter()
-		.append("g")
-		.attr("class", "timelineYAxisGroup")
-		.merge(timelineYAxisGroup)
-		.attr("transform", `translate(0,0)`);
-
-	timelineYAxisGroup.transition(syncTransition).call(timelineYAxis);
-
-	timelineYAxisGroup
-		.selectAll(".tick")
-		.filter(d => d === 0)
-		.remove();
 
 	let timelineArea = timelineGroup
 		.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
@@ -277,7 +292,25 @@ function createEmergencyTimeline({
 		return areaGenerator(d);
 	});
 
-	//create rectangles as bars
+	let timelineYAxisGroup = timelineGroup
+		.selectAll<SVGGElement, boolean>(".timelineYAxisGroup")
+		.data<boolean>([true]);
+
+	timelineYAxisGroup = timelineYAxisGroup
+		.enter()
+		.append("g")
+		.attr("class", "timelineYAxisGroup")
+		.style("pointer-events", "none")
+		.merge(timelineYAxisGroup)
+		.attr("transform", `translate(0,0)`);
+
+	timelineYAxisGroup.transition(syncTransition).call(timelineYAxis);
+
+	timelineYAxisGroup
+		.selectAll(".tick")
+		.filter(d => d === 0)
+		.remove();
+
 	let timelineTooltipBars = timelineGroup
 		.selectAll<SVGRectElement, TimelineDatumValues>(".timelineTooltipBars")
 		.data<TimelineDatumValues>(
@@ -313,86 +346,113 @@ function createEmergencyTimeline({
 			return createTooltipString(d, thisGroup, lists);
 		});
 
-	// if (mode === "byGroup") {
-	// 	createLegendGroup<TimelineDatum>(
-	// 		timelineGroup,
-	// 		lists,
-	// 		type,
-	// 		emergencyTimelineGroupHeight,
-	// 		true
-	// 	);
+	if (mode === "byGroup") {
+		createLegendByGroupTimeline(
+			timelineGroup,
+			lists,
+			yScaleOuterTimeline.bandwidth()
+		);
 
-	// 	const legendGroupByGroup = selectAll<SVGGElement, StackedDatum>(
-	// 		".emergencyTypesGroup"
-	// 	);
+		const legendGroupByGroup = timelineGroup.selectAll<
+			SVGGElement,
+			StackedDatum
+		>(".emergencyTypesGroup");
 
-	// 	legendGroupByGroup
-	// 		.on(
-	// 			"mousemove",
-	// 			() => {
-	// 				isMouseMoving = true;
-	// 			},
-	// 			{ once: true }
-	// 		)
-	// 		.on("click", (_: PointerEvent, d: StackedDatum) => {
-	// 			isMouseMoving = false;
-	// 			timelineGroup
-	// 				.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
-	// 				.style("filter", null)
-	// 				.style("opacity", 1);
-	// 			const data.yearsData: TimelineDatum[] = processTimelineData(
-	// 				dataEmergency,
-	// 				mode,
-	// 				lists,
-	// 				d.key as keyof TimelineEmergencyProperty
-	// 			);
-	// 			createTimeline(data.yearsData);
-	// 		})
-	// 		.on("mouseover", (_: PointerEvent, d) => {
-	// 			if (!isMouseMoving) return;
-	// 			const thisKey = d.key as keyof TimelineEmergencyProperty;
-	// 			const thisKeyNumber = +d.key.substring(idString.length);
-	// 			const thisGroup =
-	// 				lists.emergencyDetails.emergencyTypes[thisKeyNumber]
-	// 					.emergencyGroup;
-	// 			timelineGroup
-	// 				.filter(e => e.group === thisGroup)
-	// 				.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
-	// 				.style("filter", e =>
-	// 					e.key === thisKey ? null : "grayscale(1)"
-	// 				)
-	// 				.style("opacity", e =>
-	// 					e.key === thisKey ? 1 : timelineOpacity
-	// 				);
-	// 		})
-	// 		.on("mouseout", () => {
-	// 			timelineGroup
-	// 				.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
-	// 				.style("filter", null)
-	// 				.style("opacity", 1);
-	// 		});
-	// } else {
-	// 	const legendGroupAggregated = createLegendAggregated(
-	// 		timelineGroup,
-	// 		lists,
-	// 		emergencyTimelineAggregatedGroupHeight
-	// 	);
+		legendGroupByGroup
+			.on(
+				"mousemove",
+				() => {
+					isMouseMoving = true;
+				},
+				{ once: true }
+			)
+			.on("click", (_: PointerEvent, d: StackedDatum) => {
+				isMouseMoving = false;
+				timelineGroup
+					.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
+					.style("filter", null)
+					.style("opacity", 1);
+				recalculateData(data, d.key);
+				createEmergencyTimeline({
+					svgElement,
+					svgContainerWidth,
+					data,
+					lists,
+					mode,
+				});
+			})
+			.on("mouseover", (_: PointerEvent, d) => {
+				if (!isMouseMoving) return;
+				const thisGroup =
+					lists.emergencyDetails.emergencyTypes[d.key].emergencyGroup;
+				timelineGroup
+					.filter(e => e.parentGroup === thisGroup)
+					.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
+					.style("filter", e =>
+						e.key === d.key ? null : "grayscale(1)"
+					)
+					.style("opacity", e =>
+						e.key === d.key ? 1 : timelineOpacity
+					);
+			})
+			.on("mouseout", () => {
+				timelineGroup
+					.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
+					.style("filter", null)
+					.style("opacity", 1);
+			});
+	} else {
+		const legendGroupAggregated = createLegendAggregatedTimeline(
+			timelineGroup,
+			lists,
+			yScaleOuterTimeline.bandwidth(),
+			paddingHeight
+		);
 
-	// 	if (legendGroupAggregated) {
-	// 		legendGroupAggregated.on(
-	// 			"click",
-	// 			(_: PointerEvent, d: StackedDatum) => {
-	// 				const data.yearsData: TimelineDatum[] = processTimelineData(
-	// 					dataEmergency,
-	// 					mode,
-	// 					lists,
-	// 					d.key as keyof TimelineEmergencyProperty
-	// 				);
-	// 				createTimeline(data.yearsData);
-	// 			}
-	// 		);
-	// 	}
-	// }
+		if (legendGroupAggregated) {
+			legendGroupAggregated.on(
+				"click",
+				(_: PointerEvent, d: StackedDatum) => {
+					recalculateData(data, d.key);
+					createEmergencyTimeline({
+						svgElement,
+						svgContainerWidth,
+						data,
+						lists,
+						mode,
+					});
+				}
+			);
+		}
+	}
+}
+
+function recalculateData(
+	data: TimelineDatum,
+	baselineGroup: keyof TimelineEmergencyProperty
+) {
+	data.yearsData.forEach(yearDatum => {
+		stackGenerator
+			.keys(
+				Object.keys(data.yearsData[0].values[0]).reduce((acc, curr) => {
+					const num = +curr;
+					if (num === num) {
+						acc.push(num);
+					}
+					return acc;
+				}, [] as number[])
+			)
+			.order(d =>
+				stackCustomOrder(
+					d as unknown as Series<
+						TimelineDatumValues,
+						keyof TimelineEmergencyProperty
+					>[],
+					baselineGroup
+				)
+			);
+		yearDatum.stackedData = stackGenerator(yearDatum.values);
+	});
 }
 
 export { createEmergencyTimeline };

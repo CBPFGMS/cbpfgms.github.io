@@ -1,5 +1,4 @@
-import { select, format, Series, interpolate } from "d3";
-import { EmergencyChartModes } from "../components/EmergencyChart";
+import { select, format, Series } from "d3";
 import { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
 import {
@@ -14,11 +13,14 @@ import {
 	TimelineEmergencyProperty,
 	TimelineYearValues,
 } from "../utils/processemergencytimeline";
+import constants from "../utils/constants";
 
 type Emergencies = {
 	key: number;
 	value: number;
 };
+
+const { fullMonthNames } = constants;
 
 function wrapText<T>(
 	text: d3.Selection<SVGTextElement, T, SVGGElement | null, unknown>,
@@ -111,20 +113,6 @@ function calculateYearScaleRange(
 	const rangeMultiplier = 1 + innerPaddingTotal + outerPaddingTotal;
 
 	return size * itemCount * rangeMultiplier;
-}
-
-function calculateHeightTimeline(
-	data: TimelineDatum[],
-	mode: EmergencyChartModes
-): number {
-	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
-
-	height +=
-		mode === "aggregated"
-			? emergencyTimelineAggregatedGroupHeight
-			: data.length * emergencyTimelineGroupHeight;
-
-	return height;
 }
 
 function calculateOverviewRange(
@@ -226,9 +214,9 @@ function createTooltipString(
 	const emergencies: Emergencies[] = Object.entries(datum).reduce(
 		(acc, curr) => {
 			const [key, value] = curr;
-			if (key.includes(idString) && +value > 0) {
+			if (+key === +key && +value > 0) {
 				acc.push({
-					key: +key.substring(idString.length),
+					key: +key,
 					value: value as number,
 				});
 			}
@@ -243,7 +231,7 @@ function createTooltipString(
 
 	emergencies.sort((a, b) => b.value - a.value);
 
-	const group = thisGroup.group;
+	const group = thisGroup.parentGroup;
 
 	const emergenciesList = emergencies.map(
 		d => `<div style="display:flex;flex-direction:row;width:100%;">
@@ -279,48 +267,10 @@ function trimEmergencyName(str: string): string {
 	return trimmed;
 }
 
-function pathTween(
-	newPath: string,
-	precision: number,
-	self: SVGPathElement
-): () => (t: number) => string {
-	return function () {
-		const path0 = self,
-			path1 = path0.cloneNode() as SVGPathElement,
-			n0 = path0.getTotalLength(),
-			n1 = (path1.setAttribute("d", newPath), path1).getTotalLength();
-
-		const distances = [0],
-			dt = precision / Math.max(n0, n1);
-
-		let i = 0;
-
-		while ((i += dt) < 1) distances.push(i);
-		distances.push(1);
-
-		const points = distances.map(function (t) {
-			const p0 = path0.getPointAtLength(t * n0),
-				p1 = path1.getPointAtLength(t * n1);
-			return interpolate([p0.x, p0.y], [p1.x, p1.y]);
-		});
-
-		return (t: number) =>
-			t < 1
-				? "M" +
-				  points
-						.map(function (p) {
-							return p(t);
-						})
-						.join("L")
-				: newPath;
-	};
-}
-
 export {
 	wrapText,
 	dispatchTooltipEvent,
 	calculateHeightOverview,
-	calculateHeightTimeline,
 	calculateOverviewRange,
 	calculateYearScaleRange,
 	getMaxValueTimeline,
@@ -328,5 +278,4 @@ export {
 	createTooltipString,
 	trimEmergencyName,
 	stackCustomOrder,
-	pathTween,
 };
