@@ -146,3 +146,7 @@
 	text-anchor: middle;
 	dominant-baseline: central;
 }
+
+.timelineTooltipBars {
+	outline: none;
+}
