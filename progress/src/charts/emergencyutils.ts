@@ -207,7 +207,8 @@ function stackCustomOrder(
 function createTooltipString(
 	datum: TimelineDatumValues,
 	thisGroup: TimelineYearValues,
-	lists: List
+	lists: List,
+	hasMultipleYears: boolean
 ): string {
 	const tooltipFormat = format(",");
 
@@ -252,7 +253,7 @@ function createTooltipString(
 	)}</div>
 	<div style="flex: 0 60%;display:flex;align-items:flex-start;justify-content:flex-start;line-height:1.2;text-transform:uppercase;opacity:0.7;font-size:0.9em;text-align:left;">Total allocations in ${
 		fullMonthNames[datum.month]
-	}</div>
+	}${hasMultipleYears ? " " + thisGroup.year : ""}</div>
 	</div>
 	<div style="max-width:300px;width:100%;display:flex;flex-direction:column;margin-top:10px;">${emergenciesList.join(
 		""

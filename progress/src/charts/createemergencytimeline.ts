@@ -55,7 +55,6 @@ const {
 	emergencyColors,
 	stackGap,
 	duration,
-	yearTimelinePadding,
 	timelineOpacity,
 } = constants;
 
@@ -97,8 +96,9 @@ function createEmergencyTimeline({
 			? emergencyTimelineAggregatedGroupHeight
 			: emergencyTimelineGroupHeight;
 
+	const paddingHeight = 0; //if padding needed over the area chart
+
 	const hasMultipleYears = data.yearsData.length > 1;
-	const paddingHeight = hasMultipleYears ? yearTimelinePadding : 0;
 
 	const svgHeight =
 		(rowHeight + paddingHeight) * data.yearsData.length +
@@ -160,13 +160,6 @@ function createEmergencyTimeline({
 				},${yScaleOuterTimeline(d.year)!})`
 		);
 
-	timelineGroupEnter
-		.append("text")
-		.attr("class", "timelineYearLabel")
-		.attr("x", (xScale.range()[0] + xScale.range()[1]) / 2)
-		.attr("y", paddingHeight / 2)
-		.text(d => (hasMultipleYears ? d.year : null));
-
 	timelineGroup = timelineGroupEnter.merge(timelineGroup);
 
 	timelineGroup.each((d, i, n) => {
@@ -197,12 +190,6 @@ function createEmergencyTimeline({
 			localColorScaleTimeline.set(n[i], thisScaleColor);
 		}
 	});
-
-	timelineGroup
-		.select(".timelineYearLabel")
-		.attr("x", (xScale.range()[0] + xScale.range()[1]) / 2)
-		.attr("y", paddingHeight / 2)
-		.text(d => (hasMultipleYears ? d.year : null));
 
 	timelineGroup
 		.transition(syncTransition)
@@ -343,14 +330,15 @@ function createEmergencyTimeline({
 		.attr("data-tooltip-place", "left")
 		.attr("data-tooltip-html", (d, i, n) => {
 			const thisGroup = localTimelineDatum.get(n[i])!;
-			return createTooltipString(d, thisGroup, lists);
+			return createTooltipString(d, thisGroup, lists, hasMultipleYears);
 		});
 
 	if (mode === "byGroup") {
 		createLegendByGroupTimeline(
 			timelineGroup,
 			lists,
-			yScaleOuterTimeline.bandwidth()
+			yScaleOuterTimeline.bandwidth(),
+			hasMultipleYears
 		);
 
 		const legendGroupByGroup = timelineGroup.selectAll<
@@ -406,7 +394,8 @@ function createEmergencyTimeline({
 			timelineGroup,
 			lists,
 			yScaleOuterTimeline.bandwidth(),
-			paddingHeight
+			paddingHeight,
+			hasMultipleYears
 		);
 
 		if (legendGroupAggregated) {

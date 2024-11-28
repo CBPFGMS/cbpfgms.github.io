@@ -94,7 +94,7 @@ const constants = {
 	yearScaleInnerPadding: 0.2,
 	yearScaleOuterPadding: 0.35,
 	zeroValueOpacity: 0.5,
-	yearTimelinePadding: 22,
+	yearTimelinePadding: 42,
 } as const;
 
 export default constants;

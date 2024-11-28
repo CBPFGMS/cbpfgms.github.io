@@ -30,6 +30,7 @@ const {
 	emergencyTypesGroupRowHeight,
 	emergencyTypesGroupCircleRadius,
 	duration,
+	yearTimelinePadding,
 } = constants;
 
 const localPreviousValue = local<number>();
@@ -127,8 +128,31 @@ function createLegendByGroupTimeline(
 		unknown
 	>,
 	lists: List,
-	rowHeight: number
+	rowHeight: number,
+	hasMultipleYears: boolean
 ): void {
+	if (hasMultipleYears) {
+		rowHeight = rowHeight - yearTimelinePadding;
+	}
+
+	let timelineYearLabel = selection
+		.selectAll<SVGTextElement, number>(".timelineYearLabel")
+		.data<number>(d => (hasMultipleYears ? [d.year] : []));
+
+	timelineYearLabel.exit().remove();
+
+	const timelineYearLabelEnter = timelineYearLabel
+		.enter()
+		.append("text")
+		.attr("class", "timelineYearLabel");
+
+	timelineYearLabel = timelineYearLabelEnter.merge(timelineYearLabel);
+
+	timelineYearLabel
+		.attr("x", -emergencyTimelineLeftMargin)
+		.attr("y", 0)
+		.text(d => d);
+
 	let legendGroup = selection
 		.selectAll<SVGGElement, TimelineYearValues>(".legendGroup")
 		.data<TimelineYearValues>(
@@ -205,7 +229,9 @@ function createLegendByGroupTimeline(
 		gElement.attr(
 			"transform",
 			`translate(${-emergencyTimelineLeftMargin},${
-				rowHeight / 2 - translateY
+				rowHeight / 2 -
+				translateY +
+				(hasMultipleYears ? yearTimelinePadding : 0)
 			})`
 		);
 	});
@@ -300,9 +326,28 @@ function createLegendAggregatedTimeline(
 	>,
 	lists: List,
 	rowHeight: number,
-	paddingHeight: number
+	paddingHeight: number,
+	hasMultipleYears: boolean
 ): d3.Selection<SVGGElement, StackedDatum, SVGGElement, TimelineYearValues> {
 	const syncTransition = transition().duration(duration);
+
+	let timelineYearLabel = selection
+		.selectAll<SVGTextElement, number>(".timelineYearLabel")
+		.data<number>(d => (hasMultipleYears ? [d.year] : []));
+
+	timelineYearLabel.exit().remove();
+
+	const timelineYearLabelEnter = timelineYearLabel
+		.enter()
+		.append("text")
+		.attr("class", "timelineYearLabel");
+
+	timelineYearLabel = timelineYearLabelEnter.merge(timelineYearLabel);
+
+	timelineYearLabel
+		.attr("x", -emergencyTimelineLeftMargin)
+		.attr("y", 0)
+		.text(d => d);
 
 	let legendGroup = selection
 		.selectAll<SVGGElement, StackedDatum>(".legendGroup")
@@ -339,7 +384,9 @@ function createLegendAggregatedTimeline(
 
 	legendData.sort((a, b) => b.index! - a.index!);
 
-	aggregatedScale.domain(legendData.map(d => d.key)).range([0, rowHeight]);
+	aggregatedScale
+		.domain(legendData.map(d => d.key))
+		.range([hasMultipleYears ? yearTimelinePadding : 0, rowHeight]);
 
 	legendGroupEnter.attr(
 		"transform",
