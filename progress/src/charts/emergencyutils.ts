@@ -14,13 +14,20 @@ import {
 	TimelineYearValues,
 } from "../utils/processemergencytimeline";
 import constants from "../utils/constants";
+import { EmergencyChartModes } from "../components/EmergencyChart";
 
 type Emergencies = {
 	key: number;
 	value: number;
 };
 
-const { fullMonthNames } = constants;
+const {
+	fullMonthNames,
+	emergencyTimelineAggregatedGroupHeight,
+	emergencyTimelineGroupHeight,
+	emergencyChartMargins,
+	paddingHeight,
+} = constants;
 
 function wrapText<T>(
 	text: d3.Selection<SVGTextElement, T, SVGGElement | null, unknown>,
@@ -268,6 +275,23 @@ function trimEmergencyName(str: string): string {
 	return trimmed;
 }
 
+function calculateTimelineSVGHeight(
+	mode: EmergencyChartModes,
+	years: number
+): number {
+	const rowHeight =
+		mode === "aggregated"
+			? emergencyTimelineAggregatedGroupHeight
+			: emergencyTimelineGroupHeight;
+
+	const svgHeight =
+		(rowHeight + paddingHeight) * years +
+		emergencyChartMargins.top +
+		emergencyChartMargins.bottom;
+
+	return svgHeight;
+}
+
 export {
 	wrapText,
 	dispatchTooltipEvent,
@@ -279,4 +303,5 @@ export {
 	createTooltipString,
 	trimEmergencyName,
 	stackCustomOrder,
+	calculateTimelineSVGHeight,
 };

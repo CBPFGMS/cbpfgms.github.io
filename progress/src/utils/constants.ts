@@ -95,6 +95,8 @@ const constants = {
 	yearScaleOuterPadding: 0.35,
 	zeroValueOpacity: 0.5,
 	yearTimelinePadding: 42,
+	paddingHeight: 0, //if padding needed over the area chart
+	maxNumberOfYearsOnDisplay: 2,
 } as const;
 
 export default constants;

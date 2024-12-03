@@ -22,6 +22,7 @@ import {
 	getMaxValueTimeline,
 	createTooltipString,
 	stackCustomOrder,
+	calculateTimelineSVGHeight,
 } from "./emergencyutils";
 import {
 	TimelineDatum,
@@ -47,8 +48,6 @@ type CreateEmergencyTimelineParams = {
 
 const {
 	emergencyChartMargins,
-	emergencyTimelineAggregatedGroupHeight,
-	emergencyTimelineGroupHeight,
 	monthsArray,
 	emergencyTimelineDomainPadding,
 	emergencyTimelineLeftMargin,
@@ -56,6 +55,7 @@ const {
 	stackGap,
 	duration,
 	timelineOpacity,
+	paddingHeight,
 } = constants;
 
 const xScale = scalePoint<string>().domain(monthsArray),
@@ -90,20 +90,9 @@ function createEmergencyTimeline({
 	mode,
 }: CreateEmergencyTimelineParams): void {
 	const svg = select<SVGSVGElement, unknown>(svgElement);
-
-	const rowHeight =
-		mode === "aggregated"
-			? emergencyTimelineAggregatedGroupHeight
-			: emergencyTimelineGroupHeight;
-
-	const paddingHeight = 0; //if padding needed over the area chart
-
 	const hasMultipleYears = data.yearsData.length > 1;
 
-	const svgHeight =
-		(rowHeight + paddingHeight) * data.yearsData.length +
-		emergencyChartMargins.top +
-		emergencyChartMargins.bottom;
+	const svgHeight = calculateTimelineSVGHeight(mode, data.yearsData.length);
 
 	svg.attr("viewBox", `0 0 ${svgContainerWidth} ${svgHeight}`);
 

@@ -29,12 +29,15 @@ import {
 import { createEmergencyOverview } from "../charts/createemergencyoverview";
 import { createEmergencyTimeline } from "../charts/createemergencytimeline";
 import { createEmergencyDefs } from "../charts/createEmergencyDefs";
+import { ScrollableContainer } from "./ScrollableContainer";
+import { calculateTimelineSVGHeight } from "../charts/emergencyutils";
 
 export type EmergencyChartModes = (typeof emergencyChartModes)[number];
 
 export type EmergencyChartTypes = (typeof emergencyChartTypes)[number];
 
-const { emergencyChartModes, emergencyChartTypes } = constants;
+const { emergencyChartModes, emergencyChartTypes, maxNumberOfYearsOnDisplay } =
+	constants;
 
 const buttonSx = {
 	"& .MuiToggleButton-root": {
@@ -353,13 +356,28 @@ function EmergencyChart({
 									>
 										<Divider
 											variant="middle"
-											sx={{ borderColor: "white", borderWidth: "3px" }}
+											sx={{
+												borderColor: "white",
+												borderWidth: "3px",
+											}}
 										/>
 									</Box>
 								)}
-								<svg
-									ref={r => (svgTimelineRefs.current[i] = r)}
-								></svg>
+								<ScrollableContainer
+									maxHeight={
+										calculateTimelineSVGHeight(
+											mode,
+											maxNumberOfYearsOnDisplay
+										) + 2
+									}
+								>
+									<svg
+										ref={r =>
+											(svgTimelineRefs.current[i] = r)
+										}
+										style={{ paddingRight: "8px" }}
+									></svg>
+								</ScrollableContainer>
 							</Box>
 						))
 					)}
