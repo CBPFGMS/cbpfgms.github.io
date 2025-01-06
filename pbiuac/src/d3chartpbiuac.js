@@ -183,7 +183,7 @@
 			legendRectHeight = 6,
 			legendScalePadding = 420,
 			buttonsPanelHeight = 30,
-			buttonsNumber = 8,
+			buttonsNumber = 12,
 			minimumRectWidth = 4,
 			weekInMilliseconds = 7 * 24 * 60 * 60 * 1000,
 			yearsArray = [],
