@@ -3976,6 +3976,19 @@
 			return returnValue;
 		}
 
+		function parseTransform(translate) {
+			const group = document.createElementNS(
+				"http://www.w3.org/2000/svg",
+				"g"
+			);
+
+			group.setAttributeNS(null, "transform", translate);
+
+			const matrix = group.transform.baseVal.consolidate().matrix;
+
+			return [matrix.e, matrix.f];
+		}
+
 		//end of d3Chart
 	}
 
