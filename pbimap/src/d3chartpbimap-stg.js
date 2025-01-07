@@ -408,8 +408,8 @@
 		const showLink =
 			containerDiv.node().getAttribute("data-showlink") === "true";
 
-		const minimumUnderApprovalValue =
-			+containerDiv.node().getAttribute("data-minvalue") || 0;
+		const minimumUnderApprovalPercentage =
+			+containerDiv.node().getAttribute("data-minpercentage") || 0;
 
 		const selectedYearString = queryStringValues.has("year")
 			? queryStringValues.get("year")
@@ -769,20 +769,52 @@
 
 		loadDataWithProgress();
 
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
+			return {
+				underApprovalPercent: (underApproval / launched) * 100,
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
+		}
+
 		function receiveInitialData(rawData) {
 			removeProgressWheel();
 
+			const aggregatedLaunchedValues = {};
+
 			rawData[6].forEach(function (row) {
-				yearsWithUnderApprovalAboveMin[row.AllocationYear] =
-					(yearsWithUnderApprovalAboveMin[row.AllocationYear] || 0) +
-					+row.TotalUnderApprovalBudget;
+				aggregatedLaunchedValues[row.AllocationYear] = {
+					underApproval:
+						(aggregatedLaunchedValues[row.AllocationYear]
+							? aggregatedLaunchedValues[row.AllocationYear]
+									.underApproval
+							: 0) + +row.TotalUnderApprovalBudget,
+					approved:
+						(aggregatedLaunchedValues[row.AllocationYear]
+							? aggregatedLaunchedValues[row.AllocationYear]
+									.approved
+							: 0) + +row.TotalApprovedBudget,
+					launched:
+						(aggregatedLaunchedValues[row.AllocationYear]
+							? aggregatedLaunchedValues[row.AllocationYear]
+									.launched
+							: 0) + +row.TotalUSDPlanned,
+				};
 				launchedAllocationsData.push(row);
 			});
 
-			for (const year in yearsWithUnderApprovalAboveMin) {
+			for (const year in aggregatedLaunchedValues) {
+				const { underApprovalPercent, underPlusApprovedPercent } =
+					safeDivide(
+						aggregatedLaunchedValues[year].underApproval,
+						aggregatedLaunchedValues[year].approved,
+						aggregatedLaunchedValues[year].launched
+					);
 				yearsWithUnderApprovalAboveMin[year] =
-					yearsWithUnderApprovalAboveMin[year] >
-					minimumUnderApprovalValue;
+					underApprovalPercent > minimumUnderApprovalPercentage ||
+					underPlusApprovedPercent < minimumUnderApprovalPercentage;
 			}
 
 			createCbpfsList(rawData[2]);
@@ -3812,9 +3844,53 @@
 				topSvgObject.totalProjects += totalNumberOfProjects.length;
 			}
 
+			for (const key in yearsWithUnderApprovalAboveMin)
+				delete yearsWithUnderApprovalAboveMin[key];
+
+			const aggregatedLaunchedValues = {};
+
 			launchedAllocationsData.forEach(function (row) {
 				if (
 					filterYear(row.AllocationYear) &&
+					filterCBPF(row.PooledFundName)
+				) {
+					aggregatedLaunchedValues[row.AllocationYear] = {
+						underApproval:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.underApproval
+								: 0) + +row.TotalUnderApprovalBudget,
+						approved:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.approved
+								: 0) + +row.TotalApprovedBudget,
+						launched:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.launched
+								: 0) + +row.TotalUSDPlanned,
+					};
+				}
+			});
+
+			for (const year in aggregatedLaunchedValues) {
+				const { underApprovalPercent, underPlusApprovedPercent } =
+					safeDivide(
+						aggregatedLaunchedValues[year].underApproval,
+						aggregatedLaunchedValues[year].approved,
+						aggregatedLaunchedValues[year].launched
+					);
+				yearsWithUnderApprovalAboveMin[year] =
+					underApprovalPercent > minimumUnderApprovalPercentage ||
+					underPlusApprovedPercent < minimumUnderApprovalPercentage;
+			}
+
+			launchedAllocationsData.forEach(function (row) {
+				
+				if (
+					filterYear(row.AllocationYear) &&
+					filterCBPF(row.PooledFundName) &&
 					yearsWithUnderApprovalAboveMin[row.AllocationYear]
 				) {
 					topSvgObject.launchedAllocations += +row.TotalUSDPlanned;
