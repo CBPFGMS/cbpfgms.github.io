@@ -3887,7 +3887,6 @@
 			}
 
 			launchedAllocationsData.forEach(function (row) {
-				
 				if (
 					filterYear(row.AllocationYear) &&
 					filterCBPF(row.PooledFundName) &&
