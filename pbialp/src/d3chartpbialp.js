@@ -297,8 +297,7 @@
 		const showHelp =
 			containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const minimumUnderApprovalValue =
-			+containerDiv.node().getAttribute("data-minvalue") || 0;
+		const minimumUnderApprovalPercentage = +containerDiv.node().getAttribute("data-minpercentage") || 0;
 
 		const showLink =
 			containerDiv.node().getAttribute("data-showlink") === "true";
@@ -4963,6 +4962,14 @@
 			});
 		}
 
+		function safeDivide(underApproval, approved, launched){
+			if (launched === 0) return {underApprovalPercent: 0, underPlusApprovedPercent: 0};
+			return {
+				underApprovalPercent: (underApproval / launched) * 100,
+				underPlusApprovedPercent: ((underApproval + approved) / launched) * 100
+			}
+		}
+
 		function processData(rawData, rawLaunchedAllocationsData) {
 			topValuesLaunchedData.launched = 0;
 			topValuesLaunchedData.underApproval = 0;
@@ -4970,15 +4977,19 @@
 			for (const key in yearsWithUnderApprovalAboveMin)
 				delete yearsWithUnderApprovalAboveMin[key];
 
+			const aggregatedLaunchedValues = {};
+
 			rawLaunchedAllocationsData.forEach(function (row) {
 				if (
 					chartState.selectedYear.includes(row.AllocationYear) &&
 					(!chartState.selectedCbpfs.length ||
 						chartState.selectedCbpfs.includes(row.PooledFundName))
 				) {
-					yearsWithUnderApprovalAboveMin[row.AllocationYear] =
-						(yearsWithUnderApprovalAboveMin[row.AllocationYear] ||
-							0) + row.TotalUnderApprovalBudget;
+					aggregatedLaunchedValues[row.AllocationYear] = {
+						underApproval: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].underApproval : 0) + row.TotalUnderApprovalBudget,
+						approved: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].approved : 0) + row.TotalApprovedBudget,
+						launched: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].launched : 0) + row.TotalUSDPlanned
+					};
 					//IMPORTANT: ASK ABOUT THE LAUNCHEDALLOC FILE NOT HAVING PARTNER TYPE, IF WE CAN USE THE REGULAR DATA FILE
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval +=
@@ -4986,11 +4997,10 @@
 				}
 			});
 
-			for (const year in yearsWithUnderApprovalAboveMin) {
-				yearsWithUnderApprovalAboveMin[year] =
-					yearsWithUnderApprovalAboveMin[year] >
-					minimumUnderApprovalValue;
-			}
+			for (const year in aggregatedLaunchedValues) {
+				const {underApprovalPercent, underPlusApprovedPercent} = safeDivide(aggregatedLaunchedValues[year].underApproval, aggregatedLaunchedValues[year].approved, aggregatedLaunchedValues[year].launched);
+				yearsWithUnderApprovalAboveMin[year] = underApprovalPercent > minimumUnderApprovalPercentage || underPlusApprovedPercent < minimumUnderApprovalPercentage;
+			};
 
 			const aggregatedAllocations = [];
 

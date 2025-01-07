@@ -393,3 +393,7 @@ p#pbinadd3chartTitle {
 	text-anchor: middle;
 	font-weight: bold;
 }
+
+.pbinadtopPanelAllocatedText, .pbinadtopPanelUnderApprovalText, .pbinadtopPanelPartnersText, .pbinadtopPanelSubpartnersText {
+	letter-spacing: -0.5px;
+}

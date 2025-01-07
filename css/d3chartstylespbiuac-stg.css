@@ -363,3 +363,9 @@ p#pbiuacd3chartTitle {
 	color: #888;
 	width: 98%;
 }
+
+.pbiuacleftArrowText, .pbiuacrightArrowText {
+	font-family: "Arial", sans-serif;
+	font-size: 20px;
+	pointer-events: none;
+}
