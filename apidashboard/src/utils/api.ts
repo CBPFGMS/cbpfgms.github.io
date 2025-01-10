@@ -1,0 +1,3 @@
+function useData(): {} {}
+
+export { useData };
