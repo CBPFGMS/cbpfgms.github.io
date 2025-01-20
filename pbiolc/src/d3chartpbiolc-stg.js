@@ -184,7 +184,7 @@
 			panelVerticalPadding = 4,
 			buttonsPanelHeight = 30,
 			clusters = [
-				"Water Sanitation Hygiene",
+				"Water, Sanitation and Hygiene",
 				"Coordination and Support Services",
 				"Emergency Shelter and NFI",
 				"Health",
