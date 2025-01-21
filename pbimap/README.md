@@ -86,7 +86,7 @@ For more than one partner the values must be separated with commas. If the value
 - `"Logistics"`
 - `"Nutrition"`
 - `"Protection"`
-- `"Water Sanitation Hygiene"`
+- `"Water, Sanitation and Hygiene"`
 - `"Coordination and Support Services"`
 - `"Multi-Cluster"`
 
