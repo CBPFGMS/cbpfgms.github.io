@@ -8,12 +8,14 @@ import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
 import PublicIcon from "@mui/icons-material/Public";
 import { RefIds } from "./MainContainer";
+import constants from "../utils/constants";
 import {
 	GBVIcon,
 	DisabilityIcon,
 	ByTypeIcon,
 	OrgIcon,
 	EmergencyIcon,
+	CashIcon,
 } from "../assets/OchaIcons";
 
 type ScrollSpyProps = {
@@ -26,6 +28,7 @@ type ScrollSpyProps = {
 	inViewIndicators: boolean;
 	inViewDisability: boolean;
 	inViewGBV: boolean;
+	inViewCash: boolean;
 	refIds: RefIds;
 };
 
@@ -38,7 +41,9 @@ type TabProps = {
 	ochaIcon?: boolean;
 };
 
-function ScroolSpy({
+const { iconSize } = constants;
+
+function ScrollSpy({
 	inViewSummary,
 	inViewPictogram,
 	inViewBeneficiaryTypes,
@@ -48,6 +53,7 @@ function ScroolSpy({
 	inViewIndicators,
 	inViewDisability,
 	inViewGBV,
+	inViewCash,
 	refIds,
 }: ScrollSpyProps) {
 	function handleOnClick(reference: string) {
@@ -63,7 +69,10 @@ function ScroolSpy({
 			flexDirection="row"
 			mt={0.5}
 			mb={2}
-			gap={1}
+			gap={2}
+			style={{
+				width: "98%",
+			}}
 		>
 			<Tab
 				label="Summary"
@@ -127,6 +136,14 @@ function ScroolSpy({
 				ochaIcon={true}
 			/>
 			<Tab
+				label="CASH"
+				inView={inViewCash}
+				reference={refIds.cashRefId}
+				handleOnClick={handleOnClick}
+				Icon={CashIcon}
+				ochaIcon={true}
+			/>
+			<Tab
 				label="Indicators"
 				inView={inViewIndicators}
 				reference={refIds.indicatorsRefId}
@@ -150,36 +167,43 @@ function Tab({
 			elevation={1}
 			style={{
 				padding: "0.2rem 1rem 0rem 1rem",
-				borderBottom: inView
-					? `3px solid ${colors.unColor}`
-					: "3px solid transparent",
 				cursor: "pointer",
+				backgroundColor: inView ? colors.unColor : "white",
+				flex: 1,
 			}}
 			className="scrollSpyTab"
 			onClick={() => handleOnClick(reference)}
 		>
 			<Box
+				mt={1}
+				mb={0.5}
 				display={"flex"}
-				flexDirection={"row"}
+				flexDirection={"column"}
+				gap={1}
 				alignItems={"center"}
 			>
 				<Icon
-					htmlColor={colors.unColor}
-					fontSize="medium"
+					htmlColor={inView ? "white" : colors.unColor}
+					style={{
+						width: iconSize,
+						height: iconSize,
+					}}
 					{...(label === "Gender/Age" && {
 						type: "total",
 						svgProps: {
 							style: {
-								width: 12,
-								fill: colors.unColor,
+								width: iconSize,
+								height: iconSize,
+								fill: inView ? "white" : colors.unColor,
 							},
 						},
 					})}
 					{...(ochaIcon && {
 						svgProps: {
 							style: {
-								width: 20,
-								fill: colors.unColor,
+								width: iconSize,
+								height: iconSize,
+								fill: inView ? "white" : colors.unColor,
 							},
 						},
 					})}
@@ -188,8 +212,7 @@ function Tab({
 					variant="body2"
 					style={{
 						fontSize: "0.85rem",
-						color: "#555",
-						marginLeft: "0.5em",
+						color: inView ? "#fff" : "#555",
 					}}
 				>
 					{label}
@@ -199,6 +222,6 @@ function Tab({
 	);
 }
 
-const MemoizedScroolSpy = React.memo(ScroolSpy);
+const MemoizedScroolSpy = React.memo(ScrollSpy);
 
 export default MemoizedScroolSpy;

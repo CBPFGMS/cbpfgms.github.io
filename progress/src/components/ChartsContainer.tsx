@@ -47,6 +47,7 @@ type ChartsContainerProps = {
 	emergenciesRef: Ref;
 	disabilityRef: Ref;
 	gbvRef: Ref;
+	cashRef: Ref;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
@@ -76,6 +77,7 @@ function ChartsContainer({
 	emergenciesRef,
 	disabilityRef,
 	gbvRef,
+	cashRef,
 	year,
 	fund,
 	allocationSource,
@@ -387,6 +389,32 @@ function ChartsContainer({
 							/>
 						</Box>
 					</Grid>
+				</Grid>
+				<Divider
+					orientation="horizontal"
+					flexItem
+					style={{
+						borderTop: "3px dotted #ccc",
+						borderBottom: "none",
+						width: "96%",
+						marginLeft: "2%",
+					}}
+				/>
+				<Grid
+					container
+					direction={"row"}
+					justifyContent={"center"}
+					spacing={1}
+					size={12}
+					flexWrap={"nowrap"}
+					mt={3}
+					mb={3}
+				>
+					<Grid
+						size={12}
+						ref={cashRef}
+						id={refIds.cashRefId}
+					></Grid>
 				</Grid>
 			</Paper>
 		</Grid>

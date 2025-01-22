@@ -40,10 +40,12 @@ const downloadStates = charts.reduce(
 
 const refIdSuffix = "RefId";
 
-const refIds = (Object.keys(downloadStates) as Charts[]).reduce((acc, curr) => {
+const refIds = charts.reduce((acc, curr) => {
 	acc[`${curr}${refIdSuffix}`] = `${curr}${refIdSuffix}`;
 	return acc;
 }, {} as RefIds);
+
+console.log(refIds);
 
 const queryStringValues = new URLSearchParams(location.search);
 
@@ -92,6 +94,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
 	const [emergenciesRef, inViewEmergencies] = useInView(chartsThreshold);
 	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
+	const [cashRef, inViewCash] = useInView(chartsThreshold);
 	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
@@ -220,6 +223,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewIndicators={inViewIndicators}
 				inViewDisability={inViewDisability}
 				inViewGBV={inViewGBV}
+				inViewCash={inViewCash}
 				refIds={refIds}
 				showFinanciallyClosed={showFinanciallyClosed}
 			/>
@@ -257,6 +261,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				emergenciesRef={emergenciesRef}
 				disabilityRef={disabilityRef}
 				gbvRef={gbvRef}
+				cashRef={cashRef}
 				year={year}
 				fund={fund}
 				allocationSource={allocationSource}

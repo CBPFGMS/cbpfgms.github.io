@@ -16,6 +16,7 @@ const constants = {
 		"disability",
 		"emergency",
 		"gbv",
+		"cash",
 		"indicators",
 	],
 	filterTypes: ["Fund", "Year", "Allocation Source", "Allocation Name"],
@@ -97,6 +98,7 @@ const constants = {
 	yearTimelinePadding: 42,
 	paddingHeight: 0, //if padding needed over the area chart
 	maxNumberOfYearsOnDisplay: 2,
+	iconSize: 30,
 } as const;
 
 export default constants;

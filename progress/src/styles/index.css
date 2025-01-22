@@ -53,10 +53,6 @@
 	outline: none;
 }
 
-.scrollSpyTab:hover {
-	background-color: #f5f8ff;
-}
-
 .hiddenElement {
 	display: none !important;
 }

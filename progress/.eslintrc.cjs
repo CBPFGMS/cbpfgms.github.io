@@ -8,14 +8,15 @@ module.exports = {
 	],
 	ignorePatterns: ["dist", ".eslintrc.cjs"],
 	parser: "@typescript-eslint/parser",
-	plugins: ["react-refresh"],
+	plugins: ["@typescript-eslint", "react-refresh"],
 	rules: {
 		"react-refresh/only-export-components": [
 			"warn",
 			{ allowConstantExport: true },
 		],
 		"no-mixed-spaces-and-tabs": "off",
-		"no-unused-vars": [
+		"no-unused-vars": "off", // Disable the base rule
+		"@typescript-eslint/no-unused-vars": [
 			"error",
 			{
 				vars: "all",
