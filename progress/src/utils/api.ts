@@ -221,13 +221,6 @@ function useData(
 				setInDataLists,
 			});
 
-			//TEMPORARY FIX
-			// if (!inDataLists.years || inDataLists.years.size === 0) {
-			// 	setError("No data available");
-			// 	setLoading(false);
-			// 	return;
-			// }
-
 			setData(data);
 			setDataIndicators(globalIndicatorsData);
 			setLists(listsObj);
