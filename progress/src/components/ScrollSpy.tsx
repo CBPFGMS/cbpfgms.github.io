@@ -175,11 +175,11 @@ function Tab({
 			onClick={() => handleOnClick(reference)}
 		>
 			<Box
-				mt={1}
+				mt={0.75}
 				mb={0.5}
 				display={"flex"}
 				flexDirection={"column"}
-				gap={1}
+				gap={0.5}
 				alignItems={"center"}
 			>
 				<Icon
