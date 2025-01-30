@@ -143,6 +143,20 @@ export const emergenciesObjectSchema = z.object({
 	EmergencyTypeName: z.string().nullable(),
 });
 
+export const cvaObjectSchema = z.object({
+	PooledFundId: z.number().int().nonnegative(),
+	CHFId: z.number().int().nonnegative(),
+	CHFProjectCode: z.string(),
+	OrganizationTypeId: z.number().int().nonnegative(),
+	AllocationYear: z.number().int().nonnegative(),
+	CVATypeId: z.number().int().nonnegative(),
+	ClusterId: z.number().int().nonnegative(),
+	TargetedTransferAmt: z.number().nonnegative(),
+	ReachedTransferAmt: z.number().nonnegative(),
+	PeopleTargeted: z.number().int().nonnegative(),
+	PeopleReached: z.number().int().nonnegative(),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -365,3 +379,5 @@ export type EmergenciesObject = z.infer<typeof emergenciesObjectSchema>;
 export type EmergenciesMasterObject = z.infer<
 	typeof emergenciesMasterObjectSchema
 >;
+
+export type CvaObject = z.infer<typeof cvaObjectSchema>;

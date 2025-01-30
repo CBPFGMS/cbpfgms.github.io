@@ -18,6 +18,7 @@ import {
 	GlobalIndicatorsObject,
 	EmergenciesMasterObject,
 	EmergenciesObject,
+	CvaObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -25,6 +26,7 @@ type ReceiveDataArgs = [
 	SectorBeneficiaryObject[],
 	GlobalIndicatorsObject[],
 	EmergenciesObject[],
+	CvaObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
 	ProjectStatusMasterObject[],
@@ -36,6 +38,21 @@ type ReceiveDataArgs = [
 	GlobalIndicatorsMasterObject[],
 	EmergenciesMasterObject[]
 ];
+
+const beneficiaryTypesMasterUrl =
+		"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
+	pooledFundsMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
+	allocationSourcesMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
+	organizationTypesMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
+	sectorsMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
+	globalIndicatorsMasterUrl =
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
+	emergenciesMasterUrl =
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST&$format=csv";
 
 function useData(
 	defaultFundType: number | null,
@@ -56,23 +73,10 @@ function useData(
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		globalIndicatorsUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${fundType}&$format=csv`,
 		emergenciesDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=${fundType}&$format=csv`,
+		cvaDataUrl = "../data/fake_cvadata.csv",
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
-		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
-		beneficiaryTypesMasterUrl =
-			"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
-		pooledFundsMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
-		allocationSourcesMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
-		organizationTypesMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
-		sectorsMasterUrl =
-			"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
-		globalIndicatorsMasterUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
-		emergenciesMasterUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST&$format=csv";
+		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`;
 
 	const [data, setData] = useState<Data>([] as Data),
 		[dataIndicators, setDataIndicators] = useState<
@@ -85,7 +89,7 @@ function useData(
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
 
-	const [progress, setProgress] = useState<number>(0); //REMOVE LATER
+	const [progress, setProgress] = useState<number>(0);
 
 	useEffect(() => {
 		Promise.all([
@@ -113,6 +117,7 @@ function useData(
 				"csv",
 				setProgress
 			),
+			fetchFileDB<CvaObject[]>("CVAData", cvaDataUrl, "csv", setProgress),
 			fetchFile<AllocationTypesMasterObject[]>(
 				"allocationTypesMaster",
 				allocationTypesMasterUrl,
@@ -189,6 +194,7 @@ function useData(
 			sectorsData,
 			globalIndicatorsData,
 			emergenciesData,
+			cvaData,
 			allocationTypesMaster,
 			organizationMaster,
 			projectStatusMaster,
@@ -217,6 +223,7 @@ function useData(
 				projectSummary,
 				sectorsData,
 				emergenciesData,
+				cvaData,
 				listsObj,
 				setInDataLists,
 			});

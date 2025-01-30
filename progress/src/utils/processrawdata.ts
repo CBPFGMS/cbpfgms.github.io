@@ -5,6 +5,8 @@ import {
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	emergenciesObjectSchema,
+	cvaObjectSchema,
+	CvaObject,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -41,6 +43,7 @@ export type Datum = {
 	sectorData: SectorDatum[];
 	reportType: ReportType;
 	emergenciesData: EmergencyDatum[];
+	cvaData: CvaDatum[] | null;
 };
 
 export type ReportType = (typeof reportTypes)[number];
@@ -54,10 +57,26 @@ type SectorDatum = {
 	targeted: BeneficiariesObject;
 };
 
+type CvaDatum = {
+	cvaId: number;
+	organizationType: number;
+	sectorId: number;
+	targetedPeople: number;
+	reachedPeople: number;
+	targetedAllocations: number;
+	reachedAllocations: number;
+};
+
 type SectorMapValue = {
 	projectCode: string;
 	projectId: number;
 	sectors: SectorDatum[];
+};
+
+type CvaMapValue = {
+	projectCode: string;
+	projectId: number;
+	cva: CvaDatum[];
 };
 
 type EmergencyDatum = {
@@ -95,6 +114,7 @@ type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
 	sectorsData: SectorBeneficiaryObject[];
 	emergenciesData: EmergenciesObject[];
+	cvaData: CvaObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 };
@@ -103,12 +123,14 @@ function processRawData({
 	projectSummary,
 	sectorsData,
 	emergenciesData,
+	cvaData,
 	listsObj,
 	setInDataLists,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const emergenciesDataMap: Map<number, EmergencyDatum[]> = new Map();
+	const cvaDataMap: Map<string, CvaMapValue> = new Map();
 
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
@@ -184,6 +206,54 @@ function processRawData({
 		}
 	});
 
+	cvaData.forEach(row => {
+		const parsedRow = cvaObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			if (!cvaDataMap.has(row.CHFProjectCode)) {
+				cvaDataMap.set(row.CHFProjectCode, {
+					projectCode: row.CHFProjectCode,
+					projectId: row.CHFId,
+					cva: [
+						{
+							cvaId: row.CVATypeId,
+							organizationType: row.OrganizationTypeId,
+							sectorId: row.ClusterId,
+							targetedPeople: row.PeopleTargeted,
+							reachedPeople: row.PeopleReached,
+							targetedAllocations: row.TargetedTransferAmt,
+							reachedAllocations: row.ReachedTransferAmt,
+						},
+					],
+				});
+			} else {
+				const projectData = cvaDataMap.get(row.CHFProjectCode);
+				if (projectData) {
+					projectData.cva.push({
+						cvaId: row.CVATypeId,
+						organizationType: row.OrganizationTypeId,
+						sectorId: row.ClusterId,
+						targetedPeople: row.PeopleTargeted,
+						reachedPeople: row.PeopleReached,
+						targetedAllocations: row.TargetedTransferAmt,
+						reachedAllocations: row.ReachedTransferAmt,
+					});
+				} else {
+					warnProjectNotFound(
+						row.CHFProjectCode,
+						row,
+						"Project not found in cvaDataMap"
+					);
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"sectorsData",
+				row,
+				JSON.stringify(parsedRow.error)
+			);
+		}
+	});
+
 	emergenciesData.forEach(row => {
 		const parsedRow = emergenciesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -230,6 +300,7 @@ function processRawData({
 			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 			const thisEmergenciesData = emergenciesDataMap.get(row.ChfId);
+			const thisCvaData = cvaDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -344,6 +415,7 @@ function processRawData({
 					targetedGBV: row.GBVPeopleTgt || 0,
 					reachedGBV: row.AchGBVPeople || 0,
 					reportType: row.RptCode ?? 0,
+					cvaData: thisCvaData ? thisCvaData.cva : null,
 				};
 
 				data.push(objDatum);

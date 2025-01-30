@@ -45,8 +45,6 @@ const refIds = charts.reduce((acc, curr) => {
 	return acc;
 }, {} as RefIds);
 
-console.log(refIds);
-
 const queryStringValues = new URLSearchParams(location.search);
 
 const showFinanciallyClosed = queryStringValues.has("showFinanciallyClosed");
