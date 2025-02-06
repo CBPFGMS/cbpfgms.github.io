@@ -78,6 +78,16 @@ type EmergenciesDatumDownload = BaseDownloadDatum & {
 	"Emergency Budget": number;
 };
 
+type CvaDatumDownload = BaseDownloadDatum & {
+	"CVA type": string;
+	Organization: string;
+	Sector: string;
+	"CVA targeted budget": number;
+	"CVA reached budget": number;
+	"CVA targeted people": number;
+	"CVA reached people": number;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
@@ -522,6 +532,62 @@ export function processOrganizationsDownload({
 	});
 
 	return organizationsDataDownload;
+}
+
+export function processCvaDownload({
+	data,
+	lists,
+	year,
+	fund,
+	allocationSource,
+	allocationType,
+	implementationStatus,
+	showFinanciallyClosed,
+}: ProcessDownloadParams): CvaDatumDownload[] {
+	const cvaDataDownload: CvaDatumDownload[] = [];
+
+	data.forEach(datum => {
+		if (datum.cvaData !== null) {
+			const thisStatus = calculateStatus(
+				datum,
+				lists,
+				showFinanciallyClosed
+			);
+			if (
+				checkRow(
+					thisStatus,
+					datum,
+					year,
+					fund,
+					allocationSource,
+					allocationType,
+					implementationStatus
+				)
+			) {
+				const baseDownloadDatum = populateBaseDownloadDatum(
+					datum,
+					lists,
+					thisStatus
+				);
+
+				datum.cvaData.forEach(cva => {
+					cvaDataDownload.push({
+						...baseDownloadDatum,
+						Organization:
+							lists.organizationTypes[cva.organizationTypeId],
+						Sector: lists.sectors[cva.sectorId],
+						"CVA type": lists.cvaTypeNames[cva.cvaId],
+						"CVA reached budget": cva.reachedAllocations,
+						"CVA targeted budget": cva.targetedAllocations,
+						"CVA reached people": cva.reachedPeople,
+						"CVA targeted people": cva.targetedPeople,
+					});
+				});
+			}
+		}
+	});
+
+	return cvaDataDownload;
 }
 
 export function processIndicatorsDownload({

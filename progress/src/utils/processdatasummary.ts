@@ -63,6 +63,16 @@ export type DatumEmergency = {
 	date: Date;
 };
 
+export type DatumCva = {
+	cvaType: number;
+	organizationType: number;
+	sector: number;
+	targetedAllocations: number;
+	reachedAllocations: number;
+	targetedPeople: number;
+	reachedPeople: number;
+};
+
 const {
 	beneficiariesStatuses,
 	beneficiaryCategories,
@@ -82,6 +92,7 @@ function processDataSummary({
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataEmergency: DatumEmergency[];
+	dataCva: DatumCva[];
 	dataPictogram: DatumPictogram;
 	dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
@@ -89,6 +100,7 @@ function processDataSummary({
 } {
 	const dataSummary: DatumSummary[] = [];
 	const dataEmergency: DatumEmergency[] = [];
+	const dataCva: DatumCva[] = [];
 	const dataPictogram: DatumPictogram = {
 		targetedMen: 0,
 		targetedWomen: 0,
@@ -212,6 +224,20 @@ function processDataSummary({
 				dataGBV.reportsWithData += 1;
 			}
 
+			if (datum.cvaData) {
+				datum.cvaData.forEach(cva => {
+					dataCva.push({
+						cvaType: cva.cvaId,
+						organizationType: cva.organizationTypeId,
+						sector: cva.sectorId,
+						targetedAllocations: cva.targetedAllocations,
+						reachedAllocations: cva.reachedAllocations,
+						targetedPeople: cva.targetedPeople,
+						reachedPeople: cva.reachedPeople,
+					});
+				});
+			}
+
 			datum.emergenciesData.forEach(emergency => {
 				const approvalYear = datum.approvalDate.getFullYear();
 				const thisDate =
@@ -275,6 +301,7 @@ function processDataSummary({
 	return {
 		dataSummary,
 		dataEmergency,
+		dataCva,
 		dataPictogram,
 		dataDisability,
 		dataGBV,

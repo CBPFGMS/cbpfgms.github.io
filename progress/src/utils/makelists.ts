@@ -19,6 +19,8 @@ import {
 	globalIndicatorsMasterObjectSchema,
 	EmergenciesMasterObject,
 	emergenciesMasterObjectSchema,
+	CvaMasterObject,
+	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { GenderAndAge, ReportType } from "./processrawdata";
@@ -34,6 +36,7 @@ type MakeListParams = {
 	sectorsMaster: SectorsMasterObject[];
 	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
 	emergenciesMaster: EmergenciesMasterObject[];
+	cvaMaster: CvaMasterObject[];
 };
 
 export type ListObj = {
@@ -107,6 +110,7 @@ export type List = {
 		emergencyGroups: Map<number, EmergencyGroups>;
 		emergencyCategories: Map<number, EmergencyCategories>;
 	};
+	cvaTypeNames: ListObj;
 };
 
 function makeLists({
@@ -120,6 +124,7 @@ function makeLists({
 	sectorsMaster,
 	globalIndicatorsMaster,
 	emergenciesMaster,
+	cvaMaster,
 }: MakeListParams): List {
 	const lists: List = {
 		fundNames: {},
@@ -145,6 +150,7 @@ function makeLists({
 			emergencyGroups: new Map(),
 			emergencyCategories: new Map(),
 		},
+		cvaTypeNames: {},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -261,6 +267,19 @@ function makeLists({
 				"ProjectStatusMaster",
 				d,
 				JSON.stringify(parsedProjectStatusMaster.error)
+			);
+		}
+	});
+
+	cvaMaster.forEach(d => {
+		const parsedCvaMaster = cvaMasterObjectSchema.safeParse(d);
+		if (parsedCvaMaster.success) {
+			lists.cvaTypeNames[d.CVAId] = d.CVAName;
+		} else {
+			warnInvalidSchema(
+				"CvaMaster",
+				d,
+				JSON.stringify(parsedCvaMaster.error)
 			);
 		}
 	});

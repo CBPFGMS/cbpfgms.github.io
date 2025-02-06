@@ -112,6 +112,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const {
 		dataSummary,
 		dataEmergency,
+		dataCva,
 		dataPictogram,
 		dataDisability,
 		dataGBV,
@@ -247,6 +248,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataDisability={dataDisability}
 				dataEmergency={dataEmergency}
 				dataGBV={dataGBV}
+				dataCva={dataCva}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				lists={lists}

@@ -2,23 +2,27 @@ import { useState, useEffect, useRef } from "react";
 import clipSlice from "../utils/clipslice";
 import SliceAnimator from "./SliceAnimator";
 import { pie } from "d3";
-import { DonutDatum } from "./GBVChart";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import NumberAnimator from "./NumberAnimator";
 
-type DonutProps = {
-	totalSlice: number;
-	GBVSlice: number;
-	totalColor: string;
-	GBVColor: string;
+type CvaDonutDatum = {
+	value: number;
+	type: "total" | "CVA";
 };
 
-const pieGenerator = pie<void, DonutDatum>()
-	.value(d => d.value)
-	.sort(a => (a.type === "GBV" ? -1 : 1));
+type DonutProps = {
+	totalSlice: number;
+	cvaSlice: number;
+	totalColor: string;
+	cvaColor: string;
+};
 
-function Donut({ totalSlice, totalColor, GBVSlice, GBVColor }: DonutProps) {
+const pieGenerator = pie<void, CvaDonutDatum>()
+	.value(d => d.value)
+	.sort(a => (a.type === "CVA" ? -1 : 1));
+
+function Donut({ totalSlice, totalColor, cvaSlice, cvaColor }: DonutProps) {
 	const parentRef = useRef<HTMLDivElement>(null);
 	const [parentWidth, setParentWidth] = useState<number>(0);
 	const [parentHeight, setParentHeight] = useState<number>(0);
@@ -32,18 +36,20 @@ function Donut({ totalSlice, totalColor, GBVSlice, GBVColor }: DonutProps) {
 
 	const diameter = Math.min(parentWidth, parentHeight);
 
-	const donutData: DonutDatum[] = [totalSlice, GBVSlice].map(
+	console.log(parentHeight, parentWidth, diameter);
+
+	const donutData: CvaDonutDatum[] = [totalSlice, cvaSlice].map(
 		(slice, index) => ({
 			value: slice,
-			type: index ? "GBV" : "total",
+			type: index ? "CVA" : "total",
 		})
 	);
 
 	const pieData = pieGenerator(donutData);
 
-	const GBVData = pieData.find(d => d.data.type === "GBV")!;
+	const CvaData = pieData.find(d => d.data.type === "CVA")!;
 
-	const GBVArc = clipSlice<DonutDatum>(diameter, GBVData);
+	const CvaArc = clipSlice<CvaDonutDatum>(diameter, CvaData);
 
 	return (
 		<Box
@@ -67,8 +73,8 @@ function Donut({ totalSlice, totalColor, GBVSlice, GBVColor }: DonutProps) {
 			/>
 			<SliceAnimator
 				diameter={diameter}
-				sliceArc={GBVArc}
-				sliceColor={GBVColor}
+				sliceArc={CvaArc}
+				sliceColor={cvaColor}
 				zIndex={50}
 			/>
 			<Box
@@ -86,7 +92,7 @@ function Donut({ totalSlice, totalColor, GBVSlice, GBVColor }: DonutProps) {
 			>
 				<Typography style={{ fontSize: "0.9em", fontWeight: "bold" }}>
 					<NumberAnimator
-						number={~~((GBVSlice * 1000) / totalSlice) / 10}
+						number={~~((cvaSlice * 1000) / totalSlice) / 10}
 						type="decimal"
 					/>
 					%

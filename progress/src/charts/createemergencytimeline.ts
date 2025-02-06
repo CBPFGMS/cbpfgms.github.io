@@ -320,7 +320,8 @@ function createEmergencyTimeline({
 		.attr("data-tooltip-html", (d, i, n) => {
 			const thisGroup = localTimelineDatum.get(n[i])!;
 			return createTooltipString(d, thisGroup, lists, hasMultipleYears);
-		});
+		})
+		.raise();
 
 	if (mode === "byGroup") {
 		createLegendByGroupTimeline(

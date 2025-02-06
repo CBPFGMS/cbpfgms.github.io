@@ -59,7 +59,7 @@ type SectorDatum = {
 
 type CvaDatum = {
 	cvaId: number;
-	organizationType: number;
+	organizationTypeId: number;
 	sectorId: number;
 	targetedPeople: number;
 	reachedPeople: number;
@@ -216,7 +216,7 @@ function processRawData({
 					cva: [
 						{
 							cvaId: row.CVATypeId,
-							organizationType: row.OrganizationTypeId,
+							organizationTypeId: row.OrganizationTypeId,
 							sectorId: row.ClusterId,
 							targetedPeople: row.PeopleTargeted,
 							reachedPeople: row.PeopleReached,
@@ -230,7 +230,7 @@ function processRawData({
 				if (projectData) {
 					projectData.cva.push({
 						cvaId: row.CVATypeId,
-						organizationType: row.OrganizationTypeId,
+						organizationTypeId: row.OrganizationTypeId,
 						sectorId: row.ClusterId,
 						targetedPeople: row.PeopleTargeted,
 						reachedPeople: row.PeopleReached,
@@ -246,11 +246,7 @@ function processRawData({
 				}
 			}
 		} else {
-			warnInvalidSchema(
-				"sectorsData",
-				row,
-				JSON.stringify(parsedRow.error)
-			);
+			warnInvalidSchema("cvaData", row, JSON.stringify(parsedRow.error));
 		}
 	});
 

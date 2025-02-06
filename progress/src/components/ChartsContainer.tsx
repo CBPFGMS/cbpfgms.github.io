@@ -9,6 +9,7 @@ import {
 	DatumDisability,
 	DatumGBV,
 	DatumEmergency,
+	DatumCva,
 } from "../utils/processdatasummary";
 import {
 	DownloadStates,
@@ -23,6 +24,7 @@ import { DatumBarChart } from "../utils/processdatabarchart";
 import DisabilityChart from "./DisabilityChart";
 import GBVChart from "./GBVChart";
 import EmergencyChart from "./EmergencyChart";
+import CvaChart from "./CvaChart";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -35,6 +37,7 @@ type ChartsContainerProps = {
 	dataDisability: DatumDisability;
 	dataEmergency: DatumEmergency[];
 	dataGBV: DatumGBV;
+	dataCva: DatumCva[];
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -65,6 +68,7 @@ function ChartsContainer({
 	dataDisability,
 	dataEmergency,
 	dataGBV,
+	dataCva,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -414,7 +418,27 @@ function ChartsContainer({
 						size={12}
 						ref={cashRef}
 						id={refIds.cashRefId}
-					></Grid>
+					>
+						<Box
+							display={"flex"}
+							alignItems={"center"}
+							justifyContent={"center"}
+						>
+							<CvaChart
+								dataSummary={dataSummary}
+								dataPictogram={dataPictogram}
+								dataCva={dataCva}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								year={year}
+								fund={fund}
+								allocationSource={allocationSource}
+								allocationType={allocationType}
+								implementationStatus={implementationsStatus}
+								showFinanciallyClosed={showFinanciallyClosed}
+							/>
+						</Box>
+					</Grid>
 				</Grid>
 			</Paper>
 		</Grid>

@@ -19,6 +19,7 @@ import {
 	EmergenciesMasterObject,
 	EmergenciesObject,
 	CvaObject,
+	CvaMasterObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -36,7 +37,8 @@ type ReceiveDataArgs = [
 	OrganizationTypesMasterObject[],
 	SectorsMasterObject[],
 	GlobalIndicatorsMasterObject[],
-	EmergenciesMasterObject[]
+	EmergenciesMasterObject[],
+	CvaMasterObject[]
 ];
 
 const beneficiaryTypesMasterUrl =
@@ -76,7 +78,8 @@ function useData(
 		cvaDataUrl = "../data/fake_cvadata.csv",
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
-		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`;
+		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
+		cvaMasterUrl = "../data/fake_cvamaster.csv";
 
 	const [data, setData] = useState<Data>([] as Data),
 		[dataIndicators, setDataIndicators] = useState<
@@ -178,6 +181,12 @@ function useData(
 				"csv",
 				setProgress
 			),
+			fetchFile<CvaMasterObject[]>(
+				"cvaMaster",
+				cvaMasterUrl,
+				"csv",
+				setProgress
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -205,6 +214,7 @@ function useData(
 			sectorsMaster,
 			globalIndicatorsMaster,
 			emergenciesMaster,
+			cvaMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -217,6 +227,7 @@ function useData(
 				sectorsMaster,
 				globalIndicatorsMaster,
 				emergenciesMaster,
+				cvaMaster,
 			});
 
 			const data: Data = processRawData({

@@ -1,19 +1,15 @@
 import { path, PieArcDatum } from "d3";
-import { DonutDatum } from "../components/GBVChart";
 
 const rotationAdjustment = Math.PI / 2;
 
-function clipSlice(
-	diameter: number,
-	GBVSlice: PieArcDatum<DonutDatum>
-): string {
+function clipSlice<T>(diameter: number, slice: PieArcDatum<T>): string {
 	const radius = diameter / 2;
 
 	const pathGenerator = path();
 
-	const startAngle = GBVSlice.startAngle - rotationAdjustment;
+	const startAngle = slice.startAngle - rotationAdjustment;
 
-	let endAngle = GBVSlice.endAngle - rotationAdjustment;
+	let endAngle = slice.endAngle - rotationAdjustment;
 
 	if (startAngle === endAngle) {
 		endAngle += 1e-5;

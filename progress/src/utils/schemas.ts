@@ -285,6 +285,11 @@ export const emergenciesMasterObjectSchema = z.object({
 	EmergencyGroupName: z.string(),
 });
 
+export const cvaMasterObjectSchema = z.object({
+	CVAName: z.string(),
+	CVAId: z.number().int().nonnegative(),
+});
+
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
@@ -381,3 +386,5 @@ export type EmergenciesMasterObject = z.infer<
 >;
 
 export type CvaObject = z.infer<typeof cvaObjectSchema>;
+
+export type CvaMasterObject = z.infer<typeof cvaMasterObjectSchema>;

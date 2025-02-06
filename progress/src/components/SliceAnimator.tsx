@@ -2,20 +2,20 @@ import { useSpring, animated } from "@react-spring/web";
 
 type SliceAnimatorProps = {
 	diameter: number;
-	GBVArc: string;
-	GBVColor: string;
+	sliceArc: string;
+	sliceColor: string;
 	zIndex: number;
 };
 
 const SliceAnimator = ({
 	diameter,
-	GBVArc,
-	GBVColor,
+	sliceArc,
+	sliceColor,
 	zIndex,
 }: SliceAnimatorProps) => {
 	const springProps = useSpring({
 		to: {
-			clipPath: `path("${GBVArc}")`,
+			clipPath: `path("${sliceArc}")`,
 		},
 		config: { duration: 750 }, // 1 second animation duration
 	});
@@ -26,7 +26,7 @@ const SliceAnimator = ({
 				width: `${diameter}px`,
 				height: `${diameter}px`,
 				zIndex: zIndex,
-				backgroundColor: GBVColor,
+				backgroundColor: sliceColor,
 				...springProps,
 			}}
 		/>

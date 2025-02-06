@@ -99,6 +99,8 @@ const constants = {
 	paddingHeight: 0, //if padding needed over the area chart
 	maxNumberOfYearsOnDisplay: 2,
 	iconSize: 30,
+	cvaChartModes: ["allocations", "people"],
+	cvaChartTypes: [1, 2, 3, 4, 5],
 } as const;
 
 export default constants;
