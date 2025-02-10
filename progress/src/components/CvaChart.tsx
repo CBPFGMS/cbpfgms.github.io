@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState, useMemo } from "react";
 import {
 	DatumCva,
 	DatumPictogram,
@@ -19,6 +19,8 @@ import CvaDonuts from "./CvaDonuts";
 import Divider from "@mui/material/Divider";
 import { sum } from "d3";
 import CvaTopChart from "./CvaTopChart";
+import processCvaSectors from "../utils/processcvasectors";
+import CvaSectors from "./CvaSectors";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
@@ -84,6 +86,11 @@ function CvaChart({
 		),
 		cvaPeopleTargeted = sum(dataCva, d => d.targetedPeople),
 		cvaPeopleReached = sum(dataCva, d => d.reachedPeople);
+
+	const cvaSectorsData = useMemo(
+		() => processCvaSectors(dataCva, cvaChartType, cvaChartMode),
+		[dataCva, cvaChartType, cvaChartMode]
+	);
 
 	function handleDownloadClick() {
 		const dataCvaDownload = processCvaDownload({
@@ -229,13 +236,23 @@ function CvaChart({
 					</Box>
 				</Grid>
 			</Grid>
-			<CvaTopChart
-				dataCva={dataCva}
-				cvaChartType={cvaChartType}
-				cvaChartMode={cvaChartMode}
-				setCvaChartType={setCvaChartType}
-				lists={lists}
-			/>
+			<Box
+				display={"flex"}
+				flexDirection={"column"}
+				alignItems={"center"}
+			>
+				<CvaTopChart
+					dataCva={dataCva}
+					cvaChartType={cvaChartType}
+					cvaChartMode={cvaChartMode}
+					setCvaChartType={setCvaChartType}
+					lists={lists}
+				/>
+				<CvaSectors
+					data={cvaSectorsData}
+					lists={lists}
+				/>
+			</Box>
 		</Container>
 	);
 }

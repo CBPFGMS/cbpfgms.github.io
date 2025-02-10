@@ -81,7 +81,7 @@ function CvaTopChart({
 			mt={4}
 			display={"flex"}
 			flexDirection={"column"}
-			style={{ width: "100%" }}
+			style={{ width: "96%" }}
 		>
 			<TopChartRow
 				label={
@@ -90,7 +90,7 @@ function CvaTopChart({
 						: "Total CVA Beneficiaries"
 				}
 				value={totalValue}
-				color={colors.unColor}
+				color={"#6E276B"}
 				width={scale(totalValue)}
 				clickValue="all"
 				setCvaChartType={setCvaChartType}
@@ -165,7 +165,7 @@ function TopChartRow({
 				flexDirection={"row"}
 				alignItems={"center"}
 				justifyContent={"flex-start"}
-				style={{ flex: "0 25%", paddingLeft: 10 }}
+				style={{ flex: "0 28%", paddingLeft: 10 }}
 			>
 				<FormControlLabel
 					control={
@@ -205,7 +205,14 @@ function TopChartRow({
 				display={"flex"}
 				flexDirection={"row"}
 				alignItems={"center"}
-				style={{ flex: "0 75%" }}
+				style={{
+					flex: "0 72%",
+					opacity:
+						clickValue === "all" ||
+						cvaChartType.includes(clickValue)
+							? 1
+							: 0.5,
+				}}
 			>
 				<Box
 					style={{

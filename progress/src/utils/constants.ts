@@ -105,7 +105,7 @@ const constants = {
 		1: "#ea5545",
 		2: "#ef9b20",
 		3: "#87bc45",
-		4: "#27aeef",
+		4: "#3e6f8f",
 		5: "#b33dc6",
 	},
 	limitScaleValueInPixels: 90,
