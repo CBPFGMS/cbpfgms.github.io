@@ -4,7 +4,6 @@ import {
 	DatumPictogram,
 	DatumSummary,
 } from "../utils/processdatasummary";
-import { List } from "../utils/makelists";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import DataContext, { DataContextType } from "../context/DataContext";
@@ -19,10 +18,11 @@ import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import Divider from "@mui/material/Divider";
 import { sum } from "d3";
+import CvaTopChart from "./CvaTopChart";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
-type CvaChartTypes = (typeof cvaChartTypes)[number][];
+export type CvaChartTypes = (typeof cvaChartTypes)[number][];
 
 export type CvaGoal = (typeof beneficiariesStatuses)[number];
 
@@ -74,6 +74,16 @@ function CvaChart({
 		},
 		{ cvaTargeted: 0, cvaReached: 0 }
 	);
+	const totalPeopleTargeted = sum(
+			Object.entries(dataPictogram),
+			([key, value]) => (key.includes("targeted") ? value : 0)
+		),
+		totalPeopleReached = sum(
+			Object.entries(dataPictogram),
+			([key, value]) => (key.includes("reached") ? value : 0)
+		),
+		cvaPeopleTargeted = sum(dataCva, d => d.targetedPeople),
+		cvaPeopleReached = sum(dataCva, d => d.reachedPeople);
 
 	function handleDownloadClick() {
 		const dataCvaDownload = processCvaDownload({
@@ -135,18 +145,17 @@ function CvaChart({
 				style={{
 					alignItems: "center",
 					justifyContent: "center",
-					height: "240px",
+					height: "220px",
 				}}
 			>
 				<Grid
 					size={5.2}
 					style={{
 						height: "100%",
-						outline: "1px solid black",
 						display: "flex",
-						opacity: cvaChartMode === "allocations" ? 1 : 0.8,
+						opacity: cvaChartMode === "allocations" ? 1 : 0.7,
 						filter: `grayscale(${
-							cvaChartMode === "allocations" ? 0 : 0.75
+							cvaChartMode === "allocations" ? 0 : 1
 						})`,
 					}}
 				>
@@ -164,7 +173,10 @@ function CvaChart({
 							orientation="vertical"
 							flexItem
 							variant="middle"
-							sx={{ borderStyle: "dashed" }}
+							sx={{
+								borderStyle: "dashed",
+								borderColor: "rgba(0,0,0,0.25)",
+							}}
 						/>
 						<CvaDonuts
 							totalValue={total}
@@ -181,18 +193,49 @@ function CvaChart({
 				<Grid
 					size={5.2}
 					style={{
-						backgroundColor: "wheat",
 						height: "100%",
 						display: "flex",
-						opacity: cvaChartMode === "people" ? 1 : 0.8,
+						opacity: cvaChartMode === "people" ? 1 : 0.7,
 						filter: `grayscale(${
-							cvaChartMode === "allocations" ? 0 : 0.75
+							cvaChartMode === "people" ? 0 : 1
 						})`,
 					}}
 				>
-					<Box></Box>
+					<Box
+						display={"flex"}
+						style={{ height: "100%", width: "100%" }}
+					>
+						<CvaDonuts
+							totalValue={totalPeopleTargeted}
+							cvaValue={cvaPeopleTargeted}
+							cvaMode="people"
+							cvaGoal="targeted"
+						/>
+						<Divider
+							orientation="vertical"
+							flexItem
+							variant="middle"
+							sx={{
+								borderStyle: "dashed",
+								borderColor: "rgba(0,0,0,0.25)",
+							}}
+						/>
+						<CvaDonuts
+							totalValue={totalPeopleReached}
+							cvaValue={cvaPeopleReached}
+							cvaMode="people"
+							cvaGoal="reached"
+						/>
+					</Box>
 				</Grid>
 			</Grid>
+			<CvaTopChart
+				dataCva={dataCva}
+				cvaChartType={cvaChartType}
+				cvaChartMode={cvaChartMode}
+				setCvaChartType={setCvaChartType}
+				lists={lists}
+			/>
 		</Container>
 	);
 }

@@ -8,6 +8,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import { GenderAndAge } from "../utils/processrawdata";
 import capitalizeString from "../utils/capitalizestring";
+import constants from "../utils/constants";
 
 type DisabilityChartRowProps = {
 	type: GenderAndAge;
@@ -16,6 +17,8 @@ type DisabilityChartRowProps = {
 	maxValue: number;
 };
 
+const { limitScaleValueInPixels } = constants;
+
 function DisabilityChartRow({
 	maxValue,
 	reached,
@@ -23,7 +26,6 @@ function DisabilityChartRow({
 	type,
 }: DisabilityChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
-	const limitValue = 90;
 
 	return (
 		<Box
@@ -146,15 +148,15 @@ function DisabilityChartRow({
 									style={{
 										position: "relative",
 										left:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "3px"
 												: "-3px",
 										marginLeft:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "100%"
 												: "auto",
 										color:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "#444"
 												: "#fff",
 									}}

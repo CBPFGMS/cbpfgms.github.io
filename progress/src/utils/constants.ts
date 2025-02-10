@@ -101,6 +101,14 @@ const constants = {
 	iconSize: 30,
 	cvaChartModes: ["allocations", "people"],
 	cvaChartTypes: [1, 2, 3, 4, 5],
+	cvaTopChartColors: {
+		1: "#ea5545",
+		2: "#ef9b20",
+		3: "#87bc45",
+		4: "#27aeef",
+		5: "#b33dc6",
+	},
+	limitScaleValueInPixels: 90,
 } as const;
 
 export default constants;

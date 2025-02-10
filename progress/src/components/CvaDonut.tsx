@@ -36,8 +36,6 @@ function Donut({ totalSlice, totalColor, cvaSlice, cvaColor }: DonutProps) {
 
 	const diameter = Math.min(parentWidth, parentHeight);
 
-	console.log(parentHeight, parentWidth, diameter);
-
 	const donutData: CvaDonutDatum[] = [totalSlice, cvaSlice].map(
 		(slice, index) => ({
 			value: slice,

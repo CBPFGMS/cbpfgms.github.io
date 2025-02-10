@@ -31,16 +31,17 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 				style={{
 					fontSize: "0.8rem",
 					fontStyle: "italic",
-					color: "gray",
+					color: "#555",
 					padding: "0.5em",
 					alignSelf:
 						cvaGoal === "targeted" ? "flex-end" : "flex-start",
 				}}
 			>
-				$USD {capitalizeString(cvaGoal)}
+				{cvaMode === "allocations" ? "$USD" : "Persons"}{" "}
+				{capitalizeString(cvaGoal)}
 			</Typography>
 			<Box
-				mt={2}
+				mt={1}
 				display={"flex"}
 				justifyContent={"center"}
 				alignItems={"center"}
@@ -54,7 +55,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 					}}
 				>
 					{"Total "}
-					{cvaMode === "allocations" ? "Allocations" : "People"}
+					{cvaMode === "allocations" ? "Allocations" : "Persons"}
 					{": "}
 					<span
 						style={{
@@ -66,7 +67,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 									: colors.unColor,
 						}}
 					>
-						{"$"}
+						{cvaMode === "allocations" ? "$" : ""}
 						{totalValue < 1e3 ? (
 							<NumberAnimator
 								number={totalValue}
@@ -106,7 +107,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 					}}
 				>
 					{"CVA "}
-					{cvaMode === "allocations" ? "Allocations" : "People"}
+					{cvaMode === "allocations" ? "Allocations" : "Persons"}
 					{": "}
 					<span
 						style={{
@@ -118,7 +119,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 									: colors.unColorDarker,
 						}}
 					>
-						{"$"}
+						{cvaMode === "allocations" ? "$" : ""}
 						{cvaValue < 1e3 ? (
 							<NumberAnimator
 								number={cvaValue}

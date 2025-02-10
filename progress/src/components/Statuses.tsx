@@ -15,6 +15,7 @@ import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
+import constants from "../utils/constants";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -45,6 +46,8 @@ const statusesDescription: StatusesDescription = {
 	"Financially Closed":
 		"Project(s) which have closed all stage of Final Report(s) and other financial transaction(s). Based on the new Global guidance of CBPF, the audit for non-UN projects are due after 9 months of implementation. Final financial reports for UN Project(s) are due for end of June of the following year after the programmatic implementation",
 };
+
+const { limitScaleValueInPixels } = constants;
 
 function Statuses({
 	dataStatuses,
@@ -152,8 +155,6 @@ function Status({
 	const scale = scaleLinear<number, number>()
 		.domain([0, total])
 		.range([0, 100]);
-
-	const limitValue = 90;
 
 	const statusSelected = implementationStatus.includes(status);
 
@@ -295,15 +296,18 @@ function Status({
 								style={{
 									position: "relative",
 									left:
-										scale(statusValue) < limitValue
+										scale(statusValue) <
+										limitScaleValueInPixels
 											? "3px"
 											: "-3px",
 									marginLeft:
-										scale(statusValue) < limitValue
+										scale(statusValue) <
+										limitScaleValueInPixels
 											? "100%"
 											: "auto",
 									color:
-										scale(statusValue) < limitValue
+										scale(statusValue) <
+										limitScaleValueInPixels
 											? "#444"
 											: "#fff",
 								}}

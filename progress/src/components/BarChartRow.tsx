@@ -9,6 +9,7 @@ import colors from "../utils/colors";
 import { ListObj } from "../utils/makelists";
 import { Charts } from "./MainContainer";
 import { clustersIconsData } from "../assets/clustericons";
+import constants from "../utils/constants";
 
 type BarChartRowProps = {
 	type: number;
@@ -19,6 +20,8 @@ type BarChartRowProps = {
 	chartType: Charts;
 };
 
+const { limitScaleValueInPixels } = constants;
+
 function BarChartRow({
 	list,
 	maxValue,
@@ -28,7 +31,6 @@ function BarChartRow({
 	chartType,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
-	const limitValue = 90;
 
 	return (
 		<Box
@@ -165,15 +167,15 @@ function BarChartRow({
 									style={{
 										position: "relative",
 										left:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "3px"
 												: "-3px",
 										marginLeft:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "100%"
 												: "auto",
 										color:
-											scale(d) < limitValue
+											scale(d) < limitScaleValueInPixels
 												? "#444"
 												: "#fff",
 									}}

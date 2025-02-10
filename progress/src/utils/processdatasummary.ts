@@ -64,7 +64,7 @@ export type DatumEmergency = {
 };
 
 export type DatumCva = {
-	cvaType: number;
+	cvaType: (typeof cvaChartTypes)[number];
 	organizationType: number;
 	sector: number;
 	targetedAllocations: number;
@@ -78,6 +78,7 @@ const {
 	beneficiaryCategories,
 	reportsForDisability,
 	reportsForGBV,
+	cvaChartTypes,
 } = constants;
 
 function processDataSummary({
@@ -227,7 +228,7 @@ function processDataSummary({
 			if (datum.cvaData) {
 				datum.cvaData.forEach(cva => {
 					dataCva.push({
-						cvaType: cva.cvaId,
+						cvaType: cva.cvaId as (typeof cvaChartTypes)[number],
 						organizationType: cva.organizationTypeId,
 						sector: cva.sectorId,
 						targetedAllocations: cva.targetedAllocations,
