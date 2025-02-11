@@ -21,8 +21,6 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		progress,
 	} = useData(defaultFundType, startYear);
 
-	console.log(progress);
-
 	return loading ? (
 		<Loading progress={progress} />
 	) : error ? (

@@ -228,15 +228,22 @@ function processRawData({
 			} else {
 				const projectData = cvaDataMap.get(row.CHFProjectCode);
 				if (projectData) {
-					projectData.cva.push({
-						cvaId: row.CVATypeId,
-						organizationTypeId: row.OrganizationTypeId,
-						sectorId: row.ClusterId,
-						targetedPeople: row.PeopleTargeted,
-						reachedPeople: row.PeopleReached,
-						targetedAllocations: row.TargetedTransferAmt,
-						reachedAllocations: row.ReachedTransferAmt,
-					});
+					const duplicateCva = projectData.cva.some(
+						({ cvaId, sectorId }) =>
+							cvaId === row.CVATypeId &&
+							sectorId === row.ClusterId
+					);
+					if (!duplicateCva) {
+						projectData.cva.push({
+							cvaId: row.CVATypeId,
+							organizationTypeId: row.OrganizationTypeId,
+							sectorId: row.ClusterId,
+							targetedPeople: row.PeopleTargeted,
+							reachedPeople: row.PeopleReached,
+							targetedAllocations: row.TargetedTransferAmt,
+							reachedAllocations: row.ReachedTransferAmt,
+						});
+					}
 				} else {
 					warnProjectNotFound(
 						row.CHFProjectCode,

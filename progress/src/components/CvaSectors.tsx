@@ -9,10 +9,12 @@ import { format } from "d3";
 import constants from "../utils/constants";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
+import { CvaChartModes } from "./CvaChart";
 
 type CvaSectorsProps = {
 	data: CvaSector[];
 	lists: List;
+	cvaChartMode: CvaChartModes;
 };
 
 type SectorChartRowProps = {
@@ -20,11 +22,12 @@ type SectorChartRowProps = {
 	value: number;
 	width: number;
 	sector: number;
+	cvaChartMode: CvaChartModes;
 };
 
 const { limitScaleValueInPixels } = constants;
 
-function CvaSectors({ data, lists }: CvaSectorsProps) {
+function CvaSectors({ data, lists, cvaChartMode }: CvaSectorsProps) {
 	const maxValue = max(data, d => d.value) ?? 0;
 
 	const scale = scaleLinear<number, number, never>()
@@ -58,13 +61,20 @@ function CvaSectors({ data, lists }: CvaSectorsProps) {
 					value={d.value}
 					width={scale(d.value)}
 					sector={d.sector}
+					cvaChartMode={cvaChartMode}
 				/>
 			))}
 		</Box>
 	);
 }
 
-function SectorsChartRow({ label, value, width, sector }: SectorChartRowProps) {
+function SectorsChartRow({
+	label,
+	value,
+	width,
+	sector,
+	cvaChartMode,
+}: SectorChartRowProps) {
 	return (
 		<Box
 			display={"flex"}
@@ -159,6 +169,7 @@ function SectorsChartRow({ label, value, width, sector }: SectorChartRowProps) {
 											: "#fff",
 								}}
 							>
+								{cvaChartMode === "allocations" ? "$" : ""}
 								<NumberAnimator
 									number={parseFloat(formatSIFloat(value))}
 									type="decimal"

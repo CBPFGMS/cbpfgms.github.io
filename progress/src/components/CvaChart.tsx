@@ -251,6 +251,7 @@ function CvaChart({
 				<CvaSectors
 					data={cvaSectorsData}
 					lists={lists}
+					cvaChartMode={cvaChartMode}
 				/>
 			</Box>
 		</Container>

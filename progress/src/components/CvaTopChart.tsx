@@ -3,12 +3,11 @@ import { CvaChartModes, CvaChartTypes } from "./CvaChart";
 import { DatumCva } from "../utils/processdatasummary";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { sum } from "d3";
 import constants from "../utils/constants";
 import colors from "../utils/colors";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { format, scaleLinear } from "d3";
+import { sum, format, scaleLinear } from "d3";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import { List } from "../utils/makelists";
@@ -35,6 +34,8 @@ type TopChartRowProps = {
 	clickValue: CvaChartTypes[number] | "all";
 	cvaChartType: CvaChartTypes;
 	setCvaChartType: React.Dispatch<React.SetStateAction<CvaChartTypes>>;
+	cvaChartMode: CvaChartModes;
+	totalValue: number;
 };
 
 const { cvaChartTypes, limitScaleValueInPixels, cvaTopChartColors } = constants;
@@ -78,7 +79,7 @@ function CvaTopChart({
 
 	return (
 		<Box
-			mt={4}
+			mt={5}
 			display={"flex"}
 			flexDirection={"column"}
 			style={{ width: "96%" }}
@@ -95,6 +96,8 @@ function CvaTopChart({
 				clickValue="all"
 				setCvaChartType={setCvaChartType}
 				cvaChartType={cvaChartType}
+				cvaChartMode={cvaChartMode}
+				totalValue={totalValue}
 			/>
 			<Typography
 				variant="caption"
@@ -114,6 +117,8 @@ function CvaTopChart({
 					clickValue={d.type}
 					setCvaChartType={setCvaChartType}
 					cvaChartType={cvaChartType}
+					cvaChartMode={cvaChartMode}
+					totalValue={totalValue}
 				/>
 			))}
 		</Box>
@@ -128,6 +133,8 @@ function TopChartRow({
 	clickValue,
 	cvaChartType,
 	setCvaChartType,
+	cvaChartMode,
+	totalValue,
 }: TopChartRowProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
@@ -179,6 +186,7 @@ function TopChartRow({
 							onChange={() => handleChange(clickValue)}
 							sx={{
 								color: colors.unColorLighter,
+								padding: "5px",
 								"&.Mui-checked": {
 									color: color,
 								},
@@ -193,7 +201,7 @@ function TopChartRow({
 							style={{
 								color: "#444",
 								lineHeight: "1.2",
-								borderBottom: `2px solid ${color}`, //keep this??
+								paddingLeft: "4px",
 							}}
 						>
 							{label}
@@ -222,7 +230,10 @@ function TopChartRow({
 						alignItems: "center",
 					}}
 					data-tooltip-id="tooltip"
-					data-tooltip-content={format(",.0f")(value)}
+					data-tooltip-content={
+						(cvaChartMode === "allocations" ? "$" : "") +
+						format(",.0f")(value)
+					}
 					data-tooltip-place="top"
 				>
 					<Box
@@ -265,6 +276,7 @@ function TopChartRow({
 											: "#fff",
 								}}
 							>
+								{cvaChartMode === "allocations" ? "$" : ""}
 								<NumberAnimator
 									number={parseFloat(formatSIFloat(value))}
 									type="decimal"
@@ -272,6 +284,20 @@ function TopChartRow({
 								{isNaN(+formatSIFloat(value).slice(-1))
 									? formatSIFloat(value).slice(-1)
 									: ""}
+								{clickValue === "all" ? (
+									""
+								) : (
+									<span
+										style={{
+											fontSize: "11px",
+											fontWeight: "normal",
+										}}
+									>
+										{`\u00A0(${format(".1%")(
+											value / totalValue
+										)})`}
+									</span>
+								)}
 							</Typography>
 						</Box>
 					</Box>

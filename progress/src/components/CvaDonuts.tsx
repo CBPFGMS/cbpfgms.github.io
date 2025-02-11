@@ -7,6 +7,7 @@ import formatSIFloat from "../utils/formatsi";
 import colors from "../utils/colors";
 import capitalizeString from "../utils/capitalizestring";
 import CvaDonut from "./CvaDonut";
+import { format } from "d3";
 
 type CvaDonutsProps = {
 	totalValue: number;
@@ -47,6 +48,15 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 				alignItems={"center"}
 				flexDirection={"column"}
 				style={{ height: "100%", width: "100%" }}
+				data-tooltip-id="tooltip"
+				data-tooltip-html={`<div style='text-align:center;'>CVA ${cvaGoal} ${cvaMode}: ${
+					cvaMode === "allocations" ? "$" : ""
+				}${format(",.0f")(cvaValue)}<br />(${
+					~~((cvaValue * 10000) / totalValue) / 100
+				}% of ${cvaMode === "allocations" ? "$" : ""}${format(",.0f")(
+					totalValue
+				)})</div>`}
+				data-tooltip-place="top"
 			>
 				<Typography
 					style={{
