@@ -2158,8 +2158,12 @@
 			const extentLatitude =
 				chartState.selectedAdminLevel === 0 && data.length === 1
 					? [
-							countryBoundingBoxes[data[0].locationName].sw.lat,
-							countryBoundingBoxes[data[0].locationName].ne.lat,
+							countryBoundingBoxes[
+								stripRegionalName(data[0].locationName)
+							].sw.lat,
+							countryBoundingBoxes[
+								stripRegionalName(data[0].locationName)
+							].ne.lat,
 					  ]
 					: d3.extent(data, function (d) {
 							return +d.latitude;
@@ -2168,12 +2172,20 @@
 			const extentLongitude =
 				chartState.selectedAdminLevel === 0 && data.length === 1
 					? [
-							countryBoundingBoxes[data[0].locationName].sw.lng,
-							countryBoundingBoxes[data[0].locationName].ne.lng,
+							countryBoundingBoxes[
+								stripRegionalName(data[0].locationName)
+							].sw.lng,
+							countryBoundingBoxes[
+								stripRegionalName(data[0].locationName)
+							].ne.lng,
 					  ]
 					: d3.extent(data, function (d) {
 							return +d.longitude;
 					  });
+
+			function stripRegionalName(str) {
+				return str.split("(")[0].trim();
+			}
 
 			if (chartState.displayMode === "size") {
 				createSizeMap();
@@ -4455,7 +4467,7 @@
 					lng: 74.889862,
 				},
 			},
-			"Burkina Faso (RhPF-WCA)": {
+			"Burkina Faso": {
 				sw: {
 					lat: 9.410691,
 					lng: -5.523891,
@@ -4476,16 +4488,6 @@
 				},
 			},
 			Colombia: {
-				sw: {
-					lat: -4.2316872,
-					lng: -82.1243666,
-				},
-				ne: {
-					lat: 16.0571269,
-					lng: -66.8511907,
-				},
-			},
-			"Colombia (RhPF-LAC)": {
 				sw: {
 					lat: -4.2316872,
 					lng: -82.1243666,
@@ -4555,6 +4557,16 @@
 					lng: 36.625,
 				},
 			},
+			Mali: {
+				sw: {
+					lat: 10.147811,
+					lng: -12.240283,
+				},
+				ne: {
+					lat: 25.000002,
+					lng: 4.244825,
+				},
+			},
 			Myanmar: {
 				sw: {
 					lat: 9.4399432,
@@ -4575,7 +4587,7 @@
 					lng: 14.678014,
 				},
 			},
-			"Niger (RhPF-WCA)": {
+			Niger: {
 				sw: {
 					lat: 11.693,
 					lng: 0.166,
@@ -4643,6 +4655,16 @@
 				ne: {
 					lat: 42.297,
 					lng: 44.8176638,
+				},
+			},
+			Venezuela: {
+				sw: {
+					lat: 0.724452,
+					lng: -73.352963,
+				},
+				ne: {
+					lat: 12.201903,
+					lng: -59.80378,
 				},
 			},
 			Yemen: {
