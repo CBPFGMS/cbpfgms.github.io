@@ -3,7 +3,8 @@ import { DatumCva } from "./processdatasummary";
 
 export type CvaSector = {
 	sector: number;
-	value: number;
+	targeted: number;
+	reached: number;
 };
 
 function processCvaSectors(
@@ -13,23 +14,25 @@ function processCvaSectors(
 ): CvaSector[] {
 	const sectors: CvaSector[] = [];
 
-	const property =
-		cvaChartMode === "allocations"
-			? "targetedAllocations"
-			: "targetedPeople";
+	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
 
 	data.forEach(datum => {
 		if (cvaChartType.includes(datum.cvaType)) {
 			const foundSector = sectors.find(s => s.sector === datum.sector);
 			if (foundSector) {
-				foundSector.value += datum[property];
+				foundSector.targeted += datum[`targeted${property}`];
+				foundSector.reached += datum[`reached${property}`];
 			} else {
-				sectors.push({ sector: datum.sector, value: datum[property] });
+				sectors.push({
+					sector: datum.sector,
+					targeted: datum[`targeted${property}`],
+					reached: datum[`reached${property}`],
+				});
 			}
 		}
 	});
 
-	sectors.sort((a, b) => b.value - a.value);
+	sectors.sort((a, b) => b.targeted + b.reached - (a.targeted + a.reached));
 
 	return sectors;
 }

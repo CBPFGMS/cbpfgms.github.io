@@ -1,15 +1,10 @@
 import { CvaSector } from "../utils/processcvasectors";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { max, scaleLinear } from "d3";
+import { max } from "d3";
 import { List } from "../utils/makelists";
-import colors from "../utils/colors";
-import { clustersIconsData } from "../assets/clustericons";
-import { format } from "d3";
-import constants from "../utils/constants";
-import NumberAnimator from "./NumberAnimator";
-import formatSIFloat from "../utils/formatsi";
 import { CvaChartModes } from "./CvaChart";
+import BarChartRow from "./BarChartRow";
 
 type CvaSectorsProps = {
 	data: CvaSector[];
@@ -17,22 +12,8 @@ type CvaSectorsProps = {
 	cvaChartMode: CvaChartModes;
 };
 
-type SectorChartRowProps = {
-	label: string;
-	value: number;
-	width: number;
-	sector: number;
-	cvaChartMode: CvaChartModes;
-};
-
-const { limitScaleValueInPixels } = constants;
-
 function CvaSectors({ data, lists, cvaChartMode }: CvaSectorsProps) {
-	const maxValue = max(data, d => d.value) ?? 0;
-
-	const scale = scaleLinear<number, number, never>()
-		.domain([0, maxValue])
-		.range([0, 100]);
+	const maxValue = max(data, d => Math.max(d.targeted, d.reached)) ?? 0;
 
 	return (
 		<Box
@@ -44,7 +25,6 @@ function CvaSectors({ data, lists, cvaChartMode }: CvaSectorsProps) {
 			}}
 		>
 			<Typography
-				mb={2}
 				style={{
 					fontSize: "1rem",
 					fontWeight: 500,
@@ -54,133 +34,59 @@ function CvaSectors({ data, lists, cvaChartMode }: CvaSectorsProps) {
 			>
 				Sectors
 			</Typography>
-			{data.map(d => (
-				<SectorsChartRow
-					key={d.sector}
-					label={lists.sectors[d.sector]}
-					value={d.value}
-					width={scale(d.value)}
-					sector={d.sector}
-					cvaChartMode={cvaChartMode}
-				/>
-			))}
-		</Box>
-	);
-}
-
-function SectorsChartRow({
-	label,
-	value,
-	width,
-	sector,
-	cvaChartMode,
-}: SectorChartRowProps) {
-	return (
-		<Box
-			display={"flex"}
-			flexDirection={"row"}
-			style={{ width: "100%" }}
-			mt={0.5}
-			mb={0.5}
-		>
-			<Box
-				style={{
-					flex: "0 28%",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "flex-end",
-					textAlign: "right",
-					overflow: "hidden",
-				}}
-			>
-				<Typography
-					variant="body2"
-					fontWeight={400}
-					fontSize={13}
-					style={{ color: "#444", border: "none" }}
-				>
-					{label}
-				</Typography>
-				<img
-					src={clustersIconsData[sector]}
-					style={{
-						width: "24px",
-						height: "24px",
-						marginLeft: "8px",
-						marginRight: "6px",
-						padding: "4px",
-					}}
-				/>
-			</Box>
 			<Box
 				display={"flex"}
-				flexDirection={"row"}
+				flexDirection={"column"}
+				width={"95%"}
+				marginLeft={"3%"}
 				alignItems={"center"}
-				style={{ flex: "0 72%" }}
+				gap={2}
 			>
 				<Box
-					style={{
-						display: "flex",
-						flexDirection: "row",
-						width: "100%",
-						alignItems: "center",
-					}}
-					data-tooltip-id="tooltip"
-					data-tooltip-content={format(",.0f")(value)}
-					data-tooltip-place="top"
+					display={"flex"}
+					flexDirection={"row"}
+					width={"100%"}
 				>
+					<Box flex={"0 88%"} />
 					<Box
+						mb={-2}
 						style={{
-							marginTop: "2px",
-							marginBottom: "2px",
 							display: "flex",
+							flex: "0 12%",
+							flexDirection: "row",
 							alignItems: "center",
+							justifyContent: "center",
+							textAlign: "center",
 							width: "100%",
 						}}
 					>
-						<Box
+						<Typography
+							variant="body2"
+							fontSize={12}
 							style={{
-								width: width + "%",
-								minWidth: "1px",
-								height: "18px",
-								transitionProperty: "width",
-								transitionDuration: "0.75s",
-								display: "flex",
-								alignItems: "center",
-								backgroundColor: colors.unColor,
+								color: "#222",
+								border: "none",
+								fontStyle: "italic",
+								letterSpacing: "-0.05em",
 							}}
 						>
-							<Typography
-								fontSize={12}
-								fontWeight={700}
-								style={{
-									position: "relative",
-									left:
-										width < limitScaleValueInPixels
-											? "3px"
-											: "-3px",
-									marginLeft:
-										width < limitScaleValueInPixels
-											? "100%"
-											: "auto",
-									color:
-										width < limitScaleValueInPixels
-											? "#444"
-											: "#fff",
-								}}
-							>
-								{cvaChartMode === "allocations" ? "$" : ""}
-								<NumberAnimator
-									number={parseFloat(formatSIFloat(value))}
-									type="decimal"
-								/>
-								{isNaN(+formatSIFloat(value).slice(-1))
-									? formatSIFloat(value).slice(-1)
-									: ""}
-							</Typography>
-						</Box>
+							Reached as %<br />
+							of targeted
+						</Typography>
 					</Box>
 				</Box>
+				{data.map(d => (
+					<BarChartRow
+						key={d.sector}
+						list={lists.sectors}
+						targeted={d.targeted}
+						reached={d.reached}
+						maxValue={maxValue}
+						chartType="sectors"
+						type={d.sector}
+						isAllocation={cvaChartMode === "allocations"}
+					/>
+				))}
 			</Box>
 		</Box>
 	);

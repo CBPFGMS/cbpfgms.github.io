@@ -18,6 +18,7 @@ type BarChartRowProps = {
 	maxValue: number;
 	list: ListObj;
 	chartType: Charts;
+	isAllocation?: boolean;
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -29,6 +30,7 @@ function BarChartRow({
 	targeted,
 	type,
 	chartType,
+	isAllocation = false,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 
@@ -90,9 +92,9 @@ function BarChartRow({
 						}}
 						key={i}
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`${
-							i ? "Reached" : "Targeted"
-						}: ${format(",.0f")(d)}`}
+						data-tooltip-content={`${i ? "Reached" : "Targeted"}: ${
+							isAllocation ? "$" : ""
+						}${format(",.0f")(d)}`}
 						data-tooltip-place="top"
 					>
 						<Box
@@ -180,6 +182,7 @@ function BarChartRow({
 												: "#fff",
 									}}
 								>
+									{isAllocation ? "$" : ""}
 									<NumberAnimator
 										number={parseFloat(formatSIFloat(d))}
 										type="decimal"

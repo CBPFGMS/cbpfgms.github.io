@@ -75,11 +75,9 @@ function CvaChartSwitch({
 }: CvaChartSwitchProps) {
 	return (
 		<Grid
-			size={1.5}
+			size={2.2}
 			style={{
 				height: "100%",
-				paddingLeft: "0.5em",
-				paddingRight: "0.5em",
 				minHeight: "inherit",
 				display: "flex",
 				flexDirection: "column",
@@ -89,36 +87,51 @@ function CvaChartSwitch({
 		>
 			<Box
 				style={{
-					marginTop: "1em",
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
 				}}
 			>
-				<Typography variant="body2">Selected metric:</Typography>
-				<Typography
-					style={{
-						fontWeight: 500,
-						marginTop: "0.2em",
-						fontSize: "0.9rem",
-					}}
-				>
-					{cvaChartMode === "allocations" ? "DOLLAR" : "PEOPLE"}
-				</Typography>
+				<Typography variant="body2">Filter by:</Typography>
 			</Box>
 			<Box
 				style={{
-					marginTop: "auto",
-					marginBottom: "auto",
-					transform: "translateY(-50%)",
+					marginTop: "0.5em",
+					display: "flex",
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "center",
+					width: "100%",
 				}}
 			>
+				<Box
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "flex-end",
+						width: "25%",
+					}}
+				>
+					<Typography variant="body2">Dollar</Typography>
+				</Box>
 				<StyledSwitch
 					checked={cvaChartMode === "people"}
 					onChange={handleSwitchChange}
 					color="primary"
 					size="medium"
 				/>
+				<Box
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "flex-start",
+						width: "25%",
+					}}
+				>
+					<Typography variant="body2">Persons</Typography>
+				</Box>
 			</Box>
 		</Grid>
 	);

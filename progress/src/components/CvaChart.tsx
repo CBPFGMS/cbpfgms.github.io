@@ -156,7 +156,7 @@ function CvaChart({
 				}}
 			>
 				<Grid
-					size={5.2}
+					size={4.8}
 					style={{
 						height: "100%",
 						display: "flex",
@@ -198,7 +198,7 @@ function CvaChart({
 					handleSwitchChange={handleSwitchChange}
 				></CvaChartSwitch>
 				<Grid
-					size={5.2}
+					size={4.8}
 					style={{
 						height: "100%",
 						display: "flex",
