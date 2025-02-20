@@ -113,7 +113,7 @@ function CvaChartSwitch({
 						width: "25%",
 					}}
 				>
-					<Typography variant="body2">Dollar</Typography>
+					<Typography variant="body2">$USD</Typography>
 				</Box>
 				<StyledSwitch
 					checked={cvaChartMode === "people"}
@@ -130,7 +130,7 @@ function CvaChartSwitch({
 						width: "25%",
 					}}
 				>
-					<Typography variant="body2">Persons</Typography>
+					<Typography variant="body2">People</Typography>
 				</Box>
 			</Box>
 		</Grid>

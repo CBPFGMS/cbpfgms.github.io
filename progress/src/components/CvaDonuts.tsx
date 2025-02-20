@@ -38,7 +38,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 						cvaGoal === "targeted" ? "flex-end" : "flex-start",
 				}}
 			>
-				{cvaMode === "allocations" ? "$USD" : "Persons"}{" "}
+				{cvaMode === "allocations" ? "$USD" : "People"}{" "}
 				{capitalizeString(cvaGoal)}
 			</Typography>
 			<Box
@@ -65,7 +65,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 					}}
 				>
 					{"Total "}
-					{cvaMode === "allocations" ? "Allocations" : "Persons"}
+					{cvaMode === "allocations" ? "Allocations" : "People"}
 					{": "}
 					<span
 						style={{
@@ -117,7 +117,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 					}}
 				>
 					{"CVA "}
-					{cvaMode === "allocations" ? "Allocations" : "Persons"}
+					{cvaMode === "allocations" ? "Allocations" : "People"}
 					{": "}
 					<span
 						style={{
