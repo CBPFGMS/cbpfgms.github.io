@@ -18,6 +18,7 @@ type BarChartRowProps = {
 	maxValue: number;
 	list: ListObj;
 	chartType: Charts;
+	fromCva?: boolean;
 	isAllocation?: boolean;
 };
 
@@ -30,6 +31,7 @@ function BarChartRow({
 	targeted,
 	type,
 	chartType,
+	fromCva = false,
 	isAllocation = false,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
@@ -91,11 +93,13 @@ function BarChartRow({
 							alignItems: "center",
 						}}
 						key={i}
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${i ? "Reached" : "Targeted"}: ${
-							isAllocation ? "$" : ""
-						}${format(",.0f")(d)}`}
-						data-tooltip-place="top"
+						{...(!fromCva && {
+							"data-tooltip-id": "tooltip",
+							"data-tooltip-content": `${
+								i ? "Reached" : "Targeted"
+							}: ${isAllocation ? "$" : ""}${format(",.0f")(d)}`,
+							"data-tooltip-place": "top",
+						})}
 					>
 						<Box
 							style={{

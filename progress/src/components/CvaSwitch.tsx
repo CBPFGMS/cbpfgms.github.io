@@ -95,6 +95,7 @@ function CvaChartSwitch({
 				<Typography variant="body2">Filter by:</Typography>
 			</Box>
 			<Box
+				onClick={() => handleSwitchChange()}
 				style={{
 					marginTop: "0.5em",
 					display: "flex",
@@ -102,6 +103,7 @@ function CvaChartSwitch({
 					alignItems: "center",
 					justifyContent: "center",
 					width: "100%",
+					cursor: "pointer",
 				}}
 			>
 				<Box
@@ -113,11 +115,22 @@ function CvaChartSwitch({
 						width: "25%",
 					}}
 				>
-					<Typography variant="body2">$USD</Typography>
+					<Typography
+						style={{
+							fontWeight:
+								cvaChartMode === "allocations" ? 700 : 400,
+							color:
+								cvaChartMode === "allocations"
+									? colors.unColor
+									: "#444",
+						}}
+						variant="body2"
+					>
+						$USD
+					</Typography>
 				</Box>
 				<StyledSwitch
 					checked={cvaChartMode === "people"}
-					onChange={handleSwitchChange}
 					color="primary"
 					size="medium"
 				/>
@@ -130,7 +143,18 @@ function CvaChartSwitch({
 						width: "25%",
 					}}
 				>
-					<Typography variant="body2">People</Typography>
+					<Typography
+						style={{
+							fontWeight: cvaChartMode === "people" ? 700 : 400,
+							color:
+								cvaChartMode === "people"
+									? colors.unColor
+									: "#444",
+						}}
+						variant="body2"
+					>
+						People
+					</Typography>
 				</Box>
 			</Box>
 		</Grid>

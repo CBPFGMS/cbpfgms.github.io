@@ -21,7 +21,7 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 		<Box
 			style={{
 				width: "100%",
-				height: "100%",
+				minHeight: "inherit",
 				display: "flex",
 				justifyContent: "flex-start",
 				alignItems: "center",
@@ -34,8 +34,6 @@ function CvaDonuts({ totalValue, cvaValue, cvaMode, cvaGoal }: CvaDonutsProps) {
 					fontStyle: "italic",
 					color: "#555",
 					padding: "0.5em",
-					alignSelf:
-						cvaGoal === "targeted" ? "flex-end" : "flex-start",
 				}}
 			>
 				{cvaMode === "allocations" ? "$USD" : "People"}{" "}

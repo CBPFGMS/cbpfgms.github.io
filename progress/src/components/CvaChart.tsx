@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useMemo } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
 	DatumCva,
 	DatumPictogram,
@@ -13,14 +13,11 @@ import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid2";
-import CvaChartSwitch from "./CvaSwitch";
-import CvaDonuts from "./CvaDonuts";
 import Divider from "@mui/material/Divider";
 import { sum } from "d3";
-import CvaTopChart from "./CvaTopChart";
-import processCvaSectors from "../utils/processcvasectors";
-import CvaSectors from "./CvaSectors";
+import CvaChartSwitch from "./CvaSwitch";
+import CvaDonuts from "./CvaDonuts";
+import CvaTypesChart from "./CvaTypesChart";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
@@ -63,9 +60,6 @@ function CvaChart({
 
 	const [cvaChartMode, setCvaChartMode] =
 		useState<CvaChartModes>("allocations");
-	const [cvaChartType, setCvaChartType] = useState<CvaChartTypes>([
-		...cvaChartTypes,
-	]);
 
 	const total = sum(dataSummary, d => d.allocations);
 	const { cvaTargeted, cvaReached } = dataCva.reduce(
@@ -76,20 +70,25 @@ function CvaChart({
 		},
 		{ cvaTargeted: 0, cvaReached: 0 }
 	);
-	const totalPeopleTargeted = sum(
-			Object.entries(dataPictogram),
-			([key, value]) => (key.includes("targeted") ? value : 0)
-		),
-		totalPeopleReached = sum(
-			Object.entries(dataPictogram),
-			([key, value]) => (key.includes("reached") ? value : 0)
-		),
-		cvaPeopleTargeted = sum(dataCva, d => d.targetedPeople),
-		cvaPeopleReached = sum(dataCva, d => d.reachedPeople);
 
-	const cvaSectorsData = useMemo(
-		() => processCvaSectors(dataCva, cvaChartType, cvaChartMode),
-		[dataCva, cvaChartType, cvaChartMode]
+	const { totalPeopleTargeted, totalPeopleReached } = Object.entries(
+		dataPictogram
+	).reduce(
+		(acc, [key, value]) => {
+			acc.totalPeopleTargeted += key.includes("targeted") ? value : 0;
+			acc.totalPeopleReached += key.includes("reached") ? value : 0;
+			return acc;
+		},
+		{ totalPeopleTargeted: 0, totalPeopleReached: 0 }
+	);
+
+	const { cvaPeopleTargeted, cvaPeopleReached } = dataCva.reduce(
+		(acc, curr) => {
+			acc.cvaPeopleTargeted += curr.targetedPeople;
+			acc.cvaPeopleReached += curr.reachedPeople;
+			return acc;
+		},
+		{ cvaPeopleTargeted: 0, cvaPeopleReached: 0 }
 	);
 
 	function handleDownloadClick() {
@@ -146,113 +145,89 @@ function CvaChart({
 					Cash and Voucher Assistance
 				</Typography>
 			</Box>
-			<Grid
-				container
-				spacing={1}
+			<Box
 				style={{
+					display: "flex",
+					width: "100%",
 					alignItems: "center",
 					justifyContent: "center",
-					height: "220px",
 				}}
 			>
-				<Grid
-					size={4.8}
-					style={{
-						height: "100%",
-						display: "flex",
-						opacity: cvaChartMode === "allocations" ? 1 : 0.7,
-						filter: `grayscale(${
-							cvaChartMode === "allocations" ? 0 : 1
-						})`,
-					}}
-				>
-					<Box
-						display={"flex"}
-						style={{ height: "100%", width: "100%" }}
-					>
-						<CvaDonuts
-							totalValue={total}
-							cvaValue={cvaTargeted}
-							cvaMode="allocations"
-							cvaGoal="targeted"
-						/>
-						<Divider
-							orientation="vertical"
-							flexItem
-							variant="middle"
-							sx={{
-								borderStyle: "dashed",
-								borderColor: "rgba(0,0,0,0.25)",
-							}}
-						/>
-						<CvaDonuts
-							totalValue={total}
-							cvaValue={cvaReached}
-							cvaMode="allocations"
-							cvaGoal="reached"
-						/>
-					</Box>
-				</Grid>
 				<CvaChartSwitch
 					cvaChartMode={cvaChartMode}
 					handleSwitchChange={handleSwitchChange}
-				></CvaChartSwitch>
-				<Grid
-					size={4.8}
+				/>
+			</Box>
+			<Box
+				mt={3}
+				style={{
+					display: "flex",
+					width: "100%",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Box
 					style={{
-						height: "100%",
+						width: "60%",
+						minHeight: "220px",
 						display: "flex",
-						opacity: cvaChartMode === "people" ? 1 : 0.7,
-						filter: `grayscale(${
-							cvaChartMode === "people" ? 0 : 1
-						})`,
+						flexDirection: "row",
 					}}
 				>
-					<Box
-						display={"flex"}
-						style={{ height: "100%", width: "100%" }}
-					>
-						<CvaDonuts
-							totalValue={totalPeopleTargeted}
-							cvaValue={cvaPeopleTargeted}
-							cvaMode="people"
-							cvaGoal="targeted"
-						/>
-						<Divider
-							orientation="vertical"
-							flexItem
-							variant="middle"
-							sx={{
-								borderStyle: "dashed",
-								borderColor: "rgba(0,0,0,0.25)",
-							}}
-						/>
-						<CvaDonuts
-							totalValue={totalPeopleReached}
-							cvaValue={cvaPeopleReached}
-							cvaMode="people"
-							cvaGoal="reached"
-						/>
-					</Box>
-				</Grid>
-			</Grid>
+					<CvaDonuts
+						totalValue={
+							cvaChartMode === "allocations"
+								? total
+								: totalPeopleTargeted
+						}
+						cvaValue={
+							cvaChartMode === "allocations"
+								? cvaTargeted
+								: cvaPeopleTargeted
+						}
+						cvaMode={cvaChartMode}
+						cvaGoal="targeted"
+					/>
+					<Divider
+						orientation="vertical"
+						flexItem
+						variant="middle"
+						sx={{
+							borderStyle: "dashed",
+							borderColor: "rgba(0,0,0,0.25)",
+						}}
+					/>
+					<CvaDonuts
+						totalValue={
+							cvaChartMode === "allocations"
+								? total
+								: totalPeopleReached
+						}
+						cvaValue={
+							cvaChartMode === "allocations"
+								? cvaReached
+								: cvaPeopleReached
+						}
+						cvaMode={cvaChartMode}
+						cvaGoal="reached"
+					/>
+				</Box>
+			</Box>
 			<Box
-				display={"flex"}
-				flexDirection={"column"}
-				alignItems={"center"}
+				mt={4}
+				style={{
+					display: "flex",
+					width: "100%",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
 			>
-				<CvaTopChart
+				<CvaTypesChart
 					dataCva={dataCva}
-					cvaChartType={cvaChartType}
 					cvaChartMode={cvaChartMode}
-					setCvaChartType={setCvaChartType}
 					lists={lists}
-				/>
-				<CvaSectors
-					data={cvaSectorsData}
-					lists={lists}
-					cvaChartMode={cvaChartMode}
-				/>
+				></CvaTypesChart>
 			</Box>
 		</Container>
 	);

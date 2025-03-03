@@ -63,15 +63,21 @@ export type DatumEmergency = {
 	date: Date;
 };
 
-export type DatumCva = {
-	cvaType: (typeof cvaChartTypes)[number];
-	organizationType: number;
-	sector: number;
+type CvaReachedAndTargeted = {
 	targetedAllocations: number;
 	reachedAllocations: number;
 	targetedPeople: number;
 	reachedPeople: number;
 };
+
+type CvaSector = {
+	sector: number;
+} & CvaReachedAndTargeted;
+
+export type DatumCva = {
+	cvaType: (typeof cvaChartTypes)[number];
+	sectorData: CvaSector[];
+} & CvaReachedAndTargeted;
 
 const {
 	beneficiariesStatuses,
@@ -227,15 +233,46 @@ function processDataSummary({
 
 			if (datum.cvaData) {
 				datum.cvaData.forEach(cva => {
-					dataCva.push({
-						cvaType: cva.cvaId as (typeof cvaChartTypes)[number],
-						organizationType: cva.organizationTypeId,
-						sector: cva.sectorId,
-						targetedAllocations: cva.targetedAllocations,
-						reachedAllocations: cva.reachedAllocations,
-						targetedPeople: cva.targetedPeople,
-						reachedPeople: cva.reachedPeople,
-					});
+					let cvaDatum = dataCva.find(
+						datum => datum.cvaType === cva.cvaId
+					);
+
+					if (!cvaDatum) {
+						cvaDatum = {
+							cvaType:
+								cva.cvaId as (typeof cvaChartTypes)[number],
+							sectorData: [],
+							targetedAllocations: 0,
+							reachedAllocations: 0,
+							targetedPeople: 0,
+							reachedPeople: 0,
+						};
+						dataCva.push(cvaDatum);
+					}
+
+					let sectorData = cvaDatum.sectorData.find(
+						sector => sector.sector === cva.sectorId
+					);
+
+					if (!sectorData) {
+						sectorData = {
+							sector: cva.sectorId,
+							targetedAllocations: 0,
+							reachedAllocations: 0,
+							targetedPeople: 0,
+							reachedPeople: 0,
+						};
+						cvaDatum.sectorData.push(sectorData);
+					}
+
+					sectorData.targetedAllocations += cva.targetedAllocations;
+					sectorData.reachedAllocations += cva.reachedAllocations;
+					sectorData.targetedPeople += cva.targetedPeople;
+					sectorData.reachedPeople += cva.reachedPeople;
+					cvaDatum.targetedAllocations += cva.targetedAllocations;
+					cvaDatum.reachedAllocations += cva.reachedAllocations;
+					cvaDatum.targetedPeople += cva.targetedPeople;
+					cvaDatum.reachedPeople += cva.reachedPeople;
 				});
 			}
 
