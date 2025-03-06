@@ -109,6 +109,7 @@ const constants = {
 		5: "#b33dc6",
 	},
 	limitScaleValueInPixels: 90,
+	cvaPopoverWidth: 760,
 } as const;
 
 export default constants;

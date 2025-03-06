@@ -75,29 +75,23 @@ function CvaChartSwitch({
 }: CvaChartSwitchProps) {
 	return (
 		<Grid
-			size={2.2}
+			size={3}
 			style={{
-				height: "100%",
-				minHeight: "inherit",
 				display: "flex",
-				flexDirection: "column",
+				flexDirection: "row",
 				alignItems: "center",
-				justifyContent: "flex-start",
+				justifyContent: "center",
 			}}
 		>
-			<Box
-				style={{
-					display: "flex",
-					flexDirection: "column",
-					alignItems: "center",
-				}}
+			<Typography
+				style={{ whiteSpace: "nowrap" }}
+				variant="body2"
 			>
-				<Typography variant="body2">Filter by:</Typography>
-			</Box>
+				Filter by:
+			</Typography>
 			<Box
 				onClick={() => handleSwitchChange()}
 				style={{
-					marginTop: "0.5em",
 					display: "flex",
 					flexDirection: "row",
 					alignItems: "center",

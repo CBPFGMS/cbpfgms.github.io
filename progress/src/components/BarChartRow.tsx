@@ -11,7 +11,7 @@ import { Charts } from "./MainContainer";
 import { clustersIconsData } from "../assets/clustericons";
 import constants from "../utils/constants";
 
-type BarChartRowProps = {
+export type BarChartRowProps = {
 	type: number;
 	targeted: number;
 	reached: number;

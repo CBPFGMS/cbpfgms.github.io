@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, MouseEvent } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { List } from "../utils/makelists";
@@ -6,6 +6,7 @@ import { DatumCva } from "../utils/processdatasummary";
 import BarChartRow from "./BarChartRow";
 import { CvaChartModes } from "./CvaChart";
 import { max } from "d3";
+import CvaSectorsTooltip from "./CvaSectorsTooltip";
 
 type CvaTypesChartProps = {
 	dataCva: DatumCva[];
@@ -15,9 +16,21 @@ type CvaTypesChartProps = {
 
 function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 	const [firstTime, setFirstTime] = useState<boolean>(true);
+	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+	const [tooltipData, setTooltipData] = useState<DatumCva | null>(null);
 
 	function handleFirstTime() {
 		setFirstTime(false);
+	}
+
+	function handleBarHover(event: MouseEvent<HTMLElement>, data: DatumCva) {
+		setAnchorEl(event.currentTarget);
+		setTooltipData(data);
+	}
+
+	function handleMouseLeave() {
+		setAnchorEl(null);
+		setTooltipData(null);
 	}
 
 	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
@@ -95,27 +108,46 @@ function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 					</Box>
 				</Box>
 				{dataCva.map(d => (
-					<BarChartRow
+					<Box
 						key={d.cvaType}
-						type={d.cvaType}
-						targeted={
-							cvaChartMode === "allocations"
-								? d.targetedAllocations
-								: d.targetedPeople
-						}
-						reached={
-							cvaChartMode === "allocations"
-								? d.reachedAllocations
-								: d.reachedPeople
-						}
-						maxValue={maxValue}
-						list={lists.cvaTypeNames}
-						chartType="cash"
-						fromCva={true}
-						isAllocation={cvaChartMode === "allocations"}
-					/>
+						onMouseEnter={e => {
+							handleBarHover(e, d);
+							handleFirstTime();
+						}}
+						onMouseLeave={handleMouseLeave}
+						style={{
+							width: "100%",
+							display: "flex",
+						}}
+					>
+						<BarChartRow
+							type={d.cvaType}
+							targeted={
+								cvaChartMode === "allocations"
+									? d.targetedAllocations
+									: d.targetedPeople
+							}
+							reached={
+								cvaChartMode === "allocations"
+									? d.reachedAllocations
+									: d.reachedPeople
+							}
+							maxValue={maxValue}
+							list={lists.cvaTypeNames}
+							chartType="cash"
+							fromCva={true}
+							isAllocation={cvaChartMode === "allocations"}
+						/>
+					</Box>
 				))}
 			</Box>
+			<CvaSectorsTooltip
+				anchorEl={anchorEl}
+				handleClose={handleMouseLeave}
+				data={tooltipData}
+				lists={lists}
+				cvaChartMode={cvaChartMode}
+			/>
 		</Box>
 	);
 }
