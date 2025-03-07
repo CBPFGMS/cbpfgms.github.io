@@ -55,8 +55,8 @@ const beneficiaryTypesMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	emergenciesMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST&$format=csv",
-	cvaDataUrl = "../data/fake_cvadata.csv",
-	cvaMasterUrl = "../data/fake_cvamaster.csv";
+	cvaDataUrl = "../data/fake_cvadata.csv", //TODO: change to real data
+	cvaMasterUrl = "../data/fake_cvamaster.csv"; //TODO: change to real data
 
 function useData(
 	defaultFundType: number | null,
