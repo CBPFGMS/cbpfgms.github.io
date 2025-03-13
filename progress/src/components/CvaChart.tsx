@@ -227,6 +227,11 @@ function CvaChart({
 					dataCva={dataCva}
 					cvaChartMode={cvaChartMode}
 					lists={lists}
+					totalValue={
+						cvaChartMode === "allocations"
+							? cvaTargeted
+							: cvaPeopleTargeted
+					}
 				></CvaTypesChart>
 			</Box>
 		</Container>

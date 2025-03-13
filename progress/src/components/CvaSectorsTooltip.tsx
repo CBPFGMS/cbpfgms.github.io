@@ -66,7 +66,12 @@ function CvaSectorsTooltip({
 				style={{ pointerEvents: "none" }}
 				marginThreshold={8}
 			>
-				<Paper style={{ padding: "10px" }}>
+				<Paper
+					style={{
+						padding: "10px",
+						backgroundColor: "#f9f9f9",
+					}}
+				>
 					<Box
 						style={{
 							width: cvaPopoverWidth,
@@ -152,7 +157,9 @@ function CvaSectorsTooltip({
 											list={lists.sectors}
 											chartType="sectors"
 											fromCva={true}
-											isAllocation={false}
+											isAllocation={
+												cvaChartMode === "allocations"
+											}
 										/>
 									</Box>
 								))}

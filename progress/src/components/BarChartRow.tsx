@@ -20,6 +20,7 @@ export type BarChartRowProps = {
 	chartType: Charts;
 	fromCva?: boolean;
 	isAllocation?: boolean;
+	totalCvaPercentage?: number;
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -33,8 +34,13 @@ function BarChartRow({
 	chartType,
 	fromCva = false,
 	isAllocation = false,
+	totalCvaPercentage = 0,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
+
+	const calcAmount = fromCva ? "5%" : "0%";
+
+	console.log(totalCvaPercentage);
 
 	return (
 		<Box
@@ -47,7 +53,7 @@ function BarChartRow({
 		>
 			<Box
 				style={{
-					flex: chartType === "sectors" ? "0 26%" : "0 22%",
+					flex: chartType === "sectors" ? "0 26% " : "0 22% ",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "flex-end",
@@ -76,9 +82,40 @@ function BarChartRow({
 					/>
 				)}
 			</Box>
+			{fromCva && (
+				<Box
+					style={{
+						flex: `0 ${calcAmount}`,
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					<Typography
+						variant="body2"
+						style={{
+							fontSize: 13,
+							color: "#444",
+							border: "none",
+							fontStyle: "normal",
+							fontWeight: 600,
+						}}
+					>
+						{"("}
+						<NumberAnimator
+							number={totalCvaPercentage}
+							type="integer"
+						/>
+						{"%)"}
+					</Typography>
+				</Box>
+			)}
 			<Box
 				style={{
-					flex: chartType === "sectors" ? "0 62%" : "0 66%",
+					flex:
+						chartType === "sectors"
+							? `0 calc(62% - ${calcAmount})`
+							: `0 calc(66% - ${calcAmount})`,
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -103,13 +140,13 @@ function BarChartRow({
 					>
 						<Box
 							style={{
-								flex:
-									chartType === "sectors" ? "0 8%" : "0 10%",
 								display: "flex",
 								flexDirection: "row",
 								justifyContent: "flex-end",
 								alignItems: "baseline",
 								marginRight: "12px",
+								marginLeft:
+									chartType === "sectors" ? "12px" : "4px",
 							}}
 						>
 							<Typography
@@ -144,8 +181,6 @@ function BarChartRow({
 						</Box>
 						<Box
 							style={{
-								flex:
-									chartType === "sectors" ? "0 92%" : "0 90%",
 								marginTop: "2px",
 								marginBottom: "2px",
 								display: "flex",

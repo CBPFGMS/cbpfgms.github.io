@@ -12,9 +12,15 @@ type CvaTypesChartProps = {
 	dataCva: DatumCva[];
 	cvaChartMode: CvaChartModes;
 	lists: List;
+	totalValue: number;
 };
 
-function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
+function CvaTypesChart({
+	dataCva,
+	cvaChartMode,
+	lists,
+	totalValue,
+}: CvaTypesChartProps) {
 	const [firstTime, setFirstTime] = useState<boolean>(true);
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 	const [tooltipData, setTooltipData] = useState<DatumCva | null>(null);
@@ -38,6 +44,10 @@ function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 		max(dataCva, d =>
 			Math.max(d[`targeted${property}`], d[`reached${property}`])
 		) ?? 0;
+
+	const sortedData = dataCva.toSorted(
+		(a, b) => b[`reached${property}`] - a[`reached${property}`]
+	);
 
 	return (
 		<Box
@@ -73,15 +83,40 @@ function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 				marginLeft={"3%"}
 				alignItems={"center"}
 				gap={2}
+				mt={2}
 			>
 				<Box
 					display={"flex"}
 					flexDirection={"row"}
 					width={"100%"}
+					mb={-1}
 				>
-					<Box flex={"0 88%"} />
 					<Box
-						mb={-2}
+						display={"flex"}
+						flex={"0 28%"}
+						justifyContent={"flex-end"}
+						alignItems={"center"}
+						style={{
+							textAlign: "center",
+						}}
+					>
+						<Typography
+							variant="body2"
+							fontSize={12}
+							style={{
+								color: "#222",
+								border: "none",
+								fontStyle: "italic",
+								letterSpacing: "-0.05em",
+							}}
+						>
+							% of total
+							<br />
+							targeted CVA
+						</Typography>
+					</Box>
+					<Box flex={"0 60%"} />
+					<Box
 						style={{
 							display: "flex",
 							flex: "0 12%",
@@ -107,7 +142,7 @@ function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 						</Typography>
 					</Box>
 				</Box>
-				{dataCva.map(d => (
+				{sortedData.map(d => (
 					<Box
 						key={d.cvaType}
 						onMouseEnter={e => {
@@ -137,6 +172,12 @@ function CvaTypesChart({ dataCva, cvaChartMode, lists }: CvaTypesChartProps) {
 							chartType="cash"
 							fromCva={true}
 							isAllocation={cvaChartMode === "allocations"}
+							totalCvaPercentage={
+								~~(
+									(100 * d[`targeted${property}`]) /
+									totalValue
+								)
+							}
 						/>
 					</Box>
 				))}
