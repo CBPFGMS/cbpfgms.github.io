@@ -46,7 +46,7 @@ function CvaTypesChart({
 		) ?? 0;
 
 	const sortedData = dataCva.toSorted(
-		(a, b) => b[`reached${property}`] - a[`reached${property}`]
+		(a, b) => b[`targeted${property}`] - a[`targeted${property}`]
 	);
 
 	return (

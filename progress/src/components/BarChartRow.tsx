@@ -40,8 +40,6 @@ function BarChartRow({
 
 	const calcAmount = fromCva ? "5%" : "0%";
 
-	console.log(totalCvaPercentage);
-
 	return (
 		<Box
 			style={{

@@ -31,7 +31,7 @@ function CvaSectorsTooltip({
 	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
 
 	const sortedData = data?.sectorData.toSorted(
-		(a, b) => b[`reached${property}`] - a[`reached${property}`]
+		(a, b) => b[`targeted${property}`] - a[`targeted${property}`]
 	);
 
 	const maxValue = sortedData

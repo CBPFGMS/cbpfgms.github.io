@@ -109,6 +109,8 @@ function BarChart({
 		return { type: d.type, targeted, reached };
 	});
 
+	data.sort((a, b) => b.targeted - a.targeted);
+
 	const maxValue = max(
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
