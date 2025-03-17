@@ -23,7 +23,7 @@ function processApproved(
 		if (parsedRow.success) {
 			const thisFund =
 				reversedNames[
-					row.PooledFundName.replace("(RhPF-WCA)", "").trim()
+					row.PooledFundName.replace(/\(.*?\)/g,"").trim()
 				];
 			if (thisFund === undefined) {
 				console.warn(
