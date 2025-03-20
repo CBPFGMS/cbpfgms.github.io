@@ -20,7 +20,7 @@ export type BarChartRowProps = {
 	chartType: Charts;
 	fromCva?: boolean;
 	isAllocation?: boolean;
-	totalCvaPercentage?: number;
+	totalCvaPercentage?: number | boolean;
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -34,11 +34,12 @@ function BarChartRow({
 	chartType,
 	fromCva = false,
 	isAllocation = false,
-	totalCvaPercentage = 0,
+	totalCvaPercentage = false,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 
-	const calcAmount = fromCva ? "5%" : "0%";
+	const calcAmount =
+		fromCva && typeof totalCvaPercentage === "number" ? "5%" : "0%";
 
 	return (
 		<Box
@@ -80,7 +81,7 @@ function BarChartRow({
 					/>
 				)}
 			</Box>
-			{fromCva && (
+			{fromCva && typeof totalCvaPercentage === "number" && (
 				<Box
 					style={{
 						flex: `0 ${calcAmount}`,

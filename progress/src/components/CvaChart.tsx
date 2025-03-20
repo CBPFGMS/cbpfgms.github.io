@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useState } from "react";
 import {
+	CvaTotalPeople,
 	DatumCva,
 	DatumPictogram,
 	DatumSummary,
@@ -29,6 +30,7 @@ type CvaChartProps = {
 	dataSummary: DatumSummary[];
 	dataPictogram: DatumPictogram;
 	dataCva: DatumCva[];
+	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
@@ -45,6 +47,7 @@ function CvaChart({
 	dataSummary,
 	dataPictogram,
 	dataCva,
+	dataCvaTotalPeople,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -80,15 +83,6 @@ function CvaChart({
 			return acc;
 		},
 		{ totalPeopleTargeted: 0, totalPeopleReached: 0 }
-	);
-
-	const { cvaPeopleTargeted, cvaPeopleReached } = dataCva.reduce(
-		(acc, curr) => {
-			acc.cvaPeopleTargeted += curr.targetedPeople;
-			acc.cvaPeopleReached += curr.reachedPeople;
-			return acc;
-		},
-		{ cvaPeopleTargeted: 0, cvaPeopleReached: 0 }
 	);
 
 	function handleDownloadClick() {
@@ -184,7 +178,7 @@ function CvaChart({
 						cvaValue={
 							cvaChartMode === "allocations"
 								? cvaTargeted
-								: cvaPeopleTargeted
+								: dataCvaTotalPeople.cvaTotalTargetedPeople
 						}
 						cvaMode={cvaChartMode}
 						cvaGoal="targeted"
@@ -207,7 +201,7 @@ function CvaChart({
 						cvaValue={
 							cvaChartMode === "allocations"
 								? cvaReached
-								: cvaPeopleReached
+								: dataCvaTotalPeople.cvaTotalReachedPeople
 						}
 						cvaMode={cvaChartMode}
 						cvaGoal="reached"
@@ -230,7 +224,7 @@ function CvaChart({
 					totalValue={
 						cvaChartMode === "allocations"
 							? cvaTargeted
-							: cvaPeopleTargeted
+							: dataCvaTotalPeople.cvaTotalTargetedPeople
 					}
 				></CvaTypesChart>
 			</Box>

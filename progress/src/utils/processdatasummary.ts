@@ -79,6 +79,11 @@ export type DatumCva = {
 	sectorData: CvaSector[];
 } & CvaReachedAndTargeted;
 
+export type CvaTotalPeople = {
+	cvaTotalTargetedPeople: number;
+	cvaTotalReachedPeople: number;
+};
+
 const {
 	beneficiariesStatuses,
 	beneficiaryCategories,
@@ -100,6 +105,7 @@ function processDataSummary({
 	dataSummary: DatumSummary[];
 	dataEmergency: DatumEmergency[];
 	dataCva: DatumCva[];
+	dataCvaTotalPeople: CvaTotalPeople;
 	dataPictogram: DatumPictogram;
 	dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
@@ -108,6 +114,10 @@ function processDataSummary({
 	const dataSummary: DatumSummary[] = [];
 	const dataEmergency: DatumEmergency[] = [];
 	const dataCva: DatumCva[] = [];
+	const dataCvaTotalPeople: CvaTotalPeople = {
+		cvaTotalTargetedPeople: 0,
+		cvaTotalReachedPeople: 0,
+	};
 	const dataPictogram: DatumPictogram = {
 		targetedMen: 0,
 		targetedWomen: 0,
@@ -231,6 +241,13 @@ function processDataSummary({
 				dataGBV.reportsWithData += 1;
 			}
 
+			if (datum.cvaTotalTargetedPeople)
+				dataCvaTotalPeople.cvaTotalTargetedPeople +=
+					datum.cvaTotalTargetedPeople;
+			if (datum.cvaTotalReachedPeople)
+				dataCvaTotalPeople.cvaTotalReachedPeople +=
+					datum.cvaTotalReachedPeople;
+
 			if (datum.cvaData) {
 				datum.cvaData.forEach(cva => {
 					let cvaDatum = dataCva.find(
@@ -340,6 +357,7 @@ function processDataSummary({
 		dataSummary,
 		dataEmergency,
 		dataCva,
+		dataCvaTotalPeople,
 		dataPictogram,
 		dataDisability,
 		dataGBV,

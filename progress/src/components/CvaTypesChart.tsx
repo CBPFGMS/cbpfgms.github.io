@@ -7,6 +7,7 @@ import BarChartRow from "./BarChartRow";
 import { CvaChartModes } from "./CvaChart";
 import { max } from "d3";
 import CvaSectorsTooltip from "./CvaSectorsTooltip";
+import Tooltip from "@mui/material/Tooltip";
 
 type CvaTypesChartProps = {
 	dataCva: DatumCva[];
@@ -61,20 +62,27 @@ function CvaTypesChart({
 				display={"flex"}
 				flexDirection={"row"}
 				alignItems={"center"}
-				gap={1}
 			>
-				<Typography
-					style={{
-						marginLeft: "28.6%",
-					}}
+				<Tooltip
+					title={
+						<span
+							style={{ fontSize: "14px", fontWeight: "normal" }}
+						>
+							Hover the bars for sector details
+						</span>
+					}
+					open={firstTime}
+					arrow
+					placement="left"
 				>
-					CVA Types
-				</Typography>
-				{firstTime && (
-					<Typography style={{ fontSize: "0.8rem", color: "#555" }}>
-						(hover for sector details)
+					<Typography
+						style={{
+							marginLeft: "32%",
+						}}
+					>
+						CVA Types
 					</Typography>
-				)}
+				</Tooltip>
 			</Box>
 			<Box
 				display={"flex"}
@@ -83,7 +91,7 @@ function CvaTypesChart({
 				marginLeft={"3%"}
 				alignItems={"center"}
 				gap={2}
-				mt={2}
+				mt={1}
 			>
 				<Box
 					display={"flex"}

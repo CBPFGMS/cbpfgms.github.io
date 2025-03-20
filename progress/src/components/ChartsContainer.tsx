@@ -10,6 +10,7 @@ import {
 	DatumGBV,
 	DatumEmergency,
 	DatumCva,
+	CvaTotalPeople,
 } from "../utils/processdatasummary";
 import {
 	DownloadStates,
@@ -38,6 +39,7 @@ type ChartsContainerProps = {
 	dataEmergency: DatumEmergency[];
 	dataGBV: DatumGBV;
 	dataCva: DatumCva[];
+	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -69,6 +71,7 @@ function ChartsContainer({
 	dataEmergency,
 	dataGBV,
 	dataCva,
+	dataCvaTotalPeople,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -428,6 +431,7 @@ function ChartsContainer({
 								dataSummary={dataSummary}
 								dataPictogram={dataPictogram}
 								dataCva={dataCva}
+								dataCvaTotalPeople={dataCvaTotalPeople}
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
 								year={year}

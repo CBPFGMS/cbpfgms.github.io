@@ -44,6 +44,8 @@ export type Datum = {
 	reportType: ReportType;
 	emergenciesData: EmergencyDatum[];
 	cvaData: CvaDatum[] | null;
+	cvaTotalTargetedPeople: number | null;
+	cvaTotalReachedPeople: number | null;
 };
 
 export type ReportType = (typeof reportTypes)[number];
@@ -412,6 +414,8 @@ function processRawData({
 					reachedGBV: row.AchGBVPeople || 0,
 					reportType: row.RptCode ?? 0,
 					cvaData: thisCvaData ? thisCvaData.cva : null,
+					cvaTotalTargetedPeople: row.CVATotPeople,
+					cvaTotalReachedPeople: row.AchCVATotPeople,
 				};
 
 				data.push(objDatum);

@@ -99,6 +99,8 @@ export const projectSummaryObjectSchema = z.object({
 	RptCode: z.union([z.literal(1), z.literal(2)]).nullable(),
 	StartDate: z.string().regex(dateRegex, "Invalid date format"),
 	PrjApprDate: z.string().regex(dateRegex, "Invalid date format"),
+	CVATotPeople: z.number().int().nonnegative().nullable(),
+	AchCVATotPeople: z.number().int().nonnegative().nullable(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
