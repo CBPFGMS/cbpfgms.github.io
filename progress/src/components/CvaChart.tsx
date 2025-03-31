@@ -139,96 +139,125 @@ function CvaChart({
 					Cash and Voucher Assistance
 				</Typography>
 			</Box>
-			<Box
-				style={{
-					display: "flex",
-					width: "100%",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<CvaChartSwitch
-					cvaChartMode={cvaChartMode}
-					handleSwitchChange={handleSwitchChange}
-				/>
-			</Box>
-			<Box
-				mt={3}
-				style={{
-					display: "flex",
-					width: "100%",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Box
-					style={{
-						width: "60%",
-						minHeight: "220px",
-						display: "flex",
-						flexDirection: "row",
-					}}
-				>
-					<CvaDonuts
-						totalValue={
-							cvaChartMode === "allocations"
-								? total
-								: totalPeopleTargeted
-						}
-						cvaValue={
-							cvaChartMode === "allocations"
-								? cvaTargeted
-								: dataCvaTotalPeople.cvaTotalTargetedPeople
-						}
-						cvaMode={cvaChartMode}
-						cvaGoal="targeted"
-					/>
-					<Divider
-						orientation="vertical"
-						flexItem
-						variant="middle"
-						sx={{
-							borderStyle: "dashed",
-							borderColor: "rgba(0,0,0,0.25)",
+			{dataCva.length === 0 ? (
+				<NoData />
+			) : (
+				<>
+					<Box
+						style={{
+							display: "flex",
+							width: "100%",
+							alignItems: "center",
+							justifyContent: "center",
 						}}
-					/>
-					<CvaDonuts
-						totalValue={
-							cvaChartMode === "allocations"
-								? total
-								: totalPeopleReached
-						}
-						cvaValue={
-							cvaChartMode === "allocations"
-								? cvaReached
-								: dataCvaTotalPeople.cvaTotalReachedPeople
-						}
-						cvaMode={cvaChartMode}
-						cvaGoal="reached"
-					/>
-				</Box>
-			</Box>
-			<Box
-				mt={4}
-				style={{
-					display: "flex",
-					width: "100%",
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<CvaTypesChart
-					dataCva={dataCva}
-					cvaChartMode={cvaChartMode}
-					lists={lists}
-					totalValue={
-						cvaChartMode === "allocations"
-							? cvaTargeted
-							: dataCvaTotalPeople.cvaTotalTargetedPeople
-					}
-				></CvaTypesChart>
-			</Box>
+					>
+						<CvaChartSwitch
+							cvaChartMode={cvaChartMode}
+							handleSwitchChange={handleSwitchChange}
+						/>
+					</Box>
+					<Box
+						mt={3}
+						style={{
+							display: "flex",
+							width: "100%",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						<Box
+							style={{
+								width: "60%",
+								minHeight: "220px",
+								display: "flex",
+								flexDirection: "row",
+							}}
+						>
+							<CvaDonuts
+								totalValue={
+									cvaChartMode === "allocations"
+										? total
+										: totalPeopleTargeted
+								}
+								cvaValue={
+									cvaChartMode === "allocations"
+										? cvaTargeted
+										: dataCvaTotalPeople.cvaTotalTargetedPeople
+								}
+								cvaMode={cvaChartMode}
+								cvaGoal="targeted"
+							/>
+							<Divider
+								orientation="vertical"
+								flexItem
+								variant="middle"
+								sx={{
+									borderStyle: "dashed",
+									borderColor: "rgba(0,0,0,0.25)",
+								}}
+							/>
+							<CvaDonuts
+								totalValue={
+									cvaChartMode === "allocations"
+										? total
+										: totalPeopleReached
+								}
+								cvaValue={
+									cvaChartMode === "allocations"
+										? cvaReached
+										: dataCvaTotalPeople.cvaTotalReachedPeople
+								}
+								cvaMode={cvaChartMode}
+								cvaGoal="reached"
+							/>
+						</Box>
+					</Box>
+					<Box
+						mt={4}
+						style={{
+							display: "flex",
+							width: "100%",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						<CvaTypesChart
+							dataCva={dataCva}
+							cvaChartMode={cvaChartMode}
+							lists={lists}
+							totalValue={
+								cvaChartMode === "allocations"
+									? cvaTargeted
+									: dataCvaTotalPeople.cvaTotalTargetedPeople
+							}
+						></CvaTypesChart>
+					</Box>
+				</>
+			)}
 		</Container>
+	);
+}
+
+function NoData() {
+	return (
+		<Box
+			style={{
+				width: "100%",
+				height: "100%",
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+			}}
+		>
+			<Box width={"50%"}>
+				<Typography
+					variant="body2"
+					textAlign="center"
+				>
+					No CVA data available for the selected filters
+				</Typography>
+			</Box>
+		</Box>
 	);
 }
 
