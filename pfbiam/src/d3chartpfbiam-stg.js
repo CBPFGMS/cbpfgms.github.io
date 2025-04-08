@@ -37,7 +37,8 @@ const generalClassPrefix = "pfbihp",
 		cerfAnalogous: ["#E48F07", "#E2A336", "#FBCC23", "#FBE23E"],
 		cbpfAnalogous: ["#B52625", "#CE2E2D", cbpfColor, "#F79C8F"]
 	},
-	defaultValues = {};
+	defaultValues = {},
+	rhpfToCountry = {};
 
 //|constants populated with the data
 const yearsArrayAllocations = [],
@@ -175,6 +176,7 @@ function controlCharts([worldMap,
 	createDonorNamesList(masterDonors);
 	createFundTypesList(masterFundTypes);
 	createAllocationTypesList(masterAllocationTypes);
+	createRhpfToCountryMap(masterFunds);
 
 	//Hardcoded Syria Cross Border ISO 3 code
 	fundIsoCodes3List["108"] = "SCB";
@@ -209,6 +211,8 @@ function controlCharts([worldMap,
 		cerfPooledFundId: cerfPooledFundId,
 		defaultValues: defaultValues
 	};
+
+	preProcessData(rawAllocationsData, lists);
 
 	allocationsData = processDataAllocations(rawAllocationsData);
 
@@ -1671,3 +1675,39 @@ function makeOrdinal(value) {
 		"nd" : value % 10 === 3 && value !== 13 ?
 		"rd" : "th";
 };
+
+//This is an ad hoc solution for aggregating
+//regular fundas and their rhpf counterparts
+function createRhpfToCountryMap(masterFunds) {
+	masterFunds.forEach(fund => {
+		if (fund.PooledFundName.toLowerCase().includes("rhpf")) {
+			const regularFund = masterFunds.find(
+				e =>
+					e.CountryCode === fund.CountryCode &&
+					!e.PooledFundName.toLowerCase().includes("rhpf")
+			);
+			if (regularFund) {
+				rhpfToCountry[fund.id] = regularFund.id;
+			}
+		}
+	});
+}
+
+function preProcessData(rawAllocationsData, lists){
+	rawAllocationsData.forEach(row => {
+	if (
+		lists.fundNamesList[row.PooledFundId].toLowerCase().includes("rhpf")
+	) {
+		if (rhpfToCountry[row.PooledFundId]) {
+			row.PooledFundId = rhpfToCountry[row.PooledFundId];
+		} else {
+			if (!isPfbiSite) {
+				console.warn(
+					"RHPF to country mapping not found for " +
+						row.PooledFundId
+				);
+			}
+		}
+	}
+});
+}
