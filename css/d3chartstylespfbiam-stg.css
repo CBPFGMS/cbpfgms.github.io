@@ -415,7 +415,7 @@
 }
 
 .pfbiambuttonsDiv button:hover{background-color: #3289C9; color:#fff; border-color:#3289C9;}
-.pfbiambuttonsDiv button.active{background-color: #3289C9; color:#fff; border-color:#3289C9;}
+.pfbiambuttonsDiv button.activeButton{background-color: #3289C9; color:#fff; border-color:#3289C9;}
 
 .fa-adjust {
   color: transparent;

@@ -534,7 +534,7 @@ function createAllocations(colors, mapData, lists) {
 		mapButtons.on("click", (event, d) => {
 			chartState.selectedFund = d;
 
-			mapButtons.classed("active", e => e === chartState.selectedFund);
+			mapButtons.classed("activeButton", e => e === chartState.selectedFund);
 
 			const data = filterData(originalData);
 
@@ -773,7 +773,7 @@ function createAllocations(colors, mapData, lists) {
 			.data(buttonsList)
 			.enter()
 			.append("button")
-			.classed("active", d => chartState.selectedFund === d);
+			.classed("activeButton", d => chartState.selectedFund === d);
 
 		const bullet = buttons
 			.append("span")
