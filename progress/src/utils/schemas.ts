@@ -148,15 +148,15 @@ export const emergenciesObjectSchema = z.object({
 export const cvaObjectSchema = z.object({
 	PooledFundId: z.number().int().nonnegative(),
 	CHFId: z.number().int().nonnegative(),
-	CHFProjectCode: z.string(),
+	ChfProjectCode: z.string(),
 	OrganizationTypeId: z.number().int().nonnegative(),
 	AllocationYear: z.number().int().nonnegative(),
 	CVATypeId: z.number().int().nonnegative(),
 	ClusterId: z.number().int().nonnegative(),
-	TargetedTransferAmt: z.number().nonnegative(),
-	ReachedTransferAmt: z.number().nonnegative(),
-	PeopleTargeted: z.number().int().nonnegative(),
-	PeopleReached: z.number().int().nonnegative(),
+	TransferAmount: z.number().nonnegative().nullable(),
+	TotalAmtTransferred: z.number().nonnegative().nullable(),
+	PeopleTargeted: z.number().int().nonnegative().nullable(),
+	PeopleReached: z.number().int().nonnegative().nullable(),
 });
 
 // ********************

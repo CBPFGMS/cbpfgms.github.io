@@ -211,37 +211,37 @@ function processRawData({
 	cvaData.forEach(row => {
 		const parsedRow = cvaObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			if (!cvaDataMap.has(row.CHFProjectCode)) {
-				cvaDataMap.set(row.CHFProjectCode, {
-					projectCode: row.CHFProjectCode,
+			if (!cvaDataMap.has(row.ChfProjectCode)) {
+				cvaDataMap.set(row.ChfProjectCode, {
+					projectCode: row.ChfProjectCode,
 					projectId: row.CHFId,
 					cva: [
 						{
 							cvaId: row.CVATypeId,
 							organizationTypeId: row.OrganizationTypeId,
 							sectorId: row.ClusterId,
-							targetedPeople: row.PeopleTargeted,
-							reachedPeople: row.PeopleReached,
-							targetedAllocations: row.TargetedTransferAmt,
-							reachedAllocations: row.ReachedTransferAmt,
+							targetedPeople: row.PeopleTargeted ?? 0,
+							reachedPeople: row.PeopleReached ?? 0,
+							targetedAllocations: row.TransferAmount ?? 0,
+							reachedAllocations: row.TotalAmtTransferred ?? 0,
 						},
 					],
 				});
 			} else {
-				const projectData = cvaDataMap.get(row.CHFProjectCode);
+				const projectData = cvaDataMap.get(row.ChfProjectCode);
 				if (projectData) {
 					projectData.cva.push({
 						cvaId: row.CVATypeId,
 						organizationTypeId: row.OrganizationTypeId,
 						sectorId: row.ClusterId,
-						targetedPeople: row.PeopleTargeted,
-						reachedPeople: row.PeopleReached,
-						targetedAllocations: row.TargetedTransferAmt,
-						reachedAllocations: row.ReachedTransferAmt,
+						targetedPeople: row.PeopleTargeted ?? 0,
+						reachedPeople: row.PeopleReached ?? 0,
+						targetedAllocations: row.TransferAmount ?? 0,
+						reachedAllocations: row.TotalAmtTransferred ?? 0,
 					});
 				} else {
 					warnProjectNotFound(
-						row.CHFProjectCode,
+						row.ChfProjectCode,
 						row,
 						"Project not found in cvaDataMap"
 					);
