@@ -1239,10 +1239,13 @@
 						const i = d3.interpolate(previousValue, d);
 						return function (t) {
 							const siString = formatSIFloat(i(t));
-							node.textContent = siString.substring(
-								0,
-								siString.length - 1
-							);
+							node.textContent =
+								d < 1e3
+									? siString
+									: siString.substring(
+											0,
+											siString.length - 1
+									  );
 						};
 					});
 
@@ -2588,7 +2591,7 @@
 				targeted: aggregatedData.totalTargetedClosedReports,
 				percentage:
 					aggregatedData.totalActual /
-					aggregatedData.totalTargetedClosedReports,
+						aggregatedData.totalTargetedClosedReports || 0,
 			};
 
 			return { data, totalClosedReports };
