@@ -58,6 +58,8 @@ const beneficiaryTypesMasterUrl =
 	cvaDataUrl = "../data/fake_cvadata.csv", //TODO: change to real data
 	cvaMasterUrl = "../data/fake_cvamaster.csv"; //TODO: change to real data
 
+//fake data path on staging site: ./assets/stg-data/
+
 function useData(
 	defaultFundType: number | null,
 	startYear: number | null

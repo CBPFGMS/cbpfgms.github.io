@@ -3,7 +3,6 @@ import { csvParse, autoType } from "d3";
 import { fetchWithProgress } from "./fetchwithprogress";
 
 const localStorageTime = 60 * 60 * 1000, //1 hour
-	currentDate = new Date(),
 	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
 
 interface LocalDatabase extends DBSchema {
@@ -29,6 +28,7 @@ async function fetchFileDB<T>(
 	method: string,
 	setProgress: React.Dispatch<React.SetStateAction<number>>
 ): Promise<T> {
+	const currentDate = new Date();
 	const db = await dbPromise;
 	const tx = db.transaction("files", "readwrite");
 	const store = tx.objectStore("files");
