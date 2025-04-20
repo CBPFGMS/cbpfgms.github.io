@@ -157,6 +157,7 @@ export const cvaObjectSchema = z.object({
 	TotalAmtTransferred: z.number().nonnegative().nullable(),
 	PeopleTargeted: z.number().int().nonnegative().nullable(),
 	PeopleReached: z.number().int().nonnegative().nullable(),
+	GlobalClusterId: z.number().int().nonnegative(),
 });
 
 // ********************

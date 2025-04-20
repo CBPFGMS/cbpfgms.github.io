@@ -219,7 +219,7 @@ function processRawData({
 						{
 							cvaId: row.CVATypeId,
 							organizationTypeId: row.OrganizationTypeId,
-							sectorId: row.ClusterId,
+							sectorId: row.GlobalClusterId,
 							targetedPeople: row.PeopleTargeted ?? 0,
 							reachedPeople: row.PeopleReached ?? 0,
 							targetedAllocations: row.TransferAmount ?? 0,
@@ -233,7 +233,7 @@ function processRawData({
 					projectData.cva.push({
 						cvaId: row.CVATypeId,
 						organizationTypeId: row.OrganizationTypeId,
-						sectorId: row.ClusterId,
+						sectorId: row.GlobalClusterId,
 						targetedPeople: row.PeopleTargeted ?? 0,
 						reachedPeople: row.PeopleReached ?? 0,
 						targetedAllocations: row.TransferAmount ?? 0,
