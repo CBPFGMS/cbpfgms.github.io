@@ -145,3 +145,7 @@
 .timelineTooltipBars {
 	outline: none;
 }
+
+table td {
+	display: table-cell !important;
+}
