@@ -80,7 +80,7 @@ function TopPanel({
 			pt={1}
 			style={{
 				backgroundColor: "rgba(255,255,255,0.95)",
-				zIndex: 1200,
+				zIndex: 1600,
 				borderBottom: inViewTitle ? "none" : "1px solid #ccc",
 				boxShadow: inViewTitle
 					? "none"
