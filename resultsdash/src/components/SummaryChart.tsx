@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { sum } from "d3-array";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import { format } from "d3-format";
-import DownloadIcon from "./DownloadIcon";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
 import SummaryRow from "./SummaryRow";
@@ -24,6 +24,8 @@ function SummaryChart({
 	const data = dataSummary.filter(d =>
 		year !== null ? year.includes(d.year) : true
 	);
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	function handleDownloadClick() {
 		const data = summaryDataDownload.map(d => ({
@@ -43,12 +45,15 @@ function SummaryChart({
 		<Container
 			disableGutters={true}
 			style={{ position: "relative" }}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="summary"
+				refElement={ref}
+				fileName="summary"
 			/>
 			<Box
 				display={"flex"}

@@ -7,6 +7,9 @@ import Pictogram from "../assets/Pictogram";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PaidIcon from "@mui/icons-material/Paid";
 import { ScrollSpyProps, TabProps } from "../types";
+import { ByTypeIcon, OrgIcon } from "../assets/OchaIcons";
+
+const iconSize = 32;
 
 function ScroolSpy({
 	inViewSummary,
@@ -35,7 +38,10 @@ function ScroolSpy({
 			flexDirection="row"
 			mt={0.5}
 			mb={2}
-			gap={1}
+			gap={2}
+			style={{
+				width: "84%",
+			}}
 		>
 			<Tab
 				label="Summary"
@@ -45,35 +51,37 @@ function ScroolSpy({
 				Icon={PaidIcon}
 			/>
 			<Tab
-				label="By Gender and Age"
+				label="Gender and Age"
 				inView={inViewPictogram}
 				reference={pictogramRef}
 				handleOnClick={handleOnClick}
 				Icon={Pictogram}
 			/>
 			<Tab
-				label="By Beneficiary Types"
+				label="Beneficiary Type"
 				inView={inViewBeneficiaryTypes}
 				reference={beneficiaryTypesRef}
 				handleOnClick={handleOnClick}
-				Icon={ListIcon}
+				Icon={ByTypeIcon}
+				ochaIcon={true}
 			/>
 			<Tab
-				label="By Organization"
+				label="Organization"
 				inView={inViewOrganizationTypes}
 				reference={organizationTypesRef}
 				handleOnClick={handleOnClick}
-				Icon={ListIcon}
+				Icon={OrgIcon}
+				ochaIcon={true}
 			/>
 			<Tab
-				label="By Sectors"
+				label="Sectors"
 				inView={inViewSectors}
 				reference={sectorsRef}
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
 			/>
 			<Tab
-				label="Geographic Location"
+				label="Location"
 				inView={inViewMap}
 				reference={mapRef}
 				handleOnClick={handleOnClick}
@@ -83,34 +91,57 @@ function ScroolSpy({
 	);
 }
 
-function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
+function Tab({
+	label,
+	inView,
+	reference,
+	handleOnClick,
+	Icon,
+	ochaIcon,
+}: TabProps) {
 	return (
 		<Paper
 			elevation={1}
 			style={{
 				padding: "0.2rem 1rem 0rem 1rem",
-				borderBottom: inView
-					? `3px solid ${colors.unColor}`
-					: "3px solid transparent",
+				backgroundColor: inView ? colors.unColor : "white",
 				cursor: "pointer",
+				flex: 1,
 			}}
 			className="scrollSpyTab"
 			onClick={() => handleOnClick(reference)}
 		>
 			<Box
+				mt={0.75}
+				mb={0.5}
 				display={"flex"}
-				flexDirection={"row"}
+				flexDirection={"column"}
+				gap={0.5}
 				alignItems={"center"}
 			>
 				<Icon
-					htmlColor={colors.unColor}
+					htmlColor={inView ? "white" : colors.unColor}
+					style={{
+						width: iconSize,
+						height: iconSize,
+					}}
 					fontSize="medium"
-					{...(label === "By Gender and Age" && {
+					{...(label === "Gender and Age" && {
 						type: "total",
 						svgProps: {
 							style: {
-								width: 12,
-								fill: colors.unColor,
+								width: iconSize,
+								height: iconSize,
+								fill: inView ? "white" : colors.unColor,
+							},
+						},
+					})}
+					{...(ochaIcon && {
+						svgProps: {
+							style: {
+								width: iconSize,
+								height: iconSize,
+								fill: inView ? "white" : colors.unColor,
 							},
 						},
 					})}
@@ -118,9 +149,9 @@ function Tab({ label, inView, reference, handleOnClick, Icon }: TabProps) {
 				<Typography
 					variant="body2"
 					style={{
+						textAlign: "center",
 						fontSize: "0.85rem",
-						color: "#555",
-						marginLeft: "0.5em",
+						color: inView ? "#fff" : "#555",
 					}}
 				>
 					{label}

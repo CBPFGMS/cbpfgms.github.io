@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import DownloadIcon from "./DownloadIcon";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import Container from "@mui/material/Container";
 import { max } from "d3-array";
 import TypeAndSectorRow from "./TypeAndSectorRow";
@@ -24,6 +24,8 @@ function TypeAndSectorChart<DownloadType>({
 	const maxValue = max(
 		data.map(d => Math.max(d.reached, d.targeted))
 	) as number;
+
+	const ref = useRef<HTMLDivElement>(null);
 
 	const listProperty =
 		chartType === "beneficiaryTypes"
@@ -96,12 +98,15 @@ function TypeAndSectorChart<DownloadType>({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type={chartType}
+				refElement={ref}
+				fileName={chartType}
 			/>
 			<Box
 				style={{

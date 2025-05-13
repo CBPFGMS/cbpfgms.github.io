@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
@@ -6,7 +6,7 @@ import NumberAnimator from "./NumberAnimator";
 import Pictogram from "../assets/Pictogram";
 import Divider from "@mui/material/Divider";
 import { format } from "d3-format";
-import DownloadIcon from "./DownloadIcon";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import Container from "@mui/material/Container";
 import PictogramRow from "./PictogramRow";
 import { max } from "d3-array";
@@ -45,6 +45,8 @@ function PictogramChart({
 	const maxValue = max(Object.values(dataPictogram)) as number;
 	const maxNumberOfPictograms = 22;
 
+	const ref = useRef<HTMLDivElement>(null);
+
 	function handleDownloadClick() {
 		const data = summaryDataDownload.map(d => ({
 			"Report date": d.ReportApprovedDate,
@@ -68,12 +70,15 @@ function PictogramChart({
 			style={{
 				position: "relative",
 			}}
+			ref={ref}
 		>
-			<DownloadIcon
+			<DownloadAndImageContainer
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type="pictogram"
+				refElement={ref}
+				fileName="pictogram"
 			/>
 			<Box
 				display={"flex"}

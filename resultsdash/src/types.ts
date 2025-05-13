@@ -1,3 +1,5 @@
+import { RefObject } from "react";
+
 export type ReceiveDataArgs = [
 	BySectorObj[],
 	ByDisabilityObj[],
@@ -549,4 +551,16 @@ export type TabProps = {
 	reference: string;
 	handleOnClick: (reference: string) => void;
 	Icon: React.ElementType;
+	ochaIcon?: boolean;
 };
+
+export type DownloadAndImageContainerProps = {
+	handleDownloadClick: () => void;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	type: Charts;
+	refElement: RefObject<HTMLDivElement>;
+	fileName: string;
+};
+
+export type Mode = "download" | "copy";
