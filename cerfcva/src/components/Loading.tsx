@@ -3,8 +3,9 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import constants from "../utils/constants";
 
-const HARDCODED_TOTAL_SIZE = 295757286; //TODO: Change this value
+const { HARDCODED_TOTAL_SIZE } = constants;
 
 type LoadingProps = {
 	progress: number;

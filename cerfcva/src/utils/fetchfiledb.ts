@@ -1,4 +1,4 @@
-import { openDB, DBSchema, IDBPDatabase } from "idb";
+import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import { csvParse, autoType } from "d3";
 import { fetchWithProgress } from "./fetchwithprogress";
 
