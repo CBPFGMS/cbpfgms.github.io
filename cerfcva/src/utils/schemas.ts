@@ -156,13 +156,15 @@ export const allocationTypesMasterObjectSchema = z.object({
 export const pooledFundsMasterObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
+	AAgent: z.string(),
+	MAAgent: z.string(),
 	PFAbbrv: z.string(),
 	PFLat: z.number(),
 	PFLong: z.number(),
-	PFCountryCode: z.string().length(2),
-	MAAgent: z.string(),
-	AAgent: z.string(),
-	IsPublic: z.string(),
+	PFCountryCode: z.string(),
+	IsPublic: z.number().int(),
+	FundStatus: z.string(),
+	PoolFundCodeAbbrv: z.string(),
 });
 
 export const organizationMasterObjectSchema = z.object({
@@ -190,7 +192,7 @@ export const organizationMasterObjectSchema = z.object({
 		.string()
 		.regex(dateRegex, "Invalid date format")
 		.nullable(),
-	GlobalOrgId: z.number().int().nonnegative().nullable(),
+	GlobalOrgId: z.number().int().nonnegative(),
 	GlobalUniqueId: z.number().int().nonnegative(),
 	LocalizationMarker: z.string().nullable(),
 	OrgIsWLO: z.string().nullable(),
@@ -203,7 +205,7 @@ export const organizationMasterObjectSchema = z.object({
 export const allocationSourcesMasterObjectSchema = z.object({
 	AllSrcId: z.number().int().nonnegative(),
 	AllNm: z.string(),
-	AllSrcCode: z.string().length(1),
+	AllSrcCode: z.string(),
 });
 
 export const organizationTypesMasterObjectSchema = z.object({

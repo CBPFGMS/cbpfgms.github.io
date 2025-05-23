@@ -16,3 +16,7 @@
 	--ocha-blue-lighter: #82b5e9;
 	--ocha-blue-darker: #144372;
 }
+
+.MuiButtonBase-root:focus {
+	outline: none;
+}

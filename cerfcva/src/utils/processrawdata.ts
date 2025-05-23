@@ -43,7 +43,7 @@ export type InDataLists = {
 	sectors: Set<number>;
 	allocationTypes: Set<number>;
 	allocationSources: Set<number>;
-	funds: Set<number>;
+	countries: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 };
@@ -76,7 +76,7 @@ function processRawData({
 		new Set();
 	const allocationSourcesSet: Set<InDataListsValues["allocationSources"]> =
 		new Set();
-	const fundsSet: Set<InDataListsValues["funds"]> = new Set();
+	const countriesSet: Set<InDataListsValues["countries"]> = new Set();
 	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
@@ -140,24 +140,18 @@ function processRawData({
 				);
 			}
 
-			//In case we need to check what projects are missing from emergencies data
-			// if (!thisEmergenciesData) {
-			// 	warnProjectNotFound(
-			// 		row.ChfProjectCode,
-			// 		row,
-			// 		"Project not found in emergencies data"
-			// 	);
-			// }
-
 			if (thisAllocationType && thisOrganization) {
 				yearsSet.add(thisAllocationType.AllocationYear);
-				fundsSet.add(row.PooledFundId);
+				countriesSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				);
+				thisCvaData?.cva.forEach(cva => {
+					sectorsSet.add(cva.sectorId);
+				});
 
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
@@ -205,7 +199,7 @@ function processRawData({
 		sectors: sectorsSet,
 		allocationTypes: allocationTypesSet,
 		allocationSources: allocationSourcesSet,
-		funds: fundsSet,
+		countries: countriesSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 	}));

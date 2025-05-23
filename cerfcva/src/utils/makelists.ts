@@ -30,6 +30,10 @@ export type ListObj = {
 	[key: number]: string;
 };
 
+type FundCoordinates = {
+	[key: number]: { latitude: number; longitude: number };
+};
+
 export type AllocationTypeListObj = {
 	[key: number]: AllocationTypesMasterObject;
 };
@@ -51,10 +55,11 @@ export type ProjectDetails = {
 export type List = {
 	fundNames: ListObj;
 	fundAbbreviatedNames: ListObj;
-	fundIsoCodes: ListObj;
+	fundCoordinates: FundCoordinates;
 	allocationTypes: ListObj;
 	allocationTypesCompleteList: AllocationTypeListObj;
 	allocationSources: ListObj;
+	allocationSourcesAbbreviated: ListObj;
 	organizationTypes: ListObj;
 	organizations: ListObj;
 	organizationsCompleteList: OrganizationListObj;
@@ -76,10 +81,11 @@ function makeLists({
 	const lists: List = {
 		fundNames: {},
 		fundAbbreviatedNames: {},
-		fundIsoCodes: {},
+		fundCoordinates: {},
 		allocationTypes: {},
 		allocationTypesCompleteList: {},
 		allocationSources: {},
+		allocationSourcesAbbreviated: {},
 		organizationTypes: {},
 		organizationsCompleteList: {},
 		organizations: {},
@@ -94,7 +100,10 @@ function makeLists({
 		if (parsedFundMaster.success) {
 			lists.fundNames[d.PFId] = d.PFName;
 			lists.fundAbbreviatedNames[d.PFId] = d.PFAbbrv;
-			lists.fundIsoCodes[d.PFId] = d.PFCountryCode;
+			lists.fundCoordinates[d.PFId] = {
+				latitude: d.PFLat,
+				longitude: d.PFLong,
+			};
 		} else {
 			warnInvalidSchema(
 				"PooledFundsMaster",
@@ -128,6 +137,7 @@ function makeLists({
 			allocationSourcesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationSourcesMaster.success) {
 			lists.allocationSources[d.AllSrcId] = d.AllNm;
+			lists.allocationSourcesAbbreviated[d.AllSrcId] = d.AllSrcCode;
 		} else {
 			warnInvalidSchema(
 				"AllocationSourcesMaster",

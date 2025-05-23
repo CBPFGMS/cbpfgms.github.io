@@ -28,9 +28,9 @@ type ReceiveDataArgs = [
 ];
 
 const pooledFundsMasterUrl =
-		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALL_POOLFUND&PoolfundCodeAbbrv=&ShowAllPooledFunds=&$format=csv",
 	allocationSourcesMasterUrl =
-		"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
+		"./src/assets/stg-data/allocation_source_master.csv", //TODO: change to real master file
 	organizationTypesMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 	sectorsMasterUrl =

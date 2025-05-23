@@ -21,7 +21,7 @@ function TopIntro() {
 			>
 				<Typography
 					variant={"h4"}
-					mb={2}
+					mb={3}
 					style={{
 						fontFamily: "Montserrat",
 						fontSize: "40px",
@@ -45,7 +45,16 @@ function TopIntro() {
 					or unconditional, restricted or unrestricted, and may be
 					used to achieve specific objectives within a particular
 					sector.
-					<br />
+				</Typography>
+				<Typography
+					variant="body1"
+					style={{
+						fontFamily: "Montserrat",
+						fontSize: "14px",
+						textAlign: "center",
+						marginTop: "1em",
+					}}
+				>
 					This dashboard provides an overview of the CVA funding
 					landscape, including the funding trends, the types of
 					organizations involved, the sectors in which CVA is

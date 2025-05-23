@@ -4,104 +4,108 @@ import { type InDataLists } from "../utils/processrawdata";
 
 type UpdateQueryStringParams = {
 	queryStringValues: URLSearchParams;
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	setYear: React.Dispatch<React.SetStateAction<number[]>>;
-	setImplementationStatus: React.Dispatch<
-		React.SetStateAction<ImplementationStatuses[]>
-	>;
+	setYearSummary: React.Dispatch<React.SetStateAction<number[]>>;
+	setCountrySummary: React.Dispatch<React.SetStateAction<number[]>>;
+	setAllocationSourceSummary: React.Dispatch<React.SetStateAction<number[]>>;
+	setYearCountries: React.Dispatch<React.SetStateAction<number[]>>;
+	setSectorCountries: React.Dispatch<React.SetStateAction<number[]>>;
+	setPartnerCountries: React.Dispatch<React.SetStateAction<number[]>>;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	inDataLists: InDataLists;
-	year: number[];
-	fund: number[];
-	allocationType: number[];
-	allocationSource: number[];
-	implementationStatus: ImplementationStatuses[];
+	yearSummary: number[];
+	countrySummary: number[];
+	allocationSourceSummary: number[];
+	yearCountries: number[];
+	sectorCountries: number[];
+	partnerCountries: number[];
 	downloadStates: DownloadStates;
 	defaultYear: number;
-	showFinanciallyClosed: boolean;
 };
 
 function useUpdateQueryString({
-	allocationSource,
-	allocationType,
-	fund,
-	implementationStatus,
+	yearSummary,
+	countrySummary,
+	allocationSourceSummary,
+	yearCountries,
+	sectorCountries,
+	partnerCountries,
 	inDataLists,
 	queryStringValues,
-	setAllocationSource,
-	setAllocationType,
+	setYearSummary,
+	setCountrySummary,
+	setAllocationSourceSummary,
+	setYearCountries,
+	setSectorCountries,
+	setPartnerCountries,
 	setClickedDownload,
-	setFund,
-	setImplementationStatus,
-	setYear,
-	year,
 	downloadStates,
 	defaultYear,
-	showFinanciallyClosed,
 }: UpdateQueryStringParams): void {
-	const implementationStatusesFiltered = showFinanciallyClosed
-		? implementationStatuses
-		: implementationStatuses.filter(
-				status => status !== "Financially Closed"
-		  );
-
 	useEffect(() => {
-		const allocationTypesParam = getNumericArrayParam("allocationType");
-		const allocationSourcesParam = getNumericArrayParam("allocationSource");
-		const fundParam = getNumericArrayParam("fund");
-		const yearParam = getNumericArrayParam("year");
+		const yearSummaryParam = getNumericArrayParam("yearSummary");
+		const countrySummaryParam = getNumericArrayParam("countrySummary");
+		const allocationSourceSummaryParam = getNumericArrayParam(
+			"allocationSourceSummary"
+		);
+		const yearCountriesParam = getNumericArrayParam("yearCountries");
+		const sectorCountriesParam = getNumericArrayParam("sectorCountries");
+		const partnerCountriesParam = getNumericArrayParam("partnerCountries");
 
-		if (allocationTypesParam) setAllocationType(allocationTypesParam);
-		if (allocationSourcesParam) setAllocationSource(allocationSourcesParam);
-		if (fundParam) setFund(fundParam);
-		if (yearParam) setYear(yearParam);
-		if (implementationStatusParam) {
-			setImplementationStatus(implementationStatusParam);
-		}
+		if (yearSummaryParam) setYearSummary(yearSummaryParam);
+		if (countrySummaryParam) setCountrySummary(countrySummaryParam);
+		if (allocationSourceSummaryParam)
+			setAllocationSourceSummary(allocationSourceSummaryParam);
+		if (yearCountriesParam) setYearCountries(yearCountriesParam);
+		if (sectorCountriesParam) setSectorCountries(sectorCountriesParam);
+		if (partnerCountriesParam) setPartnerCountries(partnerCountriesParam);
+
 		return () => {};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
 		setClickedDownload(downloadStates);
-		const allocationTypesParam =
-			allocationType.length === inDataLists.allocationTypes.size
+		const yearSummaryParam =
+			yearSummary.length === 1 && yearSummary[0] === defaultYear
 				? ""
-				: `allocationType=${allocationType}`;
-		const allocationSourcesParam =
-			allocationSource.length === inDataLists.allocationSources.size
+				: `yearSummary=${yearSummary}`;
+		const countrySummaryParam =
+			countrySummary.length === inDataLists.countries.size
 				? ""
-				: `allocationSource=${allocationSource}`;
-		const fundParam =
-			fund.length === inDataLists.funds.size ? "" : `fund=${fund}`;
-		const yearParam =
-			year.length === 1 && year[0] === defaultYear ? "" : `year=${year}`;
-		const implementationStatusParam =
-			implementationStatus.length ===
-			implementationStatusesFiltered.length
+				: `countrySummary=${countrySummary}`;
+		const allocationSourceSummaryParam =
+			allocationSourceSummary.length ===
+			inDataLists.allocationSources.size
 				? ""
-				: `implementationStatus=${implementationStatus}`;
-		const showFinanciallyClosedParam = showFinanciallyClosed
-			? "showFinanciallyClosed"
-			: "";
+				: `allocationSourceSummary=${allocationSourceSummary}`;
+		const yearCountriesParam =
+			yearCountries.length === 1 && yearCountries[0] === defaultYear
+				? ""
+				: `yearCountries=${yearCountries}`;
+		const sectorCountriesParam =
+			sectorCountries.length === inDataLists.sectors.size
+				? ""
+				: `sectorCountries=${sectorCountries}`;
+		const partnerCountriesParam =
+			partnerCountries.length === inDataLists.organizations.size
+				? ""
+				: `partnerCountries=${partnerCountries}`;
 
 		if (
-			allocationTypesParam ||
-			allocationSourcesParam ||
-			fundParam ||
-			yearParam ||
-			implementationStatusParam ||
-			showFinanciallyClosed
+			yearSummaryParam ||
+			countrySummaryParam ||
+			allocationSourceSummaryParam ||
+			yearCountriesParam ||
+			sectorCountriesParam ||
+			partnerCountriesParam
 		) {
 			const params = buildQueryStringParams([
-				allocationTypesParam,
-				allocationSourcesParam,
-				fundParam,
-				yearParam,
-				implementationStatusParam,
-				showFinanciallyClosedParam,
+				yearSummaryParam,
+				countrySummaryParam,
+				allocationSourceSummaryParam,
+				yearCountriesParam,
+				sectorCountriesParam,
+				partnerCountriesParam,
 			]);
 
 			window.history.replaceState({}, "", `?${params}`);
@@ -109,7 +113,14 @@ function useUpdateQueryString({
 			window.history.replaceState({}, "", window.location.pathname);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [implementationStatus, year, fund, allocationSource, allocationType]);
+	}, [
+		yearSummary,
+		countrySummary,
+		allocationSourceSummary,
+		yearCountries,
+		sectorCountries,
+		partnerCountries,
+	]);
 
 	function getNumericArrayParam(param: string): number[] | null {
 		return queryStringValues.get(param)?.split(",").map(Number) ?? null;
