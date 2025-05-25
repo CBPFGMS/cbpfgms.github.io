@@ -6,11 +6,12 @@ import type {
 	DatumSectors,
 	DatumTypes,
 } from "../utils/processdatasummary";
-import type { DownloadStates, InSelectionData } from "./MainContainer";
+import type { DownloadStates } from "./MainContainer";
 import Box from "@mui/material/Box";
 import SelectorsSummary from "./SelectorsSummary";
 import { type InSelectionDataSummary } from "../utils/processdatasummary";
 import { type InSelectionDataCountries } from "../utils/processdatacountries";
+import TopFigures from "./TopFigures";
 
 export type InSelectionData = InSelectionDataCountries & InSelectionDataSummary;
 
@@ -92,6 +93,7 @@ function SummaryContainer({
 				setCountrySummary={setCountrySummary}
 				inSelectionData={inSelectionData}
 			/>
+			<TopFigures dataTopFigures={dataTopFigures} />
 		</Grid>
 	);
 }

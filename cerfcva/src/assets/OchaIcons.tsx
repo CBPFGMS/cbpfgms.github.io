@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
+import SvgIcon, { type SvgIconProps } from "@mui/material/SvgIcon";
 
 export function GBVIcon({ svgProps }: { svgProps: SvgIconProps }) {
 	return (
@@ -105,6 +105,21 @@ export function EmergencyIcon({ svgProps }: { svgProps: SvgIconProps }) {
 					<g id="Icons">
 						<path d="M47.66779,37.40988,27.1178,1.8a3.604,3.604,0,0,0-6.24,0L.32783,37.40988A2.39789,2.39789,0,0,0,2.40778,41.01H45.58784A2.39789,2.39789,0,0,0,47.66779,37.40988Zm-23.67-3.3999a2,2,0,1,1,2-2A2.00591,2.00591,0,0,1,23.99781,34.01Zm2-9a2,2,0,0,1-4,0v-11a2,2,0,1,1,4,0Z" />
 					</g>
+				</g>
+			</svg>
+		</SvgIcon>
+	);
+}
+
+export function MoneyBagIcon({ svgProps }: { svgProps: SvgIconProps }) {
+	return (
+		<SvgIcon {...svgProps}>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 35.993 48"
+			>
+				<g data-name="Layer 2">
+					<path d="M34.846 28.49 26.996 13h-18l-7.85 15.49a13.96 13.96 0 0 0 2.83 15.28A13.82 13.82 0 0 0 13.996 48h8a13.82 13.82 0 0 0 10.02-4.23 13.96 13.96 0 0 0 2.83-15.28M18.996 38v1.5a1.5 1.5 0 0 1-3 0V38h-.5a1.5 1.5 0 0 1 0-3h2.95a1.5 1.5 0 1 0 0-3h-.89a4.493 4.493 0 0 1-1.56-8.73V21.5a1.5 1.5 0 0 1 3 0V23h1.5a1.5 1.5 0 0 1 0 3h-2.94a1.501 1.501 0 1 0 0 3h.89a4.515 4.515 0 0 1 .55 9M8.993 11h8l-1.649-7.434A2 2 0 0 0 13.392 2h-5.4a1 1 0 0 0-.975 1.217ZM22.996 11h3.997l1.984-9.82a1.005 1.005 0 0 0-.99-1.18h-2.99a2.03 2.03 0 0 0-2.004 2 2.02 2.02 0 0 0-1.99-2h-3a1.005 1.005 0 0 0-.99 1.18l1.98 9.82Z" />
 				</g>
 			</svg>
 		</SvgIcon>

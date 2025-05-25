@@ -13,6 +13,7 @@ import TopIntro from "./TopIntro";
 import processDataSummary from "../utils/processdatasummary";
 import processDataCountries from "../utils/processdatacountries";
 import SummaryContainer from "./SummaryContainer";
+import colors from "../utils/colors";
 // import CountriesContainer from "./CountriesContainer";
 
 type MainContainerProps = {
@@ -41,14 +42,14 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		DataContext
 	) as DataContextType;
 
-	const [yearSummary, setYearSummary] = useState<number[]>([2024]), //TODO: set to [defaultYear]
+	const [yearSummary, setYearSummary] = useState<number[]>([defaultYear]),
 		[countrySummary, setCountrySummary] = useState<number[]>([
 			...inDataLists.countries,
 		]),
 		[allocationSourceSummary, setAllocationSourceSummary] = useState<
 			number[]
 		>([...inDataLists.allocationSources]),
-		[yearCountries, setYearCountries] = useState<number[]>([2024]), //TODO: set to [defaultYear]
+		[yearCountries, setYearCountries] = useState<number[]>([defaultYear]),
 		[sectorCountries, setSectorCountries] = useState<number[]>([
 			...inDataLists.sectors,
 		]),
@@ -135,7 +136,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 					style={{
 						width: "100%",
 						padding: "1em",
-						backgroundColor: "#f5f8ff",
+						backgroundColor: colors.paperColor,
 						borderRadius: "8px",
 						position: "relative",
 					}}
