@@ -20,3 +20,7 @@
 .MuiButtonBase-root:focus {
 	outline: none;
 }
+
+.hiddenElement {
+	display: none !important;
+}

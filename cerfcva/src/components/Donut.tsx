@@ -87,8 +87,8 @@ function Donut({ totalSlice, totalColor, CvaSlice, CvaColor }: DonutProps) {
 			>
 				<Typography style={{ fontSize: "0.85em", fontWeight: "bold" }}>
 					<NumberAnimator
-						number={~~((CvaSlice * 1000) / totalSlice) / 10}
-						type="decimal"
+						number={Math.round((CvaSlice * 100) / totalSlice)}
+						type="integer"
 					/>
 					%
 				</Typography>

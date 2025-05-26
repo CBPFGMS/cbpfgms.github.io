@@ -157,6 +157,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 						setYearSummary={setYearSummary}
 						setAllocationSourceSummary={setAllocationSourceSummary}
 						setCountrySummary={setCountrySummary}
+						lists={lists}
 					/>
 					<Divider
 						orientation="horizontal"
@@ -166,6 +167,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 							borderBottom: "none",
 							width: "96%",
 							marginLeft: "2%",
+							marginTop: "2em",
+							marginBottom: "2em",
 						}}
 					/>
 					{/* <CountriesContainer /> */}

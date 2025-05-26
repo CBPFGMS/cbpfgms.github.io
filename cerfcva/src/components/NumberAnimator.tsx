@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSpring, animated } from "@react-spring/web";
 
-type NumberAnimatorProps = {
+export type NumberAnimatorProps = {
 	number: number;
 	type: "decimal" | "integer";
 };

@@ -1,6 +1,6 @@
 import { type Data } from "./processrawdata";
 import { type List } from "./makelists";
-import constants from "./constants";
+import { type AllocationWindows } from "./processdatasummary";
 
 type ProcessDataCountriesParams = {
 	data: Data;
@@ -18,8 +18,6 @@ export type DatumCountries = {
 	latitude: number;
 	longitude: number;
 };
-
-type AllocationWindows = (typeof constants.allocationWindows)[number];
 
 export type InSelectionDataCountries = {
 	partnersCountries: Set<number>;

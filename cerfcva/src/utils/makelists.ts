@@ -178,7 +178,7 @@ function makeLists({
 		const parsedOrganizationMaster =
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
-			lists.organizations[d.GlobalUniqueId] = d.OrganizationName;
+			lists.organizations[d.GlobalOrgId] = d.OrganizationName;
 			lists.organizationsCompleteList[d.GlobalUniqueId] = d;
 		} else {
 			warnInvalidSchema(

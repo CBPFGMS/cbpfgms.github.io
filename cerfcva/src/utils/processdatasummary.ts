@@ -47,7 +47,7 @@ export type InSelectionDataSummary = {
 	countriesSummary: Set<number>;
 };
 
-type AllocationWindows = (typeof constants.allocationWindows)[number];
+export type AllocationWindows = (typeof constants.allocationWindows)[number];
 
 function processDataSummary({
 	data,
