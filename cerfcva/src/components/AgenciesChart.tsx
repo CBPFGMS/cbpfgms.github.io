@@ -30,7 +30,6 @@ function AgenciesChart({
 	countrySummary,
 	allocationSourceSummary,
 }: AgenciesChartProps) {
-	console.log(lists);
 	const { data } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
@@ -64,6 +63,7 @@ function AgenciesChart({
 				flexDirection: "column",
 				width: "100%",
 				position: "relative",
+				marginBottom: "2em",
 			}}
 			mt={3}
 			ref={ref}
@@ -82,7 +82,7 @@ function AgenciesChart({
 				ml={1}
 				style={{
 					fontFamily: "Roboto",
-					fontSize: "32px",
+					fontSize: "24px",
 					fontWeight: 700,
 					color: "#111",
 				}}

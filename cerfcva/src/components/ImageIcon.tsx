@@ -75,7 +75,7 @@ function ImageIcon({ refElement, iconsRef, fileName }: ImageIconProps) {
 				id={id}
 				open={open}
 				anchorEl={anchorEl}
-				sx={{ opacity: 0.9 }}
+				sx={{ opacity: 0.9, zIndex: 1000 }}
 				placement="left"
 				onMouseEnter={handleMouseEnterPopper}
 				onMouseLeave={handleClose}

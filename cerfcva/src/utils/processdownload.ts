@@ -22,12 +22,25 @@ type AgenciesDatumDownload = BaseDownloadDatum & {
 	Partner: string;
 };
 
+type CountryDatumDownload = BaseDownloadDatum & {
+	latitude: number;
+	longitude: number;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
 	yearSummary: number[];
 	countrySummary: number[];
 	allocationSourceSummary: number[];
+};
+
+type ProcessDownloadCountryParams = {
+	data: Data;
+	lists: List;
+	yearCountries: number[];
+	sectorCountries: number[];
+	partnerCountries: number[];
 };
 
 export function processCvaTypeDownload({
@@ -146,6 +159,44 @@ export function processAgenciesDownload({
 	return agenciesDataDownload;
 }
 
+export function processCountryDownload({
+	data,
+	lists,
+	yearCountries,
+	partnerCountries,
+	sectorCountries,
+}: ProcessDownloadCountryParams): CountryDatumDownload[] {
+	const countriesDataDownload: CountryDatumDownload[] = [];
+
+	data.forEach(datum => {
+		if (datum.cvaData !== null) {
+			if (
+				checkRowSummaryCountry(
+					datum,
+					yearCountries,
+					sectorCountries,
+					partnerCountries
+				)
+			) {
+				const baseDownloadDatum = populateBaseDownloadDatum(
+					datum,
+					lists
+				);
+
+				datum.cvaData.forEach(() => {
+					countriesDataDownload.push({
+						...baseDownloadDatum,
+						latitude: lists.fundCoordinates[datum.fund].latitude,
+						longitude: lists.fundCoordinates[datum.fund].longitude,
+					});
+				});
+			}
+		}
+	});
+
+	return countriesDataDownload;
+}
+
 function populateBaseDownloadDatum(
 	datum: Data[number],
 	lists: List
@@ -170,5 +221,22 @@ function checkRowSummary(
 		yearSummary.includes(datum.year) &&
 		countrySummary.includes(datum.fund) &&
 		allocationSourceSummary.includes(datum.allocationSource)
+	);
+}
+
+function checkRowSummaryCountry(
+	datum: Data[number],
+	yearCountries: number[],
+	sectorCountries: number[],
+	partnerCountries: number[]
+): boolean {
+	const sectorIncluded = !!datum.cvaData?.some(cva =>
+		sectorCountries.includes(cva.sectorId)
+	);
+
+	return (
+		yearCountries.includes(datum.year) &&
+		sectorIncluded &&
+		partnerCountries.includes(datum.organizationId)
 	);
 }

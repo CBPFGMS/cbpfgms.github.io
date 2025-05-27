@@ -81,6 +81,12 @@ function AccordionComponent({
 		case "Country":
 			namesList = lists.fundNames;
 			break;
+		case "Sector":
+			namesList = lists.sectors;
+			break;
+		case "Partner":
+			namesList = lists.organizations;
+			break;
 		default:
 			namesList = lists[dataProperty as keyof List] as never;
 	}
@@ -150,9 +156,11 @@ function AccordionComponent({
 								? isValidKey(value[0], namesList)
 									? namesList[value[0]]
 									: value[0].toString()
-								: `${
-										value.length
-								  } ${type.toLocaleLowerCase()}s selected`}
+								: `${value.length} ${
+										type === "Country"
+											? "countrie"
+											: type.toLocaleLowerCase()
+								  }s selected`}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>

@@ -81,7 +81,7 @@ function TypesChart({
 				ml={1}
 				style={{
 					fontFamily: "Roboto",
-					fontSize: "32px",
+					fontSize: "24px",
 					fontWeight: 700,
 					color: "#111",
 				}}
@@ -131,9 +131,9 @@ function TypesChart({
 							list={lists.cvaTypeNames}
 							chartType="types"
 							fromCva={true}
-							totalCvaPercentage={
-								~~((100 * d.allocations) / totalCva)
-							}
+							totalCvaPercentage={Math.round(
+								(100 * d.allocations) / totalCva
+							)}
 						/>
 					</Box>
 				))}

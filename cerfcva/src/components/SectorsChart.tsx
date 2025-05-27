@@ -81,7 +81,7 @@ function SectorsChart({
 				ml={1}
 				style={{
 					fontFamily: "Roboto",
-					fontSize: "32px",
+					fontSize: "24px",
 					fontWeight: 700,
 					color: "#111",
 				}}
@@ -94,7 +94,7 @@ function SectorsChart({
 				width={"95%"}
 				marginLeft={"3%"}
 				alignItems={"center"}
-				gap={2}
+				gap={1}
 				mt={1}
 			>
 				{sortedData.map(d => (

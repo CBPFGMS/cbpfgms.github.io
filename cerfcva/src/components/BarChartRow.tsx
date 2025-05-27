@@ -108,8 +108,8 @@ function BarChartRow({
 					<img
 						src={clustersIconsData[type]}
 						style={{
-							width: "22px",
-							height: "22px",
+							width: "26px",
+							height: "26px",
 							marginLeft: "8px",
 							marginRight: "4px",
 							padding: "4px",

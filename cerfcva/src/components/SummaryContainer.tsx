@@ -16,6 +16,7 @@ import type { List } from "../utils/makelists";
 import TypesChart from "./TypesChart";
 import SectorsChart from "./SectorsChart";
 import AgenciesChart from "./AgenciesChart";
+import Legend from "./Legend";
 
 export type InSelectionData = InSelectionDataCountries & InSelectionDataSummary;
 
@@ -131,6 +132,7 @@ function SummaryContainer({
 				countrySummary={countrySummary}
 				allocationSourceSummary={allocationSourceSummary}
 			/>
+			<Legend />
 		</Grid>
 	);
 }

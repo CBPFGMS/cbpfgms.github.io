@@ -89,6 +89,9 @@ function Search({
 				disableCloseOnSelect
 				renderValue={() => null}
 				getOptionLabel={option => namesList[option]}
+				getOptionDisabled={option =>
+					!inSelectionData[selectionProperty].has(option)
+				}
 				renderOption={(props, option) => (
 					<li
 						{...props}

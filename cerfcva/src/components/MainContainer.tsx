@@ -14,7 +14,7 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataCountries from "../utils/processdatacountries";
 import SummaryContainer from "./SummaryContainer";
 import colors from "../utils/colors";
-// import CountriesContainer from "./CountriesContainer";
+import CountryContainer from "./CountryContainer";
 
 type MainContainerProps = {
 	defaultYear: number;
@@ -34,8 +34,6 @@ const downloadStates = charts.reduce(
 );
 
 const queryStringValues = new URLSearchParams(location.search);
-
-//recreate each inSelectioData inside the process functions, then merge the object in the summarycontainer
 
 function MainContainer({ defaultYear }: MainContainerProps) {
 	const { data, inDataLists, lists } = useContext(
@@ -171,7 +169,19 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 							marginBottom: "2em",
 						}}
 					/>
-					{/* <CountriesContainer /> */}
+					<CountryContainer
+						dataCountries={dataCountries}
+						inSelectionDataSummary={inSelectionDataSummary}
+						inSelectionDataCountries={inSelectionDataCountries}
+						clickedDownload={clickedDownload}
+						setClickedDownload={setClickedDownload}
+						yearCountries={yearCountries}
+						sectorCountries={sectorCountries}
+						partnerCountries={partnerCountries}
+						setYearCountries={setYearCountries}
+						setSectorCountries={setSectorCountries}
+						setPartnerCountries={setPartnerCountries}
+					/>
 				</Paper>
 			</Grid>
 		</Container>

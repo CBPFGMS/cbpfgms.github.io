@@ -11,6 +11,7 @@ type DownloadAndImageContainerProps = {
 	type: Charts;
 	refElement: RefObject<HTMLDivElement | null>;
 	fileName: string;
+	fromMap?: boolean;
 };
 
 function DownloadAndImageContainer({
@@ -20,6 +21,7 @@ function DownloadAndImageContainer({
 	type,
 	refElement,
 	fileName,
+	fromMap = false,
 }: DownloadAndImageContainerProps) {
 	const iconsRef = useRef<HTMLDivElement>(null);
 
@@ -27,14 +29,18 @@ function DownloadAndImageContainer({
 		<Box
 			style={{
 				position: "absolute",
-				top: "0",
-				right: "0",
+				top: fromMap ? "6px" : "0",
+				right: fromMap ? "6px" : "0",
 				paddingTop: "0em",
 				paddingRight: "0.5em",
 				cursor: "pointer",
 				zIndex: 1000,
 				display: "flex",
 				flexDirection: "column",
+				backgroundColor: fromMap ? "rgba(255, 255, 255, 0.8)" : "",
+				padding: fromMap ? "0.5em" : "",
+				borderRadius: fromMap ? "0.25em" : "0",
+				border: fromMap ? "2px solid rgba(0, 0, 0, 0.2)" : "",
 			}}
 			ref={iconsRef}
 		>

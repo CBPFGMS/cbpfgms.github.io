@@ -15,6 +15,7 @@ export type Datum = {
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
+	organizationGlobalId: number;
 	allocationType: number;
 	allocationTypeId: number;
 	endDate: Date;
@@ -145,7 +146,7 @@ function processRawData({
 				countriesSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				organizationsSet.add(thisOrganization.GlobalOrgId);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				);
@@ -172,7 +173,8 @@ function processRawData({
 					projectId: row.ChfId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalUniqueId,
+					organizationId: thisOrganization.GlobalOrgId,
+					organizationGlobalId: thisOrganization.GlobalUniqueId,
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`
 					),

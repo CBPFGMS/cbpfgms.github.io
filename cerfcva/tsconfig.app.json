@@ -26,5 +26,6 @@
 		"noUncheckedSideEffectImports": true,
 		"strictNullChecks": true
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["src/Progresscode/**"]
 }
