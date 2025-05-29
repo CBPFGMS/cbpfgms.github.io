@@ -147,7 +147,7 @@ export function processAgenciesDownload({
 						Partner:
 							lists.organizations[
 								lists.organizationsCompleteList[
-									datum.organizationId
+									datum.organizationGlobalId
 								].GlobalOrgId
 							],
 					});

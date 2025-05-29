@@ -1,9 +1,9 @@
 import { select } from "d3-selection";
 import { scaleLinear, scaleSqrt } from "d3-scale";
-import { transition } from "d3-transition";
 import colors from "../utils/colors";
-import { format } from "d3-format";
 import type { DatumCountries } from "../utils/processdatacountries";
+import { pie, arc, type PieArcDatum } from "d3-shape";
+import { type AllocationWindows } from "../utils/processdatasummary";
 
 type CreateMapParams = {
 	data: DatumCountries[];
@@ -13,7 +13,16 @@ type CreateMapParams = {
 	minCircleRadius: number;
 };
 
-const latLongSeparator = "|";
+type DonutDatum = {
+	type: AllocationWindows;
+	value: number;
+	outerRadius: number;
+};
+
+const allocationTypes: AllocationWindows[] = ["rr", "ufe"];
+
+const strokeOpacityValue = 0.8,
+	fillOpacityValue = 0.5;
 
 function createMap({
 	data,
@@ -34,92 +43,106 @@ function createMap({
 		.domain([0, maxValue])
 		.range([minCircleRadius, maxCircleRadius]);
 
-	const syncedTransition = transition().duration(750);
+	// let circles = svgGroup
+	// 	.selectAll<SVGCircleElement, DatumCountries>("circle")
+	// 	.data<DatumCountries>(
+	// 		data,
+	// 		d => d.latitude + latLongSeparator + d.longitude
+	// 	);
 
-	let circles = svgGroup
-		.selectAll<SVGCircleElement, DatumCountries>("circle")
-		.data<DatumCountries>(
-			data,
-			d => d.latitude + latLongSeparator + d.longitude
+	// circles.exit().transition(syncedTransition).attr("r", 0).remove();
+
+	// const circlesEnter = circles
+	// 	.enter()
+	// 	.append("svg")
+	// 	.style("overflow", "visible")
+	// 	.attr("x", d => longitudeScale(d.longitude) + "%")
+	// 	.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%");
+
+	// circlesEnter.append("circle")
+	// 	.attr("r", 0)
+	// 	.attr("data-tooltip-id", "tooltip")
+	// 	.attr("data-tooltip-html", createHtmlString())
+	// 	.attr("data-tooltip-place", "top")
+	// 	.attr("stroke", "black")
+	// 	.attr("stroke-width", 0.5)
+	// 	.attr("stroke-opacity", 0.5)
+	// 	.style("pointer-events", "auto");
+
+	// circles = circlesEnter.merge(circles);
+
+	// circles
+	// 	.transition(syncedTransition)
+	// 	.attr("x", d => longitudeScale(d.longitude) + "%")
+	// 	.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
+	// 	.attr("r", d => radiusScale(d.allocations))
+	// 	.attr("fill", colors.ufeColor);
+
+	// PATHS
+
+	const pieGenerator = pie<DonutDatum>()
+		.value(d => d.value)
+		.sort(null);
+
+	const arcGenerator = arc<PieArcDatum<DonutDatum>>()
+		.innerRadius(0)
+		.outerRadius(d => d.data.outerRadius);
+
+	let pieGroup = svgGroup
+		.selectAll<SVGGElement, DatumCountries>(".pieGroup")
+		.data<DatumCountries>(data, d => d.country);
+
+	pieGroup.exit().remove();
+
+	const pieGroupEnter = pieGroup
+		.enter()
+		.append("svg")
+		.attr("class", "pieGroup")
+		.style("opacity", 1)
+		.style("overflow", "visible")
+		.attr("x", d => longitudeScale(d.longitude) + "%")
+		.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
+		.append("g");
+
+	pieGroup = pieGroupEnter.merge(pieGroup);
+
+	pieGroup.order();
+
+	let slices = pieGroup
+		.selectAll<SVGPathElement, PieArcDatum<DonutDatum>>(".slice")
+		.data<PieArcDatum<DonutDatum>>(
+			d => {
+				const datum: DonutDatum[] = allocationTypes
+					.map(type => ({
+						value: d[type],
+						type,
+						outerRadius: radiusScale(d.allocations),
+					}))
+					.filter(e => e.value !== 0);
+				return pieGenerator(datum);
+			},
+			d => d.data.type
 		);
 
-	circles.exit().transition(syncedTransition).attr("r", 0).remove();
+	slices.exit().remove();
 
-	const circlesEnter = circles
+	const slicesEnter = slices
 		.enter()
-		.append("circle")
-		.attr("cx", d => longitudeScale(d.longitude) + "%")
-		.attr("cy", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
-		.attr("r", 0)
-		.attr("data-tooltip-id", "tooltip")
-		.attr("data-tooltip-html", createHtmlString())
-		.attr("data-tooltip-place", "top")
-		.attr("stroke", "black")
-		.attr("stroke-width", 0.5)
-		.attr("stroke-opacity", 0.5)
-		.style("pointer-events", "auto");
+		.append("path")
+		.attr("class", "slice")
+		.style(
+			"fill",
+			d => colors[(d.data.type + "Color") as keyof typeof colors]
+		)
+		.style("stroke", "#666")
+		.style("stroke-width", "1px")
+		.style("stroke-opacity", strokeOpacityValue)
+		.style("fill-opacity", fillOpacityValue)
+		.attr("d", d => arcGenerator(d));
 
-	circles = circlesEnter.merge(circles);
+	slices = slicesEnter.merge(slices);
 
-	circles
-		.transition(syncedTransition)
-		.attr("cx", d => longitudeScale(d.longitude) + "%")
-		.attr("cy", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
-		.attr("r", d => radiusScale(d.allocations))
-		.attr("fill", colors.ufeColor);
-}
-
-function createHtmlString(): string {
-	const tooltipFormat = format(",");
-	const tooltipFormatPercent = format(".0%");
-	const totalTargeted = 0;
-	const totalReached = 0;
-	return `<span style="font-weight:bold;">Location: ${"foo"}</span><br>
-	<div style="width:300px;display:flex;flex-direction:column;margin-top:10px;">
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%"></div>
-	<div style="flex: 0 40%;text-align:right;">Targeted</div>
-	<div style="flex: 0 40%;text-align:right;">Reached</div>
-	</div>
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%">Girls</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(0)}</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
-		0
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(0)})</span></div>
-	</div>
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%">Boys</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(0)}</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
-		0
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(0)})</span></div>
-	</div>
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%">Women</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(0)}</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
-		0
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(0)})</span></div>
-	</div>
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%">Men</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(0)}</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
-		0
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(0)})</span></div>
-	</div>
-	<br>
-	<div style="display:flex;flex-direction:row;">
-	<div style="flex: 0 20%">Total</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(totalTargeted)}</div>
-	<div style="flex: 0 40%;text-align:right;">${tooltipFormat(
-		totalReached
-	)} <span style="font-size:10px;">(${tooltipFormatPercent(
-		totalReached / totalTargeted
-	)})</span></div>
-	</div>
-	</div>`;
+	slices.attr("d", d => arcGenerator(d));
 }
 
 function latitudeToMercator(latitude: number): number {

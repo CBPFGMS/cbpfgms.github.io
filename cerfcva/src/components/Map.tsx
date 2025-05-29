@@ -84,7 +84,13 @@ function Map({
 				minCircleRadius,
 			});
 		}
-	}, [minMaxValue]);
+	}, [minMaxValue, sizeSvgRef, legendSvgWidth, legendSvgHeight]);
+
+	useEffect(() => {
+		if (mapRef.current) {
+			mapRef.current.removeControl(mapRef.current.attributionControl);
+		}
+	});
 
 	return (
 		<Container

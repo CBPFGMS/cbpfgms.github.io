@@ -115,7 +115,9 @@ function CountryContainer({
 						}}
 					>
 						Allocations values <br />
-						by size of circle:
+						by size (area)
+						<br />
+						of the circles:
 					</Typography>
 				</Box>
 				<svg

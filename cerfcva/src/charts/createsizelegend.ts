@@ -58,8 +58,8 @@ function createSizeLegend({
 		.attr("cy", d => legendSvgHeight / circleBaseRatio - radiusScale(d))
 		.attr("fill", "none")
 		.attr("stroke", "black")
-		.attr("stroke-width", 0.5)
-		.attr("stroke-opacity", 0.5);
+		.attr("stroke-width", 1)
+		.attr("stroke-opacity", 0.6);
 
 	let sizeLabels = svg
 		.selectAll<SVGTextElement, number>("text")
@@ -79,7 +79,7 @@ function createSizeLegend({
 		.text(d => "$" + formatSIFloat(d))
 		.append("tspan")
 		.attr("x", (_, i) => posScale(i.toString())!)
-		.attr("dy", "1em")
+		.attr("dy", "1.25em")
 		.text((_, i) =>
 			i === sizeCirclesData.length - 1
 				? " (max)"
