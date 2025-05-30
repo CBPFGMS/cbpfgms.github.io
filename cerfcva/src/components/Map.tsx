@@ -132,6 +132,7 @@ function Map({
 							maxValue={minMaxValue[1]}
 							maxCircleRadius={maxCircleRadius}
 							minCircleRadius={minCircleRadius}
+							lists={lists}
 						/>
 					</MapContainer>
 				</Box>

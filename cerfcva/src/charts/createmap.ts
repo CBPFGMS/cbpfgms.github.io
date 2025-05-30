@@ -1,9 +1,11 @@
 import { select } from "d3-selection";
 import { scaleLinear, scaleSqrt } from "d3-scale";
+import { format } from "d3-format";
 import colors from "../utils/colors";
 import type { DatumCountries } from "../utils/processdatacountries";
 import { pie, arc, type PieArcDatum } from "d3-shape";
 import { type AllocationWindows } from "../utils/processdatasummary";
+import type { List } from "../utils/makelists";
 
 type CreateMapParams = {
 	data: DatumCountries[];
@@ -11,6 +13,7 @@ type CreateMapParams = {
 	maxCircleRadius: number;
 	maxValue: number;
 	minCircleRadius: number;
+	lists: List;
 };
 
 type DonutDatum = {
@@ -24,12 +27,16 @@ const allocationTypes: AllocationWindows[] = ["rr", "ufe"];
 const strokeOpacityValue = 0.8,
 	fillOpacityValue = 0.5;
 
+const tooltipFormat = format(","),
+	tooltipFormatPercent = format(".0%");
+
 function createMap({
 	data,
 	svgGroupRef,
 	maxCircleRadius,
 	maxValue,
 	minCircleRadius,
+	lists,
 }: CreateMapParams): void {
 	const svgGroup = select(svgGroupRef.current);
 
@@ -42,43 +49,6 @@ function createMap({
 	const radiusScale = scaleSqrt<number>()
 		.domain([0, maxValue])
 		.range([minCircleRadius, maxCircleRadius]);
-
-	// let circles = svgGroup
-	// 	.selectAll<SVGCircleElement, DatumCountries>("circle")
-	// 	.data<DatumCountries>(
-	// 		data,
-	// 		d => d.latitude + latLongSeparator + d.longitude
-	// 	);
-
-	// circles.exit().transition(syncedTransition).attr("r", 0).remove();
-
-	// const circlesEnter = circles
-	// 	.enter()
-	// 	.append("svg")
-	// 	.style("overflow", "visible")
-	// 	.attr("x", d => longitudeScale(d.longitude) + "%")
-	// 	.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%");
-
-	// circlesEnter.append("circle")
-	// 	.attr("r", 0)
-	// 	.attr("data-tooltip-id", "tooltip")
-	// 	.attr("data-tooltip-html", createHtmlString())
-	// 	.attr("data-tooltip-place", "top")
-	// 	.attr("stroke", "black")
-	// 	.attr("stroke-width", 0.5)
-	// 	.attr("stroke-opacity", 0.5)
-	// 	.style("pointer-events", "auto");
-
-	// circles = circlesEnter.merge(circles);
-
-	// circles
-	// 	.transition(syncedTransition)
-	// 	.attr("x", d => longitudeScale(d.longitude) + "%")
-	// 	.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
-	// 	.attr("r", d => radiusScale(d.allocations))
-	// 	.attr("fill", colors.ufeColor);
-
-	// PATHS
 
 	const pieGenerator = pie<DonutDatum>()
 		.value(d => d.value)
@@ -97,12 +67,17 @@ function createMap({
 	const pieGroupEnter = pieGroup
 		.enter()
 		.append("svg")
+		.style("pointer-events", "all")
 		.attr("class", "pieGroup")
 		.style("opacity", 1)
 		.style("overflow", "visible")
 		.attr("x", d => longitudeScale(d.longitude) + "%")
 		.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
-		.append("g");
+		.append("g")
+		.attr("data-tooltip-id", "tooltip")
+		.attr("data-tooltip-html", d => createHtmlString(d, lists))
+		.attr("data-tooltip-place", "top")
+		.style("pointer-events", "all");
 
 	pieGroup = pieGroupEnter.merge(pieGroup);
 
@@ -138,6 +113,7 @@ function createMap({
 		.style("stroke-width", "1px")
 		.style("stroke-opacity", strokeOpacityValue)
 		.style("fill-opacity", fillOpacityValue)
+		.style("pointer-events", "all")
 		.attr("d", d => arcGenerator(d));
 
 	slices = slicesEnter.merge(slices);
@@ -149,6 +125,30 @@ function latitudeToMercator(latitude: number): number {
 	const radians = latitude * (Math.PI / 180);
 	const mercatorY = Math.log(Math.tan(radians / 2 + Math.PI / 4));
 	return mercatorY;
+}
+
+function createHtmlString(d: DatumCountries, lists: List): string {
+	return `<span style="font-weight:bold;">Location: ${
+		lists.fundNames[d.country]
+	}</span><br>
+	<div style="width:330px;display:flex;flex-direction:column;margin-top:10px;">
+	<div style="display:flex;flex-direction:row;">
+	<div style="flex: 0 68%;text-align:left;">Allocation Window</div>
+	<div style="flex: 0 32%;text-align:right;outline:1px solid #fff;">Value</div>
+	</div>
+	<div style="display:flex;flex-direction:row;">
+	<div style="flex: 0 68%;text-align:left;">Rapid Response <span style="font-size:11px;">(${tooltipFormatPercent(
+		d.rr / d.allocations
+	)})</span>:</div>
+	<div style="flex: 0 32%;text-align:right;">$${tooltipFormat(d.rr)} </div>
+	</div>
+	<div style="display:flex;flex-direction:row;">
+	<div style="flex: 0 68%;text-align:left;">Underfunded Emergencies <span style="font-size:10px;">(${tooltipFormatPercent(
+		d.ufe / d.allocations
+	)})</span>:</div>
+	<div style="flex: 0 32%;text-align:right;">$${tooltipFormat(d.ufe)} </div>
+	</div>
+	</div>`;
 }
 
 export default createMap;

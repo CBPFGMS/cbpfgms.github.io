@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 import createMap from "../charts/createmap";
 import { extent } from "d3-array";
 import type { DatumCountries } from "../utils/processdatacountries";
+import type { List } from "../utils/makelists";
 
 export type SVGOverlayComponentProps = {
 	data: DatumCountries[];
@@ -10,6 +11,7 @@ export type SVGOverlayComponentProps = {
 	maxValue: number;
 	maxCircleRadius: number;
 	minCircleRadius: number;
+	lists: List;
 };
 
 function SVGOverlayComponent({
@@ -18,6 +20,7 @@ function SVGOverlayComponent({
 	maxValue,
 	maxCircleRadius,
 	minCircleRadius,
+	lists,
 }: SVGOverlayComponentProps) {
 	const map = useMap();
 	const svgGroupRef = useRef<SVGSVGElement | null>(null);
@@ -36,6 +39,7 @@ function SVGOverlayComponent({
 				maxCircleRadius,
 				maxValue,
 				minCircleRadius,
+				lists,
 			});
 		}
 	}, [data, map, maxCircleRadius, maxValue, maxZoomValue, minCircleRadius]);
@@ -48,7 +52,10 @@ function SVGOverlayComponent({
 			]}
 			opacity={1}
 		>
-			<g ref={svgGroupRef} />
+			<g
+				ref={svgGroupRef}
+				style={{ pointerEvents: "auto" }}
+			/>
 		</SVGOverlay>
 	);
 }
