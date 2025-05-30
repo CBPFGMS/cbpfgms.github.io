@@ -134,7 +134,7 @@ function createHtmlString(d: DatumCountries, lists: List): string {
 	<div style="width:330px;display:flex;flex-direction:column;margin-top:10px;">
 	<div style="display:flex;flex-direction:row;">
 	<div style="flex: 0 68%;text-align:left;">Allocation Window</div>
-	<div style="flex: 0 32%;text-align:right;outline:1px solid #fff;">Value</div>
+	<div style="flex: 0 32%;text-align:right;">Value</div>
 	</div>
 	<div style="display:flex;flex-direction:row;">
 	<div style="flex: 0 68%;text-align:left;">Rapid Response <span style="font-size:11px;">(${tooltipFormatPercent(
