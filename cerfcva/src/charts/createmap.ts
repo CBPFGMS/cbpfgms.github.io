@@ -59,7 +59,7 @@ function createMap({
 		.outerRadius(d => d.data.outerRadius);
 
 	let pieGroup = svgGroup
-		.selectAll<SVGGElement, DatumCountries>(".pieGroup")
+		.selectAll<SVGSVGElement, DatumCountries>(".pieGroup")
 		.data<DatumCountries>(data, d => d.country);
 
 	pieGroup.exit().remove();
@@ -72,7 +72,9 @@ function createMap({
 		.style("opacity", 1)
 		.style("overflow", "visible")
 		.attr("x", d => longitudeScale(d.longitude) + "%")
-		.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%")
+		.attr("y", d => latitudeScale(latitudeToMercator(d.latitude)) + "%");
+
+	pieGroupEnter
 		.append("g")
 		.attr("data-tooltip-id", "tooltip")
 		.attr("data-tooltip-html", d => createHtmlString(d, lists))
@@ -81,9 +83,14 @@ function createMap({
 
 	pieGroup = pieGroupEnter.merge(pieGroup);
 
+	pieGroup
+		.select<SVGGElement>("g")
+		.attr("data-tooltip-html", d => createHtmlString(d, lists));
+
 	pieGroup.order();
 
 	let slices = pieGroup
+		.select<SVGGElement>("g")
 		.selectAll<SVGPathElement, PieArcDatum<DonutDatum>>(".slice")
 		.data<PieArcDatum<DonutDatum>>(
 			d => {
