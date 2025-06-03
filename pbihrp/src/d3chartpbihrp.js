@@ -206,7 +206,7 @@
 				"hrpfunding",
 				"hrprequirements",
 			],
-			fundsNumberRightPadding = [82, 260],
+			fundsNumberRightPadding = [82, 282],
 			yScaleBarChartInnerDomain = ["HRP", "CBPF"],
 			yScaleBarChartNonHrpInnerDomain = ["TARGET", "CBPF"],
 			legendRectangleSize = 16,
@@ -2515,6 +2515,8 @@
 			topPanelRhpfsText
 				.append("tspan")
 				.attr("class", "pbihrpinfoIcon contributionColorFill")
+				.attr("dy", "-8px")
+				.style("font-size", "16px")
 				.text(" \uf05a");
 
 			topPanelRhpfsText
