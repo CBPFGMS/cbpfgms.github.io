@@ -63,9 +63,9 @@ function AgenciesChart({
 				flexDirection: "column",
 				width: "100%",
 				position: "relative",
-				marginBottom: "2em",
 			}}
-			mt={3}
+			pt={3}
+			pb={1}
 			ref={ref}
 		>
 			<DownloadAndImageContainer
@@ -111,7 +111,8 @@ function AgenciesChart({
 							rr={d.rr}
 							ufe={d.ufe}
 							maxValue={maxValue}
-							list={lists.organizations}
+							lists={lists}
+							listProperty="organizationsAcronym"
 							chartType="agencies"
 						/>
 					</Box>

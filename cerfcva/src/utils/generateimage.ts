@@ -6,11 +6,15 @@ type Mode = "download" | "copy";
 function generateImage(
 	ref: RefObject<HTMLDivElement | null>,
 	iconsRef: RefObject<HTMLDivElement | null>,
+	zoomControlRef: RefObject<HTMLDivElement | null> | undefined,
 	mode: Mode,
 	fileName: string
 ): Promise<void> {
 	if (iconsRef.current) {
 		iconsRef.current.classList.add("hiddenElement");
+	}
+	if (zoomControlRef?.current) {
+		zoomControlRef.current.classList.add("hiddenElement");
 	}
 	return new Promise((resolve, reject) => {
 		if (ref.current) {
@@ -45,6 +49,11 @@ function generateImage(
 				.finally(() => {
 					if (iconsRef.current) {
 						iconsRef.current.classList.remove("hiddenElement");
+					}
+					if (zoomControlRef?.current) {
+						zoomControlRef.current.classList.remove(
+							"hiddenElement"
+						);
 					}
 				});
 		} else {

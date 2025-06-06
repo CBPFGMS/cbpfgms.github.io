@@ -6,7 +6,6 @@ import Divider from "@mui/material/Divider";
 import { MoneyBagIcon, CashIcon } from "../assets/OchaIcons";
 import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
-import formatSIFloat from "../utils/formatsi";
 import Typography from "@mui/material/Typography";
 import Donut from "./Donut";
 import SiValue from "./SiValue";
@@ -22,16 +21,9 @@ export type DonutDatum = {
 };
 
 function TopFigures({ dataTopFigures }: TopFiguresProps) {
-	const rrPercentage = dataTopFigures.rr
-		? (dataTopFigures.rr / dataTopFigures.allocations) * 100
-		: 0;
-	const ufePercentage = dataTopFigures.ufe
-		? (dataTopFigures.ufe / dataTopFigures.allocations) * 100
-		: 0;
-
 	return (
 		<Box
-			mt={3}
+			pt={3}
 			sx={{
 				display: "flex",
 				flexDirection: "column",
@@ -44,74 +36,90 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 			<Grid
 				container
 				spacing={2}
-				width={"92%"}
+				width={"95%"}
 				flexWrap={"nowrap"}
 				justifyContent={"center"}
 				alignItems={"center"}
-				height={"88px"}
-				mb={3}
+				height={"168px"}
+				mb={5}
 			>
 				<Grid
-					size={4}
+					size={4.5}
 					height={"100%"}
 				>
 					<Box
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`Total allocations: $${format(
-							",.2f"
-						)(dataTopFigures.totalAllocations)}`}
-						data-tooltip-place="top"
-						sx={{
+						style={{
+							height: "100%",
+							width: "100%",
 							display: "flex",
-							flexDirection: "row",
+							flexDirection: "column",
 							alignItems: "center",
 							justifyContent: "center",
-							height: "100%",
+							gap: "2em",
 						}}
 					>
-						<MoneyBagIcon
-							svgProps={{
-								style: {
-									marginRight: "0.5em",
-									width: "74px",
-									height: "74px",
-									fill: colors.unColor,
-								},
-							}}
-						/>
 						<Box
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`Total allocations: $${format(
+								",.2f"
+							)(dataTopFigures.totalAllocations)}`}
+							data-tooltip-place="top"
 							sx={{
 								display: "flex",
-								flexDirection: "column",
+								flexDirection: "row",
 								alignItems: "center",
 								justifyContent: "center",
+								height: "100%",
 							}}
 						>
-							<Typography
-								variant="h3"
-								fontWeight={500}
-								style={{
-									color: colors.topFiguresColor,
-									border: "none",
+							<MoneyBagIcon
+								svgProps={{
+									style: {
+										marginRight: "0.5em",
+										width: "74px",
+										height: "74px",
+										fill: colors.unColor,
+									},
+								}}
+							/>
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
 								}}
 							>
-								<SiValue
-									number={dataTopFigures.totalAllocations}
-									type="decimal"
-								/>
-							</Typography>
-							<Typography
-								style={{
-									marginTop: "-0.5em",
-									fontSize: 18,
-									color: "#666",
-									fontFamily: "Roboto, sans-serif",
-									fontWeight: "normal",
-								}}
-							>
-								Total Allocations
-							</Typography>
+								<Typography
+									variant="h2"
+									fontWeight={500}
+									style={{
+										color: colors.topFiguresColor,
+										border: "none",
+									}}
+								>
+									<SiValue
+										number={dataTopFigures.totalAllocations}
+										type="decimal"
+									/>
+								</Typography>
+								<Typography
+									style={{
+										marginTop: "-0.5em",
+										fontSize: 18,
+										color: "#666",
+										fontFamily: "Roboto, sans-serif",
+										fontWeight: "normal",
+									}}
+								>
+									Total Allocations
+								</Typography>
+							</Box>
 						</Box>
+						<RrAndUfe
+							rr={dataTopFigures.rrTotal}
+							ufe={dataTopFigures.ufeTotal}
+						/>
 					</Box>
 				</Grid>
 				<Divider
@@ -123,66 +131,82 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 					}}
 				/>
 				<Grid
-					size={4}
+					size={4.5}
 					height={"100%"}
 				>
 					<Box
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`Total CVA allocations: $${format(
-							",.2f"
-						)(dataTopFigures.allocations)}`}
-						data-tooltip-place="top"
-						sx={{
+						style={{
+							height: "100%",
+							width: "100%",
 							display: "flex",
-							flexDirection: "row",
+							flexDirection: "column",
 							alignItems: "center",
 							justifyContent: "center",
-							height: "100%",
+							gap: "2em",
 						}}
 					>
-						<CashIcon
-							svgProps={{
-								style: {
-									marginRight: "1em",
-									width: "62px",
-									height: "62px",
-									fill: colors.unColor,
-								},
-							}}
-						/>
 						<Box
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`Total CVA allocations: $${format(
+								",.2f"
+							)(dataTopFigures.allocations)}`}
+							data-tooltip-place="top"
 							sx={{
 								display: "flex",
-								flexDirection: "column",
+								flexDirection: "row",
 								alignItems: "center",
 								justifyContent: "center",
+								height: "100%",
 							}}
 						>
-							<Typography
-								variant="h3"
-								fontWeight={500}
-								style={{
-									color: colors.topFiguresColor,
-									border: "none",
+							<CashIcon
+								svgProps={{
+									style: {
+										marginRight: "1em",
+										width: "62px",
+										height: "62px",
+										fill: colors.unColor,
+									},
+								}}
+							/>
+							<Box
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
 								}}
 							>
-								<SiValue
-									number={dataTopFigures.allocations}
-									type="decimal"
-								/>
-							</Typography>
-							<Typography
-								style={{
-									marginTop: "-0.5em",
-									fontSize: 18,
-									color: "#666",
-									fontFamily: "Roboto, sans-serif",
-									fontWeight: "normal",
-								}}
-							>
-								CVA Allocations
-							</Typography>
+								<Typography
+									variant="h2"
+									fontWeight={500}
+									style={{
+										color: colors.topFiguresColor,
+										border: "none",
+									}}
+								>
+									<SiValue
+										number={dataTopFigures.allocations}
+										type="decimal"
+									/>
+								</Typography>
+								<Typography
+									style={{
+										marginTop: "-0.5em",
+										fontSize: 18,
+										color: "#666",
+										fontFamily: "Roboto, sans-serif",
+										fontWeight: "normal",
+									}}
+								>
+									CVA Allocations
+								</Typography>
+							</Box>
 						</Box>
+						<RrAndUfe
+							rr={dataTopFigures.rr}
+							ufe={dataTopFigures.ufe}
+						/>
 					</Box>
 				</Grid>
 				<Divider
@@ -194,7 +218,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 					}}
 				/>
 				<Grid
-					size={4}
+					size={3}
 					height={"100%"}
 				>
 					<Box
@@ -215,11 +239,12 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 						<Box
 							style={{
 								display: "flex",
-								flex: "0 50%",
+								flex: "0 60%",
 								alignItems: "center",
 								justifyContent: "center",
 								textAlign: "center",
-								paddingLeft: "2em",
+								paddingLeft: "1em",
+								paddingRight: "1em",
 							}}
 						>
 							<Typography
@@ -238,7 +263,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 						<Box
 							style={{
 								display: "flex",
-								flex: "0 50%",
+								flex: "0 40%",
 								alignItems: "center",
 								justifyContent: "center",
 								width: "100%",
@@ -258,7 +283,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 			<Box
 				display={"flex"}
 				flexDirection={"row"}
-				width={"92%"}
+				width={"90%"}
 				justifyContent={"center"}
 				alignItems={"center"}
 			>
@@ -279,37 +304,6 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 					value={dataTopFigures.partners.size}
 					text={"CVA partners"}
 				/>
-				<Box>
-					<Typography
-						style={{
-							color: colors.topFiguresColor,
-						}}
-					>
-						&#x2B25;
-					</Typography>
-				</Box>
-				<Box
-					sx={{
-						display: "flex",
-						flexDirection: "column",
-						paddingLeft: "1em",
-						flexGrow: 0,
-					}}
-				>
-					<RrAndUfe
-						text={"Rapid Response"}
-						value={dataTopFigures.rr}
-						percentage={rrPercentage}
-						color={colors.rrColorDarker}
-					/>
-					<RrAndUfe
-						text={"Underfunded Emergencies"}
-						value={dataTopFigures.ufe}
-						percentage={ufePercentage}
-						color={colors.ufeColorDarker}
-						last
-					/>
-				</Box>
 			</Box>
 		</Box>
 	);
@@ -330,7 +324,7 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 		>
 			<Typography
 				fontWeight={500}
-				fontSize={24}
+				fontSize={28}
 				style={{
 					color: colors.topFiguresColor,
 				}}
@@ -342,7 +336,7 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 			</Typography>
 			<Typography
 				fontWeight={400}
-				fontSize={18}
+				fontSize={22}
 				style={{
 					color: "#666",
 					marginLeft: "0.5em",
@@ -355,70 +349,130 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 	);
 }
 
-function RrAndUfe({
-	text,
-	value,
-	percentage,
-	color,
-	last,
-}: {
-	text: string;
-	value: number;
-	percentage: number;
-	color: string;
-	last?: boolean;
-}) {
+function RrAndUfe({ rr, ufe }: { rr: number; ufe: number }) {
 	return (
 		<Box
 			data-tooltip-id="tooltip"
-			data-tooltip-content={`${text} total: $${format(",.2f")(value)}`}
+			data-tooltip-html={`<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Rapid Response (${format(
+				".1%"
+			)(
+				rr / (rr + ufe)
+			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
+				",.2f"
+			)(
+				rr
+			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Underfunded Emergencies: (${format(
+				".1%"
+			)(
+				ufe / (rr + ufe)
+			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
+				",.2f"
+			)(ufe)}</div></div></div>`}
 			data-tooltip-place="top"
 			sx={{
 				display: "flex",
 				flexDirection: "row",
-				alignItems: "baseline",
+				alignItems: "center",
 				justifyContent: "flex-start",
-				width: "100%",
-				marginTop: last ? "-0.5em" : 0,
+				width: "80%",
 			}}
 		>
-			<Typography
-				fontSize={18}
+			<Box
 				style={{
-					color: "#666",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					justifyContent: "center",
+					textAlign: "center",
+					flex: "0 41%",
 				}}
 			>
-				{text}:
-			</Typography>
-			<Typography
-				variant="h6"
-				fontWeight={500}
-				fontSize={22}
+				<Typography
+					variant="body2"
+					fontWeight={400}
+					fontSize={14}
+					lineHeight={1.2}
+					style={{
+						color: colors.topFiguresColor,
+						border: "none",
+					}}
+				>
+					Rapid
+					<br />
+					Response:
+				</Typography>
+				<Typography
+					variant="body2"
+					fontWeight={500}
+					fontSize={18}
+					style={{
+						color: colors.rrColorDarker,
+						border: "none",
+					}}
+				>
+					<SiValue
+						number={rr}
+						type="decimal"
+					/>
+				</Typography>
+			</Box>
+			<Box
 				style={{
-					color: color,
-					marginLeft: "0.5em",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					width: "100%",
+					height: "100%",
+					flex: "0 18%",
 				}}
 			>
-				<SiValue
-					number={value}
-					type="decimal"
+				<Donut
+					totalSlice={rr}
+					CvaSlice={ufe}
+					totalColor={colors.rrColor}
+					CvaColor={colors.ufeColor}
+					showTotal={false}
 				/>
-			</Typography>
-			<Typography
-				fontWeight={400}
-				fontSize={18}
+			</Box>
+			<Box
 				style={{
-					color: "#666",
-					marginLeft: "0.5em",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					justifyContent: "center",
+					textAlign: "center",
+					flex: "0 41%",
 				}}
 			>
-				{"("}
-				<NumberAnimator
-					number={parseFloat(formatSIFloat(percentage))}
-					type="integer"
-				/>
-				{"%)"}
-			</Typography>
+				<Typography
+					variant="body2"
+					fontWeight={400}
+					fontSize={14}
+					lineHeight={1.2}
+					style={{
+						color: colors.topFiguresColor,
+						border: "none",
+					}}
+				>
+					Underfunded
+					<br />
+					emergencies:
+				</Typography>
+				<Typography
+					variant="body2"
+					fontWeight={500}
+					fontSize={18}
+					style={{
+						color: colors.ufeColorDarker,
+						border: "none",
+					}}
+				>
+					<SiValue
+						number={ufe}
+						type="decimal"
+					/>
+				</Typography>
+			</Box>
 		</Box>
 	);
 }

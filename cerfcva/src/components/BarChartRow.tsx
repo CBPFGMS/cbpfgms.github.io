@@ -4,9 +4,10 @@ import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear, format } from "d3";
 import colors from "../utils/colors";
-import { type ListObj } from "../utils/makelists";
+import { type List, type ListObj } from "../utils/makelists";
 import { type Charts } from "./MainContainer";
 import { clustersIconsData } from "../assets/clustericons";
+import { agencyIconsData, unIcon } from "../assets/agencyicons";
 import type { AllocationWindows } from "../utils/processdatasummary";
 import { sum } from "d3";
 
@@ -15,7 +16,8 @@ export type BarChartRowProps = {
 	rr: number;
 	ufe: number;
 	maxValue: number;
-	list: ListObj;
+	lists: List;
+	listProperty: keyof List;
 	chartType: Charts;
 	fromCva?: boolean;
 	totalCvaPercentage?: number | boolean;
@@ -28,7 +30,8 @@ type SortedDatum = {
 };
 
 function BarChartRow({
-	list,
+	lists,
+	listProperty,
 	maxValue,
 	ufe,
 	rr,
@@ -42,20 +45,23 @@ function BarChartRow({
 	const calcAmount =
 		fromCva && typeof totalCvaPercentage === "number" ? "5%" : "0%";
 
-	const sortedData: SortedDatum[] = [ufe, rr]
-		.map<SortedDatum>((d, i) => ({
-			value: d,
-			window: i ? "rr" : "ufe",
-			windowName: i ? "Rapid Response" : "Underfunded Emergencies",
-		}))
-		.sort((a, b) => b.value - a.value);
+	const sortedData: SortedDatum[] = [rr, ufe].map<SortedDatum>((d, i) => ({
+		value: d,
+		window: i ? "ufe" : "rr",
+		windowName: i ? "Underfunded Emergencies" : "Rapid Response",
+	}));
 
 	const total = sum(sortedData, d => d.value);
 
 	return (
 		<Box
 			data-tooltip-id="tooltip"
-			data-tooltip-html={`<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Total:</div><div style='display:table-cell;text-align:right;'>$${format(
+			data-tooltip-html={`${
+				listProperty === "organizationsAcronym"
+					? `<div style='width:100%;margin-bottom:0.5em;text-align:center;font-weight:500;'>${lists.organizations[type]}</div>`
+					: ""
+			}
+			<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Total:</div><div style='display:table-cell;text-align:right;'>$${format(
 				",.2f"
 			)(
 				total
@@ -86,8 +92,8 @@ function BarChartRow({
 				style={{
 					flex:
 						chartType === "sectors" || chartType === "agencies"
-							? "0 26% "
-							: "0 22% ",
+							? "0 20% "
+							: "0 18% ",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "flex-end",
@@ -100,13 +106,24 @@ function BarChartRow({
 					fontWeight={400}
 					fontSize={13}
 					style={{ color: "#444", border: "none" }}
-					mr={chartType === "agencies" ? 2 : 0}
 				>
-					{list[type]}
+					{(lists[listProperty] as ListObj)[type]}
 				</Typography>
 				{chartType === "sectors" && (
 					<img
 						src={clustersIconsData[type]}
+						style={{
+							width: "26px",
+							height: "26px",
+							marginLeft: "8px",
+							marginRight: "4px",
+							padding: "4px",
+						}}
+					/>
+				)}
+				{chartType === "agencies" && (
+					<img
+						src={agencyIconsData[type] ?? unIcon}
 						style={{
 							width: "26px",
 							height: "26px",
@@ -149,8 +166,8 @@ function BarChartRow({
 				style={{
 					flex:
 						chartType === "sectors" || chartType === "agencies"
-							? `0 calc(68% - ${calcAmount})`
-							: `0 calc(72% - ${calcAmount})`,
+							? `0 calc(74% - ${calcAmount})`
+							: `0 calc(76% - ${calcAmount})`,
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",

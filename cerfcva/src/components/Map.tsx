@@ -11,7 +11,6 @@ import { Map as MapType } from "leaflet";
 import type { DatumCountries } from "../utils/processdatacountries";
 import type { DownloadStates } from "./MainContainer";
 import { processCountryDownload } from "../utils/processdownload";
-import createSizeLegend from "../charts/createsizelegend";
 
 type MapProps = {
 	data: DatumCountries[];
@@ -20,9 +19,6 @@ type MapProps = {
 	yearCountries: number[];
 	sectorCountries: number[];
 	partnerCountries: number[];
-	sizeSvgRef: React.RefObject<SVGSVGElement | null>;
-	legendSvgWidth: number;
-	legendSvgHeight: number;
 };
 
 const maxZoomValue = 12,
@@ -38,9 +34,6 @@ function Map({
 	yearCountries,
 	sectorCountries,
 	partnerCountries,
-	sizeSvgRef,
-	legendSvgWidth,
-	legendSvgHeight,
 }: MapProps) {
 	const { data: completeData, lists } = useContext(
 		DataContext
@@ -49,6 +42,7 @@ function Map({
 	const ref = useRef<HTMLDivElement>(null);
 	const mapRef = useRef<MapType | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
+	const zoomControlRef = useRef<HTMLDivElement | null>(null);
 
 	function handleDownloadClick() {
 		const dataCountryDownload = processCountryDownload({
@@ -69,26 +63,10 @@ function Map({
 	useEffect(() => {
 		if (mapRef.current) {
 			mapRef.current.removeControl(mapRef.current.attributionControl);
-		}
-	});
-
-	useEffect(() => {
-		if (sizeSvgRef.current) {
-			createSizeLegend({
-				svgRef: sizeSvgRef.current,
-				maxValue: minMaxValue[1],
-				minValue: minMaxValue[0],
-				legendSvgWidth,
-				legendSvgHeight,
-				maxCircleRadius,
-				minCircleRadius,
-			});
-		}
-	}, [minMaxValue, sizeSvgRef, legendSvgWidth, legendSvgHeight]);
-
-	useEffect(() => {
-		if (mapRef.current) {
-			mapRef.current.removeControl(mapRef.current.attributionControl);
+			const zoomControl = document.querySelector(".leaflet-control-zoom");
+			if (zoomControl instanceof HTMLDivElement) {
+				zoomControlRef.current = zoomControl;
+			}
 		}
 	});
 
@@ -110,6 +88,7 @@ function Map({
 					refElement={containerRef}
 					fileName={"CVA_countries"}
 					fromMap={true}
+					zoomControlRef={zoomControlRef}
 				/>
 				<Box style={{ width: "100%" }}>
 					<MapContainer

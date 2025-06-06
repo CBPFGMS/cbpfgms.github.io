@@ -64,7 +64,8 @@ function TypesChart({
 				width: "100%",
 				position: "relative",
 			}}
-			mt={3}
+			pt={3}
+			pb={1}
 			ref={ref}
 		>
 			<DownloadAndImageContainer
@@ -128,7 +129,8 @@ function TypesChart({
 							rr={d.rr}
 							ufe={d.ufe}
 							maxValue={maxValue}
-							list={lists.cvaTypeNames}
+							lists={lists}
+							listProperty="cvaTypeNames"
 							chartType="types"
 							fromCva={true}
 							totalCvaPercentage={Math.round(

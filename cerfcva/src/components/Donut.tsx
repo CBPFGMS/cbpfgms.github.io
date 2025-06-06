@@ -13,13 +13,20 @@ type DonutProps = {
 	CvaSlice: number;
 	totalColor: string;
 	CvaColor: string;
+	showTotal?: boolean;
 };
 
 const pieGenerator = pie<void, DonutDatum>()
 	.value(d => d.value)
 	.sort(a => (a.type === "cva" ? -1 : 1));
 
-function Donut({ totalSlice, totalColor, CvaSlice, CvaColor }: DonutProps) {
+function Donut({
+	totalSlice,
+	totalColor,
+	CvaSlice,
+	CvaColor,
+	showTotal = true,
+}: DonutProps) {
 	const parentRef = useRef<HTMLDivElement>(null);
 	const [parentWidth, setParentWidth] = useState<number>(0);
 	const [parentHeight, setParentHeight] = useState<number>(0);
@@ -85,13 +92,17 @@ function Donut({ totalSlice, totalColor, CvaSlice, CvaColor }: DonutProps) {
 				justifyContent={"center"}
 				alignItems={"center"}
 			>
-				<Typography style={{ fontSize: "0.85em", fontWeight: "bold" }}>
-					<NumberAnimator
-						number={Math.round((CvaSlice * 100) / totalSlice)}
-						type="integer"
-					/>
-					%
-				</Typography>
+				{showTotal && (
+					<Typography
+						style={{ fontSize: "1em", fontWeight: "bold" }}
+					>
+						<NumberAnimator
+							number={Math.round((CvaSlice * 100) / totalSlice)}
+							type="integer"
+						/>
+						%
+					</Typography>
+				)}
 			</Box>
 		</Box>
 	);

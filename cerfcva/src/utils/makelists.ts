@@ -5,13 +5,13 @@ import {
 	type OrganizationTypesMasterObject,
 	type PooledFundsMasterObject,
 	type SectorsMasterObject,
+	type CvaMasterObject,
 	pooledFundsMasterObjectSchema,
 	allocationTypesMasterObjectSchema,
 	organizationMasterObjectSchema,
 	allocationSourcesMasterObjectSchema,
 	organizationTypesMasterObjectSchema,
 	sectorsMasterObjectSchema,
-	type CvaMasterObject,
 	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
@@ -62,6 +62,7 @@ export type List = {
 	allocationSourcesAbbreviated: ListObj;
 	organizationTypes: ListObj;
 	organizations: ListObj;
+	organizationsAcronym: ListObj;
 	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	statuses: ListObj;
@@ -89,6 +90,7 @@ function makeLists({
 		organizationTypes: {},
 		organizationsCompleteList: {},
 		organizations: {},
+		organizationsAcronym: {},
 		sectors: {},
 		statuses: {},
 		projectDetails: new Map(),
@@ -179,6 +181,7 @@ function makeLists({
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
 			lists.organizations[d.GlobalOrgId] = d.OrganizationName;
+			lists.organizationsAcronym[d.GlobalOrgId] = d.OrganizationAcronym;
 			lists.organizationsCompleteList[d.GlobalUniqueId] = d;
 		} else {
 			warnInvalidSchema(

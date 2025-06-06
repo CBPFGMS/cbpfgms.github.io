@@ -84,7 +84,7 @@ function SummaryContainer({
 				</Typography>
 				<Typography
 					style={{
-						fontSize: "16px",
+						fontSize: "13px",
 						fontWeight: "normal",
 						color: "#666",
 						fontStyle: "italic",
@@ -92,7 +92,10 @@ function SummaryContainer({
 					}}
 					ml={1}
 				>
-					Starting from 1 June 2024
+					Data starting from the launch of the online grant management
+					system OneGMS on
+					<br />1 June 2024. Prior data is not represented but is
+					available in CERF’s annual reports.
 				</Typography>
 			</Box>
 			<SelectorsSummary

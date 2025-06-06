@@ -12,6 +12,8 @@ type ProcessDataSummaryParams = {
 
 export type DataTopFigures = {
 	totalAllocations: number;
+	rrTotal: number;
+	ufeTotal: number;
 	allocations: number;
 	projects: Set<number>;
 	partners: Set<number>;
@@ -70,6 +72,8 @@ function processDataSummary({
 
 	const dataTopFigures: DataTopFigures = {
 		totalAllocations: 0,
+		rrTotal: 0,
+		ufeTotal: 0,
 		allocations: 0,
 		projects: new Set<number>(),
 		partners: new Set<number>(),
@@ -87,7 +91,19 @@ function processDataSummary({
 			countrySummary.includes(datum.fund) &&
 			allocationSourceSummary.includes(datum.allocationSource)
 		) {
+			const thisOrganization =
+				lists.organizationsCompleteList[datum.organizationGlobalId]
+					.GlobalOrgId;
+
+			const thisAllocationSourceAbbreviation =
+				lists.allocationSourcesAbbreviated[
+					datum.allocationSource
+				].toLocaleLowerCase() as AllocationWindows;
+
 			dataTopFigures.totalAllocations += datum.budget;
+			dataTopFigures[`${thisAllocationSourceAbbreviation}Total`] +=
+				datum.budget;
+
 			if (datum.cvaData !== null) {
 				const cvaBudget = datum.cvaData?.reduce(
 					(acc, curr) => acc + curr.budget,
@@ -95,20 +111,11 @@ function processDataSummary({
 				);
 				dataTopFigures.allocations += cvaBudget;
 				dataTopFigures.projects.add(datum.projectId);
-				dataTopFigures.partners.add(datum.organizationId);// TODO: test thisOrganization as value here
+				dataTopFigures.partners.add(datum.organizationId); // TODO: test thisOrganization as value here
 				const allocationSource = lists.allocationSourcesAbbreviated[
 					datum.allocationSource
 				].toLocaleLowerCase() as AllocationWindows;
 				dataTopFigures[allocationSource] += cvaBudget;
-
-				const thisOrganization =
-					lists.organizationsCompleteList[datum.organizationGlobalId]
-						.GlobalOrgId;
-
-				const thisAllocationSourceAbbreviation =
-					lists.allocationSourcesAbbreviated[
-						datum.allocationSource
-					].toLocaleLowerCase() as AllocationWindows;
 
 				datum.cvaData.forEach(cva => {
 					const foundType = dataTypes.find(

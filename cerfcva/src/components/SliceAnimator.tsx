@@ -17,7 +17,7 @@ const SliceAnimator = ({
 		to: {
 			clipPath: `path("${sliceArc}")`,
 		},
-		config: { duration: 750 }, // 1 second animation duration
+		config: { duration: 750 }, 
 	});
 
 	return (

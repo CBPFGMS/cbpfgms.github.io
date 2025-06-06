@@ -12,9 +12,15 @@ type ImageIconProps = {
 	refElement: RefObject<HTMLDivElement | null>;
 	iconsRef: RefObject<HTMLDivElement | null>;
 	fileName: string;
+	zoomControlRef?: RefObject<HTMLDivElement | null>;
 };
 
-function ImageIcon({ refElement, iconsRef, fileName }: ImageIconProps) {
+function ImageIcon({
+	refElement,
+	iconsRef,
+	fileName,
+	zoomControlRef,
+}: ImageIconProps) {
 	const [anchorEl, setAnchorEl] = useState<SVGElement | null>(null);
 
 	const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -99,6 +105,7 @@ function ImageIcon({ refElement, iconsRef, fileName }: ImageIconProps) {
 							generateImage(
 								refElement,
 								iconsRef,
+								zoomControlRef,
 								"download",
 								fileName
 							)
@@ -120,6 +127,7 @@ function ImageIcon({ refElement, iconsRef, fileName }: ImageIconProps) {
 							generateImage(
 								refElement,
 								iconsRef,
+								zoomControlRef,
 								"copy",
 								fileName
 							)

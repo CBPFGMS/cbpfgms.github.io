@@ -12,6 +12,7 @@ type DownloadAndImageContainerProps = {
 	refElement: RefObject<HTMLDivElement | null>;
 	fileName: string;
 	fromMap?: boolean;
+	zoomControlRef?: RefObject<HTMLDivElement | null>;
 };
 
 function DownloadAndImageContainer({
@@ -22,6 +23,7 @@ function DownloadAndImageContainer({
 	refElement,
 	fileName,
 	fromMap = false,
+	zoomControlRef,
 }: DownloadAndImageContainerProps) {
 	const iconsRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +56,7 @@ function DownloadAndImageContainer({
 				refElement={refElement}
 				iconsRef={iconsRef}
 				fileName={fileName}
+				zoomControlRef={zoomControlRef}
 			/>
 		</Box>
 	);

@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { type DatumCountries } from "../utils/processdatacountries";
@@ -26,9 +25,6 @@ type CountryContainerProps = {
 	setPartnerCountries: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
-const legendSvgWidth = 300,
-	legendSvgHeight = 80;
-
 function CountryContainer({
 	dataCountries,
 	inSelectionDataSummary,
@@ -42,8 +38,6 @@ function CountryContainer({
 	setSectorCountries,
 	setPartnerCountries,
 }: CountryContainerProps) {
-	const sizeSvgRef = useRef<SVGSVGElement | null>(null);
-
 	const inSelectionData: InSelectionData = {
 		...inSelectionDataSummary,
 		...inSelectionDataCountries,
@@ -88,9 +82,6 @@ function CountryContainer({
 				yearCountries={yearCountries}
 				sectorCountries={sectorCountries}
 				partnerCountries={partnerCountries}
-				sizeSvgRef={sizeSvgRef}
-				legendSvgWidth={legendSvgWidth}
-				legendSvgHeight={legendSvgHeight}
 			/>
 			<Box
 				style={{
@@ -101,30 +92,6 @@ function CountryContainer({
 				}}
 			>
 				<Legend />
-				<Box>
-					<Typography
-						style={{
-							fontFamily: "Roboto",
-							fontSize: "13px",
-							color: "#555",
-							marginLeft: "4em",
-							marginRight: "1em",
-							textAlign: "right",
-							lineHeight: "1.4",
-							fontStyle: "italic",
-						}}
-					>
-						Allocations values <br />
-						by size (area)
-						<br />
-						of the circles:
-					</Typography>
-				</Box>
-				<svg
-					ref={sizeSvgRef}
-					width={legendSvgWidth}
-					height={legendSvgHeight}
-				></svg>
 			</Box>
 		</Grid>
 	);

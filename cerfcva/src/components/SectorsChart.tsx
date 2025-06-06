@@ -64,7 +64,8 @@ function SectorsChart({
 				width: "100%",
 				position: "relative",
 			}}
-			mt={3}
+			pt={3}
+			pb={1}
 			ref={ref}
 		>
 			<DownloadAndImageContainer
@@ -110,7 +111,8 @@ function SectorsChart({
 							rr={d.rr}
 							ufe={d.ufe}
 							maxValue={maxValue}
-							list={lists.sectors}
+							lists={lists}
+							listProperty="sectors"
 							chartType="sectors"
 						/>
 					</Box>
