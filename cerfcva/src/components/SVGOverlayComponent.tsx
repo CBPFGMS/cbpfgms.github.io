@@ -42,7 +42,15 @@ function SVGOverlayComponent({
 				lists,
 			});
 		}
-	}, [data, map, maxCircleRadius, maxValue, maxZoomValue, minCircleRadius]);
+	}, [
+		data,
+		map,
+		maxCircleRadius,
+		maxValue,
+		maxZoomValue,
+		minCircleRadius,
+		lists,
+	]);
 
 	return (
 		<SVGOverlay

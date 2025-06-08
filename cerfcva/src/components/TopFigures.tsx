@@ -119,6 +119,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 						<RrAndUfe
 							rr={dataTopFigures.rrTotal}
 							ufe={dataTopFigures.ufeTotal}
+							total={dataTopFigures.totalAllocations}
 						/>
 					</Box>
 				</Grid>
@@ -206,6 +207,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 						<RrAndUfe
 							rr={dataTopFigures.rr}
 							ufe={dataTopFigures.ufe}
+							total={dataTopFigures.allocations}
 						/>
 					</Box>
 				</Grid>
@@ -222,60 +224,164 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 					height={"100%"}
 				>
 					<Box
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`CVA percentage: $${format(".1%")(
-							dataTopFigures.allocations /
-								dataTopFigures.totalAllocations
-						)}`}
-						data-tooltip-place="top"
-						sx={{
+						style={{
+							height: "100%",
+							width: "100%",
 							display: "flex",
-							flexDirection: "row",
+							flexDirection: "column",
 							alignItems: "center",
 							justifyContent: "center",
-							height: "100%",
 						}}
 					>
 						<Box
-							style={{
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`CVA percentage: $${format(
+								".1%"
+							)(
+								dataTopFigures.allocations /
+									dataTopFigures.totalAllocations
+							)}`}
+							data-tooltip-place="top"
+							sx={{
 								display: "flex",
-								flex: "0 60%",
+								flexDirection: "row",
 								alignItems: "center",
 								justifyContent: "center",
-								textAlign: "center",
-								paddingLeft: "1em",
-								paddingRight: "1em",
+								height: "100%",
 							}}
+						>
+							<Box
+								style={{
+									display: "flex",
+									flex: "0 60%",
+									alignItems: "center",
+									justifyContent: "center",
+									textAlign: "center",
+									paddingLeft: "1em",
+									paddingRight: "1em",
+								}}
+							>
+								<Typography
+									variant="body2"
+									fontWeight={400}
+									fontSize={15}
+									style={{
+										color: colors.topFiguresColor,
+										border: "none",
+									}}
+								>
+									CVA Allocations as percentage of total
+									allocations
+								</Typography>
+							</Box>
+							<Box
+								style={{
+									display: "flex",
+									flex: "0 40%",
+									alignItems: "center",
+									justifyContent: "center",
+									width: "100%",
+									height: "100%",
+								}}
+							>
+								<Donut
+									totalSlice={dataTopFigures.totalAllocations}
+									CvaSlice={dataTopFigures.allocations}
+									totalColor={
+										colors.totalAllocationsSliceColor
+									}
+									CvaColor={colors.unColor}
+								/>
+							</Box>
+						</Box>
+						<Box
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								alignItems: "center",
+								justifyContent: "center",
+							}}
+							data-tooltip-id="tooltip"
+							data-tooltip-html={`RR percentage: $${format(
+								".1%"
+							)(
+								dataTopFigures.rr / dataTopFigures.rrTotal
+							)}<br />UFE percentage: $${format(".1%")(
+								dataTopFigures.ufe / dataTopFigures.ufeTotal
+							)}`}
+							data-tooltip-place="top"
 						>
 							<Typography
 								variant="body2"
 								fontWeight={400}
-								fontSize={15}
+								fontSize={14}
+								lineHeight={1.2}
 								style={{
 									color: colors.topFiguresColor,
 									border: "none",
+									paddingRight: "0.5em",
 								}}
 							>
-								CVA Allocations as percentage of total
-								allocations
+								CVA RR as % of total RR:
+							</Typography>
+							<Typography
+								variant="body2"
+								fontWeight={500}
+								fontSize={18}
+								style={{
+									color: colors.rrColorDarker,
+									border: "none",
+								}}
+							>
+								<NumberAnimator
+									number={Math.round(
+										(dataTopFigures.rr * 100) /
+											dataTopFigures.rrTotal
+									)}
+									type="integer"
+								/>
+								%
 							</Typography>
 						</Box>
 						<Box
 							style={{
 								display: "flex",
-								flex: "0 40%",
+								flexDirection: "row",
 								alignItems: "center",
 								justifyContent: "center",
-								width: "100%",
-								height: "100%",
 							}}
 						>
-							<Donut
-								totalSlice={dataTopFigures.totalAllocations}
-								CvaSlice={dataTopFigures.allocations}
-								totalColor={colors.totalAllocationsSliceColor}
-								CvaColor={colors.unColor}
-							/>
+							<Typography
+								variant="body2"
+								fontWeight={400}
+								fontSize={14}
+								lineHeight={1.2}
+								style={{
+									color: colors.topFiguresColor,
+									border: "none",
+									paddingRight: "0.5em",
+								}}
+							>
+								CVA UFE as % of total UFE:
+							</Typography>
+							<Typography
+								variant="body2"
+								fontWeight={500}
+								fontSize={18}
+								style={{
+									color: colors.ufeColorDarker,
+									border: "none",
+								}}
+							>
+								<NumberAnimator
+									number={Math.round(
+										(dataTopFigures.ufe * 100) /
+											dataTopFigures.ufeTotal
+									)}
+									type="integer"
+								/>
+								%
+							</Typography>
 						</Box>
 					</Box>
 				</Grid>
@@ -349,7 +455,15 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 	);
 }
 
-function RrAndUfe({ rr, ufe }: { rr: number; ufe: number }) {
+function RrAndUfe({
+	rr,
+	ufe,
+	total,
+}: {
+	rr: number;
+	ufe: number;
+	total: number;
+}) {
 	return (
 		<Box
 			data-tooltip-id="tooltip"
@@ -374,7 +488,7 @@ function RrAndUfe({ rr, ufe }: { rr: number; ufe: number }) {
 				flexDirection: "row",
 				alignItems: "center",
 				justifyContent: "flex-start",
-				width: "80%",
+				width: "96%",
 			}}
 		>
 			<Box
@@ -399,7 +513,12 @@ function RrAndUfe({ rr, ufe }: { rr: number; ufe: number }) {
 				>
 					Rapid
 					<br />
-					Response:
+					Response (
+					<NumberAnimator
+						number={Math.round((rr * 100) / total)}
+						type="integer"
+					/>
+					%):
 				</Typography>
 				<Typography
 					variant="body2"
@@ -456,7 +575,12 @@ function RrAndUfe({ rr, ufe }: { rr: number; ufe: number }) {
 				>
 					Underfunded
 					<br />
-					emergencies:
+					emergencies (
+					<NumberAnimator
+						number={Math.round((ufe * 100) / total)}
+						type="integer"
+					/>
+					%):
 				</Typography>
 				<Typography
 					variant="body2"
