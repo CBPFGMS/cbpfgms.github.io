@@ -17,14 +17,9 @@ function createSizeLegend({
 	const circleBaseRatio = 1.7;
 	const sizeCirclesData =
 		maxValue !== 0
-			? [
-					minValue,
-					maxValue * 0.1,
-					maxValue * 0.25,
-					maxValue * 0.5,
-					maxValue * 0.75,
-					maxValue,
-			  ]
+			? minValue === maxValue
+				? [maxValue]
+				: [minValue, (minValue + maxValue) / 2, maxValue]
 			: [];
 	const posScale = scalePoint<string>()
 		.domain(sizeCirclesData.map((_, i) => i.toString()))

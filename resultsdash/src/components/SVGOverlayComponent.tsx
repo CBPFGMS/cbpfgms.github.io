@@ -48,6 +48,16 @@ function SVGOverlayComponent({
 function calculateBounds(
 	data: MapData[]
 ): [[number, number], [number, number]] {
+	if (data.length === 1) {
+		const lat = data[0].coordinates[0];
+		const lng = data[0].coordinates[1];
+		const buffer = 0.25; 
+		return [
+			[lat - buffer, lng - buffer],
+			[lat + buffer, lng + buffer],
+		];
+	}
+
 	const latitudeExtent = extent(data, d => d.coordinates[0]) as [
 		number,
 		number

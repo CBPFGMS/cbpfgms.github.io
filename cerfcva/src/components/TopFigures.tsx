@@ -238,8 +238,10 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 							data-tooltip-content={`CVA percentage: $${format(
 								".1%"
 							)(
-								dataTopFigures.allocations /
-									dataTopFigures.totalAllocations
+								dataTopFigures.totalAllocations === 0
+									? 0
+									: dataTopFigures.allocations /
+											dataTopFigures.totalAllocations
 							)}`}
 							data-tooltip-place="top"
 							sx={{
@@ -297,91 +299,114 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 						<Box
 							style={{
 								display: "flex",
-								flexDirection: "row",
+								flexDirection: "column",
 								alignItems: "center",
 								justifyContent: "center",
 							}}
 							data-tooltip-id="tooltip"
-							data-tooltip-html={`RR percentage: $${format(
-								".1%"
-							)(
-								dataTopFigures.rr / dataTopFigures.rrTotal
+							data-tooltip-html={`RR percentage: $${format(".1%")(
+								dataTopFigures.rrTotal === 0
+									? 0
+									: dataTopFigures.rr / dataTopFigures.rrTotal
 							)}<br />UFE percentage: $${format(".1%")(
-								dataTopFigures.ufe / dataTopFigures.ufeTotal
+								dataTopFigures.ufeTotal === 0
+									? 0
+									: dataTopFigures.ufe /
+											dataTopFigures.ufeTotal
 							)}`}
 							data-tooltip-place="top"
 						>
-							<Typography
-								variant="body2"
-								fontWeight={400}
-								fontSize={14}
-								lineHeight={1.2}
+							<Box
 								style={{
-									color: colors.topFiguresColor,
-									border: "none",
-									paddingRight: "0.5em",
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "center",
+									justifyContent: "center",
+								}}
+								mt={2}
+							>
+								<Typography
+									variant="body2"
+									fontWeight={400}
+									fontSize={14}
+									lineHeight={1.2}
+									style={{
+										color: colors.topFiguresColor,
+										border: "none",
+										paddingRight: "0.5em",
+									}}
+								>
+									CVA RR as % of total RR:
+								</Typography>
+								<Typography
+									variant="body2"
+									fontWeight={500}
+									fontSize={18}
+									style={{
+										color: colors.rrColorDarker,
+										border: "none",
+									}}
+								>
+									<NumberAnimator
+										number={
+											dataTopFigures.rrTotal === 0
+												? 0
+												: Math.round(
+														(dataTopFigures.rr *
+															100) /
+															dataTopFigures.rrTotal
+												  )
+										}
+										type="integer"
+									/>
+									%
+								</Typography>
+							</Box>
+							<Box
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "center",
+									justifyContent: "center",
 								}}
 							>
-								CVA RR as % of total RR:
-							</Typography>
-							<Typography
-								variant="body2"
-								fontWeight={500}
-								fontSize={18}
-								style={{
-									color: colors.rrColorDarker,
-									border: "none",
-								}}
-							>
-								<NumberAnimator
-									number={Math.round(
-										(dataTopFigures.rr * 100) /
-											dataTopFigures.rrTotal
-									)}
-									type="integer"
-								/>
-								%
-							</Typography>
-						</Box>
-						<Box
-							style={{
-								display: "flex",
-								flexDirection: "row",
-								alignItems: "center",
-								justifyContent: "center",
-							}}
-						>
-							<Typography
-								variant="body2"
-								fontWeight={400}
-								fontSize={14}
-								lineHeight={1.2}
-								style={{
-									color: colors.topFiguresColor,
-									border: "none",
-									paddingRight: "0.5em",
-								}}
-							>
-								CVA UFE as % of total UFE:
-							</Typography>
-							<Typography
-								variant="body2"
-								fontWeight={500}
-								fontSize={18}
-								style={{
-									color: colors.ufeColorDarker,
-									border: "none",
-								}}
-							>
-								<NumberAnimator
-									number={Math.round(
-										(dataTopFigures.ufe * 100) /
-											dataTopFigures.ufeTotal
-									)}
-									type="integer"
-								/>
-								%
-							</Typography>
+								<Typography
+									variant="body2"
+									fontWeight={400}
+									fontSize={14}
+									lineHeight={1.2}
+									style={{
+										color: colors.topFiguresColor,
+										border: "none",
+										paddingRight: "0.5em",
+									}}
+								>
+									CVA UFE as % of total UFE:
+								</Typography>
+								<Typography
+									variant="body2"
+									fontWeight={500}
+									fontSize={18}
+									style={{
+										color: colors.ufeColorDarker,
+										border: "none",
+									}}
+								>
+									<NumberAnimator
+										number={
+											dataTopFigures.ufeTotal === 0
+												? 0
+												: Math.round(
+														(dataTopFigures.ufe *
+															100) /
+															dataTopFigures.ufeTotal
+												  )
+										}
+										type="integer"
+									/>
+									%
+								</Typography>
+							</Box>
 						</Box>
 					</Box>
 				</Grid>
@@ -470,7 +495,7 @@ function RrAndUfe({
 			data-tooltip-html={`<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Rapid Response (${format(
 				".1%"
 			)(
-				rr / (rr + ufe)
+				rr + ufe === 0 ? 0 : rr / (rr + ufe)
 			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
 				",.2f"
 			)(
@@ -478,7 +503,7 @@ function RrAndUfe({
 			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Underfunded Emergencies: (${format(
 				".1%"
 			)(
-				ufe / (rr + ufe)
+				rr + ufe === 0 ? 0 : ufe / (rr + ufe)
 			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
 				",.2f"
 			)(ufe)}</div></div></div>`}
@@ -515,7 +540,9 @@ function RrAndUfe({
 					<br />
 					Response (
 					<NumberAnimator
-						number={Math.round((rr * 100) / total)}
+						number={
+							total === 0 ? 0 : Math.round((rr * 100) / total)
+						}
 						type="integer"
 					/>
 					%):
@@ -577,7 +604,9 @@ function RrAndUfe({
 					<br />
 					emergencies (
 					<NumberAnimator
-						number={Math.round((ufe * 100) / total)}
+						number={
+							total === 0 ? 0 : Math.round((ufe * 100) / total)
+						}
 						type="integer"
 					/>
 					%):

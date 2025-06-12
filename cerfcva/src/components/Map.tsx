@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext } from "react";
+import React, { useRef, useContext } from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -7,7 +7,6 @@ import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import { extent } from "d3-array";
 import SVGOverlayComponent from "./SVGOverlayComponent";
 import downloadData from "../utils/downloaddata";
-import { Map as MapType } from "leaflet";
 import type { DatumCountries } from "../utils/processdatacountries";
 import type { DownloadStates } from "./MainContainer";
 import { processCountryDownload } from "../utils/processdownload";
@@ -40,7 +39,6 @@ function Map({
 	) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
-	const mapRef = useRef<MapType | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const zoomControlRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,15 +58,15 @@ function Map({
 
 	const minMaxValue = extent(data, d => d.allocations) as [number, number];
 
-	useEffect(() => {
-		if (mapRef.current) {
-			mapRef.current.removeControl(mapRef.current.attributionControl);
-			const zoomControl = document.querySelector(".leaflet-control-zoom");
-			if (zoomControl instanceof HTMLDivElement) {
-				zoomControlRef.current = zoomControl;
-			}
-		}
-	});
+	// useEffect(() => {
+	// 	if (mapRef.current) {
+	// 		mapRef.current.removeControl(mapRef.current.attributionControl);
+	// 		const zoomControl = document.querySelector(".leaflet-control-zoom");
+	// 		if (zoomControl instanceof HTMLDivElement) {
+	// 			zoomControlRef.current = zoomControl;
+	// 		}
+	// 	}
+	// });
 
 	return (
 		<Container
@@ -96,7 +94,16 @@ function Map({
 						center={[0, 0]}
 						zoom={minZoomValue}
 						scrollWheelZoom={false}
-						ref={mapRef}
+						ref={map => {
+							if (!map) return;
+							map.removeControl(map.attributionControl);
+							const zoomControl = document.querySelector(
+								".leaflet-control-zoom"
+							);
+							if (zoomControl instanceof HTMLDivElement) {
+								zoomControlRef.current = zoomControl;
+							}
+						}}
 					>
 						<TileLayer
 							url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
