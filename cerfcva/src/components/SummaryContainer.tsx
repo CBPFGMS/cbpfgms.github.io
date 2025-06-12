@@ -68,35 +68,44 @@ function SummaryContainer({
 		>
 			<Box
 				display={"flex"}
-				flexDirection={"column"}
-				mb={1}
+				justifyContent={"space-between"}
+				alignItems={"center"}
+				width={"100%"}
+				flexDirection={"row"}
 			>
-				<Typography
-					style={{
-						fontFamily: "Roboto",
-						fontSize: "36px",
-						fontWeight: 700,
-						color: "#111",
-					}}
-					ml={1}
+				<Box
+					display={"flex"}
+					flexDirection={"column"}
+					mb={1}
 				>
-					CVA Summary
-				</Typography>
-				<Typography
-					style={{
-						fontSize: "13px",
-						fontWeight: "normal",
-						color: "#666",
-						fontStyle: "italic",
-						marginTop: "-0.5em",
-					}}
-					ml={1}
-				>
-					Data starting from the launch of the online grant management
-					system OneGMS on
-					<br />1 June 2024. Prior data is not represented but is
-					available in CERF’s annual reports.
-				</Typography>
+					<Typography
+						style={{
+							fontFamily: "Roboto",
+							fontSize: "36px",
+							fontWeight: 700,
+							color: "#111",
+						}}
+						ml={1}
+					>
+						CVA Summary
+					</Typography>
+					<Typography
+						style={{
+							fontSize: "13px",
+							fontWeight: "normal",
+							color: "#666",
+							fontStyle: "italic",
+							marginTop: "-0.5em",
+						}}
+						ml={1}
+					>
+						Data starting from the launch of the online grant
+						management system OneGMS on
+						<br />1 June 2024. Prior data is not represented but is
+						available in CERF’s annual reports.
+					</Typography>
+				</Box>
+				<Legend />
 			</Box>
 			<SelectorsSummary
 				yearSummary={yearSummary}
@@ -107,7 +116,10 @@ function SummaryContainer({
 				setCountrySummary={setCountrySummary}
 				inSelectionData={inSelectionData}
 			/>
-			<TopFigures dataTopFigures={dataTopFigures} />
+			<TopFigures
+				dataTopFigures={dataTopFigures}
+				yearSummary={yearSummary}
+			/>
 			<TypesChart
 				dataTypes={dataTypes}
 				clickedDownload={clickedDownload}
@@ -135,7 +147,6 @@ function SummaryContainer({
 				countrySummary={countrySummary}
 				allocationSourceSummary={allocationSourceSummary}
 			/>
-			<Legend />
 		</Grid>
 	);
 }

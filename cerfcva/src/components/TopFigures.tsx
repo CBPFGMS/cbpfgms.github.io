@@ -10,9 +10,13 @@ import Typography from "@mui/material/Typography";
 import Donut from "./Donut";
 import SiValue from "./SiValue";
 import { format } from "d3";
+import constants from "../utils/constants";
+import InfoIcon from "@mui/icons-material/Info";
+import formatSIFloat from "../utils/formatsi";
 
 type TopFiguresProps = {
 	dataTopFigures: DataTopFigures;
+	yearSummary: number[];
 };
 
 export type DonutDatum = {
@@ -20,7 +24,9 @@ export type DonutDatum = {
 	type: "total" | "cva";
 };
 
-function TopFigures({ dataTopFigures }: TopFiguresProps) {
+const { firstYearOfCvaData } = constants;
+
+function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 	return (
 		<Box
 			pt={3}
@@ -115,6 +121,22 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 									Total Allocations
 								</Typography>
 							</Box>
+							{yearSummary.length === 1 &&
+								yearSummary[0] === firstYearOfCvaData && (
+									<InfoIcon
+										data-tooltip-id="tooltip"
+										data-tooltip-content={
+											"Data starting from the launch of the online grant management system OneGMS on 1 June 2024. Prior data is not represented but is available in CERF’s annual reports."
+										}
+										data-tooltip-place="top"
+										style={{
+											color: colors.unColor,
+											fontSize: "22px",
+											marginLeft: "0.1em",
+											alignSelf: "flex-start",
+										}}
+									/>
+								)}
 						</Box>
 						<RrAndUfe
 							rr={dataTopFigures.rrTotal}
@@ -420,7 +442,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 			>
 				<ProjectsAndPartners
 					value={dataTopFigures.projects.size}
-					text={"CVA projects"}
+					text={"CVA project"}
 				/>
 				<Box>
 					<Typography
@@ -433,7 +455,7 @@ function TopFigures({ dataTopFigures }: TopFiguresProps) {
 				</Box>
 				<ProjectsAndPartners
 					value={dataTopFigures.partners.size}
-					text={"CVA partners"}
+					text={"CVA partner"}
 				/>
 			</Box>
 		</Box>
@@ -475,6 +497,7 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 				noWrap
 			>
 				{text}
+				{value > 1 ? "s" : ""}
 			</Typography>
 		</Box>
 	);
@@ -556,10 +579,20 @@ function RrAndUfe({
 						border: "none",
 					}}
 				>
-					<SiValue
-						number={rr}
-						type="decimal"
-					/>
+					{rr < 1e3 ? (
+						<NumberAnimator
+							number={rr}
+							type="decimal"
+						/>
+					) : (
+						<span>
+							<NumberAnimator
+								number={adjustValues(rr, ufe, total).rr}
+								type="decimal"
+							/>
+							{formatSIFloat(rr).slice(-1)}
+						</span>
+					)}
 				</Typography>
 			</Box>
 			<Box
@@ -620,14 +653,83 @@ function RrAndUfe({
 						border: "none",
 					}}
 				>
-					<SiValue
-						number={ufe}
-						type="decimal"
-					/>
+					{ufe < 1e3 ? (
+						<NumberAnimator
+							number={ufe}
+							type="decimal"
+						/>
+					) : (
+						<span>
+							<NumberAnimator
+								number={adjustValues(rr, ufe, total).ufe}
+								type="decimal"
+							/>
+							{formatSIFloat(ufe).slice(-1)}
+						</span>
+					)}
 				</Typography>
 			</Box>
 		</Box>
 	);
+}
+
+function adjustValues(
+	rr: number,
+	ufe: number,
+	total: number
+): { rr: number; ufe: number } {
+	if (total < 1e3) {
+		return { rr: rr, ufe: ufe };
+	}
+
+	const formattedRr = formatSIFloat(rr),
+		formattedUfe = formatSIFloat(ufe),
+		formattedTotal = formatSIFloat(total);
+
+	const rrUnit = extractUnit(formattedRr),
+		ufeUnit = extractUnit(formattedUfe),
+		totalUnit = extractUnit(formattedTotal);
+
+	let rrFormattedValue = parseFloat(formattedRr),
+		ufeFormattedValue = parseFloat(formattedUfe);
+
+	const totalFormattedValue = parseFloat(formattedTotal);
+
+	if (
+		rrUnit === ufeUnit &&
+		ufeUnit === totalUnit &&
+		rrFormattedValue + ufeFormattedValue !== totalFormattedValue
+	) {
+		const difference = Number(
+			Math.abs(
+				rrFormattedValue + ufeFormattedValue - totalFormattedValue
+			).toFixed(3)
+		);
+		if (rrFormattedValue + ufeFormattedValue > totalFormattedValue) {
+			if (rrFormattedValue < ufeFormattedValue) {
+				rrFormattedValue -= difference;
+			} else {
+				ufeFormattedValue -= difference;
+			}
+		} else {
+			if (rrFormattedValue < ufeFormattedValue) {
+				rrFormattedValue += difference;
+			} else {
+				ufeFormattedValue += difference;
+			}
+		}
+		return {
+			rr: rrFormattedValue,
+			ufe: ufeFormattedValue,
+		};
+	}
+
+	return { rr: rr, ufe: ufe };
+}
+
+function extractUnit(s: string): string | null {
+	const match = s.match(/([a-zA-Z])$/);
+	return match ? match[1] : null;
 }
 
 const MemoizedTopFigures = React.memo(TopFigures);

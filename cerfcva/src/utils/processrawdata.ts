@@ -142,17 +142,25 @@ function processRawData({
 			}
 
 			if (thisAllocationType && thisOrganization) {
-				yearsSet.add(thisAllocationType.AllocationYear);
-				countriesSet.add(row.PooledFundId);
-				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
-				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalOrgId);
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				);
-				thisCvaData?.cva.forEach(cva => {
-					sectorsSet.add(cva.sectorId);
-				});
+				if (thisCvaData) {
+					yearsSet.add(thisAllocationType.AllocationYear);
+					countriesSet.add(row.PooledFundId);
+					allocationSourcesSet.add(
+						thisAllocationType.AllocationSourceId
+					);
+					organizationTypesSet.add(
+						thisOrganization.OrganizationTypeId
+					);
+					organizationsSet.add(thisOrganization.GlobalOrgId);
+					allocationTypesSet.add(
+						parseFloat(
+							`${row.PooledFundId}.${row.AllocationtypeId}`
+						)
+					);
+					thisCvaData?.cva.forEach(cva => {
+						sectorsSet.add(cva.sectorId);
+					});
+				}
 
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,

@@ -111,7 +111,7 @@ function processDataSummary({
 				);
 				dataTopFigures.allocations += cvaBudget;
 				dataTopFigures.projects.add(datum.projectId);
-				dataTopFigures.partners.add(datum.organizationId); // TODO: test thisOrganization as value here
+				dataTopFigures.partners.add(datum.organizationId);
 				const allocationSource = lists.allocationSourcesAbbreviated[
 					datum.allocationSource
 				].toLocaleLowerCase() as AllocationWindows;

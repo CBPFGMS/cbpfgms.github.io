@@ -9,6 +9,7 @@ const constants = {
 	filtersSummary: ["Year", "Country", "Allocation Window"],
 	filtersCountries: ["Year", "Sector", "Partner"],
 	filterTypes: ["dropdowncheck", "search", "checkbox"],
+	firstYearOfCvaData: 2024,
 } as const;
 
 export default constants;
