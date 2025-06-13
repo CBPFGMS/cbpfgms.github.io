@@ -67,9 +67,10 @@ function Map({ data, clickedDownload, setClickedDownload }: MapProps) {
 				legendSvgHeight,
 				maxCircleRadius,
 				minCircleRadius,
+				dataLength: data.length,
 			});
 		}
-	}, [minMaxValue]);
+	}, [minMaxValue, data.length]);
 
 	useEffect(() => {
 		if (mapRef.current) {

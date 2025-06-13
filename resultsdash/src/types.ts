@@ -490,6 +490,7 @@ export type CreateSizeLegendParams = {
 	legendSvgHeight: number;
 	maxCircleRadius: number;
 	minCircleRadius: number;
+	dataLength: number;
 };
 
 export type CreateColorLegendParams = {

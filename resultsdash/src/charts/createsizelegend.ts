@@ -1,6 +1,6 @@
 import { select } from "d3-selection";
 import { scalePoint, scaleSqrt } from "d3-scale";
-import formatSIFloat from "../utils/formatsi";
+import { formatPrefix } from "d3-format";
 import { CreateSizeLegendParams } from "../types";
 
 function createSizeLegend({
@@ -11,6 +11,7 @@ function createSizeLegend({
 	legendSvgHeight,
 	maxCircleRadius,
 	minCircleRadius,
+	dataLength,
 }: CreateSizeLegendParams): void {
 	const svg = select(svgRef);
 	const textPadding = 12;
@@ -19,6 +20,14 @@ function createSizeLegend({
 		maxValue !== 0
 			? minValue === maxValue
 				? [maxValue]
+				: dataLength > 3
+				? [
+						minValue,
+						(minValue + maxValue) / 4,
+						(minValue + maxValue) / 2,
+						(minValue + maxValue) / (4 / 3),
+						maxValue,
+				  ]
 				: [minValue, (minValue + maxValue) / 2, maxValue]
 			: [];
 	const posScale = scalePoint<string>()
@@ -62,7 +71,7 @@ function createSizeLegend({
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
 		.attr("font-size", "0.7rem")
-		.text(d => formatSIFloat(d))
+		.text(d => formatPrefix(".0~", d)(d))
 		.append("tspan")
 		.attr("x", (_, i) => posScale(i.toString())!)
 		.attr("dy", "1em")
