@@ -23,6 +23,8 @@ function saveCsvFile(
 
 		writeFile(filePath, content, { encoding: "utf-8" });
 
+		updateIndex(directoryPath, fullFilename);
+
 		console.log(`File saved at ${filePath}`);
 	} catch (error) {
 		if (error instanceof Error) {
@@ -30,6 +32,12 @@ function saveCsvFile(
 		}
 		throw error;
 	}
+}
+
+function updateIndex(directoryPath: string, latestFilename: string) {
+	const indexPath = path.join(directoryPath, "index.json");
+	const indexContent = JSON.stringify({ latestFile: latestFilename });
+	writeFile(indexPath, indexContent);
 }
 
 export { saveCsvFile };
