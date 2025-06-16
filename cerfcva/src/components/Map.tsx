@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -10,6 +10,7 @@ import downloadData from "../utils/downloaddata";
 import type { DatumCountries } from "../utils/processdatacountries";
 import type { DownloadStates } from "./MainContainer";
 import { processCountryDownload } from "../utils/processdownload";
+import createSizeLegend from "../charts/createsizelegend";
 
 type MapProps = {
 	data: DatumCountries[];
@@ -18,6 +19,9 @@ type MapProps = {
 	yearCountries: number[];
 	sectorCountries: number[];
 	partnerCountries: number[];
+	sizeSvgRef: React.RefObject<SVGSVGElement | null>;
+	legendSvgWidth: number;
+	legendSvgHeight: number;
 };
 
 const maxZoomValue = 12,
@@ -33,6 +37,9 @@ function Map({
 	yearCountries,
 	sectorCountries,
 	partnerCountries,
+	sizeSvgRef,
+	legendSvgWidth,
+	legendSvgHeight,
 }: MapProps) {
 	const { data: completeData, lists } = useContext(
 		DataContext
@@ -67,6 +74,21 @@ function Map({
 	// 		}
 	// 	}
 	// });
+
+	useEffect(() => {
+		if (sizeSvgRef.current) {
+			createSizeLegend({
+				svgRef: sizeSvgRef.current,
+				maxValue: minMaxValue[1],
+				minValue: minMaxValue[0],
+				legendSvgWidth,
+				legendSvgHeight,
+				maxCircleRadius,
+				minCircleRadius,
+				dataLength: data.length,
+			});
+		}
+	}, [minMaxValue, sizeSvgRef, legendSvgWidth, legendSvgHeight, data]);
 
 	return (
 		<Container

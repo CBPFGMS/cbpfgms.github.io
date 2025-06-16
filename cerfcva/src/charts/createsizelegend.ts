@@ -1,6 +1,6 @@
 import { select } from "d3-selection";
 import { scalePoint, scaleSqrt } from "d3-scale";
-import formatSIFloat from "../utils/formatsi";
+import { formatPrefix } from "d3-format";
 
 type CreateSizeLegendParams = {
 	svgRef: SVGSVGElement;
@@ -10,6 +10,7 @@ type CreateSizeLegendParams = {
 	legendSvgHeight: number;
 	maxCircleRadius: number;
 	minCircleRadius: number;
+	dataLength: number;
 };
 
 function createSizeLegend({
@@ -20,20 +21,24 @@ function createSizeLegend({
 	legendSvgHeight,
 	maxCircleRadius,
 	minCircleRadius,
+	dataLength,
 }: CreateSizeLegendParams): void {
 	const svg = select(svgRef);
 	const textPadding = 12;
 	const circleBaseRatio = 1.7;
 	const sizeCirclesData =
 		maxValue !== 0
-			? [
-					minValue,
-					maxValue * 0.1,
-					maxValue * 0.25,
-					maxValue * 0.5,
-					maxValue * 0.75,
-					maxValue,
-			  ]
+			? minValue === maxValue
+				? [maxValue]
+				: dataLength > 3
+				? [
+						minValue,
+						(minValue + maxValue) / 4,
+						(minValue + maxValue) / 2,
+						(minValue + maxValue) / (4 / 3),
+						maxValue,
+				  ]
+				: [minValue, (minValue + maxValue) / 2, maxValue]
 			: [];
 	const posScale = scalePoint<string>()
 		.domain(sizeCirclesData.map((_, i) => i.toString()))
@@ -76,7 +81,12 @@ function createSizeLegend({
 		.attr("text-anchor", "middle")
 		.attr("dominant-baseline", "middle")
 		.attr("font-size", "0.7rem")
-		.text(d => "$" + formatSIFloat(d))
+		.text(d => {
+			const digits = Math.floor(d).toString().length;
+			const powerOfTen = Math.pow(10, digits - 2);
+			const roundedToTen = Math.round(d / powerOfTen) * powerOfTen;
+			return formatPrefix(".0~", roundedToTen)(roundedToTen);
+		})
 		.append("tspan")
 		.attr("x", (_, i) => posScale(i.toString())!)
 		.attr("dy", "1.25em")
