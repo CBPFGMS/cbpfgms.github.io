@@ -219,9 +219,11 @@ function GBVChart({
 				>
 					The data on GBV reached, as reported only in the final
 					reports was identified from{" "}
-					{format(".1~%")(
-						dataGBV.reportsWithData / dataGBV.totalReports
-					)}{" "}
+					{dataGBV.totalReports === 0
+						? "0%"
+						: format(".1~%")(
+								dataGBV.reportsWithData / dataGBV.totalReports
+						  )}{" "}
 					of the projects. Possible many project(s) have not reached
 					the due date of final reports based on the selected filters.
 				</Typography>
