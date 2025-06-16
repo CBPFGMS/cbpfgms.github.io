@@ -2606,10 +2606,7 @@
 
 				tooltip
 					.style("top", thisOffset + "px")
-					.style(
-						"left",
-						svg.width - tooltipSize.width + "px"
-					);
+					.style("left", svg.width - tooltipSize.width + "px");
 			}
 
 			function mouseOutTopPanel() {
@@ -3828,7 +3825,11 @@
 					},
 					{
 						title: `HRP Funding${
-							hardcodedFundIdsTooltipText.includes(d.cbpfId)
+							hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
+							!(
+								d.cbpfId === "81" &&
+								chartState.selectedYear === 2025
+							)
 								? tooltipHRPAdditionalText
 								: ""
 						}`,
@@ -3859,7 +3860,11 @@
 					.style("flex-wrap", "wrap")
 					.style(
 						"width",
-						hardcodedFundIdsTooltipText.includes(d.cbpfId)
+						hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
+							!(
+								d.cbpfId === "81" &&
+								chartState.selectedYear === 2025
+							)
 							? "400px"
 							: "300px"
 					);
@@ -3907,7 +3912,11 @@
 					.style("flex-wrap", "wrap")
 					.style(
 						"width",
-						hardcodedFundIdsTooltipText.includes(d.cbpfId)
+						hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
+							!(
+								d.cbpfId === "81" &&
+								chartState.selectedYear === 2025
+							)
 							? "400px"
 							: "300px"
 					);
