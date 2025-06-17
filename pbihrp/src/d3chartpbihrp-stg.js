@@ -241,7 +241,7 @@
 			masterRegionalFundsUrl =
 				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			allFunds = [],
-			hardcodedFundIdsTooltipText = ["70", "81", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
+			hardcodedFundIdsTooltipText = ["70", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
 			tooltipHRPAdditionalText = " (*50% out of total HRP funding)",
 			totalValues = {},
 			chartState = {
@@ -3825,11 +3825,7 @@
 					},
 					{
 						title: `HRP Funding${
-							hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
-							!(
-								d.cbpfId === "81" &&
-								chartState.selectedYear === 2025
-							)
+							hardcodedFundIdsTooltipText.includes(d.cbpfId)
 								? tooltipHRPAdditionalText
 								: ""
 						}`,
@@ -3860,11 +3856,7 @@
 					.style("flex-wrap", "wrap")
 					.style(
 						"width",
-						hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
-							!(
-								d.cbpfId === "81" &&
-								chartState.selectedYear === 2025
-							)
+						hardcodedFundIdsTooltipText.includes(d.cbpfId)
 							? "400px"
 							: "300px"
 					);
@@ -3912,11 +3904,7 @@
 					.style("flex-wrap", "wrap")
 					.style(
 						"width",
-						hardcodedFundIdsTooltipText.includes(d.cbpfId) &&
-							!(
-								d.cbpfId === "81" &&
-								chartState.selectedYear === 2025
-							)
+						hardcodedFundIdsTooltipText.includes(d.cbpfId)
 							? "400px"
 							: "300px"
 					);

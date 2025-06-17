@@ -240,7 +240,7 @@
 			masterRegionalFundsUrl =
 				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
 			allFunds = [],
-			hardcodedFundIdsTooltipText = ["70", "81", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
+			hardcodedFundIdsTooltipText = ["70", "62"], //Hardcoded funds with a different text in the tooltip, to be removed
 			tooltipHRPAdditionalText = " (*50% out of total HRP funding)",
 			totalValues = {},
 			chartState = {
@@ -2605,10 +2605,7 @@
 
 				tooltip
 					.style("top", thisOffset + "px")
-					.style(
-						"left",
-						svg.width - tooltipSize.width + "px"
-					);
+					.style("left", svg.width - tooltipSize.width + "px");
 			}
 
 			function mouseOutTopPanel() {
