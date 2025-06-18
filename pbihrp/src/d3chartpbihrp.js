@@ -2201,9 +2201,11 @@
 					};
 				});
 
-			const overlayRectangle = topSummaryPanel.main
+			let overlayRectangle = topSummaryPanel.main
 				.selectAll(".pbihrpoverlayRectangle")
-				.data([true])
+				.data([true]);
+
+			overlayRectangle = overlayRectangle
 				.enter()
 				.append("rect")
 				.attr("class", "pbihrpoverlayRectangle")
@@ -2215,7 +2217,8 @@
 						donutsPanel.height +
 						2 * panelVerticalPadding
 				)
-				.style("opacity", 0);
+				.style("opacity", 0)
+				.merge(overlayRectangle);
 
 			overlayRectangle
 				.on("mouseover", mouseOverTopPanel)
