@@ -15,6 +15,9 @@ import capitalizeString from "../utils/capitalizestring";
 import { processDisabilityDownload } from "../utils/processdownload";
 import downloadData from "../utils/downloaddata";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import NumberAnimator from "./NumberAnimator";
+import formatSIFloat from "../utils/formatsi";
+import Divider from "@mui/material/Divider";
 
 type DisabilityChartProps = {
 	dataDisability: DatumDisability;
@@ -28,7 +31,7 @@ type DisabilityChartProps = {
 	showFinanciallyClosed: boolean;
 };
 
-const { beneficiaryCategories } = constants;
+const { beneficiaryCategories, beneficiariesStatuses } = constants;
 
 function DisabilityChart({
 	dataDisability,
@@ -42,6 +45,19 @@ function DisabilityChart({
 	showFinanciallyClosed,
 }: DisabilityChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
+
+	const [totalTargeted, totalReached] = beneficiariesStatuses.map(type =>
+		beneficiaryCategories.reduce(
+			(acc, category) =>
+				acc +
+				dataDisability[
+					`${type}${capitalizeString(
+						category
+					)}` as keyof DatumDisability
+				],
+			0
+		)
+	);
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -88,7 +104,6 @@ function DisabilityChart({
 					height: "58px",
 					flexDirection: "column",
 				}}
-				mb={3}
 			>
 				<Typography
 					style={{
@@ -99,40 +114,159 @@ function DisabilityChart({
 				>
 					Persons with disabilities, Targeted and Reached
 				</Typography>
-				<Typography
-					style={{
-						fontSize: "0.8rem",
-						display: "flex",
-						alignItems: "center",
-					}}
+			</Box>
+			<Box
+				display={"flex"}
+				flexDirection={"row"}
+				alignItems={"center"}
+				justifyContent={"center"}
+				gap={2}
+				marginBottom={4}
+				width={"100%"}
+			>
+				<Box
+					display={"flex"}
+					flexDirection={"column"}
+					alignItems={"center"}
+					justifyContent={"center"}
+					gap={0}
+					data-tooltip-id="tooltip"
+					data-tooltip-content={`Persons with disabilities, targeted: ${format(
+						",.0f"
+					)(totalTargeted)}`}
+					data-tooltip-place="top"
 				>
-					{"("}
-					<AdsClickIcon
+					<Typography
+						variant="h3"
+						fontWeight={500}
+						style={{ color: colors.contrastColor, border: "none" }}
+					>
+						{totalTargeted < 1e3 ? (
+							<NumberAnimator
+								number={totalTargeted}
+								type="integer"
+							/>
+						) : (
+							<span>
+								<NumberAnimator
+									number={parseFloat(
+										formatSIFloat(totalTargeted)
+									)}
+									type="decimal"
+								/>
+								{formatSIFloat(totalTargeted).slice(-1)}
+							</span>
+						)}
+					</Typography>
+					<Typography
+						noWrap={true}
 						style={{
 							fontSize: 18,
-							marginLeft: 3,
-							marginRight: 3,
-							color: "#777",
-							opacity: 0.6,
+							color: colors.contrastColorDarker,
+							display: "flex",
+							alignItems: "center",
+							textAlign: "center",
+							lineHeight: 1.2,
 						}}
-					/>
-					{
-						<span style={{ color: colors.contrastColorDarker }}>
-							{" "}
-							targeted,{" "}
+					>
+						People with{<br />}disabilities, Targeted
+						<AdsClickIcon
+							style={{
+								fontSize: 18,
+								marginLeft: 4,
+								color: "#777",
+								opacity: 0.6,
+							}}
+						/>
+					</Typography>
+				</Box>
+				<Divider
+					orientation="vertical"
+					flexItem
+					style={{
+						borderLeft: "2px dotted #ccc",
+						borderRight: "none",
+					}}
+				/>
+				<Box
+					display={"flex"}
+					flexDirection={"column"}
+					alignItems={"center"}
+					justifyContent={"center"}
+					gap={0}
+					data-tooltip-id="tooltip"
+					data-tooltip-content={`Persons with disabilities, reached: ${format(
+						",.0f"
+					)(totalReached)}`}
+					data-tooltip-place="top"
+				>
+					<Typography
+						noWrap={true}
+						variant="h3"
+						fontWeight={500}
+						style={{ color: colors.unColor, border: "none" }}
+					>
+						{totalReached < 1e3 ? (
+							<NumberAnimator
+								number={totalReached}
+								type="integer"
+							/>
+						) : (
+							<span>
+								<NumberAnimator
+									number={parseFloat(
+										formatSIFloat(totalReached)
+									)}
+									type="decimal"
+								/>
+								{formatSIFloat(totalReached).slice(-1)}
+							</span>
+						)}
+						<span
+							style={{
+								color: "#666",
+								fontSize: 14,
+								fontStyle: "italic",
+								marginLeft: "6px",
+							}}
+						>
+							{"("}
+							<NumberAnimator
+								number={
+									totalTargeted === 0
+										? 0
+										: ~~(
+												(totalReached * 100) /
+												totalTargeted
+										  )
+								}
+								type="integer"
+							/>
+							{"%)"}
 						</span>
-					}
-					<DoneIcon
+					</Typography>
+					<Typography
+						noWrap={true}
 						style={{
 							fontSize: 18,
-							marginLeft: 3,
-							marginRight: 3,
-							color: "#777",
-							opacity: 0.6,
+							color: colors.unColor,
+							display: "flex",
+							alignItems: "center",
+							textAlign: "center",
+							lineHeight: 1.2,
 						}}
-					/>
-					{<span style={{ color: colors.unColor }}> reached)</span>}
-				</Typography>
+					>
+						People with{<br />}disabilities, Reached
+						<DoneIcon
+							style={{
+								fontSize: 18,
+								marginLeft: 4,
+								color: "#777",
+								opacity: 0.6,
+							}}
+						/>
+					</Typography>
+				</Box>
 			</Box>
 			<Box
 				display={"flex"}
