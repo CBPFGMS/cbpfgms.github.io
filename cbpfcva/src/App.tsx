@@ -3,6 +3,8 @@ import Loading from "./components/Loading";
 import Error from "./components/Error";
 import DataContext from "./context/DataContext";
 import MainContainer from "./components/MainContainer";
+import Container from "@mui/material/Container";
+import TopIntro from "./components/TopIntro";
 
 type AppProps = {
 	defaultYear: number;
@@ -11,26 +13,30 @@ type AppProps = {
 };
 
 function App({ defaultYear, defaultFundType, startYear }: AppProps) {
-	const {
-		data,
-		dataIndicators,
-		lists,
-		inDataLists,
-		loading,
-		error,
-		progress,
-	} = useData(defaultFundType, startYear);
+	const { data, lists, inDataLists, loading, error, progress } = useData(
+		defaultFundType,
+		startYear
+	);
 
-	return loading ? (
-		<Loading progress={progress} />
-	) : error ? (
-		<Error error={error} />
-	) : (
-		<DataContext.Provider
-			value={{ data, dataIndicators, lists, inDataLists }}
+	return (
+		<Container
+			disableGutters={true}
+			style={{
+				paddingLeft: "12px",
+				paddingRight: "12px",
+			}}
 		>
-			<MainContainer defaultYear={defaultYear} />
-		</DataContext.Provider>
+			<TopIntro />
+			{loading ? (
+				<Loading progress={progress} />
+			) : error ? (
+				<Error error={error} />
+			) : (
+				<DataContext.Provider value={{ data, lists, inDataLists }}>
+					<MainContainer defaultYear={defaultYear} />
+				</DataContext.Provider>
+			)}
+		</Container>
 	);
 }
 

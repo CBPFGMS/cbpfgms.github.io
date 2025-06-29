@@ -14,7 +14,7 @@ export type Datum = {
 	projectId: number;
 	allocationSource: number;
 	organizationType: number;
-	organizationId: number;
+	organizationId: number | null;
 	organizationGlobalId: number;
 	allocationType: number;
 	allocationTypeId: number;
@@ -44,7 +44,7 @@ export type InDataLists = {
 	sectors: Set<number>;
 	allocationTypes: Set<number>;
 	allocationSources: Set<number>;
-	countries: Set<number>;
+	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 };
@@ -77,7 +77,7 @@ function processRawData({
 		new Set();
 	const allocationSourcesSet: Set<InDataListsValues["allocationSources"]> =
 		new Set();
-	const countriesSet: Set<InDataListsValues["countries"]> = new Set();
+	const fundsSet: Set<InDataListsValues["funds"]> = new Set();
 	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
@@ -144,14 +144,16 @@ function processRawData({
 			if (thisAllocationType && thisOrganization) {
 				if (thisCvaData) {
 					yearsSet.add(thisAllocationType.AllocationYear);
-					countriesSet.add(row.PooledFundId);
+					fundsSet.add(row.PooledFundId);
 					allocationSourcesSet.add(
 						thisAllocationType.AllocationSourceId
 					);
 					organizationTypesSet.add(
 						thisOrganization.OrganizationTypeId
 					);
-					organizationsSet.add(thisOrganization.GlobalOrgId);
+					if (thisOrganization.GlobalOrgId) {
+						organizationsSet.add(thisOrganization.GlobalOrgId);
+					}
 					allocationTypesSet.add(
 						parseFloat(
 							`${row.PooledFundId}.${row.AllocationtypeId}`
@@ -209,7 +211,7 @@ function processRawData({
 		sectors: sectorsSet,
 		allocationTypes: allocationTypesSet,
 		allocationSources: allocationSourcesSet,
-		countries: countriesSet,
+		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 	}));

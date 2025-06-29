@@ -1,10 +1,11 @@
 import LinearProgress, {
-	LinearProgressProps,
+	type LinearProgressProps,
 } from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import constants from "../utils/constants";
 
-const HARDCODED_TOTAL_SIZE = 295757286;
+const { HARDCODED_TOTAL_SIZE } = constants;
 
 type LoadingProps = {
 	progress: number;
@@ -15,7 +16,6 @@ function Loading({ progress }: LoadingProps) {
 		<div
 			style={{
 				width: "100%",
-				height: "100%",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
@@ -29,6 +29,8 @@ function Loading({ progress }: LoadingProps) {
 					display: "flex",
 					justifyContent: "center",
 					width: "100%",
+					marginTop: 10,
+					marginBottom: 10,
 				}}
 			>
 				<Box sx={{ width: "80%" }}>

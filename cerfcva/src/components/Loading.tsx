@@ -16,7 +16,6 @@ function Loading({ progress }: LoadingProps) {
 		<div
 			style={{
 				width: "100%",
-				height: "100%",
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
@@ -30,6 +29,8 @@ function Loading({ progress }: LoadingProps) {
 					display: "flex",
 					justifyContent: "center",
 					width: "100%",
+					marginTop: 10,
+					marginBottom: 10,
 				}}
 			>
 				<Box sx={{ width: "80%" }}>

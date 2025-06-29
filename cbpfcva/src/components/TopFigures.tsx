@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { type DataTopFigures } from "../utils/processdatasummary";
+import { type DataTopFigures } from "../utils/processdata";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import { MoneyBagIcon, CashIcon } from "../assets/OchaIcons";
@@ -16,7 +16,7 @@ import formatSIFloat from "../utils/formatsi";
 
 type TopFiguresProps = {
 	dataTopFigures: DataTopFigures;
-	yearSummary: number[];
+	year: number[];
 };
 
 export type DonutDatum = {
@@ -26,7 +26,7 @@ export type DonutDatum = {
 
 const { firstYearOfCvaData } = constants;
 
-function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
+function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 	return (
 		<Box
 			pt={3}
@@ -121,12 +121,12 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 									Total Allocations
 								</Typography>
 							</Box>
-							{yearSummary.length === 1 &&
-								yearSummary[0] === firstYearOfCvaData && (
+							{year.length === 1 &&
+								year[0] === firstYearOfCvaData && (
 									<InfoIcon
 										data-tooltip-id="tooltip"
 										data-tooltip-content={
-											"Data starting from the launch of the online grant management system OneGMS on 1 June 2024. Prior data is not represented but is available in CERF’s annual reports."
+											"Data starting from the launch of the online grant management system OneGMS on 1 June 2024. Prior data is not represented but is available in CBPF’s annual reports."
 										}
 										data-tooltip-place="top"
 										style={{
@@ -138,9 +138,9 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 									/>
 								)}
 						</Box>
-						<RrAndUfe
-							rr={dataTopFigures.rrTotal}
-							ufe={dataTopFigures.ufeTotal}
+						<StandardAndReserve
+							standard={dataTopFigures.standardTotal}
+							reserve={dataTopFigures.reserveTotal}
 							total={dataTopFigures.totalAllocations}
 						/>
 					</Box>
@@ -226,9 +226,9 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 								</Typography>
 							</Box>
 						</Box>
-						<RrAndUfe
-							rr={dataTopFigures.rr}
-							ufe={dataTopFigures.ufe}
+						<StandardAndReserve
+							standard={dataTopFigures.standard}
+							reserve={dataTopFigures.reserve}
 							total={dataTopFigures.allocations}
 						/>
 					</Box>
@@ -327,17 +327,21 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 								flexDirection: "column",
 								alignItems: "center",
 								justifyContent: "center",
+								gap: "0.5em",
 							}}
 							data-tooltip-id="tooltip"
-							data-tooltip-html={`RR percentage: $${format(".1%")(
-								dataTopFigures.rrTotal === 0
+							data-tooltip-html={`Standard percentage: $${format(
+								".1%"
+							)(
+								dataTopFigures.standardTotal === 0
 									? 0
-									: dataTopFigures.rr / dataTopFigures.rrTotal
-							)}<br />UFE percentage: $${format(".1%")(
-								dataTopFigures.ufeTotal === 0
+									: dataTopFigures.standard /
+											dataTopFigures.standardTotal
+							)}<br />Reserve percentage: $${format(".1%")(
+								dataTopFigures.reserveTotal === 0
 									? 0
-									: dataTopFigures.ufe /
-											dataTopFigures.ufeTotal
+									: dataTopFigures.reserve /
+											dataTopFigures.reserveTotal
 							)}`}
 							data-tooltip-place="top"
 						>
@@ -361,25 +365,26 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 										paddingRight: "0.5em",
 									}}
 								>
-									CVA RR as % of total RR:
+									Standard CVA as % of total standard
+									allocations:
 								</Typography>
 								<Typography
 									variant="body2"
 									fontWeight={500}
 									fontSize={18}
 									style={{
-										color: colors.rrColorDarker,
+										color: colors.standardColorDarker,
 										border: "none",
 									}}
 								>
 									<NumberAnimator
 										number={
-											dataTopFigures.rrTotal === 0
+											dataTopFigures.standardTotal === 0
 												? 0
 												: Math.round(
-														(dataTopFigures.rr *
+														(dataTopFigures.standard *
 															100) /
-															dataTopFigures.rrTotal
+															dataTopFigures.standardTotal
 												  )
 										}
 										type="integer"
@@ -406,25 +411,26 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 										paddingRight: "0.5em",
 									}}
 								>
-									CVA UFE as % of total UFE:
+									Reserve CVA as % of total reserve
+									allocations:
 								</Typography>
 								<Typography
 									variant="body2"
 									fontWeight={500}
 									fontSize={18}
 									style={{
-										color: colors.ufeColorDarker,
+										color: colors.reserveColorDarker,
 										border: "none",
 									}}
 								>
 									<NumberAnimator
 										number={
-											dataTopFigures.ufeTotal === 0
+											dataTopFigures.reserveTotal === 0
 												? 0
 												: Math.round(
-														(dataTopFigures.ufe *
+														(dataTopFigures.reserve *
 															100) /
-															dataTopFigures.ufeTotal
+															dataTopFigures.reserveTotal
 												  )
 										}
 										type="integer"
@@ -453,7 +459,7 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 							color: colors.topFiguresColor,
 						}}
 					>
-						&#x2B25;
+						{"\u2B25"}
 					</Typography>
 				</Box>
 				<ProjectsAndPartners
@@ -506,33 +512,33 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 	);
 }
 
-function RrAndUfe({
-	rr,
-	ufe,
+function StandardAndReserve({
+	standard,
+	reserve,
 	total,
 }: {
-	rr: number;
-	ufe: number;
+	standard: number;
+	reserve: number;
 	total: number;
 }) {
 	return (
 		<Box
 			data-tooltip-id="tooltip"
-			data-tooltip-html={`<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Rapid Response (${format(
+			data-tooltip-html={`<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Standard (${format(
 				".1%"
 			)(
-				rr + ufe === 0 ? 0 : rr / (rr + ufe)
+				standard + reserve === 0 ? 0 : standard / (standard + reserve)
 			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
 				",.2f"
 			)(
-				rr
-			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Underfunded Emergencies: (${format(
+				standard
+			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Reserve: (${format(
 				".1%"
 			)(
-				rr + ufe === 0 ? 0 : ufe / (rr + ufe)
+				standard + reserve === 0 ? 0 : reserve / (standard + reserve)
 			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
 				",.2f"
-			)(ufe)}</div></div></div>`}
+			)(reserve)}</div></div></div>`}
 			data-tooltip-place="top"
 			sx={{
 				display: "flex",
@@ -562,12 +568,12 @@ function RrAndUfe({
 						border: "none",
 					}}
 				>
-					Rapid
-					<br />
-					Response (
+					Standard (
 					<NumberAnimator
 						number={
-							total === 0 ? 0 : Math.round((rr * 100) / total)
+							total === 0
+								? 0
+								: Math.round((standard * 100) / total)
 						}
 						type="integer"
 					/>
@@ -578,22 +584,25 @@ function RrAndUfe({
 					fontWeight={500}
 					fontSize={18}
 					style={{
-						color: colors.rrColorDarker,
+						color: colors.standardColorDarker,
 						border: "none",
 					}}
 				>
-					{rr < 1e3 ? (
+					{standard < 1e3 ? (
 						<NumberAnimator
-							number={rr}
+							number={standard}
 							type="decimal"
 						/>
 					) : (
 						<span>
 							<NumberAnimator
-								number={adjustValues(rr, ufe, total).rr}
+								number={
+									adjustValues(standard, reserve, total)
+										.standard
+								}
 								type="decimal"
 							/>
-							{formatSIFloat(rr).slice(-1)}
+							{formatSIFloat(standard).slice(-1)}
 						</span>
 					)}
 				</Typography>
@@ -609,10 +618,10 @@ function RrAndUfe({
 				}}
 			>
 				<Donut
-					totalSlice={rr}
-					CvaSlice={ufe}
-					totalColor={colors.rrColor}
-					CvaColor={colors.ufeColor}
+					totalSlice={standard}
+					CvaSlice={reserve}
+					totalColor={colors.standardColor}
+					CvaColor={colors.reserveColor}
 					showTotal={false}
 				/>
 			</Box>
@@ -636,12 +645,12 @@ function RrAndUfe({
 						border: "none",
 					}}
 				>
-					Underfunded
-					<br />
-					emergencies (
+					Reserve (
 					<NumberAnimator
 						number={
-							total === 0 ? 0 : Math.round((ufe * 100) / total)
+							total === 0
+								? 0
+								: Math.round((reserve * 100) / total)
 						}
 						type="integer"
 					/>
@@ -652,22 +661,25 @@ function RrAndUfe({
 					fontWeight={500}
 					fontSize={18}
 					style={{
-						color: colors.ufeColorDarker,
+						color: colors.reserveColorDarker,
 						border: "none",
 					}}
 				>
-					{ufe < 1e3 ? (
+					{reserve < 1e3 ? (
 						<NumberAnimator
-							number={ufe}
+							number={reserve}
 							type="decimal"
 						/>
 					) : (
 						<span>
 							<NumberAnimator
-								number={adjustValues(rr, ufe, total).ufe}
+								number={
+									adjustValues(standard, reserve, total)
+										.reserve
+								}
 								type="decimal"
 							/>
-							{formatSIFloat(ufe).slice(-1)}
+							{formatSIFloat(reserve).slice(-1)}
 						</span>
 					)}
 				</Typography>
@@ -677,55 +689,60 @@ function RrAndUfe({
 }
 
 function adjustValues(
-	rr: number,
-	ufe: number,
+	standard: number,
+	reserve: number,
 	total: number
-): { rr: number; ufe: number } {
+): { standard: number; reserve: number } {
 	if (total < 1e3) {
-		return { rr: rr, ufe: ufe };
+		return { standard: standard, reserve: reserve };
 	}
 
-	const formattedRr = formatSIFloat(rr),
-		formattedUfe = formatSIFloat(ufe),
+	const formattedStandard = formatSIFloat(standard),
+		formattedReserve = formatSIFloat(reserve),
 		formattedTotal = formatSIFloat(total);
 
-	const rrUnit = extractUnit(formattedRr),
-		ufeUnit = extractUnit(formattedUfe),
+	const standardUnit = extractUnit(formattedStandard),
+		reserveUnit = extractUnit(formattedReserve),
 		totalUnit = extractUnit(formattedTotal);
 
-	let rrFormattedValue = parseFloat(formattedRr),
-		ufeFormattedValue = parseFloat(formattedUfe);
+	let standardFormattedValue = parseFloat(formattedStandard),
+		reserveFormattedValue = parseFloat(formattedReserve);
 
 	const totalFormattedValue = parseFloat(formattedTotal);
 
 	if (
-		rrUnit === ufeUnit &&
-		ufeUnit === totalUnit &&
-		rrFormattedValue + ufeFormattedValue !== totalFormattedValue
+		standardUnit === reserveUnit &&
+		reserveUnit === totalUnit &&
+		standardFormattedValue + reserveFormattedValue !== totalFormattedValue
 	) {
 		const difference = Number(
 			Math.abs(
-				rrFormattedValue + ufeFormattedValue - totalFormattedValue
+				standardFormattedValue +
+					reserveFormattedValue -
+					totalFormattedValue
 			).toFixed(3)
 		);
-		if (rrFormattedValue + ufeFormattedValue > totalFormattedValue) {
-			if (rrFormattedValue < ufeFormattedValue) {
-				rrFormattedValue -= difference;
+		if (
+			standardFormattedValue + reserveFormattedValue >
+			totalFormattedValue
+		) {
+			if (standardFormattedValue < reserveFormattedValue) {
+				standardFormattedValue -= difference;
 			} else {
-				ufeFormattedValue -= difference;
+				reserveFormattedValue -= difference;
 			}
 		} else {
-			if (rrFormattedValue < ufeFormattedValue) {
-				rrFormattedValue += difference;
+			if (standardFormattedValue < reserveFormattedValue) {
+				standardFormattedValue += difference;
 			} else {
-				ufeFormattedValue += difference;
+				reserveFormattedValue += difference;
 			}
 		}
 	}
 
 	return {
-		rr: Number(rrFormattedValue.toFixed(3)),
-		ufe: Number(ufeFormattedValue.toFixed(3)),
+		standard: Number(standardFormattedValue.toFixed(3)),
+		reserve: Number(reserveFormattedValue.toFixed(3)),
 	};
 }
 

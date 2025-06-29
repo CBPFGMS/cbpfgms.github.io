@@ -1,6 +1,5 @@
 import { useContext, useState, useMemo } from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
@@ -9,7 +8,6 @@ import Divider from "@mui/material/Divider";
 import { Tooltip } from "react-tooltip";
 import constants from "../utils/constants";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
-import TopIntro from "./TopIntro";
 import processDataSummary from "../utils/processdatasummary";
 import processDataCountries from "../utils/processdatacountries";
 import SummaryContainer from "./SummaryContainer";
@@ -109,18 +107,11 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	});
 
 	return (
-		<Container
-			disableGutters={true}
-			style={{
-				paddingLeft: "12px",
-				paddingRight: "12px",
-			}}
-		>
+		<Box>
 			<Tooltip
 				id="tooltip"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
-			<TopIntro />
 			<Box
 				mt={3}
 				mb={3}
@@ -184,7 +175,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 					/>
 				</Paper>
 			</Grid>
-		</Container>
+		</Box>
 	);
 }
 

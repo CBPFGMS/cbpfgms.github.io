@@ -61,8 +61,6 @@ export type List = {
 	allocationSources: ListObj;
 	allocationSourcesAbbreviated: ListObj;
 	organizationTypes: ListObj;
-	organizations: ListObj;
-	organizationsAcronym: ListObj;
 	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	statuses: ListObj;
@@ -89,8 +87,6 @@ function makeLists({
 		allocationSourcesAbbreviated: {},
 		organizationTypes: {},
 		organizationsCompleteList: {},
-		organizations: {},
-		organizationsAcronym: {},
 		sectors: {},
 		statuses: {},
 		projectDetails: new Map(),
@@ -180,8 +176,6 @@ function makeLists({
 		const parsedOrganizationMaster =
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
-			lists.organizations[d.GlobalOrgId] = d.OrganizationName;
-			lists.organizationsAcronym[d.GlobalOrgId] = d.OrganizationAcronym;
 			lists.organizationsCompleteList[d.GlobalUniqueId] = d;
 		} else {
 			warnInvalidSchema(

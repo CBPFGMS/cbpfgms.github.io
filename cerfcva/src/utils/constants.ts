@@ -1,6 +1,6 @@
 const constants = {
-	HARDCODED_TOTAL_SIZE: 447000,
-	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
+	HARDCODED_TOTAL_SIZE: 481_000,
+	isProdSite: window.location.hostname === "cerf.data.unocha.org/",
 	charts: ["types", "sectors", "agencies", "countries"],
 	get summaryCharts() {
 		return this.charts.filter(chart => chart !== "countries");
