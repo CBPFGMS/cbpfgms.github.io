@@ -10,6 +10,11 @@ import { max } from "d3";
 import downloadData from "../utils/downloaddata";
 import { processFundsDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import colors from "../utils/colors";
+import BarChartRow from "./BarChartRow";
+import type { InDataLists } from "../utils/processrawdata";
+import constants from "../utils/constants";
+import InfoIcon from "@mui/icons-material/Info";
 
 type FundsChartProps = {
 	data: DatumFunds[];
@@ -18,9 +23,12 @@ type FundsChartProps = {
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
 	fund: number[];
-	allocationSource: number[];
+	organizationType: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	inDataLists: InDataLists;
 };
+
+const { unselectedFundOpacity } = constants;
 
 function FundsChart({
 	data,
@@ -29,8 +37,9 @@ function FundsChart({
 	setClickedDownload,
 	year,
 	fund,
-	allocationSource,
+	organizationType,
 	setFund,
+	inDataLists,
 }: FundsChartProps) {
 	const { data: completeData } = useContext(DataContext) as DataContextType;
 
@@ -41,17 +50,31 @@ function FundsChart({
 	) as number;
 
 	function handleDownloadClick() {
-		const dataBeneficiariesDownload = processFundsDownload({
+		const dataFundsDownload = processFundsDownload({
 			data: completeData,
 			lists,
 			year,
 			fund,
-			allocationSource,
+			organizationType,
 		});
-		downloadData<(typeof dataBeneficiariesDownload)[number]>(
-			dataBeneficiariesDownload,
-			"beneficiary_types"
+		downloadData<(typeof dataFundsDownload)[number]>(
+			dataFundsDownload,
+			"cva_by_funds"
 		);
+	}
+
+	function handleFundClick(thisFund: number) {
+		if (fund.length === inDataLists.funds.size) {
+			setFund([thisFund]);
+		} else if (fund.length === 1 && fund.includes(thisFund)) {
+			setFund([...inDataLists.funds]);
+		} else {
+			if (fund.includes(thisFund)) {
+				setFund(fund.filter(f => f !== thisFund));
+			} else {
+				setFund(prevFund => [...prevFund, thisFund]);
+			}
+		}
 	}
 
 	return (
@@ -80,48 +103,73 @@ function FundsChart({
 				}}
 				mb={2}
 			>
-				<Typography
+				<Box
 					style={{
-						fontSize: "1rem",
-						fontWeight: 500,
-						textTransform: "uppercase",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						flexDirection: "row",
 					}}
 				>
-					Total and CVA allocations by Fund
-				</Typography>
+					<Typography
+						style={{
+							fontSize: "1rem",
+							fontWeight: 500,
+							textTransform: "uppercase",
+							position: "relative",
+						}}
+					>
+						Total and CVA allocations by Fund
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-content={
+								"Click on a fund to select or deselect that fund (deselecting the only selected fund selects all funds). Only selected funds data will be displayed on the 'Allocations by CVA Type' chart. You can select more than 1 fund."
+							}
+							data-tooltip-place="top"
+							style={{
+								color: colors.unColor,
+								fontSize: "20px",
+								marginLeft: "0.1em",
+								marginTop: "-0.4em",
+								alignSelf: "flex-start",
+								position: "absolute",
+							}}
+						/>
+					</Typography>
+				</Box>
 				<Typography
 					style={{
 						fontSize: "0.8rem",
 						display: "flex",
-						alignItems: "center",
+						alignItems: "baseline",
+						marginTop: "-0.5em",
 					}}
 				>
 					{"("}
-					<AdsClickIcon
+					<span
 						style={{
-							fontSize: 18,
+							fontSize: 22,
 							marginLeft: 3,
 							marginRight: 3,
-							color: "#777",
-							opacity: 0.6,
+							color: colors.totalAllocationsColor,
 						}}
-					/>
-					{
-						<span style={{ color: colors.contrastColorDarker }}>
-							{" "}
-							targeted,{" "}
-						</span>
-					}
-					<DoneIcon
+					>
+						{"\u25A0"}
+					</span>
+					Total allocations
+					<span
 						style={{
-							fontSize: 18,
-							marginLeft: 3,
+							fontSize: 22,
+							marginLeft: 6,
 							marginRight: 3,
-							color: "#777",
+							color: colors.cvaAllocationsColor,
 							opacity: 0.6,
 						}}
-					/>
-					{<span style={{ color: colors.unColor }}> reached)</span>}
+					>
+						{"\u25A0"}
+					</span>
+					CVA allocations
+					{")"}
 				</Typography>
 			</Box>
 			<Box
@@ -134,7 +182,6 @@ function FundsChart({
 				marginTop={2}
 			>
 				<Box
-					mb={-2}
 					style={{
 						display: "flex",
 						flexDirection: "row",
@@ -154,20 +201,35 @@ function FundsChart({
 							letterSpacing: "-0.05em",
 						}}
 					>
-						Reached as %<br />
-						of targeted
+						CVA as %<br />
+						of total
 					</Typography>
 				</Box>
 				{data.map(d => (
-					<BarChartRow
-						key={d.type}
-						type={d.type}
-						targeted={d.targeted}
-						reached={d.reached}
-						maxValue={maxValue}
-						list={lists[listProperty]}
-						chartType={chartType}
-					/>
+					<Box
+						style={{
+							width: "100%",
+							opacity: fund.includes(d.fund)
+								? 1
+								: unselectedFundOpacity,
+							cursor: "pointer",
+						}}
+						onClick={() => handleFundClick(d.fund)}
+						key={d.fund}
+					>
+						<BarChartRow
+							key={d.fund}
+							typeId={d.fund}
+							valueA={d.totalAllocations}
+							valueB={d.cvaAllocations}
+							colorA={colors.totalAllocationsColor}
+							colorB={colors.cvaAllocationsColor}
+							maxValue={maxValue}
+							listProperty={lists.fundNames}
+							chartType={"funds"}
+							fromFunds={true}
+						/>
+					</Box>
 				))}
 			</Box>
 		</Container>

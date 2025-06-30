@@ -50,6 +50,7 @@ export type DatumFunds = {
 export type InSelectionData = {
 	years: Set<number>;
 	organizationTypes: Set<number>;
+	funds: Set<number>;
 };
 
 export type AllocationSources = (typeof constants.allocationSources)[number];
@@ -69,6 +70,7 @@ function processData({
 	const inSelectionData: InSelectionData = {
 		years: new Set<number>(),
 		organizationTypes: new Set<number>(),
+		funds: new Set<number>(),
 	};
 
 	const dataTopFigures: DataTopFigures = {
@@ -118,7 +120,7 @@ function processData({
 			foundFund[`${thisAllocationSource}TotalAllocations`] +=
 				datum.budget;
 
-			if (datum.cvaData !== null && fund.includes(datum.fund)) {
+			if (datum.cvaData !== null) {
 				const cvaBudget = datum.cvaData?.reduce(
 					(acc, curr) => acc + curr.budget,
 					0
@@ -129,62 +131,73 @@ function processData({
 					dataTopFigures.partners.add(datum.organizationId);
 				}
 				dataTopFigures[thisAllocationSource] += cvaBudget;
+				dataTopFigures.allocations += cvaBudget;
+				dataTopFigures[thisAllocationSource] += cvaBudget;
+				foundFund.cvaAllocations += cvaBudget;
+				foundFund[`${thisAllocationSource}CvaAllocations`] += cvaBudget;
 
-				datum.cvaData.forEach(cva => {
-					foundFund.cvaAllocations += cva.budget;
-					foundFund[`${thisAllocationSource}CvaAllocations`] +=
-						cva.budget;
+				if (fund.includes(datum.fund)) {
+					datum.cvaData.forEach(cva => {
+						let foundType = dataTypes.find(
+							type => type.cvaType === cva.cvaId
+						);
 
-					dataTopFigures.allocations += cva.budget;
-					dataTopFigures[thisAllocationSource] += cva.budget;
+						if (!foundType) {
+							foundType = {
+								cvaType: cva.cvaId,
+								allocations: 0,
+								percentage: 0,
+								standard: 0,
+								reserve: 0,
+								sectors: [],
+							};
 
-					let foundType = dataTypes.find(
-						type => type.cvaType === cva.cvaId
-					);
+							dataTypes.push(foundType);
+						}
+						foundType.allocations += cva.budget;
+						foundType[thisAllocationSource] += cva.budget;
 
-					if (!foundType) {
-						foundType = {
-							cvaType: cva.cvaId,
-							allocations: 0,
-							percentage: 0,
-							standard: 0,
-							reserve: 0,
-							sectors: [],
-						};
-
-						dataTypes.push(foundType);
-					}
-					foundType.allocations += cva.budget;
-					foundType[thisAllocationSource] += cva.budget;
-
-					let foundSector = foundType.sectors.find(
-						sector => sector.sector === cva.sectorId
-					);
-					if (!foundSector) {
-						foundSector = {
-							sector: cva.sectorId,
-							allocations: 0,
-							standard: 0,
-							reserve: 0,
-						};
-						foundType.sectors.push(foundSector);
-					}
-					foundSector.allocations += cva.budget;
-					foundSector[thisAllocationSource] += cva.budget;
-				});
+						let foundSector = foundType.sectors.find(
+							sector => sector.sector === cva.sectorId
+						);
+						if (!foundSector) {
+							foundSector = {
+								sector: cva.sectorId,
+								allocations: 0,
+								standard: 0,
+								reserve: 0,
+							};
+							foundType.sectors.push(foundSector);
+						}
+						foundSector.allocations += cva.budget;
+						foundSector[thisAllocationSource] += cva.budget;
+					});
+				}
 			}
 		}
 
-		if (year.includes(datum.year)) {
+		if (year.includes(datum.year) && fund.includes(datum.fund)) {
 			inSelectionData.organizationTypes.add(datum.organizationType);
 		}
-		if (organizationType.includes(datum.organizationType)) {
+		if (
+			organizationType.includes(datum.organizationType) &&
+			fund.includes(datum.fund)
+		) {
 			inSelectionData.years.add(datum.year);
+		}
+		if (
+			year.includes(datum.year) &&
+			organizationType.includes(datum.organizationType)
+		) {
+			inSelectionData.funds.add(datum.fund);
 		}
 	});
 
 	dataTypes.forEach(type => {
-		type.percentage = (type.allocations / dataTopFigures.allocations) * 100;
+		type.percentage =
+			dataTopFigures.allocations === 0
+				? 0
+				: (type.allocations / dataTopFigures.allocations) * 100;
 	});
 
 	dataTypes.sort((a, b) => b.allocations - a.allocations);

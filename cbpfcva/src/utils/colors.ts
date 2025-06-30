@@ -15,6 +15,8 @@ const colors = {
 	reserveColor: "#BBC8E3",
 	reserveColorLighter: "#D7E1F1",
 	reserveColorDarker: "#8A9CB8",
+	totalAllocationsColor: "darkslategray",
+	cvaAllocationsColor: "powderblue",
 } as const;
 
 export default colors;

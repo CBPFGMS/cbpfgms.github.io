@@ -3,84 +3,47 @@ import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear, format } from "d3";
-import colors from "../utils/colors";
-import { type List, type ListObj } from "../utils/makelists";
+import { type ListObj } from "../utils/makelists";
 import { type Charts } from "./MainContainer";
 import { clustersIconsData } from "../assets/clustericons";
-import { agencyIconsData, unIcon } from "../assets/agencyicons";
-import type { AllocationWindows } from "../utils/processdatasummary";
-import { sum } from "d3";
+import constants from "../utils/constants";
 
 export type BarChartRowProps = {
-	type: number;
-	rr: number;
-	ufe: number;
+	typeId: number;
+	valueA: number;
+	valueB: number;
+	colorA: string;
+	colorB: string;
 	maxValue: number;
-	lists: List;
-	listProperty: keyof List;
+	listProperty: ListObj;
 	chartType: Charts;
 	fromCva?: boolean;
 	totalCvaPercentage?: number | boolean;
+	fromFunds?: boolean;
 };
 
-type SortedDatum = {
-	window: AllocationWindows;
-	value: number;
-	windowName: string;
-};
+const { limitScaleValueInPixels } = constants;
 
 function BarChartRow({
-	lists,
+	typeId,
+	valueA,
+	valueB,
+	colorA,
+	colorB,
 	listProperty,
 	maxValue,
-	ufe,
-	rr,
-	type,
 	chartType,
 	fromCva = false,
 	totalCvaPercentage = false,
+	fromFunds = false,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 
 	const calcAmount =
-		fromCva && typeof totalCvaPercentage === "number" ? "5%" : "0%";
-
-	const sortedData: SortedDatum[] = [rr, ufe].map<SortedDatum>((d, i) => ({
-		value: d,
-		window: i ? "ufe" : "rr",
-		windowName: i ? "Underfunded Emergencies" : "Rapid Response",
-	}));
-
-	const total = sum(sortedData, d => d.value);
+		fromCva && typeof totalCvaPercentage === "number" ? "8%" : "0%";
 
 	return (
 		<Box
-			data-tooltip-id="tooltip"
-			data-tooltip-html={`${
-				listProperty === "organizationsAcronym"
-					? `<div style='width:100%;margin-bottom:0.5em;text-align:center;font-weight:500;'>${lists.organizations[type]}</div>`
-					: ""
-			}
-			<div style='display:table;width:100%;border-spacing:2px 0;'><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>Total:</div><div style='display:table-cell;text-align:right;'>$${format(
-				",.2f"
-			)(
-				total
-			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>${
-				sortedData[0].windowName
-			} (${format(".1%")(
-				sortedData[0].value / total
-			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
-				",.2f"
-			)(
-				sortedData[0].value
-			)}</div></div><div style='display:table-row;'><div style='display:table-cell;padding-right:12px;text-align:right;'>${
-				sortedData[1].windowName
-			} (${format(".1%")(
-				sortedData[1].value / total
-			)}):</div><div style='display:table-cell;text-align:right;'>$${format(
-				",.2f"
-			)(sortedData[1].value)}</div></div></div>`}
-			data-tooltip-place="top"
 			style={{
 				display: "flex",
 				flexDirection: "row",
@@ -90,10 +53,7 @@ function BarChartRow({
 		>
 			<Box
 				style={{
-					flex:
-						chartType === "sectors" || chartType === "agencies"
-							? "0 20% "
-							: "0 18% ",
+					flex: chartType === "sectors" ? "0 26% " : "0 22% ",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "flex-end",
@@ -107,28 +67,16 @@ function BarChartRow({
 					fontSize={13}
 					style={{ color: "#444", border: "none" }}
 				>
-					{(lists[listProperty] as ListObj)[type]}
+					{listProperty[typeId]}
 				</Typography>
 				{chartType === "sectors" && (
 					<img
-						src={clustersIconsData[type]}
+						src={clustersIconsData[typeId]}
 						style={{
-							width: "26px",
-							height: "26px",
-							marginLeft: "8px",
-							marginRight: "4px",
-							padding: "4px",
-						}}
-					/>
-				)}
-				{chartType === "agencies" && (
-					<img
-						src={agencyIconsData[type] ?? unIcon}
-						style={{
-							width: "26px",
-							height: "26px",
-							marginLeft: "8px",
-							marginRight: "4px",
+							width: "32px",
+							height: "32px",
+							marginLeft: "12px",
+							marginRight: "0px",
 							padding: "4px",
 						}}
 					/>
@@ -141,6 +89,7 @@ function BarChartRow({
 						display: "flex",
 						justifyContent: "center",
 						alignItems: "center",
+						paddingLeft: "6px",
 					}}
 				>
 					<Typography
@@ -154,10 +103,14 @@ function BarChartRow({
 						}}
 					>
 						{"("}
-						<NumberAnimator
-							number={totalCvaPercentage}
-							type="integer"
-						/>
+						{totalCvaPercentage > 0 && totalCvaPercentage < 1 ? (
+							"<1"
+						) : (
+							<NumberAnimator
+								number={totalCvaPercentage}
+								numberType="integer"
+							/>
+						)}
 						{"%)"}
 					</Typography>
 				</Box>
@@ -165,28 +118,36 @@ function BarChartRow({
 			<Box
 				style={{
 					flex:
-						chartType === "sectors" || chartType === "agencies"
+						chartType === "sectors"
 							? `0 calc(74% - ${calcAmount})`
-							: `0 calc(76% - ${calcAmount})`,
+							: chartType === "cvaTypes"
+							? `0 calc(78% - ${calcAmount})`
+							: `0 calc(66% - ${calcAmount})`,
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
-					position: "relative",
 				}}
 			>
-				{sortedData.map((d, i) => (
+				{[valueA, valueB].map((d, i) => (
 					<Box
 						style={{
 							display: "flex",
 							flexDirection: "row",
 							width: "100%",
 							alignItems: "center",
-							position: "absolute",
-							top: 0,
-							left: 0,
-							transform: "translateY(-50%",
 						}}
 						key={i}
+						data-tooltip-id={"tooltip"}
+						data-tooltip-content={`${
+							fromFunds
+								? i
+									? "CVA allocations"
+									: "Total allocations"
+								: i
+								? "Reserve"
+								: "Standard"
+						}: $${format(",.0f")(d)}`}
+						data-tooltip-place={"top"}
 					>
 						<Box
 							style={{
@@ -195,48 +156,80 @@ function BarChartRow({
 								display: "flex",
 								alignItems: "center",
 								width: "100%",
+								marginLeft: "8px",
 							}}
 						>
 							<Box
 								style={{
-									width: scale(i ? d.value : total) + "%",
+									width: scale(d) + "%",
+									minWidth: "1px",
 									height: "18px",
 									transitionProperty: "width",
 									transitionDuration: "0.75s",
 									display: "flex",
 									alignItems: "center",
-									backgroundColor: colors[`${d.window}Color`],
+									backgroundColor: i ? colorB : colorA,
 								}}
 							>
-								{!i && (
-									<Typography
-										fontSize={12}
-										fontWeight={700}
-										style={{
-											position: "relative",
-											left: "3px",
-
-											marginLeft: "100%",
-											color: "#444",
-										}}
-									>
-										{"$"}
-										<NumberAnimator
-											number={parseFloat(
-												formatSIFloat(total)
-											)}
-											type="decimal"
-										/>
-										{isNaN(+formatSIFloat(total).slice(-1))
-											? formatSIFloat(total).slice(-1)
-											: ""}
-									</Typography>
-								)}
+								<Typography
+									fontSize={12}
+									fontWeight={700}
+									style={{
+										position: "relative",
+										left:
+											scale(d) < limitScaleValueInPixels
+												? "3px"
+												: "-3px",
+										marginLeft:
+											scale(d) < limitScaleValueInPixels
+												? "100%"
+												: "auto",
+										color:
+											scale(d) < limitScaleValueInPixels
+												? "#444"
+												: "#fff",
+									}}
+								>
+									{"$"}
+									<NumberAnimator
+										number={parseFloat(formatSIFloat(d))}
+										numberType="decimal"
+									/>
+									{isNaN(+formatSIFloat(d).slice(-1))
+										? formatSIFloat(d).slice(-1)
+										: ""}
+								</Typography>
 							</Box>
 						</Box>
 					</Box>
 				))}
 			</Box>
+			{chartType === "funds" && (
+				<Box
+					style={{
+						flex: "0 12%",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					<Typography
+						variant="body2"
+						style={{
+							fontSize: 12,
+							color: "#444",
+							border: "none",
+							fontStyle: "italic",
+						}}
+					>
+						<NumberAnimator
+							number={~~((valueB * 100) / valueA)}
+							numberType="integer"
+						/>
+						%
+					</Typography>
+				</Box>
+			)}
 		</Box>
 	);
 }

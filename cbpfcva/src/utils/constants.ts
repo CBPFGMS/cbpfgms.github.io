@@ -1,10 +1,12 @@
 const constants = {
 	HARDCODED_TOTAL_SIZE: 481_000,
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
-	charts: ["funds", "types"],
+	charts: ["funds", "cvaTypes", "sectors"],
 	filters: ["Year", "Organization Type"],
 	allocationSources: ["standard", "reserve"],
 	firstYearOfCvaData: 2024,
+	limitScaleValueInPixels: 90,
+	unselectedFundOpacity: 0.2,
 } as const;
 
 export default constants;

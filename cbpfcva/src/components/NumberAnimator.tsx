@@ -3,10 +3,10 @@ import { useSpring, animated } from "@react-spring/web";
 
 export type NumberAnimatorProps = {
 	number: number;
-	type: "decimal" | "integer";
+	numberType: "decimal" | "integer";
 };
 
-function NumberAnimator({ number, type = "decimal" }: NumberAnimatorProps) {
+function NumberAnimator({ number, numberType }: NumberAnimatorProps) {
 	const [prevNumber, setPrevNumber] = useState<number>(number);
 	const props = useSpring({
 		from: { number: prevNumber },
@@ -19,7 +19,7 @@ function NumberAnimator({ number, type = "decimal" }: NumberAnimatorProps) {
 
 	return (
 		<animated.span>
-			{type === "decimal"
+			{numberType === "decimal"
 				? props.number.to(val => val.toFixed(decimals))
 				: props.number.to(val => Math.floor(val).toLocaleString())}
 		</animated.span>

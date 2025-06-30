@@ -12,6 +12,8 @@ import processData from "../utils/processdata";
 import colors from "../utils/colors";
 import TopFigures from "./TopFigures";
 import Selectors from "./Selectors";
+import FundsChart from "./FundsChart";
+import CvaChart from "./CvaChart";
 
 type MainContainerProps = {
 	defaultYear: number;
@@ -110,18 +112,45 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 						dataTopFigures={dataTopFigures}
 						year={year}
 					/>
-					<Divider
-						orientation="horizontal"
-						flexItem
-						style={{
-							borderTop: "3px dotted #ccc",
-							borderBottom: "none",
-							width: "96%",
-							marginLeft: "2%",
-							marginTop: "2em",
-							marginBottom: "2em",
-						}}
-					/>
+					<Grid
+						container
+						spacing={2}
+						style={{ marginTop: "4em" }}
+					>
+						<Grid size={5.8}>
+							<FundsChart
+								data={dataFunds}
+								year={year}
+								fund={fund}
+								organizationType={organizationType}
+								setFund={setFund}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								lists={lists}
+								inDataLists={inDataLists}
+							/>
+						</Grid>
+						<Divider
+							orientation="vertical"
+							flexItem
+							style={{
+								borderLeft: "3px dotted #ccc",
+								borderRight: "none",
+							}}
+						/>
+						<Grid size={5.8}>
+							<CvaChart
+								data={dataCvaTypes}
+								year={year}
+								fund={fund}
+								organizationType={organizationType}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								lists={lists}
+								inDataLists={inDataLists}
+							/>
+						</Grid>
+					</Grid>
 				</Paper>
 			</Grid>
 		</Box>

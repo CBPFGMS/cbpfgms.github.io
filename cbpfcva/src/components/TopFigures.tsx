@@ -106,7 +106,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 								>
 									<SiValue
 										number={dataTopFigures.totalAllocations}
-										type="decimal"
+										numberType="decimal"
 									/>
 								</Typography>
 								<Typography
@@ -210,7 +210,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 								>
 									<SiValue
 										number={dataTopFigures.allocations}
-										type="decimal"
+										numberType="decimal"
 									/>
 								</Typography>
 								<Typography
@@ -387,7 +387,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 															dataTopFigures.standardTotal
 												  )
 										}
-										type="integer"
+										numberType="integer"
 									/>
 									%
 								</Typography>
@@ -433,7 +433,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 															dataTopFigures.reserveTotal
 												  )
 										}
-										type="integer"
+										numberType="integer"
 									/>
 									%
 								</Typography>
@@ -448,6 +448,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 				width={"90%"}
 				justifyContent={"center"}
 				alignItems={"center"}
+				mt={1}
 			>
 				<ProjectsAndPartners
 					value={dataTopFigures.projects.size}
@@ -493,7 +494,7 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 			>
 				<NumberAnimator
 					number={value}
-					type="integer"
+					numberType="integer"
 				/>
 			</Typography>
 			<Typography
@@ -575,7 +576,7 @@ function StandardAndReserve({
 								? 0
 								: Math.round((standard * 100) / total)
 						}
-						type="integer"
+						numberType="integer"
 					/>
 					%):
 				</Typography>
@@ -591,7 +592,7 @@ function StandardAndReserve({
 					{standard < 1e3 ? (
 						<NumberAnimator
 							number={standard}
-							type="decimal"
+							numberType="decimal"
 						/>
 					) : (
 						<span>
@@ -600,7 +601,7 @@ function StandardAndReserve({
 									adjustValues(standard, reserve, total)
 										.standard
 								}
-								type="decimal"
+								numberType="decimal"
 							/>
 							{formatSIFloat(standard).slice(-1)}
 						</span>
@@ -652,7 +653,7 @@ function StandardAndReserve({
 								? 0
 								: Math.round((reserve * 100) / total)
 						}
-						type="integer"
+						numberType="integer"
 					/>
 					%):
 				</Typography>
@@ -668,7 +669,7 @@ function StandardAndReserve({
 					{reserve < 1e3 ? (
 						<NumberAnimator
 							number={reserve}
-							type="decimal"
+							numberType="decimal"
 						/>
 					) : (
 						<span>
@@ -677,7 +678,7 @@ function StandardAndReserve({
 									adjustValues(standard, reserve, total)
 										.reserve
 								}
-								type="decimal"
+								numberType="decimal"
 							/>
 							{formatSIFloat(reserve).slice(-1)}
 						</span>

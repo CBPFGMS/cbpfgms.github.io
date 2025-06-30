@@ -66,6 +66,7 @@ export type List = {
 	statuses: ListObj;
 	projectDetails: Map<number, ProjectDetails>;
 	cvaTypeNames: ListObj;
+	cvaTypesAbbreviatedNames: ListObj;
 };
 
 function makeLists({
@@ -91,6 +92,7 @@ function makeLists({
 		statuses: {},
 		projectDetails: new Map(),
 		cvaTypeNames: {},
+		cvaTypesAbbreviatedNames: {},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -190,6 +192,7 @@ function makeLists({
 		const parsedCvaMaster = cvaMasterObjectSchema.safeParse(d);
 		if (parsedCvaMaster.success) {
 			lists.cvaTypeNames[d.CVAId] = d.CVAName;
+			lists.cvaTypesAbbreviatedNames[d.CVAId] = d.CVAAbbreviatedName;
 		} else {
 			warnInvalidSchema(
 				"CvaMaster",

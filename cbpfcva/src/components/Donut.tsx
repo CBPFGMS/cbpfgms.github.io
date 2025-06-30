@@ -98,7 +98,7 @@ function Donut({
 							number={Math.round(
 								(CvaSlice * 100) / (totalSlice + CvaSlice)
 							)}
-							type="integer"
+							numberType="integer"
 						/>
 						%
 					</Typography>

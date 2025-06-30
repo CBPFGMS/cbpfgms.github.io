@@ -7,6 +7,7 @@ type BaseDownloadDatum = {
 	"Allocation Source": string;
 	"Allocation Name": string;
 	"Project Code": string;
+	"Organization Type": string;
 	Budget: number;
 };
 
@@ -23,21 +24,21 @@ type ProcessDownloadParams = {
 	lists: List;
 	year: number[];
 	fund: number[];
-	allocationSource: number[];
+	organizationType: number[];
 };
 
-export function processCvaTypeDownload({
+export function processCvaTypesDownload({
 	data,
 	lists,
 	year,
 	fund,
-	allocationSource,
+	organizationType,
 }: ProcessDownloadParams): CvaTypeDatumDownload[] {
 	const cvaDataDownload: CvaTypeDatumDownload[] = [];
 
 	data.forEach(datum => {
 		if (datum.cvaData !== null) {
-			if (checkRow(datum, year, fund, allocationSource)) {
+			if (checkRow(datum, year, fund, organizationType)) {
 				const baseDownloadDatum = populateBaseDownloadDatum(
 					datum,
 					lists
@@ -61,12 +62,12 @@ export function processFundsDownload({
 	lists,
 	year,
 	fund,
-	allocationSource,
+	organizationType,
 }: ProcessDownloadParams): FundDatumDownload[] {
 	const fundsDataDownload: FundDatumDownload[] = [];
 
 	data.forEach(datum => {
-		if (checkRow(datum, year, fund, allocationSource)) {
+		if (checkRow(datum, year, fund, organizationType)) {
 			const baseDownloadDatum = populateBaseDownloadDatum(datum, lists);
 
 			const cvaBudget =
@@ -94,6 +95,7 @@ function populateBaseDownloadDatum(
 		"Allocation Source": lists.allocationSources[datum.allocationSource],
 		"Allocation Name": lists.allocationTypes[datum.allocationType],
 		"Project Code": datum.projectCode,
+		"Organization Type": lists.organizationTypes[datum.organizationType],
 		Budget: datum.budget,
 	};
 }
@@ -102,11 +104,11 @@ function checkRow(
 	datum: Data[number],
 	year: number[],
 	fund: number[],
-	allocationSource: number[]
+	organizationType: number[]
 ): boolean {
 	return (
 		year.includes(datum.year) &&
 		fund.includes(datum.fund) &&
-		allocationSource.includes(datum.allocationSource)
+		organizationType.includes(datum.organizationType)
 	);
 }
