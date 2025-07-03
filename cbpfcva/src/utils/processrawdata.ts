@@ -141,7 +141,7 @@ function processRawData({
 				);
 			}
 
-			if (thisAllocationType && thisOrganization && thisCvaData) {
+			if (thisAllocationType && thisOrganization) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);

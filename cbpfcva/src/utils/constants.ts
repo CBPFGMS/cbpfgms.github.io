@@ -7,6 +7,8 @@ const constants = {
 	firstYearOfCvaData: 2024,
 	limitScaleValueInPixels: 90,
 	unselectedFundOpacity: 0.2,
+	sortingOrder: ["ascending", "descending"],
+	fundChartSorting: ["totalAllocations", "cvaAllocations"],
 } as const;
 
 export default constants;

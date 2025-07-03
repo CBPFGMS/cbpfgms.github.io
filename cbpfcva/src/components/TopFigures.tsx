@@ -9,7 +9,7 @@ import NumberAnimator from "./NumberAnimator";
 import Typography from "@mui/material/Typography";
 import Donut from "./Donut";
 import SiValue from "./SiValue";
-import { format } from "d3";
+import { format, color } from "d3";
 import constants from "../utils/constants";
 import InfoIcon from "@mui/icons-material/Info";
 import formatSIFloat from "../utils/formatsi";
@@ -25,6 +25,11 @@ export type DonutDatum = {
 };
 
 const { firstYearOfCvaData } = constants;
+
+const standardColorDarker = color(colors.standardColor)
+		?.darker(1)
+		.formatHex(),
+	reserveColorDarker = color(colors.reserveColor)?.darker(1).formatHex();
 
 function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 	return (
@@ -373,7 +378,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 									fontWeight={500}
 									fontSize={18}
 									style={{
-										color: colors.standardColorDarker,
+										color: standardColorDarker,
 										border: "none",
 									}}
 								>
@@ -419,7 +424,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 									fontWeight={500}
 									fontSize={18}
 									style={{
-										color: colors.reserveColorDarker,
+										color: reserveColorDarker,
 										border: "none",
 									}}
 								>
@@ -585,7 +590,7 @@ function StandardAndReserve({
 					fontWeight={500}
 					fontSize={18}
 					style={{
-						color: colors.standardColorDarker,
+						color: standardColorDarker,
 						border: "none",
 					}}
 				>
@@ -662,7 +667,7 @@ function StandardAndReserve({
 					fontWeight={500}
 					fontSize={18}
 					style={{
-						color: colors.reserveColorDarker,
+						color: reserveColorDarker,
 						border: "none",
 					}}
 				>

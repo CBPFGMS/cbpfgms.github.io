@@ -105,33 +105,30 @@ function CvaChart({
 					style={{
 						fontSize: "0.8rem",
 						display: "flex",
-						alignItems: "baseline",
-						marginTop: "-0.5em",
+						alignItems: "center",
+						marginTop: "0.25em",
 					}}
 				>
 					{"("}
 					<span
 						style={{
-							fontSize: 22,
-							marginLeft: 3,
-							marginRight: 3,
-							color: colors.standardColor,
+							width: "1em",
+							height: "1em",
+							backgroundColor: colors.standardColor,
+							marginLeft: 5,
+							marginRight: 5,
 						}}
-					>
-						{"\u25A0"}
-					</span>
+					/>
 					Standard CVA allocations,
 					<span
 						style={{
-							fontSize: 22,
-							marginLeft: 6,
-							marginRight: 3,
-							color: colors.reserveColor,
-							opacity: 0.6,
+							width: "1em",
+							height: "1em",
+							backgroundColor: colors.reserveColor,
+							marginLeft: 5,
+							marginRight: 5,
 						}}
-					>
-						{"\u25A0"}
-					</span>
+					/>
 					Reserve CVA allocations
 					{")"}
 				</Typography>

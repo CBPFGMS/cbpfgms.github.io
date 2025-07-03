@@ -184,10 +184,7 @@ function BarChartRow({
 											scale(d) < limitScaleValueInPixels
 												? "100%"
 												: "auto",
-										color:
-											scale(d) < limitScaleValueInPixels
-												? "#444"
-												: "#fff",
+										color: "#444",
 									}}
 								>
 									{"$"}

@@ -9,14 +9,12 @@ const colors = {
 	totalAllocationsSliceColor: "#ccc",
 	cvaAllocationsSliceColor: "#657588",
 	paperColor: "#f5f8ff",
-	standardColor: "#ECDB94",
-	standardColorLighter: "#F5EBC2",
-	standardColorDarker: "#BFAF6B",
-	reserveColor: "#BBC8E3",
-	reserveColorLighter: "#D7E1F1",
-	reserveColorDarker: "#8A9CB8",
-	totalAllocationsColor: "darkslategray",
-	cvaAllocationsColor: "powderblue",
+	standardColor: "#6CB4EE",
+	reserveColor: "#AFDBF5",
+	totalAllocationsColor: "#fdeaae",
+	cvaAllocationsColor: "#eac556",
 } as const;
 
 export default colors;
+
+//TODO: Check all this mess!

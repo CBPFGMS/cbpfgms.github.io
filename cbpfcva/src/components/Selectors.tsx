@@ -1,6 +1,7 @@
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Grid";
 import { type InSelectionData } from "../utils/processdata";
+import Legend from "./Legend";
 
 type SelectorsSummaryProps = {
 	year: number[];
@@ -25,6 +26,7 @@ function SelectorsSummary({
 				width: "80%",
 				margin: "0 auto",
 			}}
+			alignItems={"center"}
 		>
 			<Grid size={3}>
 				<AccordionComponent
@@ -46,6 +48,7 @@ function SelectorsSummary({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
+			<Legend />
 		</Grid>
 	);
 }

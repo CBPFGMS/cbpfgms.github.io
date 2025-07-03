@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -15,6 +15,8 @@ import BarChartRow from "./BarChartRow";
 import type { InDataLists } from "../utils/processrawdata";
 import constants from "../utils/constants";
 import InfoIcon from "@mui/icons-material/Info";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 type FundsChartProps = {
 	data: DatumFunds[];
@@ -28,7 +30,17 @@ type FundsChartProps = {
 	inDataLists: InDataLists;
 };
 
+type SortingOrder = (typeof constants.sortingOrder)[number];
+
+type Sorting = (typeof constants.fundChartSorting)[number];
+
 const { unselectedFundOpacity } = constants;
+
+const legendStyle = {
+	fontSize: "0.8rem",
+	display: "flex",
+	alignItems: "center",
+};
 
 function FundsChart({
 	data,
@@ -44,6 +56,11 @@ function FundsChart({
 	const { data: completeData } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
+
+	const [sorting, setSorting] = useState<Sorting>("totalAllocations");
+
+	const [sortingOrder, setSortingOrder] =
+		useState<SortingOrder>("descending");
 
 	const maxValue = max(
 		data.map(d => Math.max(d.totalAllocations, d.cvaAllocations))
@@ -76,6 +93,21 @@ function FundsChart({
 			}
 		}
 	}
+
+	function handleSorting(thisSorting: Sorting) {
+		if (thisSorting === sorting) {
+			setSortingOrder(
+				sortingOrder === "ascending" ? "descending" : "ascending"
+			);
+		}
+		setSorting(thisSorting);
+	}
+
+	const sortedData: DatumFunds[] = data.sort((a, b) =>
+		sortingOrder === "ascending"
+			? a[sorting] - b[sorting]
+			: b[sorting] - a[sorting]
+	);
 
 	return (
 		<Container
@@ -137,40 +169,72 @@ function FundsChart({
 						/>
 					</Typography>
 				</Box>
-				<Typography
+				<Box
 					style={{
-						fontSize: "0.8rem",
 						display: "flex",
-						alignItems: "baseline",
-						marginTop: "-0.5em",
+						flexDirection: "row",
+						marginTop: "0.25em",
 					}}
 				>
-					{"("}
-					<span
+					<Typography style={legendStyle}>{"("}</Typography>
+					<Box
 						style={{
-							fontSize: 22,
-							marginLeft: 3,
-							marginRight: 3,
-							color: colors.totalAllocationsColor,
+							display: "flex",
+							flexDirection: "row",
+							cursor: "pointer",
 						}}
+						onClick={() => handleSorting("totalAllocations")}
 					>
-						{"\u25A0"}
-					</span>
-					Total allocations
-					<span
+						{sorting === "totalAllocations" &&
+							(sortingOrder === "ascending" ? (
+								<ArrowDownwardIcon />
+							) : (
+								<ArrowUpwardIcon />
+							))}
+						<Typography style={legendStyle}>
+							<span
+								style={{
+									width: "1em",
+									height: "1em",
+									backgroundColor:
+										colors.totalAllocationsColor,
+									marginLeft: 5,
+									marginRight: 5,
+								}}
+							/>
+							Total allocations
+						</Typography>
+					</Box>
+					<Typography style={legendStyle}>{","}</Typography>
+					<Box
 						style={{
-							fontSize: 22,
-							marginLeft: 6,
-							marginRight: 3,
-							color: colors.cvaAllocationsColor,
-							opacity: 0.6,
+							display: "flex",
+							flexDirection: "row",
+							cursor: "pointer",
 						}}
+						onClick={() => handleSorting("cvaAllocations")}
 					>
-						{"\u25A0"}
-					</span>
-					CVA allocations
-					{")"}
-				</Typography>
+						{sorting === "cvaAllocations" &&
+							(sortingOrder === "ascending" ? (
+								<ArrowDownwardIcon />
+							) : (
+								<ArrowUpwardIcon />
+							))}
+						<Typography style={legendStyle}>
+							<span
+								style={{
+									width: "1em",
+									height: "1em",
+									backgroundColor: colors.cvaAllocationsColor,
+									marginLeft: 5,
+									marginRight: 5,
+								}}
+							/>
+							CVA allocations
+						</Typography>
+					</Box>
+					<Typography style={legendStyle}>{")"}</Typography>
+				</Box>
 			</Box>
 			<Box
 				display={"flex"}
@@ -205,7 +269,7 @@ function FundsChart({
 						of total
 					</Typography>
 				</Box>
-				{data.map(d => (
+				{sortedData.map(d => (
 					<Box
 						style={{
 							width: "100%",
