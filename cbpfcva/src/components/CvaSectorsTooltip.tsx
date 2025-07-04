@@ -1,20 +1,19 @@
 import Popover from "@mui/material/Popover";
 import Paper from "@mui/material/Paper";
-import { DatumCva } from "../utils/processdatasummary";
+import type { DatumCvaTypes } from "../utils/processdata";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import constants from "../utils/constants";
-import { List } from "../utils/makelists";
+import type { List } from "../utils/makelists";
 import BarChartRow from "./BarChartRow";
-import { CvaChartModes } from "./CvaChart";
 import { max } from "d3";
+import colors from "../utils/colors";
 
 type CvaSectorsTooltipProps = {
 	anchorEl: HTMLElement | null;
 	handleClose: () => void;
-	data: DatumCva | null;
+	data: DatumCvaTypes | null;
 	lists: List;
-	cvaChartMode: CvaChartModes;
 };
 
 const { cvaPopoverWidth } = constants;
@@ -24,20 +23,15 @@ function CvaSectorsTooltip({
 	handleClose,
 	data,
 	lists,
-	cvaChartMode,
 }: CvaSectorsTooltipProps) {
 	const open = Boolean(anchorEl);
 
-	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
-
-	const sortedData = data?.sectorData.toSorted(
-		(a, b) => b[`targeted${property}`] - a[`targeted${property}`]
+	const sortedData = data?.sectors.toSorted(
+		(a, b) => b.allocations - a.allocations
 	);
 
 	const maxValue = sortedData
-		? max(sortedData, d =>
-				Math.max(d[`targeted${property}`], d[`reached${property}`])
-		  ) ?? 0
+		? max(sortedData, d => Math.max(d.standard, d.reserve)) ?? 0
 		: 0;
 
 	return (
@@ -47,29 +41,29 @@ function CvaSectorsTooltip({
 				anchorEl={anchorEl}
 				onClose={handleClose}
 				anchorOrigin={{
-					vertical: "top",
-					horizontal: "center",
+					vertical: "center",
+					horizontal: "left",
 				}}
 				transformOrigin={{
-					vertical: "bottom",
-					horizontal: "center",
+					vertical: "center",
+					horizontal: "right",
 				}}
 				slotProps={{
 					paper: {
-						// onMouseEnter: e => {
-						// 	e.stopPropagation();
-						// },
-						// style: { pointerEvents: "auto" },
 						style: { marginTop: "-10px" },
 					},
 				}}
-				style={{ pointerEvents: "none", zIndex: 2000 }}
+				style={{
+					pointerEvents: "none",
+					transform: "translateX(-10px)",
+				}}
 				marginThreshold={8}
 			>
 				<Paper
 					style={{
 						padding: "10px",
-						backgroundColor: "#f9f9f9",
+						backgroundColor: "#fff",
+						border: "1px solid #888",
 					}}
 				>
 					<Box
@@ -107,39 +101,6 @@ function CvaSectorsTooltip({
 							alignItems={"center"}
 							gap={1}
 						>
-							<Box
-								display={"flex"}
-								flexDirection={"row"}
-								width={"100%"}
-							>
-								<Box flex={"0 88%"} />
-								<Box
-									mb={-2}
-									style={{
-										display: "flex",
-										flex: "0 12%",
-										flexDirection: "row",
-										alignItems: "center",
-										justifyContent: "center",
-										textAlign: "center",
-										width: "100%",
-									}}
-								>
-									<Typography
-										variant="body2"
-										fontSize={12}
-										style={{
-											color: "#222",
-											border: "none",
-											fontStyle: "italic",
-											letterSpacing: "-0.05em",
-										}}
-									>
-										Reached as %<br />
-										of targeted
-									</Typography>
-								</Box>
-							</Box>
 							{sortedData &&
 								sortedData.map(d => (
 									<Box
@@ -150,16 +111,14 @@ function CvaSectorsTooltip({
 										}}
 									>
 										<BarChartRow
-											type={d.sector}
-											targeted={d[`targeted${property}`]}
-											reached={d[`reached${property}`]}
+											typeId={d.sector}
+											valueA={d.standard}
+											valueB={d.reserve}
+											colorA={colors.standardColor}
+											colorB={colors.reserveColor}
 											maxValue={maxValue}
-											list={lists.sectors}
+											listProperty={lists.sectors}
 											chartType="sectors"
-											fromCva={true}
-											isAllocation={
-												cvaChartMode === "allocations"
-											}
 										/>
 									</Box>
 								))}

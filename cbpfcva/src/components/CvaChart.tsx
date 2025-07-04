@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { DatumCvaTypes } from "../utils/processdata";
@@ -13,6 +13,8 @@ import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import colors from "../utils/colors";
 import BarChartRow from "./BarChartRow";
 import type { InDataLists } from "../utils/processrawdata";
+import InfoIcon from "@mui/icons-material/Info";
+import CvaSectorsTooltip from "./CvaSectorsTooltip";
 
 type CvaChartProps = {
 	data: DatumCvaTypes[];
@@ -39,6 +41,9 @@ function CvaChart({
 
 	const ref = useRef<HTMLDivElement>(null);
 
+	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+	const [tooltipData, setTooltipData] = useState<DatumCvaTypes | null>(null);
+
 	const maxValue = max(
 		data.map(d => Math.max(d.standard, d.reserve))
 	) as number;
@@ -55,6 +60,19 @@ function CvaChart({
 			dataCvaTypesDownload,
 			"cva_types"
 		);
+	}
+
+	function handleBarHover(
+		event: React.MouseEvent<HTMLElement>,
+		data: DatumCvaTypes
+	) {
+		setAnchorEl(event.currentTarget);
+		setTooltipData(data);
+	}
+
+	function handleMouseLeave() {
+		setAnchorEl(null);
+		setTooltipData(null);
 	}
 
 	return (
@@ -77,7 +95,7 @@ function CvaChart({
 				style={{
 					display: "flex",
 					alignItems: "center",
-					justifyContent: "center",
+					justifyContent: "space-around",
 					height: "58px",
 					flexDirection: "column",
 				}}
@@ -99,6 +117,21 @@ function CvaChart({
 						}}
 					>
 						Allocations by CVA Type
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-content={
+								"Mouse over a CVA type for displaying the breakdown by sectors for that CVA type."
+							}
+							data-tooltip-place="top"
+							style={{
+								color: colors.unColor,
+								fontSize: "20px",
+								marginLeft: "0.1em",
+								marginTop: "-0.4em",
+								alignSelf: "flex-start",
+								position: "absolute",
+							}}
+						/>
 					</Typography>
 				</Box>
 				<Typography
@@ -106,7 +139,6 @@ function CvaChart({
 						fontSize: "0.8rem",
 						display: "flex",
 						alignItems: "center",
-						marginTop: "0.25em",
 					}}
 				>
 					{"("}
@@ -204,21 +236,39 @@ function CvaChart({
 					</Typography>
 				</Box>
 				{data.map(d => (
-					<BarChartRow
+					<Box
 						key={d.cvaType}
-						typeId={d.cvaType}
-						valueA={d.standard}
-						valueB={d.reserve}
-						colorA={colors.standardColor}
-						colorB={colors.reserveColor}
-						maxValue={maxValue}
-						listProperty={lists.cvaTypesAbbreviatedNames}
-						chartType={"cvaTypes"}
-						fromCva={true}
-						totalCvaPercentage={d.percentage}
-					/>
+						onMouseEnter={e => {
+							handleBarHover(e, d);
+						}}
+						onMouseLeave={handleMouseLeave}
+						style={{
+							width: "100%",
+							display: "flex",
+						}}
+					>
+						<BarChartRow
+							key={d.cvaType}
+							typeId={d.cvaType}
+							valueA={d.standard}
+							valueB={d.reserve}
+							colorA={colors.standardColor}
+							colorB={colors.reserveColor}
+							maxValue={maxValue}
+							listProperty={lists.cvaTypesAbbreviatedNames}
+							chartType={"cvaTypes"}
+							fromCva={true}
+							totalCvaPercentage={d.percentage}
+						/>
+					</Box>
 				))}
 			</Box>
+			<CvaSectorsTooltip
+				anchorEl={anchorEl}
+				handleClose={handleMouseLeave}
+				data={tooltipData}
+				lists={lists}
+			/>
 		</Container>
 	);
 }

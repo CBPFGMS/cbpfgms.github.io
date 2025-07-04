@@ -9,6 +9,7 @@ const constants = {
 	unselectedFundOpacity: 0.2,
 	sortingOrder: ["ascending", "descending"],
 	fundChartSorting: ["totalAllocations", "cvaAllocations"],
+	cvaPopoverWidth: 520,
 } as const;
 
 export default constants;

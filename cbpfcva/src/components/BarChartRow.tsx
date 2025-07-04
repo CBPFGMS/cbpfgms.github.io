@@ -53,7 +53,7 @@ function BarChartRow({
 		>
 			<Box
 				style={{
-					flex: chartType === "sectors" ? "0 26% " : "0 22% ",
+					flex: chartType === "sectors" ? "0 32% " : "0 22% ",
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "flex-end",
@@ -73,9 +73,9 @@ function BarChartRow({
 					<img
 						src={clustersIconsData[typeId]}
 						style={{
-							width: "32px",
-							height: "32px",
-							marginLeft: "12px",
+							width: "24px",
+							height: "24px",
+							marginLeft: "8px",
 							marginRight: "0px",
 							padding: "4px",
 						}}
@@ -119,7 +119,7 @@ function BarChartRow({
 				style={{
 					flex:
 						chartType === "sectors"
-							? `0 calc(74% - ${calcAmount})`
+							? `0 calc(68% - ${calcAmount})`
 							: chartType === "cvaTypes"
 							? `0 calc(78% - ${calcAmount})`
 							: `0 calc(66% - ${calcAmount})`,

@@ -129,7 +129,7 @@ function FundsChart({
 				style={{
 					display: "flex",
 					alignItems: "center",
-					justifyContent: "center",
+					justifyContent: "space-around",
 					height: "58px",
 					flexDirection: "column",
 				}}
@@ -173,7 +173,6 @@ function FundsChart({
 					style={{
 						display: "flex",
 						flexDirection: "row",
-						marginTop: "0.25em",
 					}}
 				>
 					<Typography style={legendStyle}>{"("}</Typography>
