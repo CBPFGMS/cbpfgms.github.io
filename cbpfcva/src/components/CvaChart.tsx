@@ -5,7 +5,7 @@ import type { DatumCvaTypes } from "../utils/processdata";
 import type { List } from "../utils/makelists";
 import type { DownloadStates } from "./MainContainer";
 import DataContext, { type DataContextType } from "../context/DataContext";
-import { max } from "d3";
+import { max, sum } from "d3";
 import { processCvaTypesDownload } from "../utils/processdownload";
 import downloadData from "../utils/downloaddata";
 import Container from "@mui/material/Container";
@@ -51,6 +51,8 @@ function CvaChart({
 	const maxValue = max(
 		data.map(d => Math.max(d.standard, d.reserve))
 	) as number;
+
+	const totalCva = sum(data, d => d.allocations);
 
 	function handleDownloadClick() {
 		const dataCvaTypesDownload = processCvaTypesDownload({
@@ -289,7 +291,11 @@ function CvaChart({
 							listProperty={lists.cvaTypesAbbreviatedNames}
 							chartType={"cvaTypes"}
 							fromCva={true}
-							totalCvaPercentage={d.percentage}
+							totalCvaPercentage={
+								totalCva === 0
+									? 0
+									: (d.allocations / totalCva) * 100
+							}
 						/>
 					</Box>
 				))}

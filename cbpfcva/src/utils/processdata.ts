@@ -24,7 +24,6 @@ export type DataTopFigures = {
 export type DatumCvaTypes = {
 	cvaType: number;
 	allocations: number;
-	percentage: number;
 	standard: number;
 	reserve: number;
 	sectors: DatumSectors[];
@@ -131,8 +130,6 @@ function processData({
 					dataTopFigures.partners.add(datum.organizationId);
 				}
 				dataTopFigures[thisAllocationSource] += cvaBudget;
-				dataTopFigures.allocations += cvaBudget;
-				dataTopFigures[thisAllocationSource] += cvaBudget;
 				foundFund.cvaAllocations += cvaBudget;
 				foundFund[`${thisAllocationSource}CvaAllocations`] += cvaBudget;
 
@@ -146,7 +143,6 @@ function processData({
 							foundType = {
 								cvaType: cva.cvaId,
 								allocations: 0,
-								percentage: 0,
 								standard: 0,
 								reserve: 0,
 								sectors: [],
@@ -191,13 +187,6 @@ function processData({
 		) {
 			inSelectionData.funds.add(datum.fund);
 		}
-	});
-
-	dataTypes.forEach(type => {
-		type.percentage =
-			dataTopFigures.allocations === 0
-				? 0
-				: (type.allocations / dataTopFigures.allocations) * 100;
 	});
 
 	dataTypes.sort((a, b) => b.allocations - a.allocations);
