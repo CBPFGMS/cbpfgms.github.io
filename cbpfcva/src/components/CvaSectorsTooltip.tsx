@@ -8,12 +8,16 @@ import type { List } from "../utils/makelists";
 import BarChartRow from "./BarChartRow";
 import { max } from "d3";
 import colors from "../utils/colors";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
 
 type CvaSectorsTooltipProps = {
 	anchorEl: HTMLElement | null;
 	handleClose: () => void;
 	data: DatumCvaTypes | null;
 	lists: List;
+	cvaTypeClicked: number | null;
+	handlePopoverCloseButton: () => void;
 };
 
 const { cvaPopoverWidth } = constants;
@@ -23,6 +27,8 @@ function CvaSectorsTooltip({
 	handleClose,
 	data,
 	lists,
+	cvaTypeClicked,
+	handlePopoverCloseButton,
 }: CvaSectorsTooltipProps) {
 	const open = Boolean(anchorEl);
 
@@ -54,7 +60,7 @@ function CvaSectorsTooltip({
 					},
 				}}
 				style={{
-					pointerEvents: "none",
+					pointerEvents: cvaTypeClicked ? "all" : "none",
 					transform: "translateX(-10px)",
 				}}
 				marginThreshold={8}
@@ -63,7 +69,10 @@ function CvaSectorsTooltip({
 					style={{
 						padding: "10px",
 						backgroundColor: "#fff",
-						border: "1px solid #888",
+						boxSizing: "border-box",
+						border: cvaTypeClicked
+							? `1px solid ${colors.unColor}`
+							: "1px solid #888",
 					}}
 				>
 					<Box
@@ -76,22 +85,65 @@ function CvaSectorsTooltip({
 						}}
 					>
 						<Box
-							mb={2}
 							style={{
-								width: "100%",
 								display: "flex",
-								flexDirection: "column",
-								alignItems: "center",
-								justifyContent: "center",
+								flexDirection: "row",
+								width: "100%",
 							}}
+							mb={4}
 						>
-							<Typography>Sectors</Typography>
-							<Typography
-								variant="caption"
-								style={{ color: "#555" }}
+							<Box
+								style={{
+									width: "100%",
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
+								}}
 							>
-								{lists.cvaTypeNames[data.cvaType].trimEnd()}
-							</Typography>
+								<Typography>Sectors</Typography>
+								<Typography
+									variant="caption"
+									style={{ color: "#555" }}
+								>
+									{lists.cvaTypeNames[data.cvaType].trimEnd()}
+								</Typography>
+							</Box>
+							{cvaTypeClicked && (
+								<Box
+									style={{
+										flexGrow: 0,
+										alignSelf: "flex-start",
+										alignItems: "center",
+										justifyContent: "center",
+										display: "flex",
+										padding: 2,
+									}}
+								>
+									<IconButton
+										onClick={handlePopoverCloseButton}
+										size="medium"
+										aria-label="close"
+										color="inherit"
+										sx={{
+											backgroundColor: "#eaeaea",
+											"&:hover": {
+												backgroundColor: "#d2d2d2",
+											},
+										}}
+									>
+										<CloseIcon
+											sx={{
+												fontSize: 24,
+												"& path": {
+													stroke: "#444",
+													strokeWidth: 2,
+												},
+											}}
+										/>
+									</IconButton>
+								</Box>
+							)}
 						</Box>
 						<Box
 							display={"flex"}

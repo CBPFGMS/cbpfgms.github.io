@@ -15,6 +15,7 @@ import BarChartRow from "./BarChartRow";
 import type { InDataLists } from "../utils/processrawdata";
 import InfoIcon from "@mui/icons-material/Info";
 import CvaSectorsTooltip from "./CvaSectorsTooltip";
+import constants from "../utils/constants";
 
 type CvaChartProps = {
 	data: DatumCvaTypes[];
@@ -26,6 +27,8 @@ type CvaChartProps = {
 	organizationType: number[];
 	inDataLists: InDataLists;
 };
+
+const { unselectedCvaTypeOpacity } = constants;
 
 function CvaChart({
 	data,
@@ -43,6 +46,7 @@ function CvaChart({
 
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 	const [tooltipData, setTooltipData] = useState<DatumCvaTypes | null>(null);
+	const [cvaTypeClicked, setCvaTypeClicked] = useState<number | null>(null);
 
 	const maxValue = max(
 		data.map(d => Math.max(d.standard, d.reserve))
@@ -71,8 +75,26 @@ function CvaChart({
 	}
 
 	function handleMouseLeave() {
+		if (cvaTypeClicked === null) {
+			setAnchorEl(null);
+			setTooltipData(null);
+		}
+	}
+
+	function handleClickCvaType(thisType: number) {
+		if (cvaTypeClicked === null) {
+			setCvaTypeClicked(thisType);
+		}
+
+		if (cvaTypeClicked && cvaTypeClicked === thisType) {
+			setCvaTypeClicked(null);
+		}
+	}
+
+	function handlePopoverCloseButton() {
 		setAnchorEl(null);
 		setTooltipData(null);
+		setCvaTypeClicked(null);
 	}
 
 	return (
@@ -120,7 +142,7 @@ function CvaChart({
 						<InfoIcon
 							data-tooltip-id="tooltip"
 							data-tooltip-content={
-								"Mouse over a CVA type for displaying the breakdown by sectors for that CVA type."
+								"Mouse over a CVA type for displaying the breakdown by sectors for that CVA type. For freezing the sectors' breakdown click on the CVA type, this allows you to hover over the sectors and getting detailed values. Click on the close icon for interacting again."
 							}
 							data-tooltip-place="top"
 							style={{
@@ -239,12 +261,21 @@ function CvaChart({
 					<Box
 						key={d.cvaType}
 						onMouseEnter={e => {
-							handleBarHover(e, d);
+							if (cvaTypeClicked === null) {
+								handleBarHover(e, d);
+							}
 						}}
 						onMouseLeave={handleMouseLeave}
+						onClick={() => handleClickCvaType(d.cvaType)}
 						style={{
 							width: "100%",
 							display: "flex",
+							opacity:
+								cvaTypeClicked === null
+									? 1
+									: cvaTypeClicked === d.cvaType
+									? 1
+									: unselectedCvaTypeOpacity,
 						}}
 					>
 						<BarChartRow
@@ -268,6 +299,8 @@ function CvaChart({
 				handleClose={handleMouseLeave}
 				data={tooltipData}
 				lists={lists}
+				cvaTypeClicked={cvaTypeClicked}
+				handlePopoverCloseButton={handlePopoverCloseButton}
 			/>
 		</Container>
 	);

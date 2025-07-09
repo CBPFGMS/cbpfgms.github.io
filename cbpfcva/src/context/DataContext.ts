@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { Data, InDataLists } from "../utils/processrawdata";
-import { List } from "../utils/makelists";
+import type { Data, InDataLists } from "../utils/processrawdata";
+import type { List } from "../utils/makelists";
 
 export type DataContextType = {
 	data: Data;
