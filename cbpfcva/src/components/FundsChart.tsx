@@ -254,6 +254,22 @@ function FundsChart({
 						width: "100%",
 					}}
 				>
+					{fund.length !== inDataLists.funds.size && (
+						<Typography
+							variant="body1"
+							fontSize={13}
+							style={{
+								color: "#222",
+								fontWeight: "bold",
+								border: "none",
+								paddingRight: "50%",
+								cursor: "pointer",
+							}}
+							onClick={() => setFund([...inDataLists.funds])}
+						>
+							Clear selection
+						</Typography>
+					)}
 					<Typography
 						variant="body2"
 						fontSize={12}

@@ -16,6 +16,7 @@ import type { InDataLists } from "../utils/processrawdata";
 import InfoIcon from "@mui/icons-material/Info";
 import CvaSectorsTooltip from "./CvaSectorsTooltip";
 import constants from "../utils/constants";
+import formatSIFloat from "../utils/formatsi";
 
 type CvaChartProps = {
 	data: DatumCvaTypes[];
@@ -199,29 +200,72 @@ function CvaChart({
 				marginTop={2}
 				marginBottom={3}
 			>
-				<Typography
-					variant="body1"
-					fontSize={13}
+				<Box
 					style={{
-						color: "#222",
-						fontWeight: "bold",
-						border: "none",
-						paddingRight: "0.5em",
+						display: "flex",
+						flex: "0 50%",
+						alignItems: "baseline",
 					}}
 				>
-					Selected funds:
-				</Typography>
-				<Typography
-					variant="body2"
-					fontSize={13}
-					style={{
-						color: "#222",
-						border: "none",
-						paddingRight: "0.5em",
-					}}
-				>
-					{setFundsList(fund, lists, inDataLists)}
-				</Typography>
+					<Typography
+						variant="body1"
+						fontSize={13}
+						style={{
+							color: "#222",
+							fontWeight: "bold",
+							border: "none",
+							paddingRight: "0.5em",
+						}}
+					>
+						Selected funds:
+					</Typography>
+					<Typography
+						variant="body2"
+						fontSize={13}
+						style={{
+							color: "#222",
+							border: "none",
+							paddingRight: "0.5em",
+						}}
+					>
+						{setFundsList(fund, lists, inDataLists)}
+					</Typography>
+				</Box>
+				<Box style={{ display: "flex", flex: "0 50%" }}>
+					{fund.length !== inDataLists.funds.size && (
+						<Box
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								alignItems: "baseline",
+							}}
+						>
+							<Typography
+								variant="body1"
+								fontSize={13}
+								style={{
+									color: "#222",
+									fontWeight: "bold",
+									border: "none",
+									paddingRight: "0.5em",
+								}}
+							>
+								CVA for selection:
+							</Typography>
+							<Typography
+								fontSize={18}
+								style={{
+									color: colors.topFiguresColor,
+									fontWeight: "bold",
+									border: "none",
+									paddingRight: "0.5em",
+								}}
+							>
+								${formatSIFloat(totalCva)}
+							</Typography>
+						</Box>
+					)}
+				</Box>
 			</Box>
 			<Box
 				display={"flex"}
