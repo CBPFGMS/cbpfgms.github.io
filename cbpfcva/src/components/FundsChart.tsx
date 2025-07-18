@@ -17,6 +17,7 @@ import constants from "../utils/constants";
 import InfoIcon from "@mui/icons-material/Info";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import Button from "@mui/material/Button";
 
 type FundsChartProps = {
 	data: DatumFunds[];
@@ -255,20 +256,17 @@ function FundsChart({
 					}}
 				>
 					{fund.length !== inDataLists.funds.size && (
-						<Typography
-							variant="body1"
-							fontSize={13}
+						<Button
+							variant="outlined"
+							size="small"
 							style={{
-								color: "#222",
-								fontWeight: "bold",
-								border: "none",
-								paddingRight: "50%",
-								cursor: "pointer",
+								marginRight: "auto",
+								fontSize: "0.7rem",
 							}}
 							onClick={() => setFund([...inDataLists.funds])}
 						>
 							Clear selection
-						</Typography>
+						</Button>
 					)}
 					<Typography
 						variant="body2"
