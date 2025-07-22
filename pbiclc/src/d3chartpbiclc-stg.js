@@ -465,6 +465,7 @@
 			chartTitleDefault = "CBPF Contributions",
 			contributionsTotals = {},
 			countryNames = {},
+			maxStringLength = 21,
 			vizNameQueryString = "contributions",
 			bookmarkSite =
 				"https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
@@ -694,7 +695,7 @@
 						")"
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 62, 4, 0],
+			padding: [44, 42, 4, 0],
 			labelPadding: 6,
 		};
 
@@ -716,7 +717,7 @@
 						")"
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 62, 4, 0],
+			padding: [44, 42, 4, 0],
 			labelPadding: 6,
 		};
 
@@ -762,13 +763,27 @@
 			.axisLeft(yScaleDonors)
 			.tickSizeInner(2)
 			.tickSizeOuter(0)
-			.tickPadding(flagPadding);
+			.tickPadding(flagPadding)
+			.tickFormat(function (d) {
+				if (d.length > maxStringLength) {
+					return d.substring(0, maxStringLength - 3) + "...";
+				} else {
+					return d;
+				}
+			});
 
 		const yAxisCbpfs = d3
 			.axisLeft(yScaleCbpfs)
 			.tickSizeInner(0)
 			.tickSizeOuter(0)
-			.tickPadding(6 + lollipopRadius);
+			.tickPadding(6 + lollipopRadius)
+			.tickFormat(function (d) {
+				if (d.length > maxStringLength) {
+					return d.substring(0, maxStringLength - 3) + "...";
+				} else {
+					return d;
+				}
+			});
 
 		const groupXAxisDonors = donorsPanel.main
 			.append("g")
@@ -4070,6 +4085,9 @@
 			const textSizeArray = [];
 
 			allTexts.forEach(function (d) {
+				if (d.length > maxStringLength) {
+					d = d.slice(0, maxStringLength) + "...";
+				}
 				const fakeText = svg
 					.append("text")
 					.attr("class", "pbiclcgroupYAxisDonorsFake")
@@ -4100,9 +4118,9 @@
 				})
 			);
 
-			xScaleDonors.domain([0, Math.floor(maxXValue * 1.1)]);
+			xScaleDonors.domain([0, Math.floor(maxXValue * 1.05)]);
 
-			xScaleCbpfs.domain([0, Math.floor(maxXValue * 1.1)]);
+			xScaleCbpfs.domain([0, Math.floor(maxXValue * 1.05)]);
 		}
 
 		function setRanges(labelSizeDonors, labelSizeCbpfs) {
