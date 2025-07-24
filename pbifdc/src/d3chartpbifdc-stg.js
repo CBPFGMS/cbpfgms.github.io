@@ -4674,13 +4674,18 @@
 					acc,
 					curr
 				) {
-					return acc.concat(geoRegions[curr]);
+					return acc.concat(
+						geoRegions[curr].map(function (e) {
+							return e.toLowerCase();
+						})
+					);
 				},
 				[]);
 				filteredData = rawData.filter(function (d) {
 					return (
 						chartState.selectedYear.indexOf(+d.FiscalYear) > -1 &&
-						CBPFlist.indexOf(d.PooledFundISO2Code) > -1 &&
+						CBPFlist.indexOf(d.PooledFundISO2Code.toLowerCase()) >
+							-1 &&
 						d.GMSDonorISO2Code !== ""
 					);
 				});
