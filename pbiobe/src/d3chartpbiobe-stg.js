@@ -1920,7 +1920,7 @@
 						const i = d3.interpolate(actual || 0, d.actual);
 						return function (t) {
 							d3.select(node)
-								.text(formatComma(~~i(t)))
+								.text(formatToM(~~i(t)))
 								.append("tspan")
 								.attr("class", "pbiobeBarsTotalSpan")
 								.text(" out of");
@@ -1936,7 +1936,7 @@
 						const total = +node.textContent.replace(/\D/g, "");
 						const i = d3.interpolate(total || 0, d.targeted);
 						return function (t) {
-							d3.select(node).text(formatComma(~~i(t)));
+							d3.select(node).text(formatToM(~~i(t)));
 						};
 					});
 
@@ -2459,13 +2459,13 @@
 								? "people"
 								: d.beneficiary) +
 							" targeted:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
-							formatComma(d.targeted) +
+							formatToM(d.targeted) +
 							"</strong></div><div style='display:flex;margin-bottom:4px;flex:0 65%;white-space:initial;'>Number of " +
 							(d.beneficiary === "total"
 								? "people"
 								: d.beneficiary) +
 							" reached:</div><div style='display:flex;margin-bottom:4px;flex:0 35%;justify-content:flex-end;'><strong>" +
-							formatComma(d.actual) +
+							formatToM(d.actual) +
 							"</strong></div></div><div>" +
 							percentageText +
 							"</div>"
@@ -3028,6 +3028,16 @@
 				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
 			}
 			return result;
+		}
+
+		function formatToM(value) {
+			if (value >= 1000000) {
+				return (value / 1000000).toFixed(1) + "M";
+			} else if (value >= 1000) {
+				return (value / 1000).toFixed(1) + "K";
+			} else {
+				return value.toString();
+			}
 		}
 
 		function parseTransform(translate) {
