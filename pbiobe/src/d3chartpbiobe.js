@@ -1883,7 +1883,7 @@
 						const i = d3.interpolate(actual || 0, d.actual);
 						return function (t) {
 							d3.select(node)
-								.text(formatComma(~~i(t)))
+								.text(formatToM(~~i(t)))
 								.append("tspan")
 								.attr("class", "pbiobeBarsTotalSpan")
 								.text(" out of");
@@ -1899,7 +1899,7 @@
 						const total = +node.textContent.replace(/\D/g, "");
 						const i = d3.interpolate(total || 0, d.targeted);
 						return function (t) {
-							d3.select(node).text(formatComma(~~i(t)));
+							d3.select(node).text(formatToM(~~i(t)));
 						};
 					});
 
@@ -2981,6 +2981,16 @@
 				return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
 			}
 			return result;
+		}
+
+		function formatToM(value) {
+			if (value >= 1000000) {
+				return (value / 1000000).toFixed(1) + "M";
+			} else if (value >= 1000) {
+				return (value / 1000).toFixed(1) + "K";
+			} else {
+				return value.toString();
+			}
 		}
 
 		function parseTransform(translate) {
