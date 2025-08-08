@@ -337,6 +337,18 @@
 			.append("div")
 			.attr("class", "pbiobeYearsDescriptionDiv");
 
+		const disclaimerCountDiv = containerDiv
+			.append("div")
+			.attr("class", "pbiobeDisclaimerCountDiv");
+
+		disclaimerCountDiv.html(
+			'<p class="text-center" style="font-size:11px; color:#aaa; padding-top: 5px; margin:0"><b>(1) Disclaimer:</b> Figures for people targeted may include double counting as same people may receive assistance from multiple clusters/sectors/projects.<br></p>'
+		);
+
+		const disclaimerTotalTargetedDiv = containerDiv
+			.append("div")
+			.attr("class", "pbiobeDisclaimerTotalTargetedDiv");
+
 		const footerDiv = !isPfbiSite
 			? containerDiv.append("div").attr("class", "pbiobeFooterDiv")
 			: null;
@@ -461,7 +473,7 @@
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
 			height: beneficiariesHeight,
-			padding: [50, 106, 4, 56],
+			padding: [50, 86, 4, 56],
 			labelPadding: 6,
 		};
 
@@ -632,7 +644,7 @@
 		}
 
 		function draw(rawData) {
-			const data = processData(rawData);
+			const { data, totalClosedReports } = processData(rawData);
 
 			createTitle();
 
@@ -644,7 +656,7 @@
 
 			createButtonsPanel();
 
-			createTopPanel(data);
+			createTopPanel(data, totalClosedReports);
 
 			createPercentagePanel(data);
 
@@ -1089,9 +1101,9 @@
 						}
 					}
 
-					const data = processData(rawData);
+					const { data, totalClosedReports } = processData(rawData);
 
-					createTopPanel(data);
+					createTopPanel(data, totalClosedReports);
 
 					createPercentagePanel(data);
 
@@ -1132,16 +1144,25 @@
 					.style("fill", "#333");
 			}
 
-			function createTopPanel(data) {
+			function createTopPanel(data, totalClosedReports) {
 				const totalObject = data.find(function (d) {
 					return d.beneficiary === "total";
 				});
 
-				const mainValue = totalObject.targeted;
+				//const mainValue = totalObject.targeted;
+				const mainValue = totalClosedReports.targeted;
 
 				const actualValue = totalObject.actual;
 
-				const percentageValue = totalObject.percentage;
+				//const percentageValue = totalObject.percentage;
+				const percentageValue = totalClosedReports.percentage;
+
+				//IMPORTANT: create the disclaimer
+				setTotalTargetedDisclaimer(
+					totalClosedReports.targeted,
+					totalObject.targeted,
+					totalObject.percentage
+				);
 
 				const topPanelPictogram = topPanel.main
 					.selectAll(".pbiobetopPanelPictogram")
@@ -1217,10 +1238,13 @@
 						const i = d3.interpolate(previousValue, d);
 						return function (t) {
 							const siString = formatSIFloat(i(t));
-							node.textContent = siString.substring(
-								0,
-								siString.length - 1
-							);
+							node.textContent =
+								d < 1e3
+									? siString
+									: siString.substring(
+											0,
+											siString.length - 1
+									  );
 						};
 					});
 
@@ -1260,7 +1284,13 @@
 					.append("tspan")
 					.attr("dy", -8)
 					.style("font-size", "0.6em")
-					.text(" (1)");
+					.text(
+						` (1${
+							totalClosedReports.targeted !== totalObject.targeted
+								? ", 2"
+								: ""
+						})`
+					);
 
 				let topPanelSubText = mainValueGroup
 					.selectAll(".pbiobetopPanelSubText")
@@ -1365,7 +1395,13 @@
 					.append("tspan")
 					.attr("dy", -8)
 					.style("font-size", "0.6em")
-					.text(" (1)");
+					.text(
+						` (1${
+							totalClosedReports.targeted !== totalObject.targeted
+								? ", 2"
+								: ""
+						})`
+					);
 
 				let topPanelPersonsTextSubText = mainValueGroup
 					.selectAll(".pbiobetopPanelPersonsTextSubText")
@@ -1883,7 +1919,7 @@
 						const i = d3.interpolate(actual || 0, d.actual);
 						return function (t) {
 							d3.select(node)
-								.text(formatToM(~~i(t)))
+								.text(formatSIFloat(~~i(t)))
 								.append("tspan")
 								.attr("class", "pbiobeBarsTotalSpan")
 								.text(" out of");
@@ -1899,7 +1935,7 @@
 						const total = +node.textContent.replace(/\D/g, "");
 						const i = d3.interpolate(total || 0, d.targeted);
 						return function (t) {
-							d3.select(node).text(formatToM(~~i(t)));
+							d3.select(node).text(formatSIFloat(~~i(t)));
 						};
 					});
 
@@ -2267,7 +2303,7 @@
 
 				setYearsDescriptionDiv();
 
-				const data = processData(rawData);
+				const { data, totalClosedReports } = processData(rawData);
 
 				selectDiv
 					.selectAll(".pbiobeCheckboxDiv")
@@ -2290,7 +2326,7 @@
 							: 1;
 					});
 
-				createTopPanel(data);
+				createTopPanel(data, totalClosedReports);
 
 				createPercentagePanel(data);
 
@@ -2504,18 +2540,20 @@
 
 			const aggregatedData = filteredData.reduce(
 				function (acc, curr) {
-					return {
-						boysActual: acc.boysActual + +curr.ActualBoys,
-						boysTargeted: acc.boysTargeted + +curr.PlannedBoys,
-						girlsActual: acc.girlsActual + +curr.ActualGirls,
-						girlsTargeted: acc.girlsTargeted + +curr.PlannedGirls,
-						menActual: acc.menActual + +curr.ActualMen,
-						menTargeted: acc.menTargeted + +curr.PlannedMen,
-						womenActual: acc.womenActual + +curr.ActualWomen,
-						womenTargeted: acc.womenTargeted + +curr.PlannedWomen,
-						totalActual: acc.totalActual + +curr.ActualTotal,
-						totalTargeted: acc.totalTargeted + +curr.PlannedTotal,
-					};
+					acc.boysActual += +curr.ActualBoys;
+					acc.boysTargeted += +curr.PlannedBoys;
+					acc.girlsActual += +curr.ActualGirls;
+					acc.girlsTargeted += +curr.PlannedGirls;
+					acc.menActual += +curr.ActualMen;
+					acc.menTargeted += +curr.PlannedMen;
+					acc.womenActual += +curr.ActualWomen;
+					acc.womenTargeted += +curr.PlannedWomen;
+					acc.totalActual += +curr.ActualTotal;
+					acc.totalTargeted += +curr.PlannedTotal;
+					acc.totalTargetedClosedReports +=
+						+curr.ActualTotal !== 0 ? +curr.PlannedTotal : 0;
+
+					return acc;
 				},
 				{
 					boysActual: 0,
@@ -2528,6 +2566,7 @@
 					womenTargeted: 0,
 					totalActual: 0,
 					totalTargeted: 0,
+					totalTargetedClosedReports: 0,
 				}
 			);
 
@@ -2547,7 +2586,14 @@
 				};
 			});
 
-			return data;
+			let totalClosedReports = {
+				targeted: aggregatedData.totalTargetedClosedReports,
+				percentage:
+					aggregatedData.totalActual /
+						aggregatedData.totalTargetedClosedReports || 0,
+			};
+
+			return { data, totalClosedReports };
 
 			//end of processData
 		}
@@ -2983,16 +3029,6 @@
 			return result;
 		}
 
-		function formatToM(value) {
-			if (value >= 1000000) {
-				return (value / 1000000).toFixed(1) + "M";
-			} else if (value >= 1000) {
-				return (value / 1000).toFixed(1) + "K";
-			} else {
-				return value.toString();
-			}
-		}
-
 		function parseTransform(translate) {
 			const group = document.createElementNS(
 				"http://www.w3.org/2000/svg",
@@ -3022,6 +3058,26 @@
 					}, "");
 				return "\u002ASelected years: " + yearsList;
 			});
+		}
+
+		function setTotalTargetedDisclaimer(
+			totalClosedReports,
+			totalTargeted,
+			percentage
+		) {
+			if (totalClosedReports === totalTargeted) {
+				disclaimerTotalTargetedDiv.style("display", "none").html(null);
+			} else {
+				disclaimerTotalTargetedDiv
+					.style("display", "block")
+					.html(
+						`<p class="text-center" style="font-size:11px; color:#aaa; padding-top: 5px; margin:0"><b>(2) Disclaimer:</b> Figures for people targeted are based on projects with people reached. Total targeted people for the period is ${formatSIFloat(
+							totalTargeted
+						)}, for which reached people represents ${formatPercent(
+							percentage
+						)}.<br></p>`
+					);
+			}
 		}
 
 		function createSnapshot(type, fromContextMenu) {
