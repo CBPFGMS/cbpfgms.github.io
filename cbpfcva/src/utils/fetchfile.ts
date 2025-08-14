@@ -1,9 +1,10 @@
 import { csvParse, csvFormat, autoType } from "d3";
 import { fetchWithProgress } from "./fetchwithprogress";
+import constants from "./constants";
 
-const localStorageTime = 60 * 60 * 1000, //1 hour
-	currentDate = new Date(),
-	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
+const { localStorageTime, pageName, consoleStyle } = constants;
+
+const currentDate = new Date();
 
 async function fetchFile<T extends object[]>(
 	fileName: string,
@@ -11,7 +12,8 @@ async function fetchFile<T extends object[]>(
 	method: string,
 	setProgress: React.Dispatch<React.SetStateAction<number>>
 ): Promise<T> {
-	const localData = localStorage.getItem(fileName);
+	const combinedName = `${pageName}_${fileName}`;
+	const localData = localStorage.getItem(combinedName);
 	if (
 		localData &&
 		JSON.parse(localData).timeStamp >
@@ -41,7 +43,7 @@ async function fetchFile<T extends object[]>(
 
 			try {
 				localStorage.setItem(
-					fileName,
+					combinedName,
 					JSON.stringify({
 						data:
 							method === "csv"

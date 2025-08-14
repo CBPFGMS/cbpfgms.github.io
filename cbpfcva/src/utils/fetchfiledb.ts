@@ -1,9 +1,9 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import { csvParse, autoType } from "d3";
 import { fetchWithProgress } from "./fetchwithprogress";
+import constants from "./constants";
 
-const localStorageTime = 60 * 60 * 1000, //1 hour
-	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
+const { localStorageTime, consoleStyle } = constants;
 
 interface LocalDatabase extends DBSchema {
 	files: {
@@ -32,8 +32,9 @@ async function fetchFileDB<T>(
 	const db = await dbPromise;
 	const tx = db.transaction("files", "readwrite");
 	const store = tx.objectStore("files");
+	const combinedName = `${constants.pageName}_${fileName}`;
 
-	const localData = await store.get(fileName);
+	const localData = await store.get(combinedName);
 	if (
 		localData &&
 		localData.timeStamp > currentDate.getTime() - localStorageTime
@@ -65,7 +66,7 @@ async function fetchFileDB<T>(
 						data: fetchedData as T,
 						timeStamp: currentDate.getTime(),
 					},
-					fileName
+					combinedName
 				);
 			} catch (error) {
 				console.warn(
