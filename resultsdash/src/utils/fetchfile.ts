@@ -2,10 +2,12 @@ import { json, csv, csvParse, csvFormat, autoType } from "d3";
 
 const localStorageTime = 60 * 60 * 1000, //1 hour
 	currentDate = new Date(),
+	pageName = "resultsdash",
 	consoleStyle = "background-color: #0d6cb6; color: white; padding: 2px;";
 
 function fetchFile(fileName: string, url: string, method: string) {
-	const localData = localStorage.getItem(fileName);
+	const combinedName = `${pageName}_${fileName}`;
+	const localData = localStorage.getItem(combinedName);
 	if (
 		localData &&
 		JSON.parse(localData).timestamp >
@@ -26,7 +28,7 @@ function fetchFile(fileName: string, url: string, method: string) {
 		return fetchMethod().then(fetchedData => {
 			try {
 				localStorage.setItem(
-					fileName,
+					combinedName,
 					JSON.stringify({
 						data:
 							method === "csv"
