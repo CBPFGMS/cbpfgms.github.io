@@ -14,6 +14,7 @@ import TopFigures from "./TopFigures";
 import Selectors from "./Selectors";
 import FundsChart from "./FundsChart";
 import CvaChart from "./CvaChart";
+import TimelineChart from "./LineChart";
 
 type MainContainerProps = {
 	defaultYear: number;
@@ -48,18 +49,23 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [clickedDownload, setClickedDownload] =
 		useState<DownloadStates>(downloadStates);
 
-	const { dataTopFigures, dataCvaTypes, dataFunds, inSelectionData } =
-		useMemo(
-			() =>
-				processData({
-					data,
-					year,
-					organizationType,
-					fund,
-					lists,
-				}),
-			[data, year, organizationType, fund, lists]
-		);
+	const {
+		dataTopFigures,
+		dataCvaTypes,
+		dataFunds,
+		inSelectionData,
+		timelineData,
+	} = useMemo(
+		() =>
+			processData({
+				data,
+				year,
+				organizationType,
+				fund,
+				lists,
+			}),
+		[data, year, organizationType, fund, lists]
+	);
 
 	useUpdateQueryString({
 		year,
@@ -147,6 +153,24 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
 								lists={lists}
+								inDataLists={inDataLists}
+							/>
+							<Divider
+								orientation="horizontal"
+								flexItem
+								style={{
+									borderTop: "3px dotted #ccc",
+									borderBottom: "none",
+									marginTop: "2em",
+									marginBottom: "2em",
+								}}
+							/>
+							<TimelineChart
+								timelineData={timelineData}
+								lists={lists}
+								clickedDownload={clickedDownload}
+								setClickedDownload={setClickedDownload}
+								fund={fund}
 								inDataLists={inDataLists}
 							/>
 						</Grid>

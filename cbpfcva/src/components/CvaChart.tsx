@@ -17,6 +17,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import CvaSectorsTooltip from "./CvaSectorsTooltip";
 import constants from "../utils/constants";
 import formatSIFloat from "../utils/formatsi";
+import setFundsList from "../utils/setFundsList";
 
 type CvaChartProps = {
 	data: DatumCvaTypes[];
@@ -228,7 +229,7 @@ function CvaChart({
 							paddingRight: "0.5em",
 						}}
 					>
-						{setFundsList(fund, lists, inDataLists)}
+						{setFundsList(fund, lists, inDataLists, "cvaTypes")}
 					</Typography>
 				</Box>
 				<Box style={{ display: "flex", flex: "0 50%" }}>
@@ -354,25 +355,6 @@ function CvaChart({
 			/>
 		</Container>
 	);
-}
-
-function setFundsList(
-	fund: number[],
-	lists: List,
-	inDataLists: InDataLists
-): string {
-	return fund.length === inDataLists.funds.size
-		? "all funds selected"
-		: fund.reduce(function (acc, curr, index) {
-				return (
-					acc +
-					(index >= fund.length - 2
-						? index > fund.length - 2
-							? lists.fundNames[curr]
-							: lists.fundNames[curr] + " and "
-						: lists.fundNames[curr] + ", ")
-				);
-		  }, "");
 }
 
 const MemoisedCvaChart = React.memo(CvaChart);

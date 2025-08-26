@@ -20,6 +20,7 @@ export type BarChartRowProps = {
 	fromCva?: boolean;
 	totalCvaPercentage?: number | boolean;
 	fromFunds?: boolean;
+	cvaPercentage?: number;
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -36,6 +37,7 @@ function BarChartRow({
 	fromCva = false,
 	totalCvaPercentage = false,
 	fromFunds = false,
+	cvaPercentage = 0,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
 
@@ -220,7 +222,7 @@ function BarChartRow({
 						}}
 					>
 						<NumberAnimator
-							number={~~((valueB * 100) / valueA)}
+							number={cvaPercentage}
 							numberType="integer"
 						/>
 						%

@@ -4,7 +4,7 @@ const constants = {
 	localStorageTime: 60 * 60 * 1000, //1 hour
 	consoleStyle: "background-color: #0d6cb6; color: white; padding: 2px;",
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
-	charts: ["funds", "cvaTypes", "sectors"],
+	charts: ["funds", "cvaTypes", "sectors", "timeline"],
 	filters: ["Year", "Organization Type"],
 	allocationSources: ["standard", "reserve"],
 	firstYearOfCvaData: 2024,
@@ -12,8 +12,9 @@ const constants = {
 	unselectedFundOpacity: 0.2,
 	unselectedCvaTypeOpacity: 0.2,
 	sortingOrder: ["ascending", "descending"],
-	fundChartSorting: ["totalAllocations", "cvaAllocations"],
+	fundChartSorting: ["totalAllocations", "cvaAllocations", "cvaPercentage"],
 	cvaPopoverWidth: 520,
+	timelineModes: ["Cva", "CvaPercentage"],
 } as const;
 
 export default constants;

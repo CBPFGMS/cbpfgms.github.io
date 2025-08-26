@@ -1,0 +1,6 @@
+{
+	"scripts": {
+		"build-stg": "esbuild d3chartpbiclc-stg.js --bundle --minify --outfile=../../../cbpf-bi-stag/assets/js/charts/d3chartpbiclc-stg.min.js",
+		"build": "esbuild d3chartpbiclc.js --bundle --minify --outfile=d3chartpbiclc.min.js"
+	}
+}

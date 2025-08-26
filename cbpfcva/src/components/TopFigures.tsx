@@ -26,9 +26,7 @@ export type DonutDatum = {
 
 const { firstYearOfCvaData } = constants;
 
-const standardColorDarker = color(colors.standardColor)
-		?.darker(1)
-		.formatHex(),
+const standardColorDarker = color(colors.standardColor)?.darker(1).formatHex(),
 	reserveColorDarker = color(colors.reserveColor)?.darker(1).formatHex();
 
 function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
@@ -51,7 +49,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 				flexWrap={"nowrap"}
 				justifyContent={"center"}
 				alignItems={"center"}
-				height={"168px"}
+				height={"178px"}
 				mb={5}
 			>
 				<Grid
@@ -65,8 +63,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 							display: "flex",
 							flexDirection: "column",
 							alignItems: "center",
-							justifyContent: "center",
-							gap: "2em",
+							justifyContent: "space-between",
 						}}
 					>
 						<Box
@@ -78,15 +75,15 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 							sx={{
 								display: "flex",
 								flexDirection: "row",
-								alignItems: "center",
+								alignItems: "flex-start",
 								justifyContent: "center",
-								height: "100%",
 							}}
 						>
 							<MoneyBagIcon
 								svgProps={{
 									style: {
 										marginRight: "0.5em",
+										marginTop: "0.5em",
 										width: "74px",
 										height: "74px",
 										fill: colors.unColor,
@@ -169,8 +166,7 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 							display: "flex",
 							flexDirection: "column",
 							alignItems: "center",
-							justifyContent: "center",
-							gap: "2em",
+							justifyContent: "space-between",
 						}}
 					>
 						<Box
@@ -182,15 +178,15 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 							sx={{
 								display: "flex",
 								flexDirection: "row",
-								alignItems: "center",
+								alignItems: "flex-start",
 								justifyContent: "center",
-								height: "100%",
 							}}
 						>
 							<CashIcon
 								svgProps={{
 									style: {
 										marginRight: "1em",
+										marginTop: "0.5em",
 										width: "62px",
 										height: "62px",
 										fill: colors.unColor,
@@ -221,13 +217,29 @@ function TopFigures({ dataTopFigures, year }: TopFiguresProps) {
 								<Typography
 									style={{
 										marginTop: "-0.5em",
-										fontSize: 18,
+										fontSize: 16,
 										color: "#666",
 										fontFamily: "Roboto, sans-serif",
 										fontWeight: "normal",
 									}}
 								>
-									CVA Allocations
+									CVA Allocated as part
+								</Typography>
+								<Typography
+									style={{
+										marginTop: "-0.25em",
+										fontSize: 16,
+										color: "#666",
+										fontFamily: "Roboto, sans-serif",
+										fontWeight: "normal",
+									}}
+								>
+									of the{" "}
+									<SiValue
+										number={dataTopFigures.totalAllocations}
+										numberType="decimal"
+									/>{" "}
+									allocations
 								</Typography>
 							</Box>
 						</Box>

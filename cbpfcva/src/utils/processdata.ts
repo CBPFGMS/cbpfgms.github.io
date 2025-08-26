@@ -44,6 +44,17 @@ export type DatumFunds = {
 	reserveTotalAllocations: number;
 	standardCvaAllocations: number;
 	reserveCvaAllocations: number;
+	cvaPercentage: number;
+};
+
+export type TimelineDatum = {
+	year: number;
+	[key: `${number}Total`]: number;
+	[key: `${number}Cva`]: number;
+	[key: `${number}CvaPercentage`]: number;
+	total: number;
+	cva: number;
+	cvaPercentage: number;
 };
 
 export type InSelectionData = {
@@ -64,6 +75,7 @@ function processData({
 	dataTopFigures: DataTopFigures;
 	dataCvaTypes: DatumCvaTypes[];
 	dataFunds: DatumFunds[];
+	timelineData: TimelineDatum[];
 	inSelectionData: InSelectionData;
 } {
 	const inSelectionData: InSelectionData = {
@@ -85,8 +97,37 @@ function processData({
 
 	const dataTypes: DatumCvaTypes[] = [];
 	const dataFunds: DatumFunds[] = [];
+	const timelineData: TimelineDatum[] = [];
+
+	const fundsInTimeline = new Set<number>();
 
 	data.forEach(datum => {
+		let thisYear = timelineData.find(d => d.year === datum.year),
+			cvaBudget;
+
+		if (!thisYear) {
+			thisYear = { year: datum.year, total: 0, cva: 0, cvaPercentage: 0 };
+			timelineData.push(thisYear);
+		}
+
+		thisYear[`${datum.fund}Total`] =
+			(thisYear[`${datum.fund}Total`] || 0) + datum.budget;
+
+		thisYear.total += datum.budget;
+
+		if (datum.cvaData !== null) {
+			cvaBudget = datum.cvaData?.reduce(
+				(acc, curr) => acc + curr.budget,
+				0
+			);
+			fundsInTimeline.add(datum.fund);
+		}
+
+		thisYear[`${datum.fund}Cva`] =
+			(thisYear[`${datum.fund}Cva`] || 0) + (cvaBudget || 0);
+
+		thisYear.cva += cvaBudget || 0;
+
 		if (
 			year.includes(datum.year) &&
 			organizationType.includes(datum.organizationType)
@@ -111,6 +152,7 @@ function processData({
 					reserveTotalAllocations: 0,
 					standardCvaAllocations: 0,
 					reserveCvaAllocations: 0,
+					cvaPercentage: 0,
 				};
 				dataFunds.push(foundFund);
 			}
@@ -119,11 +161,7 @@ function processData({
 			foundFund[`${thisAllocationSource}TotalAllocations`] +=
 				datum.budget;
 
-			if (datum.cvaData !== null) {
-				const cvaBudget = datum.cvaData?.reduce(
-					(acc, curr) => acc + curr.budget,
-					0
-				);
+			if (datum.cvaData !== null && cvaBudget) {
 				dataTopFigures.allocations += cvaBudget;
 				dataTopFigures.projects.add(datum.projectId);
 				if (datum.organizationId) {
@@ -189,13 +227,37 @@ function processData({
 		}
 	});
 
+	dataFunds.forEach(fundDatum => {
+		fundDatum.cvaPercentage =
+			fundDatum.cvaAllocations > 0
+				? (fundDatum.cvaAllocations / fundDatum.totalAllocations) * 100
+				: 0;
+	});
+
 	dataTypes.sort((a, b) => b.allocations - a.allocations);
 	dataFunds.sort((a, b) => b.totalAllocations - a.totalAllocations);
+
+	timelineData.forEach(yearDatum => {
+		yearDatum.cvaPercentage =
+			yearDatum.total > 0 ? (yearDatum.cva / yearDatum.total) * 100 : 0;
+
+		fundsInTimeline.forEach(fundId => {
+			yearDatum[`${fundId}CvaPercentage`] =
+				yearDatum[`${fundId}Total`] > 0
+					? (yearDatum[`${fundId}Cva`] /
+							yearDatum[`${fundId}Total`]) *
+					  100
+					: 0;
+		});
+	});
+
+	timelineData.sort((a, b) => a.year - b.year);
 
 	return {
 		dataTopFigures,
 		dataCvaTypes: dataTypes,
 		dataFunds,
+		timelineData,
 		inSelectionData,
 	};
 }

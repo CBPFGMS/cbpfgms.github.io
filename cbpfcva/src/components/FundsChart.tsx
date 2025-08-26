@@ -17,6 +17,7 @@ import constants from "../utils/constants";
 import InfoIcon from "@mui/icons-material/Info";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ImportExportIcon from "@mui/icons-material/ImportExport";
 import Button from "@mui/material/Button";
 
 type FundsChartProps = {
@@ -185,12 +186,15 @@ function FundsChart({
 						}}
 						onClick={() => handleSorting("totalAllocations")}
 					>
-						{sorting === "totalAllocations" &&
-							(sortingOrder === "ascending" ? (
+						{sorting === "totalAllocations" ? (
+							sortingOrder === "ascending" ? (
 								<ArrowDownwardIcon />
 							) : (
 								<ArrowUpwardIcon />
-							))}
+							)
+						) : (
+							<ImportExportIcon style={{ opacity: 0.4 }} />
+						)}
 						<Typography style={legendStyle}>
 							<span
 								style={{
@@ -214,12 +218,15 @@ function FundsChart({
 						}}
 						onClick={() => handleSorting("cvaAllocations")}
 					>
-						{sorting === "cvaAllocations" &&
-							(sortingOrder === "ascending" ? (
+						{sorting === "cvaAllocations" ? (
+							sortingOrder === "ascending" ? (
 								<ArrowDownwardIcon />
 							) : (
 								<ArrowUpwardIcon />
-							))}
+							)
+						) : (
+							<ImportExportIcon style={{ opacity: 0.4 }} />
+						)}
 						<Typography style={legendStyle}>
 							<span
 								style={{
@@ -268,6 +275,15 @@ function FundsChart({
 							Clear selection
 						</Button>
 					)}
+					{sorting === "cvaPercentage" ? (
+						sortingOrder === "ascending" ? (
+							<ArrowDownwardIcon />
+						) : (
+							<ArrowUpwardIcon />
+						)
+					) : (
+						<ImportExportIcon style={{ opacity: 0.4 }} />
+					)}
 					<Typography
 						variant="body2"
 						fontSize={12}
@@ -276,7 +292,9 @@ function FundsChart({
 							border: "none",
 							fontStyle: "italic",
 							letterSpacing: "-0.05em",
+							cursor: "pointer",
 						}}
+						onClick={() => handleSorting("cvaPercentage")}
 					>
 						CVA as %<br />
 						of total
@@ -305,6 +323,7 @@ function FundsChart({
 							listProperty={lists.fundNames}
 							chartType={"funds"}
 							fromFunds={true}
+							cvaPercentage={d.cvaPercentage}
 						/>
 					</Box>
 				))}
