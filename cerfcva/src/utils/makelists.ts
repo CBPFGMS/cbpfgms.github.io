@@ -139,7 +139,8 @@ function makeLists({
 			allocationSourcesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationSourcesMaster.success) {
 			lists.allocationSources[d.AllSrcId] = d.AllNm;
-			lists.allocationSourcesAbbreviated[d.AllSrcId] = d.AllSrcCode;
+			lists.allocationSourcesAbbreviated[d.AllSrcId] =
+				d.AllSrcCode === "UF" ? "UFE" : d.AllSrcCode; // UFE may be UF in the master
 		} else {
 			warnInvalidSchema(
 				"AllocationSourcesMaster",
