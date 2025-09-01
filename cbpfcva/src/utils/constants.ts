@@ -14,7 +14,6 @@ const constants = {
 	sortingOrder: ["ascending", "descending"],
 	fundChartSorting: ["totalAllocations", "cvaAllocations", "cvaPercentage"],
 	cvaPopoverWidth: 520,
-	timelineModes: ["Cva", "CvaPercentage"],
 } as const;
 
 export default constants;

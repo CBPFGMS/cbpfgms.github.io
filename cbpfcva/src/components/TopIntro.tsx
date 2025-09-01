@@ -42,14 +42,9 @@ function TopIntro() {
 					provided with minimum restrictions – is an effective
 					people-centered modality that provides dignity, choice and
 					empowerment to affected populations. This dashboard provides
-					an overview of CERF funding for cash and voucher assistance,
-					including the funding trends, the types of organizations
-					involved, the sectors in which CVA is implemented, and the
-					groups of people reached. The dashboard only shows the{" "}
-					<span style={{ fontStyle: "italic" }}>transfer value</span>,
-					i.e., the amount that ends up in the hands of affected
-					people; it does not show indirect costs, including transfer
-					costs.
+					an overview of CBPF funding for cash and voucher assistance,
+					including the funding trends and the sectors in which CVA is
+					implemented.
 				</Typography>
 			</Grid>
 		</Grid>

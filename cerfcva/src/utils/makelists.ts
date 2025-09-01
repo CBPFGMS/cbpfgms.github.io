@@ -195,7 +195,7 @@ function makeLists({
 	cvaMaster.forEach(d => {
 		const parsedCvaMaster = cvaMasterObjectSchema.safeParse(d);
 		if (parsedCvaMaster.success) {
-			lists.cvaTypeNames[d.CVAId] = d.CVAName;
+			lists.cvaTypeNames[d.Id] = d.CVATypeName;
 		} else {
 			warnInvalidSchema(
 				"CvaMaster",

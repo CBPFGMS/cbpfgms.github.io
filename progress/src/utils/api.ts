@@ -55,7 +55,8 @@ const beneficiaryTypesMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	emergenciesMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST&$format=csv",
-	cvaMasterUrl = "../data/fake_cvamaster.csv"; //TODO: change to real data
+	cvaMasterUrl =
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType";
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -186,7 +187,7 @@ function useData(
 			fetchFile<CvaMasterObject[]>(
 				"cvaMaster",
 				cvaMasterUrl,
-				"csv",
+				"json",
 				setProgress
 			),
 		])

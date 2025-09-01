@@ -35,9 +35,8 @@ const pooledFundsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 	sectorsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
-	cvaMasterUrl = "./src/assets/stg-data/fake_cvamaster.csv"; //TODO: change to real data
-
-//fake data path on staging site: ./assets/stg-data/
+	cvaMasterUrl =
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType";
 
 function useData(
 	defaultFundType: number | null,
@@ -116,7 +115,7 @@ function useData(
 			fetchFile<CvaMasterObject[]>(
 				"cvaMaster",
 				cvaMasterUrl,
-				"csv",
+				"json",
 				setProgress
 			),
 		])

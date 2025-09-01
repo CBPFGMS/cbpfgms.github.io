@@ -1,5 +1,6 @@
-import { type Data } from "./processrawdata";
+import { type Data, type InDataLists } from "./processrawdata";
 import { type List } from "./makelists";
+import type { TimelineDatum } from "./processdata";
 
 type BaseDownloadDatum = {
 	Year: number;
@@ -19,12 +20,25 @@ type FundDatumDownload = BaseDownloadDatum & {
 	"CVA Budget": number;
 };
 
+type TimelineDatumDownload = {
+	year: number;
+	"Total CVA (%)": number;
+	[key: string]: number;
+};
+
 type ProcessDownloadParams = {
 	data: Data;
 	lists: List;
 	year: number[];
 	fund: number[];
 	organizationType: number[];
+};
+
+type ProcessTimelineDownloadParams = {
+	data: TimelineDatum[];
+	lists: List;
+	fund: number[];
+	inDataLists: InDataLists;
 };
 
 export function processCvaTypesDownload({
@@ -83,6 +97,33 @@ export function processFundsDownload({
 	});
 
 	return fundsDataDownload;
+}
+
+export function processTimelineDownload({
+	data,
+	lists,
+	fund,
+	inDataLists,
+}: ProcessTimelineDownloadParams): TimelineDatumDownload[] {
+	const timelineDataDownload: TimelineDatumDownload[] = [];
+
+	data.forEach(yearDatum => {
+		const yearObj: TimelineDatumDownload = {
+			year: yearDatum.year,
+			"Total CVA (%)": yearDatum.cvaPercentage,
+		};
+
+		if (fund.length !== inDataLists.funds.size) {
+			fund.forEach(fundId => {
+				yearObj[lists.fundNames[fundId] + " (%)"] =
+					Math.floor(yearDatum[`${fundId}CvaPercentage`] * 100) / 100;
+			});
+		}
+
+		timelineDataDownload.push(yearObj);
+	});
+
+	return timelineDataDownload;
 }
 
 function populateBaseDownloadDatum(

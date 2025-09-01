@@ -10,14 +10,11 @@ import type { InDataLists } from "../utils/processrawdata";
 import { type TimelineDatum } from "../utils/processdata";
 import InfoIcon from "@mui/icons-material/Info";
 import colors from "../utils/colors";
-import formatSIFloat from "../utils/formatsi";
-import constants from "../utils/constants";
 import { chartsGridClasses } from "@mui/x-charts/ChartsGrid";
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import setFundsList from "../utils/setFundsList";
 import { type CurveType } from "@mui/x-charts";
-import { format } from "d3";
+import Chip from "@mui/material/Chip";
+import { processTimelineDownload } from "../utils/processdownload";
+import downloadData from "../utils/downloaddata";
 
 type TimelineChartProps = {
 	timelineData: TimelineDatum[];
@@ -27,8 +24,6 @@ type TimelineChartProps = {
 	fund: number[];
 	inDataLists: InDataLists;
 };
-
-type TimelineModes = (typeof constants.timelineModes)[number];
 
 function TimelineChart({
 	timelineData,
@@ -41,6 +36,15 @@ function TimelineChart({
 	const ref = useRef<HTMLDivElement>(null);
 
 	const [containerWidth, setContainerWidth] = useState<number>(0);
+	const [showChip, setShowChip] = useState<boolean>(true);
+
+	if (fund.length !== inDataLists.funds.size && showChip === true) {
+		setShowChip(false);
+	}
+
+	function handleDeleteChip() {
+		setShowChip(false);
+	}
 
 	useEffect(() => {
 		if (ref.current) {
@@ -48,46 +52,42 @@ function TimelineChart({
 		}
 	}, []);
 
-	const [timelineMode, setTimelineMode] = useState<TimelineModes>("Cva");
+	const totalSeries = {
+		id: "total",
+		dataKey: "cvaPercentage",
+		label: "All funds CVA percentage",
+		curve: "catmullRom" as CurveType,
+		color: "#000",
+		valueFormatter: (value: number | null) =>
+			value !== null ? value.toFixed(1) + "%" : "N/A",
+	};
+
+	const fundSeries = Array.from(fund).map(fundId => ({
+		dataKey: `${fundId}CvaPercentage`,
+		label: lists.fundNames[fundId],
+		curve: "catmullRom" as CurveType,
+		valueFormatter: (value: number | null) =>
+			value !== null ? value.toFixed(1) + "%" : "N/A",
+	}));
+
+	fundSeries.unshift(totalSeries);
 
 	const series =
-		fund.length === inDataLists.funds.size
-			? [
-					{
-						dataKey:
-							timelineMode === "Cva" ? "total" : "cvaPercentage",
-						label: "Total CVA",
-						curve: "catmullRom" as CurveType,
-						valueFormatter: (value: number) =>
-							timelineMode === "Cva"
-								? "$" + format(",")(value)
-								: value.toFixed(1) + "%",
-					},
-			  ]
-			: Array.from(fund).map(fundId => ({
-					dataKey: `${fundId}${timelineMode}`,
-					label: lists.fundNames[fundId],
-					curve: "catmullRom" as CurveType,
-					valueFormatter: (value: number) =>
-						timelineMode === "Cva"
-							? "$" + format(",")(value)
-							: value.toFixed(1) + "%",
-			  }));
+		fund.length === inDataLists.funds.size ? [totalSeries] : fundSeries;
 
 	const timelineYears = timelineData.map(d => d.year);
 
 	function handleDownloadClick() {
-		// const dataCvaTimelineDownload = processCvaTypesDownload({
-		// 	data: completeData,
-		// 	lists,
-		// 	year,
-		// 	fund,
-		// 	organizationType,
-		// });
-		// downloadData<(typeof dataCvaTimelineDownload)[number]>(
-		// 	dataCvaTimelineDownload,
-		// 	"cva_timeline",
-		// );
+		const dataCvaTimelineDownload = processTimelineDownload({
+			data: timelineData,
+			lists,
+			fund,
+			inDataLists,
+		});
+		downloadData<(typeof dataCvaTimelineDownload)[number]>(
+			dataCvaTimelineDownload,
+			"cva_timeline"
+		);
 		return null;
 	}
 
@@ -132,11 +132,11 @@ function TimelineChart({
 							textTransform: "uppercase",
 						}}
 					>
-						CVA Timeline
+						CVA Percentage Trends
 						<InfoIcon
 							data-tooltip-id="tooltip"
 							data-tooltip-content={
-								"Mouse over a given year to see XXX for that year. When no fund is selected, the darker line represents the total XXX across all funds. Select a fund on the 'Allocations by fund' chart to highlight its trend over time."
+								"Mouse over a given year to see CVA percentages for that year. The dark dashed line represents the total CVA percentage across all funds. Select a fund on the 'Allocations by fund' chart on the left hand side to view its trend over time."
 							}
 							data-tooltip-place="top"
 							style={{
@@ -151,76 +151,29 @@ function TimelineChart({
 					</Typography>
 				</Box>
 			</Box>
-			<Box
-				display={"flex"}
-				flexDirection={"column"}
-				width={"95%"}
-				marginLeft={"3%"}
-				alignItems={"center"}
-				marginBottom={3}
-			>
-				<ButtonGroup
-					variant="outlined"
-					size="small"
-					aria-label="Basic button group"
-				>
-					<Button onClick={() => setTimelineMode("Cva")}>
-						CVA amount
-					</Button>
-					<Button onClick={() => setTimelineMode("CvaPercentage")}>
-						CVA Percentage
-					</Button>
-				</ButtonGroup>
-			</Box>
-			<Box
-				display={"flex"}
-				flexDirection={"row"}
-				width={"95%"}
-				marginLeft={"3%"}
-				alignItems={"center"}
-				justifyContent={"flex-start"}
-				marginTop={2}
-				marginBottom={3}
-			>
+			{showChip && (
 				<Box
-					style={{
-						display: "flex",
-						alignItems: "baseline",
-					}}
+					display={"flex"}
+					flexDirection={"row"}
+					width={"95%"}
+					marginLeft={"3%"}
+					alignItems={"center"}
+					justifyContent={"center"}
 				>
-					<Typography
-						variant="body1"
-						fontSize={13}
-						style={{
-							color: "#222",
-							fontWeight: "bold",
-							border: "none",
-							paddingRight: "0.5em",
-						}}
-					>
-						Selected funds:
-					</Typography>
-					<Typography
-						variant="body2"
-						fontSize={13}
-						style={{
-							color: "#222",
-							border: "none",
-							paddingRight: "0.5em",
-						}}
-					>
-						{setFundsList(fund, lists, inDataLists, "timeline")}
-					</Typography>
+					<Chip
+						label="Select a fund on the left to show its trend over time"
+						variant="outlined"
+						onDelete={handleDeleteChip}
+					/>
 				</Box>
-			</Box>
+			)}
 			<Box
 				display={"flex"}
 				flexDirection={"column"}
 				width={"95%"}
 				marginLeft={"3%"}
 				alignItems={"center"}
-				gap={2}
-				marginTop={2}
+				marginTop={1}
 			>
 				<LineChart
 					height={400}
@@ -241,18 +194,13 @@ function TimelineChart({
 					yAxis={[
 						{
 							dataKey: "totalAllocations",
-							label:
-								timelineMode === "Cva"
-									? "Total Allocations (USD)"
-									: "CVA Percentage (%)",
+
 							valueFormatter: (value: number) =>
-								timelineMode === "Cva"
-									? "$" + formatSIFloat(value)
-									: Math.round(value) + "%",
+								Math.round(value) + "%",
 							min: 1e-6,
 							disableLine: true,
 							disableTicks: true,
-							width: 72,
+							tickNumber: 5,
 						},
 					]}
 					grid={{ horizontal: true }}
@@ -267,6 +215,24 @@ function TimelineChart({
 						[`& .${markElementClasses.root}`]: {
 							r: 4,
 							fill: colors.paperColor,
+						},
+						[`& g[data-series='total'] .${markElementClasses.root}`]:
+							{
+								strokeOpacity:
+									fund.length === inDataLists.funds.size
+										? 1
+										: 0.4,
+							},
+						"& .MuiLineElement-root": {
+							strokeWidth: 1,
+						},
+						"& .MuiLineElement-root[data-series='total']": {
+							strokeWidth: 2.3,
+							strokeDasharray: "5 3",
+							opacity:
+								fund.length === inDataLists.funds.size
+									? 1
+									: 0.4,
 						},
 					}}
 				/>

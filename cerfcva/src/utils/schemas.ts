@@ -226,8 +226,10 @@ export const sectorsMasterObjectSchema = z.object({
 });
 
 export const cvaMasterObjectSchema = z.object({
-	CVAName: z.string(),
-	CVAId: z.number().int().nonnegative(),
+	Id: z.number().int().nonnegative(),
+	CVATypeName: z.string(),
+	CVATypeCode: z.string(),
+	IsActive: z.boolean(),
 });
 
 // ********************

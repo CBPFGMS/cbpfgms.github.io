@@ -9,7 +9,7 @@ const currentDate = new Date();
 async function fetchFile<T extends object[]>(
 	fileName: string,
 	url: string,
-	method: string,
+	method: "csv" | "json",
 	setProgress: React.Dispatch<React.SetStateAction<number>>
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}`;

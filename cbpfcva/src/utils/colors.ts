@@ -16,5 +16,3 @@ const colors = {
 } as const;
 
 export default colors;
-
-//TODO: Check all this mess!

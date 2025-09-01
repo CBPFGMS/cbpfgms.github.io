@@ -1,19 +1,13 @@
-import type { Charts } from "../components/MainContainer";
 import type { List } from "./makelists";
 import type { InDataLists } from "./processrawdata";
 
 function setFundsList(
 	fund: number[],
 	lists: List,
-	inDataLists: InDataLists,
-	from: Charts
+	inDataLists: InDataLists
 ): string {
 	return fund.length === inDataLists.funds.size
-		? `all funds selected${
-				from === "timeline"
-					? " (select a fund for highlighting the timeline)"
-					: ""
-		  }`
+		? "all funds selected"
 		: fund.reduce(function (acc, curr, index) {
 				return (
 					acc +

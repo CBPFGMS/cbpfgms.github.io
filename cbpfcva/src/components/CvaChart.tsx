@@ -229,7 +229,7 @@ function CvaChart({
 							paddingRight: "0.5em",
 						}}
 					>
-						{setFundsList(fund, lists, inDataLists, "cvaTypes")}
+						{setFundsList(fund, lists, inDataLists)}
 					</Typography>
 				</Box>
 				<Box style={{ display: "flex", flex: "0 50%" }}>
@@ -333,7 +333,7 @@ function CvaChart({
 							colorA={colors.standardColor}
 							colorB={colors.reserveColor}
 							maxValue={maxValue}
-							listProperty={lists.cvaTypesAbbreviatedNames}
+							listProperty={lists.cvaTypeNames}
 							chartType={"cvaTypes"}
 							fromCva={true}
 							totalCvaPercentage={
