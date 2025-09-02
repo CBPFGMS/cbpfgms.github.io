@@ -1,6 +1,6 @@
 {
 	"scripts": {
 		"build-stg": "esbuild d3chartpbimap-stg.js --bundle --minify --outfile=../../../cbpf-bi-stag/assets/js/charts/d3chartpbimap-stg.min.js",
-		"build": "esbuild d3chartpbimap.js --bundle --minify --outfile=d3chartpbimap.min.js"
+		"build": "esbuild d3chartpbimap.js --bundle --minify --outfile=../../../../OCHA\\ prod/cbpfdata-unocha-org/assets/js/charts/d3chartpbimap.min.js"
 	}
 }

@@ -2,9 +2,14 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build All Charts",
+			"label": "Staging: Build All Charts",
 			"type": "shell",
 			"command": "cd cbsank/src && npm run build-stg && cd ../../pbialp/src && npm run build-stg && cd ../../pbiclc/src && npm run build-stg && cd ../../pbicli/src && npm run build-stg && cd ../../pbifdc/src && npm run build-stg && cd ../../pbigam/src && npm run build-stg && cd ../../pbihrp/src && npm run build-stg && cd ../../pbimap/src && npm run build-stg && cd ../../pbinad/src && npm run build-stg && cd ../../pbiobe/src && npm run build-stg && cd ../../pbiolc/src && npm run build-stg && cd ../../pbiuac/src && npm run build-stg"
+		},
+		{
+			"label": "Production: Build All Charts",
+			"type": "shell",
+			"command": "cd cbsank/src && npm run build && cd ../../pbialp/src && npm run build && cd ../../pbiclc/src && npm run build && cd ../../pbicli/src && npm run build && cd ../../pbifdc/src && npm run build && cd ../../pbigam/src && npm run build && cd ../../pbihrp/src && npm run build && cd ../../pbimap/src && npm run build && cd ../../pbinad/src && npm run build && cd ../../pbiobe/src && npm run build && cd ../../pbiolc/src && npm run build && cd ../../pbiuac/src && npm run build"
 		}
 	]
 }
