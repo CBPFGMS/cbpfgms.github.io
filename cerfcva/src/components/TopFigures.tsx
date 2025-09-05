@@ -222,7 +222,7 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 										fontWeight: "normal",
 									}}
 								>
-									CVA Allocations
+									Transferred CVA amounts
 								</Typography>
 							</Box>
 						</Box>
@@ -294,7 +294,7 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 										border: "none",
 									}}
 								>
-									CVA Allocations as percentage of total
+									Transferred CVA amounts as % of total
 									allocations
 								</Typography>
 							</Box>
@@ -458,7 +458,7 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 				</Box>
 				<ProjectsAndPartners
 					value={dataTopFigures.partners.size}
-					text={"CVA partner"}
+					text={"UN Agency"}
 				/>
 			</Box>
 		</Box>
@@ -499,8 +499,11 @@ function ProjectsAndPartners({ value, text }: { value: number; text: string }) {
 				}}
 				noWrap
 			>
-				{text}
-				{value > 1 ? "s" : ""}
+				{value > 1
+					? text === "UN Agency"
+						? "UN Agencies"
+						: text + "s"
+					: text}
 			</Typography>
 		</Box>
 	);

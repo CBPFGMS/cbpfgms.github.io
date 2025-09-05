@@ -45,11 +45,16 @@ function TopIntro() {
 					an overview of CERF funding for cash and voucher assistance,
 					including the funding trends, the types of organizations
 					involved, the sectors in which CVA is implemented, and the
-					groups of people reached. The dashboard only shows the{" "}
-					<span style={{ fontStyle: "italic" }}>transfer value</span>,
-					i.e., the amount that ends up in the hands of affected
-					people; it does not show indirect costs, including transfer
-					costs.
+					groups of people reached.{" "}
+					<span style={{ fontWeight: "bold" }}>
+						The dashboard only shows the{" "}
+						<span style={{ fontStyle: "italic" }}>
+							transfer value
+						</span>
+						, i.e., the amount that ends up in the hands of affected
+						people
+					</span>
+					; it does not show indirect costs, including transfer costs.
 				</Typography>
 			</Grid>
 		</Grid>
