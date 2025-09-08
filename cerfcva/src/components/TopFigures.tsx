@@ -126,7 +126,7 @@ function TopFigures({ dataTopFigures, yearSummary }: TopFiguresProps) {
 									<InfoIcon
 										data-tooltip-id="tooltip"
 										data-tooltip-content={
-											"Data starting from the launch of the online grant management system OneGMS on 1 June 2024. Prior data is not represented but is available in CERF’s annual reports."
+											"Data starting from the launch of the online grant management system OneGMS. Prior data is not represented but is available in CERF’s annual reports."
 										}
 										data-tooltip-place="top"
 										style={{
