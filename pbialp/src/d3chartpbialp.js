@@ -297,7 +297,8 @@
 		const showHelp =
 			containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const minimumUnderApprovalPercentage = +containerDiv.node().getAttribute("data-minpercentage") || 0;
+		const minimumUnderApprovalPercentage =
+			+containerDiv.node().getAttribute("data-minpercentage") || 0;
 
 		const showLink =
 			containerDiv.node().getAttribute("data-showlink") === "true";
@@ -1256,8 +1257,8 @@
 				const rhpfs = new Set();
 
 				data.forEach(function (d) {
-					if (d.cbpf.includes("RhPF")) {
-						const fundName = d.cbpf.split("(RhPF")[0].trim();
+					if (d.cbpf.toLowerCase().includes("rhpf")) {
+						const fundName = d.cbpf.split("(")[0].trim();
 						const regionalFund = masterRegionalFunds.find(function (
 							e
 						) {
@@ -4065,8 +4066,8 @@
 				const regionalData = [];
 
 				data.forEach(function (d) {
-					if (d.cbpf.includes("RhPF")) {
-						const fundName = d.cbpf.split("(RhPF")[0].trim();
+					if (d.cbpf.toLowerCase().includes("rhpf")) {
+						const fundName = d.cbpf.split("(")[0].trim();
 						const regionalFund = masterRegionalFunds.find(function (
 							e
 						) {
@@ -4117,6 +4118,7 @@
 
 				const fundsList = fundsDiv
 					.append("ul")
+					.style("margin-bottom", "1em")
 					.selectAll(null)
 					.data(function (d) {
 						return d.funds;
@@ -4962,12 +4964,14 @@
 			});
 		}
 
-		function safeDivide(underApproval, approved, launched){
-			if (launched === 0) return {underApprovalPercent: 0, underPlusApprovedPercent: 0};
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
 			return {
 				underApprovalPercent: (underApproval / launched) * 100,
-				underPlusApprovedPercent: ((underApproval + approved) / launched) * 100
-			}
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
 		}
 
 		function processData(rawData, rawLaunchedAllocationsData) {
@@ -4986,9 +4990,21 @@
 						chartState.selectedCbpfs.includes(row.PooledFundName))
 				) {
 					aggregatedLaunchedValues[row.AllocationYear] = {
-						underApproval: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].underApproval : 0) + row.TotalUnderApprovalBudget,
-						approved: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].approved : 0) + row.TotalApprovedBudget,
-						launched: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].launched : 0) + row.TotalUSDPlanned
+						underApproval:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.underApproval
+								: 0) + row.TotalUnderApprovalBudget,
+						approved:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.approved
+								: 0) + row.TotalApprovedBudget,
+						launched:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.launched
+								: 0) + row.TotalUSDPlanned,
 					};
 					//IMPORTANT: ASK ABOUT THE LAUNCHEDALLOC FILE NOT HAVING PARTNER TYPE, IF WE CAN USE THE REGULAR DATA FILE
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
@@ -4998,9 +5014,16 @@
 			});
 
 			for (const year in aggregatedLaunchedValues) {
-				const {underApprovalPercent, underPlusApprovedPercent} = safeDivide(aggregatedLaunchedValues[year].underApproval, aggregatedLaunchedValues[year].approved, aggregatedLaunchedValues[year].launched);
-				yearsWithUnderApprovalAboveMin[year] = underApprovalPercent > minimumUnderApprovalPercentage || underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			};
+				const { underApprovalPercent, underPlusApprovedPercent } =
+					safeDivide(
+						aggregatedLaunchedValues[year].underApproval,
+						aggregatedLaunchedValues[year].approved,
+						aggregatedLaunchedValues[year].launched
+					);
+				yearsWithUnderApprovalAboveMin[year] =
+					underApprovalPercent > minimumUnderApprovalPercentage ||
+					underPlusApprovedPercent < minimumUnderApprovalPercentage;
+			}
 
 			const aggregatedAllocations = [];
 
