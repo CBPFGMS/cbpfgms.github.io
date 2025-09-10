@@ -99,10 +99,10 @@ function SummaryContainer({
 						}}
 						ml={1}
 					>
-						Data starting from the launch of the online grant
-						management system OneGMS on
-						<br />1 June 2024. Prior data is not represented but is
-						available in CERF’s annual reports.
+						Data starting from 2025 due to the launch of the online
+						grant management system OneGMS.
+						<br />Prior data is not represented but is available in
+						CERF’s annual reports.
 					</Typography>
 				</Box>
 				<Legend />
