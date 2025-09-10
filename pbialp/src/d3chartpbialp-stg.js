@@ -1258,17 +1258,14 @@
 				const rhpfs = new Set();
 
 				data.forEach(function (d) {
-					if (d.cbpf.toLowerCase().includes("rhpf")) {
-						const fundName = d.cbpf.split("(")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.cbpf.replace(/\s+/g, "").toLowerCase() ===
+							e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						if (regionalFund) {
-							rhpfs.add(regionalFund.RFundAbbrv);
+							rhpfs.add(e.RFundAbbrv);
 						}
-					}
+					});
 				});
 
 				const rhpfsData = Array.from(rhpfs).length;
@@ -4067,26 +4064,26 @@
 				const regionalData = [];
 
 				data.forEach(function (d) {
-					if (d.cbpf.toLowerCase().includes("rhpf")) {
-						const fundName = d.cbpf.split("(")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.cbpf.replace(/\s+/g, "").toLowerCase() ===
+							e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						const foundFund = regionalData.find(function (e) {
-							return e.rfCode === regionalFund.RFundAbbrv;
-						});
-						if (foundFund) {
-							foundFund.funds.push(d.cbpf);
-						} else {
-							regionalData.push({
-								rfCode: regionalFund.RFundAbbrv,
-								rfName: regionalFund.RFundTitle,
-								funds: [d.cbpf],
+							const regionalFund = e;
+							const foundFund = regionalData.find(function (e) {
+								return e.rfCode === regionalFund.RFundAbbrv;
 							});
+							if (foundFund) {
+								foundFund.funds.push(d.cbpf);
+							} else {
+								regionalData.push({
+									rfCode: regionalFund.RFundAbbrv,
+									rfName: regionalFund.RFundTitle,
+									funds: [d.cbpf],
+								});
+							}
 						}
-					}
+					});
 				});
 
 				const innerTooltip = tooltip

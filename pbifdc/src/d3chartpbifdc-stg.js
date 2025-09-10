@@ -1167,17 +1167,15 @@
 				const rhpfs = new Set();
 
 				data.forEach(function (d) {
-					if (d.category === "CBPF" && d.name.includes("RhPF")) {
-						const fundName = d.name.split("(RhPF")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.category === "CBPF" &&
+							d.name.replace(/\s+/g, "").toLowerCase() ===
+								e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						if (regionalFund) {
-							rhpfs.add(regionalFund.RFundAbbrv);
+							rhpfs.add(e.RFundAbbrv);
 						}
-					}
+					});
 				});
 
 				const rhpfsNumber = Array.from(rhpfs).length;
@@ -4498,26 +4496,27 @@
 				const regionalData = [];
 
 				dataObject.nodes.forEach(function (d) {
-					if (d.category === "CBPF" && d.name.includes("RhPF")) {
-						const fundName = d.name.split("(RhPF")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.category === "CBPF" &&
+							d.name.replace(/\s+/g, "").toLowerCase() ===
+								e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						const foundFund = regionalData.find(function (e) {
-							return e.rfCode === regionalFund.RFundAbbrv;
-						});
-						if (foundFund) {
-							foundFund.funds.push(d.name);
-						} else {
-							regionalData.push({
-								rfCode: regionalFund.RFundAbbrv,
-								rfName: regionalFund.RFundTitle,
-								funds: [d.name],
+							const regionalFund = e;
+							const foundFund = regionalData.find(function (e) {
+								return e.rfCode === regionalFund.RFundAbbrv;
 							});
+							if (foundFund) {
+								foundFund.funds.push(d.name);
+							} else {
+								regionalData.push({
+									rfCode: regionalFund.RFundAbbrv,
+									rfName: regionalFund.RFundTitle,
+									funds: [d.name],
+								});
+							}
 						}
-					}
+					});
 				});
 
 				const innerTooltip = tooltip
@@ -4550,6 +4549,7 @@
 
 				const fundsList = fundsDiv
 					.append("ul")
+					.style("margin-bottom", "1em")
 					.selectAll(null)
 					.data(function (d) {
 						return d.funds;

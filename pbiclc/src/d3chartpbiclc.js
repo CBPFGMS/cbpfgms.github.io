@@ -1604,17 +1604,14 @@
 				const rhpfs = new Set();
 
 				dataCbpfs.forEach(function (d) {
-					if (d.cbpf.includes("RhPF")) {
-						const fundName = d.cbpf.split("(RhPF")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.cbpf.replace(/\s+/g, "").toLowerCase() ===
+							e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						if (regionalFund) {
-							rhpfs.add(regionalFund.RFundAbbrv);
+							rhpfs.add(e.RFundAbbrv);
 						}
-					}
+					});
 				});
 
 				const dataCbpfsRhPF = Array.from(rhpfs);
@@ -3588,27 +3585,26 @@
 				const regionalData = [];
 
 				data.dataCbpfs.forEach(function (d) {
-					if (d.cbpf.includes("RhPF")) {
-						const fundName = d.cbpf.split("(RhPF")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.cbpf.replace(/\s+/g, "").toLowerCase() ===
+							e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						if (!regionalFund) return;
-						const foundFund = regionalData.find(function (e) {
-							return e.rfCode === regionalFund.RFundAbbrv;
-						});
-						if (foundFund) {
-							foundFund.funds.push(d.cbpf);
-						} else {
-							regionalData.push({
-								rfCode: regionalFund.RFundAbbrv,
-								rfName: regionalFund.RFundTitle,
-								funds: [d.cbpf],
+							const regionalFund = e;
+							const foundFund = regionalData.find(function (e) {
+								return e.rfCode === regionalFund.RFundAbbrv;
 							});
+							if (foundFund) {
+								foundFund.funds.push(d.cbpf);
+							} else {
+								regionalData.push({
+									rfCode: regionalFund.RFundAbbrv,
+									rfName: regionalFund.RFundTitle,
+									funds: [d.cbpf],
+								});
+							}
 						}
-					}
+					});
 				});
 
 				const innerTooltip = tooltip
@@ -3641,6 +3637,7 @@
 
 				const fundsList = fundsDiv
 					.append("ul")
+					.style("margin-bottom", "1em")
 					.selectAll(null)
 					.data(function (d) {
 						return d.funds;
