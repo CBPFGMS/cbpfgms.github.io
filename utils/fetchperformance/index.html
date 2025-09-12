@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link
+			rel="icon"
+			type="image/x-icon"
+			href="/favicon.ico"
+		/>
+		<link
+			rel="stylesheet"
+			crossorigin="anonymous"
+			href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Progress Dashboard</title>
+	</head>
+	<body
+		style="
+			margin: 0;
+			display: flex;
+			min-height: 100vh;
+			flex-direction: column;
+		"
+	>
+		<div
+			style="
+				display: flex;
+				background-color: #ffffff;
+				justify-content: start;
+				align-items: center;
+				flex-direction: column;
+				flex-grow: 1;
+			"
+		>
+			<h2>Data Fetch Performance</h2>
+			<h3>Download and Response times</h3>
+			<p>
+				From <span id="fromDate"></span> to <span id="toDate"></span>.
+				Total of <span id="numberOfDays"></span> days (API calls for
+				<span id="maxNumberOfCalls"></span> days)
+			</p>
+			<div id="buttonsContainer"></div>
+			<div
+				style="
+					width: 1110px;
+					background-color: #ffffff;
+					padding-top: 2em;
+					flex-grow: 1;
+					display: flex;
+				"
+				id="barChartContainer"
+			></div>
+			<h3>API list</h3>
+			<div
+				style="
+					width: 1110px;
+					background-color: #ffffff;
+					flex-grow: 1;
+					display: flex;
+				"
+				id="apiListContainer"
+			></div>
+		</div>
+		<script
+			type="module"
+			src="/src/main.ts"
+		></script>
+	</body>
+</html>

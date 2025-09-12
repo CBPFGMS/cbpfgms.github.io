@@ -1,0 +1,217 @@
+:root {
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	color-scheme: light dark;
+	color: rgba(255, 255, 255, 0.87);
+	background-color: #242424;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+a {
+	font-weight: 500;
+	color: #646cff;
+	text-decoration: inherit;
+}
+a:hover {
+	color: #535bf2;
+}
+
+body {
+	margin: 0;
+	display: flex;
+	place-items: center;
+	min-width: 320px;
+	min-height: 100vh;
+}
+
+h1 {
+	font-size: 3.2em;
+	line-height: 1.1;
+}
+
+#app {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 2rem;
+	text-align: center;
+}
+
+.logo {
+	height: 6em;
+	padding: 1.5em;
+	will-change: filter;
+	transition: filter 300ms;
+}
+.logo:hover {
+	filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.vanilla:hover {
+	filter: drop-shadow(0 0 2em #3178c6aa);
+}
+
+.card {
+	padding: 2em;
+}
+
+.read-the-docs {
+	color: #888;
+}
+
+button {
+	border-radius: 8px;
+	border: 1px solid transparent;
+	padding: 0.6em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	background-color: #1a1a1a;
+	cursor: pointer;
+	transition: border-color 0.25s;
+}
+button:hover {
+	border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+	outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		color: #213547;
+		background-color: #ffffff;
+	}
+	a:hover {
+		color: #747bff;
+	}
+	button {
+		background-color: #f9f9f9;
+	}
+}
+
+button.active {
+	background-color: #353535;
+	color: #fff;
+}
+
+.xAxis path,
+.yAxis path {
+	display: none;
+}
+
+.xAxis line {
+	stroke: #ccc;
+	stroke-dasharray: 4, 3;
+}
+
+.yAxis text {
+	font-size: 1.2em;
+}
+
+/* ...existing code... */
+
+/* Modern Material Table Styles */
+#apiListContainer table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: #fff;
+	box-shadow: 0 2px 8px rgba(60, 60, 60, 0.08);
+	border-radius: 12px;
+	overflow: hidden;
+	margin: 1em 0;
+	font-size: 1em;
+}
+
+#apiListContainer thead {
+	background: linear-gradient(90deg, #646cff 0%, #535bf2 100%);
+}
+
+#apiListContainer th {
+	color: #fff;
+	font-weight: 600;
+	padding: 1em;
+	text-align: left;
+	letter-spacing: 0.05em;
+	border-bottom: 2px solid #e0e0e0;
+}
+
+#apiListContainer tbody tr {
+	transition: background 0.2s;
+}
+
+#apiListContainer tbody tr:hover {
+	background: #f5f7ff;
+}
+
+#apiListContainer td {
+	padding: 1em;
+	border-bottom: 1px solid #e0e0e0;
+	color: #213547;
+	vertical-align: middle;
+}
+
+#apiListContainer a {
+	color: #646cff;
+	text-decoration: underline;
+	font-weight: 500;
+	transition: color 0.2s;
+}
+
+#apiListContainer a:hover {
+	color: #535bf2;
+}
+
+#apiListContainer tr:last-child td {
+	border-bottom: none;
+}
+
+/* Responsive Table */
+@media (max-width: 700px) {
+	#apiListContainer table,
+	#apiListContainer thead,
+	#apiListContainer tbody,
+	#apiListContainer th,
+	#apiListContainer td,
+	#apiListContainer tr {
+		display: block;
+		width: 100%;
+	}
+	#apiListContainer thead {
+		display: none;
+	}
+	#apiListContainer td {
+		position: relative;
+		padding-left: 50%;
+		border-bottom: 1px solid #e0e0e0;
+	}
+	#apiListContainer td:before {
+		position: absolute;
+		left: 1em;
+		top: 1em;
+		width: 45%;
+		white-space: nowrap;
+		font-weight: bold;
+		color: #888;
+		content: attr(data-label);
+	}
+}
+
+#tooltip {
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	padding: 0.5em 1em;
+	border-radius: 8px;
+	pointer-events: none;
+	font-size: 0.9em;
+	display: none;
+	transition: opacity 0.3s;
+	z-index: 10;
+}
