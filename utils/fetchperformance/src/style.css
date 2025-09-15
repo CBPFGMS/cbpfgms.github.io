@@ -105,12 +105,26 @@ button.active {
 	display: none;
 }
 
-.xAxis line {
+.xAxisLollipop line {
 	stroke: #ccc;
 	stroke-dasharray: 4, 3;
 }
 
-.yAxis text {
+.yAxisLollipop text {
+	font-size: 1.2em;
+}
+
+.xAxisLollipop path,
+.yAxisLollipop path {
+	display: none;
+}
+
+.yAxisLollipop line {
+	stroke: #ccc;
+	stroke-dasharray: 4, 3;
+}
+
+.yAxisLollipop text {
 	font-size: 1.2em;
 }
 

@@ -15,14 +15,25 @@ export type BarChartDatum = {
 	averageResponseTime: number;
 };
 
+export type LollipopChartDatum = {
+	date: Date;
+	numberOfErrors: number;
+	apisWithErrors: {
+		apiId: number;
+		error: string;
+	}[];
+};
+
 export function processData(rawData: Datum[]): {
 	barChartData: BarChartDatum[];
+	lollipopChartData: LollipopChartDatum[];
 	minimumDate: Date;
 	maximumDate: Date;
 	maxNumberOfCalls: number;
 } {
 	const tempData: TemporaryDatum = {};
 	const barChartData: BarChartDatum[] = [];
+	const lollipopChartData: LollipopChartDatum[] = [];
 	let minimumDate: Date = rawData[0].date;
 	let maximumDate: Date = rawData[0].date;
 
@@ -42,6 +53,37 @@ export function processData(rawData: Datum[]): {
 	rawData.forEach(datum => {
 		minimumDate = datum.date < minimumDate ? datum.date : minimumDate;
 		maximumDate = datum.date > maximumDate ? datum.date : maximumDate;
+		if (!datum.dataReceived) {
+			const lollipopDatum = lollipopChartData.find(
+				l =>
+					l.date.getFullYear() === datum.date.getFullYear() &&
+					l.date.getMonth() === datum.date.getMonth() &&
+					l.date.getDate() === datum.date.getDate()
+			);
+			if (lollipopDatum) {
+				lollipopDatum.numberOfErrors += 1;
+				lollipopDatum.apisWithErrors.push({
+					apiId: datum.id,
+					error: datum.error ?? "Unknown error",
+				});
+			} else {
+				lollipopChartData.push({
+					date: new Date(
+						datum.date.getFullYear(),
+						datum.date.getMonth(),
+						datum.date.getDate()
+					),
+					numberOfErrors: 1,
+					apisWithErrors: [
+						{
+							apiId: datum.id,
+							error: datum.error ?? "Unknown error",
+						},
+					],
+				});
+			}
+			return;
+		}
 		if (datum.downloadTime === null || datum.responseTime === null) return;
 		tempData[datum.id].downloadTime.push(datum.downloadTime);
 		tempData[datum.id].responseTime.push(datum.responseTime);
@@ -68,5 +110,11 @@ export function processData(rawData: Datum[]): {
 			tempDatum.numberOfCalls;
 	});
 
-	return { barChartData, minimumDate, maximumDate, maxNumberOfCalls };
+	return {
+		barChartData,
+		lollipopChartData,
+		minimumDate,
+		maximumDate,
+		maxNumberOfCalls,
+	};
 }
