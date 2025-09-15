@@ -24,15 +24,22 @@ export type LollipopChartDatum = {
 	}[];
 };
 
+export type LineChartDatum = {
+	date: Date;
+	[key: number]: number | null;
+};
+
 export function processData(rawData: Datum[]): {
 	barChartData: BarChartDatum[];
 	lollipopChartData: LollipopChartDatum[];
+	lineChartData: LineChartDatum[];
 	minimumDate: Date;
 	maximumDate: Date;
 	maxNumberOfCalls: number;
 } {
 	const tempData: TemporaryDatum = {};
 	const barChartData: BarChartDatum[] = [];
+	const lineChartData: LineChartDatum[] = [];
 	const lollipopChartData: LollipopChartDatum[] = [];
 	let minimumDate: Date = rawData[0].date;
 	let maximumDate: Date = rawData[0].date;
@@ -51,8 +58,51 @@ export function processData(rawData: Datum[]): {
 	});
 
 	rawData.forEach(datum => {
+		if (datum.id === 37) console.log(datum);
 		minimumDate = datum.date < minimumDate ? datum.date : minimumDate;
 		maximumDate = datum.date > maximumDate ? datum.date : maximumDate;
+
+		const lineDatum = lineChartData.find(
+			l =>
+				l.date.getFullYear() === datum.date.getFullYear() &&
+				l.date.getMonth() === datum.date.getMonth() &&
+				l.date.getDate() === datum.date.getDate()
+		);
+		if (lineDatum) {
+			if (
+				datum.dataReceived &&
+				datum.downloadTime !== null &&
+				datum.responseTime !== null
+			) {
+				lineDatum[datum.id] = datum.downloadTime + datum.responseTime;
+			} else {
+				lineDatum[datum.id] = null;
+			}
+		} else {
+			const newLineDatum: LineChartDatum = {
+				date: new Date(
+					datum.date.getFullYear(),
+					datum.date.getMonth(),
+					datum.date.getDate()
+				),
+			};
+			apiIdsList.forEach(id => {
+				newLineDatum[id] = 0;
+			});
+			if (
+				datum.dataReceived &&
+				datum.downloadTime !== null &&
+				datum.responseTime !== null
+			) {
+				newLineDatum[datum.id] =
+					datum.downloadTime + datum.responseTime;
+			} else {
+				newLineDatum[datum.id] = null;
+			}
+			lineChartData.push(newLineDatum);
+		}
+
+		// Lollipop chart - count errors per day
 		if (!datum.dataReceived) {
 			const lollipopDatum = lollipopChartData.find(
 				l =>
@@ -113,6 +163,7 @@ export function processData(rawData: Datum[]): {
 	return {
 		barChartData,
 		lollipopChartData,
+		lineChartData,
 		minimumDate,
 		maximumDate,
 		maxNumberOfCalls,

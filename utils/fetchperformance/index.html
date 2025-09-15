@@ -44,6 +44,38 @@
 				<span id="maxNumberOfCalls"></span> days)
 			</p>
 			<div id="buttonsContainer"></div>
+			<div class="legend">
+				<div
+					style="
+						display: flex;
+						align-items: center;
+						margin-bottom: 0.5em;
+					"
+				>
+					<div
+						style="
+							width: 16px;
+							height: 16px;
+							background: steelblue;
+							border-radius: 3px;
+							margin-right: 0.5em;
+						"
+					></div>
+					<span>Response Time</span>
+				</div>
+				<div style="display: flex; align-items: center">
+					<div
+						style="
+							width: 16px;
+							height: 16px;
+							background: orange;
+							border-radius: 3px;
+							margin-right: 0.5em;
+						"
+					></div>
+					<span>Download Time</span>
+				</div>
+			</div>
 			<div
 				style="
 					width: 1110px;
@@ -53,6 +85,19 @@
 					display: flex;
 				"
 				id="barChartContainer"
+			></div>
+			<h3>APIs performance</h3>
+			<p>Select an API in the dropdown for a detailed performance chart</p>
+			<div id="selectContainer"></div>
+			<div
+				style="
+					width: 1110px;
+					background-color: #ffffff;
+					padding-top: 2em;
+					flex-grow: 1;
+					display: flex;
+				"
+				id="lineChartContainer"
 			></div>
 			<h3>Timeline of Errors</h3>
 			<p>(any response outside 200-299 is considered an error)</p>

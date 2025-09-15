@@ -7,11 +7,14 @@ import { createSortButtons } from "./createsortbuttons";
 import { createApiList } from "./createapilist";
 import { createTooltip } from "./createtooltip";
 import { createLollipopChart } from "./createlollipopchart";
+import { createSelect } from "./createselect";
+import { createLineChart } from "./createlinechart";
 
 fetchFile().then(rawData => {
 	const {
 		barChartData,
 		lollipopChartData,
+		lineChartData,
 		minimumDate,
 		maximumDate,
 		maxNumberOfCalls,
@@ -20,6 +23,14 @@ fetchFile().then(rawData => {
 	createTopText(minimumDate, maximumDate, maxNumberOfCalls);
 	const sortButtons = createSortButtons();
 	createBarChart(barChartData, sortButtons, tooltip);
+	const apiSelect = createSelect();
+	createLineChart(
+		lineChartData,
+		tooltip,
+		minimumDate,
+		maximumDate,
+		apiSelect
+	);
 	createLollipopChart(lollipopChartData, tooltip, minimumDate, maximumDate);
 	createApiList();
 });

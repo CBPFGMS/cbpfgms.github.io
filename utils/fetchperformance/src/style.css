@@ -3,10 +3,6 @@
 	line-height: 1.5;
 	font-weight: 400;
 
-	color-scheme: light dark;
-	color: rgba(255, 255, 255, 0.87);
-	background-color: #242424;
-
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
@@ -65,43 +61,51 @@ h1 {
 
 button {
 	border-radius: 8px;
-	border: 1px solid transparent;
+	border: 1px solid #e0e0e0;
 	padding: 0.6em 1.2em;
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
-	background-color: #1a1a1a;
+	background-color: #fff;
+	color: #213547;
 	cursor: pointer;
-	transition: border-color 0.25s;
-}
-button:hover {
-	border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+	transition: border-color 0.25s, background-color 0.25s, color 0.25s;
+	box-shadow: 0 1px 2px rgba(60, 60, 60, 0.06);
 }
 
-@media (prefers-color-scheme: light) {
-	:root {
-		color: #213547;
-		background-color: #ffffff;
-	}
-	a:hover {
-		color: #747bff;
-	}
-	button {
-		background-color: #f9f9f9;
-	}
+button:hover {
+	border-color: #646cff;
+	background-color: #f5f7ff;
+	color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+	outline: 4px auto #646cff;
 }
 
 button.active {
-	background-color: #353535;
+	background-color: #646cff;
 	color: #fff;
+	border-color: #646cff;
 }
 
 .xAxis path,
 .yAxis path {
+	display: none;
+}
+
+.xAxis line {
+	stroke: #ccc;
+	stroke-dasharray: 4, 3;
+}
+
+.yAxis text {
+	font-size: 1.2em;
+}
+
+.xAxisLollipop path,
+.yAxisLollipop path {
 	display: none;
 }
 
@@ -114,17 +118,17 @@ button.active {
 	font-size: 1.2em;
 }
 
-.xAxisLollipop path,
-.yAxisLollipop path {
+.xAxisLine path,
+.yAxisLine path {
 	display: none;
 }
 
-.yAxisLollipop line {
+.xAxisLine line {
 	stroke: #ccc;
 	stroke-dasharray: 4, 3;
 }
 
-.yAxisLollipop text {
+.yAxisLine text {
 	font-size: 1.2em;
 }
 
