@@ -6,6 +6,7 @@ type TemporaryDatum = {
 		downloadTime: number[];
 		responseTime: number[];
 		numberOfCalls: number;
+		size: number[];
 	};
 };
 
@@ -13,6 +14,7 @@ export type BarChartDatum = {
 	id: number;
 	averageDownloadTime: number;
 	averageResponseTime: number;
+	averageFileSize: number;
 };
 
 export type LollipopChartDatum = {
@@ -48,12 +50,14 @@ export function processData(rawData: Datum[]): {
 		tempData[id] = {
 			downloadTime: [],
 			responseTime: [],
+			size: [],
 			numberOfCalls: 0,
 		};
 		barChartData.push({
 			id,
 			averageDownloadTime: 0,
 			averageResponseTime: 0,
+			averageFileSize: 0,
 		});
 	});
 
@@ -132,9 +136,15 @@ export function processData(rawData: Datum[]): {
 			}
 			return;
 		}
-		if (datum.downloadTime === null || datum.responseTime === null) return;
+		if (
+			datum.downloadTime === null ||
+			datum.responseTime === null ||
+			datum.contentSize === null
+		)
+			return;
 		tempData[datum.id].downloadTime.push(datum.downloadTime);
 		tempData[datum.id].responseTime.push(datum.responseTime);
+		tempData[datum.id].size.push(datum.contentSize);
 		tempData[datum.id].numberOfCalls += 1;
 	});
 
@@ -156,6 +166,8 @@ export function processData(rawData: Datum[]): {
 		d.averageResponseTime =
 			tempDatum.responseTime.reduce((a, b) => a + b, 0) /
 			tempDatum.numberOfCalls;
+		d.averageFileSize =
+			tempDatum.size.reduce((a, b) => a + b, 0) / tempDatum.numberOfCalls;
 	});
 
 	return {

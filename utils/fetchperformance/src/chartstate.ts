@@ -2,7 +2,7 @@ import { apiList } from "./apilist";
 
 export type SortOptions = (typeof sortOptions)[number];
 
-export const sortOptions = ["total", "download", "response"] as const;
+export const sortOptions = ["total", "download", "response", "size"] as const;
 
 interface IChartState {
 	sort: SortOptions;

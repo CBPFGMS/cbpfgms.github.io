@@ -159,7 +159,8 @@ export function createBarChart(
 					Average Download Time: ${d.averageDownloadTime.toFixed(2)} ms<br/>
 					Total Average Time: ${(d.averageResponseTime + d.averageDownloadTime).toFixed(
 						2
-					)} ms<br/>`
+					)} ms<br/>
+					File Size: ${Math.floor(d.averageFileSize).toLocaleString()} bytes`
 			);
 
 			// compute positions using the SVG bounding box so coordinates are in page space
@@ -215,6 +216,8 @@ export function createBarChart(
 					a.averageDownloadTime,
 					b.averageDownloadTime
 				);
+			} else if (chartstate.sort === "size") {
+				return d3.descending(a.averageFileSize, b.averageFileSize);
 			} else {
 				return d3.descending(
 					a.averageResponseTime,

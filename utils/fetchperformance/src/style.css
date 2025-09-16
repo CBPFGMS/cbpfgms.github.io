@@ -239,3 +239,14 @@ button.active {
 	transition: opacity 0.3s;
 	z-index: 10;
 }
+
+#apiListContainer table tr > th:nth-child(3),
+#apiListContainer table tr > td:nth-child(3),
+#apiListContainer table tr > th:nth-of-type(3),
+#apiListContainer table tr > td:nth-of-type(3) {
+  display: table-cell !important;
+  visibility: visible !important;
+  width: auto !important;
+  max-width: none !important;
+  opacity: 1 !important;
+}

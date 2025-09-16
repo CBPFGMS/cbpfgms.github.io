@@ -24,6 +24,8 @@ function createSortButtons(): SortButtons {
 				? "Total"
 				: d === "download"
 				? "Avegage Download Time"
+				: d === "size"
+				? "Average File Size"
 				: "Average Response Time"
 		)
 		.merge(buttons);
