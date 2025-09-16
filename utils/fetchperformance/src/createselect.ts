@@ -1,4 +1,4 @@
-import { select, selectAll } from "d3-selection";
+import { select } from "d3-selection";
 import { apiList } from "./apilist";
 import chartState from "./chartstate";
 

@@ -2,7 +2,7 @@ import { type BarChartDatum } from "./processdata";
 import { type SortButtons } from "./createsortbuttons";
 import chartstate from "./chartstate";
 import * as d3 from "d3";
-import { apiIdsList, apiList } from "./apilist";
+import { apiList } from "./apilist";
 
 const width = 1100,
 	padding = { top: 20, right: 20, bottom: 20, left: 200 },

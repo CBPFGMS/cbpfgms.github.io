@@ -105,11 +105,14 @@ button.active {
 }
 
 .xAxisLollipop path,
+.xAxisLollipop line {
+	stroke: #888;
+}
 .yAxisLollipop path {
 	display: none;
 }
 
-.xAxisLollipop line {
+.yAxisLollipop line {
 	stroke: #ccc;
 	stroke-dasharray: 4, 3;
 }
@@ -119,11 +122,14 @@ button.active {
 }
 
 .xAxisLine path,
+.xAxisLine line {
+	stroke: #888;
+}
 .yAxisLine path {
 	display: none;
 }
 
-.xAxisLine line {
+.yAxisLine line {
 	stroke: #ccc;
 	stroke-dasharray: 4, 3;
 }

@@ -1,5 +1,5 @@
 import type { Datum } from "./schemas";
-import { apiList, apiIdsList } from "./apilist";
+import { apiIdsList } from "./apilist";
 
 type TemporaryDatum = {
 	[key: number]: {
@@ -58,7 +58,6 @@ export function processData(rawData: Datum[]): {
 	});
 
 	rawData.forEach(datum => {
-		if (datum.id === 37) console.log(datum);
 		minimumDate = datum.date < minimumDate ? datum.date : minimumDate;
 		maximumDate = datum.date > maximumDate ? datum.date : maximumDate;
 
@@ -102,7 +101,6 @@ export function processData(rawData: Datum[]): {
 			lineChartData.push(newLineDatum);
 		}
 
-		// Lollipop chart - count errors per day
 		if (!datum.dataReceived) {
 			const lollipopDatum = lollipopChartData.find(
 				l =>

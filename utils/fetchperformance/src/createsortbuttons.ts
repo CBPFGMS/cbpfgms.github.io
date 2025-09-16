@@ -1,4 +1,4 @@
-import { select, selectAll } from "d3-selection";
+import { select } from "d3-selection";
 import chartState, { sortOptions, type SortOptions } from "./chartstate";
 
 export type SortButtons = d3.Selection<

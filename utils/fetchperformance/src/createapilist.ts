@@ -1,7 +1,6 @@
 import { apiList, type ApiList } from "./apilist";
 
 const columns = ["API Name", "Endpoint", "Type", "Charts"] as const;
-type Columns = (typeof columns)[number];
 
 export function createApiList() {
 	const table = document

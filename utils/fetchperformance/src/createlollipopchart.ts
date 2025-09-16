@@ -15,7 +15,7 @@ const yScale = d3
 	.scaleLinear<number>()
 	.range([height - padding.bottom, padding.top]);
 
-const xAxis = d3.axisBottom<Date>(xScale).tickFormat(d3.timeFormat("%b %y"));
+const xAxis = d3.axisBottom<Date>(xScale).tickFormat(d3.timeFormat("%b %y")).tickSizeOuter(0);
 
 const yAxis = d3.axisLeft<number>(yScale).ticks(4).tickPadding(10);
 
@@ -37,8 +37,7 @@ export function createLollipopChart(
 		.append("svg")
 		.attr("viewBox", `0 0 ${width} ${height}`);
 
-	const xAxisGroup = svg
-		.append("g")
+	svg.append("g")
 		.attr("class", "xAxisLollipop")
 		.attr("transform", `translate(0, ${height - padding.bottom})`)
 		.call(xAxis);
@@ -70,7 +69,7 @@ export function createLollipopChart(
 		.attr("stroke", "tomato")
 		.attr("stroke-width", 1);
 
-	const circles = lollipopGroup
+	lollipopGroup
 		.append("circle")
 		.attr("class", "lollipopCircle")
 		.attr("cy", d => yScale(d.numberOfErrors))

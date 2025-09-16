@@ -129,6 +129,11 @@ export function createLineChart(
 
 		xAxisGroup.transition().duration(duration).call(xAxis);
 		yAxisGroup.transition().duration(duration).call(yAxis);
+
+		yAxisGroup
+			.selectAll(".tick")
+			.filter(d => d === 0)
+			.remove();
 	}
 
 	const tooltipRect = svg
@@ -140,7 +145,7 @@ export function createLineChart(
 		.attr("height", yScale.range()[0] - yScale.range()[1])
 		.attr("fill", "transparent")
 		.on("mousemove", function (event) {
-			const [mouseX, mouseY] = d3.pointer(event);
+			const [mouseX, _] = d3.pointer(event);
 			const x0 = xScale.invert(mouseX);
 			const bisectDate = d3.bisector((d: LineChartDatum) => d.date).left;
 			const i = bisectDate(lineChartData, x0, 1);
