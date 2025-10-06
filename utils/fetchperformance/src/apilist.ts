@@ -12,7 +12,8 @@ type Charts =
 	| "Funding_overview"
 	| "Sectors"
 	| "Targeted_and_reached_people"
-	| "Gender_with_age_marker";
+	| "Gender_with_age_marker"
+	| "CVA";
 
 type ApiType = "data" | "master";
 
@@ -369,6 +370,23 @@ export const apiList: ApiList = [
 			"?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1&$format=csv",
 		charts: ["Progress_dashboard"],
 		apiType: "data",
+	},
+	{
+		id: 40,
+		apiName: "CVAData",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=APIDAT_CVA&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1&$format=csv",
+		charts: ["Progress_dashboard", "CVA"],
+		apiType: "data",
+	},
+	{
+		id: 41,
+		apiName: "CVAMaster",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: "?SPCode=MstCVAType",
+		charts: ["Progress_dashboard", "CVA"],
+		apiType: "master",
 	},
 ] as const;
 
