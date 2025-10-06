@@ -9036,6 +9036,6 @@ id,apiName,date,dataReceived,downloadTime,responseTime,totalTime,contentSize,err
 34,masterGlobalIndicators,2025-09-24T01:00:01.324Z,true,3.55,4672.25,4675.802625,57797,
 35,masterEmergencies,2025-09-24T01:00:01.324Z,true,1.85,4397.46,4399.307124999999,2278,
 36,projectSummary,2025-09-24T01:00:01.324Z,true,1778.27,4418.23,6196.498625,360185,
-37,projectSummaryAggregate,2025-09-24T01:00:01.324Z,,,,,,Request timed out after 30000ms
+37,projectSummaryAggregate,2025-09-24T01:00:01.324Z,false,,,,,Request timed out after 30000ms
 38,HRPSummary,2025-09-24T01:00:01.324Z,true,1.5,5080.98,5082.4778750000005,18667,
 39,emergencySummary,2025-09-24T01:00:01.324Z,true,2085.31,4390.46,6475.765375,762169,
