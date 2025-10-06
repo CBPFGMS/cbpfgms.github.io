@@ -12,7 +12,8 @@ type Charts =
 	| "Funding_overview"
 	| "Sectors"
 	| "Targeted_and_reached_people"
-	| "Gender_with_age_marker";
+	| "Gender_with_age_marker"
+	| "CVA";
 
 type ApiType = "data" | "master";
 
@@ -370,4 +371,37 @@ export const apiList: ApiList = [
 		charts: ["Progress_dashboard"],
 		apiType: "data",
 	},
+	{
+		id: 40,
+		apiName: "CVAData",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString:
+			"?SPCode=APIDAT_CVA&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1&$format=csv",
+		charts: ["Progress_dashboard", "CVA"],
+		apiType: "data",
+	},
+	{
+		id: 41,
+		apiName: "CVAMaster",
+		url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract",
+		queryString: "?SPCode=MstCVAType",
+		charts: ["Progress_dashboard", "CVA"],
+		apiType: "master",
+	},
 ] as const;
+
+//IMPORTANT:
+//This list only includes APIs used by CBPF.
+//The following APIs/files are used by CERF but not included here:
+// *Master tables:
+//- https://cerfgms-webapi.unocha.org/v1/agency/All.json
+// - https://cbpfgms.github.io/pfbi-data/mst/MstFund.json
+// Data:
+//- https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=APIDAT_CVA
+//- https://cbpfgms.github.io/pfbi-data/cerf/cerf_allocationSummary_byorg.csv
+//- https://cbpfgms.github.io/pfbi-data/cerf_sample_data/CERF_ContributionTotal.csv
+//- https://cbpfgms.github.io/pfbi-data/contributionbycerfcbpf.csv
+//- https://cbpfgms.github.io/pfbi-data/contributionbycerfcbpfAll.csv
+//- https://cbpfgms.github.io/pfbi-data/sectorSummarybyOrg.csv
+//- https://cbpfgms.github.io/pfbi-data/allocationSummarybyapproveddate.csv
+//- https://cbpfgms.github.io/pfbi-data/fund_adm1.csv
