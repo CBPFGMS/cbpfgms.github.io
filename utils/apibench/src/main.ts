@@ -8,9 +8,10 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { notifyError } from "./notification";
 
-const _dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const DIRECTORY_PATH = path.join(_dirname, "../data");
+const DIRECTORY_PATH = path.resolve(__dirname, "..", "data");
 
 const latestCsvText = await loadLatestCsvFile(DIRECTORY_PATH);
 
