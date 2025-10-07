@@ -28,7 +28,11 @@ const xAxis = d3
 const lineGenerator = d3
 	.line<LineChartDatum>()
 	.x(d => xScale(d.date))
-	.defined(d => d[chartstate.lineChartApi] !== null)
+	.defined(
+		d =>
+			d[chartstate.lineChartApi] !== null &&
+			d[chartstate.lineChartApi] !== 0
+	)
 	.curve(d3.curveMonotoneX);
 
 export function createLineChart(
@@ -105,6 +109,7 @@ export function createLineChart(
 		let points = svg
 			.selectAll<SVGCircleElement, LineChartDatum>(".point")
 			.data<LineChartDatum>(lineChartData);
+
 		points.exit().remove();
 
 		let pointsEnter = points
@@ -122,7 +127,10 @@ export function createLineChart(
 			.transition()
 			.duration(duration)
 			.style("opacity", d =>
-				d[chartstate.lineChartApi] === null ? 0 : 1
+				d[chartstate.lineChartApi] === null ||
+				d[chartstate.lineChartApi] === 0
+					? 0
+					: 1
 			)
 			.attr("cx", d => xScale(d.date))
 			.attr("cy", d => yScale(d[chartstate.lineChartApi] ?? 0));
@@ -163,14 +171,18 @@ export function createLineChart(
 					api => api.id === chartstate.lineChartApi
 				);
 				const apiName = api ? api.apiName : "Unknown API";
-				const value = d[chartstate.lineChartApi] ?? 0;
+				const apiValue = d[chartstate.lineChartApi];
+				const value =
+					apiValue !== null && apiValue !== 0
+						? apiValue.toFixed(2) + " ms"
+						: "No data";
 				tooltip
 					.style("display", "block")
 					.style("left", `${event.pageX + 10}px`)
 					.style("top", `${event.pageY - 28}px`).html(`
 						<strong>${apiName}</strong><br/>
 						Date: ${d.date.toDateString()}<br/>
-						Time: ${value.toFixed(2)} ms
+						Time: ${value}
 					`);
 			}
 		})

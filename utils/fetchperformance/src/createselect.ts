@@ -24,9 +24,13 @@ function createSelect(): ApiSelect {
 			}
 		});
 
+	const sortedApiList = apiList
+		.slice()
+		.sort((a, b) => a.apiName.localeCompare(b.apiName));
+
 	apiSelect
 		.selectAll<HTMLOptionElement, number>("option")
-		.data(apiList.map(api => api.id))
+		.data(sortedApiList.map(api => api.id))
 		.enter()
 		.append("option")
 		.attr("value", d => d.toString())
@@ -35,7 +39,7 @@ function createSelect(): ApiSelect {
 			return api ? api.apiName : d.toString();
 		});
 
-	apiSelect.property("value", apiList[0].id.toString());
+	apiSelect.property("value", sortedApiList[0].id.toString());
 
 	return apiSelect;
 }
