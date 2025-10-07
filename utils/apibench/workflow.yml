@@ -13,12 +13,12 @@ jobs:
             - uses: actions/setup-node@v4
               with:
                   node-version: "20"
-            - working-directory: utils/apibench
             - run: node dist/main.js
-            - working-directory: utils/apibench
+              working-directory: utils/apibench
             - run: |
                   git config --global user.name 'GitHub Action'
                   git config --global user.email 'action@github.com'
                   git add data/
                   git commit -m "Update benchmark data" || exit 0
                   git push
+              working-directory: utils/apibench
