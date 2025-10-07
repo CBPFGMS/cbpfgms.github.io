@@ -2369,27 +2369,25 @@
 			const rhpfs = new Set();
 
 			data.hrpData.forEach(function (d) {
-				if (d.cbpfName.includes("RhPF")) {
-					const fundName = d.cbpfName.split("(RhPF")[0].trim();
-					const regionalFund = masterRegionalFunds.find(function (e) {
-						return e.RFundName.includes(fundName);
-					});
-					if (regionalFund) {
-						rhpfs.add(regionalFund.RFundAbbrv);
+				masterRegionalFunds.forEach(function (e) {
+					if (
+						d.cbpfName.replace(/\s+/g, "").toLowerCase() ===
+						e.RFundName.replace(/\s+/g, "").toLowerCase()
+					) {
+						rhpfs.add(e.RFundAbbrv);
 					}
-				}
+				});
 			});
 
 			data.nonHrpData.forEach(function (d) {
-				if (d.cbpfName.includes("RhPF")) {
-					const fundName = d.cbpfName.split("(RhPF")[0].trim();
-					const regionalFund = masterRegionalFunds.find(function (e) {
-						return e.RFundName.includes(fundName);
-					});
-					if (regionalFund) {
-						rhpfs.add(regionalFund.RFundAbbrv);
+				masterRegionalFunds.forEach(function (e) {
+					if (
+						d.cbpfName.replace(/\s+/g, "").toLowerCase() ===
+						e.RFundName.replace(/\s+/g, "").toLowerCase()
+					) {
+						rhpfs.add(e.RFundAbbrv);
 					}
-				}
+				});
 			});
 
 			const rhpfTotalNumber = Array.from(rhpfs).length;
@@ -2541,26 +2539,26 @@
 				data.nonHrpData.forEach(populateList);
 
 				function populateList(d) {
-					if (d.cbpfName.includes("RhPF")) {
-						const fundName = d.cbpfName.split("(RhPF")[0].trim();
-						const regionalFund = masterRegionalFunds.find(function (
-							e
+					masterRegionalFunds.forEach(function (e) {
+						if (
+							d.cbpfName.replace(/\s+/g, "").toLowerCase() ===
+							e.RFundName.replace(/\s+/g, "").toLowerCase()
 						) {
-							return e.RFundName.includes(fundName);
-						});
-						const foundFund = regionalData.find(function (e) {
-							return e.rfCode === regionalFund.RFundAbbrv;
-						});
-						if (foundFund) {
-							foundFund.funds.push(d.cbpfName);
-						} else {
-							regionalData.push({
-								rfCode: regionalFund.RFundAbbrv,
-								rfName: regionalFund.RFundTitle,
-								funds: [d.cbpfName],
+							const regionalFund = e;
+							const foundFund = regionalData.find(function (e) {
+								return e.rfCode === regionalFund.RFundAbbrv;
 							});
+							if (foundFund) {
+								foundFund.funds.push(d.cbpfName);
+							} else {
+								regionalData.push({
+									rfCode: regionalFund.RFundAbbrv,
+									rfName: regionalFund.RFundTitle,
+									funds: [d.cbpfName],
+								});
+							}
 						}
-					}
+					});
 				}
 
 				const innerTooltip = tooltip
@@ -2593,6 +2591,7 @@
 
 				const fundsList = fundsDiv
 					.append("ul")
+					.style("margin-bottom", "1em")
 					.selectAll(null)
 					.data(function (d) {
 						return d.funds;
