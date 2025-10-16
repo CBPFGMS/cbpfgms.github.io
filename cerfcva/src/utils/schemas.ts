@@ -195,10 +195,10 @@ export const organizationMasterObjectSchema = z.object({
 	GlobalOrgId: z.number().int().nonnegative(),
 	GlobalUniqueId: z.number().int().nonnegative(),
 	LocalizationMarker: z.string().nullable(),
-	OrgIsWLO: z.string().nullable(),
-	OrgIsWRO: z.string().nullable(),
-	OrgIsOPD: z.string().nullable(),
-	OrgIsYLO: z.string().nullable(),
+	OrgIsWLO: z.string().nullable().optional(),
+	OrgIsWRO: z.string().nullable().optional(),
+	OrgIsOPD: z.string().nullable().optional(),
+	OrgIsYLO: z.string().nullable().optional(),
 	UNPPId: z.union([z.number(), z.string()]).nullable(),
 });
 
