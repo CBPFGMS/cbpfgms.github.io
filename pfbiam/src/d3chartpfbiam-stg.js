@@ -534,7 +534,10 @@ function createAllocations(colors, mapData, lists) {
 		mapButtons.on("click", (event, d) => {
 			chartState.selectedFund = d;
 
-			mapButtons.classed("activeButton", e => e === chartState.selectedFund);
+			mapButtons.classed(
+				"activeButton",
+				e => e === chartState.selectedFund
+			);
 
 			const data = filterData(originalData);
 
@@ -2371,6 +2374,8 @@ function createRhpfToCountryMap(masterFunds) {
 function preProcessData(rawAllocationsData, lists) {
 	rawAllocationsData.forEach(row => {
 		if (
+			//THIS IS A TEMPORARY FILTER FOR NON-NUMERIC POOLEDFUNDIDS
+			+row.PooledFundId &&
 			lists.fundNamesList[row.PooledFundId].toLowerCase().includes("rhpf")
 		) {
 			if (rhpfToCountry[row.PooledFundId]) {
