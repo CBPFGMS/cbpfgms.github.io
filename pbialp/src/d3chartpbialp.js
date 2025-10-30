@@ -4854,6 +4854,30 @@
 					")"
 			);
 
+			svg.select(".pbialpNetFundingGroup")
+				.transition()
+				.duration(shortDuration)
+				.attr(
+					"transform",
+					"translate(" +
+						(width - padding[1] - netFundingGroupPadding) +
+						"," +
+						(height - padding[2] / 2) +
+						")"
+				);
+
+			svg.select(".pbialpShowAverageGroup")
+				.transition()
+				.duration(shortDuration)
+				.attr(
+					"transform",
+					"translate(" +
+						(width - padding[1] - showAverageGroupPadding) +
+						"," +
+						(height - padding[2] / 2) +
+						")"
+				);
+
 			//end of resizeSvg
 		}
 
