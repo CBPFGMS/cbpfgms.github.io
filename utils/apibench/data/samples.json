@@ -1,0 +1,719 @@
+[
+  {
+    "apiName": "masterDonors",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstDonor.json",
+    "apiDatum": {
+      "id": 1,
+      "donorName": "Abu Dhabi National Energy Company \"TAQA",
+      "donorType": "Private",
+      "donorISO2Code": "XPRV"
+    }
+  },
+  {
+    "apiName": "masterFunds",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
+    "apiDatum": {
+      "id": 1,
+      "PooledFundName": "Afghanistan",
+      "PooledFundNameAbbrv": "Afghanistan",
+      "RegionName": "Southern Asia",
+      "RegionNameArr": "Asia",
+      "SubRegionName": "Southern Asia",
+      "ContinentName": "Asia",
+      "CountryCode": "AFG",
+      "ISO2Code": "AF",
+      "latitude": 33.93911,
+      "longitude": 67.709953,
+      "CBPFFundStatus": "",
+      "CBPFId": 23,
+      "CERFId": 8,
+      "AreaType": "Country"
+    }
+  },
+  {
+    "apiName": "masterRegionalFunds",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
+    "apiDatum": {
+      "RFundTitle": "Regionally-hosted Pooled Fund for West and Central Africa",
+      "RFundAbbrv": "RhPF-WCA",
+      "RFundName": "Niger (RhPF-WCA)",
+      "StartYearDate": "08-2022",
+      "CBPFId": 84
+    }
+  },
+  {
+    "apiName": "masterAllocationTypes",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstAllocation.json",
+    "apiDatum": {
+      "id": 1,
+      "AllocationName": "Reserve"
+    }
+  },
+  {
+    "apiName": "launchedAllocationsData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=",
+    "apiDatum": {
+      "AllocationTitle": "CERF Rapid Response: Afghanistan Apr 2025 (Anticipatory Action - Drought )",
+      "AllocationSummary": null,
+      "AllocationSource": "Rapid Response",
+      "TotalUSDPlanned": null,
+      "PlannedStartDate": null,
+      "PlannedEndDate": null,
+      "Documents": null,
+      "PooledFundId": 101,
+      "PooledFundName": "Afghanistan",
+      "AllocationYear": 2025,
+      "HRPPlans": null,
+      "AllocationHCLastProjectApprovalDate": null,
+      "TotalProjectsunderApproval": 0,
+      "TotalUnderApprovalBudget": 0,
+      "TotalProjectsApproved": 0,
+      "TotalApprovedBudget": 0,
+      "AllocationTypeId": 1428,
+      "AllocationSourceId": 4,
+      "FundTypeId": 2
+    }
+  },
+  {
+    "apiName": "contributionsData",
+    "url": "https://cbpfgms.github.io/pfbi-data/contributionSummarySankey.csv",
+    "apiDatum": {
+      "contributionYear": 2006,
+      "donorId": 124,
+      "fundId": 36,
+      "paidAmount": 5012000,
+      "pledgedAmount": 0
+    }
+  },
+  {
+    "apiName": "allocationFlowData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=",
+    "apiDatum": {
+      "source": "15",
+      "target": "UN",
+      "value": "810000",
+      "fund": 15,
+      "targetType": "1",
+      "year": 2013
+    }
+  },
+  {
+    "apiName": "masterPooledFunds",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?",
+    "apiDatum": {
+      "PFId": 23,
+      "PFName": "Afghanistan",
+      "PFAbbrv": "AFG23",
+      "PFLat": "34.53333300",
+      "PFLong": "69.16666700",
+      "PFCountryCode": "AF",
+      "MAAgent": "OCHA",
+      "AAgent": "MPTF",
+      "IsPublic": true,
+      "ParentPFId": null
+    }
+  },
+  {
+    "apiName": "masterPartners",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/MstOrgType?",
+    "apiDatum": {
+      "OrgTypeId": 1,
+      "OrgTypeNm": "National NGO",
+      "OrgTypeCode": "NGO"
+    }
+  },
+  {
+    "apiName": "masterSubPartners",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/SubIPType?",
+    "apiDatum": {
+      "Id": 1,
+      "Type": "UN and IOM",
+      "GenericPartnerTypeCode": "UN",
+      "GenericPartnerTypeName": "UN Agency",
+      "PublicSubIPCode": "UN",
+      "PublicSubIPName": "UN Agency"
+    }
+  },
+  {
+    "apiName": "allocationsData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?&FundingType=3",
+    "apiDatum": {
+      "AllocationYear": 2014,
+      "OrganizationType": "International NGO",
+      "PooledFundName": "Afghanistan",
+      "ApprovedReserveBudgetPercentage": "16.33417276",
+      "ApprovedStandardBudgetPercentage": "83.66582724",
+      "ApprovedBudget": "9493496.87",
+      "ApprovedReserveBudget": "1550684.18",
+      "ApprovedStandardBudget": "7942812.69",
+      "PipelineReserveBudgetPercentage": "0",
+      "PipelineStandardBudgetPercentage": "0",
+      "PipelineBudget": "0",
+      "PipelineReserveBudget": "0",
+      "PipelineStandardBudget": "0",
+      "FundingType": 1
+    }
+  },
+  {
+    "apiName": "contributionsTotalData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?&ShowAllPooledFunds=1",
+    "apiDatum": {
+      "FiscalYear": 1999,
+      "GMSDonorName": "United Kingdom",
+      "GMSDonorISO2Code": "GB",
+      "PooledFundName": "(Closed) Angola",
+      "PooledFundISO2Code": "AO",
+      "PaidAmt": 247170,
+      "PledgeAmt": 0,
+      "PledgeAmtLocalCurrency": "GBP",
+      "PledgeAmtCurrencyExchangeRate": "0.000000",
+      "PaidAmtLocalCurrency": "GBP",
+      "PaidAmtCurrencyExchangeRate": "0.610000",
+      "PledgeAmtLocal": "0.00",
+      "PaidAmtLocal": "150032.19"
+    }
+  },
+  {
+    "apiName": "targetedPersonsData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/PoolFundBeneficiarySummary?&ShowAllPooledFunds=1",
+    "apiDatum": {
+      "PooledFundId": 51,
+      "PooledFundName": "(Closed) ERF Afghanistan",
+      "AllocationYear": 2013,
+      "Cluster": "Education",
+      "AllocationSourceName": "Reserve",
+      "OrganizationTypeId": 1,
+      "BeneficiariesPlannedTotal": 0,
+      "BeneficiariesActualTotal": 0,
+      "BudgetByCluster": "284067.99",
+      "ProjectCount": 1,
+      "PartnerCount": 1,
+      "ReportCount": 0
+    }
+  },
+  {
+    "apiName": "targetedPersonsDetailsData",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryBeneficiaryDetail?",
+    "apiDatum": {
+      "PooledFundId": 23,
+      "PooledFundName": "Afghanistan",
+      "AllocationSourceId": 1,
+      "AllocationYear": 2014,
+      "OrganizationId": 150,
+      "OrganizationName": "World Food Programme",
+      "OrganizationTypeId": 3,
+      "ChfProjectCode": "AFG-14/ER/CCS/UN/298",
+      "PlannedMen": 1250,
+      "PlannedWomen": 1250,
+      "PlannedBoys": 0,
+      "PlannedGirls": 0,
+      "PlannedTotal": 2500,
+      "ActualMen": 1011,
+      "ActualWomen": 1010,
+      "ActualBoys": 0,
+      "ActualGirls": 0,
+      "ActualTotal": 2021
+    }
+  },
+  {
+    "apiName": "dataGam",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/ProjectGAMSummary?",
+    "apiDatum": {
+      "PooledFundId": 23,
+      "PooledFundName": "Afghanistan",
+      "AllocationYear": 2015,
+      "GenderMarkerGroup": "GM",
+      "GenderMarkerCode": "1",
+      "TotalProjects": 31,
+      "TotalBeneficiaries": 874373,
+      "TotalBudget": "20195478.16"
+    }
+  },
+  {
+    "apiName": "masterGam",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/GenderMarker?",
+    "apiDatum": {
+      "GenderMarkerGroup": "GAM",
+      "GenderMarkerCode": "0",
+      "GenderMarkerDescription": "0- Does not systematically link programming actions"
+    }
+  },
+  {
+    "apiName": "masterOrganizations",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstOrganization.json",
+    "apiDatum": {
+      "id": 1,
+      "OrganizationTypeName": "International NGO"
+    }
+  },
+  {
+    "apiName": "masterSectors",
+    "url": "https://cbpfgms.github.io/pfbi-data/mst/MstCluster.json",
+    "apiDatum": {
+      "id": 1,
+      "ClustNm": "Camp Coordination / Management",
+      "ClustCode": "CCM"
+    }
+  },
+  {
+    "apiName": "allocationsDataResults",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?poolfundAbbrv=",
+    "apiDatum": {
+      "AllocationYear": 2014,
+      "OrganizationType": "International NGO",
+      "PooledFundName": "Afghanistan",
+      "ApprovedReserveBudgetPercentage": "16.33417276",
+      "ApprovedStandardBudgetPercentage": "83.66582724",
+      "ApprovedBudget": "9493496.87",
+      "ApprovedReserveBudget": "1550684.18",
+      "ApprovedStandardBudget": "7942812.69",
+      "PipelineReserveBudgetPercentage": "0",
+      "PipelineStandardBudgetPercentage": "0",
+      "PipelineBudget": "0",
+      "PipelineReserveBudget": "0",
+      "PipelineStandardBudget": "0",
+      "FundingType": 1
+    }
+  },
+  {
+    "apiName": "resultsBySector",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/ByCluster.csv",
+    "apiDatum": {
+      "PooledFundId": 1,
+      "AllocationYear": 2017,
+      "ReportApprovedDate": "2017-11-07T00:00:00.000Z",
+      "AllocationtypeId": 2023,
+      "AllocationSourceId": 1,
+      "ClusterId": 10,
+      "ClusterBudget": 102640.61,
+      "TargetedMen": 28000,
+      "TargetedWomen": 28000,
+      "TargetedBoys": 42000,
+      "TargetedGirls": 42000,
+      "ReachedMen": 9177,
+      "ReachedWomen": 7710,
+      "ReachedBoys": 15904,
+      "ReachedGirls": 12786
+    }
+  },
+  {
+    "apiName": "resultsByDisability",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/ByGender_Disability.csv",
+    "apiDatum": {
+      "PooledFundId": 1,
+      "AllocationYear": 2017,
+      "ReportApprovedDate": "2017-11-07T00:00:00.000Z",
+      "AllocationtypeId": 2023,
+      "AllocationSourceId": 1,
+      "NumbofProjects": 1,
+      "TotalNumbPartners": 1,
+      "Budget": 102640.61,
+      "TargetedMen": 28000,
+      "TargetedWomen": 28000,
+      "TargetedBoys": 42000,
+      "TargetedGirls": 42000,
+      "ReachedMen": 9177,
+      "ReachedWomen": 7710,
+      "ReachedBoys": 15904,
+      "ReachedGirls": 12786,
+      "DisabledMen": null,
+      "DisabledWomen": null,
+      "DisabledBoys": null,
+      "DisabledGirls": null,
+      "ReachedDisabledMen": null,
+      "ReachedDisabledWomen": null,
+      "ReachedDisabledBoys": null,
+      "ReachedDisabledGirls": null
+    }
+  },
+  {
+    "apiName": "resultsByType",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/ByLocation.csv",
+    "apiDatum": {
+      "PooledFundId": 1,
+      "AllocationYear": 2017,
+      "ApprovedDate": "2017-11-07T00:00:00.000Z",
+      "LocationID": 0,
+      "AllocationtypeId": 2023,
+      "AllocationSourceId": 2,
+      "TargetMen": 5800,
+      "TargetWomen": 5800,
+      "TargetBoys": 8700,
+      "TargetGirls": 8700,
+      "ReachedMen": 936,
+      "ReachedWomen": 1085,
+      "ReachedBoys": 2740,
+      "ReachedGirls": 2940
+    }
+  },
+  {
+    "apiName": "resultsByBeneficiaryType",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/ByType.csv",
+    "apiDatum": {
+      "PooledFundId": 1,
+      "AllocationYear": 2017,
+      "ReportApprovedDate": "2017-11-07T00:00:00.000Z",
+      "BeneficiaryTypeId": 4,
+      "AllocationtypeId": 2023,
+      "AllocationSourceId": 1,
+      "TargetMen": 28000,
+      "TargetWomen": 28000,
+      "TargetBoys": 42000,
+      "TargetGirls": 42000,
+      "ReachedMen": 9177,
+      "ReachedWomen": 7710,
+      "ReachedBoys": 15904,
+      "ReachedGirls": 12786
+    }
+  },
+  {
+    "apiName": "resultsByOrganization",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/ByOrganization.csv",
+    "apiDatum": {
+      "PooledFundId": 1,
+      "AllocationYear": 2017,
+      "ReportApprovedDate": "2017-11-07T00:00:00.000Z",
+      "AllocationtypeId": 2023,
+      "AllocationSourceId": 1,
+      "OrganizationType": 1,
+      "NumbofProjects": 1,
+      "TotalNumbPartners": 1,
+      "Budget": 102640.61,
+      "TargetedMen": 28000,
+      "TargetedWomen": 28000,
+      "TargetedBoys": 42000,
+      "TargetedGirls": 42000,
+      "ReachedMen": 9177,
+      "ReachedWomen": 7710,
+      "ReachedBoys": 15904,
+      "ReachedGirls": 12786,
+      "DisabledMen": null,
+      "DisabledWomen": null,
+      "DisabledBoys": null,
+      "DisabledGirls": null,
+      "ReachedDisabledMen": null,
+      "ReachedDisabledWomen": null,
+      "ReachedDisabledBoys": null,
+      "ReachedDisabledGirls": null
+    }
+  },
+  {
+    "apiName": "masterLocations",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/locationMst.csv",
+    "apiDatum": {
+      "LocationID": 0,
+      "Location": "Nangarhar -> Behsud",
+      "AdminLocation1": "Nangarhar",
+      "AdminLocation1Latitude": 34.1718313,
+      "AdminLocation1Longitude": 70.6216794
+    }
+  },
+  {
+    "apiName": "masterBeneficiaryType",
+    "url": "https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
+    "apiDatum": {
+      "BeneficiaryTypeId": 1,
+      "BeneficiaryType": "Overall"
+    }
+  },
+  {
+    "apiName": "projectSummaryProgress",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=2025&FundTypeId=1",
+    "apiDatum": {
+      "FundType": 1,
+      "PooledFundId": 23,
+      "AllocationtypeId": 62,
+      "ChfId": 35079,
+      "ChfProjectCode": "CBPF-AFG-25-R-INGO-35079",
+      "OrgId": 462,
+      "PrjDuration": "12 Months",
+      "EndDate": "2026-05-17T00:00:00",
+      "Budget": 660158.05,
+      "BenM": 461,
+      "BenW": 649,
+      "BenB": 1050,
+      "BenG": 927,
+      "GMId": "",
+      "GAMId": "4",
+      "GlbPrjStatusId": 77,
+      "GlobalUniqueOrgId": 3289,
+      "DisabilityMarkerId": 9,
+      "GenderEqualityMarkerId": 25,
+      "GBVMarkerId": 3,
+      "GAMRefNumber": "H9934-5925-8606",
+      "PartnerProjectRisk": "Medium",
+      "PartnerRisk": "Medium",
+      "DisabledM": 104,
+      "DisabledW": 148,
+      "DisabledB": 74,
+      "DisabledG": 168,
+      "BenMSplit": "92|0|92|277|0",
+      "BenWSplit": "130|0|130|389|0",
+      "BenBSplit": "210|0|210|630|0",
+      "BenGSplit": "185|0|186|556|0",
+      "BenTotSplit": "617|0|618|1852|0",
+      "GBVBudget": 0,
+      "GBVPeopleTgt": 0,
+      "GendEqBudget": 0,
+      "GendEqPeopleTgt": 0,
+      "ProtBudget": 132031.61,
+      "ProtPeopleTgt": 3087,
+      "StartDate": "2025-05-18T00:00:00",
+      "PrjApprDate": "2025-05-06T19:30:29",
+      "CVATotPeople": 3087
+    }
+  },
+  {
+    "apiName": "sectorsData",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=2025&FundTypeId=1",
+    "apiDatum": {
+      "PooledFundName": "Afghanistan",
+      "PooledFundId": 23,
+      "AllocationTypeId": 62,
+      "ChfId": 35079,
+      "ChfProjectCode": "CBPF-AFG-25-R-INGO-35079",
+      "CountryClusterId": 95,
+      "GlobalClusterId": 4,
+      "Percentage": 100,
+      "CALCBudgetByCluster": 660158.05,
+      "TargetMen": 461,
+      "TargetWomen": 649,
+      "TargetBoys": 1050,
+      "TargetGirls": 927
+    }
+  },
+  {
+    "apiName": "globalIndicators",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=1",
+    "apiDatum": {
+      "FundTypeId": 1,
+      "PooledFundId": 23,
+      "CHFId": 34496,
+      "CHFProjectCode": "CBPF-AFG-24-R-INGO-34496",
+      "ClstrId": 3,
+      "GlbClstrId": 6,
+      "CommClstrId": 9,
+      "GlbIndicId": 2,
+      "GlbIndicType": 1,
+      "TgtTotal": 21280,
+      "AchTotal": 0
+    }
+  },
+  {
+    "apiName": "masterOrganizationsProgress",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=1",
+    "apiDatum": {
+      "FundTypeId": 1,
+      "PooledFundId": 15,
+      "OrganizationId": 6,
+      "PooledFundName": "Sudan (UNDP)",
+      "OrganizationName": "Adventist Development and Relief Agency ",
+      "OrganizationAcronym": "ADRA ",
+      "OrganizationTypeId": 2,
+      "OrganizationTypeName": "International NGO",
+      "AlternateName": "ADRA",
+      "DueDiligenceStatus": "Due Diligence approved",
+      "IsEligible": true,
+      "FirstAllocationDate": "2013-03-14T00:00:00",
+      "GlobalOrgId": 236,
+      "GlobalUniqueId": 4126,
+      "LocalizationMarker": "3.3 International NGOs ",
+      "UNPPId": "10374"
+    }
+  },
+  {
+    "apiName": "projectStatusMaster",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=1",
+    "apiDatum": {
+      "GlobalInstanceStatusId": 1,
+      "StatusName": "Audit Approved by Finance",
+      "StatusCode": "ADT_ADT_APPR_FCS",
+      "AllocSrc": 1,
+      "InstanceTypeId": 16,
+      "PooledFundId": 15
+    }
+  },
+  {
+    "apiName": "masterAllocationSource",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?",
+    "apiDatum": {
+      "AllSrcId": 1,
+      "AllNm": "Reserve",
+      "AllSrcCode": "R"
+    }
+  },
+  {
+    "apiName": "masterSectorsVo2",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/MstClusters?",
+    "apiDatum": {
+      "ClustId": 1,
+      "ClustNm": "Camp Coordination / Management",
+      "ClustCode": "CCM"
+    }
+  },
+  {
+    "apiName": "masterGlobalIndicators",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=",
+    "apiDatum": {
+      "Id": 1,
+      "Name": "(Global) Ag.4 - Number of animals distributed",
+      "HasM": 0,
+      "HasW": 0,
+      "HasB": 0,
+      "HasG": 0,
+      "UnitNm": "Animals",
+      "UnitAb": "Animals",
+      "CommClstrId": 9,
+      "Active": 1,
+      "Code": "Ag.4",
+      "TypeId": 1
+    }
+  },
+  {
+    "apiName": "masterEmergencies",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=EMERG_TYPE_MST",
+    "apiDatum": {
+      "EmergencyTypeId": 27,
+      "EmergencyTypeName": "Climate / natural disaster - Drought",
+      "EmergencyCategoryId": 5,
+      "EmergencyCategoryName": "Drought",
+      "EmergencyGroupId": 4,
+      "EmergencyGroupName": "Climate / natural disaster"
+    }
+  },
+  {
+    "apiName": "projectSummary",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?AllocationYear=2025",
+    "apiDatum": {
+      "PFId": 15,
+      "AllNm": "2025 - SHF Reserve Allocation (Healthcare Support at the Salam Centre in Khartoum)",
+      "PrjCode": "CBPF-SUD-25-R-INGO-35060",
+      "OPSCodeAgg": "",
+      "EmgAgg": "",
+      "AllYr": 2025,
+      "AllSrc": 1,
+      "OrgNm": "International NGO",
+      "OrgTypeId": 2,
+      "PrjTitle": "Delivering critical healthcare services to vulnerable and conflict-affected communities in Khartoum amid Sudan’s humanitarian crisis",
+      "AStrDt": "2025-07-16T00:00:00",
+      "AEndDt": "2026-07-15T00:00:00",
+      "PrjDur": "12 Months",
+      "PrgBdg": 4000000,
+      "BgdDC": 3738317.75,
+      "BdgSC": 0,
+      "PrjSubDt": "2025-03-10T12:43:44.973",
+      "BenAgg": "5396##7936##18031##16737",
+      "PrjGM": "2- Unlikely to contribute to gender equality (no gender equality measure but includes age consideration)",
+      "PrjStsNm": "Implementation",
+      "PrjStsId": "5361",
+      "PrjStsCode": "PRJ_IMPL_RPT",
+      "PartCode": "501057.1664",
+      "ApprDt": "2025-08-29T13:11:16.1"
+    }
+  },
+  {
+    "apiName": "projectSummaryAggregate",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?AllocationYear=2025",
+    "apiDatum": {
+      "PFId": 15,
+      "PrjCode": "CBPF-SUD-25-R-INGO-35060",
+      "ClstAgg": "7",
+      "ClstPrct": "100.00",
+      "AdmLocTypeIdAgg": "69##70##",
+      "AdmLoc1": "Khartoum",
+      "AdmLoc2": "Khartoum",
+      "AdmLoc3": null,
+      "AdmLoc4": null,
+      "AdmLoc5": null,
+      "AdmLoc6": null,
+      "AdmLocBenClustAgg1": "5396##7936##18031##16737",
+      "AdmLocBenClustAgg2": "5396##7936##18031##16737",
+      "AdmLocBenClustAgg3": null,
+      "AdmLocBenClustAgg4": null,
+      "AdmLocBenClustAgg5": null,
+      "AdmLocBenClustAgg6": null,
+      "AdmLocCord1": "15.56666700,32.51666700",
+      "AdmLocCord2": "15.57252700,32.53635300",
+      "AdmLocCord3": null,
+      "AdmLocCord4": null,
+      "AdmLocCord5": null,
+      "AdmLocCord6": null,
+      "AdmLocClustBdg1": "4000000.00",
+      "AdmLocClustBdg2": "4000000.00",
+      "AdmLocClustBdg3": null,
+      "AdmLocClustBdg4": null,
+      "AdmLocClustBdg5": null,
+      "AdmLocClustBdg6": null,
+      "AYr": 2025
+    }
+  },
+  {
+    "apiName": "HRPSummary",
+    "url": "https://cbpfapi.unocha.org/vo2/odata/HRPCBPFFundingSummary?PoolfundCodeAbbrv=",
+    "apiDatum": {
+      "PFISO3": "AFG",
+      "TargYr": 2018,
+      "PFId": 23,
+      "PFNm": "Afghanistan",
+      "HRPId": null,
+      "HRPNm": "Afghanistan Humanitarian Reponse Plan",
+      "HRPYr": 2018,
+      "HRPClstReq": "598923998.00",
+      "HRPClstFunded": "468081115.00",
+      "HRPBenReq": null,
+      "HRPBenReached": null,
+      "ClstNm": "xxx",
+      "ClsCd": "x",
+      "PFHRPTarget": "89838599.70",
+      "PFFunded": "45858472.00"
+    }
+  },
+  {
+    "apiName": "emergencySummary",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1",
+    "apiDatum": {
+      "PooledFundId": 23,
+      "PooledFundName": "Afghanistan",
+      "CHFId": 26924,
+      "CHFProjectCode": "CBPF-AFG-23-R-INGO-26924",
+      "OrganizationName": "Mercy Corps",
+      "OrganizationAcronym": "MC",
+      "OrganizationType": "International NGO",
+      "AllocationTypeName": "2023 4th Reserve Allocation - Herat Earthquake Response",
+      "AllocationYear": 2023,
+      "ProjectStatus": "Project Closed",
+      "ProjectBudget": 700000,
+      "EmergencyTypeId": 1,
+      "EmergencyTypeName": "Climate / natural disaster - Earthquake",
+      "EmergencyPercent": 100
+    }
+  },
+  {
+    "apiName": "CVAData",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=APIDAT_CVA&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1",
+    "apiDatum": {
+      "PooledFundId": 16,
+      "CHFId": 25583,
+      "ChfProjectCode": "CBPF-SUD-23-R-INGO-25583",
+      "OrganizationTypeId": 2,
+      "AllocationYear": 2023,
+      "CVATypeId": 1,
+      "ClusterId": 226,
+      "PeopleTargeted": 66500,
+      "TransferAmount": 1425000,
+      "PeopleReached": 66829,
+      "TotalAmtTransferred": 1425000,
+      "GlobalClusterId": 4
+    }
+  },
+  {
+    "apiName": "CVAMaster",
+    "url": "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
+    "apiDatum": {
+      "Id": 1,
+      "CVATypeName": "Multi-purpose cash",
+      "CVATypeCode": "MULTI-PURPOSE-CASH",
+      "IsActive": true
+    }
+  }
+]
