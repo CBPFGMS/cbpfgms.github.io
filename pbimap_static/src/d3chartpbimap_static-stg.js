@@ -322,8 +322,8 @@
 				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?",
 			],
 			apiFilesStatic = [
-				"../../OCHA%20Staging/cbpfgms.github.io/pbimap_static/data/ProjectSummaryV2_",
-				"../../OCHA%20Staging/cbpfgms.github.io/pbimap_static/data/ProjectSummaryAggV2_",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_static/data/ProjectSummaryV2_",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_static/data/ProjectSummaryAggV2_",
 			],
 			cbpfListFile =
 				"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
