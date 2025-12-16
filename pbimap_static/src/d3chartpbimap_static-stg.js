@@ -421,7 +421,7 @@
 			containerDiv.node().getAttribute("data-static") === "true";
 
 		const launchedAllocationsDataFile = dataStatic
-			? "../../OCHA%20Staging/cbpfgms.github.io/pbimap_static/data/allocationtypes.csv"
+			? "https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_static/data/allocationtypes.csv"
 			: "https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv";
 
 		const selectedYearString = queryStringValues.has("year")
