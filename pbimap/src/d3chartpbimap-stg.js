@@ -7,7 +7,7 @@
 		isTouchScreenOnly =
 			window.matchMedia("(pointer: coarse)").matches &&
 			!window.matchMedia("(any-pointer: fine)").matches,
-		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
+		//isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		isBookmarkPage =
 			window.location.hostname + window.location.pathname ===
 			"cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
@@ -243,6 +243,7 @@
 			brighterFactor = 0.3,
 			currentYear = new Date().getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
+			formatLastModified = d3.utcFormat("%d/%m/%Y %H:%M:%S"),
 			adminLocLevels = 6,
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
@@ -375,7 +376,8 @@
 			launchedValue,
 			launchedValuePadding,
 			isSnapshotTooltipVisible = false,
-			currentHoveredElem;
+			currentHoveredElem,
+			lastUpdatedDate = "";
 
 		yearsArrayString.forEach(function (d) {
 			cbpfsInCompleteData[d] = [];
@@ -469,9 +471,9 @@
 			.style("justify-content", "flex-end")
 			.attr("class", "pbimapshowAllDiv");
 
-		const footerDiv = !isPfbiSite
-			? containerDiv.append("div").attr("class", "pbimapFooterDiv")
-			: null;
+		const footerDiv = containerDiv
+			.append("div")
+			.attr("class", "pbimapFooterDiv");
 
 		const listDiv = containerDiv
 			.append("div")
@@ -673,6 +675,7 @@
 		promises.push(d3.csv(partnersListFile));
 		promises.push(d3.csv(modalitiesListFile));
 		promises.push(d3.csv(launchedAllocationsDataFile));
+		promises.push(d3.text(lastUpdated));
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
@@ -729,6 +732,8 @@
 			createCountriesCoordinates(rawData[2]);
 
 			processData(rawData[0], rawData[1]);
+
+			lastUpdatedDate = rawData[7];
 
 			loadedYears.push.apply(loadedYears, chartState.selectedYear);
 
@@ -803,7 +808,7 @@
 
 			repopulateYearFilter();
 
-			if (!isPfbiSite) createFooterDiv();
+			createFooterDiv();
 
 			createTopSvg(data.topSvgObject);
 
@@ -2786,7 +2791,11 @@
 		}
 
 		function createFooterDiv() {
-			let footerText = "© OCHA CBPF Section " + currentYear;
+			let footerText =
+				"Data updated on " +
+				formatLastModified(new Date(lastUpdatedDate)) +
+				" (UTC) © OCHA CBPF Section " +
+				currentYear;
 
 			const footerLink =
 				" | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
