@@ -18,7 +18,7 @@ const DIRECTORY_PATH = path.resolve(__dirname, "..", "data");
 const errorArray: ErrorResponse[] = [];
 
 const firstYear = 2015,
-	lastYear = 2024,
+	lastYear = 2025,
 	yearsArray: number[] = [];
 
 const csvFormatParameter = "&$format=csv",
