@@ -18,7 +18,7 @@ const DIRECTORY_PATH = path.resolve(__dirname, "..", "data");
 const errorArray: ErrorResponse[] = [];
 
 const firstYear = 2015,
-	lastYear = 2025,
+	lastYear = new Date().getFullYear(),
 	yearsArray: number[] = [];
 
 const csvFormatParameter = "&$format=csv",
@@ -59,5 +59,3 @@ if (errorArray.length > 0) {
 }
 
 await saveFile(DIRECTORY_PATH, new Date().toISOString(), "last_updated.txt");
-
-console.log("Data fetching and saving completed.");

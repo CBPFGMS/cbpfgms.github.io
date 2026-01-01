@@ -5211,6 +5211,16 @@
 			d3.select(".pbimapOverDiv").remove();
 		}
 
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
+			return {
+				underApprovalPercent: (underApproval / launched) * 100,
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
+		}
+
 		//end of d3Chart
 	}
 
