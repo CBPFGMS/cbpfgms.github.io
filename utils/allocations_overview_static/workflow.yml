@@ -1,0 +1,24 @@
+name: Allocations Overview Static Data Update
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "0 */6 * * *"
+
+jobs:
+    benchmark:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+            - run: node dist/main.js
+              working-directory: utils/apibench
+            - run: |
+                  git config --global user.name 'GitHub Action'
+                  git config --global user.email 'action@github.com'
+                  git add data/
+                  git commit -m "Update Allocations Overview static data" || exit 0
+                  git push
+              working-directory: utils/apibench
