@@ -489,6 +489,7 @@
 		const leafletMap = L.map("pbimapContainerDiv", {
 			zoomSnap: zoomSnap,
 			zoomDelta: zoomDelta,
+			minZoom: 1.5,
 		});
 
 		leafletMap.setView(
