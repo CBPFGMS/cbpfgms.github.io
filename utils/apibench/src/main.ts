@@ -6,7 +6,7 @@ import { Datum, dataSchema } from "./schemas";
 import { saveCsvFile } from "./writefile";
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { notifyError } from "./notification";
+import { collectError, handleErrorNotification } from "./notification";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,7 +27,7 @@ const results = await runBenchmark(apiList);
 results.forEach(result => {
 	if (!result.dataReceived) {
 		console.error(`Error: No data received for ${result.apiName}`);
-		notifyError(result);
+		collectError(result);
 	}
 });
 
@@ -38,3 +38,5 @@ if (parsedData.success) {
 	console.log(`Error parsing data: ${parsedData.error}`);
 	saveCsvFile(DIRECTORY_PATH, csvFormat(results), "benchmark");
 }
+
+await handleErrorNotification(DIRECTORY_PATH);
