@@ -24,8 +24,13 @@ export async function fetchData(
 				url,
 				date: new Date().toISOString(),
 			});
-			throw new Error(`Error saving CSV file: ${error.message}`);
+		} else {
+			errorArray.push({
+				errorMessage: String(error),
+				url,
+				date: new Date().toISOString(),
+			});
 		}
-		throw error;
+		return null;
 	}
 }

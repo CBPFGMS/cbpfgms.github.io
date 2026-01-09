@@ -31,24 +31,24 @@ for (let year = firstYear; year <= lastYear; year++) {
 const yearlyApis = apiFiles.filter(api => api.type === "yearly");
 const completeApis = apiFiles.filter(api => api.type === "complete");
 
-yearlyApis.forEach(async api => {
-	yearsArray.forEach(async year => {
+for (const api of yearlyApis) {
+	for (const year of yearsArray) {
 		const url = `${api.url}${yearParameter}${year}${csvFormatParameter}`;
 		const data = await fetchData(url, errorArray);
 		if (data) {
 			const fileName = `${api.name}_${year}.csv`;
 			await saveFile(DIRECTORY_PATH, data, fileName);
 		}
-	});
-});
+	}
+}
 
-completeApis.forEach(async api => {
+for (const api of completeApis) {
 	const data = await fetchData(api.url, errorArray);
 	if (data) {
 		const fileName = `${api.name}.csv`;
 		await saveFile(DIRECTORY_PATH, data, fileName);
 	}
-});
+}
 
 if (errorArray.length > 0) {
 	const errorLogContent = JSON.stringify(errorArray, null, 2);
