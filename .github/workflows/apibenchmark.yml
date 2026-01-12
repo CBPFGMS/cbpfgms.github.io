@@ -22,3 +22,24 @@ jobs:
                   git commit -m "Update benchmark data" || exit 0
                   git push
               working-directory: utils/apibench
+
+            - name: Check for errors and Create Summary
+              id: error_check
+              working-directory: utils/apibench
+              run: |
+                  if [ -f "data/errors.json" ]; then
+                    echo "### ⚠️ API Benchmark Errors Detected" >> $GITHUB_STEP_SUMMARY
+                    echo "" >> $GITHUB_STEP_SUMMARY
+                    echo "**Error Details:**" >> $GITHUB_STEP_SUMMARY
+                    echo '```json' >> $GITHUB_STEP_SUMMARY
+                    cat data/errors.json >> $GITHUB_STEP_SUMMARY
+                    echo '```' >> $GITHUB_STEP_SUMMARY
+                    exit 1
+                  fi
+
+            - name: Upload Error Log
+              if: always() && steps.error_check.outcome == 'failure'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: api-error-log
+                  path: utils/apibench/data/errors.json
