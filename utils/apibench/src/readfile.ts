@@ -60,6 +60,8 @@ async function loadLatestCsvFile(
 		const filePath = path.join(directoryPath, newestFile.filename);
 		const fileContent = await readFile(filePath, "utf-8");
 
+		console.log(`File correctly loaded: ${filePath}`);
+
 		return fileContent;
 	} catch (error) {
 		if (error instanceof Error) {
