@@ -26,8 +26,6 @@ async function saveCsvFile(
 		console.log(`File saved at ${filePath}`);
 
 		await updateIndex(directoryPath, fullFilename);
-
-		console.log(`Update file saved at ${filePath}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(`Error saving CSV file: ${error.message}`);
@@ -40,6 +38,7 @@ async function updateIndex(directoryPath: string, latestFilename: string) {
 	const indexPath = path.join(directoryPath, "index.json");
 	const indexContent = JSON.stringify({ latestFile: latestFilename });
 	await writeFile(indexPath, indexContent);
+	console.log(`Update file saved at ${indexPath}`);
 }
 
 export { saveCsvFile };
