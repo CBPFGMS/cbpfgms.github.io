@@ -33,10 +33,10 @@ results.forEach(result => {
 
 if (parsedData.success) {
 	parsedData.data.push(...results);
-	saveCsvFile(DIRECTORY_PATH, csvFormat(parsedData.data), "benchmark");
+	await saveCsvFile(DIRECTORY_PATH, csvFormat(parsedData.data), "benchmark");
 } else {
 	console.log(`Error parsing data: ${parsedData.error}`);
-	saveCsvFile(DIRECTORY_PATH, csvFormat(results), "benchmark");
+	await saveCsvFile(DIRECTORY_PATH, csvFormat(results), "benchmark");
 }
 
 await handleErrorNotification(DIRECTORY_PATH);

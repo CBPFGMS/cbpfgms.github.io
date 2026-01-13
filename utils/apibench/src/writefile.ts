@@ -1,11 +1,11 @@
 import { writeFile } from "fs/promises";
 import * as path from "path";
 
-function saveCsvFile(
+async function saveCsvFile(
 	directoryPath: string,
 	content: string,
 	filename: string
-): void {
+): Promise<void> {
 	try {
 		const baseFilename = path
 			.parse(filename)
@@ -21,9 +21,9 @@ function saveCsvFile(
 
 		const filePath = path.join(directoryPath, fullFilename);
 
-		writeFile(filePath, content, { encoding: "utf-8" });
+		await writeFile(filePath, content, { encoding: "utf-8" });
 
-		updateIndex(directoryPath, fullFilename);
+		await updateIndex(directoryPath, fullFilename);
 
 		console.log(`File saved at ${filePath}`);
 	} catch (error) {
@@ -34,10 +34,10 @@ function saveCsvFile(
 	}
 }
 
-function updateIndex(directoryPath: string, latestFilename: string) {
+async function updateIndex(directoryPath: string, latestFilename: string) {
 	const indexPath = path.join(directoryPath, "index.json");
 	const indexContent = JSON.stringify({ latestFile: latestFilename });
-	writeFile(indexPath, indexContent);
+	await writeFile(indexPath, indexContent);
 }
 
 export { saveCsvFile };
