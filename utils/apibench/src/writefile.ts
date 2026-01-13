@@ -23,9 +23,11 @@ async function saveCsvFile(
 
 		await writeFile(filePath, content, { encoding: "utf-8" });
 
+		console.log(`File saved at ${filePath}`);
+
 		await updateIndex(directoryPath, fullFilename);
 
-		console.log(`File saved at ${filePath}`);
+		console.log(`Update file saved at ${filePath}`);
 	} catch (error) {
 		if (error instanceof Error) {
 			throw new Error(`Error saving CSV file: ${error.message}`);
