@@ -239,16 +239,14 @@
 			tooltipDuration = 250,
 			tooltipMargin = 2,
 			heightProgressSVG = heightLeafletMap + heightTopSvg,
-			rectProgressWidth = 300,
 			windowHeight = window.innerHeight,
 			brighterFactor = 0.3,
 			currentYear = new Date().getFullYear(),
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
+			formatLastModified = d3.utcFormat("%d/%m/%Y %H:%M:%S"),
 			adminLocLevels = 6,
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
-			csvFormatParameter = "&$format=csv",
-			yearParameter = "AllocationYear=",
 			initialYear = 2015,
 			yearsArrayString = d3
 				.range(initialYear, currentYear + 1, 1)
@@ -297,6 +295,8 @@
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
+			baseUrl =
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/utils/allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -311,19 +311,15 @@
 				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/projectslogo.png",
 			partnersProjectSize = 50,
 			apiFiles = [
-				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?",
-				"https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryAggV2?",
+				baseUrl + "ProjectSummaryV2_",
+				baseUrl + "ProjectSummaryAggV2_",
 			],
-			cbpfListFile =
-				"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
-			clustersListFile =
-				"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
-			partnersListFile =
-				"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
-			modalitiesListFile =
-				"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
-			launchedAllocationsDataFile =
-				"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
+			cbpfListFile = baseUrl + "MstPooledFund.csv",
+			clustersListFile = baseUrl + "MstClusters.csv",
+			partnersListFile = baseUrl + "MstOrgType.csv",
+			modalitiesListFile = baseUrl + "MstAllocationSource.csv",
+			launchedAllocationsDataFile = baseUrl + "AllocationTypes.csv",
+			lastUpdated = baseUrl + "last_updated.txt",
 			promises = [],
 			filterTitles = [
 				"Year",
@@ -379,7 +375,8 @@
 			launchedValue,
 			launchedValuePadding,
 			isSnapshotTooltipVisible = false,
-			currentHoveredElem;
+			currentHoveredElem,
+			lastUpdatedDate = "";
 
 		yearsArrayString.forEach(function (d) {
 			cbpfsInCompleteData[d] = [];
@@ -473,22 +470,25 @@
 			.style("justify-content", "flex-end")
 			.attr("class", "pbimapshowAllDiv");
 
-		const footerDiv = !isPfbiSite
-			? containerDiv.append("div").attr("class", "pbimapFooterDiv")
-			: null;
+		const footerDiv = containerDiv
+			.append("div")
+			.attr("class", "pbimapFooterDiv");
 
 		const listDiv = containerDiv
 			.append("div")
 			.attr("class", "pbimapListContainerDiv");
 
-		const { rectProgress, progressText, bytesText } = createProgressBar(
+		createProgressWheel(
+			null,
 			width,
-			heightProgressSVG
+			heightProgressSVG,
+			"Loading visualisation..."
 		);
 
 		const leafletMap = L.map("pbimapContainerDiv", {
 			zoomSnap: zoomSnap,
 			zoomDelta: zoomDelta,
+			minZoom: 1.5,
 		});
 
 		leafletMap.setView(
@@ -667,118 +667,21 @@
 			saveImage(projectsLogoPathCors, "projectsLogo");
 
 		apiFiles.forEach(function (file) {
-			promises.push(
-				file +
-					yearParameter +
-					chartState.selectedYear[0] +
-					csvFormatParameter
-			);
+			promises.push(d3.csv(file + chartState.selectedYear[0] + ".csv"));
 		});
 
-		promises.push(cbpfListFile);
-		promises.push(clustersListFile);
-		promises.push(partnersListFile);
-		promises.push(modalitiesListFile);
-		promises.push(launchedAllocationsDataFile);
+		promises.push(d3.csv(cbpfListFile));
+		promises.push(d3.csv(clustersListFile));
+		promises.push(d3.csv(partnersListFile));
+		promises.push(d3.csv(modalitiesListFile));
+		promises.push(d3.csv(launchedAllocationsDataFile));
+		promises.push(d3.text(lastUpdated));
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		function csvWithProgress(url, onProgress) {
-			return new Promise((resolve, reject) => {
-				const xhr = new XMLHttpRequest();
-				xhr.open("GET", url, true);
-				xhr.responseType = "arraybuffer";
-
-				xhr.onprogress = event => {
-					onProgress(event.loaded, false);
-				};
-
-				xhr.onload = function () {
-					if (this.status >= 200 && this.status < 300) {
-						const decoder = new TextDecoder("utf-8");
-						const csv = decoder.decode(this.response);
-						try {
-							const parsedData = d3.csvParse(csv);
-							onProgress(0, true);
-							resolve(parsedData);
-						} catch (error) {
-							reject(
-								new Error("CSV Parsing Error: " + error.message)
-							);
-						}
-					} else {
-						reject(new Error(xhr.statusText));
-					}
-				};
-
-				xhr.onerror = () => {
-					onProgress(0); // Reset progress on error
-					reject(new Error("Network Error"));
-				};
-
-				xhr.send();
-			});
-		}
-
-		function loadMultipleCSVs(urls, progressCallback) {
-			const totalRequests = urls.length;
-			let totalProgress = 0;
-			let totalBytes = 0;
-
-			const promises = urls.map(url =>
-				csvWithProgress(url, (bytes, completed) => {
-					if (completed) totalProgress += 1;
-					totalBytes += bytes;
-					progressCallback(totalProgress, totalRequests, totalBytes);
-				})
-			);
-
-			return Promise.all(promises);
-		}
-
-		async function loadDataWithProgress() {
-			try {
-				const dataArrays = await loadMultipleCSVs(
-					promises,
-					(totalProgress, totalRequests, bytes) => {
-						rectProgress
-							.transition()
-							.duration(500)
-							.attr(
-								"width",
-								rectProgressWidth *
-									(totalProgress / totalRequests)
-							);
-						// no file count for the time being
-						// progressText.text(
-						// 	`${totalProgress}/${totalRequests} files`
-						// );
-						bytesText.text(
-							`${(~~(bytes / 1000)).toLocaleString()} kB loaded`
-						);
-					}
-				);
-				receiveInitialData(dataArrays);
-			} catch (error) {
-				console.error("Error loading data:", error);
-			}
-		}
-
-		loadDataWithProgress();
-
-		function safeDivide(underApproval, approved, launched) {
-			if (launched === 0)
-				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
-			return {
-				underApprovalPercent: (underApproval / launched) * 100,
-				underPlusApprovedPercent:
-					((underApproval + approved) / launched) * 100,
-			};
-		}
-
-		function receiveInitialData(rawData) {
+		Promise.all(promises).then(function (rawData) {
 			removeProgressWheel();
 
 			const aggregatedLaunchedValues = {};
@@ -830,6 +733,8 @@
 
 			processData(rawData[0], rawData[1]);
 
+			lastUpdatedDate = rawData[7];
+
 			loadedYears.push.apply(loadedYears, chartState.selectedYear);
 
 			getDataAttributes();
@@ -866,9 +771,7 @@
 
 			function loadDataFile(year) {
 				const remainingPromises = apiFiles.map(function (file) {
-					return d3.csv(
-						file + yearParameter + year + csvFormatParameter
-					);
+					return d3.csv(file + year + ".csv");
 				});
 				return Promise.all(remainingPromises).then(function (rawData) {
 					if (!rawData[0].length || !rawData[1].length) {
@@ -894,7 +797,7 @@
 			loadAllDataFiles(remainingYears);
 
 			//end of Promise.all
-		}
+		});
 
 		function draw() {
 			const data = filterData();
@@ -905,7 +808,7 @@
 
 			repopulateYearFilter();
 
-			if (!isPfbiSite) createFooterDiv();
+			createFooterDiv();
 
 			createTopSvg(data.topSvgObject);
 
@@ -2888,7 +2791,11 @@
 		}
 
 		function createFooterDiv() {
-			let footerText = "© OCHA CBPF Section " + currentYear;
+			let footerText =
+				"Data updated on " +
+				formatLastModified(new Date(lastUpdatedDate)) +
+				" (UTC) © OCHA CBPF Section " +
+				currentYear;
 
 			const footerLink =
 				" | For more information, please visit <a href='https://cbpf.data.unocha.org'>cbpf.data.unocha.org</a>";
@@ -5212,121 +5119,6 @@
 			//end of downloadSnapshotPdf
 		}
 
-		function createProgressBar(thiswidth, thisheight) {
-			const overDiv = containerDiv
-				.append("div")
-				.attr("class", "pbimapOverDiv");
-
-			const progressSvg = overDiv
-				.append("svg")
-				.attr("viewBox", "0 0 " + thiswidth + " " + thisheight);
-
-			wheelGroup = progressSvg
-				.append("g")
-				.attr("class", "pbimapd3chartwheelGroup")
-				.attr(
-					"transform",
-					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
-				);
-
-			const loadingText = wheelGroup
-				.append("text")
-				.attr("text-anchor", "middle")
-				.style("font-family", "Roboto")
-				.style("font-weight", "bold")
-				.style("font-size", "18px")
-				.attr("y", 50)
-				.attr("class", "contributionColorFill")
-				.text("Loading data...");
-
-			const outerRect = wheelGroup
-				.append("rect")
-				.attr("width", rectProgressWidth + 4)
-				.attr("height", 24)
-				.attr("x", -rectProgressWidth / 2 - 2)
-				.attr("y", 78)
-				.attr("rx", 3)
-				.attr("ry", 3)
-				.style("fill", "none")
-				.style("stroke", "#888")
-				.style("stroke-width", "1px");
-
-			const rectProgress = wheelGroup
-				.append("rect")
-				.attr("width", 0)
-				.attr("height", 20)
-				.attr("x", -rectProgressWidth / 2)
-				.attr("y", 80)
-				.attr("rx", 2)
-				.attr("ry", 2)
-				.style("fill", "#bbb");
-
-			const progressText = wheelGroup
-				.append("text")
-				.style("font-family", "Roboto")
-				.style("dominant-baseline", "middle")
-				.style("font-size", "12px")
-				.attr("x", rectProgressWidth / 2 + 10)
-				.attr("y", 90);
-			// .text("0/0 files"); //no file count for the time being
-
-			const bytesText = wheelGroup
-				.append("text")
-				.style("font-family", "Roboto")
-				.style("text-anchor", "middle")
-				.style("font-size", "14px")
-				.attr("y", 128)
-				.text("0 kB loaded");
-
-			const arc = d3.arc().outerRadius(20).innerRadius(15);
-
-			const wheel = wheelGroup
-				.append("path")
-				.datum({
-					startAngle: 0,
-					endAngle: 0,
-				})
-				.classed("contributionColorFill", true)
-				.attr("d", arc);
-
-			transitionIn();
-
-			function transitionIn() {
-				wheel
-					.transition()
-					.duration(1000)
-					.attrTween("d", function (d) {
-						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function (t) {
-							d.endAngle = interpolate(t);
-							return arc(d);
-						};
-					})
-					.on("end", transitionOut);
-			}
-
-			function transitionOut() {
-				wheel
-					.transition()
-					.duration(1000)
-					.attrTween("d", function (d) {
-						const interpolate = d3.interpolate(0, Math.PI * 2);
-						return function (t) {
-							d.startAngle = interpolate(t);
-							return arc(d);
-						};
-					})
-					.on("end", function (d) {
-						d.startAngle = 0;
-						transitionIn();
-					});
-			}
-
-			return { rectProgress, progressText, bytesText };
-
-			//end of createProgressBar
-		}
-
 		function createProgressWheel(thissvg, thiswidth, thisheight, thistext) {
 			let wheelGroup;
 
@@ -5426,6 +5218,16 @@
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 			d3.select(".pbimapOverDiv").remove();
+		}
+
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
+			return {
+				underApprovalPercent: (underApproval / launched) * 100,
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
 		}
 
 		//end of d3Chart
