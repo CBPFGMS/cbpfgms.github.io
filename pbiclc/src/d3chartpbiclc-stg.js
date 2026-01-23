@@ -2578,6 +2578,8 @@
 							!isPfbiSite
 						)
 							console.warn("Missing flag: " + d.name, d);
+						if (d.isoCode.toLowerCase() === "pk")
+							return flagsData.un;
 						return flagsData[d.isoCode.toLowerCase()] || blankFlag;
 					});
 
