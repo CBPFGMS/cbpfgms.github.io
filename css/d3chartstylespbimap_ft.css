@@ -1,0 +1,645 @@
+/*Public BI, Allocations map (code: pbimap)*/
+
+#d3chartcontainerpbimap {
+	position: relative;
+}
+
+#pbimapContainerDiv {
+	cursor: default;
+}
+
+#pbimapDownloadingDiv {
+	position: absolute;
+	padding: 8px;
+	background: #fcfcfc; 
+	border: 1px solid #222; 
+	border-radius: 8px;
+	pointer-events: none;
+	cursor: none;
+	width: 200px;
+	height: 100px;
+	z-index: 1500;
+}
+
+#pbimaptooltipdiv {    
+	position: absolute;
+	text-align: left;
+	color: darkslategray;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 8px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #f8f8f8; 
+	border: 2px solid #666; 
+	border-radius: 6px;
+	max-width: 290px;
+	z-index: 2100;
+}
+
+.pbimapTooltipSvg {
+	background-color: #f8f8f8; 
+}
+
+.pbimapTooltipSvgYAxisGroup path {
+	stroke: none;
+}
+
+.pbimapTooltipSvgYAxisGroup text {
+	font-family: "Arial";
+	font-size: 11px;
+	fill: #444;
+}
+
+.pbimapTooltipSvgXAxisGroup path {
+	stroke: none;
+}
+
+.pbimapTooltipSvgXAxisGroup text {
+	font-family: "Roboto", sans-serif;
+	font-size: 9px;
+	fill: #aaa;
+	pointer-events: none;
+}
+
+.pbimapTooltipSvgXAxisGroup line {
+	stroke: #ddd;
+	stroke-dasharray: 2, 2;
+}
+
+.pbimapTooltipLabels {
+	font-family: "Roboto";
+	font-size: 11px;
+	fill: #444;
+}
+
+.pbimapTooltipTitle {
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.pbimapTooltipSubTitle {
+	font-size: 12px;
+}
+
+.pbimapTooltipTitle2 {
+	font-weight: 700;
+}
+
+.pbimapDivSpacer {
+	margin: 0px;
+	line-height: 70%;
+}
+
+.pbimapTooltipButtonDiv {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.pbimapTooltipButtonDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: white;
+	background-color: #418fde;
+	padding: 3px 8px 3px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.pbimapTooltipButtonDiv button:hover {
+	background-color: #2e649b;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbimapTooltipButtonDiv button:active {
+	background-color: #bbb;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbimapTooltipButtonDiv button:focus {
+	outline: none;
+}
+
+.pbimapListContainerDiv {
+	width: 100%;
+}
+
+.pbimapListTitleDivContainer {
+	width: 100%;
+	display: flex;
+	margin-top: 10px;
+}
+
+.pbimapListBreadcrumbDivContainer {
+	width: 100%;
+	margin-left: 10px;
+}
+
+.pbimapListBreadcrumbs {
+	font-size: 15px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
+	margin-bottom: 0px;
+}
+
+.pbimapListTitle {
+	font-size: 20px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
+	margin-bottom: 0px;
+}
+
+.pbimapListButtonDiv button, .pbimapResetDiv button, .pbimapshowAllDiv button {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: 700;
+	color: darkslategray;
+	background-color: white;
+	padding: 2px 8px 2px 8px;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	border: 1px solid rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
+	margin-right: 6px;
+  }
+
+.pbimapListButtonDiv button:hover, .pbimapResetDiv button:hover, .pbimapshowAllDiv button:hover {
+	background-color: whitesmoke;
+	border-color: rgba(0,0,0,0.6);
+	cursor: pointer;
+}
+
+.pbimapListButtonDiv button:active, .pbimapResetDiv button:active, .pbimapshowAllDiv button:active {
+	background-color: gainsboro;
+	border-color: rgba(0,0,0,1);
+}
+
+.pbimapListButtonDiv button:focus, .pbimapResetDiv button:focus, .pbimapshowAllDiv button:focus {
+	outline: none;
+}
+
+.pbimapListHeaderContainerDiv {
+	margin-left: 10px;
+	margin-top: 6px;
+	width: 97.7%;
+	display: flex;
+	background-color: #D4DADC;
+	border-radius: 4px;
+	font-family: "Arial", sans-serif;
+	font-weight: 700;
+	font-size: 12px;
+	height: 30px;
+	align-items: center;
+}
+
+.pbimapListHeaderContainerDiv div:first-child span {
+	margin-left: 4px;
+}
+
+.pbimapListRowsContainer {
+	margin-left: 10px;
+	width: 97.7%;
+	max-height: 400px;
+	overflow-y: auto;
+	border-bottom: 2px solid #D4DADC;
+}
+
+.pbimapListRows {
+	margin-left: 4px;
+	min-height: 26px;
+	border-bottom: 1px solid #ccc;
+	display: flex;
+	font-family: "Arial", sans-serif;
+	font-size: 11px;
+	display: flex;
+	align-items: center;
+}
+
+.pbimapListRowDivs {
+	overflow-x: hidden;
+	white-space: pre-wrap;
+	margin-right: 4px;
+}
+
+#pbimapalertdiv {
+	position: absolute;    
+	text-align: center;
+	color: whitesmoke;
+	font-family: "Arial";
+	white-space: normal;
+	padding: 12px;
+	line-height: 120%;
+	font-size: 14px;
+	background: #418fde; 
+	border: 1px solid #fff; 
+	border-radius: 4px;
+	max-width: 200px;
+	z-index: 200;
+	top: 30%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.pbimapalertdivcontainer {
+	display: flex;
+	justify-content: center;
+	margin-top: 18px;
+}
+
+.pbimapalertyesorno {
+	padding: 4px 10px 4px 10px;
+	font-size: 14px;
+	background: #2e649b; 
+	border: 1px solid #eee; 
+	border-radius: 8px;
+	color: white;
+	margin-right: 8px;
+	cursor: pointer;
+}
+
+.pbimapTopDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 12px;
+	margin-top: 12px;
+}
+
+.pbimapTitleDiv, .pbimapListTitleDiv {
+	display: flex;
+	flex:0 60%;
+	margin-left: 10px;
+}
+
+.pbimapTitle {
+	font-size: 26px;
+	font-family: "Arial", sans-serif;
+	margin-left: 0px;
+}
+
+.pbimapIconsDiv, .pbimapListButtonDiv {
+	display: flex;
+	flex:0 40%;
+	flex-direction: row-reverse;
+	align-items: center;
+	margin-right: 10px;
+}
+
+.pbimapBreadcrumbDiv {
+	width: 98%;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.pbimapBreadcrumbs {
+	margin: 4px -4px 4px 10px;
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	color: #5a5a5a;
+	width: auto;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-right: 0px;
+}
+
+.pbimapBeforeSpan, .pbimapAfterSpan {
+  width: 0;
+  height: 0;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  font-size: 0px;
+  position: relative;
+  top: -4px;
+  left: 0;
+}
+
+.pbimapBeforeSpan {
+  border-left:10px solid white;
+  left: -7px;
+  z-index: 50;
+}
+
+.pbimapAfterSpan {
+  left: 10px;
+  z-index: 60;
+}
+
+.pbimapFooterDiv {
+	width: 100%;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.pbimapFooterText {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	color: #888;
+	text-align: right;
+	width: 98%;
+}
+
+.pbimapOverDiv {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+}
+
+.pbimapOverDivHelp {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,0.7);
+	top: 0;
+	left: 0;
+	z-index: 1600;
+}
+
+.pbimapAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 15px;
+	fill: #222;
+	pointer-events: none;
+}
+
+.pbimapFiltersDiv {
+	display: flex;
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+#pbimapContainerDiv {
+	width: 100%;
+}
+
+.pbimapFilterContainerDiv {
+	position: relative;
+	text-align: center;
+	width: 120px;
+	margin-left: 10px;
+	border: 1px solid #444;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.pbimapFilterContainerDivTitles {
+	width: 100%;
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	font-weight: 700;
+	color: #5a5a5a;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.pbimapDropdownContainer {
+	display: none;
+	position: absolute;
+	z-index: 1500;
+	text-align: center;
+	border: 1px solid #444;
+	border-radius: 4px;
+	min-width: 120px;
+	margin-top: 4px;
+	left: -1px;
+}
+
+.pbimapDropdownPaddingDiv {
+	background-color: white;
+	width: 120px;
+	height: 4px;
+	position: absolute;
+	margin-top: 1px;
+}
+
+.pbimapDropdownUl {
+	list-style-type: none;
+	padding: 0px;
+	margin: 4px;
+	text-align: left;
+	max-width: 280px;
+	max-height: 420px;
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+.pbimapDropdownLi {
+	font-family: "Arial", sans-serif;
+	font-size: 13px;
+	color: #5a5a5a;
+	line-height: 160%;
+	white-space: nowrap;
+	padding-right: 7px;
+}
+
+.pcimapDropdownBox {
+	margin-left: 3px;
+	margin-right: 6px;
+}
+
+.fa-check-square, .fa-square {
+	background: white;
+	height: 0.8em;
+	width: 0.8em;
+}
+
+.pbimapTopSvgAllocations, .pbimapTopSvgBeneficiaries {
+	font-family: "Arial", sans-serif;
+	font-size: 48px;
+}
+
+.pbimapTopSvgAllocationsText, .pbimapTopSvgBeneficiariesText, .pbimapTopSvgAllocationsSubtitle, .pbimapTopSvgBeneficiariesSubtitle, .pbimapTopSvgPartnersText, .pbimapTopSvgProjectsText {
+	font-family: "Arial", sans-serif;
+	font-size: 18px;
+	fill: #888;
+}
+
+.pbimapTopSvgPartners, .pbimapTopSvgProjects {
+	font-family: "Arial", sans-serif;
+	font-size: 28px;
+}
+
+.pbimapLegendDiv {
+	position: absolute;
+	z-index: 1500;
+}
+
+.pbimapButtonsTitle {
+	font-family: "Arial", sans-serif;
+	font-size: 12px;
+	fill: darkslategray;	
+}
+
+.pbimapLegendButtonsText {
+	font-family: "Roboto", sans-serif;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.pbimapLegendTitle {
+	font-family: "Roboto", sans-serif;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+.pbimapLegendCirclesText, .pbimapLegendColorTexts, .pbimapLegendSubLegendText {
+	font-family: "Arial", sans-serif;
+	font-size: 9px;
+	fill: darkslategray;	
+}
+
+.pbimapNoDataText {
+	font-family: "Roboto", sans-serif;
+	font-size: 22px;
+	font-weight: 700;
+	fill: darkslategray;		
+}
+
+.pbimapNoDataTextBack {
+	font-family: "Roboto", sans-serif;
+	font-size: 22px;
+	font-weight: 700;
+	fill: white;
+	stroke-width: 5px;
+	stroke: white;		
+}
+
+svg.leaflet-zoom-animated {
+	pointer-events: all;
+}
+
+.pbimapDropdownUl::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+	border-radius: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapDropdownUl::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapDropdownUl::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,.3);
+	background-color: #777;
+}
+
+.pbimapListRowsContainer::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+	border-radius: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapListRowsContainer::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapListRowsContainer::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,.3);
+	background-color: #777;
+}
+
+.pbimapListRowDivs::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+	border-radius: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapListRowDivs::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+	background-color: #F5F5F5;
+}
+
+.pbimapListRowDivs::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,.3);
+	background-color: #777;
+}
+
+.pbimapResetDiv {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-grow: 10;
+	text-align: right;
+	margin-right: 10px;
+}
+
+.pbimapAnnotationMainText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	pointer-events: none;
+	fill: white;
+}
+
+.pbimapAnnotationText {
+	font-family: "Arial", sans-serif;
+	font-size: 14px;
+	fill: #222;
+	pointer-events: none;
+}
+
+#pbimapSnapshotTooltip {
+	z-index: 1900;
+}
+
+.pbimapSnapshotContent {
+	position: absolute;
+	min-width: 100px;
+	display: none;
+	background-color: #f9f9f9;
+	box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.25);
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+	z-index: 1900;
+}
+
+.pbimapSnapshotContent #pbimapSnapshotPdfText, .pbimapSnapshotContent #pbimapSnapshotPngText, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText {
+	font-size: 14px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+}
+
+.pbimapSnapshotContent #pbimapBestVisualizedText, .pbimapSnapshotContent #pbimapTooltipBestVisualizedText {
+	font-size: 11px;
+	padding: 10px;
+	margin: 0px;
+	color: #222;
+	font-family: "Arial", sans-serif;
+	border-top: 1px solid lightgray;
+	width: 202px;
+}
+
+.pbimapSnapshotContent #pbimapSnapshotPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotPngText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPdfText:hover, .pbimapSnapshotContent #pbimapSnapshotTooltipPngText:hover {
+	background-color: #1F69B3;
+	color: white;
+}
+
+.pbimaplaunchedValue {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	color: #666;
+	padding-left: 68px;
+	margin-bottom: 0px !important;
+}
