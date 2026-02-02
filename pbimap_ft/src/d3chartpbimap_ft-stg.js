@@ -290,7 +290,7 @@
 			),
 			tooltipSvgWidth = 310,
 			tooltipSvgHeight = 110,
-			tooltipSvgPadding = [10, 86, 40, 45],
+			tooltipSvgPadding = [10, 102, 36, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
@@ -3010,7 +3010,24 @@
 						);
 					})
 					.text(function (d) {
-						return formatSIFloat(datum["beneficiaries" + d]);
+						const labelsText =
+							formatSIFloat(datum["beneficiariesReached" + d]) +
+							"/" +
+							formatSIFloat(datum["beneficiaries" + d]) +
+							" (" +
+							(datum["beneficiariesReached" + d] >
+							datum["beneficiaries" + d]
+								? ">100%"
+								: datum["beneficiaries" + d] !== 0
+									? formatMoney0Decimals(
+											(datum["beneficiariesReached" + d] *
+												100) /
+												datum["beneficiaries" + d],
+										)
+									: 0) +
+							"%)";
+
+						return labelsText;
 					});
 
 				const targetedBars = tooltipSvg
@@ -3113,10 +3130,17 @@
 					.attr("x", function (d) {
 						return (
 							tooltipSvgXScale(datum["beneficiaries" + d]) +
-							lollipopRadius +
-							2
+							3 +
+							tooltipSvgPadding[3]
 						);
 					});
+
+				const tooltipValuesLegend = tooltipSvg
+					.append("text")
+					.attr("x", 6)
+					.attr("y", tooltipSvgHeight - 8)
+					.attr("class", "pbimapTooltipLabels")
+					.text("Values: reached ppl/targeted ppl (% of targeted)");
 			}
 
 			//end of mouseOverMarker
