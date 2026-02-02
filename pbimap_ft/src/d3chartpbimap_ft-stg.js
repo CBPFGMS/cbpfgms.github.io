@@ -296,7 +296,8 @@
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
-			baseUrl = "../../Ocha Staging/cbpfgms.github.io/pbimap_ft/data/",
+			baseUrl =
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_ft/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
