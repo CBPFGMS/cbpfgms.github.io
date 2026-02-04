@@ -253,6 +253,7 @@
 				.map(function (d) {
 					return d.toString();
 				}),
+			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
 			bookmarkSite =
@@ -289,13 +290,15 @@
 				maxMarkerGlobalColor,
 			),
 			tooltipSvgWidth = 310,
-			tooltipSvgHeight = 110,
-			tooltipSvgPadding = [10, 102, 36, 45],
+			tooltipSvgHeight = 168,
+			tooltipSvgPadding = [10, 52, 30, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
+			beneficiariesTypes = ["Targeted", "Reached"],
+			reachedColor = "#ccc",
 			baseUrl =
 				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_ft/data/",
 			partnersLogoPath =
@@ -617,7 +620,15 @@
 				tooltipSvgHeight - tooltipSvgPadding[2],
 			])
 			.domain(beneficiariesList)
-			.padding(0.5);
+			.paddingOuter(0.1)
+			.paddingInner(0.3);
+
+		const tooltipSvgInnerYScale = d3
+			.scaleBand()
+			.range([0, tooltipSvgYScale.bandwidth()])
+			.domain(beneficiariesTypes)
+			.paddingOuter(0)
+			.paddingInner(0.3);
 
 		const tooltipSvgXScale = d3
 			.scaleLinear()
@@ -641,10 +652,10 @@
 					tooltipSvgPadding[2]
 				),
 			)
-			.ticks(2)
+			.ticks(3)
 			.tickPadding(4)
 			.tickFormat(function (d) {
-				return "$" + formatSIaxes(d).replace("G", "B");
+				return formatSIaxes(d).replace("G", "B");
 			});
 
 		const listHeaderScale = d3
@@ -2996,86 +3007,191 @@
 					})
 					.remove();
 
-				const tooltipSvgLabels = tooltipSvg
+				const tooltipBarGroups = tooltipSvg
 					.selectAll(null)
 					.data(beneficiariesList)
 					.enter()
+					.append("g")
+					.attr("transform", function (d) {
+						return `translate(${tooltipSvgPadding[3]},${tooltipSvgYScale(d)})`;
+					})
+					.each(function (d) {
+						localVariable.set(this, d);
+					});
+
+				// const tooltipSvgLabels = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("text")
+				// 	.attr("class", "pbimapTooltipLabels")
+				// 	.attr("x", tooltipSvgPadding[3] + 2)
+				// 	.attr("y", function (d) {
+				// 		return (
+				// 			tooltipSvgYScale(d) +
+				// 			tooltipSvgYScale.bandwidth() / 2 +
+				// 			4
+				// 		);
+				// 	})
+				// 	.text(function (d) {
+				// 		const labelsText =
+				// 			formatSIFloat(datum["beneficiariesReached" + d]) +
+				// 			"/" +
+				// 			formatSIFloat(datum["beneficiaries" + d]) +
+				// 			" (" +
+				// 			(datum["beneficiariesReached" + d] >
+				// 			datum["beneficiaries" + d]
+				// 				? ">100%"
+				// 				: datum["beneficiaries" + d] !== 0
+				// 					? formatMoney0Decimals(
+				// 							(datum["beneficiariesReached" + d] *
+				// 								100) /
+				// 								datum["beneficiaries" + d],
+				// 						)
+				// 					: 0) +
+				// 			"%)";
+
+				// 		return labelsText;
+				// 	});
+
+				const bars = tooltipBarGroups
+					.selectAll(null)
+					.data(beneficiariesTypes)
+					.enter()
+					.append("rect")
+					.style("fill", function (d) {
+						const color =
+							d === "Reached"
+								? reachedColor
+								: chartState.selectedAdminLevel
+									? circleColor
+									: circleGlobalColor;
+						return color;
+					})
+					.attr("x", 0)
+					.attr("y", function (d) {
+						return tooltipSvgInnerYScale(d);
+					})
+					.attr("height", tooltipSvgInnerYScale.bandwidth())
+					.attr("width", 0)
+					.transition()
+					.duration(duration)
+					.attr("width", function (d) {
+						const parentDatum = localVariable.get(this);
+						return tooltipSvgXScale(
+							datum[
+								`beneficiaries${d === "Reached" ? "Reached" : ""}` +
+									parentDatum
+							],
+						);
+					});
+
+				const labels = tooltipBarGroups
+					.selectAll(null)
+					.data(beneficiariesTypes)
+					.enter()
 					.append("text")
+					// .style("fill", function (d) {
+					// 	const color =
+					// 		d === "Reached"
+					// 			? reachedColor
+					// 			: chartState.selectedAdminLevel
+					// 				? circleColor
+					// 				: circleGlobalColor;
+					// 	return color;
+					// })
 					.attr("class", "pbimapTooltipLabels")
-					.attr("x", tooltipSvgPadding[3] + 2)
+					.attr("x", 0)
 					.attr("y", function (d) {
 						return (
-							tooltipSvgYScale(d) +
-							tooltipSvgYScale.bandwidth() / 2 +
+							tooltipSvgInnerYScale(d) +
+							tooltipSvgInnerYScale.bandwidth() / 2 +
 							4
 						);
 					})
 					.text(function (d) {
+						const parentDatum = localVariable.get(this);
 						const labelsText =
-							formatSIFloat(datum["beneficiariesReached" + d]) +
-							"/" +
-							formatSIFloat(datum["beneficiaries" + d]) +
-							" (" +
-							(datum["beneficiariesReached" + d] >
-							datum["beneficiaries" + d]
-								? ">100%"
-								: datum["beneficiaries" + d] !== 0
-									? formatMoney0Decimals(
-											(datum["beneficiariesReached" + d] *
-												100) /
-												datum["beneficiaries" + d],
-										)
-									: 0) +
-							"%)";
+							d === "Targeted"
+								? formatSIFloat(
+										datum["beneficiaries" + parentDatum],
+									)
+								: formatSIFloat(
+										datum[
+											"beneficiariesReached" + parentDatum
+										],
+									) +
+									" (" +
+									(datum[
+										"beneficiariesReached" + parentDatum
+									] > datum["beneficiaries" + parentDatum]
+										? ">100%"
+										: datum[
+													"beneficiaries" +
+														parentDatum
+											  ] !== 0
+											? formatMoney0Decimals(
+													(datum[
+														"beneficiariesReached" +
+															parentDatum
+													] *
+														100) /
+														datum[
+															"beneficiaries" +
+																parentDatum
+														],
+												)
+											: 0) +
+									"%)";
 
 						return labelsText;
 					});
 
-				const targetedBars = tooltipSvg
-					.selectAll(null)
-					.data(beneficiariesList)
-					.enter()
-					.append("rect")
-					.style("fill", "#aaa")
-					.attr("x", tooltipSvgPadding[3])
-					.attr("y", function (d) {
-						return tooltipSvgYScale(d);
-					})
-					.attr("height", tooltipSvgYScale.bandwidth())
-					.attr("width", 0)
-					.transition()
-					.duration(duration)
-					.attr("width", function (d) {
-						return tooltipSvgXScale(datum["beneficiaries" + d]);
-					});
+				// const targetedBars = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("rect")
+				// 	.style("fill", "#aaa")
+				// 	.attr("x", tooltipSvgPadding[3])
+				// 	.attr("y", function (d) {
+				// 		return tooltipSvgYScale(d);
+				// 	})
+				// 	.attr("height", tooltipSvgYScale.bandwidth())
+				// 	.attr("width", 0)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("width", function (d) {
+				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
+				// 	});
 
-				const reachedBars = tooltipSvg
-					.selectAll(null)
-					.data(beneficiariesList)
-					.enter()
-					.append("rect")
-					.style(
-						"fill",
-						chartState.selectedAdminLevel
-							? circleColor
-							: circleGlobalColor,
-					)
-					.attr("x", tooltipSvgPadding[3])
-					.attr("y", function (d) {
-						return tooltipSvgYScale(d);
-					})
-					.attr("height", tooltipSvgYScale.bandwidth())
-					.attr("width", 0)
-					.transition()
-					.duration(duration)
-					.attr("width", function (d) {
-						return tooltipSvgXScale(
-							Math.min(
-								datum["beneficiaries" + d],
-								datum["beneficiariesReached" + d],
-							),
-						);
-					});
+				// const reachedBars = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("rect")
+				// 	.style(
+				// 		"fill",
+				// 		chartState.selectedAdminLevel
+				// 			? circleColor
+				// 			: circleGlobalColor,
+				// 	)
+				// 	.attr("x", tooltipSvgPadding[3])
+				// 	.attr("y", function (d) {
+				// 		return tooltipSvgYScale(d);
+				// 	})
+				// 	.attr("height", tooltipSvgYScale.bandwidth())
+				// 	.attr("width", 0)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("width", function (d) {
+				// 		return tooltipSvgXScale(
+				// 			Math.min(
+				// 				datum["beneficiaries" + d],
+				// 				datum["beneficiariesReached" + d],
+				// 			),
+				// 		);
+				// 	});
 
 				// const tooltipSticks = tooltipSvg
 				// 	.selectAll(null)
@@ -3125,23 +3241,54 @@
 				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
 				// 	});
 
-				tooltipSvgLabels
+				labels
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
+						const parentDatum = localVariable.get(this);
+						const property =
+							d === "Reached"
+								? "beneficiariesReached"
+								: "beneficiaries";
 						return (
-							tooltipSvgXScale(datum["beneficiaries" + d]) +
-							3 +
-							tooltipSvgPadding[3]
+							tooltipSvgXScale(datum[property + parentDatum]) + 3
 						);
 					});
 
-				const tooltipValuesLegend = tooltipSvg
+				tooltipSvg
 					.append("text")
-					.attr("x", 6)
-					.attr("y", tooltipSvgHeight - 8)
+					.attr("x", tooltipSvgPadding[3] + 12)
+					.attr("y", tooltipSvgHeight - 5)
 					.attr("class", "pbimapTooltipLabels")
-					.text("Values: reached ppl/targeted ppl (% of targeted)");
+					.text("Targeted");
+
+				tooltipSvg
+					.append("text")
+					.attr("x", tooltipSvgPadding[3] + 76)
+					.attr("y", tooltipSvgHeight - 5)
+					.attr("class", "pbimapTooltipLabels")
+					.text("Reached");
+
+				tooltipSvg
+					.append("rect")
+					.attr("x", tooltipSvgPadding[3])
+					.attr("y", tooltipSvgHeight - 12)
+					.attr("width", 8)
+					.attr("height", 8)
+					.attr(
+						"fill",
+						chartState.selectedAdminLevel
+							? circleColor
+							: circleGlobalColor,
+					);
+
+				tooltipSvg
+					.append("rect")
+					.attr("x", tooltipSvgPadding[3] + 64)
+					.attr("y", tooltipSvgHeight - 12)
+					.attr("width", 8)
+					.attr("height", 8)
+					.attr("fill", reachedColor);
 			}
 
 			//end of mouseOverMarker
