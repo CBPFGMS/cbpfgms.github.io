@@ -360,6 +360,7 @@
 				selectedCluster: [],
 				selectedAdminLevel: null,
 				displayMode: "size",
+				beneficiaryType: "Targeted",
 			},
 			loadedYears = [],
 			cbpfsList = {},
@@ -588,6 +589,13 @@
 			.attr("class", "pbimapLegendSvg")
 			.attr("width", legendSvgWidth)
 			.attr("height", legendSvgHeight);
+
+		legendSvg
+			.append("rect")
+			.attr("width", legendSvgWidth)
+			.attr("height", legendSvgHeight)
+			.attr("fill", "white")
+			.attr("opacity", 0.7);
 
 		const filterColorScale = d3
 			.scaleOrdinal()
@@ -1191,7 +1199,11 @@
 
 			let topSvgBeneficiaries = topSvg
 				.selectAll(".pbimapTopSvgBeneficiaries")
-				.data([data.totalBeneficiaries]);
+				.data([
+					chartState.beneficiaryType === "Targeted"
+						? data.totalBeneficiaries
+						: data.totalBeneficiariesReached,
+				]);
 
 			topSvgBeneficiaries = topSvgBeneficiaries
 				.enter()
@@ -1229,7 +1241,11 @@
 
 			let topSvgBeneficiariesText = topSvg
 				.selectAll(".pbimapTopSvgBeneficiariesText")
-				.data([data.totalBeneficiaries]);
+				.data([
+					chartState.beneficiaryType === "Targeted"
+						? data.totalBeneficiaries
+						: data.totalBeneficiariesReached,
+				]);
 
 			topSvgBeneficiariesText = topSvgBeneficiariesText
 				.enter()
@@ -1256,9 +1272,11 @@
 							: "";
 			});
 
-			const topSvgBeneficiariesSubtitle = topSvg
+			let topSvgBeneficiariesSubtitle = topSvg
 				.selectAll(".pbimapTopSvgBeneficiariesSubtitle")
-				.data([true])
+				.data([true]);
+
+			topSvgBeneficiariesSubtitle = topSvgBeneficiariesSubtitle
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
@@ -1268,7 +1286,11 @@
 					width * topSvgHorizontalPositions[1] +
 						topSvgMainValueHorPadding,
 				)
-				.text("Targeted People");
+				.merge(topSvgBeneficiariesSubtitle);
+
+			topSvgBeneficiariesSubtitle.text(
+				`${chartState.beneficiaryType} People`,
+			);
 
 			const partnersLogo = topSvg
 				.selectAll(".pbimapTopSvgPartnersLogo")
@@ -1707,6 +1729,12 @@
 					data,
 					"clustersList",
 				);
+				highlighter.style(
+					"background-color",
+					chartState.selectedAdminLevel
+						? circleColor
+						: circleGlobalColor,
+				);
 			});
 
 			partnersDropdown.call(
@@ -1789,6 +1817,12 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
+					highlighter.style(
+						"background-color",
+						chartState.selectedAdminLevel
+							? circleColor
+							: circleGlobalColor,
+					);
 				});
 
 				partnersDropdown.call(
@@ -1802,6 +1836,44 @@
 					"clustersList",
 				);
 			}
+
+			const toggleDiv = filtersDiv
+				.append("div")
+				.attr("class", "pbimapToggleDiv");
+
+			const toggleInput = toggleDiv
+				.selectAll(null)
+				.data(beneficiariesTypes)
+				.enter()
+				.append("input")
+				.attr("id", d => d)
+				.attr("type", "radio")
+				.attr("name", "switch")
+				.property("checked", d => d === "Targeted");
+
+			const toggleLabel = toggleDiv
+				.selectAll(null)
+				.data(beneficiariesTypes)
+				.enter()
+				.append("label")
+				.attr("for", d => d)
+				.html(d => d)
+				.on("click", function (d) {
+					chartState.beneficiaryType = d;
+					createTopSvg(data.topSvgObject);
+					createMap(data.map);
+					createLegendSvg(data.map);
+				});
+
+			const highlighter = toggleDiv
+				.append("span")
+				.attr("class", "highlighter")
+				.style(
+					"background-color",
+					chartState.selectedAdminLevel
+						? circleColor
+						: circleGlobalColor,
+				);
 
 			const resetDiv = filtersDiv
 				.append("div")
@@ -3791,6 +3863,7 @@
 			const topSvgObject = {
 				totalAllocations: 0,
 				totalBeneficiaries: 0,
+				totalBeneficiariesReached: 0,
 				totalProjects: 0,
 				totalPartners: 0,
 				launchedAllocations: 0,
@@ -3950,6 +4023,8 @@
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
+					topSvgObject.totalBeneficiariesReached +=
+						row.beneficiariesReached;
 					topSvgObject.totalPartners += numberOfPartners.length;
 					topSvgObject.totalProjects += numberOfProjects.length;
 				});
@@ -4050,6 +4125,8 @@
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
+					topSvgObject.totalBeneficiariesReached +=
+						row.beneficiariesReached;
 				});
 
 				topSvgObject.totalPartners += totalNumberOfPartners.length;
