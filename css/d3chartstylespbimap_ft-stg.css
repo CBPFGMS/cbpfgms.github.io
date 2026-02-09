@@ -682,8 +682,8 @@ svg.leaflet-zoom-animated {
 	padding: 4px;
 	border: 1px solid lightgrey;
 	border-radius: 100vh;
-	margin-left: 16px;
-	margin-right: 16px;
+	margin-left: 32px;
+	margin-right: 32px;
 	background: white;
 }
 
