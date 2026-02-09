@@ -702,10 +702,7 @@ svg.leaflet-zoom-animated {
 	background: transparent;
 }
 
-.pbimapToggleDiv
-	#Targeted:checked
-	+ label[for="Reached"]
-	~ .highlighter {
+.pbimapToggleDiv #Targeted:checked + label[for="Reached"] ~ .highlighter {
 	transform: none;
 }
 
@@ -722,6 +719,7 @@ svg.leaflet-zoom-animated {
 	z-index: 1;
 	min-width: 100px;
 	/* line-height: 100%; */
+	margin-bottom: 0px !important;
 	cursor: pointer;
 	border-radius: 100vh;
 	transition: color 0.25s ease-in-out;
