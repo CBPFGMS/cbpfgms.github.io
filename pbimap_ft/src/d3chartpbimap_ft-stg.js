@@ -1587,6 +1587,13 @@
 					chartState.selectedAdminLevel,
 				);
 
+				toggleLabel.on("click", function (d) {
+					chartState.beneficiaryType = d;
+					createTopSvg(data.topSvgObject);
+					createMap(data.map);
+					createLegendSvg(data.map);
+				});
+
 				createTopSvg(data.topSvgObject);
 				createMap(data.map);
 				createLegendSvg(data.map);
@@ -1616,6 +1623,20 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
+
+					highlighter.style(
+						"background-color",
+						chartState.selectedAdminLevel
+							? circleColor
+							: circleGlobalColor,
+					);
+
+					toggleLabel.on("click", function (d) {
+						chartState.beneficiaryType = d;
+						createTopSvg(data.topSvgObject);
+						createMap(data.map);
+						createLegendSvg(data.map);
+					});
 				});
 
 				filterCbpfsDropdown();
@@ -1735,6 +1756,12 @@
 						? circleColor
 						: circleGlobalColor,
 				);
+				toggleLabel.on("click", function (d) {
+					chartState.beneficiaryType = d;
+					createTopSvg(data.topSvgObject);
+					createMap(data.map);
+					createLegendSvg(data.map);
+				});
 			});
 
 			partnersDropdown.call(
@@ -1794,6 +1821,20 @@
 				createBreadcrumbDiv();
 				createShowAllButton(data.map);
 
+				highlighter.style(
+					"background-color",
+					chartState.selectedAdminLevel
+						? circleColor
+						: circleGlobalColor,
+				);
+
+				toggleLabel.on("click", function (d) {
+					chartState.beneficiaryType = d;
+					createTopSvg(data.topSvgObject);
+					createMap(data.map);
+					createLegendSvg(data.map);
+				});
+
 				adminLevelDropdown.call(
 					populateDropdown,
 					d3.range(0, newMaxCombinedLevel + 1, 1),
@@ -1817,6 +1858,12 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
+					toggleLabel.on("click", function (d) {
+						chartState.beneficiaryType = d;
+						createTopSvg(data.topSvgObject);
+						createMap(data.map);
+						createLegendSvg(data.map);
+					});
 					highlighter.style(
 						"background-color",
 						chartState.selectedAdminLevel
@@ -1948,6 +1995,12 @@
 							createLegendSvg(data.map);
 							createBreadcrumbDiv();
 							createShowAllButton(data.map);
+							toggleLabel.on("click", function (d) {
+								chartState.beneficiaryType = d;
+								createTopSvg(data.topSvgObject);
+								createMap(data.map);
+								createLegendSvg(data.map);
+							});
 						});
 
 					const data = filterData();
@@ -1972,6 +2025,12 @@
 						data,
 						"clustersList",
 					);
+					toggleLabel.on("click", function (d) {
+						chartState.beneficiaryType = d;
+						createTopSvg(data.topSvgObject);
+						createMap(data.map);
+						createLegendSvg(data.map);
+					});
 				});
 
 			function clickModalities(d) {
