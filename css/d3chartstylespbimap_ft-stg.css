@@ -466,16 +466,13 @@
 	width: 0.8em;
 }
 
-.pbimapTopSvgAllocations,
-.pbimapTopSvgBeneficiaries {
+.pbimapTopSvgAllocations {
 	font-family: "Arial", sans-serif;
 	font-size: 48px;
 }
 
 .pbimapTopSvgAllocationsText,
-.pbimapTopSvgBeneficiariesText,
 .pbimapTopSvgAllocationsSubtitle,
-.pbimapTopSvgBeneficiariesSubtitle,
 .pbimapTopSvgPartnersText,
 .pbimapTopSvgProjectsText {
 	font-family: "Arial", sans-serif;
@@ -483,10 +480,23 @@
 	fill: #888;
 }
 
+.pbimapTopSvgBeneficiariesText,
+.pbimapTopSvgBeneficiariesReachedText {
+	font-family: "Arial", sans-serif;
+	font-size: 16px;
+	fill: #888;
+}
+
 .pbimapTopSvgPartners,
 .pbimapTopSvgProjects {
 	font-family: "Arial", sans-serif;
 	font-size: 28px;
+}
+
+.pbimapTopSvgBeneficiaries,
+.pbimapTopSvgBeneficiariesReached {
+	font-family: "Arial", sans-serif;
+	font-size: 24px;
 }
 
 .pbimapLegendDiv {
@@ -600,6 +610,7 @@ svg.leaflet-zoom-animated {
 	justify-content: flex-end;
 	text-align: right;
 	margin-right: 10px;
+	flex-grow: 1;
 }
 
 .pbimapToggleDiv {
@@ -674,67 +685,4 @@ svg.leaflet-zoom-animated {
 	color: #666;
 	padding-left: 68px;
 	margin-bottom: 0px !important;
-}
-
-.pbimapToggleDiv {
-	position: relative;
-	display: inline-flex;
-	padding: 4px;
-	border: 1px solid lightgrey;
-	border-radius: 100vh;
-	margin-left: 32px;
-	margin-right: 32px;
-	background: white;
-}
-
-.pbimapToggleDiv [type="radio"] {
-	position: absolute;
-	left: -9999px;
-}
-
-.pbimapToggleDiv #Targeted:checked ~ label[for="Targeted"],
-.pbimapToggleDiv #Reached:checked ~ label[for="Reached"] {
-	color: white;
-}
-
-.pbimapToggleDiv #Targeted:checked ~ label[for="Targeted"]:hover,
-.pbimapToggleDiv #Reached:checked ~ label[for="Reached"]:hover {
-	background: transparent;
-}
-
-.pbimapToggleDiv #Targeted:checked + label[for="Reached"] ~ .highlighter {
-	transform: none;
-}
-
-.pbimapToggleDiv
-	[type="radio"]:checked#Reached
-	+ label[for="Targeted"]
-	~ .highlighter {
-	transform: translateX(100%);
-}
-
-.pbimapToggleDiv label {
-	font-size: 13px;
-	text-align: center;
-	z-index: 1;
-	min-width: 100px;
-	/* line-height: 100%; */
-	margin-bottom: 0px !important;
-	cursor: pointer;
-	border-radius: 100vh;
-	transition: color 0.25s ease-in-out;
-}
-
-.pbimapToggleDiv label:hover {
-	background: lightgray;
-}
-
-.pbimapToggleDiv .highlighter {
-	position: absolute;
-	top: 2px;
-	left: 2px;
-	width: calc(50% - 2px);
-	height: calc(100% - 4px);
-	border-radius: 30px;
-	transition: transform 0.25s ease-in-out;
 }

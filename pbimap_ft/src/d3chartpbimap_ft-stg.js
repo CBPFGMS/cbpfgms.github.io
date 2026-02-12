@@ -224,7 +224,7 @@
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
-			topSvgHorizontalPositions = [0.18, 0.38, 0.58, 0.76],
+			topSvgHorizontalPositions = [0.16, 0.34, 0.58, 0.76],
 			topSvgMainValueVerPadding = 12,
 			topSvgMainValueHorPadding = 2,
 			legendSvgWidth = 110,
@@ -1100,6 +1100,11 @@
 				.size()
 				? d3.select(".pbimapTopSvgBeneficiaries").datum()
 				: 0;
+			const previousBeneficiariesReached = d3
+				.select(".pbimapTopSvgBeneficiariesReached")
+				.size()
+				? d3.select(".pbimapTopSvgBeneficiariesReached").datum()
+				: 0;
 			const previousProjects = d3.select(".pbimapTopSvgProjects").size()
 				? d3.select(".pbimapTopSvgProjects").datum()
 				: 0;
@@ -1189,7 +1194,7 @@
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgAllocationsSubtitle")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
@@ -1199,11 +1204,7 @@
 
 			let topSvgBeneficiaries = topSvg
 				.selectAll(".pbimapTopSvgBeneficiaries")
-				.data([
-					chartState.beneficiaryType === "Targeted"
-						? data.totalBeneficiaries
-						: data.totalBeneficiariesReached,
-				]);
+				.data([data.totalBeneficiaries]);
 
 			topSvgBeneficiaries = topSvgBeneficiaries
 				.enter()
@@ -1213,7 +1214,7 @@
 					"pbimapTopSvgBeneficiaries contributionColorFill",
 				)
 				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] -
@@ -1241,18 +1242,14 @@
 
 			let topSvgBeneficiariesText = topSvg
 				.selectAll(".pbimapTopSvgBeneficiariesText")
-				.data([
-					chartState.beneficiaryType === "Targeted"
-						? data.totalBeneficiaries
-						: data.totalBeneficiariesReached,
-				]);
+				.data([data.totalBeneficiaries]);
 
 			topSvgBeneficiariesText = topSvgBeneficiariesText
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiariesText")
 				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.7)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
@@ -1262,35 +1259,98 @@
 
 			topSvgBeneficiariesText.text(function (d) {
 				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1];
-				return unit === "k"
-					? "Thousand"
-					: unit === "M"
-						? "Million"
-						: unit === "G"
-							? "Billion"
-							: "";
+					unit = valueSI[valueSI.length - 1],
+					unitText =
+						unit === "k"
+							? "Thousand"
+							: unit === "M"
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "";
+				return unitText + " targeted people";
 			});
 
-			let topSvgBeneficiariesSubtitle = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesSubtitle")
-				.data([true]);
+			let topSvgBeneficiariesReached = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesReached")
+				.data([data.totalBeneficiariesReached]);
 
-			topSvgBeneficiariesSubtitle = topSvgBeneficiariesSubtitle
+			topSvgBeneficiariesReached = topSvgBeneficiariesReached
 				.enter()
 				.append("text")
-				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr(
+					"class",
+					"pbimapTopSvgBeneficiariesReached contributionColorFill",
+				)
+				.attr("text-anchor", "end")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+				.attr(
+					"x",
+					width * topSvgHorizontalPositions[1] -
+						topSvgMainValueHorPadding,
+				)
+				.merge(topSvgBeneficiariesReached);
+
+			topSvgBeneficiariesReached
+				.transition()
+				.duration(duration)
+				.tween("text", function (d) {
+					const node = this,
+						i = d3.interpolate(previousBeneficiariesReached, d),
+						valueSI = formatSIFloat(d),
+						unit = valueSI[valueSI.length - 1];
+					return function (t) {
+						const siString = formatSIFloat(i(t));
+						d3.select(node).text(
+							+unit !== +unit
+								? siString.substring(0, siString.length - 1)
+								: siString,
+						);
+					};
+				});
+
+			let topSvgBeneficiariesReachedText = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesReachedText")
+				.data([data.totalBeneficiariesReached]);
+
+			topSvgBeneficiariesReachedText = topSvgBeneficiariesReachedText
+				.enter()
+				.append("text")
+				.attr("class", "pbimapTopSvgBeneficiariesReachedText")
+				.attr("text-anchor", "start")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
 						topSvgMainValueHorPadding,
 				)
-				.merge(topSvgBeneficiariesSubtitle);
+				.merge(topSvgBeneficiariesReachedText);
 
-			topSvgBeneficiariesSubtitle.text(
-				`${chartState.beneficiaryType} People`,
-			);
+			topSvgBeneficiariesReachedText.text(function (d) {
+				const valueSI = formatSIFloat(d),
+					unit = valueSI[valueSI.length - 1],
+					unitText =
+						unit === "k"
+							? "Thousand"
+							: unit === "M"
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "",
+					reachedPeoplePercentage =
+						data.totalBeneficiaries === 0
+							? 0
+							: Math.floor(
+									(data.totalBeneficiariesReached * 100) /
+										data.totalBeneficiaries,
+								);
+				return (
+					unitText +
+					" reached people (" +
+					reachedPeoplePercentage +
+					"%)"
+				);
+			});
 
 			const partnersLogo = topSvg
 				.selectAll(".pbimapTopSvgPartnersLogo")
@@ -1587,13 +1647,6 @@
 					chartState.selectedAdminLevel,
 				);
 
-				toggleLabel.on("click", function (d) {
-					chartState.beneficiaryType = d;
-					createTopSvg(data.topSvgObject);
-					createMap(data.map);
-					createLegendSvg(data.map);
-				});
-
 				createTopSvg(data.topSvgObject);
 				createMap(data.map);
 				createLegendSvg(data.map);
@@ -1623,20 +1676,6 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
-
-					highlighter.style(
-						"background-color",
-						chartState.selectedAdminLevel
-							? circleColor
-							: circleGlobalColor,
-					);
-
-					toggleLabel.on("click", function (d) {
-						chartState.beneficiaryType = d;
-						createTopSvg(data.topSvgObject);
-						createMap(data.map);
-						createLegendSvg(data.map);
-					});
 				});
 
 				filterCbpfsDropdown();
@@ -1750,18 +1789,6 @@
 					data,
 					"clustersList",
 				);
-				highlighter.style(
-					"background-color",
-					chartState.selectedAdminLevel
-						? circleColor
-						: circleGlobalColor,
-				);
-				toggleLabel.on("click", function (d) {
-					chartState.beneficiaryType = d;
-					createTopSvg(data.topSvgObject);
-					createMap(data.map);
-					createLegendSvg(data.map);
-				});
 			});
 
 			partnersDropdown.call(
@@ -1821,20 +1848,6 @@
 				createBreadcrumbDiv();
 				createShowAllButton(data.map);
 
-				highlighter.style(
-					"background-color",
-					chartState.selectedAdminLevel
-						? circleColor
-						: circleGlobalColor,
-				);
-
-				toggleLabel.on("click", function (d) {
-					chartState.beneficiaryType = d;
-					createTopSvg(data.topSvgObject);
-					createMap(data.map);
-					createLegendSvg(data.map);
-				});
-
 				adminLevelDropdown.call(
 					populateDropdown,
 					d3.range(0, newMaxCombinedLevel + 1, 1),
@@ -1858,18 +1871,6 @@
 					createLegendSvg(data.map);
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
-					toggleLabel.on("click", function (d) {
-						chartState.beneficiaryType = d;
-						createTopSvg(data.topSvgObject);
-						createMap(data.map);
-						createLegendSvg(data.map);
-					});
-					highlighter.style(
-						"background-color",
-						chartState.selectedAdminLevel
-							? circleColor
-							: circleGlobalColor,
-					);
 				});
 
 				partnersDropdown.call(
@@ -1883,44 +1884,6 @@
 					"clustersList",
 				);
 			}
-
-			const toggleDiv = filtersDiv
-				.append("div")
-				.attr("class", "pbimapToggleDiv");
-
-			const toggleInput = toggleDiv
-				.selectAll(null)
-				.data(beneficiariesTypes)
-				.enter()
-				.append("input")
-				.attr("id", d => d)
-				.attr("type", "radio")
-				.attr("name", "switch")
-				.property("checked", d => d === "Targeted");
-
-			const toggleLabel = toggleDiv
-				.selectAll(null)
-				.data(beneficiariesTypes)
-				.enter()
-				.append("label")
-				.attr("for", d => d)
-				.html(d => d)
-				.on("click", function (d) {
-					chartState.beneficiaryType = d;
-					createTopSvg(data.topSvgObject);
-					createMap(data.map);
-					createLegendSvg(data.map);
-				});
-
-			const highlighter = toggleDiv
-				.append("span")
-				.attr("class", "highlighter")
-				.style(
-					"background-color",
-					chartState.selectedAdminLevel
-						? circleColor
-						: circleGlobalColor,
-				);
 
 			const resetDiv = filtersDiv
 				.append("div")
@@ -1995,12 +1958,6 @@
 							createLegendSvg(data.map);
 							createBreadcrumbDiv();
 							createShowAllButton(data.map);
-							toggleLabel.on("click", function (d) {
-								chartState.beneficiaryType = d;
-								createTopSvg(data.topSvgObject);
-								createMap(data.map);
-								createLegendSvg(data.map);
-							});
 						});
 
 					const data = filterData();
@@ -2025,12 +1982,6 @@
 						data,
 						"clustersList",
 					);
-					toggleLabel.on("click", function (d) {
-						chartState.beneficiaryType = d;
-						createTopSvg(data.topSvgObject);
-						createMap(data.map);
-						createLegendSvg(data.map);
-					});
 				});
 
 			function clickModalities(d) {
