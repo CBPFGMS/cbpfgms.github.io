@@ -695,7 +695,7 @@
 						")"
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 42, 4, 0],
+			padding: [44, 72, 4, 0],
 			labelPadding: 6,
 		};
 
@@ -717,7 +717,7 @@
 						")"
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 42, 4, 0],
+			padding: [44, 72, 4, 0],
 			labelPadding: 6,
 		};
 
