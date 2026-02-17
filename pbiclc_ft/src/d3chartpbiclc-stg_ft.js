@@ -473,7 +473,7 @@
 			blankFlag =
 				"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
 			dataUrl =
-				"https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1",
+				"https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?$format=csv&ShowAllPooledFunds=1&FiscalYearFrom=2026",
 			flagsUrl = "https://cbpfgms.github.io/img/assets/flags24.json",
 			masterRegionalFundsUrl =
 				"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json",
@@ -678,6 +678,7 @@
 			buttonVerticalPadding: 4,
 			arrowPadding: 18,
 			buttonContributionsWidth: 70,
+			buttonGroupPadding: 94,
 			buttonContributionsPadding: 590,
 		};
 
@@ -907,10 +908,11 @@
 							d.PooledFundName;
 					if (d.PaidAmt < 0) d.PaidAmt = 0;
 					if (d.PledgeAmt < 0) d.PledgeAmt = 0;
-					return +d.FiscalYear;
+					if (d.GMSDonorISO2Code.toLowerCase() === "us")
+						return +d.FiscalYear;
 				})
 				.filter(function (value, index, self) {
-					return self.indexOf(value) === index;
+					return self.indexOf(value) === index && value !== undefined;
 				})
 				.sort();
 
@@ -1267,125 +1269,125 @@
 						createSnapshot("png", false);
 					});
 
-				const playIcon = iconsDiv
-					.append("button")
-					.datum({
-						clicked: false,
-					})
-					.attr("id", "pbiclcPlayButton");
+				// const playIcon = iconsDiv
+				// 	.append("button")
+				// 	.datum({
+				// 		clicked: false,
+				// 	})
+				// 	.attr("id", "pbiclcPlayButton");
 
-				playIcon
-					.html("PLAY  ")
-					.append("span")
-					.attr("class", "fas fa-play");
+				// playIcon
+				// 	.html("PLAY  ")
+				// 	.append("span")
+				// 	.attr("class", "fas fa-play");
 
-				playIcon.on("click", function (d) {
-					d.clicked = !d.clicked;
+				// playIcon.on("click", function (d) {
+				// 	d.clicked = !d.clicked;
 
-					playIcon
-						.html(d.clicked ? "PAUSE " : "PLAY  ")
-						.append("span")
-						.attr(
-							"class",
-							d.clicked ? "fas fa-pause" : "fas fa-play",
-						);
+				// 	playIcon
+				// 		.html(d.clicked ? "PAUSE " : "PLAY  ")
+				// 		.append("span")
+				// 		.attr(
+				// 			"class",
+				// 			d.clicked ? "fas fa-pause" : "fas fa-play",
+				// 		);
 
-					if (d.clicked) {
-						chartState.selectedYear.length = 1;
-						loopButtons();
-						timer = d3.interval(loopButtons, 3 * duration);
-					} else {
-						timer.stop();
-					}
+				// 	if (d.clicked) {
+				// 		chartState.selectedYear.length = 1;
+				// 		loopButtons();
+				// 		timer = d3.interval(loopButtons, 3 * duration);
+				// 	} else {
+				// 		timer.stop();
+				// 	}
 
-					function loopButtons() {
-						const index = yearsArray.indexOf(
-							chartState.selectedYear[0],
-						);
+				// 	function loopButtons() {
+				// 		const index = yearsArray.indexOf(
+				// 			chartState.selectedYear[0],
+				// 		);
 
-						chartState.selectedYear[0] =
-							yearsArray[(index + 1) % yearsArray.length];
+				// 		chartState.selectedYear[0] =
+				// 			yearsArray[(index + 1) % yearsArray.length];
 
-						const yearButton = d3
-							.selectAll(".pbiclcbuttonsRects")
-							.filter(function (d) {
-								return d === chartState.selectedYear[0];
-							});
+				// 		const yearButton = d3
+				// 			.selectAll(".pbiclcbuttonsRects")
+				// 			.filter(function (d) {
+				// 				return d === chartState.selectedYear[0];
+				// 			});
 
-						yearButton.dispatch("click");
+				// 		yearButton.dispatch("click");
 
-						const firstYearIndex =
-							chartState.selectedYear[0] <
-							yearsArray[buttonsNumber / 2]
-								? 0
-								: chartState.selectedYear[0] >
-											yearsArray[
-												yearsArray.length -
-													buttonsNumber / 2
-											] ||
-									  chartState.selectedYear[0] ===
-											allYearsOption
-									? yearsArray.length - buttonsNumber
-									: yearsArray.indexOf(
-											chartState.selectedYear[0],
-										) -
-										buttonsNumber / 2;
+				// 		const firstYearIndex =
+				// 			chartState.selectedYear[0] <
+				// 			yearsArray[buttonsNumber / 2]
+				// 				? 0
+				// 				: chartState.selectedYear[0] >
+				// 							yearsArray[
+				// 								yearsArray.length -
+				// 									buttonsNumber / 2
+				// 							] ||
+				// 					  chartState.selectedYear[0] ===
+				// 							allYearsOption
+				// 					? yearsArray.length - buttonsNumber
+				// 					: yearsArray.indexOf(
+				// 							chartState.selectedYear[0],
+				// 						) -
+				// 						buttonsNumber / 2;
 
-						const currentTranslate = -(
-							buttonPanel.buttonWidth * firstYearIndex
-						);
+				// 		const currentTranslate = -(
+				// 			buttonPanel.buttonWidth * firstYearIndex
+				// 		);
 
-						if (currentTranslate === 0) {
-							svg.select(".pbiclcLeftArrowGroup")
-								.select("text")
-								.style("fill", "#ccc");
-							svg.select(".pbiclcLeftArrowGroup").attr(
-								"pointer-events",
-								"none",
-							);
-						} else {
-							svg.select(".pbiclcLeftArrowGroup")
-								.select("text")
-								.style("fill", "#666");
-							svg.select(".pbiclcLeftArrowGroup").attr(
-								"pointer-events",
-								"all",
-							);
-						}
+				// 		if (currentTranslate === 0) {
+				// 			svg.select(".pbiclcLeftArrowGroup")
+				// 				.select("text")
+				// 				.style("fill", "#ccc");
+				// 			svg.select(".pbiclcLeftArrowGroup").attr(
+				// 				"pointer-events",
+				// 				"none",
+				// 			);
+				// 		} else {
+				// 			svg.select(".pbiclcLeftArrowGroup")
+				// 				.select("text")
+				// 				.style("fill", "#666");
+				// 			svg.select(".pbiclcLeftArrowGroup").attr(
+				// 				"pointer-events",
+				// 				"all",
+				// 			);
+				// 		}
 
-						if (
-							Math.abs(currentTranslate) >=
-							(yearsArray.length - buttonsNumber) *
-								buttonPanel.buttonWidth
-						) {
-							svg.select(".pbiclcRightArrowGroup")
-								.select("text")
-								.style("fill", "#ccc");
-							svg.select(".pbiclcRightArrowGroup").attr(
-								"pointer-events",
-								"none",
-							);
-						} else {
-							svg.select(".pbiclcRightArrowGroup")
-								.select("text")
-								.style("fill", "#666");
-							svg.select(".pbiclcRightArrowGroup").attr(
-								"pointer-events",
-								"all",
-							);
-						}
+				// 		if (
+				// 			Math.abs(currentTranslate) >=
+				// 			(yearsArray.length - buttonsNumber) *
+				// 				buttonPanel.buttonWidth
+				// 		) {
+				// 			svg.select(".pbiclcRightArrowGroup")
+				// 				.select("text")
+				// 				.style("fill", "#ccc");
+				// 			svg.select(".pbiclcRightArrowGroup").attr(
+				// 				"pointer-events",
+				// 				"none",
+				// 			);
+				// 		} else {
+				// 			svg.select(".pbiclcRightArrowGroup")
+				// 				.select("text")
+				// 				.style("fill", "#666");
+				// 			svg.select(".pbiclcRightArrowGroup").attr(
+				// 				"pointer-events",
+				// 				"all",
+				// 			);
+				// 		}
 
-						svg.select(".pbiclcbuttonsGroup")
-							.transition()
-							.duration(duration)
-							.attrTween("transform", function () {
-								return d3.interpolateString(
-									this.getAttribute("transform"),
-									"translate(" + currentTranslate + ",0)",
-								);
-							});
-					}
-				});
+				// 		svg.select(".pbiclcbuttonsGroup")
+				// 			.transition()
+				// 			.duration(duration)
+				// 			.attrTween("transform", function () {
+				// 				return d3.interpolateString(
+				// 					this.getAttribute("transform"),
+				// 					"translate(" + currentTranslate + ",0)",
+				// 				);
+				// 			});
+				// 	}
+				// });
 
 				if (!isBookmarkPage) {
 					const shareIcon = iconsDiv
@@ -2050,31 +2052,34 @@
 			}
 
 			function createButtonPanel() {
-				yearsArray.push(allYearsOption);
+				if (yearsArray.length > 1) yearsArray.push(allYearsOption);
 
-				const clipPath = buttonPanel.main
-					.append("clipPath")
-					.attr("id", "pbiclcclip")
-					.append("rect")
-					.attr("width", buttonsNumber * buttonPanel.buttonWidth)
-					.attr("height", buttonPanel.height);
+				// const clipPath = buttonPanel.main
+				// 	.append("clipPath")
+				// 	.attr("id", "pbiclcclip")
+				// 	.append("rect")
+				// 	.attr("width", buttonsNumber * buttonPanel.buttonWidth)
+				// 	.attr("height", buttonPanel.height);
 
-				const clipPathGroup = buttonPanel.main
-					.append("g")
-					.attr("class", "pbiclcClipPathGroup")
-					.attr(
-						"transform",
-						"translate(" +
-							(buttonPanel.padding[3] +
-								buttonPanel.arrowPadding) +
-							",0)",
-					)
-					.attr("clip-path", "url(#pbiclcclip)");
+				// const clipPathGroup = buttonPanel.main
+				// 	.append("g")
+				// 	.attr("class", "pbiclcClipPathGroup")
+				// 	.attr(
+				// 		"transform",
+				// 		"translate(" +
+				// 			(buttonPanel.padding[3] +
+				// 				buttonPanel.arrowPadding) +
+				// 			",0)",
+				// 	)
+				// 	.attr("clip-path", "url(#pbiclcclip)");
 
-				const buttonsGroup = clipPathGroup
+				const buttonsGroup = buttonPanel.main
 					.append("g")
 					.attr("class", "pbiclcbuttonsGroup")
-					.attr("transform", "translate(0,0)")
+					.attr(
+						"transform",
+						"translate(" + buttonPanel.buttonGroupPadding + ",0)",
+					)
 					.style("cursor", "pointer");
 
 				const buttonsRects = buttonsGroup
@@ -2201,63 +2206,63 @@
 						}
 					});
 
-				const leftArrow = buttonPanel.main
-					.append("g")
-					.attr("class", "pbiclcLeftArrowGroup")
-					.style("cursor", "pointer")
-					.attr(
-						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)",
-					);
+				// const leftArrow = buttonPanel.main
+				// 	.append("g")
+				// 	.attr("class", "pbiclcLeftArrowGroup")
+				// 	.style("cursor", "pointer")
+				// 	.attr(
+				// 		"transform",
+				// 		"translate(" + buttonPanel.padding[3] + ",0)",
+				// 	);
 
-				const leftArrowRect = leftArrow
-					.append("rect")
-					.style("fill", "white")
-					.attr("width", buttonPanel.arrowPadding)
-					.attr("height", buttonPanel.height);
+				// const leftArrowRect = leftArrow
+				// 	.append("rect")
+				// 	.style("fill", "white")
+				// 	.attr("width", buttonPanel.arrowPadding)
+				// 	.attr("height", buttonPanel.height);
 
-				const leftArrowText = leftArrow
-					.append("text")
-					.attr("class", "pbiclcleftArrowText")
-					.attr("x", 0)
-					.attr(
-						"y",
-						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1,
-					)
-					.style("fill", "#666")
-					.text("\u25c4");
+				// const leftArrowText = leftArrow
+				// 	.append("text")
+				// 	.attr("class", "pbiclcleftArrowText")
+				// 	.attr("x", 0)
+				// 	.attr(
+				// 		"y",
+				// 		buttonPanel.height -
+				// 			buttonPanel.buttonVerticalPadding * 2.1,
+				// 	)
+				// 	.style("fill", "#666")
+				// 	.text("\u25c4");
 
-				const rightArrow = buttonPanel.main
-					.append("g")
-					.attr("class", "pbiclcRightArrowGroup")
-					.style("cursor", "pointer")
-					.attr(
-						"transform",
-						"translate(" +
-							(buttonPanel.padding[3] +
-								buttonPanel.arrowPadding +
-								buttonsNumber * buttonPanel.buttonWidth) +
-							",0)",
-					);
+				// const rightArrow = buttonPanel.main
+				// 	.append("g")
+				// 	.attr("class", "pbiclcRightArrowGroup")
+				// 	.style("cursor", "pointer")
+				// 	.attr(
+				// 		"transform",
+				// 		"translate(" +
+				// 			(buttonPanel.padding[3] +
+				// 				buttonPanel.arrowPadding +
+				// 				buttonsNumber * buttonPanel.buttonWidth) +
+				// 			",0)",
+				// 	);
 
-				const rightArrowRect = rightArrow
-					.append("rect")
-					.style("fill", "white")
-					.attr("width", buttonPanel.arrowPadding)
-					.attr("height", buttonPanel.height);
+				// const rightArrowRect = rightArrow
+				// 	.append("rect")
+				// 	.style("fill", "white")
+				// 	.attr("width", buttonPanel.arrowPadding)
+				// 	.attr("height", buttonPanel.height);
 
-				const rightArrowText = rightArrow
-					.append("text")
-					.attr("class", "pbiclcrightArrowText")
-					.attr("x", -1)
-					.attr(
-						"y",
-						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1,
-					)
-					.style("fill", "#666")
-					.text("\u25ba");
+				// const rightArrowText = rightArrow
+				// 	.append("text")
+				// 	.attr("class", "pbiclcrightArrowText")
+				// 	.attr("x", -1)
+				// 	.attr(
+				// 		"y",
+				// 		buttonPanel.height -
+				// 			buttonPanel.buttonVerticalPadding * 2.1,
+				// 	)
+				// 	.style("fill", "#666")
+				// 	.text("\u25ba");
 
 				buttonsRects
 					.on("mouseover", mouseOverButtonsRects)
@@ -2282,139 +2287,139 @@
 						}
 					});
 
-				d3.select("body").on("d3ChartsYear.pbiclc", function () {
-					clickButtonsRects(
-						validateCustomEventYear(+d3.event.detail),
-						true,
-					);
-					repositionButtonsGroup();
-					checkArrows();
-				});
+				// d3.select("body").on("d3ChartsYear.pbiclc", function () {
+				// 	clickButtonsRects(
+				// 		validateCustomEventYear(+d3.event.detail),
+				// 		true,
+				// 	);
+				// 	repositionButtonsGroup();
+				// 	checkArrows();
+				// });
 
 				buttonsContributionsRects
 					.on("mouseover", mouseOverButtonsContributionsRects)
 					.on("mouseout", mouseOutButtonsContributionsRects)
 					.on("click", clickButtonsContributionsRects);
 
-				repositionButtonsGroup();
+				// repositionButtonsGroup();
 
-				checkCurrentTranslate();
+				// checkCurrentTranslate();
 
-				leftArrow.on("click", function () {
-					leftArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
-					rightArrow.select("text").style("fill", "#666");
-					rightArrow.attr("pointer-events", "all");
-					buttonsGroup
-						.transition()
-						.duration(duration)
-						.attr(
-							"transform",
-							"translate(" +
-								Math.min(
-									0,
-									currentTranslate +
-										buttonsNumber * buttonPanel.buttonWidth,
-								) +
-								",0)",
-						)
-						.on("end", checkArrows);
-				});
+				// leftArrow.on("click", function () {
+				// 	leftArrow.attr("pointer-events", "none");
+				// 	const currentTranslate = parseTransform(
+				// 		buttonsGroup.attr("transform"),
+				// 	)[0];
+				// 	rightArrow.select("text").style("fill", "#666");
+				// 	rightArrow.attr("pointer-events", "all");
+				// 	buttonsGroup
+				// 		.transition()
+				// 		.duration(duration)
+				// 		.attr(
+				// 			"transform",
+				// 			"translate(" +
+				// 				Math.min(
+				// 					0,
+				// 					currentTranslate +
+				// 						buttonsNumber * buttonPanel.buttonWidth,
+				// 				) +
+				// 				",0)",
+				// 		)
+				// 		.on("end", checkArrows);
+				// });
 
-				rightArrow.on("click", function () {
-					rightArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
-					leftArrow.select("text").style("fill", "#666");
-					leftArrow.attr("pointer-events", "all");
-					buttonsGroup
-						.transition()
-						.duration(duration)
-						.attr(
-							"transform",
-							"translate(" +
-								Math.max(
-									-(
-										(yearsArray.length - buttonsNumber) *
-										buttonPanel.buttonWidth
-									),
-									-(
-										Math.abs(currentTranslate) +
-										buttonsNumber * buttonPanel.buttonWidth
-									),
-								) +
-								",0)",
-						)
-						.on("end", checkArrows);
-				});
+				// rightArrow.on("click", function () {
+				// 	rightArrow.attr("pointer-events", "none");
+				// 	const currentTranslate = parseTransform(
+				// 		buttonsGroup.attr("transform"),
+				// 	)[0];
+				// 	leftArrow.select("text").style("fill", "#666");
+				// 	leftArrow.attr("pointer-events", "all");
+				// 	buttonsGroup
+				// 		.transition()
+				// 		.duration(duration)
+				// 		.attr(
+				// 			"transform",
+				// 			"translate(" +
+				// 				Math.max(
+				// 					-(
+				// 						(yearsArray.length - buttonsNumber) *
+				// 						buttonPanel.buttonWidth
+				// 					),
+				// 					-(
+				// 						Math.abs(currentTranslate) +
+				// 						buttonsNumber * buttonPanel.buttonWidth
+				// 					),
+				// 				) +
+				// 				",0)",
+				// 		)
+				// 		.on("end", checkArrows);
+				// });
 
-				function checkArrows() {
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
+				// function checkArrows() {
+				// 	const currentTranslate = parseTransform(
+				// 		buttonsGroup.attr("transform"),
+				// 	)[0];
 
-					if (currentTranslate === 0) {
-						leftArrow.select("text").style("fill", "#ccc");
-						leftArrow.attr("pointer-events", "none");
-					} else {
-						leftArrow.select("text").style("fill", "#666");
-						leftArrow.attr("pointer-events", "all");
-					}
+				// 	if (currentTranslate === 0) {
+				// 		leftArrow.select("text").style("fill", "#ccc");
+				// 		leftArrow.attr("pointer-events", "none");
+				// 	} else {
+				// 		leftArrow.select("text").style("fill", "#666");
+				// 		leftArrow.attr("pointer-events", "all");
+				// 	}
 
-					if (
-						Math.abs(currentTranslate) >=
-						(yearsArray.length - buttonsNumber) *
-							buttonPanel.buttonWidth
-					) {
-						rightArrow.select("text").style("fill", "#ccc");
-						rightArrow.attr("pointer-events", "none");
-					} else {
-						rightArrow.select("text").style("fill", "#666");
-						rightArrow.attr("pointer-events", "all");
-					}
-				}
+				// 	if (
+				// 		Math.abs(currentTranslate) >=
+				// 		(yearsArray.length - buttonsNumber) *
+				// 			buttonPanel.buttonWidth
+				// 	) {
+				// 		rightArrow.select("text").style("fill", "#ccc");
+				// 		rightArrow.attr("pointer-events", "none");
+				// 	} else {
+				// 		rightArrow.select("text").style("fill", "#666");
+				// 		rightArrow.attr("pointer-events", "all");
+				// 	}
+				// }
 
-				function checkCurrentTranslate() {
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
+				// function checkCurrentTranslate() {
+				// 	const currentTranslate = parseTransform(
+				// 		buttonsGroup.attr("transform"),
+				// 	)[0];
 
-					if (currentTranslate === 0) {
-						leftArrow.select("text").style("fill", "#ccc");
-						leftArrow.attr("pointer-events", "none");
-					}
+				// 	if (currentTranslate === 0) {
+				// 		leftArrow.select("text").style("fill", "#ccc");
+				// 		leftArrow.attr("pointer-events", "none");
+				// 	}
 
-					if (
-						Math.abs(currentTranslate) >=
-						(yearsArray.length - buttonsNumber) *
-							buttonPanel.buttonWidth
-					) {
-						rightArrow.select("text").style("fill", "#ccc");
-						rightArrow.attr("pointer-events", "none");
-					}
-				}
+				// 	if (
+				// 		Math.abs(currentTranslate) >=
+				// 		(yearsArray.length - buttonsNumber) *
+				// 			buttonPanel.buttonWidth
+				// 	) {
+				// 		rightArrow.select("text").style("fill", "#ccc");
+				// 		rightArrow.attr("pointer-events", "none");
+				// 	}
+				// }
 
-				function repositionButtonsGroup() {
-					const firstYearIndex =
-						chartState.selectedYear[0] < yearsArray[5]
-							? 0
-							: chartState.selectedYear[0] >
-								  yearsArray[yearsArray.length - 4]
-								? yearsArray.length - 8
-								: yearsArray.indexOf(
-										chartState.selectedYear[0],
-									) - 4;
+				// function repositionButtonsGroup() {
+				// 	const firstYearIndex =
+				// 		chartState.selectedYear[0] < yearsArray[5]
+				// 			? 0
+				// 			: chartState.selectedYear[0] >
+				// 				  yearsArray[yearsArray.length - 4]
+				// 				? yearsArray.length - 8
+				// 				: yearsArray.indexOf(
+				// 						chartState.selectedYear[0],
+				// 					) - 4;
 
-					buttonsGroup.attr(
-						"transform",
-						"translate(" +
-							-(buttonPanel.buttonWidth * firstYearIndex) +
-							",0)",
-					);
-				}
+				// 	buttonsGroup.attr(
+				// 		"transform",
+				// 		"translate(" +
+				// 			-(buttonPanel.buttonWidth * firstYearIndex) +
+				// 			",0)",
+				// 	);
+				// }
 
 				//end of createButtonPanel
 			}
@@ -3805,7 +3810,8 @@
 					: rawData.filter(function (d) {
 							return (
 								chartState.selectedYear.indexOf(+d.FiscalYear) >
-								-1
+									-1 &&
+								d.GMSDonorISO2Code.toLowerCase() == "us"
 							);
 						});
 
