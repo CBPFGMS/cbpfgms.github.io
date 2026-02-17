@@ -891,6 +891,10 @@
 		function csvCallback([rawData, flagsData, masterRegionalFunds]) {
 			removeProgressWheel();
 
+			rawData = rawData.filter(function (d) {
+				return d.GMSDonorISO2Code.toLowerCase() === "us";
+			});
+
 			yearsArray = rawData
 				.map(function (d) {
 					if (
@@ -908,11 +912,10 @@
 							d.PooledFundName;
 					if (d.PaidAmt < 0) d.PaidAmt = 0;
 					if (d.PledgeAmt < 0) d.PledgeAmt = 0;
-					if (d.GMSDonorISO2Code.toLowerCase() === "us")
-						return +d.FiscalYear;
+					return +d.FiscalYear;
 				})
 				.filter(function (value, index, self) {
-					return self.indexOf(value) === index && value !== undefined;
+					return self.indexOf(value) === index;
 				})
 				.sort();
 
@@ -3810,8 +3813,7 @@
 					: rawData.filter(function (d) {
 							return (
 								chartState.selectedYear.indexOf(+d.FiscalYear) >
-									-1 &&
-								d.GMSDonorISO2Code.toLowerCase() == "us"
+								-1
 							);
 						});
 
