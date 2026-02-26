@@ -4,6 +4,8 @@ type ApiFile = {
 	type: "yearly" | "complete";
 };
 
+// url: "https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=CBPF_Global_PROJ_SUMMARY_Agg_V3&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AdminLocationLevel=&",
+
 export const apiFiles: ApiFile[] = [
 	{
 		url: "https://cbpfapi.unocha.org/vo2/odata/ProjectSummaryV2?",

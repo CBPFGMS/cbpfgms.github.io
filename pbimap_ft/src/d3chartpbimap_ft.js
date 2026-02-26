@@ -16,7 +16,7 @@
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
 		cssLinks = [
 			"https://cbpfgms.github.io/css/d3chartstyles.css",
-			"https://cbpfgms.github.io/css/d3chartstylespbimap.css",
+			"https://cbpfgms.github.io/css/d3chartstylespbimap_ft.css",
 			fontAwesomeLink,
 			leafletCSSLink,
 		],
@@ -42,7 +42,7 @@
 			if (cssLink === fontAwesomeLink) {
 				externalCSS.setAttribute(
 					"integrity",
-					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/",
 				);
 				externalCSS.setAttribute("crossorigin", "anonymous");
 			}
@@ -156,7 +156,7 @@
 					"use strict";
 					if (target == null) {
 						throw new TypeError(
-							"Cannot convert undefined or null to object"
+							"Cannot convert undefined or null to object",
 						);
 					}
 
@@ -170,7 +170,7 @@
 								if (
 									Object.prototype.hasOwnProperty.call(
 										nextSource,
-										nextKey
+										nextKey,
 									)
 								) {
 									to[nextKey] = nextSource[nextKey];
@@ -211,7 +211,7 @@
 						callback(
 							new Blob([arr], {
 								type: type || "image/png",
-							})
+							}),
 						);
 					});
 				},
@@ -224,7 +224,7 @@
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
-			topSvgHorizontalPositions = [0.18, 0.38, 0.58, 0.76],
+			topSvgHorizontalPositions = [0.16, 0.34, 0.58, 0.76],
 			topSvgMainValueVerPadding = 12,
 			topSvgMainValueHorPadding = 2,
 			legendSvgWidth = 110,
@@ -253,6 +253,7 @@
 				.map(function (d) {
 					return d.toString();
 				}),
+			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
 			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
@@ -281,22 +282,24 @@
 			minValueColor = "#eee",
 			colorInterpolator = d3.interpolateRgb(
 				minValueColor,
-				maxMarkerColor
+				maxMarkerColor,
 			),
 			colorInterpolatorGlobal = d3.interpolateRgb(
 				minValueColor,
-				maxMarkerGlobalColor
+				maxMarkerGlobalColor,
 			),
-			tooltipSvgWidth = 270,
-			tooltipSvgHeight = 80,
-			tooltipSvgPadding = [6, 36, 14, 45],
+			tooltipSvgWidth = 310,
+			tooltipSvgHeight = 168,
+			tooltipSvgPadding = [10, 52, 30, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
+			beneficiariesTypes = ["Targeted", "Reached"],
+			reachedColor = "#ccc",
 			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/utils/allocations_overview_static/data/",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_ft/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -343,10 +346,11 @@
 				"Partner",
 				"Allocation Type",
 				"Targeted People",
+				"Reached People",
 				"Allocations",
 			],
-			listHeadersWidth = ["18%", "32%", "20%", "12%", "9%", "9%"],
-			listRowsWidth = ["18%", "32.5%", "20%", "12.5%", "8.5%", "8.5%"],
+			listHeadersWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
+			listRowsWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
 			chartState = {
 				selectedYear: [],
 				selectedPartner: [],
@@ -355,6 +359,7 @@
 				selectedCluster: [],
 				selectedAdminLevel: null,
 				displayMode: "size",
+				beneficiaryType: "Targeted",
 			},
 			loadedYears = [],
 			cbpfsList = {},
@@ -482,7 +487,7 @@
 			null,
 			width,
 			heightProgressSVG,
-			"Loading visualisation..."
+			"Loading visualisation...",
 		);
 
 		const leafletMap = L.map("pbimapContainerDiv", {
@@ -493,7 +498,7 @@
 
 		leafletMap.setView(
 			[mapInitialLatitude, mapInitialLongitude],
-			mapInitialZoom
+			mapInitialZoom,
 		);
 
 		L.tileLayer(
@@ -503,7 +508,7 @@
 					'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
 				subdomains: "abcd",
 				maxZoom: maxZoomValue,
-			}
+			},
 		).addTo(leafletMap);
 
 		const snapshotTooltip = containerDiv
@@ -544,7 +549,7 @@
 				.append("p")
 				.attr("id", "pbimapTooltipBestVisualizedText")
 				.html(
-					"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+					"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 				)
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
@@ -584,6 +589,13 @@
 			.attr("width", legendSvgWidth)
 			.attr("height", legendSvgHeight);
 
+		legendSvg
+			.append("rect")
+			.attr("width", legendSvgWidth)
+			.attr("height", legendSvgHeight)
+			.attr("fill", "white")
+			.attr("opacity", 0.7);
+
 		const filterColorScale = d3
 			.scaleOrdinal()
 			.domain(filterTitles)
@@ -609,19 +621,27 @@
 		const colorScale = d3.scaleQuantile();
 
 		const tooltipSvgYScale = d3
-			.scalePoint()
+			.scaleBand()
 			.range([
 				tooltipSvgPadding[0],
 				tooltipSvgHeight - tooltipSvgPadding[2],
 			])
 			.domain(beneficiariesList)
-			.padding(0.5);
+			.paddingOuter(0.1)
+			.paddingInner(0.3);
+
+		const tooltipSvgInnerYScale = d3
+			.scaleBand()
+			.range([0, tooltipSvgYScale.bandwidth()])
+			.domain(beneficiariesTypes)
+			.paddingOuter(0)
+			.paddingInner(0.3);
 
 		const tooltipSvgXScale = d3
 			.scaleLinear()
 			.range([
 				tooltipSvgPadding[3],
-				tooltipSvgWidth - tooltipSvgPadding[1],
+				tooltipSvgWidth - tooltipSvgPadding[1] - tooltipSvgPadding[3],
 			]);
 
 		const tooltipSvgYAxis = d3
@@ -637,12 +657,12 @@
 					tooltipSvgHeight -
 					tooltipSvgPadding[0] -
 					tooltipSvgPadding[2]
-				)
+				),
 			)
-			.ticks(2)
+			.ticks(3)
 			.tickPadding(4)
 			.tickFormat(function (d) {
-				return "$" + formatSIaxes(d).replace("G", "B");
+				return formatSIaxes(d).replace("G", "B");
 			});
 
 		const listHeaderScale = d3
@@ -654,6 +674,7 @@
 				"OrgNm",
 				"AllNm",
 				"AdmLocBenClustAgg",
+				"AdmLocBenReachedClustAgg",
 				"AdmLocClustBdg",
 			]);
 
@@ -712,7 +733,7 @@
 					safeDivide(
 						aggregatedLaunchedValues[year].underApproval,
 						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched
+						aggregatedLaunchedValues[year].launched,
 					);
 				yearsWithUnderApprovalAboveMin[year] =
 					underApprovalPercent > minimumUnderApprovalPercentage ||
@@ -777,7 +798,7 @@
 					if (!rawData[0].length || !rawData[1].length) {
 						yearsArrayString.splice(
 							yearsArrayString.indexOf(year.toString()),
-							1
+							1,
 						);
 						removeYearFilter();
 					} else {
@@ -966,7 +987,7 @@
 					.append("p")
 					.attr("id", "pbimapBestVisualizedText")
 					.html(
-						"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+						"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 					)
 					.attr("pointer-events", "none")
 					.style("cursor", "default");
@@ -1034,7 +1055,7 @@
 			const yearsList = yearsListOriginal.reduce(function (
 				acc,
 				curr,
-				index
+				index,
 			) {
 				return (
 					acc +
@@ -1044,17 +1065,16 @@
 							: curr + " and "
 						: curr + ", ")
 				);
-			},
-			"");
+			}, "");
 
 			launchedValue
 				.style(
 					"opacity",
 					chartState.selectedYear.some(
-						e => yearsWithUnderApprovalAboveMin[e]
+						e => yearsWithUnderApprovalAboveMin[e],
 					)
 						? 1
-						: 0
+						: 0,
 				)
 				.html("Launched Allocations in " + yearsList + ": ");
 
@@ -1066,7 +1086,7 @@
 						formatSIFloat(data.launchedAllocations)
 							.replace("k", " Thousand")
 							.replace("M", " Million")
-							.replace("G", " Billion")
+							.replace("G", " Billion"),
 				);
 
 			const previousAllocations = d3
@@ -1078,6 +1098,11 @@
 				.select(".pbimapTopSvgBeneficiaries")
 				.size()
 				? d3.select(".pbimapTopSvgBeneficiaries").datum()
+				: 0;
+			const previousBeneficiariesReached = d3
+				.select(".pbimapTopSvgBeneficiariesReached")
+				.size()
+				? d3.select(".pbimapTopSvgBeneficiariesReached").datum()
 				: 0;
 			const previousProjects = d3.select(".pbimapTopSvgProjects").size()
 				? d3.select(".pbimapTopSvgProjects").datum()
@@ -1099,7 +1124,7 @@
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] -
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
 				.merge(topSvgAllocations);
 
@@ -1129,7 +1154,7 @@
 					launchedValue.style(
 						"padding-left",
 						thisLeftPadding + "px",
-						"important"
+						"important",
 					);
 				});
 
@@ -1146,7 +1171,7 @@
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
 				.merge(topSvgAllocationsText);
 
@@ -1156,10 +1181,10 @@
 				return unit === "k"
 					? "Thousand"
 					: unit === "M"
-					? "Million"
-					: unit === "G"
-					? "Billion"
-					: "";
+						? "Million"
+						: unit === "G"
+							? "Billion"
+							: "";
 			});
 
 			const topSvgAllocationsSubtitle = topSvg
@@ -1168,11 +1193,11 @@
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgAllocationsSubtitle")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
 				.text("Allocated");
 
@@ -1185,14 +1210,14 @@
 				.append("text")
 				.attr(
 					"class",
-					"pbimapTopSvgBeneficiaries contributionColorFill"
+					"pbimapTopSvgBeneficiaries contributionColorFill",
 				)
 				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] -
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
 				.merge(topSvgBeneficiaries);
 
@@ -1209,7 +1234,7 @@
 						d3.select(node).text(
 							+unit !== +unit
 								? siString.substring(0, siString.length - 1)
-								: siString
+								: siString,
 						);
 					};
 				});
@@ -1223,39 +1248,108 @@
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiariesText")
 				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.7)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
 				.merge(topSvgBeneficiariesText);
 
 			topSvgBeneficiariesText.text(function (d) {
 				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1];
-				return unit === "k"
-					? "Thousand"
-					: unit === "M"
-					? "Million"
-					: unit === "G"
-					? "Billion"
-					: "";
+					unit = valueSI[valueSI.length - 1],
+					unitText =
+						unit === "k"
+							? "Thousand"
+							: unit === "M"
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "";
+				return unitText + " targeted people";
 			});
 
-			const topSvgBeneficiariesSubtitle = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesSubtitle")
-				.data([true])
+			let topSvgBeneficiariesReached = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesReached")
+				.data([data.totalBeneficiariesReached]);
+
+			topSvgBeneficiariesReached = topSvgBeneficiariesReached
 				.enter()
 				.append("text")
-				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
+				.attr(
+					"class",
+					"pbimapTopSvgBeneficiariesReached contributionColorFill",
+				)
+				.attr("text-anchor", "end")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+				.attr(
+					"x",
+					width * topSvgHorizontalPositions[1] -
+						topSvgMainValueHorPadding,
+				)
+				.merge(topSvgBeneficiariesReached);
+
+			topSvgBeneficiariesReached
+				.transition()
+				.duration(duration)
+				.tween("text", function (d) {
+					const node = this,
+						i = d3.interpolate(previousBeneficiariesReached, d),
+						valueSI = formatSIFloat(d),
+						unit = valueSI[valueSI.length - 1];
+					return function (t) {
+						const siString = formatSIFloat(i(t));
+						d3.select(node).text(
+							+unit !== +unit
+								? siString.substring(0, siString.length - 1)
+								: siString,
+						);
+					};
+				});
+
+			let topSvgBeneficiariesReachedText = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesReachedText")
+				.data([data.totalBeneficiariesReached]);
+
+			topSvgBeneficiariesReachedText = topSvgBeneficiariesReachedText
+				.enter()
+				.append("text")
+				.attr("class", "pbimapTopSvgBeneficiariesReachedText")
+				.attr("text-anchor", "start")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
-						topSvgMainValueHorPadding
+						topSvgMainValueHorPadding,
 				)
-				.text("Targeted People");
+				.merge(topSvgBeneficiariesReachedText);
+
+			topSvgBeneficiariesReachedText.text(function (d) {
+				const valueSI = formatSIFloat(d),
+					unit = valueSI[valueSI.length - 1],
+					unitText =
+						unit === "k"
+							? "Thousand"
+							: unit === "M"
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "",
+					reachedPeoplePercentage =
+						data.totalBeneficiaries === 0
+							? 0
+							: Math.floor(
+									(data.totalBeneficiariesReached * 100) /
+										data.totalBeneficiaries,
+								);
+				return (
+					unitText +
+					" reached people (" +
+					reachedPeoplePercentage +
+					"%)"
+				);
+			});
 
 			const partnersLogo = topSvg
 				.selectAll(".pbimapTopSvgPartnersLogo")
@@ -1271,7 +1365,7 @@
 					"xlink:href",
 					localStorage.getItem("storedImagepartnersLogo")
 						? localStorage.getItem("storedImagepartnersLogo")
-						: partnersLogoPath
+						: partnersLogoPath,
 				);
 
 			let topSvgPartners = topSvg
@@ -1285,7 +1379,7 @@
 				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.6)
 				.attr(
 					"x",
-					width * topSvgHorizontalPositions[2] + partnersProjectSize
+					width * topSvgHorizontalPositions[2] + partnersProjectSize,
 				)
 				.merge(topSvgPartners);
 
@@ -1320,7 +1414,7 @@
 					"xlink:href",
 					localStorage.getItem("storedImageprojectsLogo")
 						? localStorage.getItem("storedImageprojectsLogo")
-						: projectsLogoPath
+						: projectsLogoPath,
 				);
 
 			let topSvgProjects = topSvg
@@ -1334,7 +1428,7 @@
 				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.6)
 				.attr(
 					"x",
-					width * topSvgHorizontalPositions[3] + partnersProjectSize
+					width * topSvgHorizontalPositions[3] + partnersProjectSize,
 				)
 				.merge(topSvgProjects);
 
@@ -1407,7 +1501,7 @@
 						filterContainerDivs
 							.select(".pbimapDropdownContainer")
 							.style("display", "none");
-					}
+					},
 				);
 			} else {
 				filterContainerDivs
@@ -1445,7 +1539,7 @@
 			yearsDropdown.call(
 				populateDropdown,
 				yearsArrayString,
-				chartState.selectedYear
+				chartState.selectedYear,
 			);
 
 			const cbpfsDropdown = dropdownContainer.filter(function (d) {
@@ -1457,9 +1551,9 @@
 				["All"].concat(
 					d3.values(cbpfsList).sort(function (a, b) {
 						return a.toLowerCase().localeCompare(b.toLowerCase());
-					})
+					}),
 				),
-				chartState.selectedCBPF
+				chartState.selectedCBPF,
 			);
 
 			filterCbpfsDropdown();
@@ -1471,7 +1565,7 @@
 			partnersDropdown.call(
 				populateDropdown,
 				["All"].concat(d3.values(partnersList).sort()),
-				chartState.selectedPartner
+				chartState.selectedPartner,
 			);
 
 			const clustersDropdown = dropdownContainer.filter(function (d) {
@@ -1481,7 +1575,7 @@
 			clustersDropdown.call(
 				populateDropdown,
 				["All"].concat(d3.values(clustersList).sort()),
-				chartState.selectedCluster
+				chartState.selectedCluster,
 			);
 
 			const modalitiesDropdown = dropdownContainer.filter(function (d) {
@@ -1491,7 +1585,7 @@
 			modalitiesDropdown.call(
 				populateDropdown,
 				["All"].concat(allocationsTypeList.sort()),
-				chartState.selectedModality
+				chartState.selectedModality,
 			);
 
 			const adminLevelDropdown = dropdownContainer.filter(function (d) {
@@ -1501,7 +1595,7 @@
 			adminLevelDropdown.call(
 				populateDropdown,
 				d3.range(0, maxCombinedLevel + 1, 1),
-				chartState.selectedAdminLevel
+				chartState.selectedAdminLevel,
 			);
 
 			filterContainerDivs
@@ -1524,20 +1618,20 @@
 					"year",
 					chartState.selectedYear.length === 1
 						? chartState.selectedYear[0]
-						: currentYear
+						: currentYear,
 				);
 				yearsDropdown.call(
 					populateDropdown,
 					yearsArrayString.map(function (d) {
 						return +d;
 					}),
-					chartState.selectedYear
+					chartState.selectedYear,
 				);
 				const data = filterData();
 				modalitiesDropdown.call(
 					populateDropdown,
 					["All"].concat(data.allocationsTypeList.sort()),
-					chartState.selectedModality
+					chartState.selectedModality,
 				);
 				modalitiesDropdown.selectAll("li").on("click", function (d) {
 					clickModalities(d);
@@ -1549,7 +1643,7 @@
 					}) || 0;
 				chartState.selectedAdminLevel = Math.min(
 					newMaxCombinedLevel,
-					chartState.selectedAdminLevel
+					chartState.selectedAdminLevel,
 				);
 
 				createTopSvg(data.topSvgObject);
@@ -1561,7 +1655,7 @@
 				adminLevelDropdown.call(
 					populateDropdown,
 					d3.range(0, newMaxCombinedLevel + 1, 1),
-					chartState.selectedAdminLevel
+					chartState.selectedAdminLevel,
 				);
 				adminLevelDropdown.selectAll("li").on("click", function (d) {
 					chartState.selectedAdminLevel = d;
@@ -1573,7 +1667,7 @@
 					adminLevelDropdown.call(
 						populateDropdown,
 						d3.range(0, newMaxCombinedLevel + 1, 1),
-						chartState.selectedAdminLevel
+						chartState.selectedAdminLevel,
 					);
 					const data = filterData();
 					createTopSvg(data.topSvgObject);
@@ -1588,12 +1682,12 @@
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"partnersTypeList"
+					"partnersTypeList",
 				);
 				clustersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"clustersList"
+					"clustersList",
 				);
 			});
 
@@ -1613,7 +1707,7 @@
 				cbpfsDropdown.call(
 					populateDropdown,
 					["All"].concat(d3.values(cbpfsList).sort()),
-					chartState.selectedCBPF
+					chartState.selectedCBPF,
 				);
 				filterCbpfsDropdown();
 			});
@@ -1630,13 +1724,13 @@
 				} else {
 					setQueryString(
 						"partner",
-						chartState.selectedPartner.join("|")
+						chartState.selectedPartner.join("|"),
 					);
 				}
 				partnersDropdown.call(
 					populateDropdown,
 					["All"].concat(d3.values(partnersList).sort()),
-					chartState.selectedPartner
+					chartState.selectedPartner,
 				);
 			});
 
@@ -1652,13 +1746,13 @@
 				} else {
 					setQueryString(
 						"cluster",
-						chartState.selectedCluster.join("|")
+						chartState.selectedCluster.join("|"),
 					);
 				}
 				clustersDropdown.call(
 					populateDropdown,
 					["All"].concat(d3.values(clustersList).sort()),
-					chartState.selectedCluster
+					chartState.selectedCluster,
 				);
 			});
 
@@ -1676,7 +1770,7 @@
 				adminLevelDropdown.call(
 					populateDropdown,
 					d3.range(0, maxCombinedLevel + 1, 1),
-					chartState.selectedAdminLevel
+					chartState.selectedAdminLevel,
 				);
 				const data = filterData();
 				createTopSvg(data.topSvgObject);
@@ -1687,24 +1781,24 @@
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"partnersTypeList"
+					"partnersTypeList",
 				);
 				clustersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"clustersList"
+					"clustersList",
 				);
 			});
 
 			partnersDropdown.call(
 				filterPartnersAndClusters,
 				data,
-				"partnersTypeList"
+				"partnersTypeList",
 			);
 			clustersDropdown.call(
 				filterPartnersAndClusters,
 				data,
-				"clustersList"
+				"clustersList",
 			);
 
 			function changeSelected(datum, thisChartState) {
@@ -1722,7 +1816,7 @@
 						thisChartState.push(datum.toLowerCase());
 					} else {
 						const index = thisChartState.indexOf(
-							datum.toLowerCase()
+							datum.toLowerCase(),
 						);
 						thisChartState.splice(index, 1);
 					}
@@ -1732,7 +1826,7 @@
 				modalitiesDropdown.call(
 					populateDropdown,
 					["All"].concat(data.allocationsTypeList.sort()),
-					chartState.selectedModality
+					chartState.selectedModality,
 				);
 				modalitiesDropdown.selectAll("li").on("click", function (d) {
 					clickModalities(d);
@@ -1747,7 +1841,7 @@
 					}) || 0;
 				chartState.selectedAdminLevel = Math.min(
 					newMaxCombinedLevel,
-					chartState.selectedAdminLevel
+					chartState.selectedAdminLevel,
 				);
 
 				createBreadcrumbDiv();
@@ -1756,7 +1850,7 @@
 				adminLevelDropdown.call(
 					populateDropdown,
 					d3.range(0, newMaxCombinedLevel + 1, 1),
-					chartState.selectedAdminLevel
+					chartState.selectedAdminLevel,
 				);
 				adminLevelDropdown.selectAll("li").on("click", function (d) {
 					chartState.selectedAdminLevel = d;
@@ -1768,7 +1862,7 @@
 					adminLevelDropdown.call(
 						populateDropdown,
 						d3.range(0, newMaxCombinedLevel + 1, 1),
-						chartState.selectedAdminLevel
+						chartState.selectedAdminLevel,
 					);
 					const data = filterData();
 					createTopSvg(data.topSvgObject);
@@ -1781,12 +1875,12 @@
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"partnersTypeList"
+					"partnersTypeList",
 				);
 				clustersDropdown.call(
 					filterPartnersAndClusters,
 					data,
-					"clustersList"
+					"clustersList",
 				);
 			}
 
@@ -1800,14 +1894,14 @@
 				.on("click", function () {
 					for (var key in chartState) {
 						chartState[key] = JSON.parse(
-							JSON.stringify(initialChartState[key])
+							JSON.stringify(initialChartState[key]),
 						);
 					}
 
 					yearsDropdown.call(
 						populateDropdown,
 						yearsArrayString,
-						chartState.selectedYear
+						chartState.selectedYear,
 					);
 					cbpfsDropdown.call(
 						populateDropdown,
@@ -1816,25 +1910,25 @@
 								return a
 									.toLowerCase()
 									.localeCompare(b.toLowerCase());
-							})
+							}),
 						),
-						chartState.selectedCBPF
+						chartState.selectedCBPF,
 					);
 					filterCbpfsDropdown();
 					partnersDropdown.call(
 						populateDropdown,
 						["All"].concat(d3.values(partnersList).sort()),
-						chartState.selectedPartner
+						chartState.selectedPartner,
 					);
 					clustersDropdown.call(
 						populateDropdown,
 						["All"].concat(d3.values(clustersList).sort()),
-						chartState.selectedCluster
+						chartState.selectedCluster,
 					);
 					adminLevelDropdown.call(
 						populateDropdown,
 						d3.range(0, maxCombinedLevel + 1, 1),
-						chartState.selectedAdminLevel
+						chartState.selectedAdminLevel,
 					);
 
 					modalitiesDropdown
@@ -1855,7 +1949,7 @@
 							adminLevelDropdown.call(
 								populateDropdown,
 								d3.range(0, maxCombinedLevel + 1, 1),
-								chartState.selectedAdminLevel
+								chartState.selectedAdminLevel,
 							);
 							const data = filterData();
 							createTopSvg(data.topSvgObject);
@@ -1869,7 +1963,7 @@
 					modalitiesDropdown.call(
 						populateDropdown,
 						["All"].concat(data.allocationsTypeList.sort()),
-						chartState.selectedModality
+						chartState.selectedModality,
 					);
 					createTopSvg(data.topSvgObject);
 					createMap(data.map);
@@ -1880,12 +1974,12 @@
 					partnersDropdown.call(
 						filterPartnersAndClusters,
 						data,
-						"partnersTypeList"
+						"partnersTypeList",
 					);
 					clustersDropdown.call(
 						filterPartnersAndClusters,
 						data,
-						"clustersList"
+						"clustersList",
 					);
 				});
 
@@ -1901,7 +1995,7 @@
 				} else {
 					setQueryString(
 						"modality",
-						chartState.selectedModality.join("|")
+						chartState.selectedModality.join("|"),
 					);
 				}
 			}
@@ -1911,17 +2005,15 @@
 				chartState.selectedYear.forEach(function (year) {
 					allcbpfsWithData.push.apply(
 						allcbpfsWithData,
-						cbpfsInCompleteData[year + ""]
+						cbpfsInCompleteData[year + ""],
 					);
 				});
 
-				const cbpfsWithData = allcbpfsWithData.filter(function (
-					value,
-					index,
-					self
-				) {
-					return self.indexOf(value) === index;
-				});
+				const cbpfsWithData = allcbpfsWithData.filter(
+					function (value, index, self) {
+						return self.indexOf(value) === index;
+					},
+				);
 
 				cbpfsDropdown
 					.selectAll("li")
@@ -1949,13 +2041,13 @@
 								"opacity",
 								data[property].indexOf(d) === -1
 									? fadeOpacityMenu
-									: 1
+									: 1,
 							)
 							.style(
 								"pointer-events",
 								data[property].indexOf(d) === -1
 									? "none"
-									: "all"
+									: "all",
 							);
 					});
 			}
@@ -1987,11 +2079,11 @@
 				d3.select(this)
 					.style(
 						"opacity",
-						loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu
+						loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu,
 					)
 					.style(
 						"pointer-events",
-						loadedYears.indexOf(+d) > -1 ? "all" : "none"
+						loadedYears.indexOf(+d) > -1 ? "all" : "none",
 					);
 				d3.select(this)
 					.select("span:nth-child(2)")
@@ -2027,7 +2119,7 @@
 				return;
 			} else {
 				const noDataSelection = d3MapSvgGroup.selectAll(
-					".pbimapNoDataText, .pbimapNoDataTextBack"
+					".pbimapNoDataText, .pbimapNoDataTextBack",
 				);
 				if (noDataSelection) noDataSelection.remove();
 			}
@@ -2055,7 +2147,7 @@
 				.range(
 					chartState.selectedAdminLevel
 						? colorsQuantile
-						: colorsQuantileGlobal
+						: colorsQuantileGlobal,
 				);
 
 			const extentLatitude =
@@ -2067,10 +2159,10 @@
 							countryBoundingBoxes[
 								stripRegionalName(data[0].locationName)
 							].ne.lat,
-					  ]
+						]
 					: d3.extent(data, function (d) {
 							return +d.latitude;
-					  });
+						});
 
 			const extentLongitude =
 				chartState.selectedAdminLevel === 0 && data.length === 1
@@ -2081,10 +2173,10 @@
 							countryBoundingBoxes[
 								stripRegionalName(data[0].locationName)
 							].ne.lng,
-					  ]
+						]
 					: d3.extent(data, function (d) {
 							return +d.longitude;
-					  });
+						});
 
 			function stripRegionalName(str) {
 				return str.split("(")[0].trim();
@@ -2138,7 +2230,7 @@
 						"fill",
 						chartState.selectedAdminLevel
 							? circleColor
-							: circleGlobalColor
+							: circleGlobalColor,
 					);
 
 				if (isTouchScreenOnly) {
@@ -2158,7 +2250,7 @@
 							function () {
 								sizeMarkers.style("opacity", 1);
 								mouseOutMarker();
-							}
+							},
 						);
 					}
 				} else {
@@ -2233,7 +2325,7 @@
 							function () {
 								colorMarkers.style("opacity", 1);
 								mouseOutMarker();
-							}
+							},
 						);
 					}
 				} else {
@@ -2282,7 +2374,7 @@
 			});
 
 			const noDataText = d3MapSvgGroup.selectAll(
-				".pbimapNoDataText, .pbimapNoDataTextBack"
+				".pbimapNoDataText, .pbimapNoDataTextBack",
 			);
 
 			if (noDataText) {
@@ -2341,7 +2433,7 @@
 					"transform",
 					"translate(0," +
 						(legendSvgPadding[0] + buttonTitlePadding) +
-						")"
+						")",
 				);
 
 			legendButtonsGroup
@@ -2421,7 +2513,7 @@
 					"fill",
 					chartState.selectedAdminLevel
 						? circleColor
-						: circleGlobalColor
+						: circleGlobalColor,
 				);
 
 			let legendSubLegendText = legendSvg
@@ -2438,7 +2530,7 @@
 				.text(
 					chartState.selectedAdminLevel
 						? "Admin Level " + chartState.selectedAdminLevel
-						: "Global Level"
+						: "Global Level",
 				);
 
 			if (chartState.displayMode === "size") {
@@ -2474,7 +2566,7 @@
 					.attr("x1", legendSvgPadding[3] + radiusScale.range()[1])
 					.attr(
 						"x2",
-						legendSvgPadding[3] + radiusScale.range()[1] + 30
+						legendSvgPadding[3] + radiusScale.range()[1] + 30,
 					)
 					.attr("y1", function (d) {
 						return d
@@ -2522,7 +2614,7 @@
 					.attr("class", "pbimapLegendCirclesText")
 					.attr(
 						"x",
-						legendSvgPadding[3] + radiusScale.range()[1] + 34
+						legendSvgPadding[3] + radiusScale.range()[1] + 34,
 					)
 					.attr("y", function (d, i) {
 						return i === 1
@@ -2531,14 +2623,14 @@
 									radiusScale.range()[1] * 2 -
 									radiusScale(d) * 2
 							: i
-							? legendSvgPadding[0] +
-							  73 +
-							  radiusScale.range()[1] * 2 -
-							  radiusScale(d) * 2
-							: legendSvgPadding[0] +
-							  73 +
-							  radiusScale.range()[1] * 2 -
-							  2;
+								? legendSvgPadding[0] +
+									73 +
+									radiusScale.range()[1] * 2 -
+									radiusScale(d) * 2
+								: legendSvgPadding[0] +
+									73 +
+									radiusScale.range()[1] * 2 -
+									2;
 					})
 					.text(function (d) {
 						return d ? d3.formatPrefix(".0", d)(d) : "0";
@@ -2571,7 +2663,7 @@
 				let legendRects = legendColorGroup
 					.selectAll(".pbimapLegendRects")
 					.data(
-						[colorScale.domain()[0]].concat(colorScale.quantiles())
+						[colorScale.domain()[0]].concat(colorScale.quantiles()),
 					);
 
 				legendRects = legendRects
@@ -2766,6 +2858,9 @@
 								beneficiariesList.forEach(function (e) {
 									foundProject["AdmLocBenClustAgg1" + e] +=
 										row["AdmLocBenClustAgg1" + e];
+									foundProject[
+										"AdmLocBenReachedClustAgg1" + e
+									] += row["AdmLocBenReachedClustAgg1" + e];
 								});
 								foundProject.AdmLocClustBdg1 +=
 									row.AdmLocClustBdg1;
@@ -2778,7 +2873,7 @@
 					allValues.sort(function (a, b) {
 						return (
 							cbpfsList[a.PFId].localeCompare(
-								cbpfsList[b.PFId]
+								cbpfsList[b.PFId],
 							) || b.AdmLocClustBdg1 - a.AdmLocClustBdg1
 						);
 					});
@@ -2817,13 +2912,23 @@
 
 			const level = chartState.selectedAdminLevel
 				? "(admin level " +
-				  Math.min(chartState.selectedAdminLevel, datum.maxLevel) +
-				  ")"
+					Math.min(chartState.selectedAdminLevel, datum.maxLevel) +
+					")"
 				: "(country)";
 
 			const thisCBPF = chartState.selectedAdminLevel
 				? "CBPF: " + datum.CBPFName + divSpacer
 				: "";
+
+			const reachedPercentage =
+				datum.beneficiariesReached > datum.beneficiaries
+					? ">100%"
+					: datum.beneficiaries !== 0
+						? formatMoney0Decimals(
+								(datum.beneficiariesReached * 100) /
+									datum.beneficiaries,
+							)
+						: 0;
 
 			tooltip
 				.style("display", "block")
@@ -2847,7 +2952,12 @@
 						divSpacer +
 						"<span class='pbimapTooltipTitle2'>" +
 						formatMoney0Decimals(datum.beneficiaries) +
-						" Targeted People:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>"
+						" Targeted People</span><br>" +
+						"<span class='pbimapTooltipTitle2'>" +
+						formatMoney0Decimals(datum.beneficiariesReached) +
+						" Reached People (" +
+						reachedPercentage +
+						"%)</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>",
 				);
 
 			createTooltipSvg();
@@ -2868,9 +2978,9 @@
 				tooltipBox.width + 2 * tooltipMargin
 					? thisBox.right - containerBox.left + tooltipMargin
 					: thisBox.left -
-					  containerBox.left -
-					  tooltipBox.width -
-					  tooltipMargin;
+						containerBox.left -
+						tooltipBox.width -
+						tooltipMargin;
 
 			tooltip
 				.style("top", thisOffsetTop + "px")
@@ -2890,6 +3000,16 @@
 							] +=
 								curr[
 									"AdmLocBenClustAgg" +
+										(chartState.selectedAdminLevel || 1) +
+										e
+								];
+							foundProject[
+								"AdmLocBenReachedClustAgg" +
+									(chartState.selectedAdminLevel || 1) +
+									e
+							] +=
+								curr[
+									"AdmLocBenReachedClustAgg" +
 										(chartState.selectedAdminLevel || 1) +
 										e
 								];
@@ -2932,7 +3052,7 @@
 					d3.max(
 						beneficiariesList.map(function (d) {
 							return datum["beneficiaries" + d];
-						})
+						}),
 					),
 				]);
 
@@ -2948,7 +3068,7 @@
 					.attr("class", "pbimapTooltipSvgYAxisGroup")
 					.attr(
 						"transform",
-						"translate(" + tooltipSvgPadding[3] + ",0)"
+						"translate(" + tooltipSvgPadding[3] + ",0)",
 					)
 					.call(tooltipSvgYAxis);
 
@@ -2959,7 +3079,7 @@
 						"transform",
 						"translate(0," +
 							(tooltipSvgHeight - tooltipSvgPadding[2]) +
-							")"
+							")",
 					)
 					.call(tooltipSvgXAxis)
 					.selectAll(".tick")
@@ -2968,82 +3088,288 @@
 					})
 					.remove();
 
-				const tooltipSvgLabels = tooltipSvg
+				const tooltipBarGroups = tooltipSvg
 					.selectAll(null)
 					.data(beneficiariesList)
 					.enter()
-					.append("text")
-					.attr("class", "pbimapTooltipLabels")
-					.attr("x", tooltipSvgPadding[3] + 2)
-					.attr("y", function (d) {
-						return (
-							tooltipSvgYScale(d) +
-							tooltipSvgYScale.bandwidth() / 2 +
-							4
-						);
+					.append("g")
+					.attr("transform", function (d) {
+						return `translate(${tooltipSvgPadding[3]},${tooltipSvgYScale(d)})`;
 					})
-					.text(function (d) {
-						return formatSIFloat(datum["beneficiaries" + d]);
+					.each(function (d) {
+						localVariable.set(this, d);
 					});
 
-				const tooltipSticks = tooltipSvg
+				// const tooltipSvgLabels = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("text")
+				// 	.attr("class", "pbimapTooltipLabels")
+				// 	.attr("x", tooltipSvgPadding[3] + 2)
+				// 	.attr("y", function (d) {
+				// 		return (
+				// 			tooltipSvgYScale(d) +
+				// 			tooltipSvgYScale.bandwidth() / 2 +
+				// 			4
+				// 		);
+				// 	})
+				// 	.text(function (d) {
+				// 		const labelsText =
+				// 			formatSIFloat(datum["beneficiariesReached" + d]) +
+				// 			"/" +
+				// 			formatSIFloat(datum["beneficiaries" + d]) +
+				// 			" (" +
+				// 			(datum["beneficiariesReached" + d] >
+				// 			datum["beneficiaries" + d]
+				// 				? ">100%"
+				// 				: datum["beneficiaries" + d] !== 0
+				// 					? formatMoney0Decimals(
+				// 							(datum["beneficiariesReached" + d] *
+				// 								100) /
+				// 								datum["beneficiaries" + d],
+				// 						)
+				// 					: 0) +
+				// 			"%)";
+
+				// 		return labelsText;
+				// 	});
+
+				const bars = tooltipBarGroups
 					.selectAll(null)
-					.data(beneficiariesList)
+					.data(beneficiariesTypes)
 					.enter()
 					.append("rect")
-					.style(
-						"fill",
-						chartState.selectedAdminLevel
-							? circleColor
-							: circleGlobalColor
-					)
-					.attr("x", tooltipSvgPadding[3])
-					.attr("y", function (d) {
-						return tooltipSvgYScale(d) - stickHeight / 4;
+					.style("fill", function (d) {
+						const color =
+							d === "Reached"
+								? reachedColor
+								: chartState.selectedAdminLevel
+									? circleColor
+									: circleGlobalColor;
+						return color;
 					})
-					.attr("height", stickHeight)
+					.attr("x", 0)
+					.attr("y", function (d) {
+						return tooltipSvgInnerYScale(d);
+					})
+					.attr("height", tooltipSvgInnerYScale.bandwidth())
 					.attr("width", 0)
 					.transition()
 					.duration(duration)
 					.attr("width", function (d) {
-						return (
-							tooltipSvgXScale(datum["beneficiaries" + d]) -
-							tooltipSvgPadding[3]
+						const parentDatum = localVariable.get(this);
+						return tooltipSvgXScale(
+							datum[
+								`beneficiaries${d === "Reached" ? "Reached" : ""}` +
+									parentDatum
+							],
 						);
 					});
 
-				const tooltipLollipop = tooltipSvg
+				const labels = tooltipBarGroups
 					.selectAll(null)
-					.data(beneficiariesList)
+					.data(beneficiariesTypes)
 					.enter()
-					.append("circle")
-					.style(
-						"fill",
-						chartState.selectedAdminLevel
-							? circleColor
-							: circleGlobalColor
-					)
-					.attr("cx", tooltipSvgPadding[3])
-					.attr("cy", function (d) {
-						return tooltipSvgYScale(d);
+					.append("text")
+					// .style("fill", function (d) {
+					// 	const color =
+					// 		d === "Reached"
+					// 			? reachedColor
+					// 			: chartState.selectedAdminLevel
+					// 				? circleColor
+					// 				: circleGlobalColor;
+					// 	return color;
+					// })
+					.attr("class", "pbimapTooltipLabels")
+					.attr("x", 0)
+					.attr("y", function (d) {
+						return (
+							tooltipSvgInnerYScale(d) +
+							tooltipSvgInnerYScale.bandwidth() / 2 +
+							4
+						);
 					})
-					.attr("r", lollipopRadius)
-					.transition()
-					.duration(duration)
-					.attr("cx", function (d) {
-						return tooltipSvgXScale(datum["beneficiaries" + d]);
+					.text(function (d) {
+						const parentDatum = localVariable.get(this);
+						const labelsText =
+							d === "Targeted"
+								? formatSIFloat(
+										datum["beneficiaries" + parentDatum],
+									)
+								: formatSIFloat(
+										datum[
+											"beneficiariesReached" + parentDatum
+										],
+									) +
+									" (" +
+									(datum[
+										"beneficiariesReached" + parentDatum
+									] > datum["beneficiaries" + parentDatum]
+										? ">100%"
+										: datum[
+													"beneficiaries" +
+														parentDatum
+											  ] !== 0
+											? formatMoney0Decimals(
+													(datum[
+														"beneficiariesReached" +
+															parentDatum
+													] *
+														100) /
+														datum[
+															"beneficiaries" +
+																parentDatum
+														],
+												)
+											: 0) +
+									"%)";
+
+						return labelsText;
 					});
 
-				tooltipSvgLabels
+				// const targetedBars = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("rect")
+				// 	.style("fill", "#aaa")
+				// 	.attr("x", tooltipSvgPadding[3])
+				// 	.attr("y", function (d) {
+				// 		return tooltipSvgYScale(d);
+				// 	})
+				// 	.attr("height", tooltipSvgYScale.bandwidth())
+				// 	.attr("width", 0)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("width", function (d) {
+				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
+				// 	});
+
+				// const reachedBars = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("rect")
+				// 	.style(
+				// 		"fill",
+				// 		chartState.selectedAdminLevel
+				// 			? circleColor
+				// 			: circleGlobalColor,
+				// 	)
+				// 	.attr("x", tooltipSvgPadding[3])
+				// 	.attr("y", function (d) {
+				// 		return tooltipSvgYScale(d);
+				// 	})
+				// 	.attr("height", tooltipSvgYScale.bandwidth())
+				// 	.attr("width", 0)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("width", function (d) {
+				// 		return tooltipSvgXScale(
+				// 			Math.min(
+				// 				datum["beneficiaries" + d],
+				// 				datum["beneficiariesReached" + d],
+				// 			),
+				// 		);
+				// 	});
+
+				// const tooltipSticks = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("rect")
+				// 	.style(
+				// 		"fill",
+				// 		chartState.selectedAdminLevel
+				// 			? circleColor
+				// 			: circleGlobalColor,
+				// 	)
+				// 	.attr("x", tooltipSvgPadding[3])
+				// 	.attr("y", function (d) {
+				// 		return tooltipSvgYScale(d) - stickHeight / 4;
+				// 	})
+				// 	.attr("height", stickHeight)
+				// 	.attr("width", 0)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("width", function (d) {
+				// 		return (
+				// 			tooltipSvgXScale(datum["beneficiaries" + d]) -
+				// 			tooltipSvgPadding[3]
+				// 		);
+				// 	});
+
+				// const tooltipLollipop = tooltipSvg
+				// 	.selectAll(null)
+				// 	.data(beneficiariesList)
+				// 	.enter()
+				// 	.append("circle")
+				// 	.style(
+				// 		"fill",
+				// 		chartState.selectedAdminLevel
+				// 			? circleColor
+				// 			: circleGlobalColor,
+				// 	)
+				// 	.attr("cx", tooltipSvgPadding[3])
+				// 	.attr("cy", function (d) {
+				// 		return tooltipSvgYScale(d);
+				// 	})
+				// 	.attr("r", lollipopRadius)
+				// 	.transition()
+				// 	.duration(duration)
+				// 	.attr("cx", function (d) {
+				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
+				// 	});
+
+				labels
 					.transition()
 					.duration(duration)
 					.attr("x", function (d) {
+						const parentDatum = localVariable.get(this);
+						const property =
+							d === "Reached"
+								? "beneficiariesReached"
+								: "beneficiaries";
 						return (
-							tooltipSvgXScale(datum["beneficiaries" + d]) +
-							lollipopRadius +
-							2
+							tooltipSvgXScale(datum[property + parentDatum]) + 3
 						);
 					});
+
+				tooltipSvg
+					.append("text")
+					.attr("x", tooltipSvgPadding[3] + 12)
+					.attr("y", tooltipSvgHeight - 5)
+					.attr("class", "pbimapTooltipLabels")
+					.text("Targeted");
+
+				tooltipSvg
+					.append("text")
+					.attr("x", tooltipSvgPadding[3] + 76)
+					.attr("y", tooltipSvgHeight - 5)
+					.attr("class", "pbimapTooltipLabels")
+					.text("Reached");
+
+				tooltipSvg
+					.append("rect")
+					.attr("x", tooltipSvgPadding[3])
+					.attr("y", tooltipSvgHeight - 12)
+					.attr("width", 8)
+					.attr("height", 8)
+					.attr(
+						"fill",
+						chartState.selectedAdminLevel
+							? circleColor
+							: circleGlobalColor,
+					);
+
+				tooltipSvg
+					.append("rect")
+					.attr("x", tooltipSvgPadding[3] + 64)
+					.attr("y", tooltipSvgHeight - 12)
+					.attr("width", 8)
+					.attr("height", 8)
+					.attr("fill", reachedColor);
 			}
 
 			//end of mouseOverMarker
@@ -3087,7 +3413,7 @@
 					.append("p")
 					.attr(
 						"class",
-						"pbimapListBreadcrumbs contributionColorHTMLcolor"
+						"pbimapListBreadcrumbs contributionColorHTMLcolor",
 					)
 					.html(function () {
 						let breadcrumbArray = [cbpfsList[data[0].PFId]];
@@ -3098,7 +3424,7 @@
 						) {
 							if (
 								breadcrumbArray.indexOf(
-									data[0]["AdmLoc" + i]
+									data[0]["AdmLoc" + i],
 								) === -1
 							)
 								breadcrumbArray.push(data[0]["AdmLoc" + i]);
@@ -3186,7 +3512,7 @@
 					return listHeadersWidth[i];
 				})
 				.style("text-align", function (_, i) {
-					return i === 4 || i === 5 ? "center" : "left";
+					return i === 4 || i === 5 || i === 6 ? "center" : "left";
 				});
 
 			headers.append("span").html(function (d) {
@@ -3214,10 +3540,10 @@
 					return listRowsWidth[i];
 				})
 				.style("padding-right", function (_, i) {
-					return i === 4 || i === 5 ? null : "8px";
+					return i === 4 || i === 5 || i === 6 ? null : "8px";
 				})
 				.style("text-align", function (_, i) {
-					return i === 4 || i === 5 ? "right" : "left";
+					return i === 4 || i === 5 || i === 6 ? "right" : "left";
 				});
 
 			const rowCell = rowDivs.append("span");
@@ -3237,6 +3563,17 @@
 							];
 					});
 					return formatMoney0Decimals(total);
+				} else if (d === "Reached People") {
+					let totalReached = 0;
+					beneficiariesList.forEach(function (e) {
+						totalReached +=
+							parentData[
+								"AdmLocBenReachedClustAgg" +
+									(chartState.selectedAdminLevel || 1) +
+									e
+							];
+					});
+					return formatMoney0Decimals(totalReached);
 				} else if (d === "Allocations") {
 					return (
 						"$" +
@@ -3244,7 +3581,7 @@
 							parentData[
 								"AdmLocClustBdg" +
 									(chartState.selectedAdminLevel || 1)
-							]
+							],
 						)
 					);
 				} else {
@@ -3286,7 +3623,7 @@
 							return "far fa-check-square";
 						} else {
 							return thisChartState.indexOf(
-								+d === +d ? +d : d.toLowerCase()
+								+d === +d ? +d : d.toLowerCase(),
 							) > -1
 								? "far fa-check-square"
 								: "far fa-square";
@@ -3322,7 +3659,7 @@
 							return "far fa-check-square";
 						} else {
 							return thisChartState.indexOf(
-								+d === +d ? +d : d.toLowerCase()
+								+d === +d ? +d : d.toLowerCase(),
 							) > -1
 								? "far fa-check-square"
 								: "far fa-square";
@@ -3335,7 +3672,7 @@
 					const parentDatum = d3.select(this.parentNode).datum();
 					d3.select(this).style(
 						"background-color",
-						filterColorScale(parentDatum)
+						filterColorScale(parentDatum),
 					);
 				})
 				.on("mouseout", function () {
@@ -3344,7 +3681,7 @@
 						"background-color",
 						d3
 							.color(filterColorScale(parentDatum))
-							.brighter(brighterFactor)
+							.brighter(brighterFactor),
 					);
 				});
 
@@ -3397,22 +3734,22 @@
 
 				if (
 					lowercaseAllocationsTypeList.indexOf(
-						thisRow.AllNm.toLowerCase()
+						thisRow.AllNm.toLowerCase(),
 					) === -1
 				) {
 					lowercaseAllocationsTypeList.push(
-						thisRow.AllNm.toLowerCase()
+						thisRow.AllNm.toLowerCase(),
 					);
 					allocationsTypeList.push(thisRow.AllNm);
 				}
 
 				if (
 					cbpfsInCompleteData[thisRow.AYr].indexOf(
-						cbpfsList[thisRow.PFId]
+						cbpfsList[thisRow.PFId],
 					) === -1
 				) {
 					cbpfsInCompleteData[thisRow.AYr].push(
-						cbpfsList[thisRow.PFId]
+						cbpfsList[thisRow.PFId],
 					);
 				}
 
@@ -3451,12 +3788,14 @@
 					let remainingLevels = d3.range(
 						level + 1,
 						adminLocLevels + 1,
-						1
+						1,
 					);
 					remainingLevels.forEach(function (d) {
 						row["AdmLoc" + d] = row["AdmLoc" + level];
 						row["AdmLocBenClustAgg" + d] =
 							row["AdmLocBenClustAgg" + level];
+						row["AdmLocBenReachedClustAgg" + d] =
+							row["AdmLocBenReachedClustAgg" + level];
 						row["AdmLocCord" + d] = row["AdmLocCord" + level];
 						row["AdmLocClustBdg" + d] =
 							row["AdmLocClustBdg" + level];
@@ -3518,6 +3857,12 @@
 				delete row.AdmLocBenClustAgg4;
 				delete row.AdmLocBenClustAgg5;
 				delete row.AdmLocBenClustAgg6;
+				delete row.AdmLocBenReachedClustAgg1;
+				delete row.AdmLocBenReachedClustAgg2;
+				delete row.AdmLocBenReachedClustAgg3;
+				delete row.AdmLocBenReachedClustAgg4;
+				delete row.AdmLocBenReachedClustAgg5;
+				delete row.AdmLocBenReachedClustAgg6;
 			}
 
 			//end of processData
@@ -3527,6 +3872,7 @@
 			const topSvgObject = {
 				totalAllocations: 0,
 				totalBeneficiaries: 0,
+				totalBeneficiariesReached: 0,
 				totalProjects: 0,
 				totalPartners: 0,
 				launchedAllocations: 0,
@@ -3552,11 +3898,11 @@
 				) {
 					if (
 						lowercaseAllocationsTypeList.indexOf(
-							row.AllNm.toLowerCase()
+							row.AllNm.toLowerCase(),
 						) === -1
 					) {
 						lowercaseAllocationsTypeList.push(
-							row.AllNm.toLowerCase()
+							row.AllNm.toLowerCase(),
 						);
 						allocationsTypeList.push(row.AllNm);
 					}
@@ -3597,7 +3943,7 @@
 							.concat(["all"])
 							.indexOf(d) > -1
 					);
-				}
+				},
 			);
 
 			if (chartState.selectedModality.length === 0)
@@ -3633,11 +3979,14 @@
 				nestedData.forEach(function (row) {
 					let numberOfPartners = [],
 						numberOfProjects = [],
-						numberOfBeneficiaries = {};
+						numberOfBeneficiaries = {},
+						numberOfBeneficiariesReached = {};
 					beneficiariesList.forEach(function (d) {
 						numberOfBeneficiaries[d] = 0;
+						numberOfBeneficiariesReached[d] = 0;
 					});
 					numberOfBeneficiaries.total = 0;
+					numberOfBeneficiariesReached.total = 0;
 					let totalAllocation = 0;
 
 					row.latitude = countriesCoordinates[row.key].split(",")[0];
@@ -3647,7 +3996,7 @@
 					row.maxLevel = d3.max(
 						row.values.map(function (d) {
 							return d.maxLevel;
-						})
+						}),
 					);
 
 					row.values.forEach(function (valueRow) {
@@ -3657,6 +4006,10 @@
 								valueRow["AdmLocBenClustAgg1" + d];
 							numberOfBeneficiaries.total +=
 								valueRow["AdmLocBenClustAgg1" + d];
+							numberOfBeneficiariesReached[d] +=
+								valueRow["AdmLocBenReachedClustAgg1" + d];
+							numberOfBeneficiariesReached.total +=
+								valueRow["AdmLocBenReachedClustAgg1" + d];
 						});
 						if (numberOfPartners.indexOf(valueRow.PartCode) === -1)
 							numberOfPartners.push(valueRow.PartCode);
@@ -3668,13 +4021,19 @@
 					row.numberOfPartners = numberOfPartners.length;
 					row.numberOfProjects = numberOfProjects.length;
 					row.beneficiaries = numberOfBeneficiaries.total;
+					row.beneficiariesReached =
+						numberOfBeneficiariesReached.total;
 
 					beneficiariesList.forEach(function (d) {
 						row["beneficiaries" + d] = numberOfBeneficiaries[d];
+						row["beneficiariesReached" + d] =
+							numberOfBeneficiariesReached[d];
 					});
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
+					topSvgObject.totalBeneficiariesReached +=
+						row.beneficiariesReached;
 					topSvgObject.totalPartners += numberOfPartners.length;
 					topSvgObject.totalProjects += numberOfProjects.length;
 				});
@@ -3692,11 +4051,14 @@
 				nestedData.forEach(function (row) {
 					let numberOfPartners = [],
 						numberOfProjects = [],
-						numberOfBeneficiaries = {};
+						numberOfBeneficiaries = {},
+						numberOfBeneficiariesReached = {};
 					beneficiariesList.forEach(function (d) {
 						numberOfBeneficiaries[d] = 0;
+						numberOfBeneficiariesReached[d] = 0;
 					});
 					numberOfBeneficiaries.total = 0;
+					numberOfBeneficiariesReached.total = 0;
 					let totalAllocation = 0;
 
 					row.latitude = row.key.split(",")[1];
@@ -3707,7 +4069,7 @@
 					row.maxLevel = d3.max(
 						row.values.map(function (d) {
 							return d.maxLevel;
-						})
+						}),
 					);
 
 					row.values.forEach(function (valueRow) {
@@ -3725,6 +4087,18 @@
 							numberOfBeneficiaries.total +=
 								valueRow[
 									"AdmLocBenClustAgg" +
+										chartState.selectedAdminLevel +
+										d
+								];
+							numberOfBeneficiariesReached[d] +=
+								valueRow[
+									"AdmLocBenReachedClustAgg" +
+										chartState.selectedAdminLevel +
+										d
+								];
+							numberOfBeneficiariesReached.total +=
+								valueRow[
+									"AdmLocBenReachedClustAgg" +
 										chartState.selectedAdminLevel +
 										d
 								];
@@ -3749,13 +4123,19 @@
 					row.numberOfPartners = numberOfPartners.length;
 					row.numberOfProjects = numberOfProjects.length;
 					row.beneficiaries = numberOfBeneficiaries.total;
+					row.beneficiariesReached =
+						numberOfBeneficiariesReached.total;
 
 					beneficiariesList.forEach(function (d) {
 						row["beneficiaries" + d] = numberOfBeneficiaries[d];
+						row["beneficiariesReached" + d] =
+							numberOfBeneficiariesReached[d];
 					});
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
+					topSvgObject.totalBeneficiariesReached +=
+						row.beneficiariesReached;
 				});
 
 				topSvgObject.totalPartners += totalNumberOfPartners.length;
@@ -3797,7 +4177,7 @@
 					safeDivide(
 						aggregatedLaunchedValues[year].underApproval,
 						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched
+						aggregatedLaunchedValues[year].launched,
 					);
 				yearsWithUnderApprovalAboveMin[year] =
 					underApprovalPercent > minimumUnderApprovalPercentage ||
@@ -3832,35 +4212,39 @@
 				return chartState.selectedCBPF[0] === "all"
 					? true
 					: datum
-					? chartState.selectedCBPF.indexOf(datum.toLowerCase()) > -1
-					: false;
+						? chartState.selectedCBPF.indexOf(datum.toLowerCase()) >
+							-1
+						: false;
 			}
 
 			function filterPartner(datum) {
 				return chartState.selectedPartner[0] === "all"
 					? true
 					: datum
-					? chartState.selectedPartner.indexOf(datum.toLowerCase()) >
-					  -1
-					: false;
+						? chartState.selectedPartner.indexOf(
+								datum.toLowerCase(),
+							) > -1
+						: false;
 			}
 
 			function filterModality(datum) {
 				return chartState.selectedModality[0] === "all"
 					? true
 					: datum
-					? chartState.selectedModality.indexOf(datum.toLowerCase()) >
-					  -1
-					: false;
+						? chartState.selectedModality.indexOf(
+								datum.toLowerCase(),
+							) > -1
+						: false;
 			}
 
 			function filterCluster(datum) {
 				return chartState.selectedCluster[0] === "all"
 					? true
 					: datum
-					? chartState.selectedCluster.indexOf(datum.toLowerCase()) >
-					  -1
-					: false;
+						? chartState.selectedCluster.indexOf(
+								datum.toLowerCase(),
+							) > -1
+						: false;
 			}
 
 			//end of filterData
@@ -3933,7 +4317,7 @@
 				].some(function (thisValue) {
 					return (
 						valuesInLowerCase(listScale(attribute)).indexOf(
-							thisValue
+							thisValue,
 						) === -1
 					);
 				});
@@ -3947,8 +4331,8 @@
 					? ~~queryStringValues.get("adminlevel")
 					: 0
 				: ~~containerDiv.node().getAttribute("data-adminlevel") < 7
-				? ~~containerDiv.node().getAttribute("data-adminlevel")
-				: 0;
+					? ~~containerDiv.node().getAttribute("data-adminlevel")
+					: 0;
 
 			initialChartState = JSON.parse(JSON.stringify(chartState));
 		}
@@ -4166,7 +4550,7 @@
 					"xlink:href",
 					localStorage.getItem("storedImagetooltipThumbnail")
 						? localStorage.getItem("storedImagetooltipThumbnail")
-						: tooltipThumbnailPath
+						: tooltipThumbnailPath,
 				)
 				.attr("width", 260)
 				.attr("height", 241)
@@ -4217,7 +4601,7 @@
 				.attr("y", 172)
 				.attr("pointer-events", "none")
 				.text(
-					"Hover over the elements surrounded by a blue rectangle to get additional information"
+					"Hover over the elements surrounded by a blue rectangle to get additional information",
 				)
 				.call(wrapText2, 350);
 
@@ -4296,6 +4680,7 @@
 
 			data.forEach(function (d) {
 				let total = 0;
+				let totalReached = 0;
 				beneficiariesList.forEach(function (e) {
 					total +=
 						d[
@@ -4303,8 +4688,15 @@
 								(chartState.selectedAdminLevel || 1) +
 								e
 						];
+					totalReached +=
+						d[
+							"AdmLocBenReachedClustAgg" +
+								(chartState.selectedAdminLevel || 1) +
+								e
+						];
 				});
 				total = formatMoney0Decimals(total);
+				totalReached = formatMoney0Decimals(totalReached);
 				csvData.push({
 					CBPF: d.cbpfName,
 					"Project Code": d.PrjCode,
@@ -4316,9 +4708,10 @@
 						d[
 							"AdmLocClustBdg" +
 								(chartState.selectedAdminLevel || 1)
-						]
+						],
 					),
 					"Targeted People": total,
+					"Reached People": totalReached,
 				});
 			});
 
@@ -4689,19 +5082,19 @@
 		function createSnapshot(type, fromContextMenu) {
 			if (isInternetExplorer) {
 				alert(
-					"This functionality is not supported by Internet Explorer"
+					"This functionality is not supported by Internet Explorer",
 				);
 				return;
 			}
 
 			d3.select("pbimapTopSvgPartnersLogo").attr(
 				"xlink:href",
-				localStorage.getItem("storedImagepartnersLogo")
+				localStorage.getItem("storedImagepartnersLogo"),
 			);
 
 			d3.select("pbimapTopSvgProjectsLogo").attr(
 				"xlink:href",
-				localStorage.getItem("storedImageprojectsLogo")
+				localStorage.getItem("storedImageprojectsLogo"),
 			);
 
 			const downloadingDiv = d3
@@ -4724,7 +5117,7 @@
 				downloadingDivSvg,
 				200,
 				175,
-				downloadingDivText
+				downloadingDivText,
 			);
 
 			const listOfStyles = [
@@ -4766,7 +5159,7 @@
 
 			containerDiv
 				.selectAll(
-					".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv"
+					".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv",
 				)
 				.style("opacity", 0);
 
@@ -4787,7 +5180,7 @@
 			}).then(function (canvas) {
 				containerDiv
 					.selectAll(
-						".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv"
+						".pbimapBeforeSpan, .pbimapAfterSpan, .pbimapResetDiv",
 					)
 					.style("opacity", 1);
 
@@ -4863,7 +5256,7 @@
 			};
 
 			d3.image(
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png"
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png",
 			).then(function (logo) {
 				let pdfTextPosition;
 
@@ -4876,7 +5269,7 @@
 					210 - pdfMargins.left - pdfMargins.right,
 					{
 						fontSize: 12,
-					}
+					},
 				);
 
 				const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
@@ -4920,8 +5313,8 @@
 						? "All CBPFs"
 						: createPdfList(
 								chartState.selectedCBPF,
-								d3.values(cbpfsList)
-						  );
+								d3.values(cbpfsList),
+							);
 
 				const cbpfsText =
 					chartState.selectedCBPF.length === 1 &&
@@ -4934,8 +5327,8 @@
 						? "All Partners"
 						: createPdfList(
 								chartState.selectedPartner,
-								d3.values(partnersList)
-						  );
+								d3.values(partnersList),
+							);
 
 				const partnersText =
 					chartState.selectedPartner.length === 1 &&
@@ -4948,8 +5341,8 @@
 						? "All Clusters"
 						: createPdfList(
 								chartState.selectedCluster,
-								d3.values(clustersList)
-						  );
+								d3.values(clustersList),
+							);
 
 				const clusterText =
 					chartState.selectedCluster.length === 1 &&
@@ -4962,8 +5355,8 @@
 						? "All Allocations"
 						: createPdfList(
 								chartState.selectedModality,
-								allocationsTypeList
-						  );
+								allocationsTypeList,
+							);
 
 				const allocationText =
 					chartState.selectedModality.length === 1 &&
@@ -5012,7 +5405,7 @@
 					},
 					function (position) {
 						pdfTextPosition = position;
-					}
+					},
 				);
 
 				const sourceDimentions = containerDiv
@@ -5027,7 +5420,7 @@
 					pdfTextPosition.y + 2,
 					widthInMilimeters,
 					widthInMilimeters *
-						(sourceDimentions.height / sourceDimentions.width)
+						(sourceDimentions.height / sourceDimentions.width),
 				);
 
 				createLetterhead();
@@ -5035,7 +5428,9 @@
 				const currentDate = new Date();
 
 				pdf.save(
-					"AllocationsOverview_" + csvDateFormat(currentDate) + ".pdf"
+					"AllocationsOverview_" +
+						csvDateFormat(currentDate) +
+						".pdf",
 				);
 
 				removeProgressWheel();
@@ -5063,7 +5458,7 @@
 						pdfMargins.top + 9,
 						5,
 						9,
-						"F"
+						"F",
 					);
 
 					pdf.addImage(
@@ -5072,7 +5467,7 @@
 						pdfMargins.left + 2,
 						pdfMargins.top,
 						90,
-						18
+						18,
 					);
 
 					pdf.setFillColor(236, 161, 84);
@@ -5085,7 +5480,7 @@
 					pdf.text(
 						footer,
 						pdfMargins.left,
-						pdfHeight - pdfMargins.bottom + 10
+						pdfHeight - pdfMargins.bottom + 10,
 					);
 				}
 
@@ -5100,8 +5495,8 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
@@ -5140,7 +5535,7 @@
 							thiswidth / 2 +
 							"," +
 							thisheight / 4 +
-							")"
+							")",
 					);
 			} else {
 				wheelGroup = thissvg
@@ -5152,7 +5547,7 @@
 							thiswidth / 2 +
 							"," +
 							thisheight / 4 +
-							")"
+							")",
 					);
 			}
 

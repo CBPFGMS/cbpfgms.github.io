@@ -1,4 +1,5 @@
 (function d3ChartIIFE() {
+	console.log("Monday");
 	const isInternetExplorer =
 			window.navigator.userAgent.indexOf("MSIE") > -1 ||
 			window.navigator.userAgent.indexOf("Trident") > -1,
@@ -816,7 +817,7 @@
 				}
 			}
 
-			loadAllDataFiles(remainingYears);
+			//loadAllDataFiles(remainingYears);
 
 			//end of Promise.all
 		});
