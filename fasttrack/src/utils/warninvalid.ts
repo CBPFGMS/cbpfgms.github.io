@@ -1,17 +1,17 @@
-import constants from "./constants";
+import { constants } from "./constants";
 
 const { isProdSite } = constants;
 
 function warnInvalidSchema(
 	file: string,
 	row: Record<string, unknown>,
-	error: string
+	error: string,
 ) {
 	if (!isProdSite) {
 		console.warn(
 			`File: ${file}\n-----\nRow with incorrect value types: ${JSON.stringify(
-				row
-			)}\n-----\nError description: ${error}`
+				row,
+			)}\n-----\nError description: ${error}`,
 		);
 	}
 }
@@ -19,13 +19,13 @@ function warnInvalidSchema(
 function warnProjectNotFound(
 	projectCode: string,
 	row: Record<string, unknown>,
-	message: string
+	message: string,
 ) {
 	if (!isProdSite) {
 		console.warn(
 			`${message}: ${projectCode}\nRow with project not found: ${JSON.stringify(
-				row
-			)}`
+				row,
+			)}`,
 		);
 	}
 }

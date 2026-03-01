@@ -4,8 +4,24 @@ import "./styles/index.css";
 import App from "./App.tsx";
 import { constants } from "./utils/constants.ts";
 
-createRoot(document.getElementById(constants.rootElementId)!).render(
+const rootElement = document.getElementById(constants.rootElementId),
+	defaultFundTypeString = rootElement?.dataset.fundtype,
+	startYearString = rootElement?.dataset.startyear;
+
+const defaultFundType =
+		!defaultFundTypeString || !parseInt(defaultFundTypeString)
+			? null
+			: parseInt(defaultFundTypeString),
+	startYear =
+		!startYearString || !parseInt(startYearString)
+			? null
+			: parseInt(startYearString);
+
+createRoot(rootElement!).render(
 	<StrictMode>
-		<App />
+		<App
+			defaultFundType={defaultFundType}
+			startYear={startYear}
+		/>
 	</StrictMode>,
 );

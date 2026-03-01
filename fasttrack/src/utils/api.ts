@@ -41,20 +41,27 @@ const beneficiaryTypesMasterUrl =
 	sectorsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 	globalIndicatorsMasterUrl =
-		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
-	projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&FundTypeId=${fundType}&$format=csv`,
-	allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=&$format=csv`,
-	organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`;
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv";
 
 //fake data path on staging site: ./assets/stg-data/
 
-function useData(): {
+function useData(
+	defaultFundType: number | null,
+	startYear: number | null,
+): {
 	data: Data;
 	lists: List;
 	inDataLists: InDataLists;
 	loading: boolean;
 	error: string | null;
 } {
+	const selectedFundType = defaultFundType ? defaultFundType : fundType,
+		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
+
+	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
+		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
+		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
+
 	const [data, setData] = useState<Data>([] as Data),
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
@@ -70,12 +77,12 @@ function useData(): {
 				projectSummaryUrl,
 				"csv",
 			),
-			fetchFile<AllocationTypesMasterObject[]>(
+			fetchFileDB<AllocationTypesMasterObject[]>(
 				"allocationTypesMaster",
 				allocationTypesMasterUrl,
 				"csv",
 			),
-			fetchFile<OrganizationMasterObject[]>(
+			fetchFileDB<OrganizationMasterObject[]>(
 				"organizationMaster",
 				organizationMasterUrl,
 				"csv",

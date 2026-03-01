@@ -103,63 +103,6 @@ export const projectSummaryObjectSchema = z.object({
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
 });
 
-export const sectorBeneficiaryObjectSchema = z.object({
-	PooledFundName: z.string(),
-	PooledFundId: z.number().int().nonnegative(),
-	AllocationTypeId: z.number().int().nonnegative(),
-	ChfId: z.number().int().nonnegative(),
-	ChfProjectCode: z.string(),
-	CountryClusterId: z.number().int().nonnegative(),
-	GlobalClusterId: z.number().int().nonnegative(),
-	Percentage: z.number().nonnegative(),
-	CALCBudgetByCluster: z.number().nonnegative(),
-	TargetMen: z.number().int().nonnegative().nullable(),
-	TargetWomen: z.number().int().nonnegative().nullable(),
-	TargetBoys: z.number().int().nonnegative().nullable(),
-	TargetGirls: z.number().int().nonnegative().nullable(),
-	ActualMen: z.number().int().nonnegative().nullable(),
-	ActualWomen: z.number().int().nonnegative().nullable(),
-	ActualBoys: z.number().int().nonnegative().nullable(),
-	ActualGirls: z.number().int().nonnegative().nullable(),
-	GlobalInstanceStatusId: z.number().int().nonnegative().nullable(),
-	SubmissionDate: z
-		.string()
-		.regex(dateRegex, "Invalid date format")
-		.nullable(),
-});
-
-export const emergenciesObjectSchema = z.object({
-	CHFId: z.number().int().nonnegative(),
-	EmergencyTypeId: z.number().int().nonnegative(),
-	EmergencyPercent: z.number().min(0).max(100),
-	PooledFundId: z.number().int().nonnegative(),
-	PooledFundName: z.string(),
-	CHFProjectCode: z.string(),
-	OrganizationName: z.string().nullable(),
-	OrganizationAcronym: z.string().nullable(),
-	OrganizationType: z.string().nullable(),
-	AllocationTypeName: z.string().nullable(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProjectStatus: z.string().nullable(),
-	ProjectBudget: z.number().nonnegative(),
-	EmergencyTypeName: z.string().nullable(),
-});
-
-export const cvaObjectSchema = z.object({
-	PooledFundId: z.number().int().nonnegative(),
-	CHFId: z.number().int().nonnegative(),
-	ChfProjectCode: z.string(),
-	OrganizationTypeId: z.number().int().nonnegative(),
-	AllocationYear: z.number().int().nonnegative(),
-	CVATypeId: z.number().int().nonnegative(),
-	ClusterId: z.number().int().nonnegative(),
-	TransferAmount: z.number().nonnegative().nullable(),
-	TotalAmtTransferred: z.number().nonnegative().nullable(),
-	PeopleTargeted: z.number().int().nonnegative().nullable(),
-	PeopleReached: z.number().int().nonnegative().nullable(),
-	GlobalClusterId: z.number().int().nonnegative(),
-});
-
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -230,15 +173,6 @@ export const organizationMasterObjectSchema = z.object({
 	UNPPId: z.union([z.number(), z.string()]).nullable(),
 });
 
-export const projectStatusMasterObjectSchema = z.object({
-	GlobalInstanceStatusId: z.number().int().nonnegative(),
-	StatusName: z.string(),
-	StatusCode: z.string(),
-	AllocSrc: z.union([z.literal(1), z.literal(2)]),
-	InstanceTypeId: z.number().int().nonnegative(),
-	PooledFundId: z.number().int().nonnegative(),
-});
-
 export const beneficiaryTypesMasterObjectSchema = z.object({
 	BeneficiaryTypeId: z.number().int().nonnegative(),
 	BeneficiaryType: z.string(),
@@ -277,22 +211,6 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustId: z.number().int().nonnegative(),
 	ClustNm: z.string(),
 	ClustCode: z.string(),
-});
-
-export const emergenciesMasterObjectSchema = z.object({
-	EmergencyTypeId: z.number().int().nonnegative(),
-	EmergencyTypeName: z.string(),
-	EmergencyCategoryId: z.number().int().nonnegative(),
-	EmergencyCategoryName: z.string(),
-	EmergencyGroupId: z.number().int().nonnegative(),
-	EmergencyGroupName: z.string(),
-});
-
-export const cvaMasterObjectSchema = z.object({
-	Id: z.number().int().nonnegative(),
-	CVATypeName: z.string(),
-	CVATypeCode: z.string(),
-	IsActive: z.boolean(),
 });
 
 // ********************
@@ -342,20 +260,12 @@ export const globalIndicatorsMasterObjectSchema = z.object({
 
 export type ProjectSummaryObject = z.infer<typeof projectSummaryObjectSchema>;
 
-export type SectorBeneficiaryObject = z.infer<
-	typeof sectorBeneficiaryObjectSchema
->;
-
 export type AllocationTypesMasterObject = z.infer<
 	typeof allocationTypesMasterObjectSchema
 >;
 
 export type OrganizationMasterObject = z.infer<
 	typeof organizationMasterObjectSchema
->;
-
-export type ProjectStatusMasterObject = z.infer<
-	typeof projectStatusMasterObjectSchema
 >;
 
 export type BeneficiaryTypesMasterObject = z.infer<
@@ -383,13 +293,3 @@ export type GlobalIndicatorsObject = z.infer<
 export type GlobalIndicatorsMasterObject = z.infer<
 	typeof globalIndicatorsMasterObjectSchema
 >;
-
-export type EmergenciesObject = z.infer<typeof emergenciesObjectSchema>;
-
-export type EmergenciesMasterObject = z.infer<
-	typeof emergenciesMasterObjectSchema
->;
-
-export type CvaObject = z.infer<typeof cvaObjectSchema>;
-
-export type CvaMasterObject = z.infer<typeof cvaMasterObjectSchema>;

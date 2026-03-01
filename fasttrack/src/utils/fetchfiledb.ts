@@ -1,6 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
-import { csvParse, autoType } from "d3";
-import {constants} from "./constants";
+import { json, csv, autoType } from "d3";
+import { constants } from "./constants";
 
 const { localStorageTime, pageName, consoleStyle } = constants;
 
@@ -44,44 +44,44 @@ async function fetchFileDB<T>(
 		);
 		return fetchedData;
 	} else {
-		try {
-			const response = await fetchWithProgress(url, setProgress);
-
-			let fetchedData: T;
-
-			if (method === "csv") {
-				const text = await response.text();
-				fetchedData = csvParse(text, autoType) as unknown as T;
-			} else {
-				fetchedData = await response.json();
-			}
-
-			try {
-				const tx = db.transaction("files", "readwrite");
-				const store = tx.objectStore("files");
-				store.put(
-					{
-						data: fetchedData as T,
-						timeStamp: currentDate.getTime(),
-					},
-					combinedName,
+		const fetchMethod =
+			method === "csv" ? () => csv(url, autoType) : () => json(url);
+		return fetchMethod()
+			.then(fetchedData => {
+				try {
+					const tx = db.transaction("files", "readwrite");
+					const store = tx.objectStore("files");
+					store.put(
+						{
+							data: fetchedData as T,
+							timeStamp: currentDate.getTime(),
+						},
+						combinedName,
+					);
+				} catch (error) {
+					console.warn(
+						`Error saving the file ${fileName} in indexedDB. Error: ${error}.`,
+					);
+				}
+				console.info(
+					`%cInfo: data file ${fileName} obtained from API call`,
+					consoleStyle,
 				);
-			} catch (error) {
-				console.warn(
-					`Error saving the file ${fileName} in indexedDB. Error: ${error}.`,
-				);
-			}
-			console.info(
-				`%cInfo: data file ${fileName} obtained from API call`,
-				consoleStyle,
-			);
-			return fetchedData as T;
-		} catch (error) {
-			console.warn(
-				`Error fetching the file ${fileName} from API. Error: ${error}.`,
-			);
-			return Promise.reject(error);
-		}
+				return fetchedData as T;
+			})
+			.catch((error: unknown) => {
+				if (error instanceof Error) {
+					console.error(
+						`Error fetching the file ${fileName} from API. Error: ${error}.`,
+					);
+					throw error;
+				} else {
+					console.error(
+						`Unknown error fetching the file ${fileName} from API.`,
+					);
+					throw new Error("Unknown error");
+				}
+			});
 	}
 }
 

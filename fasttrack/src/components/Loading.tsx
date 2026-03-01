@@ -1,16 +1,8 @@
-import LinearProgress, {
-	LinearProgressProps,
-} from "@mui/material/LinearProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-const HARDCODED_TOTAL_SIZE = 295757286;
-
-type LoadingProps = {
-	progress: number;
-};
-
-function Loading({ progress }: LoadingProps) {
+function Loading() {
 	return (
 		<div
 			style={{
@@ -19,27 +11,11 @@ function Loading({ progress }: LoadingProps) {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "center",
-				justifySelf: "center",
 				alignItems: "center",
-				alignSelf: "center",
 			}}
 		>
-			<Box
-				sx={{
-					display: "flex",
-					justifyContent: "center",
-					width: "100%",
-				}}
-			>
-				<Box sx={{ width: "80%" }}>
-					<LinearProgressWithLabel
-						sx={{ height: 10, borderRadius: 5 }}
-						value={Math.min(
-							100,
-							(100 * progress) / HARDCODED_TOTAL_SIZE
-						)}
-					/>
-				</Box>
+			<Box sx={{ display: "flex", justifyContent: "center" }}>
+				<CircularProgress />
 			</Box>
 			<Typography
 				variant="h6"
@@ -49,27 +25,6 @@ function Loading({ progress }: LoadingProps) {
 				Loading data
 			</Typography>
 		</div>
-	);
-}
-
-function LinearProgressWithLabel(
-	props: LinearProgressProps & { value: number }
-) {
-	return (
-		<Box sx={{ display: "flex", alignItems: "center" }}>
-			<Box sx={{ width: "100%", mr: 1 }}>
-				<LinearProgress
-					variant="determinate"
-					{...props}
-				/>
-			</Box>
-			<Box sx={{ minWidth: 35 }}>
-				<Typography
-					variant="body2"
-					sx={{ color: "text.secondary" }}
-				>{`${Math.round(props.value)}%`}</Typography>
-			</Box>
-		</Box>
 	);
 }
 

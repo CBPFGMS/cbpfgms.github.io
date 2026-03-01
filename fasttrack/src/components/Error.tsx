@@ -1,5 +1,5 @@
 import Alert from "@mui/material/Alert";
-import constants from "../utils/constants";
+import { constants } from "../utils/constants";
 
 const { isProdSite } = constants;
 
