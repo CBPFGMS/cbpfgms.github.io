@@ -6,33 +6,37 @@ function TopIntro() {
 		<Grid
 			container
 			spacing={2}
-			justifyContent={"center"}
+			justifyContent={"flex-start"}
 		>
-			<Grid
-				size={10}
-				mb={3}
-				style={{ minHeight: "2000px", backgroundColor: "blue" }}
+			<Typography
+				variant="h2"
+				style={{
+					fontFamily: "Montserrat",
+					fontSize: "2.5rem",
+					fontWeight: 700,
+					color: "var(--ocha-blue)",
+				}}
+				mb={2}
 			>
-				<Typography
-					variant="body1"
-					style={{
-						fontFamily: "Montserrat",
-						fontSize: "14px",
-						textAlign: "center",
-					}}
-				>
-					Welcome to the Country Based Pooled Fund (CBPF) Allocation
-					Progress Dashboard, a comprehensive tool that provides an
-					overview of the Targeted vs Achieved statuses for funded
-					projects. Here, you can visualize the progress of each
-					project, including the percentage of people targeted and
-					reached by type of partners engaged, sectors covered,
-					categorization of people, by disability and by Gender based
-					violence (GBV) category. Additionally this dashboard for the
-					first time explore the achievements against the targeted
-					Global Indicators across funds.
-				</Typography>
-			</Grid>
+				US Contributions
+			</Typography>
+			<Typography
+				variant="body1"
+				style={{
+					fontFamily: "Montserrat",
+					fontSize: "1.1rem",
+					color: "#666",
+					lineHeight: 1.6,
+					maxWidth: "900px",
+				}}
+			>
+				This dashboard provides comprehensive insights into humanitarian
+				financing progress made possible through generous contributions
+				from the United States. Track key performance indicators,
+				explore detailed dashboards, and monitor the impact of US
+				funding across Country Based Pooled Funds (CBPF) projects
+				worldwide.
+			</Typography>
 		</Grid>
 	);
 }

@@ -1,8 +1,10 @@
 import {
 	type ProjectSummaryObject,
+	type SectorBeneficiaryObject,
 	projectSummaryObjectSchema,
+	sectorBeneficiaryObjectSchema,
 } from "./schemas";
-import { type List } from "./makelists";
+import type { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import { constants } from "./constants";
 
@@ -21,11 +23,28 @@ export type Datum = {
 	endDate: Date;
 	approvalDate: Date;
 	budget: number;
+	sectorData: SectorDatum[];
+	reportType: ReportType;
 };
 
 export type Data = Datum[];
 
+type SectorDatum = {
+	sectorId: number;
+	percentage: number;
+	reached: BeneficiariesObject;
+	targeted: BeneficiariesObject;
+};
+
+type SectorMapValue = {
+	projectCode: string;
+	projectId: number;
+	sectors: SectorDatum[];
+};
+
 export type GenderAndAge = (typeof constants.beneficiaryCategories)[number];
+
+export type ReportType = (typeof constants.reportTypes)[number];
 
 export type BeneficiariesObject = {
 	[K in GenderAndAge]: number;
@@ -49,16 +68,19 @@ type InDataListsValues = SetType<InDataLists>;
 
 type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
+	sectorsData: SectorBeneficiaryObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 };
 
 function processRawData({
 	projectSummary,
+	sectorsData,
 	listsObj,
 	setInDataLists,
 }: ProcessRawDataParams): Data {
 	const data: Data = [];
+	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
@@ -71,6 +93,69 @@ function processRawData({
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 
+	sectorsData.forEach(row => {
+		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			sectorsSet.add(row.GlobalClusterId);
+			if (!sectorsDataMap.has(row.ChfProjectCode)) {
+				sectorsDataMap.set(row.ChfProjectCode, {
+					projectCode: row.ChfProjectCode,
+					projectId: row.ChfId,
+					sectors: [
+						{
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage,
+							reached: {
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
+							},
+							targeted: {
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
+							},
+						},
+					],
+				});
+			} else {
+				const projectData = sectorsDataMap.get(row.ChfProjectCode);
+				if (projectData) {
+					projectData.sectors.push({
+						sectorId: row.GlobalClusterId,
+						percentage: row.Percentage,
+						reached: {
+							girls: row.ActualGirls || 0,
+							boys: row.ActualBoys || 0,
+							women: row.ActualWomen || 0,
+							men: row.ActualMen || 0,
+						},
+						targeted: {
+							girls: row.TargetGirls || 0,
+							boys: row.TargetBoys || 0,
+							women: row.TargetWomen || 0,
+							men: row.TargetMen || 0,
+						},
+					});
+				} else {
+					warnProjectNotFound(
+						row.ChfProjectCode,
+						row,
+						"Project not found in sectorsDataMap",
+					);
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"sectorsData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -80,6 +165,7 @@ function processRawData({
 				];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
+			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -97,7 +183,24 @@ function processRawData({
 				);
 			}
 
-			if (thisAllocationType && thisOrganization) {
+			if (!thisSectorData) {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in sectors data",
+				);
+			}
+
+			//In case we need to check what projects are missing from emergencies data
+			// if (!thisEmergenciesData) {
+			// 	warnProjectNotFound(
+			// 		row.ChfProjectCode,
+			// 		row,
+			// 		"Project not found in emergencies data"
+			// 	);
+			// }
+
+			if (thisAllocationType && thisOrganization && thisSectorData) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
@@ -117,6 +220,7 @@ function processRawData({
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
 					projectStatusId: row.GlbPrjStatusId,
+					reportType: row.RptCode ?? 0,
 				});
 
 				const objDatum: Datum = {
@@ -134,11 +238,13 @@ function processRawData({
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
+					sectorData: thisSectorData.sectors,
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
 						row,
 						"targeted",
 					),
+					reportType: row.RptCode ?? 0,
 				};
 
 				data.push(objDatum);

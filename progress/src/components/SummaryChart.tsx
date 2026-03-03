@@ -57,13 +57,25 @@ function SummaryChart({
 		});
 		downloadData<(typeof dataSummaryDownload)[number]>(
 			dataSummaryDownload,
-			"summary"
+			"summary",
 		);
 	}
 
 	const total = sum(dataSummary, d => d.allocations),
-		totalProjects = sum(dataSummary, d => d.projects.size),
-		totalPartners = sum(dataSummary, d => d.partners.size);
+		mergedProjectsSet = new Set(
+			dataSummary.reduce((acc, d) => {
+				d.projects.forEach(p => acc.add(p));
+				return acc;
+			}, new Set<number>()),
+		),
+		mergedPartnersSet = new Set(
+			dataSummary.reduce((acc, d) => {
+				d.partners.forEach(p => acc.add(p));
+				return acc;
+			}, new Set<number>()),
+		),
+		totalProjects = mergedProjectsSet.size,
+		totalPartners = mergedPartnersSet.size;
 
 	return (
 		<Container
@@ -87,7 +99,7 @@ function SummaryChart({
 				marginBottom={4}
 				data-tooltip-id="tooltip"
 				data-tooltip-content={`Total allocations: $${format(",.2f")(
-					total
+					total,
 				)}`}
 				data-tooltip-place="top"
 			>

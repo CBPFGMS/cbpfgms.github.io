@@ -103,6 +103,31 @@ export const projectSummaryObjectSchema = z.object({
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
 });
 
+export const sectorBeneficiaryObjectSchema = z.object({
+	PooledFundName: z.string(),
+	PooledFundId: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative(),
+	ChfId: z.number().int().nonnegative(),
+	ChfProjectCode: z.string(),
+	CountryClusterId: z.number().int().nonnegative(),
+	GlobalClusterId: z.number().int().nonnegative(),
+	Percentage: z.number().nonnegative(),
+	CALCBudgetByCluster: z.number().nonnegative(),
+	TargetMen: z.number().int().nonnegative().nullable(),
+	TargetWomen: z.number().int().nonnegative().nullable(),
+	TargetBoys: z.number().int().nonnegative().nullable(),
+	TargetGirls: z.number().int().nonnegative().nullable(),
+	ActualMen: z.number().int().nonnegative().nullable(),
+	ActualWomen: z.number().int().nonnegative().nullable(),
+	ActualBoys: z.number().int().nonnegative().nullable(),
+	ActualGirls: z.number().int().nonnegative().nullable(),
+	GlobalInstanceStatusId: z.number().int().nonnegative().nullable(),
+	SubmissionDate: z
+		.string()
+		.regex(dateRegex, "Invalid date format")
+		.nullable(),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -171,6 +196,15 @@ export const organizationMasterObjectSchema = z.object({
 	OrgIsOPD: z.string().nullable().optional(),
 	OrgIsYLO: z.string().nullable().optional(),
 	UNPPId: z.union([z.number(), z.string()]).nullable(),
+});
+
+export const projectStatusMasterObjectSchema = z.object({
+	GlobalInstanceStatusId: z.number().int().nonnegative(),
+	StatusName: z.string(),
+	StatusCode: z.string(),
+	AllocSrc: z.union([z.literal(1), z.literal(2)]),
+	InstanceTypeId: z.number().int().nonnegative(),
+	PooledFundId: z.number().int().nonnegative(),
 });
 
 export const beneficiaryTypesMasterObjectSchema = z.object({
@@ -260,12 +294,20 @@ export const globalIndicatorsMasterObjectSchema = z.object({
 
 export type ProjectSummaryObject = z.infer<typeof projectSummaryObjectSchema>;
 
+export type SectorBeneficiaryObject = z.infer<
+	typeof sectorBeneficiaryObjectSchema
+>;
+
 export type AllocationTypesMasterObject = z.infer<
 	typeof allocationTypesMasterObjectSchema
 >;
 
 export type OrganizationMasterObject = z.infer<
 	typeof organizationMasterObjectSchema
+>;
+
+export type ProjectStatusMasterObject = z.infer<
+	typeof projectStatusMasterObjectSchema
 >;
 
 export type BeneficiaryTypesMasterObject = z.infer<

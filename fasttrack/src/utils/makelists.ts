@@ -17,7 +17,7 @@ import {
 	globalIndicatorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import type { GenderAndAge } from "./processrawdata";
+import type { GenderAndAge, ReportType } from "./processrawdata";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -57,23 +57,7 @@ export type ProjectDetails = {
 	endDate: Date;
 	approvalDate: Date;
 	projectStatusId: number;
-};
-
-type EmergencyTypes = {
-	[key: number]: {
-		emergencyCategory: number;
-		emergencyGroup: number;
-	};
-};
-
-type EmergencyCategories = {
-	emergencyTypes: Set<number>;
-	emergencyGroup: number;
-};
-
-type EmergencyGroups = {
-	emergencyTypes: Set<number>;
-	emergencyCategories: Set<number>;
+	reportType: ReportType;
 };
 
 export type List = {
@@ -91,15 +75,6 @@ export type List = {
 	globalIndicators: ListObj;
 	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
-	emergencyTypeNames: ListObj;
-	emergencyGroupNames: ListObj;
-	emergencyCategoryNames: ListObj;
-	emergencyDetails: {
-		emergencyTypes: EmergencyTypes;
-		emergencyGroups: Map<number, EmergencyGroups>;
-		emergencyCategories: Map<number, EmergencyCategories>;
-	};
-	cvaTypeNames: ListObj;
 };
 
 function makeLists({
@@ -127,15 +102,6 @@ function makeLists({
 		globalIndicators: {},
 		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
-		emergencyTypeNames: {},
-		emergencyGroupNames: {},
-		emergencyCategoryNames: {},
-		emergencyDetails: {
-			emergencyTypes: {},
-			emergencyGroups: new Map(),
-			emergencyCategories: new Map(),
-		},
-		cvaTypeNames: {},
 	};
 
 	pooledFundsMaster.forEach(d => {

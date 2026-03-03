@@ -1,22 +1,33 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 import { useSticky } from "../hooks/useSticky";
+import type { InSelectionData } from "../utils/processdatatopfigures";
+import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
+import AccordionComponent from "./Accordion";
 
-function TopFilter() {
+type TopFilterProps = {
+	inSelectionData: InSelectionData;
+	fund: number[];
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+};
+
+function TopFilter({ inSelectionData, fund, setFund }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
 	return (
 		<Grid
 			container
-			spacing={2}
 			justifyContent={"center"}
+			alignItems={"center"}
 			position={"sticky"}
 			top={-1}
 			mb={2}
-			pt={1}
+			mt={3}
+			pt={3}
+			pb={3}
 			ref={stickyRef}
 			style={{
-				minHeight: "100px",
 				backgroundColor: "rgba(255,255,255,0.95)",
 				zIndex: 1600,
 				borderBottom: isSticky ? "1px solid #ccc" : "none",
@@ -24,7 +35,26 @@ function TopFilter() {
 					? "0px 10px 10px -10px rgba(0,0,0,0.2)"
 					: "none",
 			}}
-		></Grid>
+		>
+			<Box
+				style={{
+					display: "flex",
+					flexDirection: "row",
+					gap: "2em",
+					width: "100%",
+					alignItems: "center",
+				}}
+			>
+				<Typography variant="h6">Select Fund:</Typography>
+				<Grid size={5}>
+					<AccordionComponent
+						value={fund}
+						setValue={setFund}
+						inSelectionData={inSelectionData}
+					/>
+				</Grid>
+			</Box>
+		</Grid>
 	);
 }
 
