@@ -11,26 +11,36 @@ import capitalizeString from "../utils/capitalizestring";
 import Typography from "@mui/material/Typography";
 import { format } from "d3";
 import type { PictogramTypesWithTotal } from "../assets/Pictogram";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 type IndicatorsTableBodyProps = {
 	data: SectorDatum[];
 	lists: List;
 	showTotal: boolean;
 	expanded: boolean;
+	virtualRows: VirtualItem[];
+	totalSize: number;
+	measureRef: (el: Element | null) => void;
 };
 
 type CellValuesProps = {
 	row: SectorDatum;
 	header: "targeted" | "reached";
 	expanded?: boolean;
+	index: number;
 };
 
-type CellRowProps = CellValuesProps & {
+type CellRowProps = Omit<CellValuesProps, "index"> & {
 	category: PictogramTypesWithTotal;
 	cellIndex?: number;
 };
 
-const { indicatorsHeader, beneficiaryCategories } = constants;
+const {
+	indicatorsHeader,
+	beneficiaryCategories,
+	columnWidths,
+	columnWidthsExpanded,
+} = constants;
 
 const pictogramWidth = 12;
 
@@ -41,58 +51,110 @@ function IndicatorsTableBody({
 	lists,
 	showTotal,
 	expanded,
+	virtualRows,
+	totalSize,
+	measureRef,
 }: IndicatorsTableBodyProps) {
 	return (
-		<TableBody>
-			{data.map((row, index) => (
-				<TableRow
-					key={index}
-					hover
-				>
-					{indicatorsHeader.map((header, index) => {
-						if (header === "indicator") {
-							return (
-								<TableCell key={index}>
-									{lists.globalIndicators[row.indicatorId]}
-								</TableCell>
-							);
-						} else if (header === "projects") {
-							return (
-								<TableCell
-									key={index}
-									align="center"
-								>
-									{row.projects.size.toLocaleString()}
-								</TableCell>
-							);
-						} else {
-							return showTotal ? (
-								<CellValues
-									key={index}
-									row={row}
-									header={header}
-								/>
-							) : (
-								<CellBeneficiariesBreakdown
-									key={index}
-									row={row}
-									header={header}
-									expanded={expanded}
-								/>
-							);
-						}
-					})}
-				</TableRow>
-			))}
+		<TableBody
+			style={{
+				height: `${totalSize}px`, // Total height for scrollbar
+				position: "relative",
+			}}
+		>
+			{virtualRows.map(virtualRow => {
+				const row = data[virtualRow.index];
+				return (
+					<TableRow
+						key={virtualRow.index}
+						data-index={virtualRow.index}
+						ref={measureRef}
+						hover
+						style={{
+							position: "absolute",
+							top: 0,
+							transform: `translateY(${virtualRow.start}px)`,
+							width: "100%",
+							display: "flex",
+						}}
+					>
+						{indicatorsHeader.map((header, index) => {
+							if (header === "indicator") {
+								return (
+									<TableCell
+										key={index}
+										style={{
+											cursor: "pointer",
+											width:
+												expanded && !showTotal
+													? columnWidthsExpanded[
+															index
+														]
+													: columnWidths[index],
+										}}
+									>
+										{
+											lists.globalIndicators[
+												row.indicatorId
+											]
+										}
+									</TableCell>
+								);
+							} else if (header === "projects") {
+								return (
+									<TableCell
+										key={index}
+										align="center"
+										style={{
+											cursor: "pointer",
+											width:
+												expanded && !showTotal
+													? columnWidthsExpanded[
+															index
+														]
+													: columnWidths[index],
+										}}
+									>
+										{row.projects.size.toLocaleString()}
+									</TableCell>
+								);
+							} else {
+								return showTotal ? (
+									<CellValues
+										key={index}
+										row={row}
+										header={header}
+										index={index}
+									/>
+								) : (
+									<CellBeneficiariesBreakdown
+										key={index}
+										row={row}
+										header={header}
+										expanded={expanded}
+										index={index}
+									/>
+								);
+							}
+						})}
+					</TableRow>
+				);
+			})}
 		</TableBody>
 	);
 }
 
-function CellValues({ row, header }: CellValuesProps) {
+function CellValues({ row, header, index }: CellValuesProps) {
 	const { targetedTotal, reachedTotal } = row;
 	const thisValue = header === "targeted" ? targetedTotal : reachedTotal;
 	return (
-		<TableCell align="right">
+		<TableCell
+			align="right"
+			style={{
+				cursor: "pointer",
+				width: columnWidths[index],
+			}}
+		>
 			{row.unit === "%"
 				? percentFormat(thisValue) + "%"
 				: thisValue.toLocaleString()}
@@ -104,6 +166,7 @@ function CellBeneficiariesBreakdown({
 	row,
 	header,
 	expanded,
+	index,
 }: CellValuesProps) {
 	const hasNoData = beneficiaryCategories.every(
 		category => row[header][category] === null,
@@ -112,7 +175,14 @@ function CellBeneficiariesBreakdown({
 	let cellIndex = 0;
 
 	return (
-		<TableCell>
+		<TableCell
+			style={{
+				cursor: "pointer",
+				width: expanded
+					? columnWidthsExpanded[index]
+					: columnWidths[index],
+			}}
+		>
 			<Box
 				style={{
 					width: expanded ? "100%" : "90%",

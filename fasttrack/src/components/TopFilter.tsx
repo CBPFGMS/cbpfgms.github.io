@@ -29,7 +29,7 @@ function TopFilter({ inSelectionData, fund, setFund }: TopFilterProps) {
 			ref={stickyRef}
 			style={{
 				backgroundColor: "rgba(255,255,255,0.95)",
-				zIndex: 1600,
+				zIndex: 1200,
 				borderBottom: isSticky ? "1px solid #ccc" : "none",
 				boxShadow: isSticky
 					? "0px 10px 10px -10px rgba(0,0,0,0.2)"
@@ -46,7 +46,7 @@ function TopFilter({ inSelectionData, fund, setFund }: TopFilterProps) {
 				}}
 			>
 				<Typography variant="h6">Select Fund:</Typography>
-				<Grid size={5}>
+				<Grid size={4}>
 					<AccordionComponent
 						value={fund}
 						setValue={setFund}

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import type {
 	DatumIndicators,
-	AllSectorsDatum,
+	// AllSectorsDatum,
 } from "../utils/processdataindicators";
 import Button from "@mui/material/Button";
 import Stepper from "@mui/material/Stepper";
@@ -11,15 +11,17 @@ import Box from "@mui/material/Box";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import IndicatorCard from "./IndicatorCard";
-import SwipeableViews from "@gromy/react-swipeable-views";
 import type { List } from "../utils/makelists";
 import { clustersIconsData } from "../assets/clustericons";
 import { Typography } from "@mui/material";
 import colors from "../utils/colors";
-import DownloadIcon from "./DownloadIcon";
+// import DownloadIcon from "./DownloadIcon";
 import type { DownloadStates } from "./MainContainer";
-import downloadData from "../utils/downloaddata";
-import { processIndicatorsDownload } from "../utils/processdownload";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
+import "swiper/swiper-bundle.css";
+// import downloadData from "../utils/downloaddata";
+// import { processIndicatorsDownload } from "../utils/processdownload";
 
 type IndicatorsCarouselProps = {
 	data: DatumIndicators[];
@@ -28,9 +30,9 @@ type IndicatorsCarouselProps = {
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
-	return datum && datum.sector === 0;
-}
+// function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
+// 	return datum && datum.sector === 0;
+// }
 
 function IndicatorsCarousel({
 	data,
@@ -41,42 +43,43 @@ function IndicatorsCarousel({
 	const [activeStep, setActiveStep] = useState<number>(0),
 		maxSteps = data.length;
 
+	const swiperRef = useRef<SwiperType | null>(null);
+
 	const visibleRange = [
 		Math.max(0, activeStep - 1),
 		activeStep,
 		Math.min(maxSteps - 1, activeStep + 1),
 	];
 
+	function handleStepClick(step: number) {
+		setActiveStep(step);
+		swiperRef.current?.slideTo(step);
+	}
+
 	function handleNext() {
-		setActiveStep(prevActiveStep =>
-			Math.min(prevActiveStep + 1, maxSteps - 1),
-		);
+		swiperRef.current?.slideNext();
 	}
 
 	function handleBack() {
-		setActiveStep(prevActiveStep => Math.max(prevActiveStep - 1, 0));
+		swiperRef.current?.slidePrev();
 	}
 
-	function handleStepChange(step: number) {
-		setActiveStep(step);
+	function handleSlideChange(swiper: SwiperType) {
+		setActiveStep(swiper.activeIndex);
 	}
 
-	function handleStepClick(step: number) {
-		setActiveStep(step);
-	}
+	// const allSectorsData = data.find(isAllSectorsDatum)!;
 
-	const allSectorsData = data.find(isAllSectorsDatum)!;
-
-	function handleDownloadClick() {
-		const dataIndicatorsDownload = processIndicatorsDownload({
-			allSectorsData,
-			lists,
-		});
-		downloadData<(typeof dataIndicatorsDownload)[number]>(
-			dataIndicatorsDownload,
-			"global_indicators",
-		);
-	}
+	// function handleDownloadClick() {
+	// 	const dataIndicatorsDownload = processIndicatorsDownload({
+	// 		allSectorsData,
+	// 		lists,
+	// 	});
+	// 	downloadData<(typeof dataIndicatorsDownload)[number]>(
+	// 		dataIndicatorsDownload,
+	// 		"global_indicators",
+	// 	);
+	// }
 
 	return (
 		<Box
@@ -100,12 +103,12 @@ function IndicatorsCarousel({
 					flexDirection: "column",
 				}}
 			>
-				<DownloadIcon
+				{/* <DownloadIcon
 					handleDownloadClick={handleDownloadClick}
 					clickedDownload={clickedDownload}
 					setClickedDownload={setClickedDownload}
 					type="indicators"
-				/>
+				/> */}
 			</Box>
 			<Box
 				display="flex"
@@ -201,29 +204,35 @@ function IndicatorsCarousel({
 				width="100%"
 				mt={2}
 			>
-				<SwipeableViews
-					axis="x"
-					index={activeStep}
-					onChangeIndex={handleStepChange}
-					enableMouseEvents
+				<Swiper
+					onSwiper={swiper => (swiperRef.current = swiper)}
+					onSlideChange={handleSlideChange}
+					initialSlide={activeStep}
+					spaceBetween={20}
+					slidesPerView={1}
+					// This replaces enableMouseEvents
+					simulateTouch={true}
+					style={{ width: "100%" }}
 				>
 					{data.map((datum, index) => (
-						<Box
-							key={datum.sector}
-							display="flex"
-							justifyContent="center"
-							alignItems="flex-start"
-							padding={2}
-						>
-							{visibleRange.includes(index) && (
-								<IndicatorCard
-									datumIndicator={datum}
-									lists={lists}
-								/>
-							)}
-						</Box>
+						<SwiperSlide key={datum.sector}>
+							<Box
+								key={datum.sector}
+								display="flex"
+								justifyContent="center"
+								alignItems="flex-start"
+								padding={2}
+							>
+								{visibleRange.includes(index) && (
+									<IndicatorCard
+										datumIndicator={datum}
+										lists={lists}
+									/>
+								)}
+							</Box>
+						</SwiperSlide>
 					))}
-				</SwipeableViews>
+				</Swiper>
 			</Box>
 		</Box>
 	);

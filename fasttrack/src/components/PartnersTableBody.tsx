@@ -1,0 +1,211 @@
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import Box from "@mui/material/Box";
+import type { PartnersDatum } from "../utils/processdatapartners";
+import type { List } from "../utils/makelists";
+import { constants } from "../utils/constants";
+import Typography from "@mui/material/Typography";
+import type { VirtualItem } from "@tanstack/react-virtual";
+import { clustersIconsData } from "../assets/clustericons";
+import colors from "../utils/colors";
+import formatSIFloat from "../utils/formatsi";
+
+type PartnersTableBodyProps = {
+	data: PartnersDatum[];
+	maxBudgetValue: number;
+	lists: List;
+	virtualRows: VirtualItem[];
+	totalSize: number;
+	measureRef: (el: Element | null) => void;
+};
+
+type BudgetCellProps = {
+	index: number;
+	row: PartnersDatum;
+	maxBudgetValue: number;
+};
+
+type SectorCellProps = {
+	index: number;
+	row: PartnersDatum;
+	lists: List;
+};
+
+const {
+	partnersHeader,
+	columnWidthsPartners,
+	partnerBarHeight,
+	partnerBarMaxWidth,
+} = constants;
+
+const sectorIconWidth = 20;
+
+function PartnersTableBody({
+	data,
+	maxBudgetValue,
+	lists,
+	virtualRows,
+	totalSize,
+	measureRef,
+}: PartnersTableBodyProps) {
+	return (
+		<TableBody
+			style={{
+				height: `${totalSize}px`, // Total height for scrollbar
+				position: "relative",
+			}}
+		>
+			{virtualRows.map(virtualRow => {
+				const row = data[virtualRow.index];
+				return (
+					<TableRow
+						key={virtualRow.index}
+						data-index={virtualRow.index}
+						ref={measureRef}
+						hover
+						style={{
+							position: "absolute",
+							top: 0,
+							transform: `translateY(${virtualRow.start}px)`,
+							width: "100%",
+							display: "flex",
+						}}
+					>
+						{partnersHeader.map((header, index) => {
+							if (header === "budget") {
+								return (
+									<BudgetCell
+										row={row}
+										index={index}
+										maxBudgetValue={maxBudgetValue}
+									/>
+								);
+							} else if (header === "sector") {
+								return (
+									<SectorCell
+										row={row}
+										index={index}
+										lists={lists}
+									/>
+								);
+							} else {
+								return (
+									<TableCell
+										key={index}
+										align={
+											header === "partner"
+												? "left"
+												: "center"
+										}
+										style={{
+											color: "#333",
+											fontFamily: "Montserrat",
+											fontSize: "16px",
+											fontWeight: 500,
+											width: columnWidthsPartners[index],
+											display: "flex",
+											alignItems: "center",
+											justifyContent:
+												header === "partner"
+													? "flex-start"
+													: "center",
+										}}
+									>
+										{header === "partner"
+											? lists.organizations[row[header]]
+											: row[header].size}
+									</TableCell>
+								);
+							}
+						})}
+					</TableRow>
+				);
+			})}
+		</TableBody>
+	);
+}
+
+function BudgetCell({ row, maxBudgetValue, index }: BudgetCellProps) {
+	const barWidth = Math.round(
+		(row.budget / maxBudgetValue) * partnerBarMaxWidth,
+	);
+	return (
+		<TableCell
+			key={index}
+			align="left"
+			style={{ width: columnWidthsPartners[index] }}
+			data-tooltip-id="tooltip"
+			data-tooltip-html={"$" + row.budget.toLocaleString()}
+			data-tooltip-place="top"
+		>
+			<Box
+				style={{
+					width: "100%",
+					height: "100%",
+					display: "flex",
+					flexDirection: "row",
+					alignItems: "center",
+				}}
+			>
+				<Box
+					style={{
+						width: barWidth + "%",
+						height: partnerBarHeight,
+						backgroundColor: colors.unColor,
+					}}
+				></Box>
+				<Typography
+					style={{
+						paddingLeft: "6px",
+						color: "#333",
+						fontFamily: "Montserrat",
+						fontSize: "16px",
+						fontWeight: 600,
+					}}
+				>
+					{formatSIFloat(row.budget)}
+				</Typography>
+			</Box>
+		</TableCell>
+	);
+}
+
+function SectorCell({ row, index, lists }: SectorCellProps) {
+	const tooltipTitle = row.sectors.size > 1 ? "Sectors" : "Sector";
+	const tooltipSectors = [...row.sectors]
+		.map(d => lists.sectors[d])
+		.join(", ");
+	const tooltipText = `<div style='text-align:center;'><span style='font-weight:bold'>${tooltipTitle}: </span>${tooltipSectors}</div>`;
+	return (
+		<TableCell
+			key={index}
+			align="center"
+			style={{ width: columnWidthsPartners[index] }}
+			data-tooltip-id="tooltip"
+			data-tooltip-html={tooltipText}
+			data-tooltip-place="top"
+		>
+			<Box
+				style={{
+					width: "100%",
+					display: "flex",
+					flexDirection: "row",
+					justifyContent: "center",
+					flexWrap: "wrap",
+				}}
+			>
+				{[...row.sectors].map(d => (
+					<img
+						src={clustersIconsData[d]}
+						width={sectorIconWidth}
+						height={sectorIconWidth}
+						style={{ padding: "4px" }}
+					/>
+				))}
+			</Box>
+		</TableCell>
+	);
+}
+
+export default PartnersTableBody;

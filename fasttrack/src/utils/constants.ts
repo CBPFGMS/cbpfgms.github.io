@@ -12,6 +12,10 @@ const constants = {
 	indicatorsHeader: ["indicator", "projects", "targeted", "reached"],
 	columnWidths: ["52%", "8%", "20%", "20%"],
 	columnWidthsExpanded: ["26%", "6%", "34%", "34%"],
+	partnersHeader: ["partner", "sector", "budget", "projects", "funds"],
+	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
+	partnerBarMaxWidth: 80,
+	partnerBarHeight: 24,
 } as const;
 
 export { constants };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import type { List } from "../utils/makelists";
 import type { DatumIndicators } from "../utils/processdataindicators";
 import Typography from "@mui/material/Typography";
@@ -15,6 +15,7 @@ import type { SortingCriterion } from "./IndicatorTableHead";
 import IndicatorsTableBody from "./IndicatorTableBody";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 type IndicatorCardProps = {
 	datumIndicator: DatumIndicators;
@@ -121,6 +122,20 @@ function IndicatorCardContent({
 	expanded,
 	toggleExpanded,
 }: IndicatorCardContentProps) {
+	const tableRef = useRef(null);
+
+	const rowVirtualizer = useVirtualizer({
+		count: sortedData.length,
+		getScrollElement: () => tableRef.current,
+		estimateSize: () => 53, // Average height of an MUI row
+		measureElement: el => el.getBoundingClientRect().height,
+		overscan: 5, // Number of rows to render outside the view
+	});
+
+	const virtualRows = rowVirtualizer.getVirtualItems();
+
+	const totalSize = rowVirtualizer.getTotalSize();
+
 	return (
 		<Paper
 			elevation={0}
@@ -133,7 +148,7 @@ function IndicatorCardContent({
 				backgroundColor: "#f3f3f3",
 				borderRadius: "8px",
 				maxHeight: expanded ? "90vh" : "",
-				overflowY: "hidden",
+				// overflowY: "hidden",
 				boxSizing: "border-box",
 			}}
 		>
@@ -141,7 +156,7 @@ function IndicatorCardContent({
 				display="flex"
 				mb={2}
 				flexDirection="column"
-				overflow="hidden"
+				// overflow="hidden"
 			>
 				<Box
 					display="flex"
@@ -227,7 +242,13 @@ function IndicatorCardContent({
 					</Typography>
 				</Box>
 				<Box sx={{ width: "100%	" }}>
-					<TableContainer sx={{ maxHeight: expanded ? "80vh" : 600 }}>
+					<TableContainer
+						ref={tableRef}
+						sx={{
+							maxHeight: expanded ? "80vh" : 600,
+							overflow: "auto",
+						}}
+					>
 						<Table
 							size={expanded ? "small" : "medium"}
 							stickyHeader
@@ -248,6 +269,9 @@ function IndicatorCardContent({
 								lists={lists}
 								showTotal={showTotal}
 								expanded={expanded}
+								virtualRows={virtualRows}
+								totalSize={totalSize}
+								measureRef={rowVirtualizer.measureElement}
 							/>
 						</Table>
 					</TableContainer>

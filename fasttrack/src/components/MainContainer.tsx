@@ -8,10 +8,12 @@ import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
 import processDataIndicators from "../utils/processdataindicators";
 import processDataTopFigures from "../utils/processdatatopfigures";
+import processDataPartners from "../utils/processdatapartners";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
 import IndicatorsContainer from "./IndicatorsContainer";
+import Partners from "./Partners";
 
 const { charts } = constants;
 
@@ -56,6 +58,15 @@ function MainContainer() {
 		[data, fund],
 	);
 
+	const { dataPartners, maxBudgetValue } = useMemo(
+		() =>
+			processDataPartners({
+				data,
+				fund,
+			}),
+		[data, fund],
+	);
+
 	useUpdateQueryString({
 		fund,
 		inDataLists,
@@ -91,8 +102,15 @@ function MainContainer() {
 				dataIndicators={filteredDataIndicators}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
-				fund={fund}
 				lists={lists}
+			/>
+			<Box mb={3} />
+			<Partners
+				data={dataPartners}
+				maxBudgetValue={maxBudgetValue}
+				lists={lists}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
 			/>
 		</Container>
 	);

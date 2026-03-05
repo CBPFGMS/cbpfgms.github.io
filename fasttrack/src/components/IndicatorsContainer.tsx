@@ -8,7 +8,6 @@ import type { List } from "../utils/makelists";
 
 type IndicatorsContainerProps = {
 	dataIndicators: DatumIndicators[];
-	fund: number[];
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
@@ -65,12 +64,48 @@ function IndicatorsContainer({
 				</Typography>
 			</Grid>
 			<Grid size={12}>
-				<IndicatorsCarousel
-					data={dataIndicators}
-					lists={lists}
-					clickedDownload={clickedDownload}
-					setClickedDownload={setClickedDownload}
-				/>
+				{dataIndicators.length > 0 ? (
+					<IndicatorsCarousel
+						data={dataIndicators}
+						lists={lists}
+						clickedDownload={clickedDownload}
+						setClickedDownload={setClickedDownload}
+					/>
+				) : (
+					<NoData />
+				)}
+			</Grid>
+		</Grid>
+	);
+}
+
+function NoData() {
+	return (
+		<Grid
+			container
+			spacing={2}
+			mt={6}
+			mb={6}
+			justifyContent={"center"}
+		>
+			<Grid
+				size={10}
+				justifyContent={"center"}
+				display={"flex"}
+				flexDirection={"column"}
+			>
+				<Typography
+					variant="body1"
+					style={{
+						fontFamily: "Montserrat",
+						fontSize: "1.2rem",
+						textAlign: "center",
+					}}
+				>
+					There is no data available for the selected fund.
+					<br />
+					Please try selecting a different fund or check back later.
+				</Typography>
 			</Grid>
 		</Grid>
 	);

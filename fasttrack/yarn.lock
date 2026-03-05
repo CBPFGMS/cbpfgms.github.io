@@ -1283,6 +1283,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-virtual@npm:^3.13.19":
+  version: 3.13.19
+  resolution: "@tanstack/react-virtual@npm:3.13.19"
+  dependencies:
+    "@tanstack/virtual-core": "npm:3.13.19"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/3b3d512590980ac609b1b319948c0a3f75f4ffa28677329d3dca6bd1fa3b15a88ea4229e45e4f3803cfd97a3c587ab4a7d9f016ddf7ea8f02be3c76f86fcf993
+  languageName: node
+  linkType: hard
+
+"@tanstack/virtual-core@npm:3.13.19":
+  version: 3.13.19
+  resolution: "@tanstack/virtual-core@npm:3.13.19"
+  checksum: 10c0/7bcff6560902e157bec2753d009288bc3be0251a9762532cb2f43f9e9fb9b5d9a2d441eba87e0463c7a891e5966b9cfda88555d428149f6a7a54a65e66ba6726
+  languageName: node
+  linkType: hard
+
 "@types/d3-array@npm:*":
   version: 3.2.2
   resolution: "@types/d3-array@npm:3.2.2"
@@ -2714,6 +2733,7 @@ __metadata:
     "@mui/icons-material": "npm:^7.3.8"
     "@mui/material": "npm:^7.3.8"
     "@react-spring/web": "npm:^10.0.3"
+    "@tanstack/react-virtual": "npm:^3.13.19"
     "@types/d3": "npm:^7"
     "@types/node": "npm:^24.10.1"
     "@types/react": "npm:^19.2.7"
@@ -2728,6 +2748,7 @@ __metadata:
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-tooltip: "npm:^5.30.0"
+    swiper: "npm:^12.1.2"
     typescript: "npm:~5.9.3"
     typescript-eslint: "npm:^8.48.0"
     vite: "npm:^7.3.1"
@@ -3873,6 +3894,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10c0/6c4032340701a9950865f7ae8ef38578d8d7053f5e10518076e6554a9381fa91bd9c6850193695c141f32b21f979c985db07265a758867bac95de05f7d8aeb39
+  languageName: node
+  linkType: hard
+
+"swiper@npm:^12.1.2":
+  version: 12.1.2
+  resolution: "swiper@npm:12.1.2"
+  checksum: 10c0/f2597a67c4d647e367a236735bb7779e2833346b332e6d7b8caf48c6b82da52787959e86f06762983ab82b142958690a0d1b9f6fc5a59170a648949b35cfedd0
   languageName: node
   linkType: hard
 

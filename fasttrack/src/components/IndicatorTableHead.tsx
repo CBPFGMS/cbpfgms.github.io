@@ -7,7 +7,7 @@ import type { SortingOrder } from "./IndicatorCard";
 import capitalizeString from "../utils/capitalizestring";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import colors from "../utils/colors";
 import InfoIcon from "@mui/icons-material/Info";
 

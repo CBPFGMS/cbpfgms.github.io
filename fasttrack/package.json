@@ -15,11 +15,13 @@
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
     "@react-spring/web": "^10.0.3",
+    "@tanstack/react-virtual": "^3.13.19",
     "d3": "^7.9.0",
     "idb": "^8.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-tooltip": "^5.30.0",
+    "swiper": "^12.1.2",
     "zod": "^4.3.6"
   },
   "devDependencies": {
