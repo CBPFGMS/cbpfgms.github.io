@@ -247,6 +247,24 @@ export const sectorsMasterObjectSchema = z.object({
 	ClustCode: z.string(),
 });
 
+export const pooledFundsWithRegionMasterObjectSchema = z.object({
+	id: z.number().int().nonnegative(),
+	PooledFundName: z.string(),
+	PooledFundNameAbbrv: z.string(),
+	RegionName: z.string(),
+	RegionNameArr: z.string(),
+	SubRegionName: z.string(),
+	ContinentName: z.string(),
+	CountryCode: z.string(),
+	ISO2Code: z.string(),
+	latitude: z.union([z.number(), z.string()]),
+	longitude: z.union([z.number(), z.string()]),
+	CBPFFundStatus: z.string(),
+	CBPFId: z.union([z.number().int().nonnegative(), z.string()]),
+	CERFId: z.union([z.number().int().nonnegative(), z.string()]),
+	AreaType: z.string(),
+});
+
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
@@ -334,4 +352,8 @@ export type GlobalIndicatorsObject = z.infer<
 
 export type GlobalIndicatorsMasterObject = z.infer<
 	typeof globalIndicatorsMasterObjectSchema
+>;
+
+export type PooledFundsWithRegionMasterObject = z.infer<
+	typeof pooledFundsWithRegionMasterObjectSchema
 >;

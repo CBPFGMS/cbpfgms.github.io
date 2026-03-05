@@ -7,6 +7,7 @@ import {
 	type PooledFundsMasterObject,
 	type SectorsMasterObject,
 	type GlobalIndicatorsMasterObject,
+	type PooledFundsWithRegionMasterObject,
 	pooledFundsMasterObjectSchema,
 	beneficiaryTypesMasterObjectSchema,
 	allocationTypesMasterObjectSchema,
@@ -15,6 +16,7 @@ import {
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
 	globalIndicatorsMasterObjectSchema,
+	pooledFundsWithRegionMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import type { GenderAndAge, ReportType } from "./processrawdata";
@@ -28,6 +30,7 @@ type MakeListParams = {
 	organizationTypesMaster: OrganizationTypesMasterObject[];
 	sectorsMaster: SectorsMasterObject[];
 	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
+	pooledFundsWithRegionMaster: PooledFundsWithRegionMasterObject[];
 };
 
 export type ListObj = {
@@ -47,6 +50,11 @@ export type GlobalIndicatorsDetails = {
 } & {
 	unit: GlobalIndicatorsMasterObject["UnitAb"];
 	unitName: GlobalIndicatorsMasterObject["UnitNm"];
+};
+
+export type Regions = {
+	regionName: string;
+	funds: Set<number>;
 };
 
 export type ProjectDetails = {
@@ -75,6 +83,7 @@ export type List = {
 	globalIndicators: ListObj;
 	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
+	regions: Regions[];
 };
 
 function makeLists({
@@ -86,6 +95,7 @@ function makeLists({
 	organizationTypesMaster,
 	sectorsMaster,
 	globalIndicatorsMaster,
+	pooledFundsWithRegionMaster,
 }: MakeListParams): List {
 	const lists: List = {
 		fundNames: {},
@@ -102,6 +112,7 @@ function makeLists({
 		globalIndicators: {},
 		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
+		regions: [],
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -118,6 +129,34 @@ function makeLists({
 			);
 		}
 	});
+
+	pooledFundsWithRegionMaster.forEach(d => {
+		const parsedPooledFundsWithRegionMaster =
+			pooledFundsWithRegionMasterObjectSchema.safeParse(d);
+		if (parsedPooledFundsWithRegionMaster.success) {
+			if (typeof d.CBPFId === "number") {
+				const foundRegion = lists.regions.find(
+					e => e.regionName === d.RegionName,
+				);
+				if (foundRegion) {
+					foundRegion.funds.add(d.CBPFId);
+				} else {
+					lists.regions.push({
+						regionName: d.RegionName,
+						funds: new Set([d.CBPFId]),
+					});
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"PooledFundsWithRegionMaster",
+				d,
+				JSON.stringify(parsedPooledFundsWithRegionMaster.error),
+			);
+		}
+	});
+
+	console.log(lists);
 
 	beneficiaryTypesMaster.forEach(d => {
 		const parsedBeneficiariesMaster =

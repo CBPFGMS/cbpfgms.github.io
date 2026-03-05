@@ -9,6 +9,7 @@ import useUpdateQueryString from "../hooks/useupdatequerystring";
 import processDataIndicators from "../utils/processdataindicators";
 import processDataTopFigures from "../utils/processdatatopfigures";
 import processDataPartners from "../utils/processdatapartners";
+import processDataRegions from "../utils/processdataregions";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
@@ -67,6 +68,16 @@ function MainContainer() {
 		[data, fund],
 	);
 
+	const dataRegions = useMemo(
+		() =>
+			processDataRegions({
+				data,
+				fund,
+				lists,
+			}),
+		[data, fund, lists],
+	);
+
 	useUpdateQueryString({
 		fund,
 		inDataLists,
@@ -75,6 +86,8 @@ function MainContainer() {
 		setClickedDownload,
 		downloadStates,
 	});
+
+	console.log(dataRegions);
 
 	return (
 		<Container
@@ -86,6 +99,7 @@ function MainContainer() {
 		>
 			<Tooltip
 				id="tooltip"
+				anchorSelect=".tooltip-cell"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
 			<TopIntro />

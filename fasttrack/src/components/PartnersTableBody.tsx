@@ -58,6 +58,11 @@ function PartnersTableBody({
 		>
 			{virtualRows.map(virtualRow => {
 				const row = data[virtualRow.index];
+				const tooltipFundTitle = row.funds.size > 1 ? "Funds" : "Fund";
+				const tooltipFunds = [...row.funds]
+					.map(d => lists.fundNames[d])
+					.join(", ");
+				const tooltipFundText = `<div style='text-align:center;'><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
 				return (
 					<TableRow
 						key={virtualRow.index}
@@ -76,6 +81,7 @@ function PartnersTableBody({
 							if (header === "budget") {
 								return (
 									<BudgetCell
+										key={`${virtualRow.index}-${index}`}
 										row={row}
 										index={index}
 										maxBudgetValue={maxBudgetValue}
@@ -84,6 +90,7 @@ function PartnersTableBody({
 							} else if (header === "sector") {
 								return (
 									<SectorCell
+										key={`${virtualRow.index}-${index}`}
 										row={row}
 										index={index}
 										lists={lists}
@@ -92,7 +99,7 @@ function PartnersTableBody({
 							} else {
 								return (
 									<TableCell
-										key={index}
+										key={`${virtualRow.index}-${index}`}
 										align={
 											header === "partner"
 												? "left"
@@ -111,6 +118,13 @@ function PartnersTableBody({
 													? "flex-start"
 													: "center",
 										}}
+										{...(header === "funds" && {
+											"data-tooltip-id": "tooltip",
+											"data-tooltip-html":
+												tooltipFundText,
+											"data-tooltip-place": "top",
+											className: "tooltip-cell",
+										})}
 									>
 										{header === "partner"
 											? lists.organizations[row[header]]
@@ -138,6 +152,7 @@ function BudgetCell({ row, maxBudgetValue, index }: BudgetCellProps) {
 			data-tooltip-id="tooltip"
 			data-tooltip-html={"$" + row.budget.toLocaleString()}
 			data-tooltip-place="top"
+			className="tooltip-cell"
 		>
 			<Box
 				style={{
@@ -180,6 +195,7 @@ function SectorCell({ row, index, lists }: SectorCellProps) {
 	return (
 		<TableCell
 			key={index}
+			className="tooltip-cell"
 			align="center"
 			style={{ width: columnWidthsPartners[index] }}
 			data-tooltip-id="tooltip"
@@ -197,6 +213,7 @@ function SectorCell({ row, index, lists }: SectorCellProps) {
 			>
 				{[...row.sectors].map(d => (
 					<img
+						key={d}
 						src={clustersIconsData[d]}
 						width={sectorIconWidth}
 						height={sectorIconWidth}

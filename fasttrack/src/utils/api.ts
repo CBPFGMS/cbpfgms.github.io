@@ -10,6 +10,7 @@ import type {
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
 	PooledFundsMasterObject,
+	PooledFundsWithRegionMasterObject,
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	SectorsMasterObject,
@@ -30,6 +31,7 @@ type ReceiveDataArgs = [
 	OrganizationTypesMasterObject[],
 	SectorsMasterObject[],
 	GlobalIndicatorsMasterObject[],
+	PooledFundsWithRegionMasterObject[],
 ];
 
 const { fundType } = constants;
@@ -45,7 +47,9 @@ const beneficiaryTypesMasterUrl =
 	sectorsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 	globalIndicatorsMasterUrl =
-		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv";
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
+	pooledFundWithRegionMasterUrl =
+		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json";
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -152,6 +156,12 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<PooledFundsWithRegionMasterObject[]>(
+				"pooledFundsWithRegionMaster",
+				pooledFundWithRegionMasterUrl,
+				"json",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -175,6 +185,7 @@ function useData(
 			organizationTypesMaster,
 			sectorsMaster,
 			globalIndicatorsMaster,
+			pooledFundsWithRegionMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -185,6 +196,7 @@ function useData(
 				organizationTypesMaster,
 				sectorsMaster,
 				globalIndicatorsMaster,
+				pooledFundsWithRegionMaster,
 			});
 
 			const data: Data = processRawData({
