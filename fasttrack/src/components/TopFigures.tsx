@@ -38,9 +38,10 @@ function TopFigures({ data }: TopFiguresProps) {
 			format: true,
 		},
 		{
-			label: "AllocationTimeline (days)",
-			value: data.days,
+			label: "Targeted People",
+			value: data.targeted,
 			type: "integer",
+			format: true,
 		},
 	];
 
@@ -82,6 +83,7 @@ function TopFigures({ data }: TopFiguresProps) {
 									fontFamily: "Montserrat",
 								}}
 							>
+								{card.label === "Disbursement" && "$"}
 								<NumberAnimator
 									number={
 										card.format

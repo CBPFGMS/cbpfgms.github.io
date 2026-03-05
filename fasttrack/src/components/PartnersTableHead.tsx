@@ -19,7 +19,7 @@ type Titles = {
 	[K in (typeof partnersHeader)[number]]: string;
 };
 
-const { partnersHeader, columnWidthsPartners } = constants;
+const { partnersHeader, columnWidthsPartnersHeader } = constants;
 
 function PartnersTableHead({
 	setSortingCriterion,
@@ -29,7 +29,7 @@ function PartnersTableHead({
 }: PartnersTableHeadProps) {
 	const titles: Titles = {
 		partner: "Organization Name",
-		sector: "Sector",
+		sector: "Sectors",
 		budget: "Approved Amount, in USD",
 		projects: "# of Projects",
 		funds: "# of CBPFs",
@@ -51,7 +51,7 @@ function PartnersTableHead({
 					<TableCell
 						key={header}
 						style={{
-							width: columnWidthsPartners[index],
+							width: columnWidthsPartnersHeader[index],
 							fontSize: "1em",
 						}}
 						sx={{ backgroundColor: "#f3f3f3" }}

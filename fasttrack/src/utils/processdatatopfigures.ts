@@ -13,7 +13,7 @@ export type DataTopFigures = {
 	numberOfProjects: number;
 	numberOfPartners: number;
 	allocations: number;
-	days: number;
+	targeted: number;
 };
 
 function processDataTopFigures({ data, fund }: ProcessDataTopFiguresParams): {
@@ -22,20 +22,24 @@ function processDataTopFigures({ data, fund }: ProcessDataTopFiguresParams): {
 } {
 	const numberOfProjectsSet = new Set<number>(),
 		numberOfPartnersSet = new Set<number>(),
-		daysExtent: [number, number] = [Infinity, -Infinity],
 		inSelectionData: InSelectionData = {
 			funds: new Set<number>(),
 		};
 
-	let allocations = 0;
+	let allocations = 0,
+		targeted = 0;
 
 	data.forEach(row => {
 		if (fund.includes(row.fund)) {
+			const totalTargeted =
+				row.targeted.boys +
+				row.targeted.girls +
+				row.targeted.men +
+				row.targeted.women;
 			numberOfProjectsSet.add(row.projectId);
 			numberOfPartnersSet.add(row.organizationId);
 			allocations += row.budget;
-			daysExtent[0] = Math.min(daysExtent[0], row.approvalDate.getTime());
-			daysExtent[1] = Math.max(daysExtent[1], row.endDate.getTime());
+			targeted += totalTargeted;
 		}
 		inSelectionData.funds.add(row.fund);
 	});
@@ -44,7 +48,7 @@ function processDataTopFigures({ data, fund }: ProcessDataTopFiguresParams): {
 		numberOfProjects: numberOfProjectsSet.size,
 		numberOfPartners: numberOfPartnersSet.size,
 		allocations,
-		days: Math.ceil((daysExtent[1] - daysExtent[0]) / (1000 * 3600 * 24)),
+		targeted,
 	};
 
 	return { dataTopFigures, inSelectionData };
