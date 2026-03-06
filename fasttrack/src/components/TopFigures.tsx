@@ -80,6 +80,12 @@ function TopFigures({ data }: TopFiguresProps) {
 									"$" + card.value.toLocaleString(),
 								"data-tooltip-place": "top",
 							})}
+							{...(card.label === "Targeted People" && {
+								"data-tooltip-id": "tooltip-regular",
+								"data-tooltip-html":
+									card.value.toLocaleString() + " people",
+								"data-tooltip-place": "top",
+							})}
 						>
 							<Typography
 								style={{

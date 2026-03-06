@@ -62,7 +62,10 @@ function Regions({
 				spacing={2}
 				position={"relative"}
 			>
-				<Grid size={12}>
+				<Grid
+					size={12}
+					mb={3}
+				>
 					<Typography
 						style={{
 							color: "var(--ocha-blue)",

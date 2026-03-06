@@ -32,6 +32,7 @@ export type Data = Datum[];
 type SectorDatum = {
 	sectorId: number;
 	percentage: number;
+	budget: number;
 	reached: BeneficiariesObject;
 	targeted: BeneficiariesObject;
 };
@@ -117,6 +118,7 @@ function processRawData({
 								women: row.TargetWomen || 0,
 								men: row.TargetMen || 0,
 							},
+							budget: row.CALCBudgetByCluster,
 						},
 					],
 				});
@@ -138,6 +140,7 @@ function processRawData({
 							women: row.TargetWomen || 0,
 							men: row.TargetMen || 0,
 						},
+						budget: row.CALCBudgetByCluster,
 					});
 				} else {
 					warnProjectNotFound(

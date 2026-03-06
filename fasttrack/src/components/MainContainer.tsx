@@ -10,12 +10,14 @@ import processDataIndicators from "../utils/processdataindicators";
 import processDataTopFigures from "../utils/processdatatopfigures";
 import processDataPartners from "../utils/processdatapartners";
 import processDataRegions from "../utils/processdataregions";
+import processDataSectors from "../utils/processdatasectors";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
 import IndicatorsContainer from "./IndicatorsContainer";
 import Partners from "./Partners";
 import Regions from "./Regions";
+import Sectors from "./Sectors";
 
 const { charts } = constants;
 
@@ -79,6 +81,15 @@ function MainContainer() {
 		[data, fund, lists],
 	);
 
+	const dataSectors = useMemo(
+		() =>
+			processDataSectors({
+				data,
+				fund,
+			}),
+		[data, fund, lists],
+	);
+
 	useUpdateQueryString({
 		fund,
 		inDataLists,
@@ -138,6 +149,13 @@ function MainContainer() {
 			<Box mb={8} />
 			<Regions
 				data={dataRegions}
+				lists={lists}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+			/>
+			<Box mb={8} />
+			<Sectors
+				data={dataSectors}
 				lists={lists}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}

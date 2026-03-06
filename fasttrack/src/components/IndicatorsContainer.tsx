@@ -30,9 +30,12 @@ function IndicatorsContainer({
 				<Typography
 					variant="h4"
 					style={{
-						fontFamily: "Montserrat",
-						fontWeight: 600,
+						color: "var(--ocha-blue)",
+						fontWeight: 700,
+						margin: "30px 0 22px 0",
 						textAlign: "center",
+						fontSize: "2rem",
+						fontFamily: "Montserrat",
 					}}
 				>
 					Global Indicators
