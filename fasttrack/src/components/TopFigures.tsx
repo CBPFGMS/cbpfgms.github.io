@@ -74,6 +74,12 @@ function TopFigures({ data }: TopFiguresProps) {
 								borderTop: "1px solid black",
 								borderBottom: "1px solid black",
 							}}
+							{...(card.label === "Disbursement" && {
+								"data-tooltip-id": "tooltip-regular",
+								"data-tooltip-html":
+									"$" + card.value.toLocaleString(),
+								"data-tooltip-place": "top",
+							})}
 						>
 							<Typography
 								style={{

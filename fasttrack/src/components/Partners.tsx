@@ -90,7 +90,7 @@ function Partners({
 					</Typography>
 				</Grid>
 			</Grid>
-			<Box sx={{ width: "100%	" }}>
+			<Box sx={{ width: "100%	", borderBottom: "1px solid #aaa" }}>
 				<TableContainer
 					ref={tableRef}
 					sx={{

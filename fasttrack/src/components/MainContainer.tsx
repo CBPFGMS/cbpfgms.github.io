@@ -15,6 +15,7 @@ import Explore from "./Explore";
 import Box from "@mui/material/Box";
 import IndicatorsContainer from "./IndicatorsContainer";
 import Partners from "./Partners";
+import Regions from "./Regions";
 
 const { charts } = constants;
 
@@ -87,8 +88,6 @@ function MainContainer() {
 		downloadStates,
 	});
 
-	console.log(dataRegions);
-
 	return (
 		<Container
 			disableGutters={true}
@@ -97,6 +96,15 @@ function MainContainer() {
 				paddingRight: "12px",
 			}}
 		>
+			<Tooltip
+				id="tooltip-regular"
+				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+			/>
+			<Tooltip
+				id="tooltip"
+				anchorSelect=".tooltip-cell2"
+				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+			/>
 			<Tooltip
 				id="tooltip"
 				anchorSelect=".tooltip-cell"
@@ -108,20 +116,28 @@ function MainContainer() {
 				fund={fund}
 				setFund={setFund}
 			/>
+			<Box mb={3} />
 			<TopFigures data={dataTopFigures} />
-			<Box mb={3} />
+			<Box mb={8} />
 			<Explore />
-			<Box mb={3} />
+			<Box mb={8} />
 			<IndicatorsContainer
 				dataIndicators={filteredDataIndicators}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				lists={lists}
 			/>
-			<Box mb={3} />
+			<Box mb={8} />
 			<Partners
 				data={dataPartners}
 				maxBudgetValue={maxBudgetValue}
+				lists={lists}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+			/>
+			<Box mb={8} />
+			<Regions
+				data={dataRegions}
 				lists={lists}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}

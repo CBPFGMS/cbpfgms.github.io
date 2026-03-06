@@ -136,13 +136,13 @@ function makeLists({
 		if (parsedPooledFundsWithRegionMaster.success) {
 			if (typeof d.CBPFId === "number") {
 				const foundRegion = lists.regions.find(
-					e => e.regionName === d.RegionName,
+					e => e.regionName === d.RegionNameArr,
 				);
 				if (foundRegion) {
 					foundRegion.funds.add(d.CBPFId);
 				} else {
 					lists.regions.push({
-						regionName: d.RegionName,
+						regionName: d.RegionNameArr,
 						funds: new Set([d.CBPFId]),
 					});
 				}

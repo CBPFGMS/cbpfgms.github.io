@@ -126,6 +126,7 @@ function IndicatorTableHead({
 												"Number of projects mapped to the indicator"
 											}
 											data-tooltip-place="top"
+											className="tooltip-cell2"
 											style={{
 												color: "#666",
 												fontSize: "16px",

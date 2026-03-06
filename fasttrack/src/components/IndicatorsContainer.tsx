@@ -49,18 +49,16 @@ function IndicatorsContainer({
 					variant="body1"
 					style={{
 						fontFamily: "Montserrat",
-						fontSize: "14px",
+						fontSize: "18px",
 						textAlign: "center",
 					}}
 				>
-					The Global Indicators are a set of metrics used to access
-					and measure the performance and impact of projects funded by
-					OCHA. These indicators cover various aspects of humanitarian
-					response, including beneficiary reach, funding allocation,
-					response time, and the effectiveness of interventions. They
-					provide a standardized framework for monitoring and
-					evaluating OCHA-funded projects, allowing for better
-					accountability and transparency
+					These indicators are metrics used to assess the performance
+					and impact of OCHA-funded projects. They cover various
+					aspects such as beneficiary reach, funding allocation,
+					response time, and intervention effectiveness. The goal is
+					to provide better accountability and transparency in
+					humanitarian operations.
 				</Typography>
 			</Grid>
 			<Grid size={12}>
