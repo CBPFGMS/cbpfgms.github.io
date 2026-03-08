@@ -3,7 +3,6 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import constants from "./constants";
-import { AllSectorsDatum } from "./processdataindicators";
 
 const { beneficiariesSplitOrder } = constants;
 
@@ -58,18 +57,6 @@ type GBVDatumDownload = BaseDownloadDatum & {
 	"GBV reached people": number;
 };
 
-type NoValue<T> = {
-	[P in keyof T]: T[P] | typeof notApplicable;
-};
-
-type IndicatorsDatumDownload = NoValue<BeneficiaryDownloadTypes> & {
-	Indicator: string;
-	sector: string;
-	"Unit of values": "percentage" | string;
-	"Targeted Total": number | typeof notApplicable;
-	"Reached Total": number | typeof notApplicable;
-};
-
 type CvaDatumDownload = BaseDownloadDatum & {
 	"CVA type": string;
 	Organization: string;
@@ -90,13 +77,6 @@ type ProcessDownloadParams = {
 	implementationStatus: ImplementationStatuses[];
 	showFinanciallyClosed: boolean;
 };
-
-type ProcessIndicatorsDownloadParams = {
-	allSectorsData: AllSectorsDatum;
-	lists: List;
-};
-
-const notApplicable = "N/A";
 
 export function processSummaryDownload({
 	data,
@@ -520,34 +500,6 @@ export function processCvaDownload({
 	});
 
 	return cvaDataDownload;
-}
-
-export function processIndicatorsDownload({
-	allSectorsData,
-	lists,
-}: ProcessIndicatorsDownloadParams): IndicatorsDatumDownload[] {
-	const indicatorsDataDownload: IndicatorsDatumDownload[] = [];
-
-	allSectorsData.sectorData.forEach(sector => {
-		indicatorsDataDownload.push({
-			Indicator: lists.globalIndicators[sector.indicatorId],
-			sector: lists.sectors[sector.sector],
-			"Unit of values":
-				sector.unit === "%" ? "percentage" : sector.unitName,
-			"Targeted Women": sector.targeted.women ?? notApplicable,
-			"Targeted Men": sector.targeted.men ?? notApplicable,
-			"Targeted Girls": sector.targeted.girls ?? notApplicable,
-			"Targeted Boys": sector.targeted.boys ?? notApplicable,
-			"Targeted Total": sector.targetedTotal ?? notApplicable,
-			"Reached Women": sector.reached.women ?? notApplicable,
-			"Reached Men": sector.reached.men ?? notApplicable,
-			"Reached Girls": sector.reached.girls ?? notApplicable,
-			"Reached Boys": sector.reached.boys ?? notApplicable,
-			"Reached Total": sector.reachedTotal ?? notApplicable,
-		});
-	});
-
-	return indicatorsDataDownload;
 }
 
 function checkIfNonZero(obj: BeneficiariesObject): boolean {

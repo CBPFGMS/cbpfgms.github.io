@@ -18,7 +18,6 @@ type TopPanelProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
-	inViewIndicators: boolean;
 	inViewDisability: boolean;
 	inViewGBV: boolean;
 	inViewCash: boolean;
@@ -48,7 +47,6 @@ function TopPanel({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
-	inViewIndicators,
 	inViewDisability,
 	inViewGBV,
 	inViewCash,
@@ -145,7 +143,6 @@ function TopPanel({
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
-				inViewIndicators={inViewIndicators}
 				inViewDisability={inViewDisability}
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}

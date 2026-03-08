@@ -270,47 +270,6 @@ export const cvaMasterObjectSchema = z.object({
 });
 
 // ********************
-// GLOBAL INDICATOR SCHEMA
-// ********************
-
-export const globalIndicatorsObjectSchema = z.object({
-	FundTypeId: z.union([z.literal(1), z.literal(2)]),
-	PooledFundId: z.number().int().nonnegative(),
-	CHFId: z.number().int().nonnegative(),
-	CHFProjectCode: z.string(),
-	ClstrId: z.number().int().nonnegative().nullable(),
-	GlbClstrId: z.number().int().nonnegative(),
-	GlbIndicId: z.number().int().nonnegative(),
-	CommClstrId: z.number().int().nonnegative().nullable(),
-	GlbIndicType: z.union([z.literal(1), z.literal(2)]).nullable(),
-	TgtM: z.number().nonnegative().nullable(),
-	TgtW: z.number().nonnegative().nullable(),
-	TgtB: z.number().nonnegative().nullable(),
-	TgtG: z.number().nonnegative().nullable(),
-	TgtTotal: z.number().nonnegative(),
-	AchM: z.number().nonnegative().nullable(),
-	AchW: z.number().nonnegative().nullable(),
-	AchB: z.number().nonnegative().nullable(),
-	AchG: z.number().nonnegative().nullable(),
-	AchTotal: z.number().nonnegative().nullable(),
-});
-
-export const globalIndicatorsMasterObjectSchema = z.object({
-	Id: z.number().int().nonnegative(),
-	Name: z.string(),
-	HasM: z.union([z.literal(0), z.literal(1)]),
-	HasW: z.union([z.literal(0), z.literal(1)]),
-	HasB: z.union([z.literal(0), z.literal(1)]),
-	HasG: z.union([z.literal(0), z.literal(1)]),
-	UnitNm: z.string(),
-	UnitAb: z.string(),
-	CommClstrId: z.number().int().nonnegative().nullable(),
-	Active: z.number().int().nonnegative().nullable(),
-	Code: z.string(),
-	TypeId: z.number().int().nonnegative().nullable(),
-});
-
-// ********************
 // TYPES
 // ********************
 
@@ -349,14 +308,6 @@ export type OrganizationTypesMasterObject = z.infer<
 >;
 
 export type SectorsMasterObject = z.infer<typeof sectorsMasterObjectSchema>;
-
-export type GlobalIndicatorsObject = z.infer<
-	typeof globalIndicatorsObjectSchema
->;
-
-export type GlobalIndicatorsMasterObject = z.infer<
-	typeof globalIndicatorsMasterObjectSchema
->;
 
 export type CvaObject = z.infer<typeof cvaObjectSchema>;
 

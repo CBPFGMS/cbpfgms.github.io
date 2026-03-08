@@ -16,7 +16,7 @@ import { clustersIconsData } from "../assets/clustericons";
 import { Typography } from "@mui/material";
 import colors from "../utils/colors";
 // import DownloadIcon from "./DownloadIcon";
-import type { DownloadStates } from "./MainContainer";
+// import type { DownloadStates } from "./MainContainer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/swiper-bundle.css";
@@ -26,8 +26,8 @@ import "swiper/swiper-bundle.css";
 type IndicatorsCarouselProps = {
 	data: DatumIndicators[];
 	lists: List;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	// clickedDownload: DownloadStates;
+	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 // function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
@@ -37,8 +37,8 @@ type IndicatorsCarouselProps = {
 function IndicatorsCarousel({
 	data,
 	lists,
-	clickedDownload,
-	setClickedDownload,
+	// clickedDownload,
+	// setClickedDownload,
 }: IndicatorsCarouselProps) {
 	const [activeStep, setActiveStep] = useState<number>(0),
 		maxSteps = data.length;

@@ -7,7 +7,6 @@ import {
 	PooledFundsMasterObject,
 	ProjectStatusMasterObject,
 	SectorsMasterObject,
-	GlobalIndicatorsMasterObject,
 	pooledFundsMasterObjectSchema,
 	beneficiaryTypesMasterObjectSchema,
 	allocationTypesMasterObjectSchema,
@@ -16,12 +15,11 @@ import {
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
 	projectStatusMasterObjectSchema,
-	globalIndicatorsMasterObjectSchema,
 	CvaMasterObject,
 	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import { GenderAndAge, ReportType } from "./processrawdata";
+import { ReportType } from "./processrawdata";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -32,7 +30,6 @@ type MakeListParams = {
 	allocationSourcesMaster: AllocationSourcesMasterObject[];
 	organizationTypesMaster: OrganizationTypesMasterObject[];
 	sectorsMaster: SectorsMasterObject[];
-	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
 	cvaMaster: CvaMasterObject[];
 };
 
@@ -46,13 +43,6 @@ export type AllocationTypeListObj = {
 
 type OrganizationListObj = {
 	[key: number]: OrganizationMasterObject;
-};
-
-export type GlobalIndicatorsDetails = {
-	[K in GenderAndAge]: boolean;
-} & {
-	unit: GlobalIndicatorsMasterObject["UnitAb"];
-	unitName: GlobalIndicatorsMasterObject["UnitNm"];
 };
 
 export type ProjectDetails = {
@@ -79,8 +69,6 @@ export type List = {
 	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	statuses: ListObj;
-	globalIndicators: ListObj;
-	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
 	cvaTypeNames: ListObj;
 };
@@ -94,7 +82,6 @@ function makeLists({
 	allocationSourcesMaster,
 	organizationTypesMaster,
 	sectorsMaster,
-	globalIndicatorsMaster,
 	cvaMaster,
 }: MakeListParams): List {
 	const lists: List = {
@@ -110,8 +97,6 @@ function makeLists({
 		organizationsCompleteList: {},
 		sectors: {},
 		statuses: {},
-		globalIndicators: {},
-		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
 		cvaTypeNames: {},
 	};
@@ -243,28 +228,6 @@ function makeLists({
 				"CvaMaster",
 				d,
 				JSON.stringify(parsedCvaMaster.error),
-			);
-		}
-	});
-
-	globalIndicatorsMaster.forEach(d => {
-		const parsedGlobalIndicatorsMaster =
-			globalIndicatorsMasterObjectSchema.safeParse(d);
-		if (parsedGlobalIndicatorsMaster.success) {
-			lists.globalIndicators[d.Id] = d.Name;
-			lists.globalIndicatorsDetails.set(d.Id, {
-				women: Boolean(d.HasW),
-				men: Boolean(d.HasM),
-				girls: Boolean(d.HasG),
-				boys: Boolean(d.HasB),
-				unit: d.UnitAb,
-				unitName: d.UnitNm,
-			});
-		} else {
-			warnInvalidSchema(
-				"GlobalIndicatorsMaster",
-				d,
-				JSON.stringify(parsedGlobalIndicatorsMaster.error),
 			);
 		}
 	});

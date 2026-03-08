@@ -11,24 +11,17 @@ type AppProps = {
 };
 
 function App({ defaultYear, defaultFundType, startYear }: AppProps) {
-	const {
-		data,
-		dataIndicators,
-		lists,
-		inDataLists,
-		loading,
-		error,
-		progress,
-	} = useData(defaultFundType, startYear);
+	const { data, lists, inDataLists, loading, error, progress } = useData(
+		defaultFundType,
+		startYear,
+	);
 
 	return loading ? (
 		<Loading progress={progress} />
 	) : error ? (
 		<Error error={error} />
 	) : (
-		<DataContext.Provider
-			value={{ data, dataIndicators, lists, inDataLists }}
-		>
+		<DataContext.Provider value={{ data, lists, inDataLists }}>
 			<MainContainer defaultYear={defaultYear} />
 		</DataContext.Provider>
 	);

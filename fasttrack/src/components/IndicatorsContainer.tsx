@@ -2,22 +2,22 @@ import React from "react";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import type { DatumIndicators } from "../utils/processdataindicators";
-import type { DownloadStates } from "./MainContainer";
+// import type { DownloadStates } from "./MainContainer";
 import IndicatorsCarousel from "./IndicatorsCarousel";
 import type { List } from "../utils/makelists";
 
 type IndicatorsContainerProps = {
 	dataIndicators: DatumIndicators[];
 	lists: List;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	// clickedDownload: DownloadStates;
+	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 function IndicatorsContainer({
 	dataIndicators,
 	lists,
-	clickedDownload,
-	setClickedDownload,
+	// clickedDownload,
+	// setClickedDownload,
 }: IndicatorsContainerProps) {
 	return (
 		<Grid
@@ -69,8 +69,8 @@ function IndicatorsContainer({
 					<IndicatorsCarousel
 						data={dataIndicators}
 						lists={lists}
-						clickedDownload={clickedDownload}
-						setClickedDownload={setClickedDownload}
+						// clickedDownload={clickedDownload}
+						// setClickedDownload={setClickedDownload}
 					/>
 				) : (
 					<NoData />

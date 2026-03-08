@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { PartnersDatum } from "../utils/processdatapartners";
 import type { List } from "../utils/makelists";
-import type { DownloadStates } from "./MainContainer";
+// import type { DownloadStates } from "./MainContainer";
 import { ascending, descending, sort } from "d3";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
@@ -17,8 +17,8 @@ type PartnersProps = {
 	data: PartnersDatum[];
 	maxBudgetValue: number;
 	lists: List;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	// clickedDownload: DownloadStates;
+	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 export type SortingCriterion = (typeof constants.partnersHeader)[number];
@@ -31,8 +31,8 @@ function Partners({
 	data,
 	maxBudgetValue,
 	lists,
-	clickedDownload,
-	setClickedDownload,
+	// clickedDownload,
+	// setClickedDownload,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),

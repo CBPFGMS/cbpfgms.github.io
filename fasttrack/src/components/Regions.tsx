@@ -4,15 +4,15 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { RegionsDatum } from "../utils/processdataregions";
 import type { List } from "../utils/makelists";
-import type { DownloadStates } from "./MainContainer";
+// import type { DownloadStates } from "./MainContainer";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 
 type RegionsProps = {
 	data: RegionsDatum[];
 	lists: List;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	// clickedDownload: DownloadStates;
+	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 const regionsSubText = {
@@ -52,8 +52,8 @@ const regionsIconsClass = {
 function Regions({
 	data,
 	lists,
-	clickedDownload,
-	setClickedDownload,
+	// clickedDownload,
+	// setClickedDownload,
 }: RegionsProps) {
 	return (
 		<Box>

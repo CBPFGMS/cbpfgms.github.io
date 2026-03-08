@@ -14,8 +14,6 @@ import {
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	SectorsMasterObject,
-	GlobalIndicatorsMasterObject,
-	GlobalIndicatorsObject,
 	CvaObject,
 	CvaMasterObject,
 } from "./schemas";
@@ -23,7 +21,6 @@ import {
 type ReceiveDataArgs = [
 	ProjectSummaryObject[],
 	SectorBeneficiaryObject[],
-	GlobalIndicatorsObject[],
 	CvaObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
@@ -33,8 +30,7 @@ type ReceiveDataArgs = [
 	AllocationSourcesMasterObject[],
 	OrganizationTypesMasterObject[],
 	SectorsMasterObject[],
-	GlobalIndicatorsMasterObject[],
-	CvaMasterObject[]
+	CvaMasterObject[],
 ];
 
 const beneficiaryTypesMasterUrl =
@@ -47,8 +43,6 @@ const beneficiaryTypesMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
 	sectorsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
-	globalIndicatorsMasterUrl =
-		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	cvaMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType";
 
@@ -56,10 +50,9 @@ const beneficiaryTypesMasterUrl =
 
 function useData(
 	defaultFundType: number | null,
-	startYear: number | null
+	startYear: number | null,
 ): {
 	data: Data;
-	dataIndicators: GlobalIndicatorsObject[];
 	lists: List;
 	inDataLists: InDataLists;
 	loading: boolean;
@@ -71,19 +64,15 @@ function useData(
 
 	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
-		globalIndicatorsUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${fundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
 		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
 		cvaDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=APIDAT_CVA&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=${fundType}&$format=csv`;
 
 	const [data, setData] = useState<Data>([] as Data),
-		[dataIndicators, setDataIndicators] = useState<
-			GlobalIndicatorsObject[]
-		>([] as GlobalIndicatorsObject[]),
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
-			{} as InDataLists
+			{} as InDataLists,
 		);
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
@@ -96,80 +85,68 @@ function useData(
 				"projectSummary",
 				projectSummaryUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFileDB<SectorBeneficiaryObject[]>(
 				"sectorsData",
 				sectorsDataUrl,
 				"csv",
-				setProgress
-			),
-			fetchFileDB<GlobalIndicatorsObject[]>(
-				"globalIndicators",
-				globalIndicatorsUrl,
-				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFileDB<CvaObject[]>("CVAData", cvaDataUrl, "csv", setProgress),
 			fetchFile<AllocationTypesMasterObject[]>(
 				"allocationTypesMaster",
 				allocationTypesMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<OrganizationMasterObject[]>(
 				"organizationMaster",
 				organizationMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<ProjectStatusMasterObject[]>(
 				"projectStatusMaster",
 				projectStatusMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<BeneficiaryTypesMasterObject[]>(
 				"beneficiaryTypesMaster",
 				beneficiaryTypesMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<PooledFundsMasterObject[]>(
 				"pooledFundsMaster",
 				pooledFundsMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<AllocationSourcesMasterObject[]>(
 				"allocationSourcesMaster",
 				allocationSourcesMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<OrganizationTypesMasterObject[]>(
 				"organizationTypesMaster",
 				organizationTypesMasterUrl,
 				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<SectorsMasterObject[]>(
 				"sectorsMaster",
 				sectorsMasterUrl,
 				"csv",
-				setProgress
-			),
-			fetchFile<GlobalIndicatorsMasterObject[]>(
-				"globalIndicatorsMaster",
-				globalIndicatorsMasterUrl,
-				"csv",
-				setProgress
+				setProgress,
 			),
 			fetchFile<CvaMasterObject[]>(
 				"cvaMaster",
 				cvaMasterUrl,
 				"json",
-				setProgress
+				setProgress,
 			),
 		])
 			.then(receiveData)
@@ -185,7 +162,6 @@ function useData(
 		function receiveData([
 			projectSummary,
 			sectorsData,
-			globalIndicatorsData,
 			cvaData,
 			allocationTypesMaster,
 			organizationMaster,
@@ -195,7 +171,6 @@ function useData(
 			allocationSourcesMaster,
 			organizationTypesMaster,
 			sectorsMaster,
-			globalIndicatorsMaster,
 			cvaMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
@@ -207,7 +182,6 @@ function useData(
 				allocationSourcesMaster,
 				organizationTypesMaster,
 				sectorsMaster,
-				globalIndicatorsMaster,
 				cvaMaster,
 			});
 
@@ -220,7 +194,6 @@ function useData(
 			});
 
 			setData(data);
-			setDataIndicators(globalIndicatorsData);
 			setLists(listsObj);
 			setLoading(false);
 		}
@@ -229,7 +202,6 @@ function useData(
 
 	return {
 		data,
-		dataIndicators,
 		lists,
 		inDataLists,
 		loading,

@@ -13,7 +13,6 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
-import IndicatorsContainer from "./IndicatorsContainer";
 
 const { implementationStatuses, charts } = constants;
 
@@ -50,7 +49,7 @@ const queryStringValues = new URLSearchParams(location.search);
 const showFinanciallyClosed = queryStringValues.has("showFinanciallyClosed");
 
 function MainContainer({ defaultYear }: MainContainerProps) {
-	const { data, dataIndicators, inDataLists, lists } = useContext(
+	const { data, inDataLists, lists } = useContext(
 		DataContext,
 	) as DataContextType;
 
@@ -92,7 +91,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
 	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
-	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -217,7 +215,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
-				inViewIndicators={inViewIndicators}
 				inViewDisability={inViewDisability}
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
@@ -263,20 +260,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				fund={fund}
 				allocationSource={allocationSource}
 				allocationType={allocationType}
-				implementationsStatus={implementationStatus}
-				showFinanciallyClosed={showFinanciallyClosed}
-			/>
-			<IndicatorsContainer
-				dataIndicators={dataIndicators}
-				year={year}
-				fund={fund}
-				allocationSource={allocationSource}
-				allocationType={allocationType}
-				indicatorsRef={indicatorsRef}
-				refIds={refIds}
-				lists={lists}
-				setClickedDownload={setClickedDownload}
-				clickedDownload={clickedDownload}
 				implementationsStatus={implementationStatus}
 				showFinanciallyClosed={showFinanciallyClosed}
 			/>

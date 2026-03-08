@@ -43,6 +43,8 @@ function MainContainer() {
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 
+	void clickedDownload;
+
 	const filteredDataIndicators = useMemo(
 		() =>
 			processDataIndicators({
@@ -134,8 +136,8 @@ function MainContainer() {
 			<Box mb={8} />
 			<IndicatorsContainer
 				dataIndicators={filteredDataIndicators}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
+				// clickedDownload={clickedDownload}
+				// setClickedDownload={setClickedDownload}
 				lists={lists}
 			/>
 			<Box mb={8} />
@@ -143,22 +145,22 @@ function MainContainer() {
 				data={dataPartners}
 				maxBudgetValue={maxBudgetValue}
 				lists={lists}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
+				// clickedDownload={clickedDownload}
+				// setClickedDownload={setClickedDownload}
 			/>
 			<Box mb={8} />
 			<Regions
 				data={dataRegions}
 				lists={lists}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
+				// clickedDownload={clickedDownload}
+				// setClickedDownload={setClickedDownload}
 			/>
 			<Box mb={8} />
 			<Sectors
 				data={dataSectors}
 				lists={lists}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
+				// clickedDownload={clickedDownload}
+				// setClickedDownload={setClickedDownload}
 			/>
 		</Container>
 	);

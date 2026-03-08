@@ -6,7 +6,6 @@ import colors from "../utils/colors";
 import ListIcon from "@mui/icons-material/List";
 import Pictogram from "../assets/Pictogram";
 import PaidIcon from "@mui/icons-material/Paid";
-import PublicIcon from "@mui/icons-material/Public";
 import { RefIds } from "./MainContainer";
 import constants from "../utils/constants";
 import {
@@ -23,7 +22,6 @@ type ScrollSpyProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
-	inViewIndicators: boolean;
 	inViewDisability: boolean;
 	inViewGBV: boolean;
 	inViewCash: boolean;
@@ -47,7 +45,6 @@ function ScrollSpy({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
-	inViewIndicators,
 	inViewDisability,
 	inViewGBV,
 	inViewCash,
@@ -131,13 +128,6 @@ function ScrollSpy({
 				handleOnClick={handleOnClick}
 				Icon={CashIcon}
 				ochaIcon={true}
-			/>
-			<Tab
-				label="Indicators"
-				inView={inViewIndicators}
-				reference={refIds.indicatorsRefId}
-				handleOnClick={handleOnClick}
-				Icon={PublicIcon}
 			/>
 		</Box>
 	);

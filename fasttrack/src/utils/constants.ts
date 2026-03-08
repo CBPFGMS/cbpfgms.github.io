@@ -14,7 +14,7 @@ const constants = {
 	columnWidthsExpanded: ["26%", "6%", "34%", "34%"],
 	partnersHeader: ["partner", "sector", "budget", "projects", "funds"],
 	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
-	columnWidthsPartnersHeader: ["35%", "18%", "36%", "6%", "6%"],
+	columnWidthsPartnersHeader: ["40%", "18%", "36%", "6%", "6%"],
 	partnerBarMaxWidth: 80,
 	partnerBarHeight: 24,
 } as const;

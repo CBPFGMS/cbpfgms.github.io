@@ -3,16 +3,15 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { List } from "../utils/makelists";
-import type { DownloadStates } from "./MainContainer";
-import NumberAnimator from "./NumberAnimator";
+// import type { DownloadStates } from "./MainContainer";
 import type { SectorsData } from "../utils/processdatasectors";
 import { clustersIconsData } from "../assets/clustericons";
 
 type SectorsProps = {
 	data: SectorsData;
 	lists: List;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	// clickedDownload: DownloadStates;
+	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
 const sectorsText: { [key: number]: string } = {
@@ -38,11 +37,9 @@ const sectorsText: { [key: number]: string } = {
 function Sectors({
 	data,
 	lists,
-	clickedDownload,
-	setClickedDownload,
+	// clickedDownload,
+	// setClickedDownload,
 }: SectorsProps) {
-	console.log(lists.sectors);
-
 	return (
 		<Box>
 			<Grid
