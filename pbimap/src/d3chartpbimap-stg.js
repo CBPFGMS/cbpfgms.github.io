@@ -224,7 +224,7 @@
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
-			topSvgHorizontalPositions = [0.16, 0.34, 0.58, 0.76],
+			topSvgHorizontalPositions = [0.18, 0.38, 0.58, 0.76],
 			topSvgMainValueVerPadding = 12,
 			topSvgMainValueHorPadding = 2,
 			legendSvgWidth = 110,
@@ -253,7 +253,6 @@
 				.map(function (d) {
 					return d.toString();
 				}),
-			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
 			bookmarkSite =
@@ -289,18 +288,16 @@
 				minValueColor,
 				maxMarkerGlobalColor,
 			),
-			tooltipSvgWidth = 310,
-			tooltipSvgHeight = 168,
-			tooltipSvgPadding = [10, 64, 30, 45],
+			tooltipSvgWidth = 270,
+			tooltipSvgHeight = 80,
+			tooltipSvgPadding = [6, 36, 14, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
-			beneficiariesTypes = ["Targeted", "Reached"],
-			reachedColor = "#ccc",
 			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/allocations_overview_static/data/",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/utils/allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -347,11 +344,10 @@
 				"Partner",
 				"Allocation Type",
 				"Targeted People",
-				"Reached People",
 				"Allocations",
 			],
-			listHeadersWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
-			listRowsWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
+			listHeadersWidth = ["18%", "32%", "20%", "12%", "9%", "9%"],
+			listRowsWidth = ["18%", "32.5%", "20%", "12.5%", "8.5%", "8.5%"],
 			chartState = {
 				selectedYear: [],
 				selectedPartner: [],
@@ -360,7 +356,6 @@
 				selectedCluster: [],
 				selectedAdminLevel: null,
 				displayMode: "size",
-				beneficiaryType: "Targeted",
 			},
 			loadedYears = [],
 			cbpfsList = {},
@@ -622,23 +617,20 @@
 		const colorScale = d3.scaleQuantile();
 
 		const tooltipSvgYScale = d3
-			.scaleBand()
+			.scalePoint()
 			.range([
 				tooltipSvgPadding[0],
 				tooltipSvgHeight - tooltipSvgPadding[2],
 			])
 			.domain(beneficiariesList)
-			.paddingOuter(0.1)
-			.paddingInner(0.3);
+			.padding(0.5);
 
-		const tooltipSvgInnerYScale = d3
-			.scaleBand()
-			.range([0, tooltipSvgYScale.bandwidth()])
-			.domain(beneficiariesTypes)
-			.paddingOuter(0)
-			.paddingInner(0.3);
-
-		const tooltipSvgXScale = d3.scaleLinear();
+		const tooltipSvgXScale = d3
+			.scaleLinear()
+			.range([
+				tooltipSvgPadding[3],
+				tooltipSvgWidth - tooltipSvgPadding[1],
+			]);
 
 		const tooltipSvgYAxis = d3
 			.axisLeft(tooltipSvgYScale)
@@ -655,10 +647,10 @@
 					tooltipSvgPadding[2]
 				),
 			)
-			.ticks(3)
+			.ticks(2)
 			.tickPadding(4)
 			.tickFormat(function (d) {
-				return formatSIaxes(d).replace("G", "B");
+				return "$" + formatSIaxes(d).replace("G", "B");
 			});
 
 		const listHeaderScale = d3
@@ -670,7 +662,6 @@
 				"OrgNm",
 				"AllNm",
 				"AdmLocBenClustAgg",
-				"AdmLocBenReachedClustAgg",
 				"AdmLocClustBdg",
 			]);
 
@@ -1095,11 +1086,6 @@
 				.size()
 				? d3.select(".pbimapTopSvgBeneficiaries").datum()
 				: 0;
-			const previousBeneficiariesReached = d3
-				.select(".pbimapTopSvgBeneficiariesReached")
-				.size()
-				? d3.select(".pbimapTopSvgBeneficiariesReached").datum()
-				: 0;
 			const previousProjects = d3.select(".pbimapTopSvgProjects").size()
 				? d3.select(".pbimapTopSvgProjects").datum()
 				: 0;
@@ -1189,7 +1175,7 @@
 				.enter()
 				.append("text")
 				.attr("class", "pbimapTopSvgAllocationsSubtitle")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
@@ -1209,7 +1195,7 @@
 					"pbimapTopSvgBeneficiaries contributionColorFill",
 				)
 				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] -
@@ -1244,7 +1230,7 @@
 				.append("text")
 				.attr("class", "pbimapTopSvgBeneficiariesText")
 				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.7)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
@@ -1254,98 +1240,29 @@
 
 			topSvgBeneficiariesText.text(function (d) {
 				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1],
-					unitText =
-						unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "";
-				return unitText + " targeted people";
+					unit = valueSI[valueSI.length - 1];
+				return unit === "k"
+					? "Thousand"
+					: unit === "M"
+						? "Million"
+						: unit === "G"
+							? "Billion"
+							: "";
 			});
 
-			let topSvgBeneficiariesReached = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesReached")
-				.data([data.totalBeneficiariesReached]);
-
-			topSvgBeneficiariesReached = topSvgBeneficiariesReached
+			const topSvgBeneficiariesSubtitle = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesSubtitle")
+				.data([true])
 				.enter()
 				.append("text")
-				.attr(
-					"class",
-					"pbimapTopSvgBeneficiariesReached contributionColorFill",
-				)
-				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
-				.attr(
-					"x",
-					width * topSvgHorizontalPositions[1] -
-						topSvgMainValueHorPadding,
-				)
-				.merge(topSvgBeneficiariesReached);
-
-			topSvgBeneficiariesReached
-				.transition()
-				.duration(duration)
-				.tween("text", function (d) {
-					const node = this,
-						i = d3.interpolate(previousBeneficiariesReached, d),
-						valueSI = formatSIFloat(d),
-						unit = valueSI[valueSI.length - 1];
-					return function (t) {
-						const siString = formatSIFloat(i(t));
-						d3.select(node).text(
-							+unit !== +unit
-								? siString.substring(0, siString.length - 1)
-								: siString,
-						);
-					};
-				});
-
-			let topSvgBeneficiariesReachedText = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesReachedText")
-				.data([data.totalBeneficiariesReached]);
-
-			topSvgBeneficiariesReachedText = topSvgBeneficiariesReachedText
-				.enter()
-				.append("text")
-				.attr("class", "pbimapTopSvgBeneficiariesReachedText")
-				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+				.attr("class", "pbimapTopSvgBeneficiariesSubtitle")
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 1.1)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] +
 						topSvgMainValueHorPadding,
 				)
-				.merge(topSvgBeneficiariesReachedText);
-
-			topSvgBeneficiariesReachedText.text(function (d) {
-				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1],
-					unitText =
-						unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "",
-					reachedPeoplePercentage =
-						data.totalBeneficiaries === 0
-							? 0
-							: Math.floor(
-									(data.totalBeneficiariesReached * 100) /
-										data.totalBeneficiaries,
-								);
-				return (
-					unitText +
-					" reached people (" +
-					reachedPeoplePercentage +
-					"%)"
-				);
-			});
+				.text("Targeted People");
 
 			const partnersLogo = topSvg
 				.selectAll(".pbimapTopSvgPartnersLogo")
@@ -2854,9 +2771,6 @@
 								beneficiariesList.forEach(function (e) {
 									foundProject["AdmLocBenClustAgg1" + e] +=
 										row["AdmLocBenClustAgg1" + e];
-									foundProject[
-										"AdmLocBenReachedClustAgg1" + e
-									] += row["AdmLocBenReachedClustAgg1" + e];
 								});
 								foundProject.AdmLocClustBdg1 +=
 									row.AdmLocClustBdg1;
@@ -2916,16 +2830,6 @@
 				? "CBPF: " + datum.CBPFName + divSpacer
 				: "";
 
-			const reachedPercentage =
-				datum.beneficiariesReached > datum.beneficiaries
-					? ">100%"
-					: datum.beneficiaries !== 0
-						? formatMoney0Decimals(
-								(datum.beneficiariesReached * 100) /
-									datum.beneficiaries,
-							)
-						: 0;
-
 			tooltip
 				.style("display", "block")
 				.html(
@@ -2948,12 +2852,7 @@
 						divSpacer +
 						"<span class='pbimapTooltipTitle2'>" +
 						formatMoney0Decimals(datum.beneficiaries) +
-						" Targeted People</span><br>" +
-						"<span class='pbimapTooltipTitle2'>" +
-						formatMoney0Decimals(datum.beneficiariesReached) +
-						" Reached People (" +
-						reachedPercentage +
-						"%)</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>",
+						" Targeted People:</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>",
 				);
 
 			createTooltipSvg();
@@ -2999,16 +2898,6 @@
 										(chartState.selectedAdminLevel || 1) +
 										e
 								];
-							foundProject[
-								"AdmLocBenReachedClustAgg" +
-									(chartState.selectedAdminLevel || 1) +
-									e
-							] +=
-								curr[
-									"AdmLocBenReachedClustAgg" +
-										(chartState.selectedAdminLevel || 1) +
-										e
-								];
 						});
 						foundProject[
 							"AdmLocClustBdg" +
@@ -3043,29 +2932,14 @@
 			});
 
 			function createTooltipSvg() {
-				const maxTargeted = d3.max(
-					beneficiariesList.map(d => datum["beneficiaries" + d]),
-				);
-				const maxReached = d3.max(
-					beneficiariesList.map(
-						d => datum["beneficiariesReached" + d],
+				tooltipSvgXScale.domain([
+					0,
+					d3.max(
+						beneficiariesList.map(function (d) {
+							return datum["beneficiaries" + d];
+						}),
 					),
-				);
-				tooltipSvgPadding[1] = maxReached > maxTargeted ? 70 : 34;
-
-				tooltipSvgXScale
-					.range([
-						tooltipSvgPadding[3],
-						tooltipSvgWidth - tooltipSvgPadding[1],
-					])
-					.domain([
-						0,
-						d3.max(
-							beneficiariesList.map(function (d) {
-								return datum["beneficiaries" + d];
-							}),
-						),
-					]);
+				]);
 
 				const tooltipSvg = tooltip
 					.select("#pbimapTooltipSvgDiv")
@@ -3099,298 +2973,82 @@
 					})
 					.remove();
 
-				const tooltipBarGroups = tooltipSvg
+				const tooltipSvgLabels = tooltipSvg
 					.selectAll(null)
 					.data(beneficiariesList)
 					.enter()
-					.append("g")
-					.attr("transform", function (d) {
-						return `translate(${tooltipSvgPadding[3]},${tooltipSvgYScale(d)})`;
-					})
-					.each(function (d) {
-						localVariable.set(this, d);
-					});
-
-				// const tooltipSvgLabels = tooltipSvg
-				// 	.selectAll(null)
-				// 	.data(beneficiariesList)
-				// 	.enter()
-				// 	.append("text")
-				// 	.attr("class", "pbimapTooltipLabels")
-				// 	.attr("x", tooltipSvgPadding[3] + 2)
-				// 	.attr("y", function (d) {
-				// 		return (
-				// 			tooltipSvgYScale(d) +
-				// 			tooltipSvgYScale.bandwidth() / 2 +
-				// 			4
-				// 		);
-				// 	})
-				// 	.text(function (d) {
-				// 		const labelsText =
-				// 			formatSIFloat(datum["beneficiariesReached" + d]) +
-				// 			"/" +
-				// 			formatSIFloat(datum["beneficiaries" + d]) +
-				// 			" (" +
-				// 			(datum["beneficiariesReached" + d] >
-				// 			datum["beneficiaries" + d]
-				// 				? ">100%"
-				// 				: datum["beneficiaries" + d] !== 0
-				// 					? formatMoney0Decimals(
-				// 							(datum["beneficiariesReached" + d] *
-				// 								100) /
-				// 								datum["beneficiaries" + d],
-				// 						)
-				// 					: 0) +
-				// 			"%)";
-
-				// 		return labelsText;
-				// 	});
-
-				const bars = tooltipBarGroups
-					.selectAll(null)
-					.data(beneficiariesTypes)
-					.enter()
-					.append("rect")
-					.style("fill", function (d) {
-						const color =
-							d === "Reached"
-								? reachedColor
-								: chartState.selectedAdminLevel
-									? circleColor
-									: circleGlobalColor;
-						return color;
-					})
-					.attr("x", 0)
-					.attr("y", function (d) {
-						return tooltipSvgInnerYScale(d);
-					})
-					.attr("height", tooltipSvgInnerYScale.bandwidth())
-					.attr("width", 0)
-					.transition()
-					.duration(duration)
-					.attr("width", function (d) {
-						const parentDatum = localVariable.get(this);
-						return (
-							Math.min(
-								tooltipSvgXScale(
-									datum[
-										`beneficiaries${d === "Reached" ? "Reached" : ""}` +
-											parentDatum
-									],
-								),
-								tooltipSvgXScale.range()[1],
-							) - tooltipSvgPadding[3]
-						);
-					});
-
-				const labels = tooltipBarGroups
-					.selectAll(null)
-					.data(beneficiariesTypes)
-					.enter()
 					.append("text")
-					// .style("fill", function (d) {
-					// 	const color =
-					// 		d === "Reached"
-					// 			? reachedColor
-					// 			: chartState.selectedAdminLevel
-					// 				? circleColor
-					// 				: circleGlobalColor;
-					// 	return color;
-					// })
 					.attr("class", "pbimapTooltipLabels")
-					.attr("x", 0)
+					.attr("x", tooltipSvgPadding[3] + 2)
 					.attr("y", function (d) {
 						return (
-							tooltipSvgInnerYScale(d) +
-							tooltipSvgInnerYScale.bandwidth() / 2 +
+							tooltipSvgYScale(d) +
+							tooltipSvgYScale.bandwidth() / 2 +
 							4
 						);
 					})
 					.text(function (d) {
-						const parentDatum = localVariable.get(this);
-						const labelsText =
-							d === "Targeted"
-								? formatSIFloat(
-										datum["beneficiaries" + parentDatum],
-									)
-								: formatSIFloat(
-										datum[
-											"beneficiariesReached" + parentDatum
-										],
-									) +
-									" (" +
-									(datum[
-										"beneficiariesReached" + parentDatum
-									] > datum["beneficiaries" + parentDatum]
-										? ">100"
-										: datum[
-													"beneficiaries" +
-														parentDatum
-											  ] !== 0
-											? formatMoney0Decimals(
-													(datum[
-														"beneficiariesReached" +
-															parentDatum
-													] *
-														100) /
-														datum[
-															"beneficiaries" +
-																parentDatum
-														],
-												)
-											: 0) +
-									"%)";
-
-						return labelsText;
+						return formatSIFloat(datum["beneficiaries" + d]);
 					});
 
-				// const targetedBars = tooltipSvg
-				// 	.selectAll(null)
-				// 	.data(beneficiariesList)
-				// 	.enter()
-				// 	.append("rect")
-				// 	.style("fill", "#aaa")
-				// 	.attr("x", tooltipSvgPadding[3])
-				// 	.attr("y", function (d) {
-				// 		return tooltipSvgYScale(d);
-				// 	})
-				// 	.attr("height", tooltipSvgYScale.bandwidth())
-				// 	.attr("width", 0)
-				// 	.transition()
-				// 	.duration(duration)
-				// 	.attr("width", function (d) {
-				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
-				// 	});
-
-				// const reachedBars = tooltipSvg
-				// 	.selectAll(null)
-				// 	.data(beneficiariesList)
-				// 	.enter()
-				// 	.append("rect")
-				// 	.style(
-				// 		"fill",
-				// 		chartState.selectedAdminLevel
-				// 			? circleColor
-				// 			: circleGlobalColor,
-				// 	)
-				// 	.attr("x", tooltipSvgPadding[3])
-				// 	.attr("y", function (d) {
-				// 		return tooltipSvgYScale(d);
-				// 	})
-				// 	.attr("height", tooltipSvgYScale.bandwidth())
-				// 	.attr("width", 0)
-				// 	.transition()
-				// 	.duration(duration)
-				// 	.attr("width", function (d) {
-				// 		return tooltipSvgXScale(
-				// 			Math.min(
-				// 				datum["beneficiaries" + d],
-				// 				datum["beneficiariesReached" + d],
-				// 			),
-				// 		);
-				// 	});
-
-				// const tooltipSticks = tooltipSvg
-				// 	.selectAll(null)
-				// 	.data(beneficiariesList)
-				// 	.enter()
-				// 	.append("rect")
-				// 	.style(
-				// 		"fill",
-				// 		chartState.selectedAdminLevel
-				// 			? circleColor
-				// 			: circleGlobalColor,
-				// 	)
-				// 	.attr("x", tooltipSvgPadding[3])
-				// 	.attr("y", function (d) {
-				// 		return tooltipSvgYScale(d) - stickHeight / 4;
-				// 	})
-				// 	.attr("height", stickHeight)
-				// 	.attr("width", 0)
-				// 	.transition()
-				// 	.duration(duration)
-				// 	.attr("width", function (d) {
-				// 		return (
-				// 			tooltipSvgXScale(datum["beneficiaries" + d]) -
-				// 			tooltipSvgPadding[3]
-				// 		);
-				// 	});
-
-				// const tooltipLollipop = tooltipSvg
-				// 	.selectAll(null)
-				// 	.data(beneficiariesList)
-				// 	.enter()
-				// 	.append("circle")
-				// 	.style(
-				// 		"fill",
-				// 		chartState.selectedAdminLevel
-				// 			? circleColor
-				// 			: circleGlobalColor,
-				// 	)
-				// 	.attr("cx", tooltipSvgPadding[3])
-				// 	.attr("cy", function (d) {
-				// 		return tooltipSvgYScale(d);
-				// 	})
-				// 	.attr("r", lollipopRadius)
-				// 	.transition()
-				// 	.duration(duration)
-				// 	.attr("cx", function (d) {
-				// 		return tooltipSvgXScale(datum["beneficiaries" + d]);
-				// 	});
-
-				labels
-					.transition()
-					.duration(duration)
-					.attr("x", function (d) {
-						const parentDatum = localVariable.get(this);
-						const property =
-							d === "Reached"
-								? "beneficiariesReached"
-								: "beneficiaries";
-						return (
-							Math.min(
-								tooltipSvgXScale(datum[property + parentDatum]),
-								tooltipSvgXScale.range()[1],
-							) +
-							3 -
-							tooltipSvgPadding[3]
-						);
-					});
-
-				tooltipSvg
-					.append("text")
-					.attr("x", tooltipSvgPadding[3] + 12)
-					.attr("y", tooltipSvgHeight - 5)
-					.attr("class", "pbimapTooltipLabels")
-					.text("Targeted");
-
-				tooltipSvg
-					.append("text")
-					.attr("x", tooltipSvgPadding[3] + 76)
-					.attr("y", tooltipSvgHeight - 5)
-					.attr("class", "pbimapTooltipLabels")
-					.text("Reached");
-
-				tooltipSvg
+				const tooltipSticks = tooltipSvg
+					.selectAll(null)
+					.data(beneficiariesList)
+					.enter()
 					.append("rect")
-					.attr("x", tooltipSvgPadding[3])
-					.attr("y", tooltipSvgHeight - 12)
-					.attr("width", 8)
-					.attr("height", 8)
-					.attr(
+					.style(
 						"fill",
 						chartState.selectedAdminLevel
 							? circleColor
 							: circleGlobalColor,
-					);
+					)
+					.attr("x", tooltipSvgPadding[3])
+					.attr("y", function (d) {
+						return tooltipSvgYScale(d) - stickHeight / 4;
+					})
+					.attr("height", stickHeight)
+					.attr("width", 0)
+					.transition()
+					.duration(duration)
+					.attr("width", function (d) {
+						return (
+							tooltipSvgXScale(datum["beneficiaries" + d]) -
+							tooltipSvgPadding[3]
+						);
+					});
 
-				tooltipSvg
-					.append("rect")
-					.attr("x", tooltipSvgPadding[3] + 64)
-					.attr("y", tooltipSvgHeight - 12)
-					.attr("width", 8)
-					.attr("height", 8)
-					.attr("fill", reachedColor);
+				const tooltipLollipop = tooltipSvg
+					.selectAll(null)
+					.data(beneficiariesList)
+					.enter()
+					.append("circle")
+					.style(
+						"fill",
+						chartState.selectedAdminLevel
+							? circleColor
+							: circleGlobalColor,
+					)
+					.attr("cx", tooltipSvgPadding[3])
+					.attr("cy", function (d) {
+						return tooltipSvgYScale(d);
+					})
+					.attr("r", lollipopRadius)
+					.transition()
+					.duration(duration)
+					.attr("cx", function (d) {
+						return tooltipSvgXScale(datum["beneficiaries" + d]);
+					});
+
+				tooltipSvgLabels
+					.transition()
+					.duration(duration)
+					.attr("x", function (d) {
+						return (
+							tooltipSvgXScale(datum["beneficiaries" + d]) +
+							lollipopRadius +
+							2
+						);
+					});
 			}
 
 			//end of mouseOverMarker
@@ -3533,7 +3191,7 @@
 					return listHeadersWidth[i];
 				})
 				.style("text-align", function (_, i) {
-					return i === 4 || i === 5 || i === 6 ? "center" : "left";
+					return i === 4 || i === 5 ? "center" : "left";
 				});
 
 			headers.append("span").html(function (d) {
@@ -3561,10 +3219,10 @@
 					return listRowsWidth[i];
 				})
 				.style("padding-right", function (_, i) {
-					return i === 4 || i === 5 || i === 6 ? null : "8px";
+					return i === 4 || i === 5 ? null : "8px";
 				})
 				.style("text-align", function (_, i) {
-					return i === 4 || i === 5 || i === 6 ? "right" : "left";
+					return i === 4 || i === 5 ? "right" : "left";
 				});
 
 			const rowCell = rowDivs.append("span");
@@ -3584,17 +3242,6 @@
 							];
 					});
 					return formatMoney0Decimals(total);
-				} else if (d === "Reached People") {
-					let totalReached = 0;
-					beneficiariesList.forEach(function (e) {
-						totalReached +=
-							parentData[
-								"AdmLocBenReachedClustAgg" +
-									(chartState.selectedAdminLevel || 1) +
-									e
-							];
-					});
-					return formatMoney0Decimals(totalReached);
 				} else if (d === "Allocations") {
 					return (
 						"$" +
@@ -3815,8 +3462,6 @@
 						row["AdmLoc" + d] = row["AdmLoc" + level];
 						row["AdmLocBenClustAgg" + d] =
 							row["AdmLocBenClustAgg" + level];
-						row["AdmLocBenReachedClustAgg" + d] =
-							row["AdmLocBenReachedClustAgg" + level];
 						row["AdmLocCord" + d] = row["AdmLocCord" + level];
 						row["AdmLocClustBdg" + d] =
 							row["AdmLocClustBdg" + level];
@@ -3878,12 +3523,6 @@
 				delete row.AdmLocBenClustAgg4;
 				delete row.AdmLocBenClustAgg5;
 				delete row.AdmLocBenClustAgg6;
-				delete row.AdmLocBenReachedClustAgg1;
-				delete row.AdmLocBenReachedClustAgg2;
-				delete row.AdmLocBenReachedClustAgg3;
-				delete row.AdmLocBenReachedClustAgg4;
-				delete row.AdmLocBenReachedClustAgg5;
-				delete row.AdmLocBenReachedClustAgg6;
 			}
 
 			//end of processData
@@ -3893,7 +3532,6 @@
 			const topSvgObject = {
 				totalAllocations: 0,
 				totalBeneficiaries: 0,
-				totalBeneficiariesReached: 0,
 				totalProjects: 0,
 				totalPartners: 0,
 				launchedAllocations: 0,
@@ -4000,14 +3638,11 @@
 				nestedData.forEach(function (row) {
 					let numberOfPartners = [],
 						numberOfProjects = [],
-						numberOfBeneficiaries = {},
-						numberOfBeneficiariesReached = {};
+						numberOfBeneficiaries = {};
 					beneficiariesList.forEach(function (d) {
 						numberOfBeneficiaries[d] = 0;
-						numberOfBeneficiariesReached[d] = 0;
 					});
 					numberOfBeneficiaries.total = 0;
-					numberOfBeneficiariesReached.total = 0;
 					let totalAllocation = 0;
 
 					row.latitude = countriesCoordinates[row.key].split(",")[0];
@@ -4027,10 +3662,6 @@
 								valueRow["AdmLocBenClustAgg1" + d];
 							numberOfBeneficiaries.total +=
 								valueRow["AdmLocBenClustAgg1" + d];
-							numberOfBeneficiariesReached[d] +=
-								valueRow["AdmLocBenReachedClustAgg1" + d];
-							numberOfBeneficiariesReached.total +=
-								valueRow["AdmLocBenReachedClustAgg1" + d];
 						});
 						if (numberOfPartners.indexOf(valueRow.PartCode) === -1)
 							numberOfPartners.push(valueRow.PartCode);
@@ -4042,19 +3673,13 @@
 					row.numberOfPartners = numberOfPartners.length;
 					row.numberOfProjects = numberOfProjects.length;
 					row.beneficiaries = numberOfBeneficiaries.total;
-					row.beneficiariesReached =
-						numberOfBeneficiariesReached.total;
 
 					beneficiariesList.forEach(function (d) {
 						row["beneficiaries" + d] = numberOfBeneficiaries[d];
-						row["beneficiariesReached" + d] =
-							numberOfBeneficiariesReached[d];
 					});
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
-					topSvgObject.totalBeneficiariesReached +=
-						row.beneficiariesReached;
 					topSvgObject.totalPartners += numberOfPartners.length;
 					topSvgObject.totalProjects += numberOfProjects.length;
 				});
@@ -4072,14 +3697,11 @@
 				nestedData.forEach(function (row) {
 					let numberOfPartners = [],
 						numberOfProjects = [],
-						numberOfBeneficiaries = {},
-						numberOfBeneficiariesReached = {};
+						numberOfBeneficiaries = {};
 					beneficiariesList.forEach(function (d) {
 						numberOfBeneficiaries[d] = 0;
-						numberOfBeneficiariesReached[d] = 0;
 					});
 					numberOfBeneficiaries.total = 0;
-					numberOfBeneficiariesReached.total = 0;
 					let totalAllocation = 0;
 
 					row.latitude = row.key.split(",")[1];
@@ -4111,18 +3733,6 @@
 										chartState.selectedAdminLevel +
 										d
 								];
-							numberOfBeneficiariesReached[d] +=
-								valueRow[
-									"AdmLocBenReachedClustAgg" +
-										chartState.selectedAdminLevel +
-										d
-								];
-							numberOfBeneficiariesReached.total +=
-								valueRow[
-									"AdmLocBenReachedClustAgg" +
-										chartState.selectedAdminLevel +
-										d
-								];
 						});
 						if (numberOfPartners.indexOf(valueRow.PartCode) === -1)
 							numberOfPartners.push(valueRow.PartCode);
@@ -4144,19 +3754,13 @@
 					row.numberOfPartners = numberOfPartners.length;
 					row.numberOfProjects = numberOfProjects.length;
 					row.beneficiaries = numberOfBeneficiaries.total;
-					row.beneficiariesReached =
-						numberOfBeneficiariesReached.total;
 
 					beneficiariesList.forEach(function (d) {
 						row["beneficiaries" + d] = numberOfBeneficiaries[d];
-						row["beneficiariesReached" + d] =
-							numberOfBeneficiariesReached[d];
 					});
 
 					topSvgObject.totalAllocations += row.totalAllocation;
 					topSvgObject.totalBeneficiaries += row.beneficiaries;
-					topSvgObject.totalBeneficiariesReached +=
-						row.beneficiariesReached;
 				});
 
 				topSvgObject.totalPartners += totalNumberOfPartners.length;
@@ -4701,7 +4305,6 @@
 
 			data.forEach(function (d) {
 				let total = 0;
-				let totalReached = 0;
 				beneficiariesList.forEach(function (e) {
 					total +=
 						d[
@@ -4709,15 +4312,8 @@
 								(chartState.selectedAdminLevel || 1) +
 								e
 						];
-					totalReached +=
-						d[
-							"AdmLocBenReachedClustAgg" +
-								(chartState.selectedAdminLevel || 1) +
-								e
-						];
 				});
 				total = formatMoney0Decimals(total);
-				totalReached = formatMoney0Decimals(totalReached);
 				csvData.push({
 					CBPF: d.cbpfName,
 					"Project Code": d.PrjCode,
@@ -4732,7 +4328,6 @@
 						],
 					),
 					"Targeted People": total,
-					"Reached People": totalReached,
 				});
 			});
 
