@@ -6,12 +6,12 @@ type JsonFile = {
 };
 
 const baseUrl =
-		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/utils/apibench/data/",
+		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/apibench/data/",
 	jsonUrl = baseUrl + "index.json";
 
 export async function fetchFile(): Promise<Datum[]> {
 	const fileName = await json<JsonFile>(jsonUrl).then(
-		data => data?.latestFile
+		data => data?.latestFile,
 	);
 	const dataUrl = baseUrl + fileName;
 	const data = await csv<Datum>(dataUrl, autoType);
