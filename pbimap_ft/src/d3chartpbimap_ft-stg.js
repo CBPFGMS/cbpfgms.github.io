@@ -1,5 +1,4 @@
 (function d3ChartIIFE() {
-	console.log("Monday");
 	const isInternetExplorer =
 			window.navigator.userAgent.indexOf("MSIE") > -1 ||
 			window.navigator.userAgent.indexOf("Trident") > -1,
@@ -292,7 +291,7 @@
 			),
 			tooltipSvgWidth = 310,
 			tooltipSvgHeight = 168,
-			tooltipSvgPadding = [10, 52, 30, 45],
+			tooltipSvgPadding = [10, 64, 30, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
@@ -301,7 +300,7 @@
 			beneficiariesTypes = ["Targeted", "Reached"],
 			reachedColor = "#ccc",
 			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/refs/heads/master/pbimap_ft/data/",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -639,12 +638,7 @@
 			.paddingOuter(0)
 			.paddingInner(0.3);
 
-		const tooltipSvgXScale = d3
-			.scaleLinear()
-			.range([
-				tooltipSvgPadding[3],
-				tooltipSvgWidth - tooltipSvgPadding[1] - tooltipSvgPadding[3],
-			]);
+		const tooltipSvgXScale = d3.scaleLinear();
 
 		const tooltipSvgYAxis = d3
 			.axisLeft(tooltipSvgYScale)
@@ -817,7 +811,7 @@
 				}
 			}
 
-			//loadAllDataFiles(remainingYears);
+			loadAllDataFiles(remainingYears);
 
 			//end of Promise.all
 		});
@@ -3049,14 +3043,29 @@
 			});
 
 			function createTooltipSvg() {
-				tooltipSvgXScale.domain([
-					0,
-					d3.max(
-						beneficiariesList.map(function (d) {
-							return datum["beneficiaries" + d];
-						}),
+				const maxTargeted = d3.max(
+					beneficiariesList.map(d => datum["beneficiaries" + d]),
+				);
+				const maxReached = d3.max(
+					beneficiariesList.map(
+						d => datum["beneficiariesReached" + d],
 					),
-				]);
+				);
+				tooltipSvgPadding[1] = maxReached > maxTargeted ? 70 : 34;
+
+				tooltipSvgXScale
+					.range([
+						tooltipSvgPadding[3],
+						tooltipSvgWidth - tooltipSvgPadding[1],
+					])
+					.domain([
+						0,
+						d3.max(
+							beneficiariesList.map(function (d) {
+								return datum["beneficiaries" + d];
+							}),
+						),
+					]);
 
 				const tooltipSvg = tooltip
 					.select("#pbimapTooltipSvgDiv")
@@ -3161,11 +3170,16 @@
 					.duration(duration)
 					.attr("width", function (d) {
 						const parentDatum = localVariable.get(this);
-						return tooltipSvgXScale(
-							datum[
-								`beneficiaries${d === "Reached" ? "Reached" : ""}` +
-									parentDatum
-							],
+						return (
+							Math.min(
+								tooltipSvgXScale(
+									datum[
+										`beneficiaries${d === "Reached" ? "Reached" : ""}` +
+											parentDatum
+									],
+								),
+								tooltipSvgXScale.range()[1],
+							) - tooltipSvgPadding[3]
 						);
 					});
 
@@ -3208,7 +3222,7 @@
 									(datum[
 										"beneficiariesReached" + parentDatum
 									] > datum["beneficiaries" + parentDatum]
-										? ">100%"
+										? ">100"
 										: datum[
 													"beneficiaries" +
 														parentDatum
@@ -3334,7 +3348,12 @@
 								? "beneficiariesReached"
 								: "beneficiaries";
 						return (
-							tooltipSvgXScale(datum[property + parentDatum]) + 3
+							Math.min(
+								tooltipSvgXScale(datum[property + parentDatum]),
+								tooltipSvgXScale.range()[1],
+							) +
+							3 -
+							tooltipSvgPadding[3]
 						);
 					});
 
