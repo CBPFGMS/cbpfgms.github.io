@@ -156,8 +156,6 @@ function makeLists({
 		}
 	});
 
-	console.log(lists);
-
 	beneficiaryTypesMaster.forEach(d => {
 		const parsedBeneficiariesMaster =
 			beneficiaryTypesMasterObjectSchema.safeParse(d);

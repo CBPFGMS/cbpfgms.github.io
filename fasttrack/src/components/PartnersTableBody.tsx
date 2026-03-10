@@ -39,7 +39,7 @@ const {
 	partnerBarMaxWidth,
 } = constants;
 
-const sectorIconWidth = 20;
+const sectorIconWidth = 26;
 
 function PartnersTableBody({
 	data,
@@ -212,13 +212,32 @@ function SectorCell({ row, index, lists }: SectorCellProps) {
 				}}
 			>
 				{[...row.sectors].map(d => (
-					<img
+					<Box
 						key={d}
-						src={clustersIconsData[d]}
-						width={sectorIconWidth}
-						height={sectorIconWidth}
-						style={{ padding: "4px" }}
-					/>
+						style={{
+							width: sectorIconWidth + "px",
+							height: sectorIconWidth + "px",
+							background: "#146eb4",
+							borderRadius: "50%",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							color: "white",
+							fontSize: "1.5rem",
+							flexShrink: "0",
+							margin: "2px",
+						}}
+					>
+						<img
+							src={clustersIconsData[d]}
+							width={"50%"}
+							height={"50%"}
+							style={{
+								padding: "4px",
+								filter: "brightness(0) invert(1)",
+							}}
+						/>
+					</Box>
 				))}
 			</Box>
 		</TableCell>

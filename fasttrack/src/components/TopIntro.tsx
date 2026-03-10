@@ -6,6 +6,7 @@ function TopIntro() {
 		<Grid
 			container
 			spacing={2}
+			mt={6}
 			justifyContent={"flex-start"}
 		>
 			<Typography

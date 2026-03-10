@@ -222,7 +222,7 @@ function processRawData({
 					),
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					reportType: row.RptCode ?? 0,
 				});
 
@@ -270,6 +270,8 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 	}));
+
+	console.log(data);
 
 	return data;
 }

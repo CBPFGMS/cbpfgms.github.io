@@ -76,29 +76,6 @@ button:focus-visible {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.explore-card {
-	background: white;
-	padding: 30px 30px;
-	border-radius: 8px;
-	text-align: center;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-	height: 100%;
-	transition:
-		transform 0.3s ease,
-		box-shadow 0.3s ease;
-	text-decoration: none;
-	color: inherit;
-	display: block;
-	margin-bottom: 20px;
-}
-
-.explore-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	text-decoration: none;
-	color: inherit;
-}
-
 .region-card {
 	background: #f8f9fa;
 	border-radius: 8px;

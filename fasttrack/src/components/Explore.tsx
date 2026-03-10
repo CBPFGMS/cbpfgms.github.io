@@ -2,8 +2,12 @@ import React from "react";
 import GradientPaper from "./GradientPaper";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+
 import contriDashImg from "../assets/img/contri-dash-img.jpg";
 import opertnlDashImg from "../assets/img/opertnl-dash-img.jpg";
 import allocatnProgresImg from "../assets/img/allocatn-progres-img.jpg";
@@ -25,7 +29,8 @@ const cardsData: CardsDatum[] = [
 	},
 	{
 		title: "Operational Dashboard",
-		subtitle: "Monitor operational metrics and performance indicators",
+		subtitle:
+			"Monitor operational metrics and performance indicators",
 		url: "./index.html",
 		image: opertnlDashImg,
 	},
@@ -47,8 +52,8 @@ function Explore() {
 	return (
 		<Paper
 			elevation={0}
-			style={{
-				padding: "1em",
+			sx={{
+				p: 2,
 				backgroundColor: "#f8f8f8",
 				borderRadius: "8px",
 				position: "relative",
@@ -58,14 +63,16 @@ function Explore() {
 			<Grid
 				container
 				spacing={2}
-				position={"relative"}
+				alignItems="stretch"
+				position="relative"
+				mb={4}
 			>
 				<Grid size={12}>
 					<Typography
-						style={{
+						sx={{
 							color: "var(--ocha-blue)",
 							fontWeight: 700,
-							margin: "30px 0 0 0",
+							mt: 4,
 							textAlign: "center",
 							fontSize: "2rem",
 							fontFamily: "Montserrat",
@@ -74,49 +81,83 @@ function Explore() {
 						Explore Dashboards
 					</Typography>
 				</Grid>
+
 				{cardsData.map((card, index) => (
 					<Grid
 						key={index}
 						size={3}
+						sx={{ display: "flex" }}
 						className="explore-card"
 					>
-						<a href={card.url}>
-							<img
-								alt={card.title}
-								src={card.image}
-								style={{
-									paddingBottom: "1em",
-								}}
-							></img>
-							<Box
-								mb={2}
-								style={{
-									borderTop: "1px solid black",
-									borderBottom: "1px solid black",
-								}}
-							>
-								<Typography
-									style={{
-										fontSize: "1.5rem",
-										color: "var(--ocha-blue)",
-										fontWeight: 600,
-										fontFamily: "Montserrat",
-										marginBottom: "0.25em",
-										marginTop: "0.25em",
-									}}
-								>
-									{card.title}
-								</Typography>
-							</Box>
-						</a>
-						<Typography
-							style={{
-								fontSize: "1rem",
-								color: "#666",
+						<Card
+							component="a"
+							href={card.url}
+							elevation={0}
+							sx={{
+								height: "100%",
+								display: "flex",
+								flexDirection: "column",
+								textDecoration: "none",
+								transition: "transform 0.2s, box-shadow 0.2s",
+								boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+								"&:hover": {
+									transform: "translateY(-6px)",
+									boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+								},
 							}}
 						>
-							{card.subtitle}
-						</Typography>
+							<Box sx={{ padding: "20px" }}>
+								<CardMedia
+									component="img"
+									image={card.image}
+									alt={card.title}
+									sx={{
+										width: "100%",
+										height: "auto",
+										display: "block",
+									}}
+								/>
+							</Box>
+							<CardContent
+								sx={{
+									display: "flex",
+									flexDirection: "column",
+									flexGrow: 1,
+								}}
+							>
+								<Box
+									sx={{
+										borderTop: "1px solid black",
+										borderBottom: "1px solid black",
+										mb: 2,
+									}}
+								>
+									<Typography
+										sx={{
+											fontSize: "1.5rem",
+											color: "var(--ocha-blue)",
+											fontWeight: 600,
+											fontFamily: "Montserrat",
+											my: "0.25em",
+											lineHeight: 1.4,
+											textAlign: "center",
+										}}
+									>
+										{card.title}
+									</Typography>
+								</Box>
+
+								<Typography
+									sx={{
+										fontSize: "1rem",
+										color: "#666",
+										textAlign: "center",
+									}}
+								>
+									{card.subtitle}
+								</Typography>
+							</CardContent>
+						</Card>
 					</Grid>
 				))}
 			</Grid>
@@ -124,6 +165,4 @@ function Explore() {
 	);
 }
 
-const MemoizedExplore = React.memo(Explore);
-
-export default MemoizedExplore;
+export default React.memo(Explore);

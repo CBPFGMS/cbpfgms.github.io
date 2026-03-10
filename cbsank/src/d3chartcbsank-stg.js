@@ -4075,7 +4075,7 @@
 
 						if (foundSource) {
 							foundSource.value +=
-								row.paidAmount || row.pledgedAmount;
+								row.paidAmount + row.pledgedAmount;
 							foundSource.pledgedValue += row.pledgedAmount;
 							foundSource.paidValue += row.paidAmount;
 						} else {
@@ -4083,7 +4083,7 @@
 								codeId: row.donorId,
 								level: 1,
 								name: lists.donorNames[row.donorId],
-								value: row.paidAmount || row.pledgedAmount,
+								value: row.paidAmount + row.pledgedAmount,
 								pledgedValue: row.pledgedAmount,
 								paidValue: row.paidAmount,
 								id: "donor#" + row.donorId,
@@ -4096,12 +4096,12 @@
 
 						if (foundLink) {
 							foundLink.value +=
-								row.paidAmount || row.pledgedAmount;
+								row.paidAmount + row.pledgedAmount;
 						} else {
 							data.links.push({
 								source: "donor#" + row.donorId,
 								target: fundId,
-								value: row.paidAmount || row.pledgedAmount,
+								value: row.paidAmount + row.pledgedAmount,
 							});
 						}
 
@@ -4385,7 +4385,7 @@
 				createLetterhead();
 
 				const intro = pdf.splitTextToSize(
-					"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+					"",
 					210 - pdfMargins.left - pdfMargins.right,
 					{
 						fontSize: 12,
