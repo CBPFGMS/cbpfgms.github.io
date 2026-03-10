@@ -354,7 +354,7 @@
 			.attr("class", "d3chartFooterText")
 			.style("text-align", "left")
 			.style("padding-left", "2%")
-			.html("*Only Paid Contributions.");
+			.html("*Paid and Pledged Contributions.");
 
 		createProgressWheel(svg, width, height, "Loading visualisation...");
 
@@ -1731,9 +1731,18 @@
 				.attr("x1", -centralCirclePanel.radius * 0.5)
 				.attr("x2", centralCirclePanel.radius * 0.5);
 
+			// const contributionsValue = dataContributions.nodes.length
+			// 	? dataContributions.nodes.find(e => e.level === 2).value
+			// 	: 0;
+
+			// counting paid and pledged values
 			const contributionsValue = dataContributions.nodes.length
-				? dataContributions.nodes.find(e => e.level === 2).value
+				? dataContributions.nodes.reduce((acc, curr) => {
+						if (curr.level === 1) acc += curr.value;
+						return acc;
+					}, 0)
 				: 0;
+
 			const allocationsValue = dataAllocations.nodes.length
 				? dataAllocations.nodes.find(e => e.level === 1).value
 				: 0;
@@ -2551,6 +2560,48 @@
 					.append("span")
 					.attr("class", classPrefix + "tooltipValues")
 					.html("$" + formatMoney0Decimals(datum.value));
+
+				const rowDivPaid = tooltipContainer
+					.append("div")
+					.style("display", "flex")
+					.style("align-items", "center")
+					.style("margin-bottom", "4px")
+					.style("width", "100%");
+
+				rowDivPaid
+					.append("span")
+					.attr("class", classPrefix + "tooltipKeys")
+					.html("Paid");
+
+				rowDivPaid
+					.append("span")
+					.attr("class", classPrefix + "tooltipLeader");
+
+				rowDivPaid
+					.append("span")
+					.attr("class", classPrefix + "tooltipValues")
+					.html("$" + formatMoney0Decimals(datum.paidValue));
+
+				const rowDivPledged = tooltipContainer
+					.append("div")
+					.style("display", "flex")
+					.style("align-items", "center")
+					.style("margin-bottom", "4px")
+					.style("width", "100%");
+
+				rowDivPledged
+					.append("span")
+					.attr("class", classPrefix + "tooltipKeys")
+					.html("Pledged");
+
+				rowDivPledged
+					.append("span")
+					.attr("class", classPrefix + "tooltipLeader");
+
+				rowDivPledged
+					.append("span")
+					.attr("class", classPrefix + "tooltipValues")
+					.html("$" + formatMoney0Decimals(datum.pledgedValue));
 
 				if (datum.codeId === othersId) {
 					const headerDiv = tooltipContainer
@@ -3995,15 +4046,18 @@
 			};
 
 			rawDataContributions.forEach(row => {
-				if (+row.fundId === +row.fundId) {
-					//removing funds without paid amounts
+				if (
+					+row.fundId === +row.fundId &&
+					+row.donorId === +row.donorId
+				) {
+					//removing funds without paid or pledged amounts
 					if (
 						chartState.selectedYear.includes(
 							row.contributionYear,
 						) &&
 						lists.fundsInAllYearsKeys.includes(row.fundId) &&
 						!chartState.fundsInData.includes(row.fundId) &&
-						row.paidAmount
+						(row.paidAmount || row.pledgedAmount)
 					) {
 						chartState.fundsInData.push(row.fundId);
 					}
@@ -4013,20 +4067,25 @@
 							row.contributionYear,
 						) &&
 						chartState.selectedFund.includes(row.fundId) &&
-						row.paidAmount
+						(row.paidAmount || row.pledgedAmount)
 					) {
 						const foundSource = data.nodes.find(
 							d => d.level === 1 && d.codeId === row.donorId,
 						);
 
 						if (foundSource) {
-							foundSource.value += row.paidAmount;
+							foundSource.value +=
+								row.paidAmount || row.pledgedAmount;
+							foundSource.pledgedValue += row.pledgedAmount;
+							foundSource.paidValue += row.paidAmount;
 						} else {
 							data.nodes.push({
 								codeId: row.donorId,
 								level: 1,
 								name: lists.donorNames[row.donorId],
-								value: row.paidAmount,
+								value: row.paidAmount || row.pledgedAmount,
+								pledgedValue: row.pledgedAmount,
+								paidValue: row.paidAmount,
 								id: "donor#" + row.donorId,
 							});
 						}
@@ -4036,12 +4095,13 @@
 						);
 
 						if (foundLink) {
-							foundLink.value += row.paidAmount;
+							foundLink.value +=
+								row.paidAmount || row.pledgedAmount;
 						} else {
 							data.links.push({
 								source: "donor#" + row.donorId,
 								target: fundId,
-								value: row.paidAmount,
+								value: row.paidAmount || row.pledgedAmount,
 							});
 						}
 
@@ -4069,10 +4129,16 @@
 									name: othersName,
 									value: curr.value,
 									id: "donor#" + othersId,
+									paidValue: curr.paidValue,
+									pledgedValue: curr.pledgedValue,
 									othersData: [curr],
 								});
 							} else {
 								acc[maxDonorsNumber].value += curr.value;
+								acc[maxDonorsNumber].paidValue +=
+									curr.paidValue;
+								acc[maxDonorsNumber].pledgedValue +=
+									curr.pledgedValue;
 								acc[maxDonorsNumber].othersData.push(curr);
 							}
 							return acc;
