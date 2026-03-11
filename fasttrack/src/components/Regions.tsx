@@ -55,6 +55,7 @@ function Regions({
 	// clickedDownload,
 	// setClickedDownload,
 }: RegionsProps) {
+	console.log(formatSIFloat(0));
 	return (
 		<Box>
 			<Grid
@@ -125,7 +126,7 @@ function Regions({
 							>
 								<Grid
 									size={6}
-									data-tooltip-id="tooltip-regular"
+									data-tooltip-id="tooltip"
 									data-tooltip-html={
 										"$" + region.budget.toLocaleString()
 									}
@@ -168,7 +169,7 @@ function Regions({
 								</Grid>
 								<Grid
 									size={6}
-									data-tooltip-id="tooltip-regular"
+									data-tooltip-id="tooltip"
 									data-tooltip-html={tooltipFundText}
 									data-tooltip-place="top"
 								>
@@ -199,7 +200,7 @@ function Regions({
 								</Grid>
 								<Grid
 									size={6}
-									data-tooltip-id="tooltip-regular"
+									data-tooltip-id="tooltip"
 									data-tooltip-html={
 										region.targeted.toLocaleString() +
 										" people"

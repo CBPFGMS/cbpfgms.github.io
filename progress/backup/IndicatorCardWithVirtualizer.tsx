@@ -15,6 +15,7 @@ import type { SortingCriterion } from "./IndicatorTableHead";
 import IndicatorsTableBody from "./IndicatorTableBody";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 type IndicatorCardProps = {
 	datumIndicator: DatumIndicators;
@@ -122,6 +123,18 @@ function IndicatorCardContent({
 	toggleExpanded,
 }: IndicatorCardContentProps) {
 	const tableRef = useRef(null);
+
+	const rowVirtualizer = useVirtualizer({
+		count: sortedData.length,
+		getScrollElement: () => tableRef.current,
+		estimateSize: () => 53, // Average height of an MUI row
+		measureElement: el => el.getBoundingClientRect().height,
+		overscan: 5, // Number of rows to render outside the view
+	});
+
+	const virtualRows = rowVirtualizer.getVirtualItems();
+
+	const totalSize = rowVirtualizer.getTotalSize();
 
 	return (
 		<Paper
@@ -256,6 +269,9 @@ function IndicatorCardContent({
 								lists={lists}
 								showTotal={showTotal}
 								expanded={expanded}
+								virtualRows={virtualRows}
+								totalSize={totalSize}
+								measureRef={rowVirtualizer.measureElement}
 							/>
 						</Table>
 					</TableContainer>

@@ -88,7 +88,7 @@ function Sectors({
 								flexDirection: "row",
 								justifyContent: "space-between",
 							}}
-							data-tooltip-id="tooltip-regular"
+							data-tooltip-id="tooltip"
 							data-tooltip-html={tooltipSectorsText}
 							data-tooltip-place="top"
 						>

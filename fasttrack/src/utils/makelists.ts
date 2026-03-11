@@ -63,7 +63,6 @@ export type ProjectDetails = {
 	allocationSource: number;
 	allocationType: number;
 	endDate: Date;
-	approvalDate: Date;
 	projectStatusId: number;
 	reportType: ReportType;
 };

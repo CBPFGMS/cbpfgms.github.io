@@ -75,13 +75,13 @@ function TopFigures({ data }: TopFiguresProps) {
 								borderBottom: "1px solid black",
 							}}
 							{...(card.label === "Disbursement" && {
-								"data-tooltip-id": "tooltip-regular",
+								"data-tooltip-id": "tooltip",
 								"data-tooltip-html":
 									"$" + card.value.toLocaleString(),
 								"data-tooltip-place": "top",
 							})}
 							{...(card.label === "Targeted People" && {
-								"data-tooltip-id": "tooltip-regular",
+								"data-tooltip-id": "tooltip",
 								"data-tooltip-html":
 									card.value.toLocaleString() + " people",
 								"data-tooltip-place": "top",

@@ -11,12 +11,16 @@ import capitalizeString from "../utils/capitalizestring";
 import Typography from "@mui/material/Typography";
 import { format } from "d3";
 import type { PictogramTypesWithTotal } from "../assets/Pictogram";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 type IndicatorsTableBodyProps = {
 	data: SectorDatum[];
 	lists: List;
 	showTotal: boolean;
 	expanded: boolean;
+	virtualRows: VirtualItem[];
+	totalSize: number;
+	measureRef: (el: Element | null) => void;
 };
 
 type CellValuesProps = {
@@ -47,67 +51,95 @@ function IndicatorsTableBody({
 	lists,
 	showTotal,
 	expanded,
+	virtualRows,
+	totalSize,
+	measureRef,
 }: IndicatorsTableBodyProps) {
 	return (
-		<TableBody>
-			{data.map((row, index) => (
-				<TableRow
-					key={index}
-					hover
-				>
-					{indicatorsHeader.map((header, index) => {
-						if (header === "indicator") {
-							return (
-								<TableCell
-									key={index}
-									style={{
-										cursor: "pointer",
-										width:
-											expanded && !showTotal
-												? columnWidthsExpanded[index]
-												: columnWidths[index],
-									}}
-								>
-									{lists.globalIndicators[row.indicatorId]}
-								</TableCell>
-							);
-						} else if (header === "projects") {
-							return (
-								<TableCell
-									key={index}
-									align="center"
-									style={{
-										cursor: "pointer",
-										width:
-											expanded && !showTotal
-												? columnWidthsExpanded[index]
-												: columnWidths[index],
-									}}
-								>
-									{row.projects.size.toLocaleString()}
-								</TableCell>
-							);
-						} else {
-							return showTotal ? (
-								<CellValues
-									key={index}
-									row={row}
-									header={header}
-									index={index}
-								/>
-							) : (
-								<CellBeneficiariesBreakdown
-									key={index}
-									row={row}
-									header={header}
-									expanded={expanded}
-									index={index}
-								/>
-							);
-						}
-					})}
-				</TableRow>
-			))}
+		<TableBody
+			style={{
+				height: `${totalSize}px`, // Total height for scrollbar
+				position: "relative",
+			}}
+		>
+			{virtualRows.map(virtualRow => {
+				const row = data[virtualRow.index];
+				return (
+					<TableRow
+						key={virtualRow.index}
+						data-index={virtualRow.index}
+						ref={measureRef}
+						hover
+						style={{
+							position: "absolute",
+							top: 0,
+							transform: `translateY(${virtualRow.start}px)`,
+							width: "100%",
+							display: "flex",
+						}}
+					>
+						{indicatorsHeader.map((header, index) => {
+							if (header === "indicator") {
+								return (
+									<TableCell
+										key={index}
+										style={{
+											cursor: "pointer",
+											width:
+												expanded && !showTotal
+													? columnWidthsExpanded[
+															index
+														]
+													: columnWidths[index],
+										}}
+									>
+										{
+											lists.globalIndicators[
+												row.indicatorId
+											]
+										}
+									</TableCell>
+								);
+							} else if (header === "projects") {
+								return (
+									<TableCell
+										key={index}
+										align="center"
+										style={{
+											cursor: "pointer",
+											width:
+												expanded && !showTotal
+													? columnWidthsExpanded[
+															index
+														]
+													: columnWidths[index],
+										}}
+									>
+										{row.projects.size.toLocaleString()}
+									</TableCell>
+								);
+							} else {
+								return showTotal ? (
+									<CellValues
+										key={index}
+										row={row}
+										header={header}
+										index={index}
+									/>
+								) : (
+									<CellBeneficiariesBreakdown
+										key={index}
+										row={row}
+										header={header}
+										expanded={expanded}
+										index={index}
+									/>
+								);
+							}
+						})}
+					</TableRow>
+				);
+			})}
 		</TableBody>
 	);
 }

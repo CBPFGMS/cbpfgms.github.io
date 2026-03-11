@@ -110,17 +110,7 @@ function MainContainer() {
 			}}
 		>
 			<Tooltip
-				id="tooltip-regular"
-				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
-			/>
-			<Tooltip
 				id="tooltip"
-				anchorSelect=".tooltip-cell2"
-				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
-			/>
-			<Tooltip
-				id="tooltip"
-				anchorSelect=".tooltip-cell"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
 			<TopIntro />

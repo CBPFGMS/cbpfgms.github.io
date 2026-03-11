@@ -15,13 +15,13 @@ export type Datum = {
 	year: number;
 	projectCode: string;
 	projectId: number;
+	projectStatus: number;
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
 	allocationType: number;
 	allocationTypeId: number;
 	endDate: Date;
-	approvalDate: Date;
 	budget: number;
 	sectorData: SectorDatum[];
 	reportType: ReportType;
@@ -221,7 +221,6 @@ function processRawData({
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
 					projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					reportType: row.RptCode ?? 0,
 				});
@@ -231,6 +230,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					projectCode: row.ChfProjectCode,
 					projectId: row.ChfId,
+					projectStatus: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
@@ -239,7 +239,6 @@ function processRawData({
 					),
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
 					sectorData: thisSectorData.sectors,
 					reached: generateBeneficiariesObjectSummary(row, "reached"),

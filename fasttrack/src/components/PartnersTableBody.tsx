@@ -6,7 +6,6 @@ import type { PartnersDatum } from "../utils/processdatapartners";
 import type { List } from "../utils/makelists";
 import { constants } from "../utils/constants";
 import Typography from "@mui/material/Typography";
-import type { VirtualItem } from "@tanstack/react-virtual";
 import { clustersIconsData } from "../assets/clustericons";
 import colors from "../utils/colors";
 import formatSIFloat from "../utils/formatsi";
@@ -15,9 +14,6 @@ type PartnersTableBodyProps = {
 	data: PartnersDatum[];
 	maxBudgetValue: number;
 	lists: List;
-	virtualRows: VirtualItem[];
-	totalSize: number;
-	measureRef: (el: Element | null) => void;
 };
 
 type BudgetCellProps = {
@@ -45,19 +41,10 @@ function PartnersTableBody({
 	data,
 	maxBudgetValue,
 	lists,
-	virtualRows,
-	totalSize,
-	measureRef,
 }: PartnersTableBodyProps) {
 	return (
-		<TableBody
-			style={{
-				height: `${totalSize}px`, // Total height for scrollbar
-				position: "relative",
-			}}
-		>
-			{virtualRows.map(virtualRow => {
-				const row = data[virtualRow.index];
+		<TableBody>
+			{data.map((row, index) => {
 				const tooltipFundTitle = row.funds.size > 1 ? "Funds" : "Fund";
 				const tooltipFunds = [...row.funds]
 					.map(d => lists.fundNames[d])
@@ -65,41 +52,39 @@ function PartnersTableBody({
 				const tooltipFundText = `<div style='text-align:center;'><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
 				return (
 					<TableRow
-						key={virtualRow.index}
-						data-index={virtualRow.index}
-						ref={measureRef}
+						key={index}
 						hover
-						style={{
-							position: "absolute",
-							top: 0,
-							transform: `translateY(${virtualRow.start}px)`,
-							width: "100%",
-							display: "flex",
-						}}
+						// style={{
+						// 	position: "absolute",
+						// 	top: 0,
+						// 	transform: `translateY(${virtualRow.start}px)`,
+						// 	width: "100%",
+						// 	display: "flex",
+						// }}
 					>
-						{partnersHeader.map((header, index) => {
+						{partnersHeader.map((header, indexCell) => {
 							if (header === "budget") {
 								return (
 									<BudgetCell
-										key={`${virtualRow.index}-${index}`}
+										key={`${index}-${indexCell}`}
 										row={row}
-										index={index}
+										index={indexCell}
 										maxBudgetValue={maxBudgetValue}
 									/>
 								);
 							} else if (header === "sector") {
 								return (
 									<SectorCell
-										key={`${virtualRow.index}-${index}`}
+										key={`${index}-${indexCell}`}
 										row={row}
-										index={index}
+										index={indexCell}
 										lists={lists}
 									/>
 								);
 							} else {
 								return (
 									<TableCell
-										key={`${virtualRow.index}-${index}`}
+										key={`${index}-${indexCell}`}
 										align={
 											header === "partner"
 												? "left"
@@ -110,20 +95,12 @@ function PartnersTableBody({
 											fontFamily: "Montserrat",
 											fontSize: "16px",
 											fontWeight: 500,
-											width: columnWidthsPartners[index],
-											display: "flex",
-											alignItems: "center",
-											justifyContent:
-												header === "partner"
-													? "flex-start"
-													: "center",
 										}}
 										{...(header === "funds" && {
 											"data-tooltip-id": "tooltip",
 											"data-tooltip-html":
 												tooltipFundText,
 											"data-tooltip-place": "top",
-											className: "tooltip-cell",
 										})}
 									>
 										{header === "partner"
@@ -152,7 +129,6 @@ function BudgetCell({ row, maxBudgetValue, index }: BudgetCellProps) {
 			data-tooltip-id="tooltip"
 			data-tooltip-html={"$" + row.budget.toLocaleString()}
 			data-tooltip-place="top"
-			className="tooltip-cell"
 		>
 			<Box
 				style={{
@@ -195,7 +171,6 @@ function SectorCell({ row, index, lists }: SectorCellProps) {
 	return (
 		<TableCell
 			key={index}
-			className="tooltip-cell"
 			align="center"
 			style={{ width: columnWidthsPartners[index] }}
 			data-tooltip-id="tooltip"
