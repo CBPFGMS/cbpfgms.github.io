@@ -15,7 +15,7 @@ export type Datum = {
 	year: number;
 	projectCode: string;
 	projectId: number;
-	projectStatus: number;
+	projectStatus: 0 | 1;
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
@@ -203,6 +203,8 @@ function processRawData({
 			// 	);
 			// }
 
+			const zeroOrOne: 0 | 1 = Math.random() < 0.5 ? 1 : 0;
+
 			if (thisAllocationType && thisOrganization && thisSectorData) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);
@@ -221,7 +223,8 @@ function processRawData({
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
-					projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
+					projectStatusId: zeroOrOne,
+					// projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					reportType: row.RptCode ?? 0,
 				});
 
@@ -230,7 +233,8 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					projectCode: row.ChfProjectCode,
 					projectId: row.ChfId,
-					projectStatus: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
+					projectStatus: zeroOrOne,
+					// projectStatus: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,

@@ -11,6 +11,7 @@ import processDataTopFigures from "../utils/processdatatopfigures";
 import processDataPartners from "../utils/processdatapartners";
 import processDataRegions from "../utils/processdataregions";
 import processDataSectors from "../utils/processdatasectors";
+import processDataStatuses from "../utils/processdatastatuses";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
@@ -18,8 +19,9 @@ import IndicatorsContainer from "./IndicatorsContainer";
 import Partners from "./Partners";
 import Regions from "./Regions";
 import Sectors from "./Sectors";
+import ProjectStatuses from "./Statuses";
 
-const { charts } = constants;
+const { charts, projectStatus } = constants;
 
 export type Charts = (typeof charts)[number];
 
@@ -32,6 +34,10 @@ const downloadStates = charts.reduce(
 	{} as DownloadStates,
 );
 
+export type Statuses = (typeof projectStatus)[number]["value"];
+
+const statuses: Statuses[] = projectStatus.map(status => status.value);
+
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer() {
@@ -41,9 +47,19 @@ function MainContainer() {
 
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[clickedDownload, setClickedDownload] =
-			useState<DownloadStates>(downloadStates);
+			useState<DownloadStates>(downloadStates),
+		[status, setStatus] = useState<Statuses[]>(statuses);
 
 	void clickedDownload;
+
+	const dataStatuses = useMemo(
+		() =>
+			processDataStatuses({
+				data,
+				fund,
+			}),
+		[data, fund],
+	);
 
 	const filteredDataIndicators = useMemo(
 		() =>
@@ -51,8 +67,9 @@ function MainContainer() {
 				dataIndicators,
 				lists,
 				fund,
+				status,
 			}),
-		[dataIndicators, lists, fund],
+		[dataIndicators, lists, fund, status],
 	);
 
 	const { dataTopFigures, inSelectionData } = useMemo(
@@ -60,8 +77,9 @@ function MainContainer() {
 			processDataTopFigures({
 				data,
 				fund,
+				status,
 			}),
-		[data, fund],
+		[data, fund, status],
 	);
 
 	const { dataPartners, maxBudgetValue } = useMemo(
@@ -69,8 +87,9 @@ function MainContainer() {
 			processDataPartners({
 				data,
 				fund,
+				status,
 			}),
-		[data, fund],
+		[data, fund, status],
 	);
 
 	const dataRegions = useMemo(
@@ -79,8 +98,9 @@ function MainContainer() {
 				data,
 				fund,
 				lists,
+				status,
 			}),
-		[data, fund, lists],
+		[data, fund, lists, status],
 	);
 
 	const dataSectors = useMemo(
@@ -88,15 +108,18 @@ function MainContainer() {
 			processDataSectors({
 				data,
 				fund,
+				status,
 			}),
-		[data, fund, lists],
+		[data, fund, status],
 	);
 
 	useUpdateQueryString({
 		fund,
+		status,
 		inDataLists,
 		queryStringValues,
 		setFund,
+		setStatus,
 		setClickedDownload,
 		downloadStates,
 	});
@@ -118,6 +141,11 @@ function MainContainer() {
 				inSelectionData={inSelectionData}
 				fund={fund}
 				setFund={setFund}
+			/>
+			<ProjectStatuses
+				dataStatuses={dataStatuses}
+				status={status}
+				setStatus={setStatus}
 			/>
 			<Box mb={3} />
 			<TopFigures data={dataTopFigures} />

@@ -16,6 +16,11 @@ const constants = {
 	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
 	partnerBarMaxWidth: 82,
 	partnerBarHeight: 24,
+	projectStatus: [
+		{ value: 0, label: "Under Approval" },
+		{ value: 1, label: "Approved" },
+	],
+	limitScaleValueInPixels: 90,
 } as const;
 
 export { constants };

@@ -1,3 +1,4 @@
+import type { Statuses } from "../components/MainContainer";
 import type { Data } from "./processrawdata";
 
 export type InSelectionData = {
@@ -7,6 +8,7 @@ export type InSelectionData = {
 type ProcessDataTopFiguresParams = {
 	data: Data;
 	fund: number[];
+	status: Statuses[];
 };
 
 export type DataTopFigures = {
@@ -16,7 +18,11 @@ export type DataTopFigures = {
 	targeted: number;
 };
 
-function processDataTopFigures({ data, fund }: ProcessDataTopFiguresParams): {
+function processDataTopFigures({
+	data,
+	fund,
+	status,
+}: ProcessDataTopFiguresParams): {
 	dataTopFigures: DataTopFigures;
 	inSelectionData: InSelectionData;
 } {
@@ -30,7 +36,7 @@ function processDataTopFigures({ data, fund }: ProcessDataTopFiguresParams): {
 		targeted = 0;
 
 	data.forEach(row => {
-		if (fund.includes(row.fund)) {
+		if (fund.includes(row.fund) && status.includes(row.projectStatus)) {
 			const totalTargeted =
 				row.targeted.boys +
 				row.targeted.girls +

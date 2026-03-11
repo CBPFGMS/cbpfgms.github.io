@@ -1,8 +1,10 @@
+import type { Statuses } from "../components/MainContainer";
 import type { Data } from "./processrawdata";
 
 type ProcessDataSectorsParams = {
 	data: Data;
 	fund: number[];
+	status: Statuses[];
 };
 
 export type SectorsData = {
@@ -17,6 +19,7 @@ export type SectorsData = {
 function processDataSectors({
 	data,
 	fund,
+	status,
 }: ProcessDataSectorsParams): SectorsData {
 	const sectorsData: SectorsData = {
 		total: 0,
@@ -24,7 +27,7 @@ function processDataSectors({
 	};
 
 	data.forEach(datum => {
-		if (fund.includes(datum.fund)) {
+		if (fund.includes(datum.fund) && status.includes(datum.projectStatus)) {
 			sectorsData.total += datum.budget;
 
 			datum.sectorData.forEach(sectorDatum => {

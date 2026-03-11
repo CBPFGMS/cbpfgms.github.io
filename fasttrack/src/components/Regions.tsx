@@ -55,7 +55,6 @@ function Regions({
 	// clickedDownload,
 	// setClickedDownload,
 }: RegionsProps) {
-	console.log(formatSIFloat(0));
 	return (
 		<Box>
 			<Grid

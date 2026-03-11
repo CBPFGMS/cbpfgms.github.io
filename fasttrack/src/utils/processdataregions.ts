@@ -1,10 +1,12 @@
 import type { Data } from "./processrawdata";
 import type { List } from "./makelists";
+import type { Statuses } from "../components/MainContainer";
 
 type ProcessDataRegionsParams = {
 	data: Data;
 	fund: number[];
 	lists: List;
+	status: Statuses[];
 };
 
 export type RegionsDatum = {
@@ -18,11 +20,12 @@ function processDataRegions({
 	data,
 	fund,
 	lists,
+	status,
 }: ProcessDataRegionsParams): RegionsDatum[] {
 	const dataRegions: RegionsDatum[] = [];
 
 	data.forEach(row => {
-		if (fund.includes(row.fund)) {
+		if (fund.includes(row.fund) && status.includes(row.projectStatus)) {
 			const thisRegion = lists.regions.find(d =>
 				d.funds.has(row.fund),
 			)?.regionName;
