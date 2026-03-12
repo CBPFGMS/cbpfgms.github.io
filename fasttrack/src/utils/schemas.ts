@@ -101,6 +101,9 @@ export const projectSummaryObjectSchema = z.object({
 	PrjApprDate: z.string().regex(dateRegex, "Invalid date format").nullable(), //TEMPORARY
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
+	ProjectStatusCode: z.string().nullable(),
+	ProcessStatus: z.string(),
+	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({

@@ -89,12 +89,13 @@ function processDataIndicators({
 			return;
 		}
 
+		// temporarily disabling warnings
 		if (!thisProjectDetails) {
-			warnProjectNotFound(
-				row.CHFProjectCode,
-				row,
-				"Global indicator without corresponding project ID",
-			);
+			// warnProjectNotFound(
+			// 	row.CHFProjectCode,
+			// 	row,
+			// 	"Global indicator without corresponding project ID",
+			// );
 			return;
 		}
 

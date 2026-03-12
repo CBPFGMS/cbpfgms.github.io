@@ -162,6 +162,11 @@ function processRawData({
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			//Temporary filter for draft projects:
+			if (row.ProjectStatusCode === "PRJ_DRFT") {
+				return;
+			}
+
 			const thisAllocationType =
 				listsObj.allocationTypesCompleteList[
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
