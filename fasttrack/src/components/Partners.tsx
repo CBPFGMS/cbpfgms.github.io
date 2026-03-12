@@ -11,11 +11,15 @@ import TableContainer from "@mui/material/TableContainer";
 import { constants } from "../utils/constants";
 import PartnersTableHead from "./PartnersTableHead";
 import PartnersTableBody from "./PartnersTableBody";
+import type { SectorsData } from "../utils/processdatasectors";
+import SectorsRibbon from "./SectorsRibbon";
+import InfoIcon from "@mui/icons-material/Info";
 
 type PartnersProps = {
 	data: PartnersDatum[];
 	maxBudgetValue: number;
 	lists: List;
+	dataSectors: SectorsData;
 	// clickedDownload: DownloadStates;
 	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
@@ -30,12 +34,16 @@ function Partners({
 	data,
 	maxBudgetValue,
 	lists,
+	dataSectors,
 	// clickedDownload,
 	// setClickedDownload,
 }: PartnersProps) {
+	const allSectors = dataSectors.sectors.map(d => d.sector);
+
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
-		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc");
+		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc"),
+		[sector, setSector] = useState<number[]>(allSectors);
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
 		sortAccessor: SortAccessor = e => {
@@ -49,7 +57,11 @@ function Partners({
 			return criteriaMap[sortingCriterion];
 		};
 
-	const sortedData = sort<PartnersDatum>(data, (a, b) =>
+	const filteredData: PartnersDatum[] = data.filter(d => {
+		return [...d.sectors].some(d => sector.includes(d));
+	});
+
+	const sortedData = sort<PartnersDatum>(filteredData, (a, b) =>
 		sortMethod(sortAccessor(a), sortAccessor(b)),
 	);
 
@@ -80,6 +92,38 @@ function Partners({
 					</Typography>
 				</Grid>
 			</Grid>
+			<Box
+				style={{ display: "flex" }}
+				mb={1}
+			>
+				<Typography
+					style={{
+						fontSize: "0.9rem",
+						color: "#666",
+						fontWeight: 400,
+					}}
+				>
+					Filter by sector
+				</Typography>
+				<InfoIcon
+					data-tooltip-id="tooltip"
+					data-tooltip-content="For partners with several sectors, you must unselect all sectors for filtering them out"
+					data-tooltip-place="top"
+					style={{
+						color: "#666",
+						fontSize: "16px",
+						marginLeft: "0.1em",
+						alignSelf: "flex-start",
+						marginTop: "-0.1em",
+					}}
+				/>
+			</Box>
+			<SectorsRibbon
+				dataSectors={dataSectors}
+				lists={lists}
+				sector={sector}
+				setSector={setSector}
+			/>
 			<Box sx={{ width: "100%	", borderBottom: "1px solid #aaa" }}>
 				<TableContainer
 					ref={tableRef}

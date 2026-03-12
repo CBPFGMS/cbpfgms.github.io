@@ -202,19 +202,9 @@ function processRawData({
 			// 		"Project not found in emergencies data"
 			// 	);
 			// }
-
 			const zeroOrOne: 0 | 1 = Math.random() < 0.5 ? 1 : 0;
 
-			if (thisAllocationType && thisOrganization && thisSectorData) {
-				yearsSet.add(thisAllocationType.AllocationYear);
-				fundsSet.add(row.PooledFundId);
-				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
-				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalUniqueId);
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
-				);
-
+			if (thisAllocationType) {
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
@@ -227,6 +217,17 @@ function processRawData({
 					// projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
 					reportType: row.RptCode ?? 0,
 				});
+			}
+
+			if (thisAllocationType && thisOrganization && thisSectorData) {
+				yearsSet.add(thisAllocationType.AllocationYear);
+				fundsSet.add(row.PooledFundId);
+				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
+				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
+				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				allocationTypesSet.add(
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+				);
 
 				const objDatum: Datum = {
 					fund: row.PooledFundId,
@@ -273,8 +274,6 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 	}));
-
-	console.log(data);
 
 	return data;
 }

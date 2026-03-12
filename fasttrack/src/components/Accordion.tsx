@@ -35,10 +35,6 @@ function AccordionComponent({
 		setExpanded(!expanded);
 	}
 
-	function handleDeselectAll() {
-		setValue([]);
-	}
-
 	function handleSelectAll() {
 		setValue(dataArray);
 	}
@@ -131,17 +127,6 @@ function AccordionComponent({
 								flexDirection: "row",
 							}}
 						>
-							<Button
-								variant="contained"
-								size="small"
-								onClick={handleDeselectAll}
-								style={{
-									marginLeft: "8px",
-									marginTop: "0px",
-								}}
-							>
-								Deselect all
-							</Button>
 							<Button
 								variant="contained"
 								size="small"

@@ -5,31 +5,30 @@ import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Snack from "./Snack";
-import type { ListObj } from "../utils/makelists";
-import type { InSelectionData } from "../utils/processdatatopfigures";
+import type { Statuses } from "./MainContainer";
+import { constants } from "../utils/constants";
 
-type DropdownProps = {
-	value: number[];
-	setValue: React.Dispatch<React.SetStateAction<number[]>>;
-	names: number[];
-	namesList: ListObj;
-	inSelectionData: InSelectionData;
+type DropdownStatusProps = {
+	value: Statuses[];
+	setValue: React.Dispatch<React.SetStateAction<Statuses[]>>;
 };
 
-function Dropdown({
-	value,
-	setValue,
-	names,
-	namesList,
-	inSelectionData,
-}: DropdownProps) {
-	let isAllSelected = value.length === names.length;
+const { projectStatus } = constants;
 
-	// const [isAllSelected, setIsAllSelected] = useState<boolean>(
-	// 	value.length === names.length,
-	// );
+type ShortNamesList = {
+	[K in Statuses]: string;
+};
+
+const shortNamesList: ShortNamesList = projectStatus.reduce((acc, curr) => {
+	acc[curr.value] = curr.label;
+	return acc;
+}, {} as ShortNamesList);
+
+function DropdownStatus({ value, setValue }: DropdownStatusProps) {
+	const allStatuses = projectStatus.map(status => status.value);
+	let isAllSelected = value.length === allStatuses.length;
 
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
@@ -37,7 +36,9 @@ function Dropdown({
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	function handleChange(event: SelectChangeEvent<typeof value>) {
-		const eventArray: number[] = [event.target.value as number[]].flat();
+		const eventArray: Statuses[] = [
+			event.target.value as Statuses[],
+		].flat();
 		if (eventArray.length === 0) {
 			setValue(value);
 			setOpenSnack(true);
@@ -45,13 +46,12 @@ function Dropdown({
 		}
 		if (isAllSelected) {
 			// eslint-disable-next-line
-			isAllSelected = eventArray.length !== names.length;
-			const missingItems: number[] = names.filter(
+			isAllSelected = eventArray.length !== allStatuses.length;
+			const missingItems: Statuses[] = allStatuses.filter(
 				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
 		} else {
-			eventArray.sort((a, b) => namesList[a].localeCompare(namesList[b]));
 			setValue(eventArray);
 		}
 	}
@@ -65,23 +65,21 @@ function Dropdown({
 		}
 	}
 
-	const namesListMemo = useMemo(() => {
-		names.sort((a, b) => namesList[a].localeCompare(namesList[b]));
-		return names;
-	}, [names, namesList]);
-
 	return (
 		<div ref={selectRef}>
 			<Snack
 				openSnack={openSnack}
 				setOpenSnack={setOpenSnack}
-				message={`At least one fund must be selected`}
+				message={`At least one implementation status must be selected`}
 			/>
 			<FormControl
-				sx={{ m: 1, maxWidth: "95%", minWidth: "95%" }}
-				size={"medium"}
+				sx={{
+					maxWidth: "100%",
+					minWidth: "100%",
+				}}
+				size={"small"}
 			>
-				<InputLabel id="multiple-checkbox-label">Fund</InputLabel>
+				<InputLabel id="multiple-checkbox-label">Status</InputLabel>
 				<Select
 					labelId="multiple-checkbox-label"
 					id="multiple-checkbox"
@@ -89,9 +87,11 @@ function Dropdown({
 					value={value}
 					onChange={handleChange}
 					onMouseEnter={calculateHeight}
-					input={<OutlinedInput label={"Fund"} />}
+					input={<OutlinedInput label="Status" />}
 					renderValue={selected =>
-						(selected as number[]).map(d => namesList[d]).join(", ")
+						isAllSelected
+							? "All selected"
+							: `${selected.length} selected`
 					}
 					MenuProps={{
 						PaperProps: {
@@ -104,11 +104,10 @@ function Dropdown({
 						disableScrollLock: true,
 					}}
 				>
-					{namesListMemo.map(name => (
+					{allStatuses.map(name => (
 						<MenuItem
 							key={name}
 							value={name}
-							disabled={!inSelectionData.funds.has(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",
@@ -120,7 +119,7 @@ function Dropdown({
 							/>
 							<ListItemText
 								style={{ maxWidth: "500px" }}
-								primary={namesList[name]}
+								primary={shortNamesList[name]}
 							/>
 						</MenuItem>
 					))}
@@ -130,4 +129,4 @@ function Dropdown({
 	);
 }
 
-export default Dropdown;
+export default DropdownStatus;

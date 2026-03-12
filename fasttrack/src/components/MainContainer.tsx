@@ -141,6 +141,8 @@ function MainContainer() {
 				inSelectionData={inSelectionData}
 				fund={fund}
 				setFund={setFund}
+				status={status}
+				setStatus={setStatus}
 			/>
 			<ProjectStatuses
 				dataStatuses={dataStatuses}
@@ -163,6 +165,7 @@ function MainContainer() {
 				data={dataPartners}
 				maxBudgetValue={maxBudgetValue}
 				lists={lists}
+				dataSectors={dataSectors}
 				// clickedDownload={clickedDownload}
 				// setClickedDownload={setClickedDownload}
 			/>
