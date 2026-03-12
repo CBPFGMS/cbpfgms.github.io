@@ -1,12 +1,11 @@
 import type { Data } from "./processrawdata";
 import type { List } from "./makelists";
-import type { Statuses } from "../components/MainContainer";
 
 type ProcessDataRegionsParams = {
 	data: Data;
 	fund: number[];
 	lists: List;
-	status: Statuses[];
+	status: number[];
 };
 
 export type RegionsDatum = {

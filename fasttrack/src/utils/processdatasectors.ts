@@ -1,10 +1,9 @@
-import type { Statuses } from "../components/MainContainer";
 import type { Data } from "./processrawdata";
 
 type ProcessDataSectorsParams = {
 	data: Data;
 	fund: number[];
-	status: Statuses[];
+	status: number[];
 };
 
 export type SectorsData = {

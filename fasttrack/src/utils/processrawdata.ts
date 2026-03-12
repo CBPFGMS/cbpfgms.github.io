@@ -15,7 +15,7 @@ export type Datum = {
 	year: number;
 	projectCode: string;
 	projectId: number;
-	projectStatus: 0 | 1;
+	projectStatus: number;
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
@@ -59,6 +59,7 @@ export type InDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	projectStatuses: Set<number>;
 };
 
 type SetType<T> = {
@@ -93,6 +94,8 @@ function processRawData({
 	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
+	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
+		new Set();
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -207,7 +210,6 @@ function processRawData({
 			// 		"Project not found in emergencies data"
 			// 	);
 			// }
-			const zeroOrOne: 0 | 1 = Math.random() < 0.5 ? 1 : 0;
 
 			if (thisAllocationType) {
 				listsObj.projectDetails.set(row.ChfId, {
@@ -218,8 +220,7 @@ function processRawData({
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
-					projectStatusId: zeroOrOne,
-					// projectStatusId: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
+					projectStatusId: row.ProcessSTatusID,
 					reportType: row.RptCode ?? 0,
 				});
 			}
@@ -230,6 +231,7 @@ function processRawData({
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				projectStatusesSet.add(row.ProcessSTatusID);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
@@ -239,8 +241,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					projectCode: row.ChfProjectCode,
 					projectId: row.ChfId,
-					projectStatus: zeroOrOne,
-					// projectStatus: row.GlbPrjStatusId || 0, //THIS WILL CHANGE, A NUMBER IS REQUIRED
+					projectStatus: row.ProcessSTatusID,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
@@ -278,6 +279,7 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
+		projectStatuses: projectStatusesSet,
 	}));
 
 	return data;

@@ -1,132 +1,144 @@
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import ListItemText from "@mui/material/ListItemText";
-import Select, { type SelectChangeEvent } from "@mui/material/Select";
-import Checkbox from "@mui/material/Checkbox";
-import { useRef, useState } from "react";
-import Snack from "./Snack";
-import type { Statuses } from "./MainContainer";
-import { constants } from "../utils/constants";
+// import OutlinedInput from "@mui/material/OutlinedInput";
+// import InputLabel from "@mui/material/InputLabel";
+// import MenuItem from "@mui/material/MenuItem";
+// import FormControl from "@mui/material/FormControl";
+// import ListItemText from "@mui/material/ListItemText";
+// import Select, { type SelectChangeEvent } from "@mui/material/Select";
+// import Checkbox from "@mui/material/Checkbox";
+// import { useRef, useState } from "react";
+// import Snack from "./Snack";
+// import { constants } from "../utils/constants";
+// import type { InSelectionData } from "../utils/processdatatopfigures";
 
-type DropdownStatusProps = {
-	value: Statuses[];
-	setValue: React.Dispatch<React.SetStateAction<Statuses[]>>;
-};
+// type DropdownStatusProps = {
+// 	value: number[];
+// 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+// 	inSelectionData: InSelectionData;
+// };
 
-const { projectStatus } = constants;
+// const { projectStatusMaster } = constants;
 
-type ShortNamesList = {
-	[K in Statuses]: string;
-};
+// function DropdownStatus({
+// 	value,
+// 	setValue,
+// 	inSelectionData,
+// }: DropdownStatusProps) {
+// 	const statusesInData = projectStatusMaster.filter(d =>
+// 		d.values.some(e => inSelectionData.statuses.has(e)),
+// 	);
 
-const shortNamesList: ShortNamesList = projectStatus.reduce((acc, curr) => {
-	acc[curr.value] = curr.label;
-	return acc;
-}, {} as ShortNamesList);
+// 	const statusesLabelsArray = statusesInData.map(d => d.label);
 
-function DropdownStatus({ value, setValue }: DropdownStatusProps) {
-	const allStatuses = projectStatus.map(status => status.value);
-	let isAllSelected = value.length === allStatuses.length;
+// 	let isAllSelected = [...inSelectionData.statuses].every(d =>
+// 		statusesInData.some(e => (e.values as readonly number[]).includes(d)),
+// 	);
 
-	const selectRef = useRef<HTMLDivElement | null>(null);
-	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
+// 	const selectRef = useRef<HTMLDivElement | null>(null);
+// 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
 
-	const [openSnack, setOpenSnack] = useState<boolean>(false);
+// 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
-	function handleChange(event: SelectChangeEvent<typeof value>) {
-		const eventArray: Statuses[] = [
-			event.target.value as Statuses[],
-		].flat();
-		if (eventArray.length === 0) {
-			setValue(value);
-			setOpenSnack(true);
-			return;
-		}
-		if (isAllSelected) {
-			// eslint-disable-next-line
-			isAllSelected = eventArray.length !== allStatuses.length;
-			const missingItems: Statuses[] = allStatuses.filter(
-				d => !eventArray.includes(d),
-			);
-			setValue(missingItems);
-		} else {
-			setValue(eventArray);
-		}
-	}
+// 	function handleChange(event: SelectChangeEvent<typeof value>) {
+// 		//HERE, the event array are the labels
+// 		const eventArray: string[] = [
+// 			event.target.value as unknown as string[],
+// 		].flat();
+// 		console.log(eventArray);
+// 		console.log(isAllSelected);
+// 		if (eventArray.length === 0) {
+// 			setValue(value);
+// 			setOpenSnack(true);
+// 			return;
+// 		}
+// 		if (isAllSelected) {
+// 			// eslint-disable-next-line
+// 			isAllSelected = eventArray.length === statusesInData.length;
+// 			const missingItems = statusesInData.filter(
+// 				d => !eventArray.includes(d.label),
+// 			);
+// 			const missingItemsIds = missingItems.flatMap(d => d.values);
+// 			setValue(missingItemsIds);
+// 		} else {
+// 			const ids = statusesInData
+// 				.filter(d => eventArray.includes(d.label))
+// 				.flatMap(d => d.values);
+// 			setValue(ids);
+// 		}
+// 	}
 
-	function calculateHeight() {
-		if (selectRef.current) {
-			const selectRect = selectRef.current.getBoundingClientRect();
-			const windowHeight = window.innerHeight;
-			const remainingSpace = windowHeight - selectRect.bottom;
-			setDropdownHeight(remainingSpace);
-		}
-	}
+// 	function calculateHeight() {
+// 		if (selectRef.current) {
+// 			const selectRect = selectRef.current.getBoundingClientRect();
+// 			const windowHeight = window.innerHeight;
+// 			const remainingSpace = windowHeight - selectRect.bottom;
+// 			setDropdownHeight(remainingSpace);
+// 		}
+// 	}
 
-	return (
-		<div ref={selectRef}>
-			<Snack
-				openSnack={openSnack}
-				setOpenSnack={setOpenSnack}
-				message={`At least one implementation status must be selected`}
-			/>
-			<FormControl
-				sx={{
-					maxWidth: "100%",
-					minWidth: "100%",
-				}}
-				size={"small"}
-			>
-				<InputLabel id="multiple-checkbox-label">Status</InputLabel>
-				<Select
-					labelId="multiple-checkbox-label"
-					id="multiple-checkbox"
-					multiple
-					value={value}
-					onChange={handleChange}
-					onMouseEnter={calculateHeight}
-					input={<OutlinedInput label="Status" />}
-					renderValue={selected =>
-						isAllSelected
-							? "All selected"
-							: `${selected.length} selected`
-					}
-					MenuProps={{
-						PaperProps: {
-							style: {
-								maxHeight: dropdownHeight,
-								marginTop: "8px",
-							},
-						},
-						disablePortal: true,
-						disableScrollLock: true,
-					}}
-				>
-					{allStatuses.map(name => (
-						<MenuItem
-							key={name}
-							value={name}
-							style={{
-								whiteSpace: "normal",
-								padding: "1px",
-							}}
-						>
-							<Checkbox
-								checked={value.includes(name)}
-								sx={{ padding: "6px" }}
-							/>
-							<ListItemText
-								style={{ maxWidth: "500px" }}
-								primary={shortNamesList[name]}
-							/>
-						</MenuItem>
-					))}
-				</Select>
-			</FormControl>
-		</div>
-	);
-}
+// 	return (
+// 		<div ref={selectRef}>
+// 			<Snack
+// 				openSnack={openSnack}
+// 				setOpenSnack={setOpenSnack}
+// 				message={`At least one implementation status must be selected`}
+// 			/>
+// 			<FormControl
+// 				sx={{
+// 					maxWidth: "100%",
+// 					minWidth: "100%",
+// 				}}
+// 				size={"small"}
+// 			>
+// 				<InputLabel id="multiple-checkbox-label">Status</InputLabel>
+// 				<Select
+// 					labelId="multiple-checkbox-label"
+// 					id="multiple-checkbox"
+// 					multiple
+// 					value={statusesLabelsArray}
+// 					onChange={handleChange}
+// 					onMouseEnter={calculateHeight}
+// 					input={<OutlinedInput label="Status" />}
+// 					renderValue={selected =>
+// 						isAllSelected
+// 							? "All selected"
+// 							: `${selected.length} selected`
+// 					}
+// 					MenuProps={{
+// 						PaperProps: {
+// 							style: {
+// 								maxHeight: dropdownHeight,
+// 								marginTop: "8px",
+// 							},
+// 						},
+// 						disablePortal: true,
+// 						disableScrollLock: true,
+// 					}}
+// 				>
+// 					{statusesInData.map(name => (
+// 						<MenuItem
+// 							key={name.label}
+// 							value={name.label}
+// 							style={{
+// 								whiteSpace: "normal",
+// 								padding: "1px",
+// 							}}
+// 						>
+// 							<Checkbox
+// 								checked={name.values.some(d =>
+// 									value.includes(d),
+// 								)}
+// 								sx={{ padding: "6px" }}
+// 							/>
+// 							<ListItemText
+// 								style={{ maxWidth: "500px" }}
+// 								primary={name.label}
+// 							/>
+// 						</MenuItem>
+// 					))}
+// 				</Select>
+// 			</FormControl>
+// 		</div>
+// 	);
+// }
 
-export default DropdownStatus;
+// export default DropdownStatus;

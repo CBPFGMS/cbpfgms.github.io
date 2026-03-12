@@ -1,14 +1,14 @@
-import type { Statuses } from "../components/MainContainer";
 import type { Data } from "./processrawdata";
 
 export type InSelectionData = {
 	funds: Set<number>;
+	statuses: Set<number>;
 };
 
 type ProcessDataTopFiguresParams = {
 	data: Data;
 	fund: number[];
-	status: Statuses[];
+	status: number[];
 };
 
 export type DataTopFigures = {
@@ -30,6 +30,7 @@ function processDataTopFigures({
 		numberOfPartnersSet = new Set<number>(),
 		inSelectionData: InSelectionData = {
 			funds: new Set<number>(),
+			statuses: new Set<number>(),
 		};
 
 	let allocations = 0,
@@ -47,7 +48,13 @@ function processDataTopFigures({
 			allocations += row.budget;
 			targeted += totalTargeted;
 		}
-		inSelectionData.funds.add(row.fund);
+		if (status.includes(row.projectStatus)) {
+			inSelectionData.funds.add(row.fund);
+		}
+
+		if (fund.includes(row.fund)) {
+			inSelectionData.statuses.add(row.projectStatus);
+		}
 	});
 
 	const dataTopFigures: DataTopFigures = {

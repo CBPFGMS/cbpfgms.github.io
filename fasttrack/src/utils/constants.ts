@@ -16,9 +16,37 @@ const constants = {
 	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
 	partnerBarMaxWidth: 82,
 	partnerBarHeight: 24,
-	projectStatus: [
-		{ value: 0, label: "Under Approval" },
-		{ value: 1, label: "Approved" },
+	projectStatusMaster: [
+		{
+			values: [1, 2],
+			label: "Submission of Proposal",
+			description: "Submission of Proposal",
+		},
+		{
+			values: [3],
+			label: "Under Review",
+			description: "Under Review",
+		},
+		{
+			values: [4],
+			label: "Under Final Approval",
+			description: "Under Final Approval",
+		},
+		{
+			values: [5, 6],
+			label: "Under Implementation",
+			description: "Under Implementation",
+		},
+		{
+			values: [7],
+			label: "Final Reporting",
+			description: "Final Reporting",
+		},
+		{
+			values: [8],
+			label: "Project Closure",
+			description: "Project Closure",
+		},
 	],
 	limitScaleValueInPixels: 90,
 } as const;

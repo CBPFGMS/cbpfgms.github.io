@@ -20,7 +20,6 @@ import {
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import type { GenderAndAge, ReportType } from "./processrawdata";
-import type { Statuses } from "../components/MainContainer";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -64,7 +63,7 @@ export type ProjectDetails = {
 	allocationSource: number;
 	allocationType: number;
 	endDate: Date;
-	projectStatusId: Statuses;
+	projectStatusId: number;
 	reportType: ReportType;
 };
 

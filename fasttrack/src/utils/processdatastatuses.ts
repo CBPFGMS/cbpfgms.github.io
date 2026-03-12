@@ -1,8 +1,7 @@
 import type { Data } from "./processrawdata";
-import type { Statuses } from "../components/MainContainer";
 
 export type DataStatuses = {
-	[K in Statuses]: number;
+	[key: number]: number;
 };
 
 type ProcessDataStatusesParams = {
@@ -14,14 +13,12 @@ function processDataStatuses({
 	data,
 	fund,
 }: ProcessDataStatusesParams): DataStatuses {
-	const dataStatuses: DataStatuses = {
-		0: 0,
-		1: 0,
-	};
+	const dataStatuses: DataStatuses = {};
 
 	data.forEach(datum => {
 		if (fund.includes(datum.fund)) {
-			dataStatuses[datum.projectStatus] += datum.budget;
+			dataStatuses[datum.projectStatus] =
+				(dataStatuses[datum.projectStatus] ?? 0) + datum.budget;
 		}
 	});
 

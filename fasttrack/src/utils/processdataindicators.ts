@@ -7,7 +7,6 @@ import { sum, mean } from "d3";
 import { constants } from "./constants";
 import type { List, GlobalIndicatorsDetails } from "./makelists";
 import { warnProjectNotFound } from "./warninvalid";
-import type { Statuses } from "../components/MainContainer";
 
 export type DatumIndicators = {
 	sector: number;
@@ -55,7 +54,7 @@ type ProcessDataIndicatorsParams = {
 	dataIndicators: GlobalIndicatorsObject[];
 	lists: List;
 	fund: number[];
-	status: Statuses[];
+	status: number[];
 };
 
 type StatusKey = "Tgt" | "Ach";

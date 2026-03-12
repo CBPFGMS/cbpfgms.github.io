@@ -21,7 +21,7 @@ import Regions from "./Regions";
 import Sectors from "./Sectors";
 import ProjectStatuses from "./Statuses";
 
-const { charts, projectStatus } = constants;
+const { charts } = constants;
 
 export type Charts = (typeof charts)[number];
 
@@ -34,10 +34,6 @@ const downloadStates = charts.reduce(
 	{} as DownloadStates,
 );
 
-export type Statuses = (typeof projectStatus)[number]["value"];
-
-const statuses: Statuses[] = projectStatus.map(status => status.value);
-
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer() {
@@ -47,10 +43,7 @@ function MainContainer() {
 
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[clickedDownload, setClickedDownload] =
-			useState<DownloadStates>(downloadStates),
-		[status, setStatus] = useState<Statuses[]>(statuses);
-
-	void clickedDownload;
+			useState<DownloadStates>(downloadStates);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -60,6 +53,12 @@ function MainContainer() {
 			}),
 		[data, fund],
 	);
+
+	const [status, setStatus] = useState<number[]>(
+		Object.keys(dataStatuses).map(d => +d),
+	);
+
+	void clickedDownload;
 
 	const filteredDataIndicators = useMemo(
 		() =>
@@ -122,6 +121,7 @@ function MainContainer() {
 		setStatus,
 		setClickedDownload,
 		downloadStates,
+		dataStatuses,
 	});
 
 	return (
@@ -146,6 +146,7 @@ function MainContainer() {
 			/>
 			<ProjectStatuses
 				dataStatuses={dataStatuses}
+				inSelectionData={inSelectionData}
 				status={status}
 				setStatus={setStatus}
 			/>

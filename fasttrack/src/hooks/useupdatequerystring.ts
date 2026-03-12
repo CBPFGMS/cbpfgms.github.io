@@ -1,21 +1,18 @@
 import { useEffect } from "react";
-import type { DownloadStates, Statuses } from "../components/MainContainer";
+import type { DownloadStates } from "../components/MainContainer";
 import type { InDataLists } from "../utils/processrawdata";
-import { constants } from "../utils/constants";
-
-const { projectStatus } = constants;
-
-const statusArray = projectStatus.map(status => status.value);
+import type { DataStatuses } from "../utils/processdatastatuses";
 
 type UpdateQueryStringParams = {
 	queryStringValues: URLSearchParams;
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	setStatus: React.Dispatch<React.SetStateAction<Statuses[]>>;
+	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	inDataLists: InDataLists;
 	fund: number[];
-	status: Statuses[];
+	status: number[];
 	downloadStates: DownloadStates;
+	dataStatuses: DataStatuses;
 };
 
 function useUpdateQueryString({
@@ -27,13 +24,16 @@ function useUpdateQueryString({
 	setFund,
 	setStatus,
 	downloadStates,
+	dataStatuses,
 }: UpdateQueryStringParams): void {
+	const statusArray = Object.keys(dataStatuses).map(d => +d);
+
 	useEffect(() => {
 		const fundParam = getNumericArrayParam("fund");
 		const statusParam = getNumericArrayParam("status");
 
 		if (fundParam) setFund(fundParam);
-		if (statusParam) setStatus(statusParam as Statuses[]);
+		if (statusParam) setStatus(statusParam);
 
 		return () => {};
 		// eslint-disable-next-line react-hooks/exhaustive-deps

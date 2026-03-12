@@ -1,11 +1,10 @@
-import type { Statuses } from "../components/MainContainer";
 import type { Data } from "./processrawdata";
 import { max } from "d3";
 
 type ProcessDataPartnersParams = {
 	data: Data;
 	fund: number[];
-	status: Statuses[];
+	status: number[];
 };
 
 export type PartnersDatum = {

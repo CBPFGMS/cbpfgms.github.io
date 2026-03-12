@@ -5,15 +5,14 @@ import type { InSelectionData } from "../utils/processdatatopfigures";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import AccordionComponent from "./Accordion";
-import DropdownStatus from "./DropdownStatus";
-import type { Statuses } from "./MainContainer";
+// import DropdownStatus from "./DropdownStatus";
 
 type TopFilterProps = {
 	inSelectionData: InSelectionData;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	status: Statuses[];
-	setStatus: React.Dispatch<React.SetStateAction<Statuses[]>>;
+	status: number[];
+	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 function TopFilter({
@@ -24,6 +23,9 @@ function TopFilter({
 	setStatus,
 }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
+
+	void status;
+	void setStatus;
 
 	return (
 		<Grid
@@ -63,14 +65,15 @@ function TopFilter({
 						inSelectionData={inSelectionData}
 					/>
 				</Grid>
-				{isSticky && (
+				{/* {isSticky && (
 					<Grid size={3}>
 						<DropdownStatus
 							value={status}
 							setValue={setStatus}
+							inSelectionData={inSelectionData}
 						/>
 					</Grid>
-				)}
+				)} */}
 			</Box>
 		</Grid>
 	);
