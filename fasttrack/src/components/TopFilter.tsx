@@ -5,7 +5,8 @@ import type { InSelectionData } from "../utils/processdatatopfigures";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import AccordionComponent from "./Accordion";
-// import DropdownStatus from "./DropdownStatus";
+import DropdownStatus from "./DropdownStatus";
+import type { List } from "../utils/makelists";
 
 type TopFilterProps = {
 	inSelectionData: InSelectionData;
@@ -13,6 +14,7 @@ type TopFilterProps = {
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	status: number[];
 	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
+	lists: List;
 };
 
 function TopFilter({
@@ -21,6 +23,7 @@ function TopFilter({
 	setFund,
 	status,
 	setStatus,
+	lists,
 }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
@@ -65,15 +68,16 @@ function TopFilter({
 						inSelectionData={inSelectionData}
 					/>
 				</Grid>
-				{/* {isSticky && (
+				{isSticky && (
 					<Grid size={3}>
 						<DropdownStatus
 							value={status}
 							setValue={setStatus}
 							inSelectionData={inSelectionData}
+							namesList={lists.projectStatus}
 						/>
 					</Grid>
-				)} */}
+				)}
 			</Box>
 		</Grid>
 	);

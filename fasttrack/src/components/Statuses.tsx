@@ -15,33 +15,32 @@ import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
 import { constants } from "../utils/constants";
-import type { InSelectionData } from "../utils/processdatatopfigures";
+import type { List } from "../utils/makelists";
 
 type ProjectStatusesProps = {
 	dataStatuses: DataStatuses;
 	status: number[];
-	inSelectionData: InSelectionData;
 	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
+	lists: List;
 };
 
-type StatusType = (typeof projectStatusMaster)[number]["values"];
-
 type StatusProps = {
-	handleClick: (thisStatus: StatusType) => void;
-	statusType: StatusType;
+	handleClick: (thisStatus: number) => void;
+	statusType: number;
 	statusValue: number;
 	total: number;
 	status: number[];
-	statusDatum: (typeof projectStatusMaster)[number];
+	title: string;
+	description: string;
 };
 
-const { limitScaleValueInPixels, projectStatusMaster } = constants;
+const { limitScaleValueInPixels, projectStatusDescription } = constants;
 
 function ProjectStatuses({
 	dataStatuses,
 	status,
 	setStatus,
-	inSelectionData,
+	lists,
 }: ProjectStatusesProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
@@ -50,30 +49,18 @@ function ProjectStatuses({
 		0,
 	);
 
-	const statusesInData = projectStatusMaster.filter(d =>
-		d.values.some(e => inSelectionData.statuses.has(e)),
-	);
+	const dataStatusesKeys = Object.keys(dataStatuses).map((d: string) => +d);
 
-	function handleClick(thisStatus: StatusType) {
-		const match =
-			status.length === thisStatus.length &&
-			status
-				.slice()
-				.sort()
-				.every((val, index) => {
-					return val === thisStatus.slice().sort()[index];
-				});
-		if (match) {
+	function handleClick(thisStatus: number) {
+		if (status.length === 1 && status.includes(thisStatus)) {
 			setOpenSnack(true);
 			return;
 		}
-		setStatus(prevStatus => {
-			const toKeep = prevStatus.filter(
-				item => !(thisStatus as readonly number[]).includes(item),
-			);
-			const toAdd = thisStatus.filter(item => !prevStatus.includes(item));
-			return [...toKeep, ...toAdd];
-		});
+		setStatus(
+			status.includes(thisStatus)
+				? status.filter(e => thisStatus !== e)
+				: [...status, thisStatus],
+		);
 	}
 
 	return (
@@ -129,20 +116,24 @@ function ProjectStatuses({
 					width: "100%",
 				}}
 			>
-				{statusesInData.map((statusDatum, index) => {
-					const statusValue = statusDatum.values.reduce(
-						(acc, curr) => acc + (dataStatuses[curr] || 0),
-						0,
-					);
+				{dataStatusesKeys.map((datum, index) => {
 					return (
 						<Status
 							key={index}
 							handleClick={handleClick}
-							statusType={statusDatum.values}
-							statusValue={statusValue}
+							statusType={datum}
+							statusValue={dataStatuses[datum]}
 							total={total}
 							status={status}
-							statusDatum={statusDatum}
+							title={lists.projectStatus[datum]}
+							description={
+								(
+									projectStatusDescription as Record<
+										number,
+										string
+									>
+								)[datum]
+							}
 						/>
 					);
 				})}
@@ -157,15 +148,14 @@ function Status({
 	statusValue,
 	total,
 	status,
-	statusDatum,
+	title,
+	description,
 }: StatusProps) {
 	const scale = scaleLinear<number, number>()
 		.domain([0, total])
 		.range([0, 100]);
 
-	const statusSelected = statusType.some(e => status.includes(e));
-
-	const title = statusDatum.label;
+	const statusSelected = status.includes(statusType);
 
 	return (
 		<Grid
@@ -208,9 +198,7 @@ function Status({
 								{
 									<InfoIcon
 										data-tooltip-id="tooltip"
-										data-tooltip-content={
-											statusDatum.description
-										}
+										data-tooltip-content={description}
 										data-tooltip-place="top"
 										style={{
 											color: "#666",

@@ -16,39 +16,35 @@ const constants = {
 	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
 	partnerBarMaxWidth: 82,
 	partnerBarHeight: 24,
-	projectStatusMaster: [
-		{
-			values: [1, 2],
-			label: "Submission of Proposal",
-			description: "Submission of Proposal",
-		},
-		{
-			values: [3],
-			label: "Under Review",
-			description: "Under Review",
-		},
-		{
-			values: [4],
-			label: "Under Final Approval",
-			description: "Under Final Approval",
-		},
-		{
-			values: [5, 6],
-			label: "Under Implementation",
-			description: "Under Implementation",
-		},
-		{
-			values: [7],
-			label: "Final Reporting",
-			description: "Final Reporting",
-		},
-		{
-			values: [8],
-			label: "Project Closure",
-			description: "Project Closure",
-		},
-	],
 	limitScaleValueInPixels: 90,
+	projectStatusDescription: {
+		1: "Submission of Proposal",
+		2: "Under Review",
+		3: "Under Final Approval",
+		4: "Under Implementation",
+		5: "Final Reporting",
+		6: "Project Closure",
+	},
 } as const;
 
-export { constants };
+const projectStatusMaster = {
+	1: "Submission of Proposal",
+	2: "Under Review",
+	3: "Under Final Approval",
+	4: "Under Implementation",
+	5: "Final Reporting",
+	6: "Project Closure",
+};
+
+const projectStatusMapping: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+};
+
+export { constants, projectStatusMaster, projectStatusMapping };

@@ -6,7 +6,7 @@ import {
 } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
-import { constants } from "./constants";
+import { constants, projectStatusMapping } from "./constants";
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -220,7 +220,7 @@ function processRawData({
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
-					projectStatusId: row.ProcessSTatusID,
+					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 					reportType: row.RptCode ?? 0,
 				});
 			}
@@ -231,7 +231,7 @@ function processRawData({
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
-				projectStatusesSet.add(row.ProcessSTatusID);
+				projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
@@ -241,7 +241,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					projectCode: row.ChfProjectCode,
 					projectId: row.ChfId,
-					projectStatus: row.ProcessSTatusID,
+					projectStatus: projectStatusMapping[row.ProcessSTatusID],
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,

@@ -20,6 +20,7 @@ import {
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import type { GenderAndAge, ReportType } from "./processrawdata";
+import { projectStatusMaster } from "./constants";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -83,6 +84,7 @@ export type List = {
 	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
 	regions: Regions[];
+	projectStatus: ListObj;
 };
 
 function makeLists({
@@ -112,6 +114,7 @@ function makeLists({
 		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
 		regions: [],
+		projectStatus: projectStatusMaster,
 	};
 
 	pooledFundsMaster.forEach(d => {

@@ -143,12 +143,13 @@ function MainContainer() {
 				setFund={setFund}
 				status={status}
 				setStatus={setStatus}
+				lists={lists}
 			/>
 			<ProjectStatuses
 				dataStatuses={dataStatuses}
-				inSelectionData={inSelectionData}
 				status={status}
 				setStatus={setStatus}
+				lists={lists}
 			/>
 			<Box mb={3} />
 			<TopFigures data={dataTopFigures} />
