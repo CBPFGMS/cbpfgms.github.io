@@ -44,18 +44,18 @@ function MainContainer() {
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
+	const [status, setStatus] = useState<number[]>([
+		...inDataLists.projectStatuses,
+	]);
 
 	const dataStatuses = useMemo(
 		() =>
 			processDataStatuses({
 				data,
 				fund,
+				setStatus,
 			}),
 		[data, fund],
-	);
-
-	const [status, setStatus] = useState<number[]>(
-		Object.keys(dataStatuses).map(d => +d),
 	);
 
 	void clickedDownload;
