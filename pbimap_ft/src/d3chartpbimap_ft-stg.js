@@ -299,8 +299,7 @@
 			fadeOpacityMenu = 0.5,
 			beneficiariesTypes = ["Targeted", "Reached"],
 			reachedColor = "#ccc",
-			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/allocations_overview_static/data/",
+			baseUrl = "../../Ocha Staging/cbpfgms.github.io/pbimap_ft/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
