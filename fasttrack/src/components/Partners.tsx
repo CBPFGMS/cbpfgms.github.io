@@ -20,6 +20,8 @@ type PartnersProps = {
 	maxBudgetValue: number;
 	lists: List;
 	dataSectors: SectorsData;
+	sector: number[];
+	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	// clickedDownload: DownloadStates;
 	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
@@ -35,15 +37,14 @@ function Partners({
 	maxBudgetValue,
 	lists,
 	dataSectors,
+	sector,
+	setSector,
 	// clickedDownload,
 	// setClickedDownload,
 }: PartnersProps) {
-	const allSectors = dataSectors.sectors.map(d => d.sector);
-
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
-		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc"),
-		[sector, setSector] = useState<number[]>(allSectors);
+		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc");
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
 		sortAccessor: SortAccessor = e => {
@@ -57,11 +58,7 @@ function Partners({
 			return criteriaMap[sortingCriterion];
 		};
 
-	const filteredData: PartnersDatum[] = data.filter(d => {
-		return [...d.sectors].some(d => sector.includes(d));
-	});
-
-	const sortedData = sort<PartnersDatum>(filteredData, (a, b) =>
+	const sortedData = sort<PartnersDatum>(data, (a, b) =>
 		sortMethod(sortAccessor(a), sortAccessor(b)),
 	);
 

@@ -45,8 +45,9 @@ function MainContainer() {
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 	const [status, setStatus] = useState<number[]>([
-		...inDataLists.projectStatuses,
-	]);
+			...inDataLists.projectStatuses,
+		]),
+		[sector, setSector] = useState<number[]>([...inDataLists.sectors]);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -87,8 +88,9 @@ function MainContainer() {
 				data,
 				fund,
 				status,
+				sector,
 			}),
-		[data, fund, status],
+		[data, fund, status, sector],
 	);
 
 	const dataRegions = useMemo(
@@ -108,6 +110,7 @@ function MainContainer() {
 				data,
 				fund,
 				status,
+				setSector,
 			}),
 		[data, fund, status],
 	);
@@ -168,6 +171,8 @@ function MainContainer() {
 				maxBudgetValue={maxBudgetValue}
 				lists={lists}
 				dataSectors={dataSectors}
+				sector={sector}
+				setSector={setSector}
 				// clickedDownload={clickedDownload}
 				// setClickedDownload={setClickedDownload}
 			/>

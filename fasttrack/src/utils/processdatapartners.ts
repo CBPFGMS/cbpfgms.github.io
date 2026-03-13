@@ -5,6 +5,7 @@ type ProcessDataPartnersParams = {
 	data: Data;
 	fund: number[];
 	status: number[];
+	sector: number[];
 };
 
 export type PartnersDatum = {
@@ -19,6 +20,7 @@ function processDataPartners({
 	data,
 	fund,
 	status,
+	sector,
 }: ProcessDataPartnersParams): {
 	dataPartners: PartnersDatum[];
 	maxBudgetValue: number;
@@ -26,21 +28,38 @@ function processDataPartners({
 	const dataPartners: PartnersDatum[] = [];
 
 	data.forEach(datum => {
-		if (fund.includes(datum.fund) && status.includes(datum.projectStatus)) {
+		const sectors = datum.sectorData.map(d => d.sectorId);
+		if (
+			fund.includes(datum.fund) &&
+			status.includes(datum.projectStatus) &&
+			sectors.some(d => sector.includes(d))
+		) {
 			const foundPartner = dataPartners.find(
 				d => d.partner === datum.organizationId,
 			);
-			const sectors = datum.sectorData.map(d => d.sectorId);
+
 			if (foundPartner) {
-				sectors.forEach(d => foundPartner.sectors.add(d));
-				foundPartner.budget += datum.budget;
+				datum.sectorData.forEach(d => {
+					if (sector.includes(d.sectorId)) {
+						foundPartner.sectors.add(d.sectorId);
+						foundPartner.budget += d.budget;
+					}
+				});
 				foundPartner.projects.add(datum.projectId);
 				foundPartner.funds.add(datum.fund);
 			} else {
+				let thisBudget = 0;
+				const thisSectors = new Set<number>();
+				datum.sectorData.forEach(d => {
+					if (sector.includes(d.sectorId)) {
+						thisSectors.add(d.sectorId);
+						thisBudget += d.budget;
+					}
+				});
 				dataPartners.push({
 					partner: datum.organizationId,
-					sectors: new Set(sectors),
-					budget: datum.budget,
+					sectors: thisSectors,
+					budget: thisBudget,
 					funds: new Set([datum.fund]),
 					projects: new Set([datum.projectId]),
 				});

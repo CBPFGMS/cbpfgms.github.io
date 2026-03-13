@@ -4,6 +4,7 @@ type ProcessDataSectorsParams = {
 	data: Data;
 	fund: number[];
 	status: number[];
+	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export type SectorsData = {
@@ -19,6 +20,7 @@ function processDataSectors({
 	data,
 	fund,
 	status,
+	setSector,
 }: ProcessDataSectorsParams): SectorsData {
 	const sectorsData: SectorsData = {
 		total: 0,
@@ -52,6 +54,8 @@ function processDataSectors({
 	});
 
 	sectorsData.sectors.sort((a, b) => b.percentage - a.percentage);
+
+	setSector(sectorsData.sectors.map(d => d.sector));
 
 	return sectorsData;
 }
