@@ -594,7 +594,7 @@
 				csvCallback(rawData);
 			} else {
 				d3.csv(
-					"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
+					"https://cbpfapib.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
 					row
 				).then(function (rawData) {
 					try {
