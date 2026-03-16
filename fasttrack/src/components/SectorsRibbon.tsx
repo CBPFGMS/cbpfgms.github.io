@@ -85,7 +85,6 @@ function SectorsRibbon({
 									width={"50%"}
 									height={"50%"}
 									style={{
-										padding: "4px",
 										filter: "brightness(0) invert(1)",
 									}}
 								/>

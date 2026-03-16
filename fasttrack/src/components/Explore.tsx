@@ -9,7 +9,6 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import contriDashImg from "../assets/img/contri-dash-img.jpg";
-import opertnlDashImg from "../assets/img/opertnl-dash-img.jpg";
 import allocatnProgresImg from "../assets/img/allocatn-progres-img.jpg";
 import allocatnOverImg from "../assets/img/allocatn-over-img.jpg";
 
@@ -22,18 +21,18 @@ type CardsDatum = {
 
 const cardsData: CardsDatum[] = [
 	{
-		title: "Contributions Dashboard",
+		title: "Contributions",
 		subtitle: "View detailed contribution data and funding information",
 		url: "./full-contribution.html",
 		image: contriDashImg,
 	},
-	{
-		title: "Operational Dashboard",
-		subtitle:
-			"Monitor operational metrics and performance indicators",
-		url: "./index.html",
-		image: opertnlDashImg,
-	},
+	// {
+	// 	title: "Operational Dashboard",
+	// 	subtitle:
+	// 		"Monitor operational metrics and performance indicators",
+	// 	url: "./index.html",
+	// 	image: opertnlDashImg,
+	// },
 	{
 		title: "Allocation Progress",
 		subtitle: "Track allocation progress and status updates",
@@ -66,6 +65,7 @@ function Explore() {
 				alignItems="stretch"
 				position="relative"
 				mb={4}
+				style={{ paddingLeft: "30px", paddingRight: "30px" }}
 			>
 				<Grid size={12}>
 					<Typography
@@ -85,7 +85,7 @@ function Explore() {
 				{cardsData.map((card, index) => (
 					<Grid
 						key={index}
-						size={3}
+						size={4}
 						sx={{ display: "flex" }}
 						className="explore-card"
 					>

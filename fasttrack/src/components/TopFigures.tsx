@@ -32,7 +32,7 @@ function TopFigures({ data }: TopFiguresProps) {
 			type: "integer",
 		},
 		{
-			label: "Disbursement",
+			label: "Allocated / Launched",
 			value: data.allocations,
 			type: "decimal",
 			format: true,
@@ -74,7 +74,7 @@ function TopFigures({ data }: TopFiguresProps) {
 								borderTop: "1px solid black",
 								borderBottom: "1px solid black",
 							}}
-							{...(card.label === "Disbursement" && {
+							{...(card.label === "Allocated / Launched" && {
 								"data-tooltip-id": "tooltip",
 								"data-tooltip-html":
 									"$" + card.value.toLocaleString(),
@@ -95,7 +95,7 @@ function TopFigures({ data }: TopFiguresProps) {
 									fontFamily: "Montserrat",
 								}}
 							>
-								{card.label === "Disbursement" && "$"}
+								{card.label === "Allocated / Launched" && "$"}
 								<NumberAnimator
 									number={
 										card.format
