@@ -76,7 +76,7 @@ function ScrollSpy({
 				Icon={PaidIcon}
 			/>
 			<Tab
-				label="Gender/Age"
+				label="People/Age"
 				inView={inViewPictogram}
 				reference={refIds.pictogramRefId}
 				handleOnClick={handleOnClick}
@@ -114,7 +114,7 @@ function ScrollSpy({
 				ochaIcon={true}
 			/>
 			<Tab
-				label="GBV"
+				label="VAP"
 				inView={inViewGBV}
 				reference={refIds.gbvRefId}
 				handleOnClick={handleOnClick}
@@ -167,7 +167,7 @@ function Tab({
 						width: iconSize,
 						height: iconSize,
 					}}
-					{...(label === "Gender/Age" && {
+					{...(label === "People/Age" && {
 						type: "total",
 						svgProps: {
 							style: {

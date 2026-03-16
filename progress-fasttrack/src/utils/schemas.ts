@@ -24,7 +24,7 @@ export const projectSummaryObjectSchema = z.object({
 	BenG: z.number().int().nonnegative(),
 	GMId: z.union([z.number(), z.string()]).nullable(),
 	GAMId: z.number().nullable(),
-	GlbPrjStatusId: z.number().int().nonnegative(),
+	GlbPrjStatusId: z.number().int().nonnegative().nullable(), //TEMPORARY?
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
 	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
 	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
@@ -98,9 +98,12 @@ export const projectSummaryObjectSchema = z.object({
 	AchProtPeople: z.number().int().nonnegative().nullable(),
 	RptCode: z.union([z.literal(1), z.literal(2)]).nullable(),
 	StartDate: z.string().regex(dateRegex, "Invalid date format"),
-	PrjApprDate: z.string().regex(dateRegex, "Invalid date format"),
+	PrjApprDate: z.string().regex(dateRegex, "Invalid date format").nullable(), //TEMPORARY
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
+	ProjectStatusCode: z.string().nullable(),
+	ProcessStatus: z.string(),
+	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({

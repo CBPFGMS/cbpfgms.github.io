@@ -90,7 +90,7 @@ function GBVChart({
 				setClickedDownload={setClickedDownload}
 				type="gbv"
 				refElement={ref}
-				fileName="Gender_Based_Violence"
+				fileName="Violence_Against_Person"
 			/>
 			<Box
 				style={{
@@ -109,11 +109,11 @@ function GBVChart({
 						textTransform: "uppercase",
 					}}
 				>
-					GBV
+					VAP
 				</Typography>
 				<InfoIcon
 					data-tooltip-id="tooltip"
-					data-tooltip-content={"Gender-Based Violence"}
+					data-tooltip-content={"Violence against Person"}
 					data-tooltip-place="top"
 					style={{
 						color: "#666",
@@ -144,7 +144,7 @@ function GBVChart({
 			>
 				<GBVColumn>
 					<GBVCell
-						title={"GBV Planned Budget"}
+						title={"VAP Planned Budget"}
 						totalSlice={dataGBV.allocations}
 						totalColor={colors.contrastColorLighter}
 						GBVSlice={dataGBV.allocationsGBVPlanned}
@@ -155,7 +155,7 @@ function GBVChart({
 						noData={dataGBV.allocationsGBVPlanned === 0}
 					/>
 					<GBVCell
-						title={"GBV Reached Budget"}
+						title={"VAP Reached Budget"}
 						totalSlice={dataGBV.allocations}
 						totalColor={colors.unColorLighter}
 						GBVSlice={dataGBV.allocationsGBVReached}
@@ -168,7 +168,7 @@ function GBVChart({
 				</GBVColumn>
 				<GBVColumn>
 					<GBVCell
-						title={"GBV Targeted People"}
+						title={"VAP Targeted People"}
 						totalSlice={dataGBV.targeted}
 						totalColor={colors.contrastColorLighter}
 						GBVSlice={dataGBV.targetedGBV}
@@ -187,7 +187,7 @@ function GBVChart({
 						noData={dataGBV.targetedGBV === 0}
 					/>
 					<GBVCell
-						title={"GBV Reached People"}
+						title={"VAP Reached People"}
 						totalSlice={dataGBV.reached}
 						totalColor={colors.unColorLighter}
 						GBVSlice={dataGBV.reachedGBV}
@@ -217,7 +217,7 @@ function GBVChart({
 					variant="caption"
 					sx={{ lineHeight: 1.2, width: "80%", fontStyle: "italic" }}
 				>
-					The data on GBV reached, as reported only in the final
+					The data on VAP reached, as reported only in the final
 					reports was identified from{" "}
 					{dataGBV.totalReports === 0
 						? "0%"
@@ -344,7 +344,7 @@ function NoData() {
 					textAlign="center"
 				>
 					Data not yet available; report due dates have not been
-					reached or the selected year(s) do not have GBV data.
+					reached or the selected year(s) do not have VAP data.
 				</Typography>
 			</Box>
 		</Box>
