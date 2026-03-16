@@ -126,7 +126,7 @@ function Dropdown({
 						<MenuItem
 							key={name}
 							value={name}
-							disabled={!inSelectionData[dataProperty].has(name)}
+							disabled={!(inSelectionData[dataProperty] as Set<number>).has(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",

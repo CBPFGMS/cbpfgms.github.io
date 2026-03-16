@@ -5,10 +5,8 @@ import DataContext, { DataContextType } from "../context/DataContext";
 import { InSelectionData } from "../utils/processdatasummary";
 import { makeYearsList } from "../utils/makeyearslist";
 import { ImplementationStatuses } from "./MainContainer";
-import constants from "../utils/constants";
 import DropdownStatus from "./DropdownStatus";
 
-const { implementationStatuses } = constants;
 
 type SelectorsProps = {
 	year: number[];
@@ -46,7 +44,7 @@ function QuickSelectors({
 	const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
 	const dataArrayAllocationSources = [...inDataLists.allocationSources];
 	const dataArrayImplementationStatuses: ImplementationStatuses[] = [
-		...implementationStatuses,
+		...inSelectionData.statuses,
 	];
 
 	const yearsList = makeYearsList(dataArrayYears);
@@ -105,6 +103,7 @@ function QuickSelectors({
 				value={implementationStatus}
 				setValue={setImplementationStatus}
 				names={dataArrayImplementationStatuses}
+				inSelectionData={inSelectionData}
 			/>
 		</Box>
 	);

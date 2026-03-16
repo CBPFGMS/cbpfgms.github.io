@@ -8,11 +8,13 @@ import Checkbox from "@mui/material/Checkbox";
 import { useRef, useState } from "react";
 import Snack from "./Snack";
 import { ImplementationStatuses } from "./MainContainer";
+import { InSelectionData } from "../utils/processdatasummary";
 
 type DropdownStatusProps = {
 	value: ImplementationStatuses[];
 	setValue: React.Dispatch<React.SetStateAction<ImplementationStatuses[]>>;
 	names: ImplementationStatuses[];
+	inSelectionData: InSelectionData;
 };
 
 type ShortNamesList = {
@@ -20,13 +22,23 @@ type ShortNamesList = {
 };
 
 const shortNamesList: ShortNamesList = {
-	"Financially Closed": "Financ. Closed\u00A0",
-	"Under Implementation": "Under Impl.\u00A0",
-	"Programmatically Closed": "Prog. Closed\u00A0",
+	"Submission of Proposal": "Submission of Proposal",
+	"Under Review": "Under Review",
+	"Under Final Approval": "Under Final Approval",
+	"Under Implementation": "Under Implementation",
+	"Final Reporting": "Final Reporting",
+	"Project Closure": "Project Closure",
 };
 
-function DropdownStatus({ value, setValue, names }: DropdownStatusProps) {
-	let isAllSelected = value.length === names.length;
+function DropdownStatus({
+	value,
+	setValue,
+	names,
+	inSelectionData,
+}: DropdownStatusProps) {
+	let isAllSelected = [...inSelectionData.statuses].every(d =>
+		value.includes(d),
+	);
 
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
@@ -45,7 +57,7 @@ function DropdownStatus({ value, setValue, names }: DropdownStatusProps) {
 		if (isAllSelected) {
 			isAllSelected = eventArray.length !== names.length;
 			const missingItems: ImplementationStatuses[] = names.filter(
-				d => !eventArray.includes(d)
+				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
 		} else {

@@ -10,6 +10,7 @@ export type InSelectionData = {
 	funds: Set<number>;
 	allocationSources: Set<number>;
 	allocationTypes: Set<number>;
+	statuses: Set<ImplementationStatuses>;
 };
 
 type ProcessDataSummaryParams = {
@@ -143,6 +144,7 @@ function processDataSummary({
 		funds: new Set(),
 		allocationSources: new Set(),
 		allocationTypes: new Set(),
+		statuses: new Set(),
 	};
 
 	data.forEach(datum => {
@@ -310,6 +312,15 @@ function processDataSummary({
 			allocationType.includes(datum.allocationType)
 		) {
 			inSelectionData.years.add(datum.year);
+		}
+
+		if (
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			inSelectionData.statuses.add(thisStatus);
 		}
 	});
 

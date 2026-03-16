@@ -44,7 +44,7 @@ function Search({
 		}
 		if (isAllSelected) {
 			const missingItems: number[] = names.filter(
-				d => !eventValue.includes(d)
+				d => !eventValue.includes(d),
 			);
 			setValue(missingItems);
 		} else {
@@ -94,14 +94,16 @@ function Search({
 						{...props}
 						key={option}
 						style={
-							!inSelectionData[dataProperty].has(option)
+							!(inSelectionData[dataProperty] as Set<number>).has(
+								option,
+							)
 								? {
 										display: "none",
-								  }
+									}
 								: {
 										whiteSpace: "normal",
 										padding: "1px",
-								  }
+									}
 						}
 					>
 						<Checkbox
@@ -111,7 +113,9 @@ function Search({
 							style={{ marginRight: 8 }}
 							checked={value.includes(option)}
 							disabled={
-								!inSelectionData[dataProperty].has(option)
+								!(
+									inSelectionData[dataProperty] as Set<number>
+								).has(option)
 							}
 						/>
 						{namesList[option]}

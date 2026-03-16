@@ -37,15 +37,21 @@ function CheckboxLabel({
 				{names.map((name, index) => (
 					<FormControlLabel
 						key={index}
-						disabled={!inSelectionData[dataProperty].has(name)}
+						disabled={
+							!(inSelectionData[dataProperty] as Set<number>).has(
+								name,
+							)
+						}
 						style={
-							!inSelectionData[dataProperty].has(name)
+							!(inSelectionData[dataProperty] as Set<number>).has(
+								name,
+							)
 								? {
 										filter: "grayscale(100%)",
-								  }
+									}
 								: {
 										filter: "grayscale(0%)",
-								  }
+									}
 						}
 						control={
 							<Checkbox
@@ -60,7 +66,7 @@ function CheckboxLabel({
 									}
 									if (value.includes(name)) {
 										setValue(prev =>
-											prev.filter(d => d !== name)
+											prev.filter(d => d !== name),
 										);
 									} else {
 										setValue(prev => [...prev, name]);
