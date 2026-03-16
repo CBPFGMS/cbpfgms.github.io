@@ -8,7 +8,7 @@ import {
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
-import constants from "./constants";
+import constants, { projectStatusMapping } from "./constants";
 
 const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
 	constants;
@@ -30,7 +30,6 @@ export type Datum = {
 	allocationType: number;
 	allocationTypeId: number;
 	endDate: Date;
-	approvalDate: Date;
 	budget: number;
 	budgetGBVPlanned: number;
 	budgetGBVReached: number;
@@ -184,7 +183,7 @@ function processRawData({
 					warnProjectNotFound(
 						row.ChfProjectCode,
 						row,
-						"Project not found in sectorsDataMap"
+						"Project not found in sectorsDataMap",
 					);
 				}
 			}
@@ -192,7 +191,7 @@ function processRawData({
 			warnInvalidSchema(
 				"sectorsData",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
@@ -232,7 +231,7 @@ function processRawData({
 					warnProjectNotFound(
 						row.ChfProjectCode,
 						row,
-						"Project not found in cvaDataMap"
+						"Project not found in cvaDataMap",
 					);
 				}
 			}
@@ -240,7 +239,6 @@ function processRawData({
 			warnInvalidSchema("cvaData", row, JSON.stringify(parsedRow.error));
 		}
 	});
-
 
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
@@ -251,7 +249,8 @@ function processRawData({
 				];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
-			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
+			const thisStatus =
+				listsObj.statuses[projectStatusMapping[row.ProcessSTatusID]];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 			const thisCvaData = cvaDataMap.get(row.ChfProjectCode);
 
@@ -259,7 +258,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in allocation types"
+					"Project not found in allocation types",
 				);
 			}
 
@@ -267,7 +266,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in organizations"
+					"Project not found in organizations",
 				);
 			}
 
@@ -275,7 +274,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in statuses"
+					"Project not found in statuses",
 				);
 			}
 
@@ -283,7 +282,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in sectors data"
+					"Project not found in sectors data",
 				);
 			}
 
@@ -299,7 +298,7 @@ function processRawData({
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
 				listsObj.projectDetails.set(row.ChfId, {
@@ -307,11 +306,10 @@ function processRawData({
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 					reportType: row.RptCode ?? 0,
 				});
 
@@ -329,27 +327,26 @@ function processRawData({
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
 					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
 					projectStatus: thisStatus,
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 					sectorData: thisSectorData.sectors,
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
 						row,
-						"targeted"
+						"targeted",
 					),
 					disabledReached: generateBeneficiariesObjectSummary(
 						row,
-						"disabledReached"
+						"disabledReached",
 					),
 					disabledTargeted: generateBeneficiariesObjectSummary(
 						row,
-						"disabledTargeted"
+						"disabledTargeted",
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
@@ -369,7 +366,7 @@ function processRawData({
 			warnInvalidSchema(
 				"projectSummary",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
@@ -389,7 +386,7 @@ function processRawData({
 
 function generateBeneficiariesSplitObject(
 	row: ProjectSummaryObject,
-	type: "Ach" | "Ben"
+	type: "Ach" | "Ben",
 ): BeneficiaryTypes {
 	const zeroSplit = [0, 0, 0, 0, 0];
 	const girlsColumn = row[`${type}GSplit`],
@@ -425,7 +422,7 @@ function generateBeneficiariesSplitObject(
 
 function generateBeneficiariesObjectSummary(
 	row: ProjectSummaryObject,
-	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted"
+	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted",
 ): BeneficiariesObject {
 	let girls = 0,
 		boys = 0,

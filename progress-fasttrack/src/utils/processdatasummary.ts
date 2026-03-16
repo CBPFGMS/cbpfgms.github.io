@@ -1,7 +1,6 @@
 import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
-import calculateStatus from "./calculatestatus";
 import constants from "./constants";
 import capitalizeString from "./capitalizestring";
 import { GenderAndAge } from "./processrawdata";
@@ -21,7 +20,6 @@ type ProcessDataSummaryParams = {
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
-	showFinanciallyClosed: boolean;
 };
 
 export type DatumSummary = {
@@ -92,7 +90,6 @@ function processDataSummary({
 	allocationType,
 	implementationStatus,
 	lists,
-	showFinanciallyClosed,
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataCva: DatumCva[];
@@ -149,7 +146,9 @@ function processDataSummary({
 	};
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			implementationStatus.includes(thisStatus) &&
 			year.includes(datum.year) &&

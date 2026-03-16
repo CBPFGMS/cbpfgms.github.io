@@ -1,14 +1,11 @@
 import { Data } from "./processrawdata";
 import { List } from "./makelists";
-import calculateStatus from "./calculatestatus";
 import { ImplementationStatuses } from "../components/MainContainer";
 import constants from "./constants";
 
 export type DataStatuses = {
-	[K in Exclude<ImplementationStatuses, "Financially Closed">]: number;
-} & Partial<{
-	[K in Extract<ImplementationStatuses, "Financially Closed">]: number;
-}>;
+	[K in ImplementationStatuses]: number;
+};
 
 type ProcessDataStatusesParams = {
 	data: Data;
@@ -17,7 +14,6 @@ type ProcessDataStatusesParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	lists: List;
-	showFinanciallyClosed: boolean;
 };
 
 const { implementationStatuses } = constants;
@@ -29,21 +25,19 @@ function processDataStatuses({
 	allocationSource,
 	allocationType,
 	lists,
-	showFinanciallyClosed,
 }: ProcessDataStatusesParams): DataStatuses {
 	const dataStatuses: DataStatuses = implementationStatuses.reduce(
 		(acc, curr) => {
-			if (curr === "Financially Closed" && !showFinanciallyClosed) {
-				return acc;
-			}
 			acc[curr] = 0;
 			return acc;
 		},
-		{} as DataStatuses
+		{} as DataStatuses,
 	);
 
 	data.forEach(datum => {
-		const status = calculateStatus(datum, lists, showFinanciallyClosed);
+		const status = lists.statuses[
+			datum.projectStatusId
+		] as keyof DataStatuses;
 		if (
 			year.includes(datum.year) &&
 			fund.includes(datum.fund) &&

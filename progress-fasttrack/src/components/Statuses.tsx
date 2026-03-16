@@ -23,7 +23,6 @@ type StatusesProps = {
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
-	showFinanciallyClosed: boolean;
 };
 
 type StatusProps = {
@@ -39,12 +38,12 @@ type StatusesDescription = {
 };
 
 const statusesDescription: StatusesDescription = {
-	"Programmatically Closed":
-		"Project(s) which have completed the implementation and their project end date is over",
-	"Under Implementation":
-		"Project(s) which are still under implementation stage where Project Implementation End date is greater than today",
-	"Financially Closed":
-		"Project(s) which have closed all stage of Final Report(s) and other financial transaction(s). Based on the new Global guidance of CBPF, the audit for non-UN projects are due after 9 months of implementation. Final financial reports for UN Project(s) are due for end of June of the following year after the programmatic implementation",
+	"Submission of Proposal": "Submission of Proposal",
+	"Under Review": "Under Review",
+	"Under Final Approval": "Under Final Approval",
+	"Under Implementation": "Under Implementation",
+	"Final Reporting": "Final Reporting",
+	"Project Closure": "Project Closure",
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -53,13 +52,12 @@ function Statuses({
 	dataStatuses,
 	implementationStatus,
 	setImplementationStatus,
-	showFinanciallyClosed,
 }: StatusesProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const total = Object.values(dataStatuses).reduce(
 		(acc, curr) => acc + curr,
-		0
+		0,
 	);
 
 	function handleClick(status: ImplementationStatuses) {
@@ -73,7 +71,7 @@ function Statuses({
 		setImplementationStatus(
 			implementationStatus.includes(status)
 				? implementationStatus.filter(e => status !== e)
-				: [...implementationStatus, status]
+				: [...implementationStatus, status],
 		);
 	}
 
@@ -103,9 +101,7 @@ function Statuses({
 				<InfoIcon
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
-						showFinanciallyClosed
-							? "Projects can fall into three implementation statuses: Under Implementation, Programmatically Closed, and Financially Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
-							: "Projects can fall into two implementation statuses: Under Implementation and Programmatically Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
+						"Projects can fall into different implementation statuses.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
 					}
 					data-tooltip-place="top"
 					style={{
@@ -119,27 +115,29 @@ function Statuses({
 			</Grid>
 			<Grid
 				container
-				gap={2}
+				spacing={2}
 				sx={{
 					width: "100%",
-					flexWrap: "nowrap",
 				}}
 			>
 				{(
 					Object.entries(dataStatuses) as [
 						keyof typeof dataStatuses,
-						number
+						number,
 					][]
-				).map(([status, statusValue]) => (
-					<Status
-						key={status}
-						handleClick={handleClick}
-						status={status}
-						statusValue={statusValue}
-						total={total}
-						implementationStatus={implementationStatus}
-					/>
-				))}
+				).map(
+					([status, statusValue]) =>
+						statusValue > 0 && (
+							<Status
+								key={status}
+								handleClick={handleClick}
+								status={status}
+								statusValue={statusValue}
+								total={total}
+								implementationStatus={implementationStatus}
+							/>
+						),
+				)}
 			</Grid>
 		</Box>
 	);
@@ -159,7 +157,7 @@ function Status({
 	const statusSelected = implementationStatus.includes(status);
 
 	return (
-		<Grid size={6}>
+		<Grid size={4}>
 			<Card
 				key={status}
 				variant="outlined"
@@ -243,7 +241,7 @@ function Status({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(statusValue)
+										formatSIFloat(statusValue),
 									)}
 									type="decimal"
 								/>
@@ -265,16 +263,16 @@ function Status({
 						data-tooltip-content={`The total amount of allocations for ${status} projects is $${toLocaleFixed(
 							statusValue,
 							0,
-							2
+							2,
 						)}, which represents ${(
 							(statusValue / total) *
 							100
 						).toFixed(
-							1
+							1,
 						)}% of the total allocations for all statuses (${toLocaleFixed(
 							total,
 							0,
-							2
+							2,
 						)}).`}
 						data-tooltip-place="top"
 					>
@@ -314,7 +312,9 @@ function Status({
 							>
 								<NumberAnimator
 									number={parseFloat(
-										((statusValue / total) * 100).toFixed(2)
+										((statusValue / total) * 100).toFixed(
+											2,
+										),
 									)}
 									type="decimal"
 								/>

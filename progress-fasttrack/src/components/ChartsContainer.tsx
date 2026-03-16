@@ -54,7 +54,6 @@ type ChartsContainerProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationsStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 function ChartsContainer({
@@ -84,7 +83,6 @@ function ChartsContainer({
 	allocationSource,
 	allocationType,
 	implementationsStatus,
-	showFinanciallyClosed,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -139,7 +137,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -164,7 +161,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -204,7 +200,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -234,7 +229,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -280,7 +274,6 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
-								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>
@@ -318,7 +311,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -343,7 +335,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -389,7 +380,6 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
-								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>

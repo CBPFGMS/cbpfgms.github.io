@@ -1,7 +1,6 @@
 import { BeneficiariesObject, Data } from "./processrawdata";
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
-import calculateStatus from "./calculatestatus";
 import constants from "./constants";
 
 const { beneficiariesSplitOrder } = constants;
@@ -75,7 +74,6 @@ type ProcessDownloadParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 export function processSummaryDownload({
@@ -86,12 +84,13 @@ export function processSummaryDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): SummaryDatumDownload[] {
 	const summaryDataDownload: SummaryDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -127,12 +126,13 @@ export function processPictogramDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): PictogramDatumDownload[] {
 	const pictogramDataDownload: PictogramDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -175,12 +175,13 @@ export function processDisabilityDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): DisabilityDatumDownload[] {
 	const disabilityDataDownload: DisabilityDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -223,12 +224,13 @@ export function processGBVDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): GBVDatumDownload[] {
 	const gbvDataDownload: GBVDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -267,12 +269,13 @@ export function processBeneficiaryTypesDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): BeneficiaryTypesDatumDownload[] {
 	const beneficiaryTypesDataDownload: BeneficiaryTypesDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -354,12 +357,13 @@ export function processSectorsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): SectorsDatumDownload[] {
 	const sectorsDataDownload: SectorsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -405,12 +409,13 @@ export function processOrganizationsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): OrganizationsDatumDownload[] {
 	const organizationsDataDownload: OrganizationsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -454,17 +459,14 @@ export function processCvaDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): CvaDatumDownload[] {
 	const cvaDataDownload: CvaDatumDownload[] = [];
 
 	data.forEach(datum => {
 		if (datum.cvaData !== null) {
-			const thisStatus = calculateStatus(
-				datum,
-				lists,
-				showFinanciallyClosed,
-			);
+			const thisStatus = lists.statuses[
+				datum.projectStatusId
+			] as ImplementationStatuses;
 			if (
 				checkRow(
 					thisStatus,

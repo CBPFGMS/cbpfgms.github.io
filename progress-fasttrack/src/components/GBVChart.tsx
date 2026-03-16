@@ -26,7 +26,6 @@ type GBVChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 export type DonutDatum = {
@@ -53,7 +52,6 @@ function GBVChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: GBVChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -68,7 +66,6 @@ function GBVChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataGBVDownload)[number]>(
 			dataGBVDownload,

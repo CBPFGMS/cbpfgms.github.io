@@ -46,8 +46,6 @@ const refIds = charts.reduce((acc, curr) => {
 
 const queryStringValues = new URLSearchParams(location.search);
 
-const showFinanciallyClosed = queryStringValues.has("showFinanciallyClosed");
-
 function MainContainer({ defaultYear }: MainContainerProps) {
 	const { data, inDataLists, lists } = useContext(
 		DataContext,
@@ -63,13 +61,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		]),
 		[implementationStatus, setImplementationStatus] = useState<
 			ImplementationStatuses[]
-		>(
-			showFinanciallyClosed
-				? [...implementationStatuses]
-				: implementationStatuses.filter(
-						status => status !== "Financially Closed",
-					),
-		),
+		>([...implementationStatuses]),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 
@@ -101,7 +93,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource,
 				allocationType,
 				lists,
-				showFinanciallyClosed,
 			}),
 		[data, year, fund, allocationSource, allocationType, lists],
 	);
@@ -124,7 +115,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
-				showFinanciallyClosed,
 			}),
 		[
 			data,
@@ -147,7 +137,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
-				showFinanciallyClosed,
 			}),
 		[
 			data,
@@ -176,7 +165,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		year,
 		downloadStates,
 		defaultYear,
-		showFinanciallyClosed,
 	});
 
 	const filterProps = {
@@ -219,7 +207,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
 				refIds={refIds}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 			<TopIntro />
 			<FiltersContainer
@@ -228,7 +215,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setImplementationStatus={setImplementationStatus}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 			<Box
 				mt={4}
@@ -261,7 +247,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 		</Container>
 	);

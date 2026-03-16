@@ -28,7 +28,6 @@ type DisabilityChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 const { beneficiaryCategories, beneficiariesStatuses } = constants;
@@ -42,7 +41,6 @@ function DisabilityChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: DisabilityChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -72,7 +70,6 @@ function DisabilityChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataDisabilityDownload)[number]>(
 			dataDisabilityDownload,

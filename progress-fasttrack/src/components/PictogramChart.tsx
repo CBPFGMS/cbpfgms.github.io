@@ -29,7 +29,6 @@ type PictogramChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 const { beneficiaryCategories } = constants;
@@ -43,7 +42,6 @@ function PictogramChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: PictogramChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -73,7 +71,6 @@ function PictogramChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataPictogramDownload)[number]>(
 			dataPictogramDownload,

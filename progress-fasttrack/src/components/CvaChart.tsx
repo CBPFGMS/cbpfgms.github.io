@@ -38,7 +38,6 @@ type CvaChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 const { cvaChartModes, cvaChartTypes, beneficiariesStatuses } = constants;
@@ -55,7 +54,6 @@ function CvaChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: CvaChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -94,7 +92,6 @@ function CvaChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataCvaDownload)[number]>(dataCvaDownload, "CVA");
 	}

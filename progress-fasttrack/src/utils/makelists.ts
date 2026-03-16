@@ -5,7 +5,6 @@ import {
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
 	PooledFundsMasterObject,
-	ProjectStatusMasterObject,
 	SectorsMasterObject,
 	pooledFundsMasterObjectSchema,
 	beneficiaryTypesMasterObjectSchema,
@@ -14,17 +13,16 @@ import {
 	organizationTypesMasterObjectSchema,
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
-	projectStatusMasterObjectSchema,
 	CvaMasterObject,
 	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { ReportType } from "./processrawdata";
+import { projectStatusMaster } from "./constants";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
 	organizationMaster: OrganizationMasterObject[];
-	projectStatusMaster: ProjectStatusMasterObject[];
 	beneficiaryTypesMaster: BeneficiaryTypesMasterObject[];
 	pooledFundsMaster: PooledFundsMasterObject[];
 	allocationSourcesMaster: AllocationSourcesMasterObject[];
@@ -51,7 +49,6 @@ export type ProjectDetails = {
 	allocationSource: number;
 	allocationType: number;
 	endDate: Date;
-	approvalDate: Date;
 	projectStatusId: number;
 	reportType: ReportType;
 };
@@ -76,7 +73,6 @@ export type List = {
 function makeLists({
 	allocationTypesMaster,
 	organizationMaster,
-	projectStatusMaster,
 	beneficiaryTypesMaster,
 	pooledFundsMaster,
 	allocationSourcesMaster,
@@ -96,7 +92,7 @@ function makeLists({
 		organizations: {},
 		organizationsCompleteList: {},
 		sectors: {},
-		statuses: {},
+		statuses: projectStatusMaster,
 		projectDetails: new Map(),
 		cvaTypeNames: {},
 	};
@@ -201,20 +197,6 @@ function makeLists({
 				"OrganizationMaster",
 				d,
 				JSON.stringify(parsedOrganizationMaster.error),
-			);
-		}
-	});
-
-	projectStatusMaster.forEach(d => {
-		const parsedProjectStatusMaster =
-			projectStatusMasterObjectSchema.safeParse(d);
-		if (parsedProjectStatusMaster.success) {
-			lists.statuses[d.GlobalInstanceStatusId] = d.StatusCode;
-		} else {
-			warnInvalidSchema(
-				"ProjectStatusMaster",
-				d,
-				JSON.stringify(parsedProjectStatusMaster.error),
 			);
 		}
 	});

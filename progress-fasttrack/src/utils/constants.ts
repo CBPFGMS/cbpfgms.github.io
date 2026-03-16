@@ -1,9 +1,12 @@
 const constants = {
 	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
 	implementationStatuses: [
+		"Submission of Proposal",
+		"Under Review",
+		"Under Final Approval",
 		"Under Implementation",
-		"Programmatically Closed",
-		"Financially Closed",
+		"Final Reporting",
+		"Project Closure",
 	],
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	pageName: "CBPFProgress",
@@ -91,5 +94,25 @@ const constants = {
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
 } as const;
+
+export const projectStatusMaster = {
+	1: "Submission of Proposal",
+	2: "Under Review",
+	3: "Under Final Approval",
+	4: "Under Implementation",
+	5: "Final Reporting",
+	6: "Project Closure",
+};
+
+export const projectStatusMapping: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+};
 
 export default constants;

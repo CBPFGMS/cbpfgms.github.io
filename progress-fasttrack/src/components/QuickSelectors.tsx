@@ -24,7 +24,6 @@ type SelectorsProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
-	showFinanciallyClosed: boolean;
 };
 
 function QuickSelectors({
@@ -39,7 +38,6 @@ function QuickSelectors({
 	setFund,
 	setYear,
 	setImplementationStatus,
-	showFinanciallyClosed,
 }: SelectorsProps) {
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 
@@ -47,12 +45,9 @@ function QuickSelectors({
 	const dataArrayFunds = [...inDataLists.funds];
 	const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
 	const dataArrayAllocationSources = [...inDataLists.allocationSources];
-	const dataArrayImplementationStatuses: ImplementationStatuses[] =
-		showFinanciallyClosed
-			? [...implementationStatuses]
-			: implementationStatuses.filter(
-					status => status !== "Financially Closed"
-			  );
+	const dataArrayImplementationStatuses: ImplementationStatuses[] = [
+		...implementationStatuses,
+	];
 
 	const yearsList = makeYearsList(dataArrayYears);
 	const namesListFunds = lists.fundNames;
