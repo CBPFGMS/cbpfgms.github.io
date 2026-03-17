@@ -247,7 +247,7 @@
 			adminLocLevels = 6,
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
-			initialYear = 2015,
+			initialYear = 2026,
 			yearsArrayString = d3
 				.range(initialYear, currentYear + 1, 1)
 				.map(function (d) {
