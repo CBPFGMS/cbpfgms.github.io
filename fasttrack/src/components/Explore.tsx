@@ -24,26 +24,25 @@ const cardsData: CardsDatum[] = [
 	{
 		title: "Contributions Dashboard",
 		subtitle: "View detailed contribution data and funding information",
-		url: "./full-contribution.html",
+		url: "./us_contribution.html",
 		image: contriDashImg,
 	},
 	{
 		title: "Allocations Timeline",
-		subtitle:
-			"View detailed timeline of allocations",
-		url: "./allocationstimeline_ft.html",
+		subtitle: "View detailed timeline of allocations",
+		url: "./us_timeline_ft.html",
 		image: allocTimeImg,
 	},
 	{
 		title: "Allocation Progress",
 		subtitle: "Track allocation progress and status updates",
-		url: "./progress-fasttrack.html",
+		url: "./us_progress.html",
 		image: allocatnProgresImg,
 	},
 	{
 		title: "Allocation Overview",
 		subtitle: "Comprehensive overview of allocation distributions",
-		url: "./allocations-overview-ft.html",
+		url: "./us_allocations.html",
 		image: allocatnOverImg,
 	},
 ];
@@ -73,7 +72,8 @@ function Explore() {
 						sx={{
 							color: "var(--ocha-blue)",
 							fontWeight: 700,
-							mt: 4,
+							mt: 2,
+							mb: 2,
 							textAlign: "center",
 							fontSize: "2rem",
 							fontFamily: "Montserrat",

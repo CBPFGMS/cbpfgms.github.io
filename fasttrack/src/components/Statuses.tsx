@@ -66,7 +66,7 @@ function ProjectStatuses({
 	return (
 		<Box
 			mb={6}
-			sx={{ width: "100%" }}
+			sx={{  padding: "1em" }}
 		>
 			<Snack
 				openSnack={openSnack}
@@ -76,9 +76,7 @@ function ProjectStatuses({
 			<Grid
 				pb={2}
 				pt={2}
-				size={12}
-				display={"flex"}
-				alignItems={"center"}
+				container
 				justifyContent={"center"}
 			>
 				<Typography
@@ -111,10 +109,7 @@ function ProjectStatuses({
 			<Grid
 				container
 				spacing={2}
-				alignItems={"stretch"}
-				sx={{
-					width: "100%",
-				}}
+				// alignItems={"stretch"}
 			>
 				{dataStatusesKeys.map((datum, index) => {
 					return (
@@ -159,7 +154,7 @@ function Status({
 
 	return (
 		<Grid
-			size={3}
+			size={4}
 			display={"flex"}
 		>
 			<Card

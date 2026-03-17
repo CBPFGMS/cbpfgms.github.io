@@ -87,7 +87,6 @@ function IndicatorsCarousel({
 			justifyContent="center"
 			alignItems="center"
 			flexDirection="column"
-			width="100%"
 			position={"relative"}
 		>
 			<Box
@@ -221,7 +220,7 @@ function IndicatorsCarousel({
 								display="flex"
 								justifyContent="center"
 								alignItems="flex-start"
-								padding={2}
+								paddingTop={2}
 							>
 								{visibleRange.includes(index) && (
 									<IndicatorCard

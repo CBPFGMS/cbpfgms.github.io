@@ -98,6 +98,18 @@ function Regions({
 							size={6}
 							key={index}
 							className="region-card"
+							data-tooltip-id="tooltip"
+							data-tooltip-html={
+								"<div style='text-align:left;'>Total allocated: $" +
+								region.budget.toLocaleString() +
+								"<br/>" +
+								"Targeted people: " +
+								region.targeted.toLocaleString() +
+								"<br/>" +
+								tooltipFundText +
+								"</div>"
+							}
+							data-tooltip-place="top"
 						>
 							<h3>
 								<i
@@ -123,14 +135,7 @@ function Regions({
 								container
 								spacing={2}
 							>
-								<Grid
-									size={6}
-									data-tooltip-id="tooltip"
-									data-tooltip-html={
-										"$" + region.budget.toLocaleString()
-									}
-									data-tooltip-place="top"
-								>
+								<Grid size={6}>
 									<Typography
 										style={{
 											fontSize: "2.5rem",
@@ -166,12 +171,7 @@ function Regions({
 										Total Allocated
 									</Typography>
 								</Grid>
-								<Grid
-									size={6}
-									data-tooltip-id="tooltip"
-									data-tooltip-html={tooltipFundText}
-									data-tooltip-place="top"
-								>
+								<Grid size={6}>
 									<Typography
 										style={{
 											fontSize: "2.5rem",
@@ -197,15 +197,7 @@ function Regions({
 											: "Country"}
 									</Typography>
 								</Grid>
-								<Grid
-									size={6}
-									data-tooltip-id="tooltip"
-									data-tooltip-html={
-										region.targeted.toLocaleString() +
-										" people"
-									}
-									data-tooltip-place="top"
-								>
+								<Grid size={6}>
 									<Typography
 										style={{
 											fontSize: "2.5rem",
