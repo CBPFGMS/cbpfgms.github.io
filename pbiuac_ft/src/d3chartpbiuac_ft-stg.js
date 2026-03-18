@@ -8,9 +8,6 @@
 			window.matchMedia("(pointer: coarse)").matches &&
 			!window.matchMedia("(any-pointer: fine)").matches,
 		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
-		isBookmarkPage =
-			window.location.hostname + window.location.pathname ===
-			"cbpfgms.github.io/cbpf-bi-stag/bookmark.html",
 		fontAwesomeLink =
 			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = [
@@ -486,7 +483,7 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite && !isBookmarkPage) {
+		if (isPfbiSite) {
 			window.cbpfbiDataObject.launchedAllocationsData.then(rawData => {
 				const filteredRawData = rawData.reduce((acc, curr) => {
 					if (curr.PlannedStartDate && curr.PlannedEndDate) {
