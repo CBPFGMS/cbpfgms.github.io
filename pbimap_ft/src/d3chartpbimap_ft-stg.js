@@ -299,7 +299,8 @@
 			fadeOpacityMenu = 0.5,
 			beneficiariesTypes = ["Targeted", "Reached"],
 			reachedColor = "#ccc",
-			baseUrl = "https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/",
+			baseUrl =
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -900,82 +901,6 @@
 				.on("click", function () {
 					createSnapshot("png", false);
 				});
-
-			if (!isBookmarkPage) {
-				const shareIcon = iconsDiv
-					.append("button")
-					.attr("id", "pbimapShareButton");
-
-				shareIcon
-					.html("SHARE  ")
-					.append("span")
-					.attr("class", "fas fa-share");
-
-				const shareDiv = containerDiv
-					.append("div")
-					.attr("class", "d3chartShareDiv")
-					.style("display", "none");
-
-				shareIcon
-					.on("mouseover", function () {
-						shareDiv
-							.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetTop =
-							thisBox.top -
-							containerBox.top -
-							(shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv
-							.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					})
-					.on("mouseout", function () {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function () {
-						const newURL =
-							bookmarkSite + queryStringValues.toString();
-
-						const shareInput = shareDiv
-							.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-					});
-			}
 
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent

@@ -247,7 +247,7 @@
 			adminLocLevels = 6,
 			beneficiariesList = ["Men", "Women", "Boys", "Girls"],
 			dataAttributes = ["CBPF", "Partner", "Cluster"],
-			initialYear = 2015,
+			initialYear = 2026,
 			yearsArrayString = d3
 				.range(initialYear, currentYear + 1, 1)
 				.map(function (d) {
@@ -290,7 +290,7 @@
 			),
 			tooltipSvgWidth = 310,
 			tooltipSvgHeight = 168,
-			tooltipSvgPadding = [10, 52, 30, 45],
+			tooltipSvgPadding = [10, 64, 30, 45],
 			stickHeight = 2,
 			lollipopRadius = 3,
 			formatSIaxes = d3.format("~s"),
@@ -299,7 +299,7 @@
 			beneficiariesTypes = ["Targeted", "Reached"],
 			reachedColor = "#ccc",
 			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/allocations_overview_static/data/",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
@@ -637,12 +637,7 @@
 			.paddingOuter(0)
 			.paddingInner(0.3);
 
-		const tooltipSvgXScale = d3
-			.scaleLinear()
-			.range([
-				tooltipSvgPadding[3],
-				tooltipSvgWidth - tooltipSvgPadding[1] - tooltipSvgPadding[3],
-			]);
+		const tooltipSvgXScale = d3.scaleLinear();
 
 		const tooltipSvgYAxis = d3
 			.axisLeft(tooltipSvgYScale)
@@ -905,82 +900,6 @@
 				.on("click", function () {
 					createSnapshot("png", false);
 				});
-
-			if (!isBookmarkPage) {
-				const shareIcon = iconsDiv
-					.append("button")
-					.attr("id", "pbimapShareButton");
-
-				shareIcon
-					.html("SHARE  ")
-					.append("span")
-					.attr("class", "fas fa-share");
-
-				const shareDiv = containerDiv
-					.append("div")
-					.attr("class", "d3chartShareDiv")
-					.style("display", "none");
-
-				shareIcon
-					.on("mouseover", function () {
-						shareDiv
-							.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetTop =
-							thisBox.top -
-							containerBox.top -
-							(shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv
-							.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					})
-					.on("mouseout", function () {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function () {
-						const newURL =
-							bookmarkSite + queryStringValues.toString();
-
-						const shareInput = shareDiv
-							.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-					});
-			}
 
 			if (browserHasSnapshotIssues) {
 				const bestVisualizedSpan = snapshotContent
@@ -3047,14 +2966,29 @@
 			});
 
 			function createTooltipSvg() {
-				tooltipSvgXScale.domain([
-					0,
-					d3.max(
-						beneficiariesList.map(function (d) {
-							return datum["beneficiaries" + d];
-						}),
+				const maxTargeted = d3.max(
+					beneficiariesList.map(d => datum["beneficiaries" + d]),
+				);
+				const maxReached = d3.max(
+					beneficiariesList.map(
+						d => datum["beneficiariesReached" + d],
 					),
-				]);
+				);
+				tooltipSvgPadding[1] = maxReached > maxTargeted ? 70 : 34;
+
+				tooltipSvgXScale
+					.range([
+						tooltipSvgPadding[3],
+						tooltipSvgWidth - tooltipSvgPadding[1],
+					])
+					.domain([
+						0,
+						d3.max(
+							beneficiariesList.map(function (d) {
+								return datum["beneficiaries" + d];
+							}),
+						),
+					]);
 
 				const tooltipSvg = tooltip
 					.select("#pbimapTooltipSvgDiv")
@@ -3159,11 +3093,16 @@
 					.duration(duration)
 					.attr("width", function (d) {
 						const parentDatum = localVariable.get(this);
-						return tooltipSvgXScale(
-							datum[
-								`beneficiaries${d === "Reached" ? "Reached" : ""}` +
-									parentDatum
-							],
+						return (
+							Math.min(
+								tooltipSvgXScale(
+									datum[
+										`beneficiaries${d === "Reached" ? "Reached" : ""}` +
+											parentDatum
+									],
+								),
+								tooltipSvgXScale.range()[1],
+							) - tooltipSvgPadding[3]
 						);
 					});
 
@@ -3206,7 +3145,7 @@
 									(datum[
 										"beneficiariesReached" + parentDatum
 									] > datum["beneficiaries" + parentDatum]
-										? ">100%"
+										? ">100"
 										: datum[
 													"beneficiaries" +
 														parentDatum
@@ -3332,7 +3271,12 @@
 								? "beneficiariesReached"
 								: "beneficiaries";
 						return (
-							tooltipSvgXScale(datum[property + parentDatum]) + 3
+							Math.min(
+								tooltipSvgXScale(datum[property + parentDatum]),
+								tooltipSvgXScale.range()[1],
+							) +
+							3 -
+							tooltipSvgPadding[3]
 						);
 					});
 
