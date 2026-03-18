@@ -812,29 +812,21 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
-			Promise.all([
-				window.cbpfbiDataObject.contributionsTotalData,
-				window.cbpfbiDataObject.flags,
-				window.cbpfbiDataObject.masterRegionalFunds,
-			]).then(allData => csvCallback(allData));
-		} else {
-			Promise.all([
-				fetchFile(
-					classPrefix + "data",
-					dataUrl,
-					"contributions data",
-					"csv",
-				),
-				fetchFile("flags", flagsUrl, "flags data", "json"),
-				fetchFile(
-					"masterRegionalFunds",
-					masterRegionalFundsUrl,
-					"master regional funds data",
-					"json",
-				),
-			]).then(allData => csvCallback(allData));
-		}
+		Promise.all([
+			fetchFile(
+				classPrefix + "data",
+				dataUrl,
+				"contributions data",
+				"csv",
+			),
+			fetchFile("flags", flagsUrl, "flags data", "json"),
+			fetchFile(
+				"masterRegionalFunds",
+				masterRegionalFundsUrl,
+				"master regional funds data",
+				"json",
+			),
+		]).then(allData => csvCallback(allData));
 
 		function fetchFile(fileName, url, warningString, method) {
 			if (

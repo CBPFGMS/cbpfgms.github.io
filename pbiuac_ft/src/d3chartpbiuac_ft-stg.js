@@ -7,7 +7,7 @@
 		isTouchScreenOnly =
 			window.matchMedia("(pointer: coarse)").matches &&
 			!window.matchMedia("(any-pointer: fine)").matches,
-		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
+		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		fontAwesomeLink =
 			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = [
@@ -483,51 +483,38 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
-			window.cbpfbiDataObject.launchedAllocationsData.then(rawData => {
-				const filteredRawData = rawData.reduce((acc, curr) => {
-					if (curr.PlannedStartDate && curr.PlannedEndDate) {
-						const newRow = row(curr);
-						if (newRow) acc.push(newRow);
-					}
-					return acc;
-				}, []);
-				csvCallback(filteredRawData);
-			});
-		} else {
-			if (
-				localStorage.getItem("launchedAllocationsData") &&
+		if (
+			localStorage.getItem("launchedAllocationsData") &&
+			JSON.parse(localStorage.getItem("launchedAllocationsData"))
+				.timestamp >
+				currentDate.getTime() - localStorageTime
+		) {
+			const rawData = d3.csvParse(
 				JSON.parse(localStorage.getItem("launchedAllocationsData"))
-					.timestamp >
-					currentDate.getTime() - localStorageTime
-			) {
-				const rawData = d3.csvParse(
-					JSON.parse(localStorage.getItem("launchedAllocationsData"))
-						.data,
-					row,
-				);
-				console.info("pbiuac: data from local storage");
+					.data,
+				row,
+			);
+			console.info("pbiuac: data from local storage");
+			csvCallback(rawData);
+		} else {
+			d3.csv(
+				"https://cbpfapib.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
+				row,
+			).then(function (rawData) {
+				try {
+					localStorage.setItem(
+						"launchedAllocationsData",
+						JSON.stringify({
+							data: d3.csvFormat(rawData),
+							timestamp: currentDate.getTime(),
+						}),
+					);
+				} catch (error) {
+					console.info("D3 chart pbiuac, " + error);
+				}
+				console.info("pbiuac: data from API");
 				csvCallback(rawData);
-			} else {
-				d3.csv(
-					"https://cbpfapib.unocha.org/vo2/odata/AllocationTypes?$format=csv&ShowAllPooledFunds=1",
-					row,
-				).then(function (rawData) {
-					try {
-						localStorage.setItem(
-							"launchedAllocationsData",
-							JSON.stringify({
-								data: d3.csvFormat(rawData),
-								timestamp: currentDate.getTime(),
-							}),
-						);
-					} catch (error) {
-						console.info("D3 chart pbiuac, " + error);
-					}
-					console.info("pbiuac: data from API");
-					csvCallback(rawData);
-				});
-			}
+			});
 		}
 
 		function csvCallback(rawData) {

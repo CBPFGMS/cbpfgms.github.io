@@ -7,7 +7,7 @@
 		isTouchScreenOnly =
 			window.matchMedia("(pointer: coarse)").matches &&
 			!window.matchMedia("(any-pointer: fine)").matches,
-		isPfbiSite = window.location.hostname === "cbpfgms.github.io",
+		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
 		fontAwesomeLink =
 			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		cssLinks = [
@@ -812,29 +812,21 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite) {
-			Promise.all([
-				window.cbpfbiDataObject.contributionsTotalData,
-				window.cbpfbiDataObject.flags,
-				window.cbpfbiDataObject.masterRegionalFunds,
-			]).then(allData => csvCallback(allData));
-		} else {
-			Promise.all([
-				fetchFile(
-					classPrefix + "data",
-					dataUrl,
-					"contributions data",
-					"csv",
-				),
-				fetchFile("flags", flagsUrl, "flags data", "json"),
-				fetchFile(
-					"masterRegionalFunds",
-					masterRegionalFundsUrl,
-					"master regional funds data",
-					"json",
-				),
-			]).then(allData => csvCallback(allData));
-		}
+		Promise.all([
+			fetchFile(
+				classPrefix + "data",
+				dataUrl,
+				"contributions data",
+				"csv",
+			),
+			fetchFile("flags", flagsUrl, "flags data", "json"),
+			fetchFile(
+				"masterRegionalFunds",
+				masterRegionalFundsUrl,
+				"master regional funds data",
+				"json",
+			),
+		]).then(allData => csvCallback(allData));
 
 		function fetchFile(fileName, url, warningString, method) {
 			if (
