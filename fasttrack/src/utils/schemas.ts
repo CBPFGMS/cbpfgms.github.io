@@ -26,6 +26,7 @@ export const projectSummaryObjectSchema = z.object({
 	GAMId: z.number().nullable(),
 	GlbPrjStatusId: z.union([z.literal(0), z.literal(1)]).nullable(), //THIS WILL BE A NUMBER
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
+	GlobalOrgID: z.number().int().nonnegative(),
 	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
 	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
 	GBVMarkerId: z.number().int().nonnegative().nullable(),
@@ -191,7 +192,7 @@ export const organizationMasterObjectSchema = z.object({
 		.string()
 		.regex(dateRegex, "Invalid date format")
 		.nullable(),
-	GlobalOrgId: z.number().int().nonnegative().nullable(),
+	GlobalOrgId: z.number().int().nonnegative(),
 	GlobalUniqueId: z.number().int().nonnegative(),
 	LocalizationMarker: z.string().nullable(),
 	OrgIsWLO: z.string().nullable().optional(),

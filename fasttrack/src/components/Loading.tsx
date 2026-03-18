@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-const HARDCODED_TOTAL_SIZE = 218263386; //for prod, divide by 2
+const HARDCODED_TOTAL_SIZE = 1017382;
 
 type LoadingProps = {
 	progress: number;

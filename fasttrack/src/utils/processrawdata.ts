@@ -175,7 +175,7 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
+				listsObj.organizationsCompleteList[row.GlobalOrgID];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {
@@ -230,7 +230,7 @@ function processRawData({
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				organizationsSet.add(thisOrganization.GlobalOrgId);
 				projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
@@ -244,7 +244,7 @@ function processRawData({
 					projectStatus: projectStatusMapping[row.ProcessSTatusID],
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalUniqueId,
+					organizationId: thisOrganization.GlobalOrgId,
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
