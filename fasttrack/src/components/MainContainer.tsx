@@ -4,7 +4,6 @@ import { constants } from "../utils/constants";
 import Container from "@mui/material/Container";
 import { Tooltip } from "react-tooltip";
 import TopFilter from "./TopFilter";
-import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
 import processDataIndicators from "../utils/processdataindicators";
 import processDataTopFigures from "../utils/processdatatopfigures";
@@ -139,7 +138,6 @@ function MainContainer() {
 				id="tooltip"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
-			<TopIntro />
 			<TopFilter
 				inSelectionData={inSelectionData}
 				fund={fund}

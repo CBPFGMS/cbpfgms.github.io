@@ -89,7 +89,7 @@ function ProjectStatuses({
 						fontFamily: "Montserrat",
 					}}
 				>
-					Implementation Statuses
+					Project Statuses
 				</Typography>
 				<InfoIcon
 					data-tooltip-id="tooltip"

@@ -41,8 +41,8 @@ type SortAccessor = (e: SectorDatum) => string | number;
 
 function IndicatorCard({ datumIndicator, lists }: IndicatorCardProps) {
 	const [sortingCriterion, setSortingCriterion] =
-			useState<SortingCriterion>("indicator"),
-		[sortingOrder, setSortingOrder] = useState<SortingOrder>("asc"),
+			useState<SortingCriterion>("projects"),
+		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc"),
 		[showTotal, setShowTotal] = useState<boolean>(false),
 		[expanded, setExpanded] = useState<boolean>(false);
 
