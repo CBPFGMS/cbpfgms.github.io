@@ -297,7 +297,7 @@
 			fadeOpacity = 0.4,
 			fadeOpacityMenu = 0.5,
 			baseUrl =
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/utils/allocations_overview_static/data/",
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/CBPF_allocations_overview_static/data/",
 			partnersLogoPath =
 				"https://github.com/CBPFGMS/cbpfgms.github.io/raw/master/img/assets/partnerslogo.png",
 			projectsLogoPath =
