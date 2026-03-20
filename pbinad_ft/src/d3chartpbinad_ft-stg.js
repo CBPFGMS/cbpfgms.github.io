@@ -323,7 +323,7 @@
 		if (!queryStringValues.has("viz"))
 			queryStringValues.append("viz", vizNameQueryString);
 
-		const containerDiv = d3.select("#d3chartcontainerpbinad");
+		const containerDiv = d3.select("#d3chartcontainerpbinad_ft");
 
 		const showHelp =
 			containerDiv.node().getAttribute("data-showhelp") === "true";

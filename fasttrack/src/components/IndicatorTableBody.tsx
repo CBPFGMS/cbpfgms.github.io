@@ -75,9 +75,9 @@ function IndicatorsTableBody({
 	// State for Modal
 	const [selectedRow, setSelectedRow] = useState<SectorDatum | null>(null);
 
-	const handleRowClick = (row: SectorDatum) => {
-		setSelectedRow(row);
-	};
+	// const handleRowClick = (row: SectorDatum) => {
+	// 	setSelectedRow(row);
+	// };
 
 	const handleClose = () => {
 		setSelectedRow(null);
@@ -90,7 +90,7 @@ function IndicatorsTableBody({
 					<TableRow
 						key={index}
 						hover
-						onClick={() => handleRowClick(row)} // Click handler
+						//onClick={() => handleRowClick(row)} // ADD LATER!!!
 						style={{ cursor: "pointer" }}
 					>
 						{indicatorsHeader.map((header, index) => {

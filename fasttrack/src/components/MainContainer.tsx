@@ -19,6 +19,7 @@ import Partners from "./Partners";
 import Regions from "./Regions";
 import Sectors from "./Sectors";
 import ProjectStatuses from "./Statuses";
+import FlowContainer from "./FlowContainer";
 
 const { charts } = constants;
 
@@ -156,6 +157,8 @@ function MainContainer() {
 			<TopFigures data={dataTopFigures} />
 			<Box mb={8} />
 			<Explore />
+			<Box mb={8} />
+			<FlowContainer />
 			<Box mb={8} />
 			<IndicatorsContainer
 				dataIndicators={filteredDataIndicators}
