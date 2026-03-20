@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 function FlowContainer() {
+	useEffect(() => {
+		const src =
+			"https://cbpfgms.github.io/pbinad_ft/src/d3chartpbinad_ft-stg.js";
+		if (document.querySelector(`script[src="${src}"]`)) return;
+
+		const script = document.createElement("script");
+		script.src = src;
+		script.async = true;
+
+		document.body.appendChild(script);
+	}, []);
+
 	return (
 		<Box>
 			<Grid
