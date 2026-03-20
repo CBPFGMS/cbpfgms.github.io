@@ -45,17 +45,21 @@ function FlowContainer() {
 				spacing={2}
 				position={"relative"}
 			>
-				<div
-					id="d3chartcontainerpbinad_ft"
-					data-year="2026"
-					data-cbpf="all"
-					data-aggregate="type"
-					data-minpercentage="3"
-					data-showhelp="false"
-					data-showlink="false"
-					data-responsive="true"
-					data-lazyload="true"
-				></div>
+				<Grid
+					size={12}
+				>
+					<div
+						id="d3chartcontainerpbinad_ft"
+						data-year="2026"
+						data-cbpf="all"
+						data-aggregate="type"
+						data-minpercentage="3"
+						data-showhelp="false"
+						data-showlink="false"
+						data-responsive="true"
+						data-lazyload="true"
+					></div>
+				</Grid>
 			</Grid>
 		</Box>
 	);

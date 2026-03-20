@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
 import { constants } from "../utils/constants";
 import Container from "@mui/material/Container";
@@ -58,6 +58,10 @@ function MainContainer() {
 			}),
 		[data, fund],
 	);
+
+	useEffect(() => {
+		window.dispatchEvent(new CustomEvent("updatefunds", { detail: fund }));
+	}, [fund]);
 
 	void clickedDownload;
 

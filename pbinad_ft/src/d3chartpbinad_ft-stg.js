@@ -712,7 +712,7 @@
 
 			window.addEventListener("updatefunds", e => {
 				chartState.selectedCbpfs = e.detail;
-				data = processData(rawData, rawLaunchedAllocationsData);
+				const data = processData(rawData, rawLaunchedAllocationsData);
 				createTopPanel(data);
 				createSankey(data);
 			});
