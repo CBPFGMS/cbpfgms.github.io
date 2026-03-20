@@ -4,8 +4,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 function FlowContainer() {
 	useEffect(() => {
-		const src =
-			"https://cbpfgms.github.io/pbinad_ft/src/d3chartpbinad_ft-stg.js";
+		// const src =
+		// 	"https://cbpfgms.github.io/pbinad_ft/src/d3chartpbinad_ft-stg.js";
+
+		const src = "/d3chartpbinad_ft-stg.js";
 		if (document.querySelector(`script[src="${src}"]`)) return;
 
 		const script = document.createElement("script");
@@ -45,9 +47,7 @@ function FlowContainer() {
 				spacing={2}
 				position={"relative"}
 			>
-				<Grid
-					size={12}
-				>
+				<Grid size={12}>
 					<div
 						id="d3chartcontainerpbinad_ft"
 						data-year="2026"
