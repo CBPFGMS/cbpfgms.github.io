@@ -1,14 +1,14 @@
-import React, { useState } from "react"; // Added useState
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import Modal from "@mui/material/Modal"; // Added Modal
+import Modal from "@mui/material/Modal";
 import Backdrop from "@mui/material/Backdrop";
 import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close"; // You may need to install @mui/icons-material
+import CloseIcon from "@mui/icons-material/Close";
 import type { SectorDatum } from "../utils/processdataindicators";
 import type { List } from "../utils/makelists";
 import { constants } from "../utils/constants";
@@ -75,9 +75,9 @@ function IndicatorsTableBody({
 	// State for Modal
 	const [selectedRow, setSelectedRow] = useState<SectorDatum | null>(null);
 
-	// const handleRowClick = (row: SectorDatum) => {
-	// 	setSelectedRow(row);
-	// };
+	const handleRowClick = (row: SectorDatum) => {
+		setSelectedRow(row);
+	};
 
 	const handleClose = () => {
 		setSelectedRow(null);
@@ -90,7 +90,7 @@ function IndicatorsTableBody({
 					<TableRow
 						key={index}
 						hover
-						//onClick={() => handleRowClick(row)} // ADD LATER!!!
+						onClick={() => handleRowClick(row)}
 						style={{ cursor: "pointer" }}
 					>
 						{indicatorsHeader.map((header, index) => {

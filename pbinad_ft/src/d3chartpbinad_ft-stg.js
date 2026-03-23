@@ -511,7 +511,7 @@
 				),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [40, 86, 44, 86],
+			padding: [40, 96, 44, 96],
 		};
 
 		const invisibleLayer = svg.append("g").attr("opacity", 0);
