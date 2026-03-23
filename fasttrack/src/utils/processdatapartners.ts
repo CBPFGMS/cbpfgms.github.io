@@ -8,12 +8,19 @@ type ProcessDataPartnersParams = {
 	sector: number[];
 };
 
+type SectorDetailsDatum = {
+	sector: number;
+	budget: number;
+	fund: number;
+};
+
 export type PartnersDatum = {
 	partner: number;
 	sectors: Set<number>;
 	budget: number;
 	projects: Set<number>;
 	funds: Set<number>;
+	sectorsDetails: SectorDetailsDatum[];
 };
 
 function processDataPartners({
@@ -44,16 +51,36 @@ function processDataPartners({
 						foundPartner.sectors.add(d.sectorId);
 						foundPartner.budget += d.budget;
 					}
+					const foundSectorInDetails =
+						foundPartner.sectorsDetails.find(
+							e => e.sector === d.sectorId,
+						);
+					if (foundSectorInDetails) {
+						foundSectorInDetails.budget += d.budget;
+						foundSectorInDetails.fund = datum.fund;
+					} else {
+						foundPartner.sectorsDetails.push({
+							sector: d.sectorId,
+							budget: d.budget,
+							fund: datum.fund,
+						});
+					}
 				});
 				foundPartner.projects.add(datum.projectId);
 				foundPartner.funds.add(datum.fund);
 			} else {
 				let thisBudget = 0;
 				const thisSectors = new Set<number>();
+				const thisSectorDetails: SectorDetailsDatum[] = [];
 				datum.sectorData.forEach(d => {
 					if (sector.includes(d.sectorId)) {
 						thisSectors.add(d.sectorId);
 						thisBudget += d.budget;
+						thisSectorDetails.push({
+							sector: d.sectorId,
+							budget: d.budget,
+							fund: datum.fund,
+						});
 					}
 				});
 				dataPartners.push({
@@ -62,6 +89,7 @@ function processDataPartners({
 					budget: thisBudget,
 					funds: new Set([datum.fund]),
 					projects: new Set([datum.projectId]),
+					sectorsDetails: thisSectorDetails,
 				});
 			}
 		}
