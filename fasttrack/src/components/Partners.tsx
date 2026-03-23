@@ -121,6 +121,20 @@ function Partners({
 				sector={sector}
 				setSector={setSector}
 			/>
+			<Box
+				style={{ display: "flex" }}
+				mb={1}
+			>
+				<Typography
+					style={{
+						fontSize: "0.9rem",
+						color: "#666",
+						fontWeight: 400,
+					}}
+				>
+					Click on the headers for sorting. Click on a row for detailed sector information.
+				</Typography>
+			</Box>
 			<Box sx={{ width: "100%	", borderBottom: "1px solid #aaa" }}>
 				<TableContainer
 					ref={tableRef}

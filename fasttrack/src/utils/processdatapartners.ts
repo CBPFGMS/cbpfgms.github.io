@@ -50,20 +50,21 @@ function processDataPartners({
 					if (sector.includes(d.sectorId)) {
 						foundPartner.sectors.add(d.sectorId);
 						foundPartner.budget += d.budget;
-					}
-					const foundSectorInDetails =
-						foundPartner.sectorsDetails.find(
-							e => e.sector === d.sectorId,
-						);
-					if (foundSectorInDetails) {
-						foundSectorInDetails.budget += d.budget;
-						foundSectorInDetails.fund = datum.fund;
-					} else {
-						foundPartner.sectorsDetails.push({
-							sector: d.sectorId,
-							budget: d.budget,
-							fund: datum.fund,
-						});
+
+						const foundSectorInDetails =
+							foundPartner.sectorsDetails.find(
+								e => e.sector === d.sectorId,
+							);
+						if (foundSectorInDetails) {
+							foundSectorInDetails.budget += d.budget;
+							foundSectorInDetails.fund = datum.fund;
+						} else {
+							foundPartner.sectorsDetails.push({
+								sector: d.sectorId,
+								budget: d.budget,
+								fund: datum.fund,
+							});
+						}
 					}
 				});
 				foundPartner.projects.add(datum.projectId);

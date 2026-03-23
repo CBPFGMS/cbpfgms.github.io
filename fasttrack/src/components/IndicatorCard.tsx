@@ -228,6 +228,19 @@ function IndicatorCardContent({
 						Show Total
 					</Typography>
 				</Box>
+				<Box style={{ display: "flex" }}>
+					<Typography
+						ml={1}
+						style={{
+							fontSize: "0.8rem",
+							color: "#666",
+							fontWeight: 400,
+						}}
+					>
+						Click on the headers for sorting. Click on a row for
+						detailed sector information.
+					</Typography>
+				</Box>
 				<Box sx={{ width: "100%	" }}>
 					<TableContainer
 						ref={tableRef}

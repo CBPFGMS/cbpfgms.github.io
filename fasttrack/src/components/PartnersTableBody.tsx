@@ -275,6 +275,9 @@ function SectorCell({ row, index, lists }: SectorCellProps) {
 }
 
 function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
+	const sortedRow = selectedRow.sectorsDetails
+		.slice()
+		.sort((a, b) => b.budget - a.budget);
 	return (
 		<Modal
 			open={Boolean(selectedRow)}
@@ -326,44 +329,34 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{selectedRow.sectorsDetails.map(
-										(row, index) => {
-											return (
-												<TableRow
-													hover
-													key={`${row}-${index}`}
-													sx={{
-														"&:last-child td, &:last-child th":
-															{
-																border: 0,
-															},
-													}}
+									{sortedRow.map((row, index) => {
+										return (
+											<TableRow
+												hover
+												key={`${row}-${index}`}
+												sx={{
+													"&:last-child td, &:last-child th":
+														{
+															border: 0,
+														},
+												}}
+											>
+												<TableCell
+													component="th"
+													scope="row"
 												>
-													<TableCell
-														component="th"
-														scope="row"
-													>
-														{
-															lists.sectors[
-																row.sector
-															]
-														}
-													</TableCell>
-													<TableCell>
-														{"$" +
-															row.budget.toLocaleString()}
-													</TableCell>
-													<TableCell>
-														{
-															lists.fundNames[
-																row.fund
-															]
-														}
-													</TableCell>
-												</TableRow>
-											);
-										},
-									)}
+													{lists.sectors[row.sector]}
+												</TableCell>
+												<TableCell>
+													{"$" +
+														row.budget.toLocaleString()}
+												</TableCell>
+												<TableCell>
+													{lists.fundNames[row.fund]}
+												</TableCell>
+											</TableRow>
+										);
+									})}
 								</TableBody>
 							</Table>
 						</TableContainer>

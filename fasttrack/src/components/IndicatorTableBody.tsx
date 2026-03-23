@@ -100,9 +100,6 @@ function IndicatorsTableBody({
 						hover
 						onClick={() => handleRowClick(row)}
 						style={{ cursor: "pointer" }}
-						data-tooltip-id="tooltip"
-						data-tooltip-content="Click for a detailed list of projects"
-						data-tooltip-place="top"
 					>
 						{indicatorsHeader.map((header, index) => {
 							if (header === "indicator") {
