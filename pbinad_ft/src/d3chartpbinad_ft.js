@@ -512,7 +512,7 @@
 				),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [40, 106, 44, 106],
+			padding: [40, 106, 44, 116],
 		};
 
 		const invisibleLayer = svg.append("g").attr("opacity", 0);
@@ -3311,7 +3311,7 @@
 												: 0,
 										) +
 										" of total fund allocation: " +
-										formatSI0decimals(tooltipData[0]) +
+										formatSIFloat(tooltipData[0]) +
 										")"
 								: "(" +
 										formatPercent1dec(
@@ -3320,7 +3320,7 @@
 												: 0,
 										) +
 										" of total CBPFs allocation: " +
-										formatSI0decimals(totalForFunds) +
+										formatSIFloat(totalForFunds) +
 										")",
 						);
 				});
@@ -3692,7 +3692,7 @@
 										" of total " +
 										datum.name +
 										": " +
-										formatSI0decimals(tooltipData[0]) +
+										formatSIFloat(tooltipData[0]) +
 										")"
 								: "(" +
 										formatPercent1dec(
@@ -3702,7 +3702,7 @@
 												: 0,
 										) +
 										" of total direct allocation: " +
-										formatSI0decimals(
+										formatSIFloat(
 											totalForDirectPartners,
 										) +
 										")",
@@ -4418,7 +4418,7 @@
 									: 0,
 							) +
 							" of total allocation: " +
-							formatSI0decimals(totalAllocations) +
+							formatSIFloat(totalAllocations) +
 							")",
 					);
 
