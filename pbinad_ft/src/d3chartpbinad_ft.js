@@ -258,13 +258,12 @@
 			],
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
-			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/allocation-flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl =
-				"https://cbpfapi.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
+				"https://cbpfapiB.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
 			launchedAllocationsDataUrl =
-				"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
+				"https://cbpfapiB.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			cbpfsListUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			partnersListUrl =
@@ -272,10 +271,10 @@
 			subPartnersListUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/SubIPType?$format=csv",
 			moneyBagdAttribute = [
-				"M83.277,10.493l-13.132,12.22H22.821L9.689,10.493c0,0,6.54-9.154,17.311-10.352c10.547-1.172,14.206,5.293,19.493,5.56 c5.273-0.267,8.945-6.731,19.479-5.56C76.754,1.339,83.277,10.493,83.277,10.493z",
-				"M48.297,69.165v9.226c1.399-0.228,2.545-0.768,3.418-1.646c0.885-0.879,1.321-1.908,1.321-3.08 c0-1.055-0.371-1.966-1.113-2.728C51.193,70.168,49.977,69.582,48.297,69.165z",
-				"M40.614,57.349c0,0.84,0.299,1.615,0.898,2.324c0.599,0.729,1.504,1.303,2.718,1.745v-8.177 c-1.104,0.306-1.979,0.846-2.633,1.602C40.939,55.61,40.614,56.431,40.614,57.349z",
-				"M73.693,30.584H19.276c0,0-26.133,20.567-17.542,58.477c0,0,2.855,10.938,15.996,10.938h57.54 c13.125,0,15.97-10.938,15.97-10.938C99.827,51.151,73.693,30.584,73.693,30.584z M56.832,80.019 c-2.045,1.953-4.89,3.151-8.535,3.594v4.421H44.23v-4.311c-3.232-0.318-5.853-1.334-7.875-3.047 c-2.018-1.699-3.307-4.102-3.864-7.207l7.314-0.651c0.3,1.25,0.856,2.338,1.677,3.256c0.823,0.911,1.741,1.575,2.747,1.979v-9.903 c-3.659-0.879-6.348-2.22-8.053-3.997c-1.716-1.804-2.565-3.958-2.565-6.523c0-2.578,0.96-4.753,2.897-6.511 c1.937-1.751,4.508-2.767,7.721-3.034v-2.344h4.066v2.344c2.969,0.306,5.338,1.159,7.09,2.565c1.758,1.406,2.877,3.3,3.372,5.658 l-7.097,0.774c-0.43-1.849-1.549-3.118-3.365-3.776v9.238c4.485,1.035,7.539,2.357,9.16,3.984c1.634,1.635,2.441,3.725,2.441,6.289 C59.898,75.656,58.876,78.072,56.832,80.019z",
+				"M40.76,28.68l-7.85-15.49H14.91l-7.85,15.49c-2.37,5.53-.89,11.44,2.83,15.28,2.5,2.58,5.99,4.23,10.02,4.23h8c4.03,0,7.52-1.65,10.02-4.23,3.72-3.84,5.2-9.75,2.83-15.28ZM32.02,32.67l-7.07,7.07c-.59.59-1.54.59-2.12,0-.59-.59-.59-1.54,0-2.12l4.51-4.51h-10.48c-.83,0-1.5-.67-1.5-1.5s.67-1.5,1.5-1.5h10.48s-4.51-4.51-4.51-4.51c-.59-.59-.59-1.54,0-2.12.59-.59,1.54-.59,2.12,0l7.07,7.07c.59.59.59,1.54,0,2.12Z",
+				"M14.9,11.19h8l-1.65-7.43c-.2-.92-1.02-1.57-1.95-1.57h-5.4c-.64,0-1.11.59-.98,1.22l1.98,7.78Z",
+				"M28.91,11.19h4l1.98-9.82c.11-.61-.36-1.18-.99-1.18h-2.99c-1.09,0-1.99.91-2,2-.02-1.09-.9-2-1.99-2h-3c-.63,0-1.1.57-.99,1.18l1.98,9.82h4Z",
+				"M24.95,23.48c-.59-.59-1.54-.59-2.12,0-.59.59-.59,1.54,0,2.12l4.51,4.51h-10.48c-.83,0-1.5.67-1.5,1.5s.67,1.5,1.5,1.5h10.48s-4.51,4.51-4.51,4.51c-.59.59-.59,1.54,0,2.12.59.59,1.54.59,2.12,0l7.07-7.07c.59-.59.59-1.54,0-2.12l-7.07-7.07Z",
 			],
 			sankeyAnnotationsData = [
 				{
@@ -325,7 +324,7 @@
 		if (!queryStringValues.has("viz"))
 			queryStringValues.append("viz", vizNameQueryString);
 
-		const containerDiv = d3.select("#d3chartcontainerpbinad");
+		const containerDiv = d3.select("#d3chartcontainerpbinad_ft");
 
 		const showHelp =
 			containerDiv.node().getAttribute("data-showhelp") === "true";
@@ -369,22 +368,6 @@
 				.style("width", width + "px")
 				.style("height", height + "px");
 		}
-
-		const topDiv = containerDiv.append("div").attr("class", "pbinadTopDiv");
-
-		const titleDiv = topDiv.append("div").attr("class", "pbinadTitleDiv");
-
-		const iconsDiv = topDiv
-			.append("div")
-			.attr("class", "pbinadIconsDiv d3chartIconsDiv");
-
-		const selectTitleDiv = containerDiv
-			.append("div")
-			.attr("class", "pbinadSelectTitleDiv");
-
-		const selectDiv = containerDiv
-			.append("div")
-			.attr("class", "pbinadSelectDiv");
 
 		const svg = containerDiv
 			.append("svg")
@@ -482,7 +465,7 @@
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
 			moneyBagPadding: 4,
-			leftPadding: [174, 412, 638],
+			leftPadding: [174, 504, 666],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8,
@@ -529,7 +512,7 @@
 				),
 			width: width - padding[1] - padding[3],
 			height: sankeyPanelHeight,
-			padding: [40, 80, 44, 116],
+			padding: [40, 106, 44, 106],
 		};
 
 		const invisibleLayer = svg.append("g").attr("opacity", 0);
@@ -590,52 +573,42 @@
 
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
-		if (isPfbiSite && !isBookmarkPage) {
-			Promise.all([
-				window.cbpfbiDataObject.allocationFlowData,
-				window.cbpfbiDataObject.masterPooledFunds,
-				window.cbpfbiDataObject.masterPartners,
-				window.cbpfbiDataObject.masterSubPartners,
-				window.cbpfbiDataObject.launchedAllocationsData,
-			]).then(csvCallback);
-		} else {
-			fetchFile("pbinad", dataUrl, [], "data")
-				.then(function (previousData) {
-					return fetchFile(
-						"pbinadcbpfList",
-						cbpfsListUrl,
-						previousData,
-						"cbpfList",
-					);
-				})
-				.then(function (previousData) {
-					return fetchFile(
-						"pbinadpartnersList",
-						partnersListUrl,
-						previousData,
-						"partnersList",
-					);
-				})
-				.then(function (previousData) {
-					return fetchFile(
-						"pbinadsubpartnersList",
-						subPartnersListUrl,
-						previousData,
-						"subPartnersList",
-					);
-				})
-				.then(function (previousData) {
-					return fetchFile(
-						"launchedAllocationsData",
-						launchedAllocationsDataUrl,
-						previousData,
-						"launched allocations data",
-					);
-				})
-				.then(function (previousData) {
-					csvCallback(previousData);
-				});
-		}
+		fetchFile("pbinad", dataUrl, [], "data")
+			.then(function (previousData) {
+				return fetchFile(
+					"pbinadcbpfList",
+					cbpfsListUrl,
+					previousData,
+					"cbpfList",
+				);
+			})
+			.then(function (previousData) {
+				return fetchFile(
+					"pbinadpartnersList",
+					partnersListUrl,
+					previousData,
+					"partnersList",
+				);
+			})
+			.then(function (previousData) {
+				return fetchFile(
+					"pbinadsubpartnersList",
+					subPartnersListUrl,
+					previousData,
+					"subPartnersList",
+				);
+			})
+			.then(function (previousData) {
+				return fetchFile(
+					"launchedAllocationsData",
+					launchedAllocationsDataUrl,
+					previousData,
+					"launched allocations data",
+				);
+			})
+			.then(function (previousData) {
+				csvCallback(previousData);
+			});
 
 		function fetchFile(fileName, url, previousData, warningString) {
 			const rowFunction =
@@ -726,10 +699,6 @@
 		function draw(rawData, rawLaunchedAllocationsData) {
 			const data = processData(rawData, rawLaunchedAllocationsData);
 
-			createTitle(rawData);
-
-			createCheckboxes(rawData, rawLaunchedAllocationsData);
-
 			createTopPanel(data);
 
 			createButtonsPanel(rawData, rawLaunchedAllocationsData);
@@ -738,449 +707,19 @@
 
 			setYearsDescriptionDiv();
 
-			createTimeline(rawData);
-
 			if (!isPfbiSite) createFooterDiv();
 
 			if (showHelp) createAnnotationsDiv();
 
-			//end of draw
-		}
-
-		function createTitle(rawData) {
-			const title = titleDiv
-				.append("p")
-				.attr("id", "pbinadd3chartTitle")
-				.html(chartTitle);
-
-			const helpIcon = iconsDiv
-				.append("button")
-				.attr("id", "pbinadHelpButton");
-
-			helpIcon.html("HELP  ").append("span").attr("class", "fas fa-info");
-
-			const downloadIcon = iconsDiv
-				.append("button")
-				.attr("id", "pbinadDownloadButton");
-
-			downloadIcon
-				.html(".CSV  ")
-				.append("span")
-				.attr("class", "fas fa-download");
-
-			const snapshotDiv = iconsDiv
-				.append("div")
-				.attr("class", "pbinadSnapshotDiv");
-
-			const snapshotIcon = snapshotDiv
-				.append("button")
-				.attr("id", "pbinadSnapshotButton");
-
-			snapshotIcon
-				.html("IMAGE ")
-				.append("span")
-				.attr("class", "fas fa-camera");
-
-			const snapshotContent = snapshotDiv
-				.append("div")
-				.attr("class", "pbinadSnapshotContent");
-
-			const pdfSpan = snapshotContent
-				.append("p")
-				.attr("id", "pbinadSnapshotPdfText")
-				.html("Download PDF")
-				.on("click", function () {
-					createSnapshot("pdf", false);
-				});
-
-			const pngSpan = snapshotContent
-				.append("p")
-				.attr("id", "pbinadSnapshotPngText")
-				.html("Download Image (PNG)")
-				.on("click", function () {
-					createSnapshot("png", false);
-				});
-
-			const playIcon = iconsDiv
-				.append("button")
-				.datum({
-					clicked: false,
-				})
-				.attr("id", "pbinadPlayButton");
-
-			playIcon.html("PLAY  ").append("span").attr("class", "fas fa-play");
-
-			playIcon.on("click", function (d) {
-				d.clicked = !d.clicked;
-
-				playIcon
-					.html(d.clicked ? "PAUSE " : "PLAY  ")
-					.append("span")
-					.attr("class", d.clicked ? "fas fa-pause" : "fas fa-play");
-
-				if (d.clicked) {
-					chartState.selectedYear.length = 1;
-					loopButtons();
-					timer = d3.interval(loopButtons, 3 * duration);
-				} else {
-					timer.stop();
-				}
-
-				function loopButtons() {
-					const index = yearsArray.indexOf(
-						chartState.selectedYear[0],
-					);
-
-					chartState.selectedYear[0] =
-						yearsArray[(index + 1) % yearsArray.length];
-
-					const yearButton = d3
-						.selectAll(".pbinadbuttonsRects")
-						.filter(function (d) {
-							return d === chartState.selectedYear[0];
-						});
-
-					yearButton.dispatch("click");
-
-					if (yearsArray.length > buttonsNumber) {
-						const firstYearIndex =
-							chartState.selectedYear[0] <
-							yearsArray[buttonsNumber / 2]
-								? 0
-								: chartState.selectedYear[0] >
-									  yearsArray[
-											yearsArray.length -
-												buttonsNumber / 2
-									  ]
-									? yearsArray.length - buttonsNumber
-									: yearsArray.indexOf(
-											chartState.selectedYear[0],
-										) -
-										buttonsNumber / 2;
-
-						const currentTranslate = -(
-							buttonsPanel.buttonWidth * firstYearIndex
-						);
-
-						if (currentTranslate === 0) {
-							svg.select(".pbinadLeftArrowGroup")
-								.select("text")
-								.style("fill", "#ccc");
-							svg.select(".pbinadLeftArrowGroup").attr(
-								"pointer-events",
-								"none",
-							);
-						} else {
-							svg.select(".pbinadLeftArrowGroup")
-								.select("text")
-								.style("fill", "#666");
-							svg.select(".pbinadLeftArrowGroup").attr(
-								"pointer-events",
-								"all",
-							);
-						}
-
-						if (
-							Math.abs(currentTranslate) >=
-							(yearsArray.length - buttonsNumber) *
-								buttonsPanel.buttonWidth
-						) {
-							svg.select(".pbinadRightArrowGroup")
-								.select("text")
-								.style("fill", "#ccc");
-							svg.select(".pbinadRightArrowGroup").attr(
-								"pointer-events",
-								"none",
-							);
-						} else {
-							svg.select(".pbinadRightArrowGroup")
-								.select("text")
-								.style("fill", "#666");
-							svg.select(".pbinadRightArrowGroup").attr(
-								"pointer-events",
-								"all",
-							);
-						}
-
-						svg.select(".pbinadbuttonsGroup")
-							.transition()
-							.duration(duration)
-							.attrTween("transform", function () {
-								return d3.interpolateString(
-									this.getAttribute("transform"),
-									"translate(" + currentTranslate + ",0)",
-								);
-							});
-					}
-				}
-			});
-
-			if (!isBookmarkPage) {
-				const shareIcon = iconsDiv
-					.append("button")
-					.attr("id", "pbinadShareButton");
-
-				shareIcon
-					.html("SHARE  ")
-					.append("span")
-					.attr("class", "fas fa-share");
-
-				const shareDiv = containerDiv
-					.append("div")
-					.attr("class", "d3chartShareDiv")
-					.style("display", "none");
-
-				shareIcon
-					.on("mouseover", function () {
-						shareDiv
-							.html("Click to copy")
-							.style("display", "block");
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetTop =
-							thisBox.top -
-							containerBox.top -
-							(shareBox.height - thisBox.height) / 2;
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv
-							.style("top", thisOffsetTop + "px")
-							.style("left", thisOffsetLeft + "20px");
-					})
-					.on("mouseout", function () {
-						shareDiv.style("display", "none");
-					})
-					.on("click", function () {
-						const newURL =
-							bookmarkSite + queryStringValues.toString();
-
-						const shareInput = shareDiv
-							.append("input")
-							.attr("type", "text")
-							.attr("readonly", true)
-							.attr("spellcheck", "false")
-							.property("value", newURL);
-
-						shareInput.node().select();
-
-						document.execCommand("copy");
-
-						shareDiv.html("Copied!");
-
-						const thisBox = this.getBoundingClientRect();
-						const containerBox = containerDiv
-							.node()
-							.getBoundingClientRect();
-						const shareBox = shareDiv
-							.node()
-							.getBoundingClientRect();
-						const thisOffsetLeft =
-							thisBox.left -
-							containerBox.left -
-							shareBox.width -
-							12;
-						shareDiv.style("left", thisOffsetLeft + "20px");
-					});
-			}
-
-			if (browserHasSnapshotIssues) {
-				const bestVisualizedSpan = snapshotContent
-					.append("p")
-					.attr("id", "pbinadBestVisualizedText")
-					.html(
-						"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
-					)
-					.attr("pointer-events", "none")
-					.style("cursor", "default");
-			}
-
-			snapshotDiv
-				.on("mouseover", function () {
-					snapshotContent.style("display", "block");
-				})
-				.on("mouseout", function () {
-					snapshotContent.style("display", "none");
-				});
-
-			helpIcon.on("click", createAnnotationsDiv);
-
-			downloadIcon.on("click", function () {
-				const csv = createCsv(rawData);
-
-				const currentDate = new Date();
-
-				const fileName =
-					"AllocationFlow_" + csvDateFormat(currentDate) + ".csv";
-
-				const blob = new Blob([csv], {
-					type: "text/csv;charset=utf-8;",
-				});
-
-				if (navigator.msSaveBlob) {
-					navigator.msSaveBlob(blob, filename);
-				} else {
-					const link = document.createElement("a");
-
-					if (link.download !== undefined) {
-						const url = URL.createObjectURL(blob);
-
-						link.setAttribute("href", url);
-						link.setAttribute("download", fileName);
-						link.style = "visibility:hidden";
-
-						document.body.appendChild(link);
-
-						link.click();
-
-						document.body.removeChild(link);
-					}
-				}
-			});
-
-			//end of createTitle
-		}
-
-		function createCheckboxes(rawData, rawLaunchedAllocationsData) {
-			selectTitleDiv.html("Select CBPF:");
-
-			const checkboxData = d3.keys(cbpfsDataList).sort(function (a, b) {
-				return cbpfsList[a].localeCompare(cbpfsList[b]);
-			});
-
-			checkboxData.unshift("All CBPFs");
-
-			const checkboxDivs = selectDiv
-				.selectAll(null)
-				.data(checkboxData)
-				.enter()
-				.append("div")
-				.attr("class", "pbinadCheckboxDiv");
-
-			checkboxDivs
-				.filter(function (d) {
-					return d !== "All CBPFs";
-				})
-				.style("opacity", function (d) {
-					return chartState.cbpfsInData.indexOf(d) === -1
-						? disabledOpacity
-						: 1;
-				});
-
-			const checkbox = checkboxDivs.append("label");
-
-			const input = checkbox
-				.append("input")
-				.attr("type", "checkbox")
-				.property("checked", function (d) {
-					return (
-						chartState.selectedCbpfs.length !==
-							d3.keys(cbpfsDataList).length &&
-						chartState.selectedCbpfs.indexOf(d) > -1
-					);
-				})
-				.attr("value", function (d) {
-					return d;
-				});
-
-			const span = checkbox
-				.append("span")
-				.attr("class", "pbinadCheckboxText")
-				.html(function (d) {
-					return cbpfsDataList[d] || d;
-				});
-
-			const allCbpfs = checkboxDivs
-				.filter(function (d) {
-					return d === "All CBPFs";
-				})
-				.select("input");
-
-			d3.select(allCbpfs.node().nextSibling).attr(
-				"class",
-				"pbinadCheckboxTextAllCbpfs",
-			);
-
-			const cbpfsCheckboxes = checkboxDivs
-				.filter(function (d) {
-					return d !== "All CBPFs";
-				})
-				.select("input");
-
-			cbpfsCheckboxes.property("disabled", function (d) {
-				return chartState.cbpfsInData.indexOf(d) === -1;
-			});
-
-			allCbpfs.property("checked", function () {
-				return (
-					chartState.selectedCbpfs.length ===
-					d3.keys(cbpfsDataList).length
-				);
-			});
-
-			checkbox.select("input").on("change", function () {
-				if (this.value === "All CBPFs") {
-					if (this.checked) {
-						chartState.selectedCbpfs = d3.keys(cbpfsDataList);
-						cbpfsCheckboxes.property("checked", false);
-					} else {
-						chartState.selectedCbpfs.length = 0;
-					}
-				} else {
-					if (this.checked) {
-						if (
-							chartState.selectedCbpfs.length ===
-							d3.keys(cbpfsDataList).length
-						) {
-							chartState.selectedCbpfs = [this.value];
-						} else {
-							chartState.selectedCbpfs.push(this.value);
-						}
-					} else {
-						const thisIndex = chartState.selectedCbpfs.indexOf(
-							this.value,
-						);
-						chartState.selectedCbpfs.splice(thisIndex, 1);
-					}
-					allCbpfs.property("checked", false);
-				}
-
-				if (
-					!chartState.selectedCbpfs.length ||
-					chartState.selectedCbpfs.length ===
-						d3.keys(cbpfsDataList).length
-				) {
-					queryStringValues.delete("fund");
-				} else {
-					const allFunds = chartState.selectedCbpfs
-						.map(function (d) {
-							return cbpfsDataList[d];
-						})
-						.join("|");
-					if (queryStringValues.has("fund")) {
-						queryStringValues.set("fund", allFunds);
-					} else {
-						queryStringValues.append("fund", allFunds);
-					}
-				}
-
+			window.addEventListener("updatefunds", e => {
+				const fundsList = e.detail.map(d => d.toString());
+				chartState.selectedCbpfs = fundsList;
 				const data = processData(rawData, rawLaunchedAllocationsData);
-
 				createTopPanel(data);
-
 				createSankey(data);
-
-				createTimeline(rawData);
 			});
 
-			//end of createCheckboxes
+			//end of draw
 		}
 
 		function createTopPanel(data) {
@@ -1219,8 +758,6 @@
 				},
 			);
 
-			const underApprovalValue = topValuesLaunchedData.underApproval;
-
 			const topPanelMoneyBag = topPanel.main
 				.selectAll(".pbinadtopPanelMoneyBag")
 				.data([true])
@@ -1229,11 +766,17 @@
 				.attr("class", "pbinadtopPanelMoneyBag contributionColorFill")
 				.attr(
 					"transform",
-					"translate(" + topPanel.moneyBagPadding + ",6) scale(0.5)",
+					"translate(" + topPanel.moneyBagPadding + ",6)",
 				)
 				.each(function (_, i, n) {
-					moneyBagdAttribute.forEach(function (d) {
-						d3.select(n[i]).append("path").attr("d", d);
+					moneyBagdAttribute.forEach(function (d, j) {
+						const thisPath = d3
+							.select(n[i])
+							.append("path")
+							.attr("d", d);
+						if (j === moneyBagdAttribute.length - 1) {
+							thisPath.style("fill", "#fff");
+						}
 					});
 				});
 
@@ -1244,10 +787,6 @@
 			const previousAllocatedValue =
 				d3.select(".pbinadtopPanelAllocatedValue").size() !== 0
 					? d3.select(".pbinadtopPanelAllocatedValue").datum()
-					: 0;
-			const previousUnderApprovalValue =
-				d3.select(".pbinadtopPanelUnderApprovalValue").size() !== 0
-					? d3.select(".pbinadtopPanelUnderApprovalValue").datum()
 					: 0;
 			const previousPartnersValue =
 				d3.select(".pbinadtopPanelPartnersValue").size() !== 0
@@ -1369,7 +908,7 @@
 				);
 
 			let topPanelAllocatedValue = topPanel.main
-				.selectAll(".pbinadtopPanelAllocatedValue")
+				.selectAll(".pbinadtopPanelAllocatedMainValue")
 				.data([totalAllocated]);
 
 			topPanelAllocatedValue = topPanelAllocatedValue
@@ -1377,11 +916,12 @@
 				.append("text")
 				.attr(
 					"class",
-					"pbinadtopPanelAllocatedValue contributionColorFill",
+					"pbinadtopPanelAllocatedMainValue contributionColorFill",
 				)
 				.attr("text-anchor", "end")
-				.style("opacity", 0)
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("font-family", "Arial")
+				.attr("font-size", "48px")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
@@ -1415,16 +955,19 @@
 				});
 
 			let topPanelAllocatedText = topPanel.main
-				.selectAll(".pbinadtopPanelAllocatedText")
+				.selectAll(".pbinadtopPanelAllocatedTextFT")
 				.data([totalAllocated]);
 
 			topPanelAllocatedText = topPanelAllocatedText
 				.enter()
 				.append("text")
-				.attr("class", "pbinadtopPanelAllocatedText")
+				.attr("class", "pbinadtopPanelAllocatedTextFT")
+				.attr("font-family", "Arial")
+				.attr("font-size", "18px")
+				.attr("fill", "#888")
 				.style("opacity", 0)
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
@@ -1447,90 +990,42 @@
 				.text(function (d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return (
-						(unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "") + " Allocated"
-					);
+					return unit === "k"
+						? "Thousand"
+						: unit === "M"
+							? "Million"
+							: unit === "G"
+								? "Billion"
+								: "";
 				});
 
-			let topPanelUnderApprovalValue = topPanel.main
-				.selectAll(".pbinadtopPanelUnderApprovalValue")
-				.data([underApprovalValue]);
+			let topPanelAllocatedSubText = topPanel.main
+				.selectAll(".pbinadtopPanelAllocatedSubTextFT")
+				.data([true]);
 
-			topPanelUnderApprovalValue = topPanelUnderApprovalValue
+			topPanelAllocatedSubText = topPanelAllocatedSubText
 				.enter()
 				.append("text")
-				.attr(
-					"class",
-					"pbinadtopPanelUnderApprovalValue contributionColorFill",
-				)
-				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr(
-					"x",
-					topPanel.moneyBagPadding +
-						topPanel.leftPadding[1] -
-						topPanel.mainValueHorPadding,
-				)
-				.merge(topPanelUnderApprovalValue);
-
-			topPanelUnderApprovalValue
-				.transition()
-				.duration(duration)
-				.tween("text", function (d) {
-					const node = this;
-					const i = d3.interpolate(previousSubpartnersValue, d);
-					return function (t) {
-						const siString = formatSIFloat(i(t));
-						node.textContent =
-							"$" +
-							(d < 1e3
-								? d
-								: siString.substring(0, siString.length - 1));
-					};
-				});
-
-			let topPanelUnderApprovalText = topPanel.main
-				.selectAll(".pbinadtopPanelUnderApprovalText")
-				.data([underApprovalValue]);
-
-			topPanelUnderApprovalText = topPanelUnderApprovalText
-				.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelUnderApprovalText")
+				.attr("class", "pbinadtopPanelAllocatedSubTextFT")
+				.attr("font-family", "Arial")
+				.attr("font-size", "18px")
+				.attr("fill", "#888")
 				.style("opacity", 0)
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
 						topPanel.leftPadding[1] +
 						topPanel.mainValueHorPadding,
 				)
-				.merge(topPanelUnderApprovalText);
+				.merge(topPanelAllocatedSubText);
 
-			topPanelUnderApprovalText
+			topPanelAllocatedSubText
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text(function (d) {
-					const valueSI = formatSIFloat(d);
-					const unit = valueSI[valueSI.length - 1];
-					return (
-						(unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "") + " Under Approval"
-					);
-				});
+				.text("Allocated");
 
 			let topPanelPartnersValue = topPanel.main
 				.selectAll(".pbinadtopPanelPartnersValue")
@@ -1690,88 +1185,6 @@
 		}
 
 		function createButtonsPanel(rawData, rawLaunchedAllocationsData) {
-			const clipPath = buttonsPanel.main
-				.append("clipPath")
-				.attr("id", "pbinadclip")
-				.append("rect")
-				.attr("width", buttonsNumber * buttonsPanel.buttonWidth)
-				.attr("height", buttonsPanel.height);
-
-			const extraPadding =
-				yearsArray.length > buttonsNumber
-					? buttonsPanel.arrowPadding
-					: -2;
-
-			const clipPathGroup = buttonsPanel.main
-				.append("g")
-				.attr("class", "pbinadClipPathGroup")
-				.attr(
-					"transform",
-					"translate(" +
-						(buttonsPanel.padding[3] + extraPadding) +
-						",0)",
-				)
-				.attr("clip-path", "url(#pbinadclip)");
-
-			const buttonsGroup = clipPathGroup
-				.append("g")
-				.attr("class", "pbinadbuttonsGroup")
-				.attr("transform", "translate(0,0)")
-				.style("cursor", "pointer");
-
-			const buttonsRects = buttonsGroup
-				.selectAll(null)
-				.data(yearsArray)
-				.enter()
-				.append("rect")
-				.attr("rx", "2px")
-				.attr("ry", "2px")
-				.attr("class", "pbinadbuttonsRects")
-				.attr(
-					"width",
-					buttonsPanel.buttonWidth - buttonsPanel.buttonsMargin,
-				)
-				.attr(
-					"height",
-					buttonsPanel.height -
-						buttonsPanel.buttonVerticalPadding * 2,
-				)
-				.attr("y", buttonsPanel.buttonVerticalPadding)
-				.attr("x", function (_, i) {
-					return (
-						i * buttonsPanel.buttonWidth +
-						buttonsPanel.buttonsMargin / 2
-					);
-				})
-				.style("fill", function (d) {
-					return chartState.selectedYear.indexOf(d) > -1
-						? unBlue
-						: "#eaeaea";
-				});
-
-			const buttonsText = buttonsGroup
-				.selectAll(null)
-				.data(yearsArray)
-				.enter()
-				.append("text")
-				.attr("text-anchor", "middle")
-				.attr("class", "pbinadbuttonsText")
-				.attr("y", buttonsPanel.height / 1.6)
-				.attr("x", function (_, i) {
-					return (
-						i * buttonsPanel.buttonWidth +
-						buttonsPanel.buttonWidth / 2
-					);
-				})
-				.style("fill", function (d) {
-					return chartState.selectedYear.indexOf(d) > -1
-						? "white"
-						: "#444";
-				})
-				.text(function (d) {
-					return d;
-				});
-
 			const buttonsAggregationGroup = buttonsPanel.main
 				.append("g")
 				.attr("class", "pbinadbuttonsAggegationGroup")
@@ -1838,397 +1251,12 @@
 
 			buttonsAggregationGroup.attr(
 				"transform",
-				"translate(" +
-					(buttonsPanel.width -
-						2 * buttonsPanel.buttonAggregationWidth) +
-					",0)",
+				"translate(" + sankeyPanel.padding[3] + ",0)",
 			);
-
-			const leftArrow = buttonsPanel.main
-				.append("g")
-				.attr("class", "pbinadLeftArrowGroup")
-				.style("opacity", 0)
-				.attr("pointer-events", "none")
-				.style("cursor", "pointer")
-				.attr(
-					"transform",
-					"translate(" + buttonsPanel.padding[3] + ",0)",
-				);
-
-			const leftArrowRect = leftArrow
-				.append("rect")
-				.style("fill", "white")
-				.attr("width", buttonsPanel.arrowPadding)
-				.attr("height", buttonsPanel.height);
-
-			const leftArrowText = leftArrow
-				.append("text")
-				.attr("class", "pbinadleftArrowText")
-				.attr("x", 0)
-				.attr(
-					"y",
-					buttonsPanel.height -
-						buttonsPanel.buttonVerticalPadding * 2.1,
-				)
-				.style("fill", "#666")
-				.text("\u25c4");
-
-			const rightArrow = buttonsPanel.main
-				.append("g")
-				.attr("class", "pbinadRightArrowGroup")
-				.style("opacity", 0)
-				.attr("pointer-events", "none")
-				.style("cursor", "pointer")
-				.attr(
-					"transform",
-					"translate(" +
-						(buttonsPanel.padding[3] +
-							buttonsPanel.arrowPadding +
-							buttonsNumber * buttonsPanel.buttonWidth) +
-						",0)",
-				);
-
-			const rightArrowRect = rightArrow
-				.append("rect")
-				.style("fill", "white")
-				.attr("width", buttonsPanel.arrowPadding)
-				.attr("height", buttonsPanel.height);
-
-			const rightArrowText = rightArrow
-				.append("text")
-				.attr("class", "pbinadrightArrowText")
-				.attr("x", -1)
-				.attr(
-					"y",
-					buttonsPanel.height -
-						buttonsPanel.buttonVerticalPadding * 2.1,
-				)
-				.style("fill", "#666")
-				.text("\u25ba");
-
-			buttonsRects
-				.on("mouseover", mouseOverButtonsRects)
-				.on("mouseout", mouseOutButtonsRects)
-				.on("click", function (d) {
-					const self = this;
-					if (d3.event.altKey) {
-						clickButtonsRects(d, false);
-						return;
-					}
-					if (localVariable.get(this) !== "clicked") {
-						localVariable.set(this, "clicked");
-						setTimeout(function () {
-							if (localVariable.get(self) === "clicked") {
-								clickButtonsRects(d, true);
-							}
-							localVariable.set(self, null);
-						}, 250);
-					} else {
-						clickButtonsRects(d, false);
-						localVariable.set(this, null);
-					}
-				});
-
-			d3.select("body").on("d3ChartsYear.pbinad", function () {
-				clickButtonsRects(
-					validateCustomEventYear(+d3.event.detail),
-					true,
-				);
-				if (yearsArray.length > buttonsNumber) {
-					repositionButtonsGroup();
-					checkArrows();
-				}
-			});
 
 			buttonsAggregationRects
 				.on("mouseover", mouseOverButtonsAggregationRects)
 				.on("mouseout", mouseOutButtonsAggregationRects);
-
-			if (yearsArray.length > buttonsNumber) {
-				rightArrow.style("opacity", 1).attr("pointer-events", "all");
-
-				leftArrow.style("opacity", 1).attr("pointer-events", "all");
-
-				repositionButtonsGroup();
-
-				checkCurrentTranslate();
-
-				leftArrow.on("click", function () {
-					leftArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
-					rightArrow.select("text").style("fill", "#666");
-					rightArrow.attr("pointer-events", "all");
-					buttonsGroup
-						.transition()
-						.duration(duration)
-						.attr(
-							"transform",
-							"translate(" +
-								Math.min(
-									0,
-									currentTranslate +
-										buttonsNumber *
-											buttonsPanel.buttonWidth,
-								) +
-								",0)",
-						)
-						.on("end", checkArrows);
-				});
-
-				rightArrow.on("click", function () {
-					rightArrow.attr("pointer-events", "none");
-					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform"),
-					)[0];
-					leftArrow.select("text").style("fill", "#666");
-					leftArrow.attr("pointer-events", "all");
-					buttonsGroup
-						.transition()
-						.duration(duration)
-						.attr(
-							"transform",
-							"translate(" +
-								Math.max(
-									-(
-										(yearsArray.length - buttonsNumber) *
-										buttonsPanel.buttonWidth
-									),
-									-(
-										Math.abs(currentTranslate) +
-										buttonsNumber * buttonsPanel.buttonWidth
-									),
-								) +
-								",0)",
-						)
-						.on("end", checkArrows);
-				});
-			}
-
-			function checkArrows() {
-				const currentTranslate = parseTransform(
-					buttonsGroup.attr("transform"),
-				)[0];
-
-				if (currentTranslate === 0) {
-					leftArrow.select("text").style("fill", "#ccc");
-					leftArrow.attr("pointer-events", "none");
-				} else {
-					leftArrow.select("text").style("fill", "#666");
-					leftArrow.attr("pointer-events", "all");
-				}
-
-				if (
-					Math.abs(currentTranslate) >=
-					(yearsArray.length - buttonsNumber) *
-						buttonsPanel.buttonWidth
-				) {
-					rightArrow.select("text").style("fill", "#ccc");
-					rightArrow.attr("pointer-events", "none");
-				} else {
-					rightArrow.select("text").style("fill", "#666");
-					rightArrow.attr("pointer-events", "all");
-				}
-			}
-
-			function checkCurrentTranslate() {
-				const currentTranslate = parseTransform(
-					buttonsGroup.attr("transform"),
-				)[0];
-
-				if (currentTranslate === 0) {
-					leftArrow.select("text").style("fill", "#ccc");
-					leftArrow.attr("pointer-events", "none");
-				}
-
-				if (
-					Math.abs(currentTranslate) >=
-					(yearsArray.length - buttonsNumber) *
-						buttonsPanel.buttonWidth
-				) {
-					rightArrow.select("text").style("fill", "#ccc");
-					rightArrow.attr("pointer-events", "none");
-				}
-			}
-
-			function repositionButtonsGroup() {
-				const firstYearIndex =
-					yearsArray.indexOf(chartState.selectedYear[0]) <
-					buttonsNumber / 2
-						? 0
-						: yearsArray.indexOf(chartState.selectedYear[0]) >
-							  yearsArray.length - buttonsNumber / 2
-							? Math.max(yearsArray.length - buttonsNumber, 0)
-							: yearsArray.indexOf(
-									yearsArray.indexOf(
-										chartState.selectedYear[0],
-									),
-								) -
-								buttonsNumber / 2;
-
-				buttonsGroup.attr(
-					"transform",
-					"translate(" +
-						-(buttonsPanel.buttonWidth * firstYearIndex) +
-						",0)",
-				);
-			}
-
-			function mouseOverButtonsRects(d) {
-				tooltip.style("display", "block").html(null);
-
-				const innerTooltip = tooltip
-					.append("div")
-					.style("max-width", "200px")
-					.attr("id", "pbinadInnerTooltipDiv");
-
-				innerTooltip.html(
-					"Click for selecting a single year. Double-click or ALT + click for selecting multiple years.",
-				);
-
-				const containerSize = containerDiv
-					.node()
-					.getBoundingClientRect();
-
-				const thisSize = this.getBoundingClientRect();
-
-				tooltipSize = tooltip.node().getBoundingClientRect();
-
-				tooltip
-					.style(
-						"left",
-						thisSize.left +
-							thisSize.width / 2 -
-							containerSize.left >
-							containerSize.width -
-								tooltipSize.width / 2 -
-								padding[1]
-							? containerSize.width -
-									tooltipSize.width -
-									padding[1] +
-									"px"
-							: thisSize.left +
-										thisSize.width / 2 -
-										containerSize.left <
-								  tooltipSize.width / 2 +
-										buttonsPanel.padding[3] +
-										padding[0]
-								? buttonsPanel.padding[3] + padding[0] + "px"
-								: thisSize.left +
-									thisSize.width / 2 -
-									containerSize.left -
-									tooltipSize.width / 2 +
-									"px",
-					)
-					.style(
-						"top",
-						thisSize.top + thisSize.height / 2 - containerSize.top <
-							tooltipSize.height
-							? thisSize.top -
-									containerSize.top +
-									thisSize.height +
-									2 +
-									"px"
-							: thisSize.top -
-									containerSize.top -
-									tooltipSize.height -
-									4 +
-									"px",
-					);
-
-				d3.select(this).style("fill", unBlue);
-				buttonsText
-					.filter(function (e) {
-						return e === d;
-					})
-					.style("fill", "white");
-			}
-
-			function mouseOutButtonsRects(d) {
-				tooltip.style("display", "none");
-				if (chartState.selectedYear.indexOf(d) > -1) return;
-				d3.select(this).style("fill", "#eaeaea");
-				buttonsText
-					.filter(function (e) {
-						return e === d;
-					})
-					.style("fill", "#444");
-			}
-
-			function clickButtonsRects(d, singleSelection) {
-				tooltip.style("display", "none");
-
-				if (singleSelection) {
-					chartState.selectedYear = [d];
-				} else {
-					const index = chartState.selectedYear.indexOf(d);
-					if (index > -1) {
-						if (chartState.selectedYear.length === 1) {
-							return;
-						} else {
-							chartState.selectedYear.splice(index, 1);
-						}
-					} else {
-						chartState.selectedYear.push(d);
-					}
-				}
-
-				const allYears = chartState.selectedYear
-					.map(function (d) {
-						return d;
-					})
-					.join("|");
-
-				if (queryStringValues.has("year")) {
-					queryStringValues.set("year", allYears);
-				} else {
-					queryStringValues.append("year", allYears);
-				}
-
-				d3.selectAll(".pbinadbuttonsRects").style("fill", function (e) {
-					return chartState.selectedYear.indexOf(e) > -1
-						? unBlue
-						: "#eaeaea";
-				});
-
-				d3.selectAll(".pbinadbuttonsText").style("fill", function (e) {
-					return chartState.selectedYear.indexOf(e) > -1
-						? "white"
-						: "#444";
-				});
-
-				setYearsDescriptionDiv();
-
-				const data = processData(rawData, rawLaunchedAllocationsData);
-
-				selectDiv
-					.selectAll(".pbinadCheckboxDiv")
-					.filter(function (d) {
-						return d !== "All CBPFs";
-					})
-					.select("input")
-					.property("disabled", function (d) {
-						return chartState.cbpfsInData.indexOf(d) === -1;
-					});
-
-				selectDiv
-					.selectAll(".pbinadCheckboxDiv")
-					.filter(function (d) {
-						return d !== "All CBPFs";
-					})
-					.style("opacity", function (d) {
-						return chartState.cbpfsInData.indexOf(d) === -1
-							? disabledOpacity
-							: 1;
-					});
-
-				createTopPanel(data);
-
-				createSankey(data);
-
-				//end of clickButtonsRects
-			}
 
 			function mouseOverButtonsAggregationRects(d) {
 				d3.select(this).style("fill", unBlue);
@@ -5920,313 +4948,6 @@
 			//end of createSankey
 		}
 
-		function createTimeline(rawData) {
-			const timelineData = processTimelineData(rawData);
-
-			const timelineHeader = timelineDiv
-				.selectAll(".pbinadtimelineHeader")
-				.data([true])
-				.enter()
-				.append("div")
-				.attr("class", "pbinadtimelineHeader")
-				.html("Allocation trends by Partners types");
-
-			const timelineSubtitle = timelineDiv
-				.selectAll(".pbinadtimelineSubtitle")
-				.data([true])
-				.enter()
-				.append("div")
-				.attr("class", "pbinadtimelineSubtitle")
-				.html(
-					"Trends for the last three complete years (from " +
-						(currentYear - 4) +
-						" to " +
-						(currentYear - 1) +
-						"). Green triangle (<span class='fa' style='color:" +
-						greenArrowColor +
-						";'>\u25B2</span>) means increase, red triangle (<span class='fa' style='color:" +
-						redArrowColor +
-						";'>\u25BC</span>) means decrease.",
-				);
-
-			let timelineContainer = timelineDiv
-				.selectAll(".pbinadtimelineContainer")
-				.data([true]);
-
-			timelineContainer = timelineContainer
-				.enter()
-				.append("div")
-				.attr("class", "pbinadtimelineContainer")
-				.merge(timelineContainer);
-
-			let timelines = timelineContainer
-				.selectAll(".pbinadtimelines")
-				.data(timelineData, function (d) {
-					return d.partner;
-				});
-
-			const timelinesExit = timelines
-				.exit()
-				.transition()
-				.duration(duration)
-				.style("opacity", 0)
-				.remove();
-
-			const timelinesEnter = timelines
-				.enter()
-				.append("div")
-				.attr("class", "pbinadtimelines")
-				.style("width", timelinesWidth + "px")
-				.style("height", timelinesHeight + "px");
-
-			const timelinesNameDiv = timelinesEnter
-				.append("div")
-				.attr("class", "pbinadtimelinesNameDiv")
-				.append("p")
-				.html(function (d) {
-					return d.partner === "NGO"
-						? nationalPartnersName +
-								"<span style='color: " +
-								subpartnerColor +
-								";'>*</span>"
-						: aggregationNameRule[d.partner];
-				});
-
-			const timelinesChartDiv = timelinesEnter
-				.append("div")
-				.attr("class", "pbinadtimelinesChartDiv");
-
-			const timelinesSvg = timelinesChartDiv
-				.append("svg")
-				.attr("width", timelineSvgWidth)
-				.attr("height", timelineSvgHeight)
-				.each(function (d) {
-					const thisYScale = localTimelineScale.set(
-						this,
-						d3
-							.scaleLinear()
-							.range([
-								timelineSvgHeight - timelineSvgPadding[2],
-								timelineSvgPadding[0],
-							])
-							.domain(d3.extent(d.values)),
-					);
-					localTimelineGenerator.set(
-						this,
-						d3
-							.line()
-							.x(function (_, i) {
-								return timelineXScale(i);
-							})
-							.y(function (e) {
-								return thisYScale(e);
-							}),
-					);
-				});
-
-			const timelineSvgInitialValue = timelinesSvg
-				.append("text")
-				.attr("class", "pbinadtimelineSvgInitialValue")
-				.attr("text-anchor", "end")
-				.attr("x", timelineSvgPadding[3] - timelineSvgTextPadding)
-				.attr("y", function (d) {
-					return (
-						localTimelineScale.get(this)(d.values[0]) +
-						timelineSvgVertTextPadding
-					);
-				})
-				.text(function (d) {
-					return formatSIFloat(d.values[0]).replace("G", "B");
-				});
-
-			const timelineSvgFinalValue = timelinesSvg
-				.append("text")
-				.attr("class", "pbinadtimelineSvgFinalValue")
-				.attr(
-					"x",
-					timelineSvgWidth -
-						timelineSvgPadding[1] +
-						timelineSvgTextPadding,
-				)
-				.attr("y", function (d) {
-					return (
-						localTimelineScale.get(this)(d.values[3]) +
-						timelineSvgVertTextPadding
-					);
-				})
-				.text(function (d) {
-					return formatSIFloat(d.values[3]).replace("G", "B");
-				});
-
-			const timelineSvgPath = timelinesSvg
-				.append("path")
-				.attr("class", "pbinadtimelineSvgPath")
-				.style("fill", "none")
-				.style("stroke", "#bbb")
-				.style("stroke-width", "1px")
-				.attr("d", function (d) {
-					return localTimelineGenerator.get(this)(d.values);
-				});
-
-			const timelinesArrowDiv = timelinesChartDiv
-				.append("div")
-				.attr("class", "pbinadtimelinesArrowDiv");
-
-			const timelineArrowAndTextDiv = timelinesArrowDiv.append("div");
-
-			const timelineArrow = timelineArrowAndTextDiv
-				.append("span")
-				.attr("class", "pbinadtimelineArrow")
-				.style("font-size", "16px")
-				.style("color", function (d) {
-					return d.values[3] >= d.values[0]
-						? greenArrowColor
-						: redArrowColor;
-				})
-				.html(function (d) {
-					return d.values[3] >= d.values[0] ? "\u25B2" : "\u25BC";
-				});
-
-			const timelinePercentage = timelineArrowAndTextDiv
-				.append("span")
-				.attr("class", "pbinadtimelinePercentage")
-				.html(function (d) {
-					return d.values[0] && d.values[3]
-						? formatPercent1dec(
-								Math.abs(d.values[3] / d.values[0] - 1),
-							)
-						: "n/a";
-				});
-
-			timelines = timelinesEnter.merge(timelines);
-
-			timelines.sort(function (a, b) {
-				return b.values[3] - a.values[3];
-			});
-
-			timelines.select("svg").each(function (d) {
-				const thisYScale = localTimelineScale.set(
-					this,
-					d3
-						.scaleLinear()
-						.range([
-							timelineSvgHeight - timelineSvgPadding[2],
-							timelineSvgPadding[0],
-						])
-						.domain(d3.extent(d.values)),
-				);
-				localTimelineGenerator.set(
-					this,
-					d3
-						.line()
-						.x(function (_, i) {
-							return timelineXScale(i);
-						})
-						.y(function (e) {
-							return thisYScale(e);
-						}),
-				);
-			});
-
-			timelines
-				.select(".pbinadtimelineSvgInitialValue")
-				.transition()
-				.duration(duration)
-				.attr("y", function (d) {
-					return (
-						localTimelineScale.get(this)(d.values[0]) +
-						timelineSvgVertTextPadding
-					);
-				})
-				.tween("text", function (d) {
-					const node = this;
-					const i = d3.interpolate(
-						reverseFormat(node.textContent) || 0,
-						d.values[0],
-					);
-					return function (t) {
-						node.textContent = formatSIFloat(i(t)).replace(
-							"G",
-							"B",
-						);
-					};
-				});
-
-			timelines
-				.select(".pbinadtimelineSvgFinalValue")
-				.transition()
-				.duration(duration)
-				.attr("y", function (d) {
-					return (
-						localTimelineScale.get(this)(d.values[3]) +
-						timelineSvgVertTextPadding
-					);
-				})
-				.tween("text", function (d) {
-					const node = this;
-					const i = d3.interpolate(
-						reverseFormat(node.textContent) || 0,
-						d.values[3],
-					);
-					return function (t) {
-						node.textContent = formatSIFloat(i(t)).replace(
-							"G",
-							"B",
-						);
-					};
-				});
-
-			timelines
-				.select(".pbinadtimelineSvgPath")
-				.transition()
-				.duration(duration)
-				.attr("d", function (d) {
-					return localTimelineGenerator.get(this)(d.values);
-				});
-
-			timelines
-				.select(".pbinadtimelineArrow")
-				.html(function (d) {
-					return d.values[3] >= d.values[0] ? "\u25B2" : "\u25BC";
-				})
-				.style("color", function (d) {
-					return d.values[3] >= d.values[0]
-						? greenArrowColor
-						: redArrowColor;
-				});
-
-			timelines.select(".pbinadtimelinePercentage").html(function (d) {
-				return d.values[0] && d.values[3]
-					? formatPercent1dec(Math.abs(d.values[3] / d.values[0] - 1))
-					: "n/a";
-			});
-
-			const timelinesDisclaimer = timelineDiv
-				.selectAll(".pbinadtimelinesDisclaimer")
-				.data(
-					timelineData.filter(function (d) {
-						return d.partner === "NGO";
-					}),
-				);
-
-			timelinesDisclaimer.exit().remove();
-
-			timelinesDisclaimer
-				.enter()
-				.append("div")
-				.attr("class", "pbinadtimelinesDisclaimer")
-				.append("span")
-				.style("color", subpartnerColor)
-				.html("*")
-				.append("span")
-				.style("color", "#666")
-				.html(
-					"National Partners includes funding to National NGOs, Government/Others and Private Contractors.",
-				);
-
-			//end of createTimeline
-		}
-
 		function preProcessData(rawData, rawLaunchedAllocationsData) {
 			rawData.forEach(function (row) {
 				if (yearsArray.indexOf(+row.year) === -1)
@@ -6737,7 +5458,12 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			const result = d3.formatPrefix("." + digits + "~", value)(value);
+			const result = d3
+				.formatPrefix(
+					"." + digits + "~",
+					value,
+				)(value)
+				.replace("G", "B");
 			if (parseInt(result) === 1000) {
 				const lastDigit = result[result.length - 1];
 				const units = { k: "M", M: "B" };
@@ -7200,7 +5926,7 @@
 		}
 
 		function formatSI0decimals(value) {
-			return d3.formatPrefix(".0", value)(value);
+			return d3.formatPrefix(".0", value)(value).replace("G", "B");
 		}
 
 		function reverseFormat(s) {

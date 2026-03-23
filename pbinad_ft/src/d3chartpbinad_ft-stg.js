@@ -255,8 +255,6 @@
 			],
 			chartTitleDefault = "Allocation flow (net funding)",
 			vizNameQueryString = "netfunding",
-			bookmarkSite =
-				"https://cbpfgms.github.io/cbpf-bi-stag/bookmark.html?",
 			helpPortalUrl = "https://gms.unocha.org/content/allocation-flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl =
@@ -5457,7 +5455,12 @@
 		function formatSIFloat(value) {
 			const length = (~~Math.log10(value) + 1) % 3;
 			const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
-			const result = d3.formatPrefix("." + digits + "~", value)(value);
+			const result = d3
+				.formatPrefix(
+					"." + digits + "~",
+					value,
+				)(value)
+				.replace("G", "B");
 			if (parseInt(result) === 1000) {
 				const lastDigit = result[result.length - 1];
 				const units = { k: "M", M: "B" };
@@ -5920,7 +5923,7 @@
 		}
 
 		function formatSI0decimals(value) {
-			return d3.formatPrefix(".0", value)(value);
+			return d3.formatPrefix(".0", value)(value).replace("G", "B");
 		}
 
 		function reverseFormat(s) {
