@@ -1,6 +1,6 @@
 /*PFBI, Net Funding Alluvial Diagram (code: pbinad)*/
 
-#d3chartcontainerpbinad {
+#d3chartcontainerpbinad, #d3chartcontainerpbinad_ft {
 	position: relative;
 }
 
