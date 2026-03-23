@@ -66,6 +66,7 @@ export type ProjectDetails = {
 	endDate: Date;
 	projectStatusId: number;
 	reportType: ReportType;
+	projectName: string;
 };
 
 export type List = {

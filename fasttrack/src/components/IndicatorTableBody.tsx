@@ -6,6 +6,10 @@ import TableRow from "@mui/material/TableRow";
 import Modal from "@mui/material/Modal";
 import Backdrop from "@mui/material/Backdrop";
 import Fade from "@mui/material/Fade";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,6 +41,12 @@ type CellRowProps = Omit<CellValuesProps, "index"> & {
 	cellIndex?: number;
 };
 
+type RowModalProps = {
+	selectedRow: SectorDatum;
+	lists: List;
+	handleClose: () => void;
+};
+
 const {
 	indicatorsHeader,
 	beneficiaryCategories,
@@ -55,7 +65,6 @@ const modalStyle = {
 	transform: "translate(-50%, -50%)",
 	width: "100%",
 	maxWidth: 900,
-	maxHeight: "70vh",
 	bgcolor: "background.paper",
 	boxShadow: 24,
 	p: 4,
@@ -63,7 +72,6 @@ const modalStyle = {
 	outline: "none",
 	display: "flex",
 	flexDirection: "column",
-	overflow: "hidden",
 };
 
 function IndicatorsTableBody({
@@ -92,6 +100,9 @@ function IndicatorsTableBody({
 						hover
 						onClick={() => handleRowClick(row)}
 						style={{ cursor: "pointer" }}
+						data-tooltip-id="tooltip"
+						data-tooltip-content="Click for a detailed list of projects"
+						data-tooltip-place="top"
 					>
 						{indicatorsHeader.map((header, index) => {
 							if (header === "indicator") {
@@ -154,79 +165,13 @@ function IndicatorsTableBody({
 					</TableRow>
 				))}
 			</TableBody>
-			{/* Modal Implementation */}
-			<Modal
-				open={Boolean(selectedRow)}
-				onClose={handleClose}
-				closeAfterTransition
-				slots={{ backdrop: Backdrop }}
-				slotProps={{
-					backdrop: {
-						timeout: 500,
-					},
-				}}
-			>
-				<Fade in={Boolean(selectedRow)}>
-					<Box sx={modalStyle}>
-						<Box
-							display="flex"
-							justifyContent="space-between"
-							alignItems="center"
-							mb={2}
-						>
-							<Box
-								display="flex"
-								flexDirection="column"
-							>
-								<Typography>Indicator:</Typography>
-								<Typography variant="h6">
-									{selectedRow
-										? lists.globalIndicators[
-												selectedRow.indicatorId
-											]
-										: ""}
-								</Typography>
-							</Box>
-							<IconButton onClick={handleClose}>
-								<CloseIcon />
-							</IconButton>
-						</Box>
-						<Typography
-							variant="body1"
-							sx={{ mb: 2 }}
-						>
-							Detailed Metrics
-						</Typography>
-						<Box
-							sx={{
-								overflowY: "auto", // This activates the scroll
-								flexGrow: 1, // This forces it to take up the remaining 70vh
-								background: "#fdfdfd",
-								pr: 1, // Extra padding for the scrollbar gutter
-							}}
-						>
-							{/* Simulated long content */}
-							<div
-								style={{
-									height: "1000px",
-									background: "#f5f5f5",
-									padding: "20px",
-									borderRadius: "8px",
-								}}
-							>
-								<Typography
-									variant="body2"
-									color="textSecondary"
-								>
-									Success! The title stays at the top, and
-									this gray area scrolls within the{" "}
-									{modalStyle.maxHeight} limit.
-								</Typography>
-							</div>
-						</Box>
-					</Box>
-				</Fade>
-			</Modal>
+			{selectedRow && (
+				<RowModal
+					selectedRow={selectedRow}
+					lists={lists}
+					handleClose={handleClose}
+				/>
+			)}
 		</>
 	);
 }
@@ -365,6 +310,134 @@ function CellRow({ row, header, expanded, category, cellIndex }: CellRowProps) {
 						: row[header][category]!.toLocaleString()}
 			</Box>
 		</Box>
+	);
+}
+
+function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
+	return (
+		<Modal
+			open={Boolean(selectedRow)}
+			onClose={handleClose}
+			closeAfterTransition
+			slots={{ backdrop: Backdrop }}
+			slotProps={{
+				backdrop: {
+					timeout: 500,
+				},
+			}}
+		>
+			<Fade in={Boolean(selectedRow)}>
+				<Box sx={modalStyle}>
+					<Box
+						display="flex"
+						justifyContent="space-between"
+						alignItems="center"
+						mb={2}
+					>
+						<Box
+							display="flex"
+							flexDirection="column"
+						>
+							<Typography>Indicator:</Typography>
+							<Typography variant="h6">
+								{selectedRow
+									? lists.globalIndicators[
+											selectedRow.indicatorId
+										]
+									: ""}
+							</Typography>
+						</Box>
+						<IconButton onClick={handleClose}>
+							<CloseIcon />
+						</IconButton>
+					</Box>
+					<Typography
+						variant="body1"
+						sx={{ mb: 2 }}
+					>
+						List of projects:
+					</Typography>
+					<Paper sx={{ width: "100%", overflow: "hidden" }}>
+						<TableContainer
+							sx={{
+								maxHeight: "50vh",
+							}}
+						>
+							<Table
+								stickyHeader
+								aria-label="project data table"
+							>
+								<TableHead>
+									<TableRow>
+										<TableCell>Project Name</TableCell>
+										<TableCell>Fund</TableCell>
+										<TableCell>Allocation Source</TableCell>
+										<TableCell>Project Status</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{Array.from(selectedRow.projects).map(
+										(row, index) => {
+											const thisProject =
+												lists.projectDetails.get(row);
+											return (
+												thisProject && (
+													<TableRow
+														hover
+														key={`${row}-${index}`}
+														sx={{
+															"&:last-child td, &:last-child th":
+																{
+																	border: 0,
+																},
+														}}
+													>
+														<TableCell
+															component="th"
+															scope="row"
+														>
+															{
+																thisProject.projectName
+															}
+														</TableCell>
+														<TableCell>
+															{
+																lists.fundNames[
+																	thisProject
+																		.fund
+																]
+															}
+														</TableCell>
+														<TableCell>
+															{
+																lists
+																	.allocationSources[
+																	thisProject
+																		.allocationSource
+																]
+															}
+														</TableCell>
+														<TableCell>
+															{
+																lists
+																	.projectStatus[
+																	thisProject
+																		.projectStatusId
+																]
+															}
+														</TableCell>
+													</TableRow>
+												)
+											);
+										},
+									)}
+								</TableBody>
+							</Table>
+						</TableContainer>
+					</Paper>
+				</Box>
+			</Fade>
+		</Modal>
 	);
 }
 

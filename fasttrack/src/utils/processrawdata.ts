@@ -222,6 +222,7 @@ function processRawData({
 					endDate: new Date(row.EndDate),
 					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 					reportType: row.RptCode ?? 0,
+					projectName: row.ChfProjectCode,
 				});
 			}
 
@@ -231,7 +232,9 @@ function processRawData({
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalOrgId);
-				projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
+				projectStatusesSet.add(
+					projectStatusMapping[row.ProcessSTatusID],
+				);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
