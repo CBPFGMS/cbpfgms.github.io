@@ -69,7 +69,7 @@ function GBVChart({
 		});
 		downloadData<(typeof dataGBVDownload)[number]>(
 			dataGBVDownload,
-			"GBV_marker"
+			"GBV_marker",
 		);
 	}
 
@@ -87,7 +87,7 @@ function GBVChart({
 				setClickedDownload={setClickedDownload}
 				type="gbv"
 				refElement={ref}
-				fileName="Violence_Against_Person"
+				fileName="Violence_Against_People"
 			/>
 			<Box
 				style={{
@@ -110,7 +110,7 @@ function GBVChart({
 				</Typography>
 				<InfoIcon
 					data-tooltip-id="tooltip"
-					data-tooltip-content={"Violence against Person"}
+					data-tooltip-content={"Violence against People"}
 					data-tooltip-place="top"
 					style={{
 						color: "#666",
@@ -219,8 +219,8 @@ function GBVChart({
 					{dataGBV.totalReports === 0
 						? "0%"
 						: format(".1~%")(
-								dataGBV.reportsWithData / dataGBV.totalReports
-						  )}{" "}
+								dataGBV.reportsWithData / dataGBV.totalReports,
+							)}{" "}
 					of the projects. Possible many project(s) have not reached
 					the due date of final reports based on the selected filters.
 				</Typography>
@@ -266,7 +266,7 @@ function GBVCell({
 			}${format(",.0f")(GBVSlice)}<br />(${
 				~~((GBVSlice * 10000) / totalSlice) / 100
 			}% of ${title.toLowerCase().includes("budget") ? "$" : ""}${format(
-				",.0f"
+				",.0f",
 			)(totalSlice)})</div>`}
 			data-tooltip-place="top"
 		>

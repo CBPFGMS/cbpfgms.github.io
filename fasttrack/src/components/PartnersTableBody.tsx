@@ -323,13 +323,20 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 							>
 								<TableHead>
 									<TableRow>
+										<TableCell>Project Code</TableCell>
 										<TableCell>Sector</TableCell>
-										<TableCell>Budget</TableCell>
 										<TableCell>Fund</TableCell>
+										<TableCell align="right">
+											Budget
+										</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
 									{sortedRow.map((row, index) => {
+										const thisProjectName =
+											lists.projectDetails.get(
+												row.project,
+											);
 										return (
 											<TableRow
 												hover
@@ -345,14 +352,24 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 													component="th"
 													scope="row"
 												>
+													{thisProjectName
+														? thisProjectName.projectName
+														: "Unspecified Project"}
+												</TableCell>
+												<TableCell
+													component="th"
+													scope="row"
+												>
 													{lists.sectors[row.sector]}
 												</TableCell>
 												<TableCell>
-													{"$" +
-														row.budget.toLocaleString()}
-												</TableCell>
-												<TableCell>
 													{lists.fundNames[row.fund]}
+												</TableCell>
+												<TableCell align="right">
+													{"$" +
+														Math.floor(
+															row.budget,
+														).toLocaleString()}
 												</TableCell>
 											</TableRow>
 										);

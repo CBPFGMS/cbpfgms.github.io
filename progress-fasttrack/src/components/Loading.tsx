@@ -4,7 +4,7 @@ import LinearProgress, {
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-const HARDCODED_TOTAL_SIZE = 295757286;
+const HARDCODED_TOTAL_SIZE = 55757286;
 
 type LoadingProps = {
 	progress: number;

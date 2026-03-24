@@ -12,6 +12,7 @@ type SectorDetailsDatum = {
 	sector: number;
 	budget: number;
 	fund: number;
+	project: number;
 };
 
 export type PartnersDatum = {
@@ -53,7 +54,9 @@ function processDataPartners({
 
 						const foundSectorInDetails =
 							foundPartner.sectorsDetails.find(
-								e => e.sector === d.sectorId,
+								e =>
+									e.sector === d.sectorId &&
+									e.project === datum.projectId,
 							);
 						if (foundSectorInDetails) {
 							foundSectorInDetails.budget += d.budget;
@@ -63,6 +66,7 @@ function processDataPartners({
 								sector: d.sectorId,
 								budget: d.budget,
 								fund: datum.fund,
+								project: datum.projectId,
 							});
 						}
 					}
@@ -81,6 +85,7 @@ function processDataPartners({
 							sector: d.sectorId,
 							budget: d.budget,
 							fund: datum.fund,
+							project: datum.projectId,
 						});
 					}
 				});

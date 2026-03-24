@@ -63,6 +63,12 @@ function MainContainer() {
 		window.dispatchEvent(new CustomEvent("updatefunds", { detail: fund }));
 	}, [fund]);
 
+	useEffect(() => {
+		window.dispatchEvent(
+			new CustomEvent("updatestatuses", { detail: status }),
+		);
+	}, [status]);
+
 	void clickedDownload;
 
 	const filteredDataIndicators = useMemo(
