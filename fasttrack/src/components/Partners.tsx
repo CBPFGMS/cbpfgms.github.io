@@ -132,7 +132,10 @@ function Partners({
 						fontWeight: 400,
 					}}
 				>
-					Click on the headers for sorting. Click on a row for detailed sector information.
+					Click on the headers for sorting. Click on a row for
+					detailed sector information, and in the{" "}
+					<span style={{ fontWeight: "bold" }}>Projects</span> column
+					for detailed breakdown by project.
 				</Typography>
 			</Box>
 			<Box sx={{ width: "100%	", borderBottom: "1px solid #aaa" }}>

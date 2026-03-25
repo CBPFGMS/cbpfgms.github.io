@@ -12,6 +12,8 @@ type SectorDetailsDatum = {
 	sector: number;
 	budget: number;
 	fund: number;
+};
+type SectorDetailsDatumProject = SectorDetailsDatum & {
 	project: number;
 };
 
@@ -21,6 +23,7 @@ export type PartnersDatum = {
 	budget: number;
 	projects: Set<number>;
 	funds: Set<number>;
+	sectorsDetailsForProjects: SectorDetailsDatumProject[];
 	sectorsDetails: SectorDetailsDatum[];
 };
 
@@ -54,15 +57,30 @@ function processDataPartners({
 
 						const foundSectorInDetails =
 							foundPartner.sectorsDetails.find(
-								e =>
-									e.sector === d.sectorId &&
-									e.project === datum.projectId,
+								e => e.sector === d.sectorId,
 							);
 						if (foundSectorInDetails) {
 							foundSectorInDetails.budget += d.budget;
 							foundSectorInDetails.fund = datum.fund;
 						} else {
 							foundPartner.sectorsDetails.push({
+								sector: d.sectorId,
+								budget: d.budget,
+								fund: datum.fund,
+							});
+						}
+
+						const foundSectorInDetailsForProjects =
+							foundPartner.sectorsDetailsForProjects.find(
+								e =>
+									e.sector === d.sectorId &&
+									e.project === datum.projectId,
+							);
+						if (foundSectorInDetailsForProjects) {
+							foundSectorInDetailsForProjects.budget += d.budget;
+							foundSectorInDetailsForProjects.fund = datum.fund;
+						} else {
+							foundPartner.sectorsDetailsForProjects.push({
 								sector: d.sectorId,
 								budget: d.budget,
 								fund: datum.fund,
@@ -77,15 +95,22 @@ function processDataPartners({
 				let thisBudget = 0;
 				const thisSectors = new Set<number>();
 				const thisSectorDetails: SectorDetailsDatum[] = [];
+				const thisSectorDetailsForProjects: SectorDetailsDatumProject[] =
+					[];
 				datum.sectorData.forEach(d => {
 					if (sector.includes(d.sectorId)) {
 						thisSectors.add(d.sectorId);
 						thisBudget += d.budget;
-						thisSectorDetails.push({
+						thisSectorDetailsForProjects.push({
 							sector: d.sectorId,
 							budget: d.budget,
 							fund: datum.fund,
 							project: datum.projectId,
+						});
+						thisSectorDetails.push({
+							sector: d.sectorId,
+							budget: d.budget,
+							fund: datum.fund,
 						});
 					}
 				});
@@ -95,6 +120,7 @@ function processDataPartners({
 					budget: thisBudget,
 					funds: new Set([datum.fund]),
 					projects: new Set([datum.projectId]),
+					sectorsDetailsForProjects: thisSectorDetailsForProjects,
 					sectorsDetails: thisSectorDetails,
 				});
 			}

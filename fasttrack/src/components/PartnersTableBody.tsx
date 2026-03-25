@@ -69,14 +69,18 @@ const modalStyle = {
 	flexDirection: "column",
 };
 
+const projectsRowIndex = 3;
+
 function PartnersTableBody({
 	data,
 	maxBudgetValue,
 	lists,
 }: PartnersTableBodyProps) {
 	const [selectedRow, setSelectedRow] = useState<PartnersDatum | null>(null);
+	const [fromProjects, setFromProjects] = useState<boolean>(false);
 
-	const handleRowClick = (row: PartnersDatum) => {
+	const handleRowClick = (row: PartnersDatum, fromProjects: boolean) => {
+		setFromProjects(fromProjects);
 		setSelectedRow(row);
 	};
 
@@ -98,7 +102,17 @@ function PartnersTableBody({
 						<TableRow
 							key={index}
 							hover
-							onClick={() => handleRowClick(row)}
+							onClick={event => {
+								const cell = (
+									event.target as HTMLElement
+								).closest("td");
+								if (cell) {
+									handleRowClick(
+										row,
+										cell.cellIndex === projectsRowIndex,
+									);
+								}
+							}}
 							style={{ cursor: "pointer" }}
 							// style={{
 							// 	position: "absolute",
@@ -162,7 +176,14 @@ function PartnersTableBody({
 					);
 				})}
 			</TableBody>
-			{selectedRow && (
+			{selectedRow && fromProjects && (
+				<RowModalProjects
+					selectedRow={selectedRow}
+					lists={lists}
+					handleClose={handleClose}
+				/>
+			)}
+			{selectedRow && !fromProjects && (
 				<RowModal
 					selectedRow={selectedRow}
 					lists={lists}
@@ -211,7 +232,7 @@ function BudgetCell({ row, maxBudgetValue, index }: BudgetCellProps) {
 						fontWeight: 600,
 					}}
 				>
-					{formatSIFloat(row.budget)}
+					{"$" + formatSIFloat(row.budget)}
 				</Typography>
 			</Box>
 		</TableCell>
@@ -302,7 +323,100 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 							display="flex"
 							flexDirection="column"
 						>
-							<Typography>Indicator:</Typography>
+							<Typography variant="h6">
+								List of Sectors:
+							</Typography>
+						</Box>
+						<IconButton onClick={handleClose}>
+							<CloseIcon />
+						</IconButton>
+					</Box>
+					<Paper sx={{ width: "100%", overflow: "hidden" }}>
+						<TableContainer
+							sx={{
+								maxHeight: "50vh",
+							}}
+						>
+							<Table
+								stickyHeader
+								aria-label="project data table"
+							>
+								<TableHead>
+									<TableRow>
+										<TableCell>Sector</TableCell>
+										<TableCell>Fund</TableCell>
+										<TableCell align="right">
+											Budget
+										</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{sortedRow.map((row, index) => {
+										return (
+											<TableRow
+												hover
+												key={`${row}-${index}`}
+												sx={{
+													"&:last-child td, &:last-child th":
+														{
+															border: 0,
+														},
+												}}
+											>
+												<TableCell
+													component="th"
+													scope="row"
+												>
+													{lists.sectors[row.sector]}
+												</TableCell>
+												<TableCell>
+													{lists.fundNames[row.fund]}
+												</TableCell>
+												<TableCell align="right">
+													{"$" +
+														row.budget.toLocaleString()}
+												</TableCell>
+											</TableRow>
+										);
+									})}
+								</TableBody>
+							</Table>
+						</TableContainer>
+					</Paper>
+				</Box>
+			</Fade>
+		</Modal>
+	);
+}
+
+function RowModalProjects({ selectedRow, lists, handleClose }: RowModalProps) {
+	const sortedRow = selectedRow.sectorsDetailsForProjects
+		.slice()
+		.sort((a, b) => b.budget - a.budget);
+	return (
+		<Modal
+			open={Boolean(selectedRow)}
+			onClose={handleClose}
+			closeAfterTransition
+			slots={{ backdrop: Backdrop }}
+			slotProps={{
+				backdrop: {
+					timeout: 500,
+				},
+			}}
+		>
+			<Fade in={Boolean(selectedRow)}>
+				<Box sx={modalStyle}>
+					<Box
+						display="flex"
+						justifyContent="space-between"
+						alignItems="center"
+						mb={2}
+					>
+						<Box
+							display="flex"
+							flexDirection="column"
+						>
 							<Typography variant="h6">
 								List of Sectors:
 							</Typography>

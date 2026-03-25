@@ -261,7 +261,7 @@
 			helpPortalUrl = "https://gms.unocha.org/content/allocation-flow",
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl =
-				"https://cbpfapiB.unocha.org/vo2/odata/AllocationFlowByOrgType?PoolfundCodeAbbrv=&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
+				"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_FLOW_NSFT&PoolfundCodeAbbrv=&ShowAllPooledFunds=0&AllocationYear=2026_2026&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
 			launchedAllocationsDataUrl =
 				"https://cbpfapiB.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			cbpfsListUrl =
@@ -313,7 +313,23 @@
 				selectedAggregation: null,
 				selectedCbpfs: null,
 				cbpfsInData: [],
+				selectedStatuses: [],
 			};
+
+		const projectStatusMapping = {
+			1: 1,
+			2: 1,
+			3: 2,
+			4: 3,
+			5: 4,
+			6: 4,
+			7: 5,
+			8: 6,
+		};
+
+		chartState.selectedStatuses = Array.from(
+			new Set(Object.values(projectStatusMapping)),
+		);
 
 		let isSnapshotTooltipVisible = false,
 			cerfInData = false,
@@ -719,6 +735,13 @@
 				createSankey(data);
 			});
 
+			window.addEventListener("updatestatuses", e => {
+				chartState.selectedStatuses = e.detail;
+				const data = processData(rawData, rawLaunchedAllocationsData);
+				createTopPanel(data);
+				createSankey(data);
+			});
+
 			//end of draw
 		}
 
@@ -857,12 +880,13 @@
 				.text(function (d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
+					console.log(unit);
 					return (
 						(unit === "k"
 							? "Thousand"
 							: unit === "M"
 								? "Million"
-								: unit === "G"
+								: unit === "B"
 									? "Billion"
 									: "") +
 						(chartState.selectedYear.some(
@@ -994,7 +1018,7 @@
 						? "Thousand"
 						: unit === "M"
 							? "Million"
-							: unit === "G"
+							: unit === "B"
 								? "Billion"
 								: "";
 				});
@@ -1095,7 +1119,7 @@
 							? "Thousand"
 							: unit === "M"
 								? "Million"
-								: unit === "G"
+								: unit === "B"
 									? "Billion"
 									: "") +
 						" to direct partners (" +
@@ -1172,7 +1196,7 @@
 							? "Thousand"
 							: unit === "M"
 								? "Million"
-								: unit === "G"
+								: unit === "B"
 									? "Billion"
 									: "") +
 						" to sub-impl. partners (" +
@@ -3702,9 +3726,7 @@
 												: 0,
 										) +
 										" of total direct allocation: " +
-										formatSIFloat(
-											totalForDirectPartners,
-										) +
+										formatSIFloat(totalForDirectPartners) +
 										")",
 						);
 				});
@@ -5041,14 +5063,20 @@
 				if (
 					chartState.selectedYear.indexOf(+row.year) > -1 &&
 					cbpfsListKeys.indexOf(row.source) > -1 &&
-					chartState.cbpfsInData.indexOf(row.source) === -1
+					chartState.cbpfsInData.indexOf(row.source) === -1 &&
+					chartState.selectedStatuses.indexOf(
+						projectStatusMapping[+row.ProcessStatusId],
+					) > -1
 				) {
 					chartState.cbpfsInData.push(row.source);
 				}
 
 				if (
 					chartState.selectedYear.indexOf(+row.year) > -1 &&
-					chartState.selectedCbpfs.indexOf(row.fund) > -1
+					chartState.selectedCbpfs.indexOf(row.fund) > -1 &&
+					chartState.selectedStatuses.indexOf(
+						projectStatusMapping[+row.ProcessStatusId],
+					) > -1
 				) {
 					if (cbpfsListKeys.indexOf(row.source) > -1) {
 						const foundSource = data.nodes.find(function (d) {

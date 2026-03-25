@@ -7,6 +7,7 @@ import type { SortingOrder } from "./IndicatorCard";
 import Box from "@mui/material/Box";
 import type { SortingCriterion } from "./Partners";
 import colors from "../utils/colors";
+import InfoIcon from "@mui/icons-material/Info";
 
 type PartnersTableHeadProps = {
 	sortingCriterion: SortingCriterion;
@@ -92,6 +93,19 @@ function PartnersTableHead({
 								}}
 							>
 								{titles[header]}
+								{header === "projects" && (
+									<InfoIcon
+										data-tooltip-id="tooltip"
+										data-tooltip-content="Click on the # of projects for a detailed projects information"
+										data-tooltip-place="top"
+										style={{
+											color: "#666",
+											fontSize: "16px",
+											alignSelf: "flex-start",
+											marginTop: "1em",
+										}}
+									/>
+								)}
 							</TableSortLabel>
 						</Box>
 					</TableCell>
