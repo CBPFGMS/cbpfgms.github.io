@@ -481,7 +481,7 @@
 			height: topPanelHeight,
 			padding: [0, 0, 0, 0],
 			moneyBagPadding: 4,
-			leftPadding: [174, 504, 666],
+			leftPadding: [196, 504, 760],
 			mainValueVerPadding: 12,
 			mainValueHorPadding: 2,
 			linePadding: 8,
@@ -820,119 +820,119 @@
 					? d3.select(".pbinadtopPanelSubpartnersValue").datum()
 					: 0;
 
-			let topPanelMainValue = topPanel.main
-				.selectAll(".pbinadtopPanelMainValue")
-				.data([mainValue]);
+			// let topPanelMainValue = topPanel.main
+			// 	.selectAll(".pbinadtopPanelMainValue")
+			// 	.data([mainValue]);
 
-			topPanelMainValue = topPanelMainValue
-				.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelMainValue contributionColorFill")
-				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-				.attr(
-					"x",
-					topPanel.moneyBagPadding +
-						topPanel.leftPadding[0] -
-						topPanel.mainValueHorPadding,
-				)
-				.merge(topPanelMainValue);
+			// topPanelMainValue = topPanelMainValue
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr("class", "pbinadtopPanelMainValue contributionColorFill")
+			// 	.attr("text-anchor", "end")
+			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+			// 	.attr(
+			// 		"x",
+			// 		topPanel.moneyBagPadding +
+			// 			topPanel.leftPadding[0] -
+			// 			topPanel.mainValueHorPadding,
+			// 	)
+			// 	.merge(topPanelMainValue);
 
-			topPanelMainValue
-				.transition()
-				.duration(duration)
-				.tween("text", function (d) {
-					const node = this;
-					const i = d3.interpolate(previousValue, d);
-					return function (t) {
-						const siString = formatSIFloat(i(t));
-						node.textContent =
-							"$" +
-							(d < 1e3
-								? d
-								: siString.substring(0, siString.length - 1));
-					};
-				});
+			// topPanelMainValue
+			// 	.transition()
+			// 	.duration(duration)
+			// 	.tween("text", function (d) {
+			// 		const node = this;
+			// 		const i = d3.interpolate(previousValue, d);
+			// 		return function (t) {
+			// 			const siString = formatSIFloat(i(t));
+			// 			node.textContent =
+			// 				"$" +
+			// 				(d < 1e3
+			// 					? d
+			// 					: siString.substring(0, siString.length - 1));
+			// 		};
+			// 	});
 
-			let topPanelMainText = topPanel.main
-				.selectAll(".pbinadtopPanelMainText")
-				.data([mainValue]);
+			// let topPanelMainText = topPanel.main
+			// 	.selectAll(".pbinadtopPanelMainText")
+			// 	.data([mainValue]);
 
-			topPanelMainText = topPanelMainText
-				.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelMainText")
-				.style("opacity", 0)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
-				.attr(
-					"x",
-					topPanel.moneyBagPadding +
-						topPanel.leftPadding[0] +
-						topPanel.mainValueHorPadding,
-				)
-				.merge(topPanelMainText);
+			// topPanelMainText = topPanelMainText
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr("class", "pbinadtopPanelMainText")
+			// 	.style("opacity", 0)
+			// 	.attr("text-anchor", "start")
+			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
+			// 	.attr(
+			// 		"x",
+			// 		topPanel.moneyBagPadding +
+			// 			topPanel.leftPadding[0] +
+			// 			topPanel.mainValueHorPadding,
+			// 	)
+			// 	.merge(topPanelMainText);
 
-			topPanelMainText
-				.transition()
-				.duration(duration)
-				.style("opacity", 1)
-				.text(function (d) {
-					const valueSI = formatSIFloat(d);
-					const unit = valueSI[valueSI.length - 1];
-					console.log(unit);
-					return (
-						(unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "B"
-									? "Billion"
-									: "") +
-						(chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e],
-						)
-							? " in Allocations"
-							: " Allocated in")
-					);
-				});
+			// topPanelMainText
+			// 	.transition()
+			// 	.duration(duration)
+			// 	.style("opacity", 1)
+			// 	.text(function (d) {
+			// 		const valueSI = formatSIFloat(d);
+			// 		const unit = valueSI[valueSI.length - 1];
+			// 		console.log(unit);
+			// 		return (
+			// 			(unit === "k"
+			// 				? "Thousand"
+			// 				: unit === "M"
+			// 					? "Million"
+			// 					: unit === "B"
+			// 						? "Billion"
+			// 						: "") +
+			// 			(chartState.selectedYear.some(
+			// 				e => yearsWithUnderApprovalAboveMin[e],
+			// 			)
+			// 				? " in Allocations"
+			// 				: " Allocated in")
+			// 		);
+			// 	});
 
-			let topPanelSubText = topPanel.main
-				.selectAll(".pbinadtopPanelSubText")
-				.data([true]);
+			// let topPanelSubText = topPanel.main
+			// 	.selectAll(".pbinadtopPanelSubText")
+			// 	.data([true]);
 
-			topPanelSubText = topPanelSubText
-				.enter()
-				.append("text")
-				.attr("class", "pbinadtopPanelSubText")
-				.style("opacity", 0)
-				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
-				.attr(
-					"x",
-					topPanel.moneyBagPadding +
-						topPanel.leftPadding[0] +
-						topPanel.mainValueHorPadding,
-				)
-				.merge(topPanelSubText);
+			// topPanelSubText = topPanelSubText
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr("class", "pbinadtopPanelSubText")
+			// 	.style("opacity", 0)
+			// 	.attr("text-anchor", "start")
+			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+			// 	.attr(
+			// 		"x",
+			// 		topPanel.moneyBagPadding +
+			// 			topPanel.leftPadding[0] +
+			// 			topPanel.mainValueHorPadding,
+			// 	)
+			// 	.merge(topPanelSubText);
 
-			topPanelSubText
-				.transition()
-				.duration(duration)
-				.style("opacity", 1)
-				.text(
-					(chartState.selectedYear.some(
-						e => yearsWithUnderApprovalAboveMin[e],
-					)
-						? "Launched in "
-						: "") +
-						(chartState.selectedYear.length === 1
-							? chartState.selectedYear[0]
-							: "years\u002A"),
-				);
+			// topPanelSubText
+			// 	.transition()
+			// 	.duration(duration)
+			// 	.style("opacity", 1)
+			// 	.text(
+			// 		(chartState.selectedYear.some(
+			// 			e => yearsWithUnderApprovalAboveMin[e],
+			// 		)
+			// 			? "Launched in "
+			// 			: "") +
+			// 			(chartState.selectedYear.length === 1
+			// 				? chartState.selectedYear[0]
+			// 				: "years\u002A"),
+			// 	);
 
 			let topPanelAllocatedValue = topPanel.main
-				.selectAll(".pbinadtopPanelAllocatedMainValue")
+				.selectAll(".pbinadtopPanelAllocateValueFT")
 				.data([totalAllocated]);
 
 			topPanelAllocatedValue = topPanelAllocatedValue
@@ -940,7 +940,7 @@
 				.append("text")
 				.attr(
 					"class",
-					"pbinadtopPanelAllocatedMainValue contributionColorFill",
+					"pbinadtopPanelAllocateValueFT contributionColorFill",
 				)
 				.attr("text-anchor", "end")
 				.attr("font-family", "Arial")
@@ -949,7 +949,7 @@
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
-						topPanel.leftPadding[1] -
+						topPanel.leftPadding[0] -
 						topPanel.mainValueHorPadding,
 				)
 				.merge(topPanelAllocatedValue);
@@ -995,7 +995,7 @@
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
-						topPanel.leftPadding[1] +
+						topPanel.leftPadding[0] +
 						topPanel.mainValueHorPadding,
 				)
 				.merge(topPanelAllocatedText);
@@ -1014,13 +1014,15 @@
 				.text(function (d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
-					return unit === "k"
-						? "Thousand"
-						: unit === "M"
-							? "Million"
-							: unit === "B"
-								? "Billion"
-								: "";
+					return (
+						(unit === "k"
+							? "Thousand"
+							: unit === "M"
+								? "Million"
+								: unit === "B"
+									? "Billion"
+									: "") + " Allocated/"
+					);
 				});
 
 			let topPanelAllocatedSubText = topPanel.main
@@ -1040,7 +1042,7 @@
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
-						topPanel.leftPadding[1] +
+						topPanel.leftPadding[0] +
 						topPanel.mainValueHorPadding,
 				)
 				.merge(topPanelAllocatedSubText);
@@ -1049,10 +1051,10 @@
 				.transition()
 				.duration(duration)
 				.style("opacity", 1)
-				.text("Allocated");
+				.text("Launched");
 
 			let topPanelPartnersValue = topPanel.main
-				.selectAll(".pbinadtopPanelPartnersValue")
+				.selectAll(".pbinadtopPanelPartnersValueFt")
 				.data([partnersValue]);
 
 			topPanelPartnersValue = topPanelPartnersValue
@@ -1060,14 +1062,16 @@
 				.append("text")
 				.attr(
 					"class",
-					"pbinadtopPanelPartnersValue contributionColorFill",
+					"pbinadtopPanelPartnersValueFt contributionColorFill",
 				)
 				.attr("text-anchor", "end")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("font-family", "Arial")
+				.attr("font-size", "44px")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
-						topPanel.leftPadding[2] -
+						topPanel.leftPadding[1] -
 						topPanel.mainValueHorPadding,
 				)
 				.merge(topPanelPartnersValue);
@@ -1089,20 +1093,23 @@
 				});
 
 			let topPanelPartnersText = topPanel.main
-				.selectAll(".pbinadtopPanelPartnersText")
+				.selectAll(".pbinadtopPanelPartnersTextFT")
 				.data([partnersValue]);
 
 			topPanelPartnersText = topPanelPartnersText
 				.enter()
 				.append("text")
-				.attr("class", "pbinadtopPanelPartnersText")
+				.attr("class", "pbinadtopPanelPartnersTextFT")
 				.style("opacity", 0)
+				.attr("font-family", "Arial")
+				.attr("font-size", "15px")
+				.attr("fill", "#888")
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 3.0)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
-						topPanel.leftPadding[2] +
+						topPanel.leftPadding[1] +
 						topPanel.mainValueHorPadding,
 				)
 				.merge(topPanelPartnersText);
@@ -1121,15 +1128,46 @@
 								? "Million"
 								: unit === "B"
 									? "Billion"
-									: "") +
-						" to direct partners (" +
+									: "") + " to direct"
+					);
+				});
+
+			let topPanelPartnersSubText = topPanel.main
+				.selectAll(".pbinadtopPanelPartnersSubTextFT")
+				.data([partnersValue]);
+
+			topPanelPartnersSubText = topPanelPartnersSubText
+				.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelPartnersSubTextFT")
+				.attr("font-family", "Arial")
+				.attr("font-size", "15px")
+				.attr("fill", "#888")
+				.style("opacity", 0)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+				.attr(
+					"x",
+					topPanel.moneyBagPadding +
+						topPanel.leftPadding[1] +
+						topPanel.mainValueHorPadding,
+				)
+				.merge(topPanelPartnersSubText);
+
+			topPanelPartnersSubText
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.text(function (d) {
+					return (
+						"partners (" +
 						formatPercent1dec(d / totalAllocated || 0) +
 						")"
 					);
 				});
 
 			let topPanelSubpartnersValue = topPanel.main
-				.selectAll(".pbinadtopPanelSubpartnersValue")
+				.selectAll(".pbinadtopPanelSubpartnersValueFT")
 				.data([subpartnersValue]);
 
 			topPanelSubpartnersValue = topPanelSubpartnersValue
@@ -1137,9 +1175,11 @@
 				.append("text")
 				.attr(
 					"class",
-					"pbinadtopPanelSubpartnersValue contributionColorFill",
+					"pbinadtopPanelSubpartnersValueFT contributionColorFill",
 				)
 				.attr("text-anchor", "end")
+				.attr("font-family", "Arial")
+				.attr("font-size", "44px")
 				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
 				.attr(
 					"x",
@@ -1166,16 +1206,19 @@
 				});
 
 			let topPanelSubpartnersText = topPanel.main
-				.selectAll(".pbinadtopPanelSubpartnersText")
+				.selectAll(".pbinadtopPanelSubpartnersTextFT")
 				.data([subpartnersValue]);
 
 			topPanelSubpartnersText = topPanelSubpartnersText
 				.enter()
 				.append("text")
-				.attr("class", "pbinadtopPanelSubpartnersText")
+				.attr("class", "pbinadtopPanelSubpartnersTextFT")
 				.style("opacity", 0)
+				.attr("font-family", "Arial")
+				.attr("font-size", "15px")
+				.attr("fill", "#888")
 				.attr("text-anchor", "start")
-				.attr("y", topPanel.height - topPanel.mainValueVerPadding)
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
 				.attr(
 					"x",
 					topPanel.moneyBagPadding +
@@ -1198,8 +1241,39 @@
 								? "Million"
 								: unit === "B"
 									? "Billion"
-									: "") +
-						" to sub-impl. partners (" +
+									: "") + " to sub-impl."
+					);
+				});
+
+			let topPanelSubPartnersSubText = topPanel.main
+				.selectAll(".pbinadtopPanelSubPartnersSubTextFT")
+				.data([subpartnersValue]);
+
+			topPanelSubPartnersSubText = topPanelSubPartnersSubText
+				.enter()
+				.append("text")
+				.attr("class", "pbinadtopPanelSubPartnersSubTextFT")
+				.attr("font-family", "Arial")
+				.attr("font-size", "15px")
+				.attr("fill", "#888")
+				.style("opacity", 0)
+				.attr("text-anchor", "start")
+				.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
+				.attr(
+					"x",
+					topPanel.moneyBagPadding +
+						topPanel.leftPadding[2] +
+						topPanel.mainValueHorPadding,
+				)
+				.merge(topPanelSubPartnersSubText);
+
+			topPanelSubPartnersSubText
+				.transition()
+				.duration(duration)
+				.style("opacity", 1)
+				.text(function (d) {
+					return (
+						"partners (" +
 						formatPercent1dec(d / totalAllocated || 0) +
 						")"
 					);
