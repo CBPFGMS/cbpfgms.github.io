@@ -2070,6 +2070,8 @@
 						: colorsQuantileGlobal,
 				);
 
+			console.log(stripRegionalName(data[0].locationName));
+
 			const extentLatitude =
 				chartState.selectedAdminLevel === 0 && data.length === 1
 					? [
@@ -4940,6 +4942,56 @@
 				ne: {
 					lat: 52.3791473,
 					lng: 40.2275801,
+				},
+			},
+			Bangladesh: {
+				sw: {
+					lat: 20.5707,
+					lng: 88.0106,
+				},
+				ne: {
+					lat: 26.6345,
+					lng: 92.6737,
+				},
+			},
+			Chad: {
+				sw: {
+					lat: 7.4411,
+					lng: 13.4735,
+				},
+				ne: {
+					lat: 23.4475,
+					lng: 24.0,
+				},
+			},
+			Kenya: {
+				sw: {
+					lat: -4.6767,
+					lng: 33.9096,
+				},
+				ne: {
+					lat: 5.5061,
+					lng: 41.9069,
+				},
+			},
+			Mozambique: {
+				sw: {
+					lat: -26.8686,
+					lng: 30.2166,
+				},
+				ne: {
+					lat: -10.4704,
+					lng: 40.8436,
+				},
+			},
+			Uganda: {
+				sw: {
+					lat: -1.4788,
+					lng: 29.5734,
+				},
+				ne: {
+					lat: 4.2341,
+					lng: 35.0336,
 				},
 			},
 		};
