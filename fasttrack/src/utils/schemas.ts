@@ -24,7 +24,7 @@ export const projectSummaryObjectSchema = z.object({
 	BenG: z.number().int().nonnegative(),
 	GMId: z.union([z.number(), z.string()]).nullable(),
 	GAMId: z.number().nullable(),
-	GlbPrjStatusId: z.union([z.literal(0), z.literal(1)]).nullable(), //THIS WILL BE A NUMBER
+	GlbPrjStatusId: z.number().nullable(),
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
 	GlobalOrgID: z.number().int().nonnegative(),
 	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
