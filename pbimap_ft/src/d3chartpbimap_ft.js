@@ -321,7 +321,7 @@
 			lastUpdated = baseUrl + "last_updated.txt",
 			promises = [],
 			filterTitles = [
-				"Status",
+				"Year",
 				"CBPF",
 				"Partner Type",
 				"Cluster",
@@ -349,7 +349,6 @@
 			listRowsWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
 			chartState = {
 				selectedYear: [],
-				selectedStatus: ["all"],
 				selectedPartner: [],
 				selectedCBPF: [],
 				selectedModality: ["all"],
@@ -364,14 +363,6 @@
 			clustersList = {},
 			partnersList = {},
 			modalitiesList = {},
-			statusList = {
-				1: "Submission of Proposal",
-				2: "Under Review",
-				3: "Under Final Approval",
-				4: "Under Implementation",
-				5: "Final Reporting",
-				6: "Project Closure",
-			},
 			allocationsTypeList = [],
 			cbpfsInCompleteData = {},
 			lowercaseAllocationsTypeList = [],
@@ -380,19 +371,10 @@
 			yearsWithUnderApprovalAboveMin = {},
 			completeData = [];
 
-		const projectStatusMapping = {
-			1: 1,
-			2: 1,
-			3: 2,
-			4: 3,
-			5: 4,
-			6: 4,
-			7: 5,
-			8: 6,
-		};
-
 		let initialChartState,
 			timer,
+			launchedValue,
+			launchedValuePadding,
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem,
 			lastUpdatedDate = "";
@@ -809,11 +791,11 @@
 							yearsArrayString.indexOf(year.toString()),
 							1,
 						);
-						// removeYearFilter();
+						removeYearFilter();
 					} else {
 						processData(rawData[0], rawData[1]);
 						loadedYears.push(+year);
-						// repopulateYearFilter();
+						repopulateYearFilter();
 					}
 				});
 			}
@@ -836,7 +818,7 @@
 
 			createFilterDivs(data);
 
-			// repopulateYearFilter();
+			repopulateYearFilter();
 
 			createFooterDiv();
 
@@ -858,6 +840,15 @@
 		}
 
 		function createTitle() {
+			const title = titleDiv
+				.append("p")
+				.attr("class", "pbimapTitle contributionColorHTMLcolor")
+				.html(chartTitle);
+
+			launchedValue = titleDiv
+				.append("p")
+				.attr("class", "pbimaplaunchedValue");
+
 			const helpIcon = iconsDiv
 				.append("button")
 				.attr("id", "pbimapHelpButton");
@@ -991,6 +982,28 @@
 				);
 			}, "");
 
+			launchedValue
+				.style(
+					"opacity",
+					chartState.selectedYear.some(
+						e => yearsWithUnderApprovalAboveMin[e],
+					)
+						? 1
+						: 0,
+				)
+				.html("Launched Allocations in " + yearsList + ": ");
+
+			launchedValue
+				.append("span")
+				.classed("contributionColorHTMLcolor", true)
+				.html(
+					"$" +
+						formatSIFloat(data.launchedAllocations)
+							.replace("k", " Thousand")
+							.replace("M", " Million")
+							.replace("G", " Billion"),
+				);
+
 			const previousAllocations = d3
 				.select(".pbimapTopSvgAllocations")
 				.size()
@@ -1053,6 +1066,11 @@
 						.node()
 						.getBoundingClientRect();
 					const thisLeftPadding = thisBox.left - containerBox.left;
+					launchedValue.style(
+						"padding-left",
+						thisLeftPadding + "px",
+						"important",
+					);
 				});
 
 			let topSvgAllocationsText = topSvg
@@ -1429,24 +1447,14 @@
 				.append("ul")
 				.attr("class", "pbimapDropdownUl");
 
-			// const yearsDropdown = dropdownContainer.filter(function (d) {
-			// 	return d === "Year";
-			// });
-
-			// yearsDropdown.call(
-			// 	populateDropdown,
-			// 	yearsArrayString,
-			// 	chartState.selectedYear,
-			// );
-
-			const statusDropdown = dropdownContainer.filter(function (d) {
-				return d === "Status";
+			const yearsDropdown = dropdownContainer.filter(function (d) {
+				return d === "Year";
 			});
 
-			statusDropdown.call(
+			yearsDropdown.call(
 				populateDropdown,
-				["All"].concat(d3.values(statusList)),
-				chartState.selectedStatus,
+				yearsArrayString,
+				chartState.selectedYear,
 			);
 
 			const cbpfsDropdown = dropdownContainer.filter(function (d) {
@@ -1513,110 +1521,88 @@
 				})
 				.style("opacity", 1);
 
-			// yearsDropdown.selectAll("li").on("click", function (d) {
-			// 	if (chartState.selectedYear.indexOf(+d) === -1) {
-			// 		chartState.selectedYear.push(+d);
-			// 	} else {
-			// 		if (chartState.selectedYear.length === 1) return;
-			// 		const index = chartState.selectedYear.indexOf(+d);
-			// 		chartState.selectedYear.splice(index, 1);
-			// 	}
-			// 	setQueryString(
-			// 		"year",
-			// 		chartState.selectedYear.length === 1
-			// 			? chartState.selectedYear[0]
-			// 			: currentYear,
-			// 	);
-			// 	yearsDropdown.call(
-			// 		populateDropdown,
-			// 		yearsArrayString.map(function (d) {
-			// 			return +d;
-			// 		}),
-			// 		chartState.selectedYear,
-			// 	);
-			// 	const data = filterData();
-			// 	modalitiesDropdown.call(
-			// 		populateDropdown,
-			// 		["All"].concat(data.allocationsTypeList.sort()),
-			// 		chartState.selectedModality,
-			// 	);
-			// 	modalitiesDropdown.selectAll("li").on("click", function (d) {
-			// 		clickModalities(d);
-			// 	});
-
-			// 	const newMaxCombinedLevel =
-			// 		d3.max(data.map, function (d) {
-			// 			return d.maxLevel;
-			// 		}) || 0;
-			// 	chartState.selectedAdminLevel = Math.min(
-			// 		newMaxCombinedLevel,
-			// 		chartState.selectedAdminLevel,
-			// 	);
-
-			// 	createTopSvg(data.topSvgObject);
-			// 	createMap(data.map);
-			// 	createLegendSvg(data.map);
-			// 	createBreadcrumbDiv();
-			// 	createShowAllButton(data.map);
-
-			// 	adminLevelDropdown.call(
-			// 		populateDropdown,
-			// 		d3.range(0, newMaxCombinedLevel + 1, 1),
-			// 		chartState.selectedAdminLevel,
-			// 	);
-			// 	adminLevelDropdown.selectAll("li").on("click", function (d) {
-			// 		chartState.selectedAdminLevel = d;
-			// 		if (!chartState.selectedAdminLevel) {
-			// 			queryStringValues.delete("adminlevel");
-			// 		} else {
-			// 			setQueryString("adminlevel", d);
-			// 		}
-			// 		adminLevelDropdown.call(
-			// 			populateDropdown,
-			// 			d3.range(0, newMaxCombinedLevel + 1, 1),
-			// 			chartState.selectedAdminLevel,
-			// 		);
-			// 		const data = filterData();
-			// 		createTopSvg(data.topSvgObject);
-			// 		createMap(data.map);
-			// 		createLegendSvg(data.map);
-			// 		createBreadcrumbDiv();
-			// 		createShowAllButton(data.map);
-			// 	});
-
-			// 	filterCbpfsDropdown();
-
-			// 	partnersDropdown.call(
-			// 		filterPartnersAndClusters,
-			// 		data,
-			// 		"partnersTypeList",
-			// 	);
-			// 	clustersDropdown.call(
-			// 		filterPartnersAndClusters,
-			// 		data,
-			// 		"clustersList",
-			// 	);
-			// });
-
-			statusDropdown.selectAll("li").on("click", function (d) {
-				if (
-					chartState.selectedStatus.indexOf(d.toLowerCase()) > -1 &&
-					chartState.selectedStatus.length === 1
-				)
-					return;
-				changeSelected(d, chartState.selectedStatus);
-				if (chartState.selectedStatus[0] === "all") {
-					queryStringValues.delete("partner");
+			yearsDropdown.selectAll("li").on("click", function (d) {
+				if (chartState.selectedYear.indexOf(+d) === -1) {
+					chartState.selectedYear.push(+d);
 				} else {
-					setQueryString(
-						"partner",
-						chartState.selectedStatus.join("|"),
-					);
+					if (chartState.selectedYear.length === 1) return;
+					const index = chartState.selectedYear.indexOf(+d);
+					chartState.selectedYear.splice(index, 1);
 				}
-				statusDropdown.call(
+				setQueryString(
+					"year",
+					chartState.selectedYear.length === 1
+						? chartState.selectedYear[0]
+						: currentYear,
+				);
+				yearsDropdown.call(
 					populateDropdown,
-					["All"].concat(d3.values(statusList)),
-					chartState.selectedStatus,
+					yearsArrayString.map(function (d) {
+						return +d;
+					}),
+					chartState.selectedYear,
+				);
+				const data = filterData();
+				modalitiesDropdown.call(
+					populateDropdown,
+					["All"].concat(data.allocationsTypeList.sort()),
+					chartState.selectedModality,
+				);
+				modalitiesDropdown.selectAll("li").on("click", function (d) {
+					clickModalities(d);
+				});
+
+				const newMaxCombinedLevel =
+					d3.max(data.map, function (d) {
+						return d.maxLevel;
+					}) || 0;
+				chartState.selectedAdminLevel = Math.min(
+					newMaxCombinedLevel,
+					chartState.selectedAdminLevel,
+				);
+
+				createTopSvg(data.topSvgObject);
+				createMap(data.map);
+				createLegendSvg(data.map);
+				createBreadcrumbDiv();
+				createShowAllButton(data.map);
+
+				adminLevelDropdown.call(
+					populateDropdown,
+					d3.range(0, newMaxCombinedLevel + 1, 1),
+					chartState.selectedAdminLevel,
+				);
+				adminLevelDropdown.selectAll("li").on("click", function (d) {
+					chartState.selectedAdminLevel = d;
+					if (!chartState.selectedAdminLevel) {
+						queryStringValues.delete("adminlevel");
+					} else {
+						setQueryString("adminlevel", d);
+					}
+					adminLevelDropdown.call(
+						populateDropdown,
+						d3.range(0, newMaxCombinedLevel + 1, 1),
+						chartState.selectedAdminLevel,
+					);
+					const data = filterData();
+					createTopSvg(data.topSvgObject);
+					createMap(data.map);
+					createLegendSvg(data.map);
+					createBreadcrumbDiv();
+					createShowAllButton(data.map);
+				});
+
+				filterCbpfsDropdown();
+
+				partnersDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"partnersTypeList",
+				);
+				clustersDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"clustersList",
 				);
 			});
 
@@ -1827,18 +1813,11 @@
 						);
 					}
 
-					// yearsDropdown.call(
-					// 	populateDropdown,
-					// 	yearsArrayString,
-					// 	chartState.selectedYear,
-					// );
-
-					statusDropdown.call(
+					yearsDropdown.call(
 						populateDropdown,
-						["All"].concat(d3.values(statusList)),
-						chartState.selectedStatus,
+						yearsArrayString,
+						chartState.selectedYear,
 					);
-					
 					cbpfsDropdown.call(
 						populateDropdown,
 						["All"].concat(
@@ -1991,43 +1970,43 @@
 			//end of createFilterDivs
 		}
 
-		// function removeYearFilter() {
-		// 	filtersDiv
-		// 		.selectAll(".pbimapDropdownUl")
-		// 		.filter(function (d) {
-		// 			return d === "Year";
-		// 		})
-		// 		.selectAll("li")
-		// 		.filter(function (d) {
-		// 			return yearsArrayString.indexOf(d) === -1;
-		// 		})
-		// 		.remove();
-		// }
+		function removeYearFilter() {
+			filtersDiv
+				.selectAll(".pbimapDropdownUl")
+				.filter(function (d) {
+					return d === "Year";
+				})
+				.selectAll("li")
+				.filter(function (d) {
+					return yearsArrayString.indexOf(d) === -1;
+				})
+				.remove();
+		}
 
-		// function repopulateYearFilter() {
-		// 	const yearsDropdown = filtersDiv
-		// 		.selectAll(".pbimapDropdownUl")
-		// 		.filter(function (d) {
-		// 			return d === "Year";
-		// 		});
+		function repopulateYearFilter() {
+			const yearsDropdown = filtersDiv
+				.selectAll(".pbimapDropdownUl")
+				.filter(function (d) {
+					return d === "Year";
+				});
 
-		// 	yearsDropdown.selectAll("li").each(function (d) {
-		// 		d3.select(this)
-		// 			.style(
-		// 				"opacity",
-		// 				loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu,
-		// 			)
-		// 			.style(
-		// 				"pointer-events",
-		// 				loadedYears.indexOf(+d) > -1 ? "all" : "none",
-		// 			);
-		// 		d3.select(this)
-		// 			.select("span:nth-child(2)")
-		// 			.html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
-		// 	});
+			yearsDropdown.selectAll("li").each(function (d) {
+				d3.select(this)
+					.style(
+						"opacity",
+						loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu,
+					)
+					.style(
+						"pointer-events",
+						loadedYears.indexOf(+d) > -1 ? "all" : "none",
+					);
+				d3.select(this)
+					.select("span:nth-child(2)")
+					.html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
+			});
 
-		// 	//end of repopulateYearFilter
-		// }
+			//end of repopulateYearFilter
+		}
 
 		function createMap(data, fromLegend) {
 			if (data.length === 0) {
@@ -2684,7 +2663,7 @@
 			}
 
 			let breadcrumbData = [
-				chartState.selectedStatus,
+				chartState.selectedYear,
 				chartState.selectedCBPF,
 				chartState.selectedPartner,
 				chartState.selectedCluster,
@@ -2695,7 +2674,7 @@
 				if (d.length > 1) {
 					return "Several";
 				} else if (i !== 2) {
-					return capitalizeEvery(d[0]);
+					return i ? capitalizeEvery(d[0]) : d[0];
 				} else {
 					let partner;
 					for (var key in partnersList) {
@@ -2706,7 +2685,6 @@
 				}
 			});
 
-			if (breadcrumbData[0] === "All") breadcrumbData[0] = "All Statuses";
 			if (breadcrumbData[1] === "All") breadcrumbData[1] = "All CBPFs";
 			if (breadcrumbData[2] === "All") breadcrumbData[2] = "All Partners";
 			if (breadcrumbData[3] === "All") breadcrumbData[3] = "All Clusters";
@@ -3681,7 +3659,6 @@
 				}
 
 				thisRow.cbpfName = cbpfsList[thisRow.PFId];
-				thisRow.PrjStsId = foundSummaryObject.PrjStsId;
 				thisRow.OrgTypeId = foundSummaryObject.OrgTypeId;
 				thisRow.OrgNm = foundSummaryObject.OrgNm;
 				thisRow.AllNm =
@@ -3805,7 +3782,6 @@
 				row.partnerType = partnersList[row.OrgTypeId];
 				row.cluster = clustersList[row.ClstAgg];
 				row.modality = modalitiesList[row.AllSrc];
-				row.status = statusList[projectStatusMapping[row.PrjStsId]];
 
 				for (let key in row) {
 					if (key.indexOf("AdmLocClustBdg") > -1) {
@@ -3920,8 +3896,7 @@
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
 					filterModality(row.AllNm) &&
-					filterCluster(row.cluster) &&
-					filterStatus(row.status)
+					filterCluster(row.cluster)
 				);
 			});
 
@@ -4171,16 +4146,6 @@
 
 			function filterYear(datum) {
 				return chartState.selectedYear.indexOf(+datum) > -1;
-			}
-
-			function filterStatus(datum) {
-				return chartState.selectedStatus[0] === "all"
-					? true
-					: datum
-						? chartState.selectedStatus.indexOf(
-								datum.toLowerCase(),
-							) > -1
-						: false;
 			}
 
 			function filterCBPF(datum) {
