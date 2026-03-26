@@ -8,9 +8,6 @@
 			window.matchMedia("(pointer: coarse)").matches &&
 			!window.matchMedia("(any-pointer: fine)").matches,
 		isPfbiSite = window.location.hostname === "cbpf.data.unocha.org",
-		isBookmarkPage =
-			window.location.hostname + window.location.pathname ===
-			"cbpf.data.unocha.org/bookmark.html",
 		fontAwesomeLink =
 			"https://use.fontawesome.com/releases/v5.6.3/css/all.css",
 		leafletCSSLink = "https://cbpfgms.github.io/libraries/leaflet.css",
@@ -256,7 +253,6 @@
 			localVariable = d3.local(),
 			chartTitleDefault = "Allocations Overview",
 			vizNameQueryString = "allocations-overview",
-			bookmarkSite = "https://cbpf.data.unocha.org/bookmark.html?",
 			helpPortalUrl =
 				"https://gms.unocha.org/content/allocations-overview",
 			formatMoney0Decimals = d3.format(",.0f"),
