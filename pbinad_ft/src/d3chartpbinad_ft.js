@@ -262,8 +262,6 @@
 			csvDateFormat = d3.utcFormat("_%Y%m%d_%H%M%S_UTC"),
 			dataUrl =
 				"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_FLOW_NSFT&PoolfundCodeAbbrv=&ShowAllPooledFunds=0&AllocationYear=2026_2026&$format=csv", //NOTE ON CERF: CERF ID MUST BE 999
-			launchedAllocationsDataUrl =
-				"https://cbpfapiB.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			cbpfsListUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 			partnersListUrl =
@@ -305,8 +303,6 @@
 			partnersTypeList = ["subpartner", "partner"],
 			yearsArray = [],
 			cbpfsDataList = {},
-			yearsWithUnderApprovalAboveMin = {},
-			topValuesLaunchedData = {},
 			aggregationMode = ["level", "type"],
 			chartState = {
 				selectedYear: [],
@@ -375,9 +371,6 @@
 
 		const selectedResponsiveness =
 			containerDiv.node().getAttribute("data-responsive") === "true";
-
-		const lazyLoad =
-			containerDiv.node().getAttribute("data-lazyload") === "true";
 
 		if (selectedResponsiveness === false) {
 			containerDiv
@@ -615,20 +608,10 @@
 				);
 			})
 			.then(function (previousData) {
-				return fetchFile(
-					"launchedAllocationsData",
-					launchedAllocationsDataUrl,
-					previousData,
-					"launched allocations data",
-				);
-			})
-			.then(function (previousData) {
 				csvCallback(previousData);
 			});
 
 		function fetchFile(fileName, url, previousData, warningString) {
-			const rowFunction =
-				fileName === "launchedAllocationsData" ? d3.autoType : null;
 			if (
 				localStorage.getItem(fileName) &&
 				JSON.parse(localStorage.getItem(fileName)).timestamp >
@@ -636,7 +619,6 @@
 			) {
 				const fetchedData = d3.csvParse(
 					JSON.parse(localStorage.getItem(fileName)).data,
-					rowFunction,
 				);
 				console.info(
 					"pbinad: " + warningString + " from local storage",
@@ -644,7 +626,7 @@
 				previousData.push(fetchedData);
 				return Promise.resolve(previousData);
 			} else {
-				return d3.csv(url, rowFunction).then(function (fetchedData) {
+				return d3.csv(url).then(function (fetchedData) {
 					try {
 						localStorage.setItem(
 							fileName,
@@ -675,39 +657,14 @@
 
 			createSubPartnersList(rawData[3]);
 
-			preProcessData(rawData[0], rawData[4]);
+			preProcessData(rawData[0]);
 
 			validateYear(selectedYearString);
 
 			chartState.selectedCbpfs =
 				populateSelectedCbpfs(selectedCbpfsString);
 
-			if (!lazyLoad) {
-				draw(rawData[0], rawData[4]);
-			} else {
-				d3.select(window).on("scroll.pbinad", checkPosition);
-				d3.select("body").on("d3ChartsYear.pbinad", function () {
-					chartState.selectedYear = [
-						validateCustomEventYear(+d3.event.detail),
-					];
-				});
-				checkPosition();
-			}
-
-			function checkPosition() {
-				const containerPosition = containerDiv
-					.node()
-					.getBoundingClientRect();
-				if (
-					!(
-						containerPosition.bottom < 0 ||
-						containerPosition.top - windowHeight > 0
-					)
-				) {
-					d3.select(window).on("scroll.pbinad", null);
-					draw(rawData[0], rawData[4]);
-				}
-			}
+			draw(rawData[0]);
 
 			//end of csvCallback
 		}
@@ -746,8 +703,6 @@
 		}
 
 		function createTopPanel(data) {
-			const totalLaunched = topValuesLaunchedData.launched;
-
 			const totalAllocated = d3.sum(
 				data.nodes.filter(function (d) {
 					return d.level === 1;
@@ -756,12 +711,6 @@
 					return d.amount;
 				},
 			);
-
-			const mainValue = chartState.selectedYear.some(
-				e => yearsWithUnderApprovalAboveMin[e],
-			)
-				? totalLaunched
-				: totalAllocated;
 
 			const partnersValue = d3.sum(
 				data.nodes.filter(function (d) {
@@ -820,117 +769,6 @@
 					? d3.select(".pbinadtopPanelSubpartnersValue").datum()
 					: 0;
 
-			// let topPanelMainValue = topPanel.main
-			// 	.selectAll(".pbinadtopPanelMainValue")
-			// 	.data([mainValue]);
-
-			// topPanelMainValue = topPanelMainValue
-			// 	.enter()
-			// 	.append("text")
-			// 	.attr("class", "pbinadtopPanelMainValue contributionColorFill")
-			// 	.attr("text-anchor", "end")
-			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding)
-			// 	.attr(
-			// 		"x",
-			// 		topPanel.moneyBagPadding +
-			// 			topPanel.leftPadding[0] -
-			// 			topPanel.mainValueHorPadding,
-			// 	)
-			// 	.merge(topPanelMainValue);
-
-			// topPanelMainValue
-			// 	.transition()
-			// 	.duration(duration)
-			// 	.tween("text", function (d) {
-			// 		const node = this;
-			// 		const i = d3.interpolate(previousValue, d);
-			// 		return function (t) {
-			// 			const siString = formatSIFloat(i(t));
-			// 			node.textContent =
-			// 				"$" +
-			// 				(d < 1e3
-			// 					? d
-			// 					: siString.substring(0, siString.length - 1));
-			// 		};
-			// 	});
-
-			// let topPanelMainText = topPanel.main
-			// 	.selectAll(".pbinadtopPanelMainText")
-			// 	.data([mainValue]);
-
-			// topPanelMainText = topPanelMainText
-			// 	.enter()
-			// 	.append("text")
-			// 	.attr("class", "pbinadtopPanelMainText")
-			// 	.style("opacity", 0)
-			// 	.attr("text-anchor", "start")
-			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding * 2.7)
-			// 	.attr(
-			// 		"x",
-			// 		topPanel.moneyBagPadding +
-			// 			topPanel.leftPadding[0] +
-			// 			topPanel.mainValueHorPadding,
-			// 	)
-			// 	.merge(topPanelMainText);
-
-			// topPanelMainText
-			// 	.transition()
-			// 	.duration(duration)
-			// 	.style("opacity", 1)
-			// 	.text(function (d) {
-			// 		const valueSI = formatSIFloat(d);
-			// 		const unit = valueSI[valueSI.length - 1];
-			// 		console.log(unit);
-			// 		return (
-			// 			(unit === "k"
-			// 				? "Thousand"
-			// 				: unit === "M"
-			// 					? "Million"
-			// 					: unit === "B"
-			// 						? "Billion"
-			// 						: "") +
-			// 			(chartState.selectedYear.some(
-			// 				e => yearsWithUnderApprovalAboveMin[e],
-			// 			)
-			// 				? " in Allocations"
-			// 				: " Allocated in")
-			// 		);
-			// 	});
-
-			// let topPanelSubText = topPanel.main
-			// 	.selectAll(".pbinadtopPanelSubText")
-			// 	.data([true]);
-
-			// topPanelSubText = topPanelSubText
-			// 	.enter()
-			// 	.append("text")
-			// 	.attr("class", "pbinadtopPanelSubText")
-			// 	.style("opacity", 0)
-			// 	.attr("text-anchor", "start")
-			// 	.attr("y", topPanel.height - topPanel.mainValueVerPadding * 1.2)
-			// 	.attr(
-			// 		"x",
-			// 		topPanel.moneyBagPadding +
-			// 			topPanel.leftPadding[0] +
-			// 			topPanel.mainValueHorPadding,
-			// 	)
-			// 	.merge(topPanelSubText);
-
-			// topPanelSubText
-			// 	.transition()
-			// 	.duration(duration)
-			// 	.style("opacity", 1)
-			// 	.text(
-			// 		(chartState.selectedYear.some(
-			// 			e => yearsWithUnderApprovalAboveMin[e],
-			// 		)
-			// 			? "Launched in "
-			// 			: "") +
-			// 			(chartState.selectedYear.length === 1
-			// 				? chartState.selectedYear[0]
-			// 				: "years\u002A"),
-			// 	);
-
 			let topPanelAllocatedValue = topPanel.main
 				.selectAll(".pbinadtopPanelAllocateValueFT")
 				.data([totalAllocated]);
@@ -957,14 +795,7 @@
 			topPanelAllocatedValue
 				.transition()
 				.duration(duration)
-				.style(
-					"opacity",
-					chartState.selectedYear.some(
-						e => yearsWithUnderApprovalAboveMin[e],
-					)
-						? 1
-						: 0,
-				)
+				.style("opacity", 1)
 				.tween("text", function (d) {
 					const node = this;
 					const i = d3.interpolate(previousPartnersValue, d);
@@ -1003,14 +834,7 @@
 			topPanelAllocatedText
 				.transition()
 				.duration(duration)
-				.style(
-					"opacity",
-					chartState.selectedYear.some(
-						e => yearsWithUnderApprovalAboveMin[e],
-					)
-						? 1
-						: 0,
-				)
+				.style("opacity", 1)
 				.text(function (d) {
 					const valueSI = formatSIFloat(d);
 					const unit = valueSI[valueSI.length - 1];
@@ -5044,7 +4868,7 @@
 			//end of createSankey
 		}
 
-		function preProcessData(rawData, rawLaunchedAllocationsData) {
+		function preProcessData(rawData) {
 			rawData.forEach(function (row) {
 				if (yearsArray.indexOf(+row.year) === -1)
 					yearsArray.push(+row.year);
@@ -5068,19 +4892,11 @@
 			};
 		}
 
-		function processData(rawData, rawLaunchedAllocationsData) {
+		function processData(rawData) {
 			const data = {
 				nodes: [],
 				links: [],
 			};
-
-			for (const key in yearsWithUnderApprovalAboveMin)
-				delete yearsWithUnderApprovalAboveMin[key];
-
-			const aggregatedLaunchedValues = {};
-
-			topValuesLaunchedData.launched = 0;
-			topValuesLaunchedData.underApproval = 0;
 
 			level3order.length = 0;
 
@@ -5089,49 +4905,6 @@
 			const allCbpfsSelected =
 				chartState.selectedCbpfs.length ===
 				d3.keys(cbpfsDataList).length;
-
-			rawLaunchedAllocationsData.forEach(function (row) {
-				if (
-					chartState.selectedYear.includes(row.AllocationYear) &&
-					(allCbpfsSelected ||
-						chartState.selectedCbpfs.includes(
-							row.PooledFundId + "",
-						))
-				) {
-					aggregatedLaunchedValues[row.AllocationYear] = {
-						underApproval:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.underApproval
-								: 0) + row.TotalUnderApprovalBudget,
-						approved:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.approved
-								: 0) + row.TotalApprovedBudget,
-						launched:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.launched
-								: 0) + row.TotalUSDPlanned,
-					};
-					topValuesLaunchedData.launched += row.TotalUSDPlanned;
-					topValuesLaunchedData.underApproval +=
-						row.TotalUnderApprovalBudget;
-				}
-			});
-
-			for (const year in aggregatedLaunchedValues) {
-				const { underApprovalPercent, underPlusApprovedPercent } =
-					safeDivide(
-						aggregatedLaunchedValues[year].underApproval,
-						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched,
-					);
-				yearsWithUnderApprovalAboveMin[year] =
-					underApprovalPercent > minimumUnderApprovalPercentage ||
-					underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			}
 
 			rawData.forEach(function (row) {
 				if (
