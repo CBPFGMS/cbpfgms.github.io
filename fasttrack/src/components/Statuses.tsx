@@ -125,11 +125,33 @@ function ProjectStatuses({
 			>
 				<Box className="status-legend">
 					<Box className="status-legend-pill status-lp-amber">
-						<span className="status-lp-dot status-lpd-amber"></span>
+						{/* <span className="status-lp-dot status-lpd-amber"></span> */}
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-html={
+								"<div style='text-align: left;'>These are the statuses in the 'Submission and Under Approval' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Submission of Proposal</li><li>Under Review</li><li>Under Final Approval</li></ul></div>"
+							}
+							data-tooltip-place="top"
+							style={{
+								fontSize: "16px",
+								alignSelf: "flex-start",
+							}}
+						/>
 						Submission and under approval
 					</Box>
 					<Box className="status-legend-pill status-lp-blue">
-						<span className="status-lp-dot status-lpd-blue"></span>
+						{/* <span className="status-lp-dot status-lpd-blue"></span> */}
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-html={
+								"<div style='text-align: left;'>These are the statuses in the 'Implementation and Reporting' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Under Implementation</li><li>Final Reporting</li><li>Project Closure</li></ul></div>"
+							}
+							data-tooltip-place="top"
+							style={{
+								fontSize: "16px",
+								alignSelf: "flex-start",
+							}}
+						/>
 						Implementation and reporting
 					</Box>
 				</Box>
@@ -301,7 +323,6 @@ function Status({
 										color: "#666",
 										fontSize: "18px",
 										marginRight: "0.3em",
-										marginBottom: "-0.1em",
 									}}
 								/>
 							}
