@@ -27,8 +27,6 @@ const constants = {
 	},
 	submissionAndUnderApprovalProjects: [1, 2, 3],
 	implementationAndReportingProjects: [4, 5, 6],
-	submissionAndUnderApprovalProjectsColor: "#f9f7bb",
-	implementationAndReportingProjectsColor: "#aff18b",
 } as const;
 
 const projectStatusMaster = {

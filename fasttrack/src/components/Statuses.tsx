@@ -3,12 +3,9 @@ import type { DataStatuses } from "../utils/processdatastatuses";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
-import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
@@ -32,15 +29,14 @@ type StatusProps = {
 	status: number[];
 	title: string;
 	description: string;
+	cardClassName: "amber" | "blue";
+	isLast: boolean;
 };
 
 const {
-	limitScaleValueInPixels,
 	projectStatusDescription,
 	submissionAndUnderApprovalProjects,
-	submissionAndUnderApprovalProjectsColor,
 	implementationAndReportingProjects,
-	implementationAndReportingProjectsColor,
 } = constants;
 
 function ProjectStatuses({
@@ -91,214 +87,147 @@ function ProjectStatuses({
 				message={`At least one implementation status must be selected`}
 			/>
 			<Grid
-				pb={4}
+				pb={1}
 				pt={2}
 				container
 				justifyContent={"center"}
 			>
-				<Box sx={{ flex: 1 }} />
-				<Box
-					sx={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
+				<Typography
+					mb={1}
+					style={{
+						color: "var(--ocha-blue)",
+						fontWeight: 700,
+						textAlign: "center",
+						fontSize: "2rem",
+						fontFamily: "Montserrat",
 					}}
 				>
-					<Typography
-						mb={1}
-						style={{
-							color: "var(--ocha-blue)",
-							fontWeight: 700,
-							textAlign: "center",
-							fontSize: "2rem",
-							fontFamily: "Montserrat",
-						}}
-					>
-						Project Statuses
-					</Typography>
-					<InfoIcon
-						data-tooltip-id="tooltip"
-						data-tooltip-html={
-							"CBPF projects can be in different statuses. Click 'remove' or 'add' for filtering by implementation status"
-						}
-						data-tooltip-place="top"
-						style={{
-							color: "#666",
-							fontSize: "20px",
-							marginLeft: "0.1em",
-							alignSelf: "flex-start",
-							marginTop: "-0.1em",
-						}}
-					/>
-				</Box>
-				<Box
-					sx={{
-						flex: 1,
-						display: "flex",
-						justifyContent: "flex-end",
+					Project Statuses
+				</Typography>
+				<InfoIcon
+					data-tooltip-id="tooltip"
+					data-tooltip-html={
+						"CBPF projects can be in different statuses. Click 'remove' or 'add' for filtering by implementation status"
+					}
+					data-tooltip-place="top"
+					style={{
+						color: "#666",
+						fontSize: "20px",
+						marginLeft: "0.1em",
+						alignSelf: "flex-start",
+						marginTop: "-0.1em",
 					}}
-				>
-					<Box
-						style={{
-							display: "flex",
-							flexDirection: "column",
-						}}
-					>
-						<Box
-							style={{
-								borderRadius: "8px",
-								backgroundColor:
-									submissionAndUnderApprovalProjectsColor,
-								display: "flex",
-								flexDirection: "row",
-								padding: "0.25rem 0.5rem",
-							}}
-							mb={1}
-						>
-							<Typography
-								style={{
-									fontWeight: 700,
-									textAlign: "center",
-									fontSize: "0.8rem",
-									fontFamily: "Montserrat",
-								}}
-							>
-								{" "}
-								Submission and Under Approval
-							</Typography>
-							<InfoIcon
-								data-tooltip-id="tooltip"
-								data-tooltip-html={
-									"<div style='text-align: left;'>These are the statuses in the 'Submission and Under Approval' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Submission of Proposal</li><li>Under Review</li><li>Under Final Approval</li></ul></div>"
-								}
-								data-tooltip-place="top"
-								style={{
-									color: "#666",
-									fontSize: "14px",
-									marginLeft: "0.1em",
-									alignSelf: "flex-start",
-									marginTop: "-0.1em",
-								}}
-							/>
-						</Box>
-						<Box
-							style={{
-								borderRadius: "8px",
-								backgroundColor:
-									implementationAndReportingProjectsColor,
-								display: "flex",
-								flexDirection: "row",
-								padding: "0.25rem 0.5rem",
-							}}
-						>
-							<Typography
-								style={{
-									fontWeight: 700,
-									textAlign: "center",
-									fontSize: "0.8rem",
-									fontFamily: "Montserrat",
-								}}
-							>
-								Implementation and Reporting
-							</Typography>
-							<InfoIcon
-								data-tooltip-id="tooltip"
-								data-tooltip-html={
-									"<div style='text-align: left;'>These are the statuses in the 'Implementation and Reporting' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Under Implementation</li><li>Final Reporting</li><li>Project Closure</li></ul></div>"
-								}
-								data-tooltip-place="top"
-								style={{
-									color: "#666",
-									fontSize: "14px",
-									marginLeft: "0.1em",
-									alignSelf: "flex-start",
-									marginTop: "-0.1em",
-								}}
-							/>
-						</Box>
+				/>
+			</Grid>
+			<Grid
+				container
+				justifyContent={"flex-end"}
+			>
+				<Box className="status-legend">
+					<Box className="status-legend-pill status-lp-amber">
+						<span className="status-lp-dot status-lpd-amber"></span>
+						Submission and under approval
+					</Box>
+					<Box className="status-legend-pill status-lp-blue">
+						<span className="status-lp-dot status-lpd-blue"></span>
+						Implementation and reporting
 					</Box>
 				</Box>
 			</Grid>
 			{submissionAndUnderApprovalKeys.length > 0 && (
-				<Grid
-					container
-					spacing={2}
-					style={{
-						backgroundColor:
-							submissionAndUnderApprovalProjectsColor,
-						padding: "1em",
-						borderRadius: "8px",
-						display: "inline-flex",
-						width:
-							submissionAndUnderApprovalKeys.length >= 3
-								? "100%"
-								: `${(submissionAndUnderApprovalKeys.length / 3) * 100}%`,
-						marginBottom: "1em",
-					}}
-					// alignItems={"stretch"}
-				>
-					{submissionAndUnderApprovalKeys.map((datum, index) => {
-						return (
-							<Status
-								key={index}
-								handleClick={handleClick}
-								statusType={datum}
-								statusValue={dataStatuses[datum]}
-								total={total}
-								status={status}
-								title={lists.projectStatus[datum]}
-								description={
-									(
-										projectStatusDescription as Record<
-											number,
-											string
-										>
-									)[datum]
-								}
-							/>
-						);
-					})}
-				</Grid>
+				<>
+					<Box sx={{ width: "100%" }}>
+						<Box className="status-section-divider">
+							<Box className="status-divider-label">
+								Submission and under approval
+							</Box>
+							<Box className="status-divider-line status-dline-amber"></Box>
+						</Box>
+					</Box>
+					<Grid
+						container
+						mb={2}
+						style={{
+							display: "inline-flex",
+							width:
+								submissionAndUnderApprovalKeys.length >= 3
+									? "100%"
+									: `${(submissionAndUnderApprovalKeys.length / 3) * 100}%`,
+						}}
+						// alignItems={"stretch"}
+					>
+						{submissionAndUnderApprovalKeys.map((datum, index) => {
+							return (
+								<Status
+									key={index}
+									handleClick={handleClick}
+									statusType={datum}
+									statusValue={dataStatuses[datum]}
+									total={total}
+									status={status}
+									title={lists.projectStatus[datum]}
+									description={
+										(
+											projectStatusDescription as Record<
+												number,
+												string
+											>
+										)[datum]
+									}
+									cardClassName="amber"
+									isLast={index === 2}
+								/>
+							);
+						})}
+					</Grid>
+				</>
 			)}
 			{implementationAndReportingKeys.length > 0 && (
-				<Grid
-					container
-					spacing={2}
-					style={{
-						backgroundColor:
-							implementationAndReportingProjectsColor,
-						padding: "1em",
-						borderRadius: "8px",
-						display: "inline-flex",
-						width:
-							implementationAndReportingKeys.length >= 3
-								? "100%"
-								: `${(implementationAndReportingKeys.length / 3) * 100}%`,
-					}}
-					// alignItems={"stretch"}
-				>
-					{implementationAndReportingKeys.map((datum, index) => {
-						return (
-							<Status
-								key={index}
-								handleClick={handleClick}
-								statusType={datum}
-								statusValue={dataStatuses[datum]}
-								total={total}
-								status={status}
-								title={lists.projectStatus[datum]}
-								description={
-									(
-										projectStatusDescription as Record<
-											number,
-											string
-										>
-									)[datum]
-								}
-							/>
-						);
-					})}
-				</Grid>
+				<>
+					<Box sx={{ width: "100%" }}>
+						<Box className="status-section-divider">
+							<Box className="status-divider-label">
+								Implementation and reporting
+							</Box>
+							<Box className="status-divider-line status-dline-blue"></Box>
+						</Box>
+					</Box>
+					<Grid
+						container
+						style={{
+							display: "inline-flex",
+							width:
+								implementationAndReportingKeys.length >= 3
+									? "100%"
+									: `${(implementationAndReportingKeys.length / 3) * 100}%`,
+						}}
+						// alignItems={"stretch"}
+					>
+						{implementationAndReportingKeys.map((datum, index) => {
+							return (
+								<Status
+									key={index}
+									handleClick={handleClick}
+									statusType={datum}
+									statusValue={dataStatuses[datum]}
+									total={total}
+									status={status}
+									title={lists.projectStatus[datum]}
+									description={
+										(
+											projectStatusDescription as Record<
+												number,
+												string
+											>
+										)[datum]
+									}
+									cardClassName="blue"
+									isLast={index === 2}
+								/>
+							);
+						})}
+					</Grid>
+				</>
 			)}
 		</Box>
 	);
@@ -312,6 +241,8 @@ function Status({
 	status,
 	title,
 	description,
+	cardClassName,
+	isLast,
 }: StatusProps) {
 	const scale = scaleLinear<number, number>()
 		.domain([0, total])
@@ -324,39 +255,43 @@ function Status({
 			key={title}
 			variant="outlined"
 			sx={{
-				width: "30%",
+				width: "32%",
+				marginRight: isLast ? 0 : 1.5,
 				flex: "1 1 auto",
-				borderColor: statusSelected ? "#bbb" : null,
-				backgroundColor: "white",
-				filter: statusSelected ? "none" : "grayscale(100%)",
+				borderRadius: "8px",
+				background: statusSelected
+					? cardClassName === "amber"
+						? "#fffdf8"
+						: "#f7fbff"
+					: "#fafafa",
+				border: statusSelected
+					? cardClassName === "amber"
+						? "1px solid #fac775"
+						: "1px solid #b5d4f4"
+					: "1px solid #ccc",
 			}}
 		>
-			<CardContent
-				sx={{
-					padding: "8px 18px 8px 18px",
-					height: "100%",
-					opacity: statusSelected ? 1 : 0.6,
-				}}
-			>
+			<CardContent>
 				<Box
 					style={{
 						display: "flex",
 						flexDirection: "row",
 						justifyContent: "space-between",
 						alignItems: "center",
-						height: "35%",
 					}}
+					mb={1}
 				>
 					<Grid
-						size={8}
-						container
+						sx={{
+							opacity: statusSelected ? 1 : 0.5,
+							filter: statusSelected ? "none" : "grayscale(100%)",
+						}}
+						size={9}
 					>
 						<Typography
 							variant="h6"
 							fontSize={"1em"}
-							gutterBottom
 						>
-							{title}
 							{
 								<InfoIcon
 									data-tooltip-id="tooltip"
@@ -364,44 +299,41 @@ function Status({
 									data-tooltip-place="top"
 									style={{
 										color: "#666",
-										fontSize: "16px",
-										marginLeft: "0.1em",
-										alignSelf: "flex-start",
-										marginTop: "-0.1em",
+										fontSize: "18px",
+										marginRight: "0.3em",
+										marginBottom: "-0.1em",
 									}}
 								/>
 							}
+							{title}
 						</Typography>
 					</Grid>
 					<Grid
-						container
-						size={4}
-						alignSelf={"flex-start"}
+						size={3}
 						justifyContent={"flex-end"}
 					>
-						<CardActions>
-							<Button
-								size="small"
-								style={{
-									backgroundColor: "whitesmoke",
-								}}
-								variant="text"
-								onClick={() => handleClick(statusType)}
-							>
-								{statusSelected ? "Remove" : "Add"}
-							</Button>
-						</CardActions>
+						<Box
+							onClick={() => handleClick(statusType)}
+							className={`status-remove-btn status-rb-${cardClassName}`}
+							display={"flex"}
+							justifyContent={"center"}
+						>
+							{statusSelected ? "Remove" : "Add"}
+						</Box>
 					</Grid>
 				</Box>
 				<Typography
+					sx={{
+						opacity: statusSelected ? 1 : 0.5,
+						filter: statusSelected ? "none" : "grayscale(100%)",
+					}}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`${title}: $${statusValue.toLocaleString()}`}
 					data-tooltip-place="top"
-					color={colors.unColor}
+					className={`status-cv-${cardClassName}`}
 					style={{
-						fontSize: "2.5em",
+						fontSize: "43px",
 						fontWeight: 500,
-						display: "inline-block",
 					}}
 				>
 					{"$"}
@@ -421,13 +353,12 @@ function Status({
 					)}
 				</Typography>
 				<Box
-					mt={2}
-					mb={0}
-					style={{
-						display: "flex",
-						alignItems: "center",
-						width: "100%",
+					sx={{
+						opacity: statusSelected ? 1 : 0.5,
+						filter: statusSelected ? "none" : "grayscale(100%)",
 					}}
+					mt={1}
+					className="status-card-footer"
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`The total amount of allocations for ${title} projects is $${toLocaleFixed(
 						statusValue,
@@ -437,7 +368,7 @@ function Status({
 						(statusValue / total) *
 						100
 					).toFixed(
-						1,
+						2,
 					)}% of the total allocations for all statuses (${toLocaleFixed(
 						total,
 						0,
@@ -446,39 +377,22 @@ function Status({
 					data-tooltip-place="top"
 				>
 					<Box
-						style={{
-							width: scale(statusValue) + "%",
-							minWidth: "1px",
-							height: "18px",
-							transitionProperty: "width",
-							transitionDuration: "0.75s",
-							display: "flex",
-							alignItems: "center",
-							backgroundColor: colors.unColorDarker,
-						}}
+						className={`status-prog-track status-pt-${cardClassName}`}
 					>
-						<Typography
-							fontSize={12}
-							fontWeight={700}
+						<Box
+							className={`status-prog-fill status-pf-${cardClassName}`}
 							style={{
-								position: "relative",
-								left:
-									scale(statusValue) < limitScaleValueInPixels
-										? "3px"
-										: "-3px",
-								marginLeft:
-									scale(statusValue) < limitScaleValueInPixels
-										? "100%"
-										: "auto",
-								color:
-									scale(statusValue) < limitScaleValueInPixels
-										? "#444"
-										: "#fff",
+								width: scale(statusValue) + "%",
+								transitionProperty: "width",
+								transitionDuration: "0.75s",
 							}}
-						>
+						></Box>
+					</Box>
+					<Box className={`status-pct status-pct-${cardClassName}`}>
+						<Typography fontWeight={500}>
 							<NumberAnimator
 								number={parseFloat(
-									((statusValue / total) * 100).toFixed(2),
+									((statusValue / total) * 100).toFixed(1),
 								)}
 								type="decimal"
 							/>

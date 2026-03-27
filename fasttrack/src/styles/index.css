@@ -100,3 +100,192 @@ button:focus-visible {
 	border-top: 1px solid rgb(0, 0, 0);
 	border-bottom: 1px solid rgb(0, 0, 0);
 }
+
+.status-section-divider {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 14px;
+	margin-top: 6px;
+	font-family: "Roboto", sans-serif;
+}
+.status-dl-amber {
+	color: #854f0b;
+}
+.status-dl-blue {
+	color: #185fa5;
+}
+.status-divider-label {
+	font-size: 18px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+.status-divider-line {
+	flex: 1;
+	height: 1px;
+}
+.status-dline-amber {
+	background: #fac775;
+}
+.status-dline-blue {
+	background: #b5d4f4;
+}
+.status-row-3 {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.status-section-row {
+	display: grid;
+	gap: 16px;
+	margin-bottom: 14px;
+	font-family: "Roboto", sans-serif;
+}
+.status-card-amber {
+	background: #fffdf8;
+	border: 1px solid #fac775;
+}
+.status-card-blue {
+	background: #f7fbff;
+	border: 1px solid #b5d4f4;
+}
+.status-card {
+	border-radius: 8px;
+	padding: 18px 20px 16px;
+}
+.status-card-top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 14px;
+}
+.status-cl-amber {
+	color: #854f0b;
+}
+.status-cl-blue {
+	color: #185fa5;
+}
+.status-card-label {
+	font-size: 16px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.status-info-dot {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 1.5px solid #ccc;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	color: #fff;
+	background-color: #666;
+	cursor: default;
+}
+.status-rb-amber {
+	color: #854f0b;
+	border-color: #fac775 !important;
+	background: #fef6ec;
+}
+.status-rb-blue {
+	color: #185fa5;
+	border-color: #b5d4f4 !important;
+	background: #edf5fd;
+}
+.status-remove-btn {
+	font-size: 14px;
+	font-weight: normal;
+	padding: 4px 14px;
+	border-radius: 20px;
+	border: 1px solid;
+	cursor: pointer;
+}
+.status-cv-amber {
+	color: #412402;
+}
+.status-cv-blue {
+	color: #042c53;
+}
+.status-card-value {
+	font-size: 43px;
+	font-weight: 500;
+}
+.status-card-footer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: none;
+	border: none;
+	padding: 0;
+}
+.status-pt-amber {
+	background: #fac775;
+}
+.status-pt-blue {
+	background: #b5d4f4;
+}
+.status-prog-track {
+	flex: 1;
+	height: 10px;
+	border-radius: 5px;
+	overflow: hidden;
+}
+.status-pf-amber {
+	background: #ba7517;
+}
+.status-pf-blue {
+	background: #185fa5;
+}
+.status-prog-fill {
+	height: 100%;
+	border-radius: 5px;
+}
+.status-pct-amber {
+	color: #633806;
+}
+.status-pct-blue {
+	color: #0c447c;
+}
+.status-pct {
+	font-size: 16px;
+	font-weight: 500;
+	white-space: nowrap;
+}
+.status-legend {
+	display: flex;
+	flex-direction: row;
+	gap: 16px;
+	align-items: flex-end;
+	justify-content: flex-end;
+}
+.status-lp-amber {
+	background: #faeeda;
+	color: #633806;
+	border: 1px solid #fac775;
+}
+.status-legend-pill {
+	font-size: 12px;
+	font-weight: normal;
+	padding: 3px 12px;
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.status-lpd-amber {
+	background: #ef9f27;
+}
+.status-lp-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+.status-lp-blue {
+	background: #e6f1fb;
+	color: #0c447c;
+	border: 1px solid #b5d4f4;
+}
+.status-lpd-blue {
+	background: #378add;
+}
