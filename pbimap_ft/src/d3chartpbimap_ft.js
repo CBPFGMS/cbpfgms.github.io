@@ -317,11 +317,10 @@
 			clustersListFile = baseUrl + "MstClusters.csv",
 			partnersListFile = baseUrl + "MstOrgType.csv",
 			modalitiesListFile = baseUrl + "MstAllocationSource.csv",
-			launchedAllocationsDataFile = baseUrl + "AllocationTypes.csv",
 			lastUpdated = baseUrl + "last_updated.txt",
 			promises = [],
 			filterTitles = [
-				"Year",
+				"Status",
 				"CBPF",
 				"Partner Type",
 				"Cluster",
@@ -349,6 +348,7 @@
 			listRowsWidth = ["18%", "26%", "15%", "14%", "9%", "9%", "9%"],
 			chartState = {
 				selectedYear: [],
+				selectedStatus: ["all"],
 				selectedPartner: [],
 				selectedCBPF: [],
 				selectedModality: ["all"],
@@ -363,18 +363,34 @@
 			clustersList = {},
 			partnersList = {},
 			modalitiesList = {},
+			statusList = {
+				1: "Submission of Proposal",
+				2: "Under Review",
+				3: "Under Final Approval",
+				4: "Under Implementation",
+				5: "Final Reporting",
+				6: "Project Closure",
+			},
 			allocationsTypeList = [],
 			cbpfsInCompleteData = {},
+			statusesInCompleteData = [],
 			lowercaseAllocationsTypeList = [],
 			countriesCoordinates = {},
-			launchedAllocationsData = [],
-			yearsWithUnderApprovalAboveMin = {},
 			completeData = [];
+
+		const projectStatusMapping = {
+			1: 1,
+			2: 1,
+			3: 2,
+			4: 3,
+			5: 4,
+			6: 4,
+			7: 5,
+			8: 6,
+		};
 
 		let initialChartState,
 			timer,
-			launchedValue,
-			launchedValuePadding,
 			isSnapshotTooltipVisible = false,
 			currentHoveredElem,
 			lastUpdatedDate = "";
@@ -686,7 +702,6 @@
 		promises.push(d3.csv(clustersListFile));
 		promises.push(d3.csv(partnersListFile));
 		promises.push(d3.csv(modalitiesListFile));
-		promises.push(d3.csv(launchedAllocationsDataFile));
 		promises.push(d3.text(lastUpdated));
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
@@ -695,41 +710,6 @@
 
 		Promise.all(promises).then(function (rawData) {
 			removeProgressWheel();
-
-			const aggregatedLaunchedValues = {};
-
-			rawData[6].forEach(function (row) {
-				aggregatedLaunchedValues[row.AllocationYear] = {
-					underApproval:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.underApproval
-							: 0) + +row.TotalUnderApprovalBudget,
-					approved:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.approved
-							: 0) + +row.TotalApprovedBudget,
-					launched:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.launched
-							: 0) + +row.TotalUSDPlanned,
-				};
-				launchedAllocationsData.push(row);
-			});
-
-			for (const year in aggregatedLaunchedValues) {
-				const { underApprovalPercent, underPlusApprovedPercent } =
-					safeDivide(
-						aggregatedLaunchedValues[year].underApproval,
-						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched,
-					);
-				yearsWithUnderApprovalAboveMin[year] =
-					underApprovalPercent > minimumUnderApprovalPercentage ||
-					underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			}
 
 			createCbpfsList(rawData[2]);
 
@@ -791,11 +771,11 @@
 							yearsArrayString.indexOf(year.toString()),
 							1,
 						);
-						removeYearFilter();
+						// removeYearFilter();
 					} else {
 						processData(rawData[0], rawData[1]);
 						loadedYears.push(+year);
-						repopulateYearFilter();
+						// repopulateYearFilter();
 					}
 				});
 			}
@@ -818,7 +798,7 @@
 
 			createFilterDivs(data);
 
-			repopulateYearFilter();
+			// repopulateYearFilter();
 
 			createFooterDiv();
 
@@ -840,15 +820,6 @@
 		}
 
 		function createTitle() {
-			const title = titleDiv
-				.append("p")
-				.attr("class", "pbimapTitle contributionColorHTMLcolor")
-				.html(chartTitle);
-
-			launchedValue = titleDiv
-				.append("p")
-				.attr("class", "pbimaplaunchedValue");
-
 			const helpIcon = iconsDiv
 				.append("button")
 				.attr("id", "pbimapHelpButton");
@@ -959,51 +930,6 @@
 		}
 
 		function createTopSvg(data) {
-			const yearsListOriginal = chartState.selectedYear
-				.sort(function (a, b) {
-					return a - b;
-				})
-				.filter(function (d) {
-					return yearsWithUnderApprovalAboveMin[d];
-				});
-
-			const yearsList = yearsListOriginal.reduce(function (
-				acc,
-				curr,
-				index,
-			) {
-				return (
-					acc +
-					(index >= yearsListOriginal.length - 2
-						? index > yearsListOriginal.length - 2
-							? curr
-							: curr + " and "
-						: curr + ", ")
-				);
-			}, "");
-
-			launchedValue
-				.style(
-					"opacity",
-					chartState.selectedYear.some(
-						e => yearsWithUnderApprovalAboveMin[e],
-					)
-						? 1
-						: 0,
-				)
-				.html("Launched Allocations in " + yearsList + ": ");
-
-			launchedValue
-				.append("span")
-				.classed("contributionColorHTMLcolor", true)
-				.html(
-					"$" +
-						formatSIFloat(data.launchedAllocations)
-							.replace("k", " Thousand")
-							.replace("M", " Million")
-							.replace("G", " Billion"),
-				);
-
 			const previousAllocations = d3
 				.select(".pbimapTopSvgAllocations")
 				.size()
@@ -1066,11 +992,6 @@
 						.node()
 						.getBoundingClientRect();
 					const thisLeftPadding = thisBox.left - containerBox.left;
-					launchedValue.style(
-						"padding-left",
-						thisLeftPadding + "px",
-						"important",
-					);
 				});
 
 			let topSvgAllocationsText = topSvg
@@ -1447,15 +1368,27 @@
 				.append("ul")
 				.attr("class", "pbimapDropdownUl");
 
-			const yearsDropdown = dropdownContainer.filter(function (d) {
-				return d === "Year";
+			// const yearsDropdown = dropdownContainer.filter(function (d) {
+			// 	return d === "Year";
+			// });
+
+			// yearsDropdown.call(
+			// 	populateDropdown,
+			// 	yearsArrayString,
+			// 	chartState.selectedYear,
+			// );
+
+			const statusDropdown = dropdownContainer.filter(function (d) {
+				return d === "Status";
 			});
 
-			yearsDropdown.call(
+			statusDropdown.call(
 				populateDropdown,
-				yearsArrayString,
-				chartState.selectedYear,
+				["All"].concat(d3.values(statusList)),
+				chartState.selectedStatus,
 			);
+
+			filterStatusDropdown();
 
 			const cbpfsDropdown = dropdownContainer.filter(function (d) {
 				return d === "CBPF";
@@ -1521,89 +1454,112 @@
 				})
 				.style("opacity", 1);
 
-			yearsDropdown.selectAll("li").on("click", function (d) {
-				if (chartState.selectedYear.indexOf(+d) === -1) {
-					chartState.selectedYear.push(+d);
+			// yearsDropdown.selectAll("li").on("click", function (d) {
+			// 	if (chartState.selectedYear.indexOf(+d) === -1) {
+			// 		chartState.selectedYear.push(+d);
+			// 	} else {
+			// 		if (chartState.selectedYear.length === 1) return;
+			// 		const index = chartState.selectedYear.indexOf(+d);
+			// 		chartState.selectedYear.splice(index, 1);
+			// 	}
+			// 	setQueryString(
+			// 		"year",
+			// 		chartState.selectedYear.length === 1
+			// 			? chartState.selectedYear[0]
+			// 			: currentYear,
+			// 	);
+			// 	yearsDropdown.call(
+			// 		populateDropdown,
+			// 		yearsArrayString.map(function (d) {
+			// 			return +d;
+			// 		}),
+			// 		chartState.selectedYear,
+			// 	);
+			// 	const data = filterData();
+			// 	modalitiesDropdown.call(
+			// 		populateDropdown,
+			// 		["All"].concat(data.allocationsTypeList.sort()),
+			// 		chartState.selectedModality,
+			// 	);
+			// 	modalitiesDropdown.selectAll("li").on("click", function (d) {
+			// 		clickModalities(d);
+			// 	});
+
+			// 	const newMaxCombinedLevel =
+			// 		d3.max(data.map, function (d) {
+			// 			return d.maxLevel;
+			// 		}) || 0;
+			// 	chartState.selectedAdminLevel = Math.min(
+			// 		newMaxCombinedLevel,
+			// 		chartState.selectedAdminLevel,
+			// 	);
+
+			// 	createTopSvg(data.topSvgObject);
+			// 	createMap(data.map);
+			// 	createLegendSvg(data.map);
+			// 	createBreadcrumbDiv();
+			// 	createShowAllButton(data.map);
+
+			// 	adminLevelDropdown.call(
+			// 		populateDropdown,
+			// 		d3.range(0, newMaxCombinedLevel + 1, 1),
+			// 		chartState.selectedAdminLevel,
+			// 	);
+			// 	adminLevelDropdown.selectAll("li").on("click", function (d) {
+			// 		chartState.selectedAdminLevel = d;
+			// 		if (!chartState.selectedAdminLevel) {
+			// 			queryStringValues.delete("adminlevel");
+			// 		} else {
+			// 			setQueryString("adminlevel", d);
+			// 		}
+			// 		adminLevelDropdown.call(
+			// 			populateDropdown,
+			// 			d3.range(0, newMaxCombinedLevel + 1, 1),
+			// 			chartState.selectedAdminLevel,
+			// 		);
+			// 		const data = filterData();
+			// 		createTopSvg(data.topSvgObject);
+			// 		createMap(data.map);
+			// 		createLegendSvg(data.map);
+			// 		createBreadcrumbDiv();
+			// 		createShowAllButton(data.map);
+			// 	});
+
+			// 	filterCbpfsDropdown();
+
+			// 	partnersDropdown.call(
+			// 		filterPartnersAndClusters,
+			// 		data,
+			// 		"partnersTypeList",
+			// 	);
+			// 	clustersDropdown.call(
+			// 		filterPartnersAndClusters,
+			// 		data,
+			// 		"clustersList",
+			// 	);
+			// });
+
+			statusDropdown.selectAll("li").on("click", function (d) {
+				if (
+					chartState.selectedStatus.indexOf(d.toLowerCase()) > -1 &&
+					chartState.selectedStatus.length === 1
+				)
+					return;
+				changeSelected(d, chartState.selectedStatus);
+				if (chartState.selectedStatus[0] === "all") {
+					queryStringValues.delete("partner");
 				} else {
-					if (chartState.selectedYear.length === 1) return;
-					const index = chartState.selectedYear.indexOf(+d);
-					chartState.selectedYear.splice(index, 1);
-				}
-				setQueryString(
-					"year",
-					chartState.selectedYear.length === 1
-						? chartState.selectedYear[0]
-						: currentYear,
-				);
-				yearsDropdown.call(
-					populateDropdown,
-					yearsArrayString.map(function (d) {
-						return +d;
-					}),
-					chartState.selectedYear,
-				);
-				const data = filterData();
-				modalitiesDropdown.call(
-					populateDropdown,
-					["All"].concat(data.allocationsTypeList.sort()),
-					chartState.selectedModality,
-				);
-				modalitiesDropdown.selectAll("li").on("click", function (d) {
-					clickModalities(d);
-				});
-
-				const newMaxCombinedLevel =
-					d3.max(data.map, function (d) {
-						return d.maxLevel;
-					}) || 0;
-				chartState.selectedAdminLevel = Math.min(
-					newMaxCombinedLevel,
-					chartState.selectedAdminLevel,
-				);
-
-				createTopSvg(data.topSvgObject);
-				createMap(data.map);
-				createLegendSvg(data.map);
-				createBreadcrumbDiv();
-				createShowAllButton(data.map);
-
-				adminLevelDropdown.call(
-					populateDropdown,
-					d3.range(0, newMaxCombinedLevel + 1, 1),
-					chartState.selectedAdminLevel,
-				);
-				adminLevelDropdown.selectAll("li").on("click", function (d) {
-					chartState.selectedAdminLevel = d;
-					if (!chartState.selectedAdminLevel) {
-						queryStringValues.delete("adminlevel");
-					} else {
-						setQueryString("adminlevel", d);
-					}
-					adminLevelDropdown.call(
-						populateDropdown,
-						d3.range(0, newMaxCombinedLevel + 1, 1),
-						chartState.selectedAdminLevel,
+					setQueryString(
+						"partner",
+						chartState.selectedStatus.join("|"),
 					);
-					const data = filterData();
-					createTopSvg(data.topSvgObject);
-					createMap(data.map);
-					createLegendSvg(data.map);
-					createBreadcrumbDiv();
-					createShowAllButton(data.map);
-				});
-
-				filterCbpfsDropdown();
-
-				partnersDropdown.call(
-					filterPartnersAndClusters,
-					data,
-					"partnersTypeList",
+				}
+				statusDropdown.call(
+					populateDropdown,
+					["All"].concat(d3.values(statusList)),
+					chartState.selectedStatus,
 				);
-				clustersDropdown.call(
-					filterPartnersAndClusters,
-					data,
-					"clustersList",
-				);
+				filterStatusDropdown();
 			});
 
 			cbpfsDropdown.selectAll("li").on("click", function (d) {
@@ -1693,6 +1649,11 @@
 				createLegendSvg(data.map);
 				createBreadcrumbDiv();
 				createShowAllButton(data.map);
+				cbpfsDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"cbpfsList",
+				);
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
@@ -1705,6 +1666,7 @@
 				);
 			});
 
+			cbpfsDropdown.call(filterPartnersAndClusters, data, "cbpfsList");
 			partnersDropdown.call(
 				filterPartnersAndClusters,
 				data,
@@ -1787,6 +1749,11 @@
 					createShowAllButton(data.map);
 				});
 
+				cbpfsDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"cbpfsList",
+				);
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
@@ -1813,11 +1780,19 @@
 						);
 					}
 
-					yearsDropdown.call(
+					// yearsDropdown.call(
+					// 	populateDropdown,
+					// 	yearsArrayString,
+					// 	chartState.selectedYear,
+					// );
+
+					statusDropdown.call(
 						populateDropdown,
-						yearsArrayString,
-						chartState.selectedYear,
+						["All"].concat(d3.values(statusList)),
+						chartState.selectedStatus,
 					);
+					filterStatusDropdown();
+
 					cbpfsDropdown.call(
 						populateDropdown,
 						["All"].concat(
@@ -1886,6 +1861,11 @@
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
 					listDiv.html("");
+					cbpfsDropdown.call(
+						filterPartnersAndClusters,
+						data,
+						"cbpfsList",
+					);
 					partnersDropdown.call(
 						filterPartnersAndClusters,
 						data,
@@ -1944,6 +1924,21 @@
 					});
 			}
 
+			function filterStatusDropdown() {
+				statusDropdown
+					.selectAll("li")
+					.filter(function (d) {
+						return d !== "All";
+					})
+					.each(function (d) {
+						d3.select(this).style("display", function () {
+							return statusesInCompleteData.indexOf(d) === -1
+								? "none"
+								: null;
+						});
+					});
+			}
+
 			function filterPartnersAndClusters(selection, data, property) {
 				selection
 					.selectAll("li")
@@ -1970,43 +1965,43 @@
 			//end of createFilterDivs
 		}
 
-		function removeYearFilter() {
-			filtersDiv
-				.selectAll(".pbimapDropdownUl")
-				.filter(function (d) {
-					return d === "Year";
-				})
-				.selectAll("li")
-				.filter(function (d) {
-					return yearsArrayString.indexOf(d) === -1;
-				})
-				.remove();
-		}
+		// function removeYearFilter() {
+		// 	filtersDiv
+		// 		.selectAll(".pbimapDropdownUl")
+		// 		.filter(function (d) {
+		// 			return d === "Year";
+		// 		})
+		// 		.selectAll("li")
+		// 		.filter(function (d) {
+		// 			return yearsArrayString.indexOf(d) === -1;
+		// 		})
+		// 		.remove();
+		// }
 
-		function repopulateYearFilter() {
-			const yearsDropdown = filtersDiv
-				.selectAll(".pbimapDropdownUl")
-				.filter(function (d) {
-					return d === "Year";
-				});
+		// function repopulateYearFilter() {
+		// 	const yearsDropdown = filtersDiv
+		// 		.selectAll(".pbimapDropdownUl")
+		// 		.filter(function (d) {
+		// 			return d === "Year";
+		// 		});
 
-			yearsDropdown.selectAll("li").each(function (d) {
-				d3.select(this)
-					.style(
-						"opacity",
-						loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu,
-					)
-					.style(
-						"pointer-events",
-						loadedYears.indexOf(+d) > -1 ? "all" : "none",
-					);
-				d3.select(this)
-					.select("span:nth-child(2)")
-					.html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
-			});
+		// 	yearsDropdown.selectAll("li").each(function (d) {
+		// 		d3.select(this)
+		// 			.style(
+		// 				"opacity",
+		// 				loadedYears.indexOf(+d) > -1 ? 1 : fadeOpacityMenu,
+		// 			)
+		// 			.style(
+		// 				"pointer-events",
+		// 				loadedYears.indexOf(+d) > -1 ? "all" : "none",
+		// 			);
+		// 		d3.select(this)
+		// 			.select("span:nth-child(2)")
+		// 			.html(loadedYears.indexOf(+d) > -1 ? d : d + " (loading)");
+		// 	});
 
-			//end of repopulateYearFilter
-		}
+		// 	//end of repopulateYearFilter
+		// }
 
 		function createMap(data, fromLegend) {
 			if (data.length === 0) {
@@ -2663,7 +2658,7 @@
 			}
 
 			let breadcrumbData = [
-				chartState.selectedYear,
+				chartState.selectedStatus,
 				chartState.selectedCBPF,
 				chartState.selectedPartner,
 				chartState.selectedCluster,
@@ -2674,7 +2669,7 @@
 				if (d.length > 1) {
 					return "Several";
 				} else if (i !== 2) {
-					return i ? capitalizeEvery(d[0]) : d[0];
+					return capitalizeEvery(d[0]);
 				} else {
 					let partner;
 					for (var key in partnersList) {
@@ -2685,6 +2680,7 @@
 				}
 			});
 
+			if (breadcrumbData[0] === "All") breadcrumbData[0] = "All Statuses";
 			if (breadcrumbData[1] === "All") breadcrumbData[1] = "All CBPFs";
 			if (breadcrumbData[2] === "All") breadcrumbData[2] = "All Partners";
 			if (breadcrumbData[3] === "All") breadcrumbData[3] = "All Clusters";
@@ -3659,6 +3655,7 @@
 				}
 
 				thisRow.cbpfName = cbpfsList[thisRow.PFId];
+				thisRow.PrjStsId = foundSummaryObject.PrjStsId;
 				thisRow.OrgTypeId = foundSummaryObject.OrgTypeId;
 				thisRow.OrgNm = foundSummaryObject.OrgNm;
 				thisRow.AllNm =
@@ -3690,6 +3687,16 @@
 				) {
 					cbpfsInCompleteData[thisRow.AYr].push(
 						cbpfsList[thisRow.PFId],
+					);
+				}
+
+				if (
+					statusesInCompleteData.indexOf(
+						statusList[projectStatusMapping[thisRow.PrjStsId]],
+					) === -1
+				) {
+					statusesInCompleteData.push(
+						statusList[projectStatusMapping[thisRow.PrjStsId]],
 					);
 				}
 
@@ -3782,6 +3789,7 @@
 				row.partnerType = partnersList[row.OrgTypeId];
 				row.cluster = clustersList[row.ClstAgg];
 				row.modality = modalitiesList[row.AllSrc];
+				row.status = statusList[projectStatusMapping[row.PrjStsId]];
 
 				for (let key in row) {
 					if (key.indexOf("AdmLocClustBdg") > -1) {
@@ -3815,8 +3823,6 @@
 				totalBeneficiariesReached: 0,
 				totalProjects: 0,
 				totalPartners: 0,
-				launchedAllocations: 0,
-				underApprovalAllocations: 0,
 			};
 
 			let nestedData;
@@ -3829,12 +3835,15 @@
 
 			const clustersList = [];
 
+			const cbpfsList = [];
+
 			completeData.forEach(function (row) {
 				if (
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
-					filterCluster(row.cluster)
+					filterCluster(row.cluster) &&
+					filterStatus(row.status)
 				) {
 					if (
 						lowercaseAllocationsTypeList.indexOf(
@@ -3852,7 +3861,8 @@
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterModality(row.AllNm) &&
-					filterCluster(row.cluster)
+					filterCluster(row.cluster) &&
+					filterStatus(row.status)
 				) {
 					if (partnersTypeList.indexOf(row.partnerType) === -1) {
 						partnersTypeList.push(row.partnerType);
@@ -3863,10 +3873,17 @@
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
-					filterModality(row.AllNm)
+					filterModality(row.AllNm) &&
+					filterStatus(row.status)
 				) {
 					if (clustersList.indexOf(row.cluster) === -1) {
 						clustersList.push(row.cluster);
+					}
+				}
+
+				if (filterStatus(row.status)) {
+					if (cbpfsList.indexOf(row.cbpfName) === -1) {
+						cbpfsList.push(row.cbpfName);
 					}
 				}
 			});
@@ -3896,7 +3913,8 @@
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
 					filterModality(row.AllNm) &&
-					filterCluster(row.cluster)
+					filterCluster(row.cluster) &&
+					filterStatus(row.status)
 				);
 			});
 
@@ -4082,70 +4100,27 @@
 				topSvgObject.totalProjects += totalNumberOfProjects.length;
 			}
 
-			for (const key in yearsWithUnderApprovalAboveMin)
-				delete yearsWithUnderApprovalAboveMin[key];
-
-			const aggregatedLaunchedValues = {};
-
-			launchedAllocationsData.forEach(function (row) {
-				if (
-					filterYear(row.AllocationYear) &&
-					filterCBPF(row.PooledFundName)
-				) {
-					aggregatedLaunchedValues[row.AllocationYear] = {
-						underApproval:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.underApproval
-								: 0) + +row.TotalUnderApprovalBudget,
-						approved:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.approved
-								: 0) + +row.TotalApprovedBudget,
-						launched:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.launched
-								: 0) + +row.TotalUSDPlanned,
-					};
-				}
-			});
-
-			for (const year in aggregatedLaunchedValues) {
-				const { underApprovalPercent, underPlusApprovedPercent } =
-					safeDivide(
-						aggregatedLaunchedValues[year].underApproval,
-						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched,
-					);
-				yearsWithUnderApprovalAboveMin[year] =
-					underApprovalPercent > minimumUnderApprovalPercentage ||
-					underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			}
-
-			launchedAllocationsData.forEach(function (row) {
-				if (
-					filterYear(row.AllocationYear) &&
-					filterCBPF(row.PooledFundName) &&
-					yearsWithUnderApprovalAboveMin[row.AllocationYear]
-				) {
-					topSvgObject.launchedAllocations += +row.TotalUSDPlanned;
-					topSvgObject.underApprovalAllocations +=
-						+row.TotalUnderApprovalBudget;
-				}
-			});
-
 			return {
 				topSvgObject: topSvgObject,
 				map: nestedData,
 				allocationsTypeList: allocationsTypeList,
 				partnersTypeList: partnersTypeList,
 				clustersList: clustersList,
+				cbpfsList: cbpfsList,
 			};
 
 			function filterYear(datum) {
 				return chartState.selectedYear.indexOf(+datum) > -1;
+			}
+
+			function filterStatus(datum) {
+				return chartState.selectedStatus[0] === "all"
+					? true
+					: datum
+						? chartState.selectedStatus.indexOf(
+								datum.toLowerCase(),
+							) > -1
+						: false;
 			}
 
 			function filterCBPF(datum) {
@@ -5603,16 +5578,6 @@
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 			d3.select(".pbimapOverDiv").remove();
-		}
-
-		function safeDivide(underApproval, approved, launched) {
-			if (launched === 0)
-				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
-			return {
-				underApprovalPercent: (underApproval / launched) * 100,
-				underPlusApprovedPercent:
-					((underApproval + approved) / launched) * 100,
-			};
 		}
 
 		//end of d3Chart
