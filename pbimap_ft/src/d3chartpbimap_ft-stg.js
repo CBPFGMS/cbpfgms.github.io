@@ -317,7 +317,6 @@
 			clustersListFile = baseUrl + "MstClusters.csv",
 			partnersListFile = baseUrl + "MstOrgType.csv",
 			modalitiesListFile = baseUrl + "MstAllocationSource.csv",
-			launchedAllocationsDataFile = baseUrl + "AllocationTypes.csv",
 			lastUpdated = baseUrl + "last_updated.txt",
 			promises = [],
 			filterTitles = [
@@ -377,8 +376,6 @@
 			statusesInCompleteData = [],
 			lowercaseAllocationsTypeList = [],
 			countriesCoordinates = {},
-			launchedAllocationsData = [],
-			yearsWithUnderApprovalAboveMin = {},
 			completeData = [];
 
 		const projectStatusMapping = {
@@ -705,7 +702,6 @@
 		promises.push(d3.csv(clustersListFile));
 		promises.push(d3.csv(partnersListFile));
 		promises.push(d3.csv(modalitiesListFile));
-		promises.push(d3.csv(launchedAllocationsDataFile));
 		promises.push(d3.text(lastUpdated));
 
 		if (!isScriptLoaded(html2ToCanvas)) loadScript(html2ToCanvas, null);
@@ -714,41 +710,6 @@
 
 		Promise.all(promises).then(function (rawData) {
 			removeProgressWheel();
-
-			const aggregatedLaunchedValues = {};
-
-			rawData[6].forEach(function (row) {
-				aggregatedLaunchedValues[row.AllocationYear] = {
-					underApproval:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.underApproval
-							: 0) + +row.TotalUnderApprovalBudget,
-					approved:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.approved
-							: 0) + +row.TotalApprovedBudget,
-					launched:
-						(aggregatedLaunchedValues[row.AllocationYear]
-							? aggregatedLaunchedValues[row.AllocationYear]
-									.launched
-							: 0) + +row.TotalUSDPlanned,
-				};
-				launchedAllocationsData.push(row);
-			});
-
-			for (const year in aggregatedLaunchedValues) {
-				const { underApprovalPercent, underPlusApprovedPercent } =
-					safeDivide(
-						aggregatedLaunchedValues[year].underApproval,
-						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched,
-					);
-				yearsWithUnderApprovalAboveMin[year] =
-					underApprovalPercent > minimumUnderApprovalPercentage ||
-					underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			}
 
 			createCbpfsList(rawData[2]);
 
@@ -969,29 +930,6 @@
 		}
 
 		function createTopSvg(data) {
-			const yearsListOriginal = chartState.selectedYear
-				.sort(function (a, b) {
-					return a - b;
-				})
-				.filter(function (d) {
-					return yearsWithUnderApprovalAboveMin[d];
-				});
-
-			const yearsList = yearsListOriginal.reduce(function (
-				acc,
-				curr,
-				index,
-			) {
-				return (
-					acc +
-					(index >= yearsListOriginal.length - 2
-						? index > yearsListOriginal.length - 2
-							? curr
-							: curr + " and "
-						: curr + ", ")
-				);
-			}, "");
-
 			const previousAllocations = d3
 				.select(".pbimapTopSvgAllocations")
 				.size()
@@ -3885,8 +3823,6 @@
 				totalBeneficiariesReached: 0,
 				totalProjects: 0,
 				totalPartners: 0,
-				launchedAllocations: 0,
-				underApprovalAllocations: 0,
 			};
 
 			let nestedData;
@@ -4163,60 +4099,6 @@
 				topSvgObject.totalPartners += totalNumberOfPartners.length;
 				topSvgObject.totalProjects += totalNumberOfProjects.length;
 			}
-
-			for (const key in yearsWithUnderApprovalAboveMin)
-				delete yearsWithUnderApprovalAboveMin[key];
-
-			const aggregatedLaunchedValues = {};
-
-			launchedAllocationsData.forEach(function (row) {
-				if (
-					filterYear(row.AllocationYear) &&
-					filterCBPF(row.PooledFundName)
-				) {
-					aggregatedLaunchedValues[row.AllocationYear] = {
-						underApproval:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.underApproval
-								: 0) + +row.TotalUnderApprovalBudget,
-						approved:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.approved
-								: 0) + +row.TotalApprovedBudget,
-						launched:
-							(aggregatedLaunchedValues[row.AllocationYear]
-								? aggregatedLaunchedValues[row.AllocationYear]
-										.launched
-								: 0) + +row.TotalUSDPlanned,
-					};
-				}
-			});
-
-			for (const year in aggregatedLaunchedValues) {
-				const { underApprovalPercent, underPlusApprovedPercent } =
-					safeDivide(
-						aggregatedLaunchedValues[year].underApproval,
-						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched,
-					);
-				yearsWithUnderApprovalAboveMin[year] =
-					underApprovalPercent > minimumUnderApprovalPercentage ||
-					underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			}
-
-			launchedAllocationsData.forEach(function (row) {
-				if (
-					filterYear(row.AllocationYear) &&
-					filterCBPF(row.PooledFundName) &&
-					yearsWithUnderApprovalAboveMin[row.AllocationYear]
-				) {
-					topSvgObject.launchedAllocations += +row.TotalUSDPlanned;
-					topSvgObject.underApprovalAllocations +=
-						+row.TotalUnderApprovalBudget;
-				}
-			});
 
 			return {
 				topSvgObject: topSvgObject,
@@ -5696,16 +5578,6 @@
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
 			d3.select(".pbimapOverDiv").remove();
-		}
-
-		function safeDivide(underApproval, approved, launched) {
-			if (launched === 0)
-				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
-			return {
-				underApprovalPercent: (underApproval / launched) * 100,
-				underPlusApprovedPercent:
-					((underApproval + approved) / launched) * 100,
-			};
 		}
 
 		//end of d3Chart
