@@ -374,6 +374,7 @@
 			},
 			allocationsTypeList = [],
 			cbpfsInCompleteData = {},
+			statusesInCompleteData = [],
 			lowercaseAllocationsTypeList = [],
 			countriesCoordinates = {},
 			launchedAllocationsData = [],
@@ -1449,6 +1450,8 @@
 				chartState.selectedStatus,
 			);
 
+			filterStatusDropdown();
+
 			const cbpfsDropdown = dropdownContainer.filter(function (d) {
 				return d === "CBPF";
 			});
@@ -1618,6 +1621,7 @@
 					["All"].concat(d3.values(statusList)),
 					chartState.selectedStatus,
 				);
+				filterStatusDropdown();
 			});
 
 			cbpfsDropdown.selectAll("li").on("click", function (d) {
@@ -1707,6 +1711,11 @@
 				createLegendSvg(data.map);
 				createBreadcrumbDiv();
 				createShowAllButton(data.map);
+				cbpfsDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"cbpfsList",
+				);
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
@@ -1719,6 +1728,7 @@
 				);
 			});
 
+			cbpfsDropdown.call(filterPartnersAndClusters, data, "cbpfsList");
 			partnersDropdown.call(
 				filterPartnersAndClusters,
 				data,
@@ -1801,6 +1811,11 @@
 					createShowAllButton(data.map);
 				});
 
+				cbpfsDropdown.call(
+					filterPartnersAndClusters,
+					data,
+					"cbpfsList",
+				);
 				partnersDropdown.call(
 					filterPartnersAndClusters,
 					data,
@@ -1838,7 +1853,8 @@
 						["All"].concat(d3.values(statusList)),
 						chartState.selectedStatus,
 					);
-					
+					filterStatusDropdown();
+
 					cbpfsDropdown.call(
 						populateDropdown,
 						["All"].concat(
@@ -1907,6 +1923,11 @@
 					createBreadcrumbDiv();
 					createShowAllButton(data.map);
 					listDiv.html("");
+					cbpfsDropdown.call(
+						filterPartnersAndClusters,
+						data,
+						"cbpfsList",
+					);
 					partnersDropdown.call(
 						filterPartnersAndClusters,
 						data,
@@ -1959,6 +1980,21 @@
 					.each(function (d) {
 						d3.select(this).style("display", function () {
 							return cbpfsWithData.indexOf(d) === -1
+								? "none"
+								: null;
+						});
+					});
+			}
+
+			function filterStatusDropdown() {
+				statusDropdown
+					.selectAll("li")
+					.filter(function (d) {
+						return d !== "All";
+					})
+					.each(function (d) {
+						d3.select(this).style("display", function () {
+							return statusesInCompleteData.indexOf(d) === -1
 								? "none"
 								: null;
 						});
@@ -3716,6 +3752,16 @@
 					);
 				}
 
+				if (
+					statusesInCompleteData.indexOf(
+						statusList[projectStatusMapping[thisRow.PrjStsId]],
+					) === -1
+				) {
+					statusesInCompleteData.push(
+						statusList[projectStatusMapping[thisRow.PrjStsId]],
+					);
+				}
+
 				populateColumns(thisRow);
 
 				populateUniqueValues(thisRow);
@@ -3853,12 +3899,15 @@
 
 			const clustersList = [];
 
+			const cbpfsList = [];
+
 			completeData.forEach(function (row) {
 				if (
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
-					filterCluster(row.cluster)
+					filterCluster(row.cluster) &&
+					filterStatus(row.status)
 				) {
 					if (
 						lowercaseAllocationsTypeList.indexOf(
@@ -3876,7 +3925,8 @@
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterModality(row.AllNm) &&
-					filterCluster(row.cluster)
+					filterCluster(row.cluster) &&
+					filterStatus(row.status)
 				) {
 					if (partnersTypeList.indexOf(row.partnerType) === -1) {
 						partnersTypeList.push(row.partnerType);
@@ -3887,10 +3937,17 @@
 					filterYear(row.AYr) &&
 					filterCBPF(row.cbpfName) &&
 					filterPartner(row.partnerType) &&
-					filterModality(row.AllNm)
+					filterModality(row.AllNm) &&
+					filterStatus(row.status)
 				) {
 					if (clustersList.indexOf(row.cluster) === -1) {
 						clustersList.push(row.cluster);
+					}
+				}
+
+				if (filterStatus(row.status)) {
+					if (cbpfsList.indexOf(row.cbpfName) === -1) {
+						cbpfsList.push(row.cbpfName);
 					}
 				}
 			});
@@ -4167,6 +4224,7 @@
 				allocationsTypeList: allocationsTypeList,
 				partnersTypeList: partnersTypeList,
 				clustersList: clustersList,
+				cbpfsList: cbpfsList,
 			};
 
 			function filterYear(datum) {
