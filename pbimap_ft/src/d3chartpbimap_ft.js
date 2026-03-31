@@ -725,7 +725,7 @@
 
 			processData(rawData[0], rawData[1]);
 
-			lastUpdatedDate = rawData[7];
+			lastUpdatedDate = rawData[6];
 
 			loadedYears.push.apply(loadedYears, chartState.selectedYear);
 
