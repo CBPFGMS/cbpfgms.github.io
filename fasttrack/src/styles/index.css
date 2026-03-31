@@ -289,3 +289,7 @@ button:focus-visible {
 .status-lpd-blue {
 	background: #378add;
 }
+
+.hiddenElement {
+	display: none !important;
+}

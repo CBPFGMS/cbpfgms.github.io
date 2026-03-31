@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { PartnersDatum } from "../utils/processdatapartners";
 import type { List } from "../utils/makelists";
-// import type { DownloadStates } from "./MainContainer";
+import type { DownloadStates } from "./MainContainer";
 import { ascending, descending, sort } from "d3";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
@@ -14,6 +14,9 @@ import PartnersTableBody from "./PartnersTableBody";
 import type { SectorsData } from "../utils/processdatasectors";
 import SectorsRibbon from "./SectorsRibbon";
 import InfoIcon from "@mui/icons-material/Info";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import type { PartnersDatumDownload } from "../utils/processdownload";
+import downloadData from "../utils/downloaddata";
 
 type PartnersProps = {
 	data: PartnersDatum[];
@@ -22,8 +25,9 @@ type PartnersProps = {
 	dataSectors: SectorsData;
 	sector: number[];
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
-	// clickedDownload: DownloadStates;
-	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	dataPartnersDownload: () => PartnersDatumDownload[];
 };
 
 export type SortingCriterion = (typeof constants.partnersHeader)[number];
@@ -39,8 +43,9 @@ function Partners({
 	dataSectors,
 	sector,
 	setSector,
-	// clickedDownload,
-	// setClickedDownload,
+	clickedDownload,
+	setClickedDownload,
+	dataPartnersDownload,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
@@ -64,13 +69,31 @@ function Partners({
 
 	const tableRef = useRef(null);
 
+	const ref = useRef<HTMLDivElement>(null);
+
+	function handleDownloadClick() {
+		const dataPartners = dataPartnersDownload();
+		downloadData<(typeof dataPartners)[number]>(
+			dataPartners,
+			"implementing_partners",
+		);
+	}
+
 	return (
-		<Box>
+		<Box ref={ref}>
 			<Grid
 				container
 				spacing={2}
 				position={"relative"}
 			>
+				<DownloadAndImageContainer
+					handleDownloadClick={handleDownloadClick}
+					clickedDownload={clickedDownload}
+					setClickedDownload={setClickedDownload}
+					type="partners"
+					refElement={ref}
+					fileName="Implementing_Partners"
+				/>
 				<Grid
 					size={12}
 					mb={3}

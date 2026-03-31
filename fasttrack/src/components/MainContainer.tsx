@@ -1,4 +1,4 @@
-import { useContext, useState, useMemo, useEffect } from "react";
+import { useContext, useState, useMemo, useEffect, useCallback } from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
 import { constants } from "../utils/constants";
 import Container from "@mui/material/Container";
@@ -11,6 +11,7 @@ import processDataPartners from "../utils/processdatapartners";
 import processDataRegions from "../utils/processdataregions";
 import processDataSectors from "../utils/processdatasectors";
 import processDataStatuses from "../utils/processdatastatuses";
+import { processPartnersDownload } from "../utils/processdownload";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
@@ -125,6 +126,17 @@ function MainContainer() {
 		[data, fund, status],
 	);
 
+	const dataPartnersDownload = useCallback(
+		() =>
+			processPartnersDownload({
+				data,
+				lists,
+				fund,
+				status,
+			}),
+		[data, lists, fund, status],
+	);
+
 	useUpdateQueryString({
 		fund,
 		status,
@@ -172,8 +184,8 @@ function MainContainer() {
 			<Box mb={8} />
 			<IndicatorsContainer
 				dataIndicators={filteredDataIndicators}
-				// clickedDownload={clickedDownload}
-				// setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
 				lists={lists}
 			/>
 			<Box mb={8} />
@@ -184,8 +196,9 @@ function MainContainer() {
 				dataSectors={dataSectors}
 				sector={sector}
 				setSector={setSector}
-				// clickedDownload={clickedDownload}
-				// setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				dataPartnersDownload={dataPartnersDownload}
 			/>
 			<Box mb={8} />
 			<Regions

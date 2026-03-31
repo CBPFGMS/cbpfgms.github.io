@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import type {
 	DatumIndicators,
-	// AllSectorsDatum,
+	AllSectorsDatum,
 } from "../utils/processdataindicators";
 import Button from "@mui/material/Button";
 import Stepper from "@mui/material/Stepper";
@@ -15,30 +15,30 @@ import type { List } from "../utils/makelists";
 import { clustersIconsData } from "../assets/clustericons";
 import { Typography } from "@mui/material";
 import colors from "../utils/colors";
-// import DownloadIcon from "./DownloadIcon";
-// import type { DownloadStates } from "./MainContainer";
+import DownloadIcon from "./DownloadIcon";
+import type { DownloadStates } from "./MainContainer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/swiper-bundle.css";
-// import downloadData from "../utils/downloaddata";
-// import { processIndicatorsDownload } from "../utils/processdownload";
+import downloadData from "../utils/downloaddata";
+import { processIndicatorsDownload } from "../utils/processdownload";
 
 type IndicatorsCarouselProps = {
 	data: DatumIndicators[];
 	lists: List;
-	// clickedDownload: DownloadStates;
-	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 };
 
-// function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
-// 	return datum && datum.sector === 0;
-// }
+function isAllSectorsDatum(datum: DatumIndicators): datum is AllSectorsDatum {
+	return datum && datum.sector === 0;
+}
 
 function IndicatorsCarousel({
 	data,
 	lists,
-	// clickedDownload,
-	// setClickedDownload,
+	clickedDownload,
+	setClickedDownload,
 }: IndicatorsCarouselProps) {
 	const [activeStep, setActiveStep] = useState<number>(0),
 		maxSteps = data.length;
@@ -68,18 +68,18 @@ function IndicatorsCarousel({
 		setActiveStep(swiper.activeIndex);
 	}
 
-	// const allSectorsData = data.find(isAllSectorsDatum)!;
+	const allSectorsData = data.find(isAllSectorsDatum)!;
 
-	// function handleDownloadClick() {
-	// 	const dataIndicatorsDownload = processIndicatorsDownload({
-	// 		allSectorsData,
-	// 		lists,
-	// 	});
-	// 	downloadData<(typeof dataIndicatorsDownload)[number]>(
-	// 		dataIndicatorsDownload,
-	// 		"global_indicators",
-	// 	);
-	// }
+	function handleDownloadClick() {
+		const dataIndicatorsDownload = processIndicatorsDownload({
+			allSectorsData,
+			lists,
+		});
+		downloadData<(typeof dataIndicatorsDownload)[number]>(
+			dataIndicatorsDownload,
+			"global_indicators",
+		);
+	}
 
 	return (
 		<Box
@@ -102,12 +102,12 @@ function IndicatorsCarousel({
 					flexDirection: "column",
 				}}
 			>
-				{/* <DownloadIcon
+				<DownloadIcon
 					handleDownloadClick={handleDownloadClick}
 					clickedDownload={clickedDownload}
 					setClickedDownload={setClickedDownload}
 					type="indicators"
-				/> */}
+				/>
 			</Box>
 			<Box
 				display="flex"
