@@ -618,7 +618,7 @@
 					JSON.parse(localStorage.getItem(fileName)).data,
 				);
 				console.info(
-					"pbinad: " + warningString + " from local storage",
+					"Allocations Flow: " + warningString + " from local storage",
 				);
 				previousData.push(fetchedData);
 				return Promise.resolve(previousData);
@@ -635,7 +635,7 @@
 					} catch (error) {
 						console.info("D3 chart pbinad, " + error);
 					}
-					console.info("pbinad: " + warningString + " from API");
+					console.info("Allocations Flow: " + warningString + " from API");
 					previousData.push(fetchedData);
 					return previousData;
 				});
