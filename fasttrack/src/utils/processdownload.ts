@@ -46,7 +46,8 @@ export type RegionsDatumDownload = BaseDownloadDatum & {
 };
 
 export type SectorsDatumDownload = BaseDownloadDatum & {
-	foo: number;
+	Sector: string;
+	Budget: number;
 };
 
 type ProcessDownloadParams = {
@@ -129,9 +130,13 @@ export function processSectorsDownload({
 	data.forEach(datum => {
 		if (checkRow(datum, fund, status)) {
 			const baseDownloadDatum = populateBaseDownloadDatum(datum, lists);
-			sectorsDataDownload.push({
-				...baseDownloadDatum,
-				foo: 0,
+			delete baseDownloadDatum.Budget;
+			datum.sectorData.forEach(sectorDatum => {
+				sectorsDataDownload.push({
+					...baseDownloadDatum,
+					Sector: lists.sectors[sectorDatum.sectorId],
+					Budget: sectorDatum.budget,
+				});
 			});
 		}
 	});

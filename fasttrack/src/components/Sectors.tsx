@@ -1,17 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { List } from "../utils/makelists";
-// import type { DownloadStates } from "./MainContainer";
+import type { DownloadStates } from "./MainContainer";
 import type { SectorsData } from "../utils/processdatasectors";
 import { clustersIconsData } from "../assets/clustericons";
+import type { SectorsDatumDownload } from "../utils/processdownload";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import downloadData from "../utils/downloaddata";
 
 type SectorsProps = {
 	data: SectorsData;
 	lists: List;
-	// clickedDownload: DownloadStates;
-	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	dataSectorsDownload: () => SectorsDatumDownload[];
 };
 
 const sectorsText: { [key: number]: string } = {
@@ -37,16 +41,32 @@ const sectorsText: { [key: number]: string } = {
 function Sectors({
 	data,
 	lists,
-	// clickedDownload,
-	// setClickedDownload,
+	clickedDownload,
+	setClickedDownload,
+	dataSectorsDownload,
 }: SectorsProps) {
+	const ref = useRef<HTMLDivElement>(null);
+
+	function handleDownloadClick() {
+		const dataSectors = dataSectorsDownload();
+		downloadData<(typeof dataSectors)[number]>(dataSectors, "sectors");
+	}
+
 	return (
-		<Box>
+		<Box ref={ref}>
 			<Grid
 				container
 				spacing={2}
 				position={"relative"}
 			>
+				<DownloadAndImageContainer
+					handleDownloadClick={handleDownloadClick}
+					clickedDownload={clickedDownload}
+					setClickedDownload={setClickedDownload}
+					type="sectors"
+					refElement={ref}
+					fileName="Sectors"
+				/>
 				<Grid
 					size={12}
 					mb={3}

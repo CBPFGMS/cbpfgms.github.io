@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { RegionsDatum } from "../utils/processdataregions";
 import type { List } from "../utils/makelists";
-// import type { DownloadStates } from "./MainContainer";
+import type { DownloadStates } from "./MainContainer";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
+import type { RegionsDatumDownload } from "../utils/processdownload";
+import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import downloadData from "../utils/downloaddata";
 
 type RegionsProps = {
 	data: RegionsDatum[];
 	lists: List;
-	// clickedDownload: DownloadStates;
-	// setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	clickedDownload: DownloadStates;
+	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	dataRegionsDownload: () => RegionsDatumDownload[];
 };
 
 const regionsSubText = {
@@ -52,16 +56,31 @@ const regionsIconsClass = {
 function Regions({
 	data,
 	lists,
-	// clickedDownload,
-	// setClickedDownload,
+	clickedDownload,
+	setClickedDownload,
+	dataRegionsDownload,
 }: RegionsProps) {
+	const ref = useRef<HTMLDivElement>(null);
+	function handleDownloadClick() {
+		const dataRegions = dataRegionsDownload();
+		downloadData<(typeof dataRegions)[number]>(dataRegions, "regions");
+	}
+
 	return (
-		<Box>
+		<Box ref={ref}>
 			<Grid
 				container
 				spacing={2}
 				position={"relative"}
 			>
+				<DownloadAndImageContainer
+					handleDownloadClick={handleDownloadClick}
+					clickedDownload={clickedDownload}
+					setClickedDownload={setClickedDownload}
+					type="regions"
+					refElement={ref}
+					fileName="Regions"
+				/>
 				<Grid
 					size={12}
 					mb={3}

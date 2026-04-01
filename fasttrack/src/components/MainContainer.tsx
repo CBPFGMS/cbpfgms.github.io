@@ -11,7 +11,11 @@ import processDataPartners from "../utils/processdatapartners";
 import processDataRegions from "../utils/processdataregions";
 import processDataSectors from "../utils/processdatasectors";
 import processDataStatuses from "../utils/processdatastatuses";
-import { processPartnersDownload } from "../utils/processdownload";
+import {
+	processPartnersDownload,
+	processRegionsDownload,
+	processSectorsDownload,
+} from "../utils/processdownload";
 import TopFigures from "./TopFigures";
 import Explore from "./Explore";
 import Box from "@mui/material/Box";
@@ -137,6 +141,28 @@ function MainContainer() {
 		[data, lists, fund, status],
 	);
 
+	const dataRegionsDownload = useCallback(
+		() =>
+			processRegionsDownload({
+				data,
+				lists,
+				fund,
+				status,
+			}),
+		[data, lists, fund, status],
+	);
+
+	const dataSectorsDownload = useCallback(
+		() =>
+			processSectorsDownload({
+				data,
+				lists,
+				fund,
+				status,
+			}),
+		[data, lists, fund, status],
+	);
+
 	useUpdateQueryString({
 		fund,
 		status,
@@ -204,15 +230,17 @@ function MainContainer() {
 			<Regions
 				data={dataRegions}
 				lists={lists}
-				// clickedDownload={clickedDownload}
-				// setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				dataRegionsDownload={dataRegionsDownload}
 			/>
 			<Box mb={8} />
 			<Sectors
 				data={dataSectors}
 				lists={lists}
-				// clickedDownload={clickedDownload}
-				// setClickedDownload={setClickedDownload}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				dataSectorsDownload={dataSectorsDownload}
 			/>
 		</Container>
 	);
