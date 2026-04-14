@@ -12,6 +12,7 @@ function Loading() {
 				flexDirection: "column",
 				justifyContent: "center",
 				alignItems: "center",
+				marginTop: "4em",
 			}}
 		>
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -20,7 +21,7 @@ function Loading() {
 			<Typography
 				variant="h6"
 				align="center"
-				mt={3}
+				style={{ marginTop: "1.5em" }}
 			>
 				Loading data
 			</Typography>

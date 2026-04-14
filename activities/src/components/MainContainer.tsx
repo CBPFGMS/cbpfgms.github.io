@@ -1,15 +1,30 @@
+import { use } from "react";
+import type { AppData } from "../utils/api";
+import Container from "@mui/material/Container";
+
 type MainContainerProps = {
-	startYear: number | null;
+	dataPromise: Promise<AppData>;
 };
 
-function MainContainer({ startYear }: MainContainerProps) {
+function MainContainer({ dataPromise }: MainContainerProps) {
+	const { data } = use(dataPromise);
+
 	return (
-		<div className="main-container">
-			<div className="main-container__content">
+		<Container
+			disableGutters={true}
+			style={{
+				paddingLeft: "12px",
+				paddingRight: "12px",
+			}}
+		>
+			<div
+				className="main-container__content"
+				style={{ flexWrap: "wrap" }}
+			>
 				<h1>Main Container</h1>
-				<p>Start Year: {startYear}</p>
+				<p>Data Length: {data.length}</p>
 			</div>
-		</div>
+		</Container>
 	);
 }
 
