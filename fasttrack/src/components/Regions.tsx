@@ -10,6 +10,10 @@ import formatSIFloat from "../utils/formatsi";
 import type { RegionsDatumDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import downloadData from "../utils/downloaddata";
+import WarningIcon from "@mui/icons-material/Warning";
+import { constants } from "../utils/constants";
+
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 type RegionsProps = {
 	data: RegionsDatum[];
@@ -34,7 +38,7 @@ const regionsSubText = {
 		"Rapid response to large-scale displacement and conflict, ensuring life-saving assistance reaches those most in need.",
 	CERF: "Rapid response to large-scale displacement and conflict, ensuring life-saving assistance reaches those most in need.",
 	"Australia and New Zealand":
-		"fSupporting humanitarian operations across additional regions, addressing diverse crises and needs.",
+		"Supporting humanitarian operations across additional regions, addressing diverse crises and needs.",
 	Americas:
 		"Supporting humanitarian operations across additional regions, addressing diverse crises and needs.",
 };
@@ -110,7 +114,7 @@ function Regions({
 					const tooltipFunds = [...region.funds]
 						.map(d => lists.fundNames[d])
 						.join(", ");
-					const tooltipFundText = `<div style='text-align:center;'><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
+					const tooltipFundText = `<div><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
 
 					return (
 						<Grid
@@ -248,6 +252,19 @@ function Regions({
 											fontFamily: "Montserrat",
 										}}
 									>
+										<WarningIcon
+											style={{
+												fontSize: "1.2rem",
+												color: disclaimerWarningColor,
+												verticalAlign: "text-bottom",
+												marginRight: "6px",
+											}}
+											data-tooltip-id="tooltip"
+											data-tooltip-content={
+												disclaimerText
+											}
+											data-tooltip-place="top"
+										/>
 										People Targeted
 									</Typography>
 								</Grid>

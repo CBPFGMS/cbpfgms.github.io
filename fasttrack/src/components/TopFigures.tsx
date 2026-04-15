@@ -5,8 +5,12 @@ import Paper from "@mui/material/Paper";
 import NumberAnimator, { type NumberAnimatorProps } from "./NumberAnimator";
 import type { DataTopFigures } from "../utils/processdatatopfigures";
 import Box from "@mui/material/Box";
+import WarningIcon from "@mui/icons-material/Warning";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
+import { constants } from "../utils/constants";
+
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 type TopFiguresProps = {
 	data: DataTopFigures;
@@ -118,6 +122,19 @@ function TopFigures({ data }: TopFiguresProps) {
 								color: "#666",
 							}}
 						>
+							{card.label === "Targeted People" && (
+								<WarningIcon
+									style={{
+										fontSize: "1.2rem",
+										color: disclaimerWarningColor,
+										verticalAlign: "text-bottom",
+										marginRight: "6px",
+									}}
+									data-tooltip-id="tooltip"
+									data-tooltip-content={disclaimerText}
+									data-tooltip-place="top"
+								/>
+							)}
 							{card.label}
 						</Typography>
 					</Grid>

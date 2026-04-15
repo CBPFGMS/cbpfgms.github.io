@@ -10,6 +10,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import Box from "@mui/material/Box";
 import colors from "../utils/colors";
 import InfoIcon from "@mui/icons-material/Info";
+import WarningIcon from "@mui/icons-material/Warning";
 
 export type SortingCriterion = (typeof indicatorsHeader)[number];
 
@@ -23,7 +24,13 @@ type IndicatorTableHeadProps = {
 	numberOfIndicators: number;
 };
 
-const { indicatorsHeader, columnWidths, columnWidthsExpanded } = constants;
+const {
+	indicatorsHeader,
+	columnWidths,
+	columnWidthsExpanded,
+	disclaimerText,
+	disclaimerWarningColor,
+} = constants;
 
 function IndicatorTableHead({
 	setSortingCriterion,
@@ -143,6 +150,19 @@ function IndicatorTableHead({
 													: ""
 											} (${numberOfIndicators})`
 										: "")
+								)}
+								{(header === "targeted" ||
+									header === "reached") && (
+									<WarningIcon
+										style={{
+											fontSize: "1.3em",
+											color: disclaimerWarningColor,
+											marginLeft: "6px",
+										}}
+										data-tooltip-id="tooltip"
+										data-tooltip-content={disclaimerText}
+										data-tooltip-place="top"
+									/>
 								)}
 							</TableSortLabel>
 						</Box>
