@@ -1075,9 +1075,19 @@
 					};
 				});
 
-			let topSvgBeneficiariesText = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesText")
+			let topSvgBeneficiariesTextGroup = topSvg
+				.selectAll(".pbimapTopSvgBeneficiariesTextGroup")
 				.data([data.totalBeneficiaries]);
+
+			topSvgBeneficiariesTextGroup = topSvgBeneficiariesTextGroup
+				.enter()
+				.append("g")
+				.attr("class", "pbimapTopSvgBeneficiariesTextGroup")
+				.merge(topSvgBeneficiariesTextGroup);
+
+			let topSvgBeneficiariesText = topSvgBeneficiariesTextGroup
+				.selectAll(".pbimapTopSvgBeneficiariesText")
+				.data(d => [d]);
 
 			topSvgBeneficiariesText = topSvgBeneficiariesText
 				.enter()
@@ -1105,6 +1115,25 @@
 									: "";
 				return unitText + " targeted people";
 			});
+
+			const iconGroup = topSvgBeneficiariesTextGroup
+				.selectAll(".warning-icon")
+				.data([true])
+				.enter()
+				.append("g")
+				.attr("class", "warning-icon")
+				.attr("transform", function () {
+					// Position the icon to the right of the text
+					const textBBox = topSvgBeneficiariesText.node().getBBox();
+					return `translate(${textBBox.x + textBBox.width + 5}, ${textBBox.y})`; // 5px gap; adjust as needed
+				});
+
+			// Add the SVG path from your provided SVG (scaled to fit, e.g., 12x12 instead of 18x18)
+			iconGroup
+				.append("path")
+				.attr("d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z") // Your SVG path
+				.attr("fill", "#eed202") // Your fill color
+				.attr("transform", "scale(0.67)");
 
 			let topSvgBeneficiariesReached = topSvg
 				.selectAll(".pbimapTopSvgBeneficiariesReached")
