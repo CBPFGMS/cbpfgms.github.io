@@ -1,5 +1,9 @@
-import Grid from '@mui/material/Grid2';
+import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
+import WarningIcon from "@mui/icons-material/Warning";
+import constants from "../utils/constants";
+
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 function TopIntro() {
 	return (
@@ -30,6 +34,24 @@ function TopIntro() {
 					violence (GBV) category. Additionally this dashboard for the
 					first time explore the achievements against the targeted
 					Indicators across funds.
+				</Typography>
+				<Typography
+					variant="body1"
+					mt={2}
+					style={{
+						fontFamily: "Montserrat",
+						fontSize: "13px",
+					}}
+				>
+					<WarningIcon
+						style={{
+							color: disclaimerWarningColor,
+							verticalAlign: "text-bottom",
+							marginRight: "5px",
+							fontSize: "1.2em",
+						}}
+					/>
+					{disclaimerText}
 				</Typography>
 			</Grid>
 		</Grid>

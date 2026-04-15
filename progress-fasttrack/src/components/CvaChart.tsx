@@ -115,6 +115,7 @@ function CvaChart({
 				type="summary"
 				refElement={ref}
 				fileName="summary"
+				showDisclaimer={true}
 			/>
 			<Box
 				style={{

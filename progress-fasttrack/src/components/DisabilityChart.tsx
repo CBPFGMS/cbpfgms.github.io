@@ -92,6 +92,7 @@ function DisabilityChart({
 				type="disability"
 				refElement={ref}
 				fileName="people_with_disability"
+				showDisclaimer={true}
 			/>
 			<Box
 				style={{

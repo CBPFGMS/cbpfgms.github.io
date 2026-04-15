@@ -93,6 +93,9 @@ const constants = {
 	},
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
+	disclaimerWarningColor: "#eed202",
+	disclaimerText:
+		"Disclaimer: Figures for people targeted/reached may include double counting as same people may receive assistance from multiple clusters/sectors/projects.",
 } as const;
 
 export const projectStatusMaster = {

@@ -88,6 +88,7 @@ function GBVChart({
 				type="gbv"
 				refElement={ref}
 				fileName="Violence_Against_People"
+				showDisclaimer={true}
 			/>
 			<Box
 				style={{

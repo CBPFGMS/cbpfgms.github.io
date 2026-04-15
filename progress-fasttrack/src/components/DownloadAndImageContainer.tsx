@@ -3,6 +3,10 @@ import DownloadIcon from "./DownloadIcon";
 import ImageIcon from "./ImageIcon";
 import Box from "@mui/material/Box";
 import { DownloadStates, Charts } from "./MainContainer";
+import WarningIcon from "@mui/icons-material/Warning";
+import constants from "../utils/constants";
+
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 type DownloadAndImageContainerProps = {
 	handleDownloadClick: () => void;
@@ -11,6 +15,7 @@ type DownloadAndImageContainerProps = {
 	type: Charts;
 	refElement: RefObject<HTMLDivElement>;
 	fileName: string;
+	showDisclaimer?: boolean;
 };
 
 function DownloadAndImageContainer({
@@ -20,6 +25,7 @@ function DownloadAndImageContainer({
 	type,
 	refElement,
 	fileName,
+	showDisclaimer = false,
 }: DownloadAndImageContainerProps) {
 	const iconsRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +55,19 @@ function DownloadAndImageContainer({
 				iconsRef={iconsRef}
 				fileName={fileName}
 			/>
+			{showDisclaimer && (
+				<WarningIcon
+					data-tooltip-id="tooltip"
+					data-tooltip-content={disclaimerText}
+					data-tooltip-place="bottom"
+					style={{
+						color: disclaimerWarningColor,
+						verticalAlign: "text-bottom",
+						marginRight: "5px",
+						fontSize: "1.2em",
+					}}
+				/>
+			)}
 		</Box>
 	);
 }

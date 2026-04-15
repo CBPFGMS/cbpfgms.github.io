@@ -74,7 +74,7 @@ function PictogramChart({
 		});
 		downloadData<(typeof dataPictogramDownload)[number]>(
 			dataPictogramDownload,
-			"people_targeted_reached"
+			"people_targeted_reached",
 		);
 	}
 
@@ -93,6 +93,7 @@ function PictogramChart({
 				type="pictogram"
 				refElement={ref}
 				fileName="people_targeted_reached"
+				showDisclaimer={true}
 			/>
 			<Box
 				display={"flex"}
@@ -120,7 +121,7 @@ function PictogramChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`People targeted: ${format(",.0f")(
-						totalTargeted
+						totalTargeted,
 					)}`}
 					data-tooltip-place="top"
 				>
@@ -138,7 +139,7 @@ function PictogramChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalTargeted)
+										formatSIFloat(totalTargeted),
 									)}
 									type="decimal"
 								/>
@@ -183,7 +184,7 @@ function PictogramChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`People reached: ${format(",.0f")(
-						totalReached
+						totalReached,
 					)}`}
 					data-tooltip-place="top"
 				>
@@ -202,7 +203,7 @@ function PictogramChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalReached)
+										formatSIFloat(totalReached),
 									)}
 									type="decimal"
 								/>
@@ -291,7 +292,7 @@ function PictogramChart({
 							dataPictogram[
 								("targeted" +
 									capitalizeString(
-										type
+										type,
 									)) as keyof DatumPictogram
 							]
 						}
@@ -299,7 +300,7 @@ function PictogramChart({
 							dataPictogram[
 								("reached" +
 									capitalizeString(
-										type
+										type,
 									)) as keyof DatumPictogram
 							]
 						}
@@ -339,7 +340,7 @@ function PictogramChart({
 					{
 						<NumberAnimator
 							number={parseFloat(
-								formatSIFloat(maxValue / maxNumberOfPictograms)
+								formatSIFloat(maxValue / maxNumberOfPictograms),
 							)}
 							type="decimal"
 						/>

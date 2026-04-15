@@ -196,6 +196,7 @@ function BarChart({
 				type={chartType}
 				refElement={ref}
 				fileName={chartType}
+				showDisclaimer={true}
 			/>
 			<Box
 				style={{
