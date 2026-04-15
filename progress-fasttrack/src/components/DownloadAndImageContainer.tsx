@@ -41,6 +41,7 @@ function DownloadAndImageContainer({
 				zIndex: 1000,
 				display: "flex",
 				flexDirection: "column",
+				alignItems: "center",
 			}}
 			ref={iconsRef}
 		>
