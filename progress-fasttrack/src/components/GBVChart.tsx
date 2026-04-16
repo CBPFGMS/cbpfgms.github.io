@@ -261,15 +261,16 @@ function GBVCell({
 			flexDirection={"column"}
 			alignItems={"center"}
 			justifyContent={"center"}
-			data-tooltip-id="tooltip"
-			data-tooltip-html={`<div style='text-align:center;'>${title}: ${
-				title.toLowerCase().includes("budget") ? "$" : ""
-			}${format(",.0f")(GBVSlice)}<br />(${
-				~~((GBVSlice * 10000) / totalSlice) / 100
-			}% of ${title.toLowerCase().includes("budget") ? "$" : ""}${format(
-				",.0f",
-			)(totalSlice)})</div>`}
-			data-tooltip-place="top"
+			// TEMPORARILY REMOVING TOOLTIP
+			// data-tooltip-id="tooltip"
+			// data-tooltip-html={`<div style='text-align:center;'>${title}: ${
+			// 	title.toLowerCase().includes("budget") ? "$" : ""
+			// }${format(",.0f")(GBVSlice)}<br />(${
+			// 	~~((GBVSlice * 10000) / totalSlice) / 100
+			// }% of ${title.toLowerCase().includes("budget") ? "$" : ""}${format(
+			// 	",.0f",
+			// )(totalSlice)})</div>`}
+			// data-tooltip-place="top"
 		>
 			<Typography
 				mb={0.5}

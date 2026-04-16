@@ -64,7 +64,6 @@ function DownloadAndImageContainer({
 					style={{
 						color: disclaimerWarningColor,
 						verticalAlign: "text-bottom",
-						marginRight: "5px",
 						fontSize: "1.2em",
 					}}
 				/>

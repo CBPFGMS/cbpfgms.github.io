@@ -20,6 +20,12 @@ import capitalizeString from "../utils/capitalizestring";
 import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
+// TEMPORARILY REMOVING TOTAL FIGURES
+void format;
+void Divider;
+void AdsClickIcon;
+void DoneIcon;
+
 type PictogramChartProps = {
 	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
@@ -31,7 +37,7 @@ type PictogramChartProps = {
 	implementationStatus: ImplementationStatuses[];
 };
 
-const { beneficiaryCategories } = constants;
+const { beneficiaryCategories, totalBeneficiariesText } = constants;
 
 function PictogramChart({
 	dataPictogram,
@@ -58,6 +64,10 @@ function PictogramChart({
 		dataPictogram.reachedGirls +
 		dataPictogram.reachedMen +
 		dataPictogram.reachedWomen;
+
+	//TEMPORARILY REMOVING TOTAL FIGURES
+	void totalTargeted;
+	void totalReached;
 
 	const maxValue = max(Object.values(dataPictogram)) || 0;
 	const maxNumberOfPictograms = 22;
@@ -114,6 +124,29 @@ function PictogramChart({
 					type="total"
 				/>
 				<Box
+					display={"flex"}
+					alignItems={"center"}
+					justifyContent={"center"}
+					flexGrow={1}
+				>
+					<Typography
+						style={{
+							fontSize: "1rem",
+							color: colors.unColorDarker,
+							fontWeight: 600,
+							fontFamily: "Montserrat",
+							lineHeight: 1.1,
+							textAlign: "center",
+							paddingLeft: "1em",
+							paddingRight: "1em",
+						}}
+					>
+						{totalBeneficiariesText}
+					</Typography>
+				</Box>
+				{/* 
+					// TEMPORARILY REMOVING TOTAL FIGURES
+					<Box
 					display={"flex"}
 					flexDirection={"column"}
 					alignItems={"center"}
@@ -248,7 +281,7 @@ function PictogramChart({
 							}}
 						/>
 					</Typography>
-				</Box>
+				</Box> */}
 			</Box>
 			<Box
 				display={"flex"}

@@ -20,6 +20,9 @@ import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import CvaTypesChart from "./CvaTypesChart";
 
+// TEMPORARILY REMOVING SWITCH
+void CvaChartSwitch;
+
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
 export type CvaChartTypes = (typeof cvaChartTypes)[number][];
@@ -69,18 +72,18 @@ function CvaChart({
 			acc.cvaReached += curr.reachedAllocations;
 			return acc;
 		},
-		{ cvaTargeted: 0, cvaReached: 0 }
+		{ cvaTargeted: 0, cvaReached: 0 },
 	);
 
 	const { totalPeopleTargeted, totalPeopleReached } = Object.entries(
-		dataPictogram
+		dataPictogram,
 	).reduce(
 		(acc, [key, value]) => {
 			acc.totalPeopleTargeted += key.includes("targeted") ? value : 0;
 			acc.totalPeopleReached += key.includes("reached") ? value : 0;
 			return acc;
 		},
-		{ totalPeopleTargeted: 0, totalPeopleReached: 0 }
+		{ totalPeopleTargeted: 0, totalPeopleReached: 0 },
 	);
 
 	function handleDownloadClick() {
@@ -98,9 +101,12 @@ function CvaChart({
 
 	function handleSwitchChange() {
 		setCvaChartMode(
-			cvaChartMode === "allocations" ? "people" : "allocations"
+			cvaChartMode === "allocations" ? "people" : "allocations",
 		);
 	}
+
+	// TEMPORARILY REMOVING SWITCH
+	void handleSwitchChange;
 
 	return (
 		<Container
@@ -141,7 +147,9 @@ function CvaChart({
 				<NoData />
 			) : (
 				<>
-					<Box
+					{/* 
+						// TEMPORARILY REMOVING SWITCH
+						<Box
 						style={{
 							display: "flex",
 							width: "100%",
@@ -153,7 +161,7 @@ function CvaChart({
 							cvaChartMode={cvaChartMode}
 							handleSwitchChange={handleSwitchChange}
 						/>
-					</Box>
+					</Box> */}
 					<Box
 						mt={3}
 						style={{

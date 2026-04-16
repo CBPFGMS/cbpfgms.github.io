@@ -19,6 +19,14 @@ import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
 
+// TEMPORARILY REMOVING TOTAL FIGURES
+void format;
+void AdsClickIcon;
+void DoneIcon;
+void Divider;
+void formatSIFloat;
+void NumberAnimator;
+
 type DisabilityChartProps = {
 	dataDisability: DatumDisability;
 	clickedDownload: DownloadStates;
@@ -30,7 +38,8 @@ type DisabilityChartProps = {
 	implementationStatus: ImplementationStatuses[];
 };
 
-const { beneficiaryCategories, beneficiariesStatuses } = constants;
+const { beneficiaryCategories, beneficiariesStatuses, totalBeneficiariesText } =
+	constants;
 
 function DisabilityChart({
 	dataDisability,
@@ -50,12 +59,16 @@ function DisabilityChart({
 				acc +
 				dataDisability[
 					`${type}${capitalizeString(
-						category
+						category,
 					)}` as keyof DatumDisability
 				],
-			0
-		)
+			0,
+		),
 	);
+
+	//TEMPORARILY REMOVING TOTAL FIGURES
+	void totalTargeted;
+	void totalReached;
 
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -73,7 +86,7 @@ function DisabilityChart({
 		});
 		downloadData<(typeof dataDisabilityDownload)[number]>(
 			dataDisabilityDownload,
-			"people_with_disability"
+			"people_with_disability",
 		);
 	}
 
@@ -123,6 +136,29 @@ function DisabilityChart({
 				width={"100%"}
 			>
 				<Box
+					display={"flex"}
+					alignItems={"center"}
+					justifyContent={"center"}
+					flexGrow={1}
+				>
+					<Typography
+						style={{
+							fontSize: "1rem",
+							color: colors.unColorDarker,
+							fontWeight: 600,
+							fontFamily: "Montserrat",
+							lineHeight: 1.1,
+							textAlign: "center",
+							paddingLeft: "15%",
+							paddingRight: "15%",
+						}}
+					>
+						{totalBeneficiariesText}
+					</Typography>
+				</Box>
+				{/* 
+					// TEMPORARILY REMOVING TOTAL FIGURES
+					<Box
 					display={"flex"}
 					flexDirection={"column"}
 					alignItems={"center"}
@@ -264,7 +300,7 @@ function DisabilityChart({
 							}}
 						/>
 					</Typography>
-				</Box>
+				</Box> */}
 			</Box>
 			<Box
 				display={"flex"}
@@ -307,14 +343,14 @@ function DisabilityChart({
 						targeted={
 							dataDisability[
 								`targeted${capitalizeString(
-									type
+									type,
 								)}` as keyof DatumDisability
 							]
 						}
 						reached={
 							dataDisability[
 								`reached${capitalizeString(
-									type
+									type,
 								)}` as keyof DatumDisability
 							]
 						}
@@ -336,7 +372,7 @@ function DisabilityChart({
 					the latest programmatic reports, was identified from{" "}
 					{format(".1~%")(
 						dataDisability.reportsWithData /
-							dataDisability.totalReports
+							dataDisability.totalReports,
 					)}{" "}
 					of the projects.
 				</Typography>
