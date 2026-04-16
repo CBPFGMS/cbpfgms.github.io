@@ -1037,184 +1037,219 @@
 				)
 				.text("Allocated");
 
-			let topSvgBeneficiaries = topSvg
-				.selectAll(".pbimapTopSvgBeneficiaries")
-				.data([data.totalBeneficiaries]);
-
-			topSvgBeneficiaries = topSvgBeneficiaries
-				.enter()
-				.append("text")
-				.attr(
-					"class",
-					"pbimapTopSvgBeneficiaries contributionColorFill",
-				)
-				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
-				.attr(
-					"x",
-					width * topSvgHorizontalPositions[1] -
-						topSvgMainValueHorPadding,
-				)
-				.merge(topSvgBeneficiaries);
-
-			topSvgBeneficiaries
-				.transition()
-				.duration(duration)
-				.tween("text", function (d) {
-					const node = this,
-						i = d3.interpolate(previousBeneficiaries, d),
-						valueSI = formatSIFloat(d),
-						unit = valueSI[valueSI.length - 1];
-					return function (t) {
-						const siString = formatSIFloat(i(t));
-						d3.select(node).text(
-							+unit !== +unit
-								? siString.substring(0, siString.length - 1)
-								: siString,
-						);
-					};
-				});
-
-			let topSvgBeneficiariesTextGroup = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesTextGroup")
-				.data([data.totalBeneficiaries]);
-
-			topSvgBeneficiariesTextGroup = topSvgBeneficiariesTextGroup
-				.enter()
-				.append("g")
-				.attr("class", "pbimapTopSvgBeneficiariesTextGroup")
-				.merge(topSvgBeneficiariesTextGroup);
-
-			let topSvgBeneficiariesText = topSvgBeneficiariesTextGroup
+			const temporarilyRemovingPeopleFigures = topSvg
 				.selectAll(".pbimapTopSvgBeneficiariesText")
-				.data(d => [d]);
-
-			topSvgBeneficiariesText = topSvgBeneficiariesText
-				.enter()
-				.append("text")
-				.attr("class", "pbimapTopSvgBeneficiariesText")
-				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
-				.attr(
-					"x",
-					width * topSvgHorizontalPositions[1] +
-						topSvgMainValueHorPadding,
-				)
-				.merge(topSvgBeneficiariesText);
-
-			topSvgBeneficiariesText.text(function (d) {
-				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1],
-					unitText =
-						unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "";
-				return unitText + " targeted people";
-			});
-
-			const iconGroup = topSvgBeneficiariesTextGroup
-				.selectAll(".warning-icon")
 				.data([true])
 				.enter()
-				.append("g")
-				.attr("class", "warning-icon")
-				.attr("transform", function () {
-					// Position the icon to the right of the text
-					const textBBox = topSvgBeneficiariesText.node().getBBox();
-					return `translate(${textBBox.x + textBBox.width + 5}, ${textBBox.y})`; // 5px gap; adjust as needed
-				});
-
-			// Add the SVG path from your provided SVG (scaled to fit, e.g., 12x12 instead of 18x18)
-			iconGroup
-				.append("path")
-				.attr("d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z") // Your SVG path
-				.attr("fill", "#eed202") // Your fill color
-				.attr("transform", "scale(0.67)");
-
-			let topSvgBeneficiariesReached = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesReached")
-				.data([data.totalBeneficiariesReached]);
-
-			topSvgBeneficiariesReached = topSvgBeneficiariesReached
-				.enter()
 				.append("text")
 				.attr(
 					"class",
-					"pbimapTopSvgBeneficiariesReached contributionColorFill",
+					"pbimapTopSvgBeneficiariesText contributionColorFill",
 				)
-				.attr("text-anchor", "end")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[1] -
+						48 +
 						topSvgMainValueHorPadding,
 				)
-				.merge(topSvgBeneficiariesReached);
-
-			topSvgBeneficiariesReached
-				.transition()
-				.duration(duration)
-				.tween("text", function (d) {
-					const node = this,
-						i = d3.interpolate(previousBeneficiariesReached, d),
-						valueSI = formatSIFloat(d),
-						unit = valueSI[valueSI.length - 1];
-					return function (t) {
-						const siString = formatSIFloat(i(t));
-						d3.select(node).text(
-							+unit !== +unit
-								? siString.substring(0, siString.length - 1)
-								: siString,
-						);
-					};
-				});
-
-			let topSvgBeneficiariesReachedText = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesReachedText")
-				.data([data.totalBeneficiariesReached]);
-
-			topSvgBeneficiariesReachedText = topSvgBeneficiariesReachedText
-				.enter()
-				.append("text")
-				.attr("class", "pbimapTopSvgBeneficiariesReachedText")
-				.attr("text-anchor", "start")
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+				.text("Calculation of unique beneficiaries ")
+				.append("tspan")
 				.attr(
 					"x",
-					width * topSvgHorizontalPositions[1] +
+					width * topSvgHorizontalPositions[1] -
+						48 +
 						topSvgMainValueHorPadding,
 				)
-				.merge(topSvgBeneficiariesReachedText);
+				.attr("dy", "1.2em")
+				.text("are underway, will be published soon.");
 
-			topSvgBeneficiariesReachedText.text(function (d) {
-				const valueSI = formatSIFloat(d),
-					unit = valueSI[valueSI.length - 1],
-					unitText =
-						unit === "k"
-							? "Thousand"
-							: unit === "M"
-								? "Million"
-								: unit === "G"
-									? "Billion"
-									: "",
-					reachedPeoplePercentage =
-						data.totalBeneficiaries === 0
-							? 0
-							: Math.floor(
-									(data.totalBeneficiariesReached * 100) /
-										data.totalBeneficiaries,
-								);
-				return (
-					unitText +
-					" reached people (" +
-					reachedPeoplePercentage +
-					"%)"
-				);
-			});
+			// ********************************
+			// TEMPORARYLI REMOVING TOP FIGURES
+			// ********************************
+
+			// let topSvgBeneficiaries = topSvg
+			// 	.selectAll(".pbimapTopSvgBeneficiaries")
+			// 	.data([data.totalBeneficiaries]);
+
+			// topSvgBeneficiaries = topSvgBeneficiaries
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr(
+			// 		"class",
+			// 		"pbimapTopSvgBeneficiaries contributionColorFill",
+			// 	)
+			// 	.attr("text-anchor", "end")
+			// 	.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] -
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.merge(topSvgBeneficiaries);
+
+			// topSvgBeneficiaries
+			// 	.transition()
+			// 	.duration(duration)
+			// 	.tween("text", function (d) {
+			// 		const node = this,
+			// 			i = d3.interpolate(previousBeneficiaries, d),
+			// 			valueSI = formatSIFloat(d),
+			// 			unit = valueSI[valueSI.length - 1];
+			// 		return function (t) {
+			// 			const siString = formatSIFloat(i(t));
+			// 			d3.select(node).text(
+			// 				+unit !== +unit
+			// 					? siString.substring(0, siString.length - 1)
+			// 					: siString,
+			// 			);
+			// 		};
+			// 	});
+
+			// let topSvgBeneficiariesTextGroup = topSvg
+			// 	.selectAll(".pbimapTopSvgBeneficiariesTextGroup")
+			// 	.data([data.totalBeneficiaries]);
+
+			// topSvgBeneficiariesTextGroup = topSvgBeneficiariesTextGroup
+			// 	.enter()
+			// 	.append("g")
+			// 	.attr("class", "pbimapTopSvgBeneficiariesTextGroup")
+			// 	.merge(topSvgBeneficiariesTextGroup);
+
+			// let topSvgBeneficiariesText = topSvgBeneficiariesTextGroup
+			// 	.selectAll(".pbimapTopSvgBeneficiariesText")
+			// 	.data(d => [d]);
+
+			// topSvgBeneficiariesText = topSvgBeneficiariesText
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr("class", "pbimapTopSvgBeneficiariesText")
+			// 	.attr("text-anchor", "start")
+			// 	.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] +
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.merge(topSvgBeneficiariesText);
+
+			// topSvgBeneficiariesText.text(function (d) {
+			// 	const valueSI = formatSIFloat(d),
+			// 		unit = valueSI[valueSI.length - 1],
+			// 		unitText =
+			// 			unit === "k"
+			// 				? "Thousand"
+			// 				: unit === "M"
+			// 					? "Million"
+			// 					: unit === "G"
+			// 						? "Billion"
+			// 						: "";
+			// 	return unitText + " targeted people";
+			// });
+
+			// const iconGroup = topSvgBeneficiariesTextGroup
+			// 	.selectAll(".warning-icon")
+			// 	.data([true])
+			// 	.enter()
+			// 	.append("g")
+			// 	.attr("class", "warning-icon")
+			// 	.attr("transform", function () {
+			// 		// Position the icon to the right of the text
+			// 		const textBBox = topSvgBeneficiariesText.node().getBBox();
+			// 		return `translate(${textBBox.x + textBBox.width + 5}, ${textBBox.y})`; // 5px gap; adjust as needed
+			// 	});
+
+			// // Add the SVG path from your provided SVG (scaled to fit, e.g., 12x12 instead of 18x18)
+			// iconGroup
+			// 	.append("path")
+			// 	.attr("d", "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z") // Your SVG path
+			// 	.attr("fill", "#eed202") // Your fill color
+			// 	.attr("transform", "scale(0.67)");
+
+			// let topSvgBeneficiariesReached = topSvg
+			// 	.selectAll(".pbimapTopSvgBeneficiariesReached")
+			// 	.data([data.totalBeneficiariesReached]);
+
+			// topSvgBeneficiariesReached = topSvgBeneficiariesReached
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr(
+			// 		"class",
+			// 		"pbimapTopSvgBeneficiariesReached contributionColorFill",
+			// 	)
+			// 	.attr("text-anchor", "end")
+			// 	.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] -
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.merge(topSvgBeneficiariesReached);
+
+			// topSvgBeneficiariesReached
+			// 	.transition()
+			// 	.duration(duration)
+			// 	.tween("text", function (d) {
+			// 		const node = this,
+			// 			i = d3.interpolate(previousBeneficiariesReached, d),
+			// 			valueSI = formatSIFloat(d),
+			// 			unit = valueSI[valueSI.length - 1];
+			// 		return function (t) {
+			// 			const siString = formatSIFloat(i(t));
+			// 			d3.select(node).text(
+			// 				+unit !== +unit
+			// 					? siString.substring(0, siString.length - 1)
+			// 					: siString,
+			// 			);
+			// 		};
+			// 	});
+
+			// let topSvgBeneficiariesReachedText = topSvg
+			// 	.selectAll(".pbimapTopSvgBeneficiariesReachedText")
+			// 	.data([data.totalBeneficiariesReached]);
+
+			// topSvgBeneficiariesReachedText = topSvgBeneficiariesReachedText
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr("class", "pbimapTopSvgBeneficiariesReachedText")
+			// 	.attr("text-anchor", "start")
+			// 	.attr("y", heightTopSvg - topSvgMainValueVerPadding * 0.8)
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] +
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.merge(topSvgBeneficiariesReachedText);
+
+			// topSvgBeneficiariesReachedText.text(function (d) {
+			// 	const valueSI = formatSIFloat(d),
+			// 		unit = valueSI[valueSI.length - 1],
+			// 		unitText =
+			// 			unit === "k"
+			// 				? "Thousand"
+			// 				: unit === "M"
+			// 					? "Million"
+			// 					: unit === "G"
+			// 						? "Billion"
+			// 						: "",
+			// 		reachedPeoplePercentage =
+			// 			data.totalBeneficiaries === 0
+			// 				? 0
+			// 				: Math.floor(
+			// 						(data.totalBeneficiariesReached * 100) /
+			// 							data.totalBeneficiaries,
+			// 					);
+			// 	return (
+			// 		unitText +
+			// 		" reached people (" +
+			// 		reachedPeoplePercentage +
+			// 		"%)"
+			// 	);
+			// });
+
+			// ********************************
+			// TEMPORARYLI REMOVING TOP FIGURES
+			// ********************************
 
 			const partnersLogo = topSvg
 				.selectAll(".pbimapTopSvgPartnersLogo")
@@ -3476,12 +3511,19 @@
 				.style("width", function (_, i) {
 					return listHeadersWidth[i];
 				})
+				.style("padding", "6px")
 				.style("text-align", function (_, i) {
-					return i === 4 || i === 5 || i === 6 ? "center" : "left";
+					return i === 4 || i === 5 || i === 6 ? "right" : "left";
 				});
 
-			headers.append("span").html(function (d) {
-				return d;
+			headers.html(function (d) {
+				return d !== "Targeted People" && d !== "Reached People"
+					? "<span>" + d + "</span>"
+					: "<span>" +
+							d.split(" ")[0] +
+							"</span><br /><span>" +
+							d.split(" ")[1] +
+							"</span>";
 			});
 
 			const listRowsContainer = listDiv
