@@ -15,7 +15,6 @@ import BarChartRow from "./BarChartRow";
 import type { InDataLists } from "../utils/processrawdata";
 import InfoIcon from "@mui/icons-material/Info";
 import CvaSectorsTooltip from "./CvaSectorsTooltip";
-import constants from "../utils/constants";
 import formatSIFloat from "../utils/formatsi";
 import setFundsList from "../utils/setFundsList";
 
@@ -29,8 +28,6 @@ type CvaChartProps = {
 	organizationType: number[];
 	inDataLists: InDataLists;
 };
-
-const { unselectedCvaTypeOpacity } = constants;
 
 function CvaChart({
 	data,
@@ -51,7 +48,7 @@ function CvaChart({
 	const [cvaTypeClicked, setCvaTypeClicked] = useState<number | null>(null);
 
 	const maxValue = max(
-		data.map(d => Math.max(d.standard, d.reserve))
+		data.map(d => Math.max(d.standard, d.reserve)),
 	) as number;
 
 	const totalCva = sum(data, d => d.allocations);
@@ -66,13 +63,13 @@ function CvaChart({
 		});
 		downloadData<(typeof dataCvaTypesDownload)[number]>(
 			dataCvaTypesDownload,
-			"cva_types"
+			"cva_types",
 		);
 	}
 
 	function handleBarHover(
 		event: React.MouseEvent<HTMLElement>,
-		data: DatumCvaTypes
+		data: DatumCvaTypes,
 	) {
 		setAnchorEl(event.currentTarget);
 		setTooltipData(data);
@@ -199,7 +196,7 @@ function CvaChart({
 				alignItems={"center"}
 				justifyContent={"flex-start"}
 				marginTop={2}
-				marginBottom={3}
+				marginBottom={2}
 			>
 				<Box
 					style={{
@@ -274,8 +271,6 @@ function CvaChart({
 				width={"95%"}
 				marginLeft={"3%"}
 				alignItems={"center"}
-				gap={2}
-				marginTop={2}
 			>
 				<Box
 					style={{
@@ -284,9 +279,9 @@ function CvaChart({
 						alignItems: "center",
 						justifyContent: "flex-end",
 						textAlign: "center",
-						width: "29%",
+						width: "30%",
 						alignSelf: "flex-start",
-						marginBottom: "-1em",
+						marginBottom: "0em",
 					}}
 				>
 					<Typography
@@ -314,15 +309,20 @@ function CvaChart({
 						}}
 						onMouseLeave={handleMouseLeave}
 						onClick={() => handleClickCvaType(d.cvaType)}
+						p={2}
 						style={{
 							width: "100%",
 							display: "flex",
-							opacity:
-								cvaTypeClicked === null
-									? 1
-									: cvaTypeClicked === d.cvaType
-									? 1
-									: unselectedCvaTypeOpacity,
+							cursor: "pointer",
+							borderRadius: 6,
+							backgroundColor:
+								cvaTypeClicked === d.cvaType
+									? "#fff"
+									: undefined,
+							border:
+								cvaTypeClicked === d.cvaType
+									? "1px solid #888"
+									: undefined,
 						}}
 					>
 						<BarChartRow

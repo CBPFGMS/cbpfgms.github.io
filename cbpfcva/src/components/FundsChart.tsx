@@ -36,8 +36,6 @@ type SortingOrder = (typeof constants.sortingOrder)[number];
 
 type Sorting = (typeof constants.fundChartSorting)[number];
 
-const { unselectedFundOpacity } = constants;
-
 const legendStyle = {
 	fontSize: "0.8rem",
 	display: "flex",
@@ -65,7 +63,7 @@ function FundsChart({
 		useState<SortingOrder>("descending");
 
 	const maxValue = max(
-		data.map(d => Math.max(d.totalAllocations, d.cvaAllocations))
+		data.map(d => Math.max(d.totalAllocations, d.cvaAllocations)),
 	) as number;
 
 	function handleDownloadClick() {
@@ -78,7 +76,7 @@ function FundsChart({
 		});
 		downloadData<(typeof dataFundsDownload)[number]>(
 			dataFundsDownload,
-			"cva_by_funds"
+			"cva_by_funds",
 		);
 	}
 
@@ -99,7 +97,7 @@ function FundsChart({
 	function handleSorting(thisSorting: Sorting) {
 		if (thisSorting === sorting) {
 			setSortingOrder(
-				sortingOrder === "ascending" ? "descending" : "ascending"
+				sortingOrder === "ascending" ? "descending" : "ascending",
 			);
 		}
 		setSorting(thisSorting);
@@ -108,7 +106,7 @@ function FundsChart({
 	const sortedData: DatumFunds[] = data.sort((a, b) =>
 		sortingOrder === "ascending"
 			? a[sorting] - b[sorting]
-			: b[sorting] - a[sorting]
+			: b[sorting] - a[sorting],
 	);
 
 	return (
@@ -249,7 +247,7 @@ function FundsChart({
 				width={"95%"}
 				marginLeft={"3%"}
 				alignItems={"center"}
-				gap={2}
+				gap={1}
 				marginTop={2}
 			>
 				<Box
@@ -302,12 +300,21 @@ function FundsChart({
 				</Box>
 				{sortedData.map(d => (
 					<Box
+						p={2}
 						style={{
 							width: "100%",
-							opacity: fund.includes(d.fund)
-								? 1
-								: unselectedFundOpacity,
 							cursor: "pointer",
+							borderRadius: 6,
+							backgroundColor:
+								fund.length !== inDataLists.funds.size &&
+								fund.includes(d.fund)
+									? "#fff"
+									: undefined,
+							border:
+								fund.length !== inDataLists.funds.size &&
+								fund.includes(d.fund)
+									? "1px solid #888"
+									: undefined,
 						}}
 						onClick={() => handleFundClick(d.fund)}
 						key={d.fund}
