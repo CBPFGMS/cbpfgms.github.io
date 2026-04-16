@@ -132,9 +132,10 @@ function Regions({
 								"<div style='text-align:left;'>Total allocated: $" +
 								region.budget.toLocaleString() +
 								"<br/>" +
-								"Targeted people: " +
-								region.targeted.toLocaleString() +
-								"<br/>" +
+								// TEMPORARILY REMOVED TARGETED PEOPLE FROM TOOLTIP
+								// "Targeted people: " +
+								// region.targeted.toLocaleString() +
+								// "<br/>" +
 								tooltipFundText +
 								"</div>"
 							}
