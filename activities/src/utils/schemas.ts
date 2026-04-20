@@ -1,14 +1,23 @@
 import { z } from "zod";
 
 //this regex allows only digits and double hashtag symbol, e.g: "5396##7936##18031##16737". Eventually a trailing part with "|||" and another set of digits and double hashtags can be added, e.g: "5396##7936##18031##16737|||5396##7936##18031##16737". This is used for the sector and administrative location aggregation fields.
-const digitsAndHashtagRegex = /^\d+(?:##\d+){3}(?:\|\|\|\d+(?:##\d+){3})*$/,
-	digitsAndHashtagErrorMessage =
+const digitsPipesAndHashtagRegex =
+		/^\d+(?:##\d+){3}(?:\|\|\|\d+(?:##\d+){3})*$/,
+	digitsPipesAndHashtagErrorMessage =
 		"String doesn't match the expected format of digits and double hashtags (e.g., '5396##7936##18031##16737' or '5396##7936##18031##16737|||5396##7936##18031##16737')";
 
 //this regex checks for a correct latitude/longitude pair, comma separated.
 const latLongRegex = /^[-+]?\d+(\.\d+)?,\s*[-+]?\d+(\.\d+)?$/,
 	latLongErrorMessage =
 		"String must be a valid coordinate pair (e.g., '15.56, 32.51')";
+
+const digitsAndHashtagRegex = /^(?:\d|##)+$/,
+	digitsAndHashtagErrorMessage =
+		"String doesn't match the expected format of digits and double hashtags (e.g., '5396##7936##18031##16737')";
+
+const digitsDotsAndPipesRegex = /^\d+(\.\d+)?(\|{3}\d+(\.\d+)?)*$/,
+	digitsDotsAndPipesErrorMessage =
+		"String doesn't match the expected format of digits and triple pipes (e.g., '5396|||7936|||18031|||16737')";
 
 // ********************
 // DATA SCHEMAS
@@ -17,8 +26,8 @@ const latLongRegex = /^[-+]?\d+(\.\d+)?,\s*[-+]?\d+(\.\d+)?$/,
 export const projectSummaryAggregatedObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PrjCode: z.string(),
-	ClstAgg: z.string(),
-	ClstPrct: z.number(),
+	ClstAgg: z.union([z.string(), z.number()]),
+	ClstPrct: z.union([z.string(), z.number()]),
 	AdmLocTypeIdAgg: z
 		.string()
 		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage),
@@ -31,26 +40,26 @@ export const projectSummaryAggregatedObjectSchema = z.object({
 	AdmLoc6: z.string().nullable(),
 	AdmLocBenClustAgg1: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage),
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage),
 	AdmLocBenClustAgg2: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage)
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
 		.nullable(),
 	AdmLocBenClustAgg3: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage)
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
 		.nullable(),
 	AdmLocBenClustAgg4: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage)
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
 		.nullable(),
 	AdmLocBenClustAgg5: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage)
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
 		.nullable(),
 	AdmLocBenClustAgg6: z
 		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage)
+		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
 		.nullable(),
 	AdmLocCord1: z.string().regex(latLongRegex, latLongErrorMessage),
 	AdmLocCord2: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
@@ -58,12 +67,52 @@ export const projectSummaryAggregatedObjectSchema = z.object({
 	AdmLocCord4: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
 	AdmLocCord5: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
 	AdmLocCord6: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocClustBdg1: z.number().nonnegative(),
-	AdmLocClustBdg2: z.number().nonnegative().nullable(),
-	AdmLocClustBdg3: z.number().nonnegative().nullable(),
-	AdmLocClustBdg4: z.number().nonnegative().nullable(),
-	AdmLocClustBdg5: z.number().nonnegative().nullable(),
-	AdmLocClustBdg6: z.number().nonnegative().nullable(),
+	AdmLocClustBdg1: z.union([
+		z.number(),
+		z
+			.string()
+			.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+	]),
+	AdmLocClustBdg2: z
+		.union([
+			z.number(),
+			z
+				.string()
+				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+		])
+		.nullable(),
+	AdmLocClustBdg3: z
+		.union([
+			z.number(),
+			z
+				.string()
+				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+		])
+		.nullable(),
+	AdmLocClustBdg4: z
+		.union([
+			z.number(),
+			z
+				.string()
+				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+		])
+		.nullable(),
+	AdmLocClustBdg5: z
+		.union([
+			z.number(),
+			z
+				.string()
+				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+		])
+		.nullable(),
+	AdmLocClustBdg6: z
+		.union([
+			z.number(),
+			z
+				.string()
+				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
+		])
+		.nullable(),
 	AYr: z.number().int().nonnegative(),
 });
 
@@ -102,15 +151,12 @@ export const activitiesObjectSchema = z.object({
 	OrganizationName: z.string(),
 	OrganizationAcronym: z.string(),
 	OrganizationType: z.string(),
-	AllocationTypeName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProjectStatus: z.string(),
-	ProjectBudget: z.number().nonnegative(),
 	ClusterId: z.number().int().nonnegative(),
 	ClusterName: z.string(),
 	LocationBeneficiaryId: z.number().int().nonnegative(),
 	ActivityCode: z.string(),
-	ActivityDescription: z.string(),
+	StandardActivityID: z.number().int().nonnegative().nullable(),
+	GlobalStandardActivityID: z.number().int().nonnegative(),
 });
 
 // ********************
@@ -121,12 +167,12 @@ export const pooledFundsMasterObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	PFAbbrv: z.string(),
-	PFLat: z.string(),
-	PFLong: z.string(),
+	PFLat: z.number(),
+	PFLong: z.number(),
 	PFCountryCode: z.string().length(2),
 	MAAgent: z.string(),
 	AAgent: z.string(),
-	IsPublic: z.boolean(),
+	IsPublic: z.string(),
 	ParentPFId: z.number().int().nonnegative().nullable(),
 });
 

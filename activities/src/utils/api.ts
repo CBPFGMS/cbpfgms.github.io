@@ -10,9 +10,13 @@ import type {
 	AllocationSourcesMasterObject,
 	ActivitiesMasterObject,
 } from "./schemas";
+import makeLists, { type List } from "./makelists";
+import processRawData, { type InDataLists, type Data } from "./processrawdata";
 
 export type AppData = {
-	data: ProjectSummaryAggregatedObject[];
+	data: Data;
+	inDataLists: InDataLists;
+	lists: List;
 };
 
 type ReceiveDataArgs = [
@@ -33,8 +37,7 @@ const pooledFundsMasterUrl = `${baseUrl}MstPooledFund.csv`,
 	sectorsMasterUrl = `${baseUrl}MstClusters.csv`,
 	organizationTypesMasterUrl = `${baseUrl}MstOrgType.csv`,
 	allocationSourcesMasterUrl = `${baseUrl}MstAllocationSource.csv`,
-	activitiesMasterUrl =
-		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_ACTIVITY_MST&PoolfundCodeAbbrv=&$format=csv";
+	activitiesMasterUrl = `${baseUrl}MstActivities.csv`;
 
 export async function fetchAppData(startYear: number | null): Promise<AppData> {
 	// const yearRange = startYear
@@ -45,7 +48,7 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 
 	const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
 
-	const activitiesUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=LOCATION_ACTIVITIES_OneGMS&PoolfundCodeAbbrv=&AllocationYear=${startYear}&FundTypeId=1&$format=csv`;
+	const activitiesUrl = `${baseUrl}LocationActivities_${startYear}.csv`;
 
 	return Promise.all([
 		fetchFileDB<ProjectSummaryAggregatedObject[]>(
@@ -101,8 +104,25 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 		allocationSourcesMaster,
 		activitiesMaster,
 	]: ReceiveDataArgs): AppData {
+		const lists = makeLists({
+			pooledFundsMaster,
+			allocationSourcesMaster,
+			organizationTypesMaster,
+			sectorsMaster,
+			activitiesMaster,
+		});
+
+		const { data, inDataLists } = processRawData({
+			projectSummaryAggregated,
+			projectSummary,
+			activities,
+			lists,
+		});
+
 		return {
-			data: projectSummaryAggregated,
+			data,
+			inDataLists,
+			lists,
 		};
 	}
 }

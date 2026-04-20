@@ -1,5 +1,5 @@
 import Alert from "@mui/material/Alert";
-import { getErrorMessage, type FallbackProps } from "react-error-boundary";
+import { type FallbackProps } from "react-error-boundary";
 
 function Error({ error }: FallbackProps) {
 	console.error(error);
@@ -16,7 +16,7 @@ function Error({ error }: FallbackProps) {
 		>
 			<Alert severity="error">
 				An error occurred while loading the data. Please try again
-				later. Error: {getErrorMessage(error)}
+				later.
 				<br />
 				If the problem persists, please contact the support team.
 			</Alert>
