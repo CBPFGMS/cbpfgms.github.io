@@ -32,6 +32,8 @@ const constants = {
 		"Disclaimer: Figures for people targeted/reached may include double counting as same people may receive assistance from multiple clusters/sectors/projects.",
 	totalBeneficiairesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
+	pooledFundsShowingOrgName: [88, 508, 509, 510],
+	orgsShowingOrgName: [17014, 17025, 17026, 17027],
 } as const;
 
 const projectStatusMaster = {

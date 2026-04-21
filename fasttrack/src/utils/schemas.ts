@@ -193,6 +193,8 @@ export const organizationMasterObjectSchema = z.object({
 		.regex(dateRegex, "Invalid date format")
 		.nullable(),
 	GlobalOrgId: z.number().int().nonnegative(),
+	GlobalOrgName: z.string(),
+	GlobalOrgAcronym: z.string(),
 	GlobalUniqueId: z.number().int().nonnegative(),
 	LocalizationMarker: z.string().nullable(),
 	OrgIsWLO: z.string().nullable().optional(),
