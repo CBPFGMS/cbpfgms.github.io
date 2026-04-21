@@ -21,6 +21,7 @@ export type Datum = {
 	budget: number;
 	locationLevel: number;
 	locationName: string;
+	parentLocationName: string | null;
 	latitude: number;
 	longitude: number;
 	sector: number;
@@ -52,13 +53,14 @@ type ProcessRawDataParams = {
 	lists: List;
 };
 
-type ActivitiesPerLocationId = {
-	[key: number]: { activity: number; sector: number }[];
-};
-
-const { pipeSeparator } = constants;
+type ActivitiesPerLocationId = Map<
+	number,
+	{ activity: number; sector: number }[]
+>;
 
 const seenActivitySector = new Set<string>();
+
+const { lastAdminLevel } = constants;
 
 function processRawData({
 	projectSummary,
@@ -71,7 +73,7 @@ function processRawData({
 } {
 	const data: Data = [];
 
-	const activitiesPerLocationId: ActivitiesPerLocationId = {};
+	const activitiesPerLocationId: ActivitiesPerLocationId = new Map();
 
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
@@ -87,31 +89,53 @@ function processRawData({
 	activities.forEach(row => {
 		const parsedRow = activitiesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			// **********************************
+			// IMPORTANT: THIS HAS TO BE THE GLOBAL SECTOR
+			// **********************************
+
 			const locationId = row.LocationBeneficiaryId;
 			const compositeKey = `${locationId}|${row.GlobalStandardActivityID}|${row.ClusterId}`;
 
 			if (!seenActivitySector.has(compositeKey)) {
 				seenActivitySector.add(compositeKey);
 
-				if (!activitiesPerLocationId[locationId]) {
-					activitiesPerLocationId[locationId] = [];
+				if (!activitiesPerLocationId.has(locationId)) {
+					activitiesPerLocationId.set(locationId, []);
 				}
 
-				activitiesPerLocationId[locationId].push({
+				activitiesPerLocationId.get(locationId)!.push({
 					activity: row.GlobalStandardActivityID,
 					sector: row.ClusterId,
 				});
 			}
 		} else {
 			warnInvalidSchema(
-				"activities",
+				"Location Activities",
 				row,
 				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
 
-	console.log(activitiesPerLocationId);
+	projectSummary.forEach(row => {
+		const parsedRow = projectSummaryObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			lists.projectDetails.set(row.PrjCode, {
+				year: row.AllYr,
+				fund: row.PFId,
+				allocationSource: row.AllSrc,
+				organizationType: row.OrgTypeId,
+				endDate: new Date(row.AEndDt),
+				projectStatusId: projectStatusMapping[row.PrjStsId],
+			});
+		} else {
+			warnInvalidSchema(
+				"Project Summary",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
 
 	projectSummaryAggregated.forEach(row => {
 		const parsedRow = projectSummaryAggregatedObjectSchema.safeParse(row);
@@ -120,9 +144,8 @@ function processRawData({
 				datum => datum.PrjCode === row.PrjCode,
 			);
 
-			const thisActivity = activities.find(
-				datum =>
-					datum.LocationBeneficiaryId === row.LocationBeneficiaryID,
+			const thisActivity = activitiesPerLocationId.get(
+				row.LocationBeneficiaryID,
 			);
 
 			if (!thisProject) {
@@ -153,10 +176,9 @@ function processRawData({
 			}
 
 			if (thisProject && thisActivity) {
-				const sectors: number[] =
-					typeof row.ClstAgg === "string"
-						? row.ClstAgg.split(pipeSeparator).map(d => +d)
-						: [row.ClstAgg];
+				const sectors = thisActivity.map(a => a.sector);
+				const activities = thisActivity.map(a => a.activity);
+
 				yearsSet.add(row.AYr);
 				sectors.forEach(s => sectorsSet.add(s));
 				fundsSet.add(row.PFId);
@@ -165,39 +187,24 @@ function processRawData({
 				projectStatusesSet.add(
 					projectStatusMapping[thisProject.PrjStsId],
 				);
-				// activitiesSet.add(thisActivity.);
+				activities.forEach(a => activitiesSet.add(a));
 
-				return;
+				let thisAdminLevel = lastAdminLevel;
 
-				const objDatum: Datum = {
-					fund: row.PooledFundId,
-					year: thisAllocationType.AllocationYear,
-					projectCode: row.ChfProjectCode,
-					projectId: row.ChfId,
-					projectStatus: projectStatusMapping[row.ProcessSTatusID],
-					allocationSource: thisAllocationType.AllocationSourceId,
-					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalOrgId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
-					allocationTypeId: row.AllocationtypeId,
-					endDate: new Date(row.EndDate),
-					budget: row.Budget,
-					sectorData: thisSectorData.sectors,
-					reached: generateBeneficiariesObjectSummary(row, "reached"),
-					targeted: generateBeneficiariesObjectSummary(
-						row,
-						"targeted",
-					),
-					reportType: row.RptCode ?? 0,
-				};
+				while (
+					row[`AdmLoc${thisAdminLevel}`] === null &&
+					thisAdminLevel > 0
+				) {
+					thisAdminLevel--;
+				}
+
+				const objDatum: Datum = {};
 
 				data.push(objDatum);
 			}
 		} else {
 			warnInvalidSchema(
-				"projectSummaryAggregated",
+				"Project Summary Aggregated",
 				row,
 				JSON.stringify(parsedRow.error),
 			);
@@ -216,51 +223,6 @@ function processRawData({
 	}));
 
 	return data;
-}
-
-function generateBeneficiariesObjectSummary(
-	row: ProjectSummaryObject,
-	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted",
-): BeneficiariesObject {
-	let girls = 0,
-		boys = 0,
-		women = 0,
-		men = 0;
-
-	if (type === "reached") {
-		girls = row.AchG || 0;
-		boys = row.AchB || 0;
-		women = row.AchW || 0;
-		men = row.AchM || 0;
-	}
-
-	if (type === "targeted") {
-		girls = row.BenG || 0;
-		boys = row.BenB || 0;
-		women = row.BenW || 0;
-		men = row.BenM || 0;
-	}
-
-	if (type === "disabledReached") {
-		girls = row.AchDisabledG || 0;
-		boys = row.AchDisabledB || 0;
-		women = row.AchDisabledW || 0;
-		men = row.AchDisabledM || 0;
-	}
-
-	if (type === "disabledTargeted") {
-		girls = row.DisabledG || 0;
-		boys = row.DisabledB || 0;
-		women = row.DisabledW || 0;
-		men = row.DisabledM || 0;
-	}
-
-	return {
-		girls,
-		boys,
-		women,
-		men,
-	};
 }
 
 export default processRawData;

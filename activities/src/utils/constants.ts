@@ -13,6 +13,7 @@ const constants = {
 	},
 	pipeSeparator: "|||",
 	hashtagSeparator: "##",
+	lastAdminLevel: 6,
 } as const;
 
 const projectStatusMaster = {
