@@ -157,6 +157,7 @@ export const activitiesObjectSchema = z.object({
 	ActivityCode: z.string(),
 	StandardActivityID: z.number().int().nonnegative().nullable(),
 	GlobalStandardActivityID: z.number().int().nonnegative(),
+	GlobalClusterId: z.number().int().nonnegative(),
 });
 
 // ********************

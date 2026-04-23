@@ -14,11 +14,9 @@ export type Datum = {
 	fund: number;
 	year: number;
 	projectCode: string;
-	projectId: number;
 	projectStatus: number;
 	allocationSource: number;
 	organizationType: number;
-	budget: number;
 	locationLevel: number;
 	locationName: string;
 	parentLocationName: string | null;
@@ -58,6 +56,10 @@ type ActivitiesPerLocationId = Map<
 	{ activity: number; sector: number }[]
 >;
 
+type ThisAdminLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+type ParentAdminLevel = 0 | 1 | 2 | 3 | 4 | 5;
+
 const seenActivitySector = new Set<string>();
 
 const { lastAdminLevel } = constants;
@@ -89,12 +91,18 @@ function processRawData({
 	activities.forEach(row => {
 		const parsedRow = activitiesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			// **********************************
-			// IMPORTANT: THIS HAS TO BE THE GLOBAL SECTOR
-			// **********************************
-
 			const locationId = row.LocationBeneficiaryId;
-			const compositeKey = `${locationId}|${row.GlobalStandardActivityID}|${row.ClusterId}`;
+			const compositeKey = `${locationId}|${row.GlobalStandardActivityID}|${row.GlobalClusterId}`;
+
+			if (lists.activitiesPerSector[row.GlobalClusterId]) {
+				lists.activitiesPerSector[row.GlobalClusterId].add(
+					row.GlobalStandardActivityID,
+				);
+			} else {
+				lists.activitiesPerSector[row.GlobalClusterId] = new Set([
+					row.GlobalStandardActivityID,
+				]);
+			}
 
 			if (!seenActivitySector.has(compositeKey)) {
 				seenActivitySector.add(compositeKey);
@@ -105,7 +113,7 @@ function processRawData({
 
 				activitiesPerLocationId.get(locationId)!.push({
 					activity: row.GlobalStandardActivityID,
-					sector: row.ClusterId,
+					sector: row.GlobalClusterId,
 				});
 			}
 		} else {
@@ -148,6 +156,22 @@ function processRawData({
 				row.LocationBeneficiaryID,
 			);
 
+			let thisAdminLevel: ThisAdminLevel = lastAdminLevel;
+
+			while (
+				row[`AdmLoc${thisAdminLevel}`] === null &&
+				thisAdminLevel > 0
+			) {
+				thisAdminLevel = (thisAdminLevel - 1) as ThisAdminLevel;
+			}
+
+			const parentAdminLevel: ParentAdminLevel = (thisAdminLevel -
+				1) as ParentAdminLevel;
+
+			const coord = row[`AdmLocCord${thisAdminLevel}`];
+			const latitude = coord ? +coord.split(",")[0] : null;
+			const longitude = coord ? +coord.split(",")[1] : null;
+
 			if (!thisProject) {
 				warnProjectNotFound(
 					row.PrjCode,
@@ -164,6 +188,14 @@ function processRawData({
 				);
 			}
 
+			if (!latitude || !longitude) {
+				warnProjectNotFound(
+					row.PrjCode,
+					row,
+					"Coordinates not found for any admin level",
+				);
+			}
+
 			if (thisProject) {
 				lists.projectDetails.set(row.PrjCode, {
 					year: row.AYr,
@@ -175,7 +207,7 @@ function processRawData({
 				});
 			}
 
-			if (thisProject && thisActivity) {
+			if (thisProject && thisActivity && latitude && longitude) {
 				const sectors = thisActivity.map(a => a.sector);
 				const activities = thisActivity.map(a => a.activity);
 
@@ -189,18 +221,30 @@ function processRawData({
 				);
 				activities.forEach(a => activitiesSet.add(a));
 
-				let thisAdminLevel = lastAdminLevel;
+				thisActivity.forEach(activity => {
+					const objDatum: Datum = {
+						fund: row.PFId,
+						year: row.AYr,
+						projectCode: row.PrjCode,
+						projectStatus:
+							projectStatusMapping[thisProject.PrjStsId],
+						allocationSource: thisProject.AllSrc,
+						organizationType: thisProject.OrgTypeId,
+						locationLevel: thisAdminLevel,
+						locationName:
+							row[`AdmLoc${thisAdminLevel}`] ||
+							"Unknown Location Name",
+						parentLocationName: parentAdminLevel
+							? row[`AdmLoc${parentAdminLevel}`]
+							: null,
+						latitude: latitude,
+						longitude: longitude,
+						sector: activity.sector,
+						activity: activity.activity,
+					};
 
-				while (
-					row[`AdmLoc${thisAdminLevel}`] === null &&
-					thisAdminLevel > 0
-				) {
-					thisAdminLevel--;
-				}
-
-				const objDatum: Datum = {};
-
-				data.push(objDatum);
+					data.push(objDatum);
+				});
 			}
 		} else {
 			warnInvalidSchema(
@@ -211,18 +255,17 @@ function processRawData({
 		}
 	});
 
-	setInDataLists(() => ({
+	const inDataLists: InDataLists = {
 		years: yearsSet,
 		sectors: sectorsSet,
-		allocationTypes: allocationTypesSet,
 		allocationSources: allocationSourcesSet,
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
-		organizations: organizationsSet,
 		projectStatuses: projectStatusesSet,
-	}));
+		activities: activitiesSet,
+	};
 
-	return data;
+	return { data, inDataLists };
 }
 
 export default processRawData;

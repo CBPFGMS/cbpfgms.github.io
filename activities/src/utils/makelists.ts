@@ -46,6 +46,9 @@ export type List = {
 	projectDetails: Map<string, ProjectDetails>;
 	projectStatus: ListObj;
 	activities: ListObj;
+	activitiesPerSector: {
+		[key: number]: Set<number>;
+	};
 };
 
 function makeLists({
@@ -67,6 +70,7 @@ function makeLists({
 		projectDetails: new Map(),
 		projectStatus: projectStatusMaster,
 		activities: {},
+		activitiesPerSector: {},
 	};
 
 	pooledFundsMaster.forEach(d => {

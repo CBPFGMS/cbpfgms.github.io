@@ -48,7 +48,7 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 
 	const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
 
-	const activitiesUrl = `${baseUrl}LocationActivities_${startYear}.csv`;
+	const activitiesUrl = "/Location_activity_hardcoded_withglobal.csv";
 
 	return Promise.all([
 		fetchFileDB<ProjectSummaryAggregatedObject[]>(
