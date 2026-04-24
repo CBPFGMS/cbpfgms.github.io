@@ -10,6 +10,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { clustersIconsData } from "../assets/clustericons";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import Badge from "@mui/material/Badge";
 
 type SectorSelectProps = {
 	sectors: number[];
@@ -36,6 +37,14 @@ function SectorSelect({
 	sectorsComplete,
 }: SectorSelectProps) {
 	const sectorsArray = Array.from(inDataLists.sectors).sort((a, b) => a - b);
+
+	const activitiesPerSectorsSelected = sectors.reduce((acc, sector) => {
+		const activities = lists.activitiesPerSector[sector];
+		if (activities) {
+			activities.forEach(activity => acc.add(activity));
+		}
+		return acc;
+	}, new Set<number>());
 
 	function toggleSector(sector: number) {
 		setSectors(prev =>
@@ -80,6 +89,7 @@ function SectorSelect({
 					active={selectionLevel === "nothing"}
 					done={sectorsComplete}
 					doneTitle={`${sectors.length} sector${sectors.length > 1 ? "s" : ""} selected`}
+					doneSubtitle={` (encompassing ${activitiesPerSectorsSelected.size} activit${activitiesPerSectorsSelected.size === 1 ? "y" : "ies"})`}
 				/>
 				<Grid
 					container
@@ -87,7 +97,7 @@ function SectorSelect({
 					sx={{
 						display: "flex",
 						flexDirection: "row",
-						mt: 2,
+						mt: 4,
 						flexWrap: "wrap",
 						width: "100%",
 					}}
@@ -110,96 +120,115 @@ function SectorSelect({
 function SectorCard({ sector, selected, onClick, lists }: SectorCardProps) {
 	return (
 		<Grid size={3}>
-			<Box
-				onClick={onClick}
+			<Badge
+				badgeContent={lists.activitiesPerSector[sector]?.size}
 				sx={{
-					cursor: "pointer",
-					borderRadius: 2,
-					border: "2px solid",
-					borderColor: selected ? colors.unColor : "transparent",
-					background: selected
-						? alpha(colors.unColorLighter, 0.08)
-						: alpha("#1a2433", 0.04),
-					p: 1.5,
-					display: "flex",
-					alignItems: "center",
-					gap: 1.5,
-					transition: "all 0.2s ease",
-					userSelect: "none",
-					"&:hover": {
-						borderColor: selected
-							? colors.unColor
-							: alpha(colors.unColorLighter, 0.5),
-						background: alpha(colors.unColorLighter, 0.06),
-						transform: "translateY(-1px)",
-						boxShadow: `0 4px 16px ${alpha(colors.unColorLighter, 0.15)}`,
+					width: "100%",
+					display: "block",
+					"& .MuiBadge-badge": {
+						color: "white",
+						backgroundColor: "#777", // Your custom hex code
 					},
 				}}
 			>
 				<Box
+					onClick={onClick}
 					sx={{
-						width: 32,
-						height: 32,
+						cursor: "pointer",
 						borderRadius: 2,
+						border: "2px solid",
+						borderColor: selected ? colors.unColor : "transparent",
 						background: selected
-							? colors.unColor
-							: alpha(colors.unColorLighter, 0.15),
+							? alpha(colors.unColorLighter, 0.08)
+							: alpha("#1a2433", 0.04),
+						p: 1.5,
 						display: "flex",
 						alignItems: "center",
-						justifyContent: "center",
-						fontSize: 20,
+						gap: 1.5,
 						transition: "all 0.2s ease",
-						flexShrink: 0,
+						userSelect: "none",
+						"&:hover": {
+							borderColor: selected
+								? colors.unColor
+								: alpha(colors.unColorLighter, 0.5),
+							background: alpha(colors.unColorLighter, 0.06),
+							transform: "translateY(-1px)",
+							boxShadow: `0 4px 16px ${alpha(colors.unColorLighter, 0.15)}`,
+						},
 					}}
+					data-tooltip-id="tooltip"
+					data-tooltip-html={
+						selected
+							? "Click to deselect"
+							: `<div style="max-width: 200px;"><strong>${lists.sectors[sector]}</strong> encompasses ${lists.activitiesPerSector[sector]?.size} activit${lists.activitiesPerSector[sector]?.size === 1 ? "y" : "ies"}</div>`
+					}
+					data-tooltip-place="top"
 				>
-					<img
-						src={clustersIconsData[sector]}
-						width={"50%"}
-						height={"50%"}
-						style={{
-							filter: selected
-								? "brightness(0) invert(1)"
-								: "none",
-						}}
-					/>
-				</Box>
-				<Box
-					sx={{
-						display: "flex",
-						flexGrow: 1,
-						justifyContent: "center",
-						alignItems: "center",
-					}}
-				>
-					<Typography
-						variant="body2"
+					<Box
 						sx={{
-							fontWeight: selected ? 600 : 500,
-							fontSize: "0.85rem",
-							lineHeight: 1.2,
+							width: 32,
+							height: 32,
+							borderRadius: 2,
+							background: selected
+								? colors.unColor
+								: alpha(colors.unColorLighter, 0.15),
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							fontSize: 20,
 							transition: "all 0.2s ease",
+							flexShrink: 0,
 						}}
 					>
-						{lists.sectors[sector]}
-					</Typography>
-				</Box>
-				<Box
-					sx={{
-						width: 26,
-					}}
-				>
-					{selected && (
-						<CheckCircleIcon
-							sx={{
-								ml: "auto",
-								fontSize: 18,
-								color: colors.unColor,
-								flexShrink: 0,
+						<img
+							src={clustersIconsData[sector]}
+							width={"50%"}
+							height={"50%"}
+							style={{
+								filter: selected
+									? "brightness(0) invert(1)"
+									: "none",
 							}}
 						/>
-					)}
+					</Box>
+					<Box
+						sx={{
+							display: "flex",
+							flexGrow: 1,
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+					>
+						<Typography
+							variant="body2"
+							sx={{
+								fontWeight: selected ? 600 : 500,
+								fontSize: "0.85rem",
+								lineHeight: 1.2,
+								transition: "all 0.2s ease",
+							}}
+						>
+							{lists.sectors[sector]}
+						</Typography>
+					</Box>
+					<Box
+						sx={{
+							width: 26,
+						}}
+					>
+						{selected && (
+							<CheckCircleIcon
+								sx={{
+									ml: "auto",
+									fontSize: 18,
+									color: colors.activeGradientStart,
+									flexShrink: 0,
+								}}
+							/>
+						)}
+					</Box>
 				</Box>
-			</Box>
+			</Badge>
 		</Grid>
 	);
 }

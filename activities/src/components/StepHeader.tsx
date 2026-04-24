@@ -11,6 +11,7 @@ type StepHeaderProps = {
 	active: boolean;
 	done: boolean;
 	doneTitle: string;
+	doneSubtitle?: string;
 };
 
 function StepHeader({
@@ -20,6 +21,7 @@ function StepHeader({
 	active,
 	done,
 	doneTitle,
+	doneSubtitle,
 }: StepHeaderProps) {
 	return (
 		<Box
@@ -42,9 +44,9 @@ function StepHeader({
 					justifyContent: "center",
 					flexShrink: 0,
 					background: done
-						? `linear-gradient(135deg, ${colors.doneGradientStart}, ${colors.doneGradientEnd})`
+						? colors.doneGradientStart
 						: active
-							? `linear-gradient(135deg, ${colors.activeGradientStart}, ${colors.activeGradientEnd})`
+							? colors.activeGradientStart
 							: alpha(colors.inactiveBackground, 0.1),
 					boxShadow:
 						done || active ? "0 4px 12px rgba(0,0,0,0.15)" : "none",
@@ -77,6 +79,15 @@ function StepHeader({
 						}}
 					>
 						{doneTitle}
+						{doneSubtitle && (
+							<Typography
+								variant="body2"
+								color="text.secondary"
+								sx={{ lineHeight: 1.2 }}
+							>
+								{doneSubtitle}
+							</Typography>
+						)}
 					</Typography>
 				) : (
 					<>

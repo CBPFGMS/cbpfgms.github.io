@@ -2,6 +2,9 @@ import { use, useState } from "react";
 import type { AppData } from "../utils/api";
 import Container from "@mui/material/Container";
 import SectorSelect from "./SectorSelect";
+import { Tooltip } from "react-tooltip";
+import ActivitySelect from "./ActivitySelect";
+import Box from "@mui/material/Box";
 
 type MainContainerProps = {
 	dataPromise: Promise<AppData>;
@@ -32,12 +35,26 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				paddingRight: "12px",
 			}}
 		>
+			<Tooltip
+				id="tooltip"
+				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+			/>
 			<SectorSelect
 				sectors={sectors}
 				setSectors={setSectors}
 				selectionLevel={selectionLevel}
 				inDataLists={inDataLists}
 				lists={lists}
+				sectorsComplete={sectorsComplete}
+			/>
+			<Box mb={4} />
+			<ActivitySelect
+				activities={activities}
+				setActivities={setActivities}
+				sectors={sectors}
+				selectionLevel={selectionLevel}
+				lists={lists}
+				activitiesComplete={activitiesComplete}
 				sectorsComplete={sectorsComplete}
 			/>
 		</Container>
