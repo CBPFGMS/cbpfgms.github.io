@@ -5,6 +5,7 @@ import SectorSelect from "./SectorSelect";
 import { Tooltip } from "react-tooltip";
 import ActivitySelect from "./ActivitySelect";
 import Box from "@mui/material/Box";
+import MapContainer from "./MapContainer";
 
 type MainContainerProps = {
 	dataPromise: Promise<AppData>;
@@ -20,6 +21,7 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 
 	const sectorsComplete = sectors.length > 0;
 	const activitiesComplete = activities.length > 0;
+	const showMap = sectorsComplete && activitiesComplete;
 
 	const selectionLevel: SelectionLevel = !sectorsComplete
 		? "nothing"
@@ -56,6 +58,12 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				lists={lists}
 				activitiesComplete={activitiesComplete}
 				sectorsComplete={sectorsComplete}
+			/>
+			<Box mb={4} />
+			<MapContainer
+				data={data}
+				inDataLists={inDataLists}
+				showMap={showMap}
 			/>
 		</Container>
 	);

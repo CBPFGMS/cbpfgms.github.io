@@ -175,7 +175,7 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				listsObj.organizationsCompleteList[row.GlobalOrgID];
+				listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {

@@ -10,7 +10,7 @@ type StepHeaderProps = {
 	subtitle: string;
 	active: boolean;
 	done: boolean;
-	doneTitle: string;
+	doneTitle?: string;
 	doneSubtitle?: string;
 };
 

@@ -246,7 +246,6 @@ function makeLists({
 				(orgsShowingOrgName as readonly number[]).includes(
 					d.GlobalUniqueId,
 				);
-			console.log(showOrgName);
 			lists.organizations[d.GlobalOrgId] = showOrgName
 				? d.OrganizationName
 				: d.GlobalOrgName;
