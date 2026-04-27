@@ -132,6 +132,29 @@ export const sectorBeneficiaryObjectSchema = z.object({
 		.nullable(),
 });
 
+export const totalBeneficiariesObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	AllocationYear: z.number().int().nonnegative(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	CurrentAdminLevel: z.number().int().nonnegative(),
+	defaultAdminLevel: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative(),
+	BenW: z.number().int().nonnegative(),
+	BenB: z.number().int().nonnegative(),
+	BenG: z.number().int().nonnegative(),
+	TotTarg: z.number().int().nonnegative(),
+	TotProjects: z.number().int().nonnegative(),
+	Budget: z.number().nonnegative(),
+	AllocationtypeId: z.number().int().nonnegative(),
+	step1: z.string(),
+	step2: z.string(),
+	step3: z.string(),
+	step4: z.string(),
+	syncedAt: z.string(),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -320,6 +343,10 @@ export type ProjectSummaryObject = z.infer<typeof projectSummaryObjectSchema>;
 
 export type SectorBeneficiaryObject = z.infer<
 	typeof sectorBeneficiaryObjectSchema
+>;
+
+export type TotalBeneficiariesObject = z.infer<
+	typeof totalBeneficiariesObjectSchema
 >;
 
 export type AllocationTypesMasterObject = z.infer<

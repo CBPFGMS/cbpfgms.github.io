@@ -42,9 +42,8 @@ const downloadStates = charts.reduce(
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer() {
-	const { data, dataIndicators, inDataLists, lists } = useContext(
-		DataContext,
-	) as DataContextType;
+	const { data, dataIndicators, totalBeneficiariesData, inDataLists, lists } =
+		useContext(DataContext) as DataContextType;
 
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[clickedDownload, setClickedDownload] =
@@ -91,10 +90,12 @@ function MainContainer() {
 		() =>
 			processDataTopFigures({
 				data,
+				totalBeneficiariesData,
 				fund,
 				status,
+				inDataLists,
 			}),
-		[data, fund, status],
+		[data, totalBeneficiariesData, fund, status, inDataLists],
 	);
 
 	const { dataPartners, maxBudgetValue } = useMemo(

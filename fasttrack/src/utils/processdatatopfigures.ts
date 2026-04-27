@@ -1,4 +1,8 @@
-import type { Data } from "./processrawdata";
+import type {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 
 export type InSelectionData = {
 	funds: Set<number>;
@@ -9,6 +13,8 @@ type ProcessDataTopFiguresParams = {
 	data: Data;
 	fund: number[];
 	status: number[];
+	totalBeneficiariesData: TotalBeneficiariesData;
+	inDataLists: InDataLists;
 };
 
 export type DataTopFigures = {
@@ -22,6 +28,8 @@ function processDataTopFigures({
 	data,
 	fund,
 	status,
+	totalBeneficiariesData,
+	inDataLists,
 }: ProcessDataTopFiguresParams): {
 	dataTopFigures: DataTopFigures;
 	inSelectionData: InSelectionData;
@@ -34,19 +42,41 @@ function processDataTopFigures({
 		};
 
 	let allocations = 0,
-		targeted = 0;
+		targeted = 0,
+		oldTargeted = 0;
+
+	fund.forEach(pf => {
+		if (!totalBeneficiariesData[pf]) {
+			console.warn(
+				`Pooled fund code ${pf} not found in the totalBeneficiaries data`,
+			);
+			return;
+		}
+
+		const allStatuses = [...inDataLists.statusesPerFund[pf]];
+		const fundHasAllStatuses = allStatuses.every(pfStatus =>
+			status.includes(pfStatus),
+		);
+		if (fundHasAllStatuses) {
+			targeted += totalBeneficiariesData[pf].all;
+		} else {
+			status.forEach(st => {
+				targeted += totalBeneficiariesData[pf][st] || 0;
+			});
+		}
+	});
 
 	data.forEach(row => {
 		if (fund.includes(row.fund) && status.includes(row.projectStatus)) {
+			numberOfProjectsSet.add(row.projectId);
+			numberOfPartnersSet.add(row.organizationId);
+			allocations += row.budget;
 			const totalTargeted =
 				row.targeted.boys +
 				row.targeted.girls +
 				row.targeted.men +
 				row.targeted.women;
-			numberOfProjectsSet.add(row.projectId);
-			numberOfPartnersSet.add(row.organizationId);
-			allocations += row.budget;
-			targeted += totalTargeted;
+			oldTargeted += totalTargeted;
 		}
 		if (status.includes(row.projectStatus)) {
 			inSelectionData.funds.add(row.fund);
@@ -63,6 +93,8 @@ function processDataTopFigures({
 		allocations,
 		targeted,
 	};
+
+	console.log("old targeted people number:", oldTargeted.toLocaleString());
 
 	return { dataTopFigures, inSelectionData };
 }

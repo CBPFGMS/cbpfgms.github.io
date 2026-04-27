@@ -13,8 +13,7 @@ import downloadData from "../utils/downloaddata";
 import WarningIcon from "@mui/icons-material/Warning";
 import { constants } from "../utils/constants";
 
-const { disclaimerWarningColor, disclaimerText, totalBeneficiairesText } =
-	constants;
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 //REMOVE
 void disclaimerWarningColor;
@@ -132,10 +131,9 @@ function Regions({
 								"<div style='text-align:left;'>Total allocated: $" +
 								region.budget.toLocaleString() +
 								"<br/>" +
-								// TEMPORARILY REMOVED TARGETED PEOPLE FROM TOOLTIP
-								// "Targeted people: " +
-								// region.targeted.toLocaleString() +
-								// "<br/>" +
+								"Targeted people: " +
+								region.targeted.toLocaleString() +
+								"<br/>" +
 								tooltipFundText +
 								"</div>"
 							}
@@ -232,19 +230,6 @@ function Regions({
 									// size={6} //ORIGINAL SIZE
 								>
 									<Typography
-										mt={2}
-										style={{
-											fontSize: "1.1rem",
-											color: "var(--ocha-blue)",
-											fontWeight: 600,
-											fontFamily: "Montserrat",
-										}}
-									>
-										{totalBeneficiairesText}
-									</Typography>
-									{/* 
-									// TOTAL BENEFICIAIRES COMMENTED OUT TEMPORARILY
-									<Typography
 										style={{
 											fontSize: "2.5rem",
 											color: "var(--ocha-blue)",
@@ -289,7 +274,7 @@ function Regions({
 											data-tooltip-place="top"
 										/>
 										People Targeted
-									</Typography> */}
+									</Typography>
 								</Grid>
 							</Grid>
 						</Grid>

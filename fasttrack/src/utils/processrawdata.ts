@@ -1,8 +1,10 @@
 import {
 	type ProjectSummaryObject,
 	type SectorBeneficiaryObject,
+	type TotalBeneficiariesObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
+	totalBeneficiariesObjectSchema,
 } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -60,6 +62,7 @@ export type InDataLists = {
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	projectStatuses: Set<number>;
+	statusesPerFund: { [key: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -73,6 +76,11 @@ type ProcessRawDataParams = {
 	sectorsData: SectorBeneficiaryObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
+	totalBeneficiaries: TotalBeneficiariesObject[];
+};
+
+export type TotalBeneficiariesData = {
+	[key: number]: { [id: number]: number; all: number };
 };
 
 function processRawData({
@@ -80,8 +88,14 @@ function processRawData({
 	sectorsData,
 	listsObj,
 	setInDataLists,
-}: ProcessRawDataParams): Data {
+	totalBeneficiaries,
+}: ProcessRawDataParams): {
+	data: Data;
+	totalBeneficiariesData: TotalBeneficiariesData;
+} {
 	const data: Data = [];
+	const totalBeneficiariesData: TotalBeneficiariesData = {};
+
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
@@ -96,6 +110,32 @@ function processRawData({
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
 		new Set();
+	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+
+	totalBeneficiaries.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+
+			if (!totalBeneficiariesData[projectKey]) {
+				totalBeneficiariesData[projectKey] = { all: 0 };
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesData[projectKey].all = row.TotTarg;
+			} else {
+				totalBeneficiariesData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				] = row.TotTarg;
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -239,6 +279,16 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
+				if (statusesPerFund[row.PooledFundId]) {
+					statusesPerFund[row.PooledFundId].add(
+						projectStatusMapping[row.ProcessSTatusID],
+					);
+				} else {
+					statusesPerFund[row.PooledFundId] = new Set([
+						projectStatusMapping[row.ProcessSTatusID],
+					]);
+				}
+
 				const objDatum: Datum = {
 					fund: row.PooledFundId,
 					year: thisAllocationType.AllocationYear,
@@ -283,9 +333,10 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 		projectStatuses: projectStatusesSet,
+		statusesPerFund,
 	}));
 
-	return data;
+	return { data, totalBeneficiariesData };
 }
 
 function generateBeneficiariesObjectSummary(

@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import makeLists, { type List } from "./makelists";
-import processRawData, { type Data, type InDataLists } from "./processrawdata";
+import processRawData, {
+	type Data,
+	type InDataLists,
+	type TotalBeneficiariesData,
+} from "./processrawdata";
 import type {
 	AllocationSourcesMasterObject,
 	AllocationTypesMasterObject,
@@ -16,6 +20,7 @@ import type {
 	SectorsMasterObject,
 	GlobalIndicatorsMasterObject,
 	GlobalIndicatorsObject,
+	TotalBeneficiariesObject,
 } from "./schemas";
 import { constants } from "./constants";
 
@@ -32,6 +37,7 @@ type ReceiveDataArgs = [
 	SectorsMasterObject[],
 	GlobalIndicatorsMasterObject[],
 	PooledFundsWithRegionMasterObject[],
+	TotalBeneficiariesObject[],
 ];
 
 const { fundType } = constants;
@@ -49,7 +55,8 @@ const beneficiaryTypesMasterUrl =
 	globalIndicatorsMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	pooledFundWithRegionMasterUrl =
-		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json";
+		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
+	totalBeneficiariesUrl = "/total_beneficiaries.csv";
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -61,6 +68,7 @@ function useData(
 	dataIndicators: GlobalIndicatorsObject[];
 	lists: List;
 	inDataLists: InDataLists;
+	totalBeneficiariesData: TotalBeneficiariesData;
 	loading: boolean;
 	error: string | null;
 	progress: number;
@@ -78,6 +86,8 @@ function useData(
 		[dataIndicators, setDataIndicators] = useState<
 			GlobalIndicatorsObject[]
 		>([] as GlobalIndicatorsObject[]),
+		[totalBeneficiariesData, setTotalBeneficiariesData] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
 			{} as InDataLists,
@@ -162,6 +172,12 @@ function useData(
 				"json",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiaries",
+				totalBeneficiariesUrl,
+				"csv",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -186,6 +202,7 @@ function useData(
 			sectorsMaster,
 			globalIndicatorsMaster,
 			pooledFundsWithRegionMaster,
+			totalBeneficiaries,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -199,15 +216,17 @@ function useData(
 				pooledFundsWithRegionMaster,
 			});
 
-			const data: Data = processRawData({
+			const { data, totalBeneficiariesData } = processRawData({
 				projectSummary,
 				sectorsData,
 				listsObj,
 				setInDataLists,
+				totalBeneficiaries,
 			});
 
 			setData(data);
 			setDataIndicators(globalIndicatorsData);
+			setTotalBeneficiariesData(totalBeneficiariesData);
 			setLists(listsObj);
 			setLoading(false);
 		}
@@ -219,6 +238,7 @@ function useData(
 		dataIndicators,
 		lists,
 		inDataLists,
+		totalBeneficiariesData,
 		loading,
 		error,
 		progress,

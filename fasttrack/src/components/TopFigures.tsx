@@ -10,8 +10,7 @@ import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import { constants } from "../utils/constants";
 
-const { disclaimerWarningColor, disclaimerText, totalBeneficiairesText } =
-	constants;
+const { disclaimerWarningColor, disclaimerText } = constants;
 
 type TopFiguresProps = {
 	data: DataTopFigures;
@@ -49,7 +48,7 @@ function TopFigures({ data }: TopFiguresProps) {
 		{
 			label: "Targeted People",
 			value: data.targeted,
-			type: "integer",
+			type: "decimal",
 			format: true,
 		},
 	];
@@ -94,58 +93,13 @@ function TopFigures({ data }: TopFiguresProps) {
 									"$" + card.value.toLocaleString(),
 								"data-tooltip-place": "top",
 							})}
-							// TOTAL BENEFICIAIRES COMMENTED OUT TEMPORARILY
-							// {...(card.label === "Targeted People" && {
-							// 	"data-tooltip-id": "tooltip",
-							// 	"data-tooltip-html":
-							// 		card.value.toLocaleString() + " people",
-							// 	"data-tooltip-place": "top",
-							// })}
+							{...(card.label === "Targeted People" && {
+								"data-tooltip-id": "tooltip",
+								"data-tooltip-html":
+									card.value.toLocaleString() + " people",
+								"data-tooltip-place": "top",
+							})}
 						>
-							{card.label === "Targeted People" && (
-								<Typography
-									style={{
-										fontSize: "0.9rem",
-										color: "var(--ocha-blue)",
-										fontWeight: 600,
-										fontFamily: "Montserrat",
-										lineHeight: 1.1,
-									}}
-								>
-									{totalBeneficiairesText}
-								</Typography>
-							)}
-							{card.label !== "Targeted People" && (
-								<Typography
-									style={{
-										fontSize: "2.5rem",
-										color: "var(--ocha-blue)",
-										fontWeight: 700,
-										fontFamily: "Montserrat",
-									}}
-								>
-									{card.label === "Allocated / Launched" &&
-										"$"}
-									<NumberAnimator
-										number={
-											card.format
-												? parseFloat(
-														formatSIFloat(
-															card.value,
-														),
-													)
-												: card.value
-										}
-										type={card.type}
-									/>
-									{card.format &&
-									isNaN(+formatSIFloat(card.value).slice(-1))
-										? formatSIFloat(card.value).slice(-1)
-										: ""}
-								</Typography>
-							)}
-							{/* 
-							// TOTAL BENEFICIAIRES COMMENTED OUT TEMPORARILY
 							<Typography
 								style={{
 									fontSize: "2.5rem",
@@ -169,7 +123,7 @@ function TopFigures({ data }: TopFiguresProps) {
 								isNaN(+formatSIFloat(card.value).slice(-1))
 									? formatSIFloat(card.value).slice(-1)
 									: ""}
-							</Typography> */}
+							</Typography>
 						</Box>
 						<Typography
 							style={{
