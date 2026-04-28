@@ -1,11 +1,18 @@
-import type { Data } from "./processrawdata";
+import type {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 import type { List } from "./makelists";
+import { simpleWarn } from "./warninvalid";
 
 type ProcessDataRegionsParams = {
 	data: Data;
 	fund: number[];
 	lists: List;
 	status: number[];
+	totalBeneficiariesData: TotalBeneficiariesData;
+	inDataLists: InDataLists;
 };
 
 export type RegionsDatum = {
@@ -20,6 +27,8 @@ function processDataRegions({
 	fund,
 	lists,
 	status,
+	inDataLists,
+	totalBeneficiariesData,
 }: ProcessDataRegionsParams): RegionsDatum[] {
 	const dataRegions: RegionsDatum[] = [];
 
@@ -35,24 +44,38 @@ function processDataRegions({
 				if (foundRegion) {
 					foundRegion.funds.add(row.fund);
 					foundRegion.budget += row.budget;
-					foundRegion.targeted +=
-						row.targeted.boys +
-						row.targeted.girls +
-						row.targeted.men +
-						row.targeted.women;
 				} else {
 					dataRegions.push({
 						region: thisRegion,
 						funds: new Set([row.fund]),
 						budget: row.budget,
-						targeted:
-							row.targeted.boys +
-							row.targeted.girls +
-							row.targeted.men +
-							row.targeted.women,
+						targeted: 0,
 					});
 				}
 			}
+		}
+	});
+
+	fund.forEach(pf => {
+		if (!totalBeneficiariesData[pf]) {
+			return;
+		}
+
+		const thisRegion = dataRegions.find(d => d.funds.has(pf));
+		if (thisRegion) {
+			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const fundHasAllStatuses = allStatuses.every(pfStatus =>
+				status.includes(pfStatus),
+			);
+			if (fundHasAllStatuses) {
+				thisRegion.targeted += totalBeneficiariesData[pf].all;
+			} else {
+				status.forEach(st => {
+					thisRegion.targeted += totalBeneficiariesData[pf][st] || 0;
+				});
+			}
+		} else {
+			simpleWarn(`Pooled fund code ${pf} not found in the regions data`);
 		}
 	});
 

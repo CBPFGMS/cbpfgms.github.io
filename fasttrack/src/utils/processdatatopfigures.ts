@@ -3,6 +3,7 @@ import type {
 	InDataLists,
 	TotalBeneficiariesData,
 } from "./processrawdata";
+import { simpleWarn } from "./warninvalid";
 
 export type InSelectionData = {
 	funds: Set<number>;
@@ -42,12 +43,11 @@ function processDataTopFigures({
 		};
 
 	let allocations = 0,
-		targeted = 0,
-		oldTargeted = 0;
+		targeted = 0;
 
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
-			console.warn(
+			simpleWarn(
 				`Pooled fund code ${pf} not found in the totalBeneficiaries data`,
 			);
 			return;
@@ -71,12 +71,6 @@ function processDataTopFigures({
 			numberOfProjectsSet.add(row.projectId);
 			numberOfPartnersSet.add(row.organizationId);
 			allocations += row.budget;
-			const totalTargeted =
-				row.targeted.boys +
-				row.targeted.girls +
-				row.targeted.men +
-				row.targeted.women;
-			oldTargeted += totalTargeted;
 		}
 		if (status.includes(row.projectStatus)) {
 			inSelectionData.funds.add(row.fund);
@@ -93,8 +87,6 @@ function processDataTopFigures({
 		allocations,
 		targeted,
 	};
-
-	console.log("old targeted people number:", oldTargeted.toLocaleString());
 
 	return { dataTopFigures, inSelectionData };
 }

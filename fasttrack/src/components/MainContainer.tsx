@@ -116,8 +116,10 @@ function MainContainer() {
 				fund,
 				lists,
 				status,
+				inDataLists,
+				totalBeneficiariesData,
 			}),
-		[data, fund, lists, status],
+		[data, fund, lists, status, inDataLists, totalBeneficiariesData],
 	);
 
 	const dataSectors = useMemo(

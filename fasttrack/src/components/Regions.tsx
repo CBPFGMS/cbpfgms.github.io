@@ -15,11 +15,6 @@ import { constants } from "../utils/constants";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
 
-//REMOVE
-void disclaimerWarningColor;
-void disclaimerText;
-void WarningIcon;
-
 type RegionsProps = {
 	data: RegionsDatum[];
 	lists: List;

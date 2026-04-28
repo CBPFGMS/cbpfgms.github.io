@@ -56,7 +56,8 @@ const beneficiaryTypesMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
-	totalBeneficiariesUrl = "/total_beneficiaries.csv";
+	totalBeneficiariesUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiary?year=2026&$format=csv";
 
 //fake data path on staging site: ./assets/stg-data/
 
