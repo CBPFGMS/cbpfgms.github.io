@@ -29,7 +29,7 @@ const constants = {
 	implementationAndReportingProjects: [4, 5, 6],
 	disclaimerWarningColor: "#eed202",
 	disclaimerText:
-		"Disclaimer: Figures for people targeted/reached may include double counting as same people may receive assistance from multiple clusters/sectors/projects.",
+		"Disclaimer: Beneficiary figures are calculated using a hybrid methodology designed to minimize double counting across activities and locations. As a result, totals may not fully reconcile when applying different filters or comparing across views.",
 	totalBeneficiairesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
 	pooledFundsShowingOrgName: [88, 508, 509, 510],
