@@ -22,14 +22,14 @@ type TopPanelProps = {
 	inViewGBV: boolean;
 	inViewCash: boolean;
 	refIds: RefIds;
-	year: number[];
-	setYear: React.Dispatch<React.SetStateAction<number[]>>;
+	// year: number[];
+	// setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationSource: number[];
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationSource: number[];
+	// setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationType: number[];
+	// setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
@@ -50,14 +50,14 @@ function TopPanel({
 	inViewGBV,
 	inViewCash,
 	refIds,
-	year,
-	setYear,
+	// year,
+	// setYear,
 	fund,
 	setFund,
-	allocationSource,
-	setAllocationSource,
-	allocationType,
-	setAllocationType,
+	// allocationSource,
+	// setAllocationSource,
+	// allocationType,
+	// setAllocationType,
 	implementationStatus,
 	setImplementationStatus,
 	inSelectionData,
@@ -120,14 +120,14 @@ function TopPanel({
 				/>
 				{!inViewMenus && (
 					<QuickSelectors
-						year={year}
-						setYear={setYear}
+						// year={year}
+						// setYear={setYear}
 						fund={fund}
 						setFund={setFund}
-						allocationSource={allocationSource}
-						setAllocationSource={setAllocationSource}
-						allocationType={allocationType}
-						setAllocationType={setAllocationType}
+						// allocationSource={allocationSource}
+						// setAllocationSource={setAllocationSource}
+						// allocationType={allocationType}
+						// setAllocationType={setAllocationType}
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}

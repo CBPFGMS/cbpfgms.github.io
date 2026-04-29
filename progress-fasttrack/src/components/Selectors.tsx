@@ -3,26 +3,26 @@ import Grid from "@mui/material/Grid2";
 import { InSelectionData } from "../utils/processdatasummary";
 
 type SelectorsProps = {
-	year: number[];
-	setYear: React.Dispatch<React.SetStateAction<number[]>>;
+	// year: number[];
+	// setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationSource: number[];
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationType: number[];
+	// setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationSource: number[];
+	// setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
 };
 
 function Selectors({
-	year,
-	setYear,
+	// year,
+	// setYear,
 	fund,
 	setFund,
-	allocationSource,
-	setAllocationSource,
-	allocationType,
-	setAllocationType,
+	// allocationSource,
+	// setAllocationSource,
+	// allocationType,
+	// setAllocationType,
 	inSelectionData,
 }: SelectorsProps) {
 	return (
@@ -30,7 +30,7 @@ function Selectors({
 			container
 			spacing={1}
 		>
-			<Grid size={2}>
+			{/* <Grid size={2}>
 				<AccordionComponent
 					type="Year"
 					dataProperty="years"
@@ -39,8 +39,8 @@ function Selectors({
 					setValue={setYear}
 					inSelectionData={inSelectionData}
 				/>
-			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
+			</Grid> */}
+			<Grid size={6}>
 				<AccordionComponent
 					type="Fund"
 					dataProperty="funds"
@@ -50,7 +50,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
+			{/* <Grid sx={{ flexGrow: 1 }}>
 				<AccordionComponent
 					type="Allocation Name"
 					dataProperty="allocationTypes"
@@ -69,7 +69,7 @@ function Selectors({
 					setValue={setAllocationSource}
 					inSelectionData={inSelectionData}
 				/>
-			</Grid>
+			</Grid> */}
 		</Grid>
 	);
 }

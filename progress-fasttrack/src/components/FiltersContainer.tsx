@@ -10,14 +10,14 @@ import { DataStatuses } from "../utils/processdatastatuses";
 import React from "react";
 
 type FiltersContainerProps = {
-	year: number[];
-	setYear: React.Dispatch<React.SetStateAction<number[]>>;
+	// year: number[];
+	// setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationSource: number[];
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationSource: number[];
+	// setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationType: number[];
+	// setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
@@ -28,14 +28,14 @@ type FiltersContainerProps = {
 };
 
 function FiltersContainer({
-	year,
-	setYear,
+	// year,
+	// setYear,
 	fund,
 	setFund,
-	allocationSource,
-	setAllocationSource,
-	allocationType,
-	setAllocationType,
+	// allocationSource,
+	// setAllocationSource,
+	// allocationType,
+	// setAllocationType,
 	inSelectionData,
 	menusRef,
 	implementationStatus,
@@ -77,14 +77,14 @@ function FiltersContainer({
 					size={12}
 				>
 					<Selectors
-						year={year}
-						setYear={setYear}
+						// year={year}
+						// setYear={setYear}
 						fund={fund}
 						setFund={setFund}
-						allocationSource={allocationSource}
-						setAllocationSource={setAllocationSource}
-						allocationType={allocationType}
-						setAllocationType={setAllocationType}
+						// allocationSource={allocationSource}
+						// setAllocationSource={setAllocationSource}
+						// allocationType={allocationType}
+						// setAllocationType={setAllocationType}
 						inSelectionData={inSelectionData}
 					/>
 				</Grid>

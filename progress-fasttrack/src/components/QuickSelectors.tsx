@@ -3,20 +3,20 @@ import Box from "@mui/material/Box";
 import Dropdown from "./Dropdown";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { InSelectionData } from "../utils/processdatasummary";
-import { makeYearsList } from "../utils/makeyearslist";
+// import { makeYearsList } from "../utils/makeyearslist";
 import { ImplementationStatuses } from "./MainContainer";
 import DropdownStatus from "./DropdownStatus";
 
 
 type SelectorsProps = {
-	year: number[];
-	setYear: React.Dispatch<React.SetStateAction<number[]>>;
+	// year: number[];
+	// setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationSource: number[];
-	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationType: number[];
+	// setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	// allocationSource: number[];
+	// setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
@@ -25,32 +25,32 @@ type SelectorsProps = {
 };
 
 function QuickSelectors({
-	allocationSource,
-	allocationType,
+	// allocationSource,
+	// allocationType,
 	fund,
-	year,
+	// year,
 	implementationStatus,
 	inSelectionData,
-	setAllocationSource,
-	setAllocationType,
+	// setAllocationSource,
+	// setAllocationType,
 	setFund,
-	setYear,
+	// setYear,
 	setImplementationStatus,
 }: SelectorsProps) {
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 
-	const dataArrayYears = [...inDataLists.years];
+	// const dataArrayYears = [...inDataLists.years];
 	const dataArrayFunds = [...inDataLists.funds];
-	const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
-	const dataArrayAllocationSources = [...inDataLists.allocationSources];
+	// const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
+	// const dataArrayAllocationSources = [...inDataLists.allocationSources];
 	const dataArrayImplementationStatuses: ImplementationStatuses[] = [
 		...inSelectionData.statuses,
 	];
 
-	const yearsList = makeYearsList(dataArrayYears);
+	// const yearsList = makeYearsList(dataArrayYears);
 	const namesListFunds = lists.fundNames;
-	const namesListAllocationTypes = lists.allocationTypes;
-	const namesListAllocationSources = lists.allocationSources;
+	// const namesListAllocationTypes = lists.allocationTypes;
+	// const namesListAllocationSources = lists.allocationSources;
 
 	return (
 		<Box
@@ -59,7 +59,7 @@ function QuickSelectors({
 			marginLeft={"4em"}
 			gap={1}
 		>
-			<Dropdown
+			{/* <Dropdown
 				value={year}
 				setValue={setYear}
 				names={dataArrayYears}
@@ -68,7 +68,7 @@ function QuickSelectors({
 				inSelectionData={inSelectionData}
 				dataProperty={"years"}
 				fromQuickSelectors={true}
-			/>
+			/> */}
 			<Dropdown
 				value={fund}
 				setValue={setFund}
@@ -79,7 +79,7 @@ function QuickSelectors({
 				dataProperty={"funds"}
 				fromQuickSelectors={true}
 			/>
-			<Dropdown
+			{/* <Dropdown
 				value={allocationType}
 				setValue={setAllocationType}
 				names={dataArrayAllocationTypes}
@@ -98,7 +98,7 @@ function QuickSelectors({
 				inSelectionData={inSelectionData}
 				dataProperty={"allocationSources"}
 				fromQuickSelectors={true}
-			/>
+			/> */}
 			<DropdownStatus
 				value={implementationStatus}
 				setValue={setImplementationStatus}
