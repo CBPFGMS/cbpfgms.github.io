@@ -2,7 +2,6 @@ import React, { useContext, useRef, useState } from "react";
 import {
 	CvaTotalPeople,
 	DatumCva,
-	DatumPictogram,
 	DatumSummary,
 } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
@@ -19,9 +18,7 @@ import { sum } from "d3";
 import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import CvaTypesChart from "./CvaTypesChart";
-
-// TEMPORARILY REMOVING SWITCH
-void CvaChartSwitch;
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
@@ -31,7 +28,7 @@ export type CvaGoal = (typeof beneficiariesStatuses)[number];
 
 type CvaChartProps = {
 	dataSummary: DatumSummary[];
-	dataPictogram: DatumPictogram;
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 	dataCva: DatumCva[];
 	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
@@ -47,7 +44,7 @@ const { cvaChartModes, cvaChartTypes, beneficiariesStatuses } = constants;
 
 function CvaChart({
 	dataSummary,
-	dataPictogram,
+	targetedAndReachedTotal,
 	dataCva,
 	dataCvaTotalPeople,
 	clickedDownload,
@@ -75,16 +72,8 @@ function CvaChart({
 		{ cvaTargeted: 0, cvaReached: 0 },
 	);
 
-	const { totalPeopleTargeted, totalPeopleReached } = Object.entries(
-		dataPictogram,
-	).reduce(
-		(acc, [key, value]) => {
-			acc.totalPeopleTargeted += key.includes("targeted") ? value : 0;
-			acc.totalPeopleReached += key.includes("reached") ? value : 0;
-			return acc;
-		},
-		{ totalPeopleTargeted: 0, totalPeopleReached: 0 },
-	);
+	const totalPeopleTargeted = targetedAndReachedTotal.targeted;
+	const totalPeopleReached = targetedAndReachedTotal.reached;
 
 	function handleDownloadClick() {
 		const dataCvaDownload = processCvaDownload({
@@ -104,9 +93,6 @@ function CvaChart({
 			cvaChartMode === "allocations" ? "people" : "allocations",
 		);
 	}
-
-	// TEMPORARILY REMOVING SWITCH
-	void handleSwitchChange;
 
 	return (
 		<Container
@@ -147,9 +133,7 @@ function CvaChart({
 				<NoData />
 			) : (
 				<>
-					{/* 
-						// TEMPORARILY REMOVING SWITCH
-						<Box
+					<Box
 						style={{
 							display: "flex",
 							width: "100%",
@@ -161,7 +145,7 @@ function CvaChart({
 							cvaChartMode={cvaChartMode}
 							handleSwitchChange={handleSwitchChange}
 						/>
-					</Box> */}
+					</Box>
 					<Box
 						mt={3}
 						style={{

@@ -374,7 +374,9 @@ function ChartsContainer({
 						>
 							<CvaChart
 								dataSummary={dataSummary}
-								dataPictogram={dataPictogram}
+								targetedAndReachedTotal={
+									targetedAndReachedTotal
+								}
 								dataCva={dataCva}
 								dataCvaTotalPeople={dataCvaTotalPeople}
 								clickedDownload={clickedDownload}

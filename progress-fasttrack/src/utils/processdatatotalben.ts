@@ -29,7 +29,7 @@ function processDataTotalBeneficiaries({
 	const numericStatuses = flipObject(lists.statuses);
 
 	const status = implementationStatus.map(
-		implSt => numericStatuses[implSt as ImplementationStatuses],
+		implSt => +numericStatuses[implSt as ImplementationStatuses],
 	);
 
 	fund.forEach(pf => {

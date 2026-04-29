@@ -75,6 +75,7 @@ function FiltersContainer({
 				<Grid
 					ref={menusRef}
 					size={12}
+					mb={3}
 				>
 					<Selectors
 						// year={year}

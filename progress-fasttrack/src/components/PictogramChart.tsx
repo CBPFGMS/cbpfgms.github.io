@@ -21,12 +21,6 @@ import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
-// TEMPORARILY REMOVING TOTAL FIGURES
-void format;
-void Divider;
-void AdsClickIcon;
-void DoneIcon;
-
 type PictogramChartProps = {
 	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
@@ -39,7 +33,7 @@ type PictogramChartProps = {
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 };
 
-const { beneficiaryCategories, totalBeneficiariesText } = constants;
+const { beneficiaryCategories } = constants;
 
 function PictogramChart({
 	dataPictogram,
@@ -59,10 +53,6 @@ function PictogramChart({
 	const totalTargeted = targetedAndReachedTotal.targeted;
 
 	const totalReached = targetedAndReachedTotal.reached;
-
-	//TEMPORARILY REMOVING TOTAL FIGURES
-	void totalTargeted;
-	void totalReached;
 
 	const maxValue = max(Object.values(dataPictogram)) || 0;
 	const maxNumberOfPictograms = 22;
@@ -118,7 +108,7 @@ function PictogramChart({
 					}}
 					type="total"
 				/>
-				<Box
+				{/* <Box
 					display={"flex"}
 					alignItems={"center"}
 					justifyContent={"center"}
@@ -138,10 +128,8 @@ function PictogramChart({
 					>
 						{totalBeneficiariesText}
 					</Typography>
-				</Box>
-				{/* 
-					// TEMPORARILY REMOVING TOTAL FIGURES
-					<Box
+				</Box> */}
+				<Box
 					display={"flex"}
 					flexDirection={"column"}
 					alignItems={"center"}
@@ -276,7 +264,7 @@ function PictogramChart({
 							}}
 						/>
 					</Typography>
-				</Box> */}
+				</Box>
 			</Box>
 			<Box
 				display={"flex"}
