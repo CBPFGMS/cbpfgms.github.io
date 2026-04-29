@@ -24,6 +24,7 @@ import { DatumBarChart } from "../utils/processdatabarchart";
 import DisabilityChart from "./DisabilityChart";
 import GBVChart from "./GBVChart";
 import CvaChart from "./CvaChart";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -54,6 +55,7 @@ type ChartsContainerProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationsStatus: ImplementationStatuses[];
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 };
 
 function ChartsContainer({
@@ -83,6 +85,7 @@ function ChartsContainer({
 	allocationSource,
 	allocationType,
 	implementationsStatus,
+	targetedAndReachedTotal,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -161,6 +164,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
+							targetedAndReachedTotal={targetedAndReachedTotal}
 						/>
 					</Grid>
 				</Grid>

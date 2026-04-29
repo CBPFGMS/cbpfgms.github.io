@@ -2,7 +2,11 @@ import { useEffect, useState } from "react"; //REMOVE LATER
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import makeLists, { List } from "./makelists";
-import processRawData, { Data, InDataLists } from "./processrawdata";
+import processRawData, {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 import {
 	AllocationSourcesMasterObject,
 	AllocationTypesMasterObject,
@@ -15,6 +19,7 @@ import {
 	SectorsMasterObject,
 	CvaObject,
 	CvaMasterObject,
+	TotalBeneficiariesObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -29,6 +34,7 @@ type ReceiveDataArgs = [
 	OrganizationTypesMasterObject[],
 	SectorsMasterObject[],
 	CvaMasterObject[],
+	TotalBeneficiariesObject[],
 ];
 
 const beneficiaryTypesMasterUrl =
@@ -42,7 +48,9 @@ const beneficiaryTypesMasterUrl =
 	sectorsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
 	cvaMasterUrl =
-		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType";
+		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
+	totalBeneficiariesUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiary?year=2026&$format=csv";
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -53,6 +61,7 @@ function useData(
 	data: Data;
 	lists: List;
 	inDataLists: InDataLists;
+	totalBeneficiariesData: TotalBeneficiariesData;
 	loading: boolean;
 	error: string | null;
 	progress: number;
@@ -70,7 +79,10 @@ function useData(
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
 			{} as InDataLists,
-		);
+		),
+		[totalBeneficiariesData, setTotalBeneficiariesData] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData);
+
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
 
@@ -139,6 +151,12 @@ function useData(
 				"json",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiaries",
+				totalBeneficiariesUrl,
+				"csv",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -162,6 +180,7 @@ function useData(
 			organizationTypesMaster,
 			sectorsMaster,
 			cvaMaster,
+			totalBeneficiaries,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -174,16 +193,18 @@ function useData(
 				cvaMaster,
 			});
 
-			const data: Data = processRawData({
+			const { data, totalBeneficiariesData } = processRawData({
 				projectSummary,
 				sectorsData,
 				cvaData,
 				listsObj,
 				setInDataLists,
+				totalBeneficiaries,
 			});
 
 			setData(data);
 			setLists(listsObj);
+			setTotalBeneficiariesData(totalBeneficiariesData);
 			setLoading(false);
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,6 +214,7 @@ function useData(
 		data,
 		lists,
 		inDataLists,
+		totalBeneficiariesData,
 		loading,
 		error,
 		progress,

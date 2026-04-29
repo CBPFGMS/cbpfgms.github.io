@@ -1,10 +1,12 @@
 import {
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
+	TotalBeneficiariesObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	cvaObjectSchema,
 	CvaObject,
+	totalBeneficiariesObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -95,6 +97,7 @@ export type InDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	statusesPerFund: { [key: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -109,6 +112,11 @@ type ProcessRawDataParams = {
 	cvaData: CvaObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
+	totalBeneficiaries: TotalBeneficiariesObject[];
+};
+
+export type TotalBeneficiariesData = {
+	[key: number]: { [id: number]: number; all: number };
 };
 
 function processRawData({
@@ -117,8 +125,14 @@ function processRawData({
 	cvaData,
 	listsObj,
 	setInDataLists,
-}: ProcessRawDataParams): Data {
+	totalBeneficiaries,
+}: ProcessRawDataParams): {
+	data: Data;
+	totalBeneficiariesData: TotalBeneficiariesData;
+} {
 	const data: Data = [];
+	const totalBeneficiariesData: TotalBeneficiariesData = {};
+
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const cvaDataMap: Map<string, CvaMapValue> = new Map();
 
@@ -132,6 +146,32 @@ function processRawData({
 	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
+	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+
+	totalBeneficiaries.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+
+			if (!totalBeneficiariesData[projectKey]) {
+				totalBeneficiariesData[projectKey] = { all: 0 };
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesData[projectKey].all = row.TotTarg;
+			} else {
+				totalBeneficiariesData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				] = row.TotTarg;
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -248,7 +288,7 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
+				listsObj.organizationsCompleteList[row.GlobalOrgId];
 			const thisStatus =
 				listsObj.statuses[projectStatusMapping[row.ProcessSTatusID]];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
@@ -296,10 +336,19 @@ function processRawData({
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				organizationsSet.add(thisOrganization.GlobalOrgId);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
+				if (statusesPerFund[row.PooledFundId]) {
+					statusesPerFund[row.PooledFundId].add(
+						projectStatusMapping[row.ProcessSTatusID],
+					);
+				} else {
+					statusesPerFund[row.PooledFundId] = new Set([
+						projectStatusMapping[row.ProcessSTatusID],
+					]);
+				}
 
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
@@ -325,7 +374,7 @@ function processRawData({
 					projectId: row.ChfId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalUniqueId,
+					organizationId: thisOrganization.GlobalOrgId,
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
@@ -379,9 +428,10 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
+		statusesPerFund,
 	}));
 
-	return data;
+	return { data, totalBeneficiariesData };
 }
 
 function generateBeneficiariesSplitObject(

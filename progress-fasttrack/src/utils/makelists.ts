@@ -18,7 +18,7 @@ import {
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { ReportType } from "./processrawdata";
-import { projectStatusMaster } from "./constants";
+import constants, { projectStatusMaster } from "./constants";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -69,6 +69,8 @@ export type List = {
 	projectDetails: Map<number, ProjectDetails>;
 	cvaTypeNames: ListObj;
 };
+
+const { pooledFundsShowingOrgName, orgsShowingOrgName } = constants;
 
 function makeLists({
 	allocationTypesMaster,
@@ -190,8 +192,17 @@ function makeLists({
 		const parsedOrganizationMaster =
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
-			lists.organizations[d.GlobalUniqueId] = d.OrganizationName;
-			lists.organizationsCompleteList[d.GlobalUniqueId] = d;
+			const showOrgName =
+				(pooledFundsShowingOrgName as readonly number[]).includes(
+					d.PooledFundId,
+				) &&
+				(orgsShowingOrgName as readonly number[]).includes(
+					d.GlobalUniqueId,
+				);
+			lists.organizations[d.GlobalOrgId] = showOrgName
+				? d.OrganizationName
+				: d.GlobalOrgName;
+			lists.organizationsCompleteList[d.GlobalOrgId] = d;
 		} else {
 			warnInvalidSchema(
 				"OrganizationMaster",

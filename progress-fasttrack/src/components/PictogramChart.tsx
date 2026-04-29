@@ -19,6 +19,7 @@ import constants from "../utils/constants";
 import capitalizeString from "../utils/capitalizestring";
 import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 // TEMPORARILY REMOVING TOTAL FIGURES
 void format;
@@ -35,6 +36,7 @@ type PictogramChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 };
 
 const { beneficiaryCategories, totalBeneficiariesText } = constants;
@@ -48,22 +50,15 @@ function PictogramChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
+	targetedAndReachedTotal,
 }: PictogramChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
 
-	const totalTargeted =
-		dataPictogram.targetedBoys +
-		dataPictogram.targetedGirls +
-		dataPictogram.targetedMen +
-		dataPictogram.targetedWomen;
+	const totalTargeted = targetedAndReachedTotal.targeted;
 
-	const totalReached =
-		dataPictogram.reachedBoys +
-		dataPictogram.reachedGirls +
-		dataPictogram.reachedMen +
-		dataPictogram.reachedWomen;
+	const totalReached = targetedAndReachedTotal.reached;
 
 	//TEMPORARILY REMOVING TOTAL FIGURES
 	void totalTargeted;

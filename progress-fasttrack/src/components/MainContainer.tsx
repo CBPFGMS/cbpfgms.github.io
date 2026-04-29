@@ -13,6 +13,7 @@ import processDataSummary from "../utils/processdatasummary";
 import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
+import processDataTotalBeneficiaries from "../utils/processdatatotalben";
 
 const { implementationStatuses, charts } = constants;
 
@@ -47,7 +48,7 @@ const refIds = charts.reduce((acc, curr) => {
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer({ defaultYear }: MainContainerProps) {
-	const { data, inDataLists, lists } = useContext(
+	const { data, totalBeneficiariesData, inDataLists, lists } = useContext(
 		DataContext,
 	) as DataContextType;
 
@@ -83,6 +84,24 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
 	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
+
+	const targetedAndReachedTotal = useMemo(
+		() =>
+			processDataTotalBeneficiaries({
+				totalBeneficiariesData,
+				fund,
+				implementationStatus,
+				inDataLists,
+				lists,
+			}),
+		[
+			totalBeneficiariesData,
+			fund,
+			implementationStatus,
+			inDataLists,
+			lists,
+		],
+	);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -247,6 +266,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
+				targetedAndReachedTotal={targetedAndReachedTotal}
 			/>
 		</Container>
 	);
