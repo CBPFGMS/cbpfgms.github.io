@@ -344,7 +344,7 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 								<TableHead>
 									<TableRow>
 										<TableCell>Sector</TableCell>
-										<TableCell>Fund</TableCell>
+										<TableCell>Funds</TableCell>
 										<TableCell align="right">
 											Budget
 										</TableCell>
@@ -370,7 +370,14 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 													{lists.sectors[row.sector]}
 												</TableCell>
 												<TableCell>
-													{lists.fundNames[row.fund]}
+													{[...row.fund]
+														.map(
+															f =>
+																lists.fundNames[
+																	f
+																],
+														)
+														.join(", ")}
 												</TableCell>
 												<TableCell align="right">
 													{"$" +

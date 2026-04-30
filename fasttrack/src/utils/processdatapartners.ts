@@ -11,9 +11,12 @@ type ProcessDataPartnersParams = {
 type SectorDetailsDatum = {
 	sector: number;
 	budget: number;
-	fund: number;
+	fund: Set<number>;
 };
-type SectorDetailsDatumProject = SectorDetailsDatum & {
+type SectorDetailsDatumProject = {
+	sector: number;
+	budget: number;
+	fund: number;
 	project: number;
 };
 
@@ -61,12 +64,12 @@ function processDataPartners({
 							);
 						if (foundSectorInDetails) {
 							foundSectorInDetails.budget += d.budget;
-							foundSectorInDetails.fund = datum.fund;
+							foundSectorInDetails.fund.add(datum.fund);
 						} else {
 							foundPartner.sectorsDetails.push({
 								sector: d.sectorId,
 								budget: d.budget,
-								fund: datum.fund,
+								fund: new Set([datum.fund]),
 							});
 						}
 
@@ -110,7 +113,7 @@ function processDataPartners({
 						thisSectorDetails.push({
 							sector: d.sectorId,
 							budget: d.budget,
-							fund: datum.fund,
+							fund: new Set([datum.fund]),
 						});
 					}
 				});

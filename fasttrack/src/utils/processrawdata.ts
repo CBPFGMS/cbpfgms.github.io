@@ -161,7 +161,7 @@ function processRawData({
 								women: row.TargetWomen || 0,
 								men: row.TargetMen || 0,
 							},
-							budget: row.CALCBudgetByCluster,
+							budget: Math.floor(row.CALCBudgetByCluster),
 						},
 					],
 				});
@@ -183,7 +183,7 @@ function processRawData({
 							women: row.TargetWomen || 0,
 							men: row.TargetMen || 0,
 						},
-						budget: row.CALCBudgetByCluster,
+						budget: Math.floor(row.CALCBudgetByCluster),
 					});
 				} else {
 					warnProjectNotFound(
@@ -303,7 +303,7 @@ function processRawData({
 					),
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
-					budget: row.Budget,
+					budget: Math.floor(row.Budget),
 					sectorData: thisSectorData.sectors,
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
