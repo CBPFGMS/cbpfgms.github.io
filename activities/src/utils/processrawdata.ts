@@ -36,6 +36,7 @@ export type InDataLists = {
 	organizationTypes: Set<number>;
 	projectStatuses: Set<number>;
 	activities: Set<number>;
+	adminLevels: Set<number>;
 };
 
 type SetType<T> = {
@@ -87,6 +88,7 @@ function processRawData({
 	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
 		new Set();
 	const activitiesSet: Set<InDataListsValues["activities"]> = new Set();
+	const adminLevelsSet: Set<InDataListsValues["adminLevels"]> = new Set();
 
 	activities.forEach(row => {
 		const parsedRow = activitiesObjectSchema.safeParse(row);
@@ -209,7 +211,7 @@ function processRawData({
 
 			if (thisProject && thisActivity && latitude && longitude) {
 				const sectors = thisActivity.map(a => a.sector);
-				const activities = thisActivity.map(a => a.activity);
+				const activitiesArray = thisActivity.map(a => a.activity);
 
 				yearsSet.add(row.AYr);
 				sectors.forEach(s => sectorsSet.add(s));
@@ -219,7 +221,8 @@ function processRawData({
 				projectStatusesSet.add(
 					projectStatusMapping[thisProject.PrjStsId],
 				);
-				activities.forEach(a => activitiesSet.add(a));
+				activitiesArray.forEach(a => activitiesSet.add(a));
+				adminLevelsSet.add(thisAdminLevel);
 
 				thisActivity.forEach(activity => {
 					const objDatum: Datum = {
@@ -263,6 +266,7 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		projectStatuses: projectStatusesSet,
 		activities: activitiesSet,
+		adminLevels: adminLevelsSet,
 	};
 
 	return { data, inDataLists };

@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { use, useState, useMemo } from "react";
 import type { AppData } from "../utils/api";
 import Container from "@mui/material/Container";
 import SectorSelect from "./SectorSelect";
@@ -6,6 +6,7 @@ import { Tooltip } from "react-tooltip";
 import ActivitySelect from "./ActivitySelect";
 import Box from "@mui/material/Box";
 import MapContainer from "./MapContainer";
+import filterData from "../utils/filterData";
 
 type MainContainerProps = {
 	dataPromise: Promise<AppData>;
@@ -28,6 +29,16 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 		: !activitiesComplete
 			? "sector"
 			: "sectorAndActivity";
+
+	const { filteredData, inSelectionData } = useMemo(
+		() =>
+			filterData({
+				data,
+				sectors,
+				activities,
+			}),
+		[data, sectors, activities],
+	);
 
 	return (
 		<Container
@@ -61,7 +72,8 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 			/>
 			<Box mb={4} />
 			<MapContainer
-				data={data}
+				data={filteredData}
+				inSelectionData={inSelectionData}
 				inDataLists={inDataLists}
 				showMap={showMap}
 			/>

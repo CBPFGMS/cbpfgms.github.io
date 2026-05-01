@@ -14,6 +14,7 @@ const constants = {
 	pipeSeparator: "|||",
 	hashtagSeparator: "##",
 	lastAdminLevel: 6,
+	filterTypes: ["Funds", "Statuses", "Partners", "Admin Levels"],
 } as const;
 
 const projectStatusMaster = {

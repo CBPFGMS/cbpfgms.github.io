@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import type { Data, InDataLists } from "../utils/processrawdata";
@@ -6,14 +7,35 @@ import { alpha } from "@mui/material/styles";
 import StepHeader from "./StepHeader";
 import Typography from "@mui/material/Typography";
 import MapIcon from "@mui/icons-material/Map";
+import MapFilters from "./MapFilters";
+import type { InSelectionData } from "../utils/filterData";
 
 type MapContainerProps = {
 	data: Data;
+	inSelectionData: InSelectionData;
 	inDataLists: InDataLists;
 	showMap: boolean;
 };
 
-function MapContainer({ data, inDataLists, showMap }: MapContainerProps) {
+function MapContainer({
+	data,
+	inSelectionData,
+	inDataLists,
+	showMap,
+}: MapContainerProps) {
+	const [selectedFunds, setSelectedFunds] = useState<number[]>([
+			...inDataLists.funds,
+		]),
+		[selectedStatuses, setSelectedStatuses] = useState<number[]>([
+			...inDataLists.projectStatuses,
+		]),
+		[selectedPartners, setSelectedPartners] = useState<number[]>([
+			...inDataLists.organizationTypes,
+		]),
+		[selectedAdminLevels, setSelectedAdminLevels] = useState<number[]>([
+			...inDataLists.adminLevels,
+		]);
+
 	return (
 		<Box
 			sx={{
@@ -50,29 +72,49 @@ function MapContainer({ data, inDataLists, showMap }: MapContainerProps) {
 				{!showMap && (
 					<Box
 						sx={{
+							width: "100%",
 							display: "flex",
-							alignItems: "center",
+							flexDirection: "column",
 							gap: 1,
-							py: 1.5,
-							px: 2,
-							mt: 4,
-							borderRadius: 2,
-							background: alpha("#4a5f78", 0.05),
 						}}
 					>
-						<MapIcon
+						<Box
 							sx={{
-								fontSize: 16,
-								color: "text.disabled",
+								display: "flex",
+								alignItems: "center",
+								gap: 1,
+								py: 1.5,
+								px: 2,
+								mt: 4,
+								borderRadius: 2,
+								background: alpha("#4a5f78", 0.05),
 							}}
-						/>
-						<Typography
-							variant="body2"
-							sx={{ fontStyle: "italic" }}
 						>
-							Select sectors and activities above to reveal the
-							map.
-						</Typography>
+							<MapIcon
+								sx={{
+									fontSize: 16,
+									color: "text.disabled",
+								}}
+							/>
+							<Typography
+								variant="body2"
+								sx={{ fontStyle: "italic" }}
+							>
+								Select sectors and activities above to reveal
+								the map.
+							</Typography>
+						</Box>
+						<MapFilters
+							selectedFunds={selectedFunds}
+							setSelectedFunds={setSelectedFunds}
+							selectedStatuses={selectedStatuses}
+							setSelectedStatuses={setSelectedStatuses}
+							selectedPartners={selectedPartners}
+							setSelectedPartners={setSelectedPartners}
+							selectedAdminLevels={selectedAdminLevels}
+							setSelectedAdminLevels={setSelectedAdminLevels}
+							inSelectionData={inSelectionData}
+						/>
 					</Box>
 				)}
 			</Paper>
