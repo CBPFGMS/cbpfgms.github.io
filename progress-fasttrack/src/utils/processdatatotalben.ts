@@ -68,11 +68,11 @@ function processDataTotalBeneficiaries({
 			targeted.men += totalBeneficiariesData[pf].all.men;
 		} else {
 			status.forEach(st => {
-				targeted.total += totalBeneficiariesData[pf][st].total || 0;
-				targeted.girls += totalBeneficiariesData[pf][st].girls || 0;
-				targeted.boys += totalBeneficiariesData[pf][st].boys || 0;
-				targeted.women += totalBeneficiariesData[pf][st].women || 0;
-				targeted.men += totalBeneficiariesData[pf][st].men || 0;
+				targeted.total += totalBeneficiariesData[pf][st]?.total || 0;
+				targeted.girls += totalBeneficiariesData[pf][st]?.girls || 0;
+				targeted.boys += totalBeneficiariesData[pf][st]?.boys || 0;
+				targeted.women += totalBeneficiariesData[pf][st]?.women || 0;
+				targeted.men += totalBeneficiariesData[pf][st]?.men || 0;
 			});
 		}
 	});

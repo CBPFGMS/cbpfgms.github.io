@@ -1,5 +1,5 @@
 import { useRef, RefObject } from "react";
-import DownloadIcon from "./DownloadIcon";
+// import DownloadIcon from "./DownloadIcon";
 import ImageIcon from "./ImageIcon";
 import Box from "@mui/material/Box";
 import { DownloadStates, Charts } from "./MainContainer";
@@ -27,6 +27,11 @@ function DownloadAndImageContainer({
 	fileName,
 	showDisclaimer = false,
 }: DownloadAndImageContainerProps) {
+	void handleDownloadClick;
+	void clickedDownload;
+	void setClickedDownload;
+	void type;
+
 	const iconsRef = useRef<HTMLDivElement>(null);
 
 	return (
@@ -45,12 +50,12 @@ function DownloadAndImageContainer({
 			}}
 			ref={iconsRef}
 		>
-			<DownloadIcon
+			{/* <DownloadIcon
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type={type}
-			/>
+			/> */}
 			<ImageIcon
 				refElement={refElement}
 				iconsRef={iconsRef}
