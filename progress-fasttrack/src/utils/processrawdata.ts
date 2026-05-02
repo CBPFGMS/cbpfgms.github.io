@@ -115,8 +115,15 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 };
 
+export type TotalBeneficiariesBreakdown = {
+	[key in GenderAndAge | "total"]: number;
+};
+
 export type TotalBeneficiariesData = {
-	[key: number]: { [id: number]: number; all: number };
+	[key: number]: {
+		[id: number]: TotalBeneficiariesBreakdown;
+		all: TotalBeneficiariesBreakdown;
+	};
 };
 
 function processRawData({
@@ -154,15 +161,35 @@ function processRawData({
 			const projectKey = row.PFId;
 
 			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] = { all: 0 };
+				totalBeneficiariesData[projectKey] = {
+					all: {
+						girls: 0,
+						boys: 0,
+						women: 0,
+						men: 0,
+						total: 0,
+					},
+				};
 			}
 
 			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey].all = row.TotTarg;
+				totalBeneficiariesData[projectKey].all = {
+					girls: row.BenG,
+					boys: row.BenB,
+					women: row.BenW,
+					men: row.BenM,
+					total: row.TotTarg,
+				};
 			} else {
 				totalBeneficiariesData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
-				] = row.TotTarg;
+				] = {
+					girls: row.BenG,
+					boys: row.BenB,
+					women: row.BenW,
+					men: row.BenM,
+					total: row.TotTarg,
+				};
 			}
 		} else {
 			warnInvalidSchema(

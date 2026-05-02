@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { sum } from "d3";
-import CvaChartSwitch from "./CvaSwitch";
+// import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import CvaTypesChart from "./CvaTypesChart";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
@@ -62,6 +62,8 @@ function CvaChart({
 	const [cvaChartMode, setCvaChartMode] =
 		useState<CvaChartModes>("allocations");
 
+	void setCvaChartMode;
+
 	const total = sum(dataSummary, d => d.allocations);
 	const { cvaTargeted, cvaReached } = dataCva.reduce(
 		(acc, curr) => {
@@ -72,8 +74,8 @@ function CvaChart({
 		{ cvaTargeted: 0, cvaReached: 0 },
 	);
 
-	const totalPeopleTargeted = targetedAndReachedTotal.targeted;
-	const totalPeopleReached = targetedAndReachedTotal.reached;
+	const totalPeopleTargeted = targetedAndReachedTotal.targeted.total;
+	const totalPeopleReached = targetedAndReachedTotal.reached.total;
 
 	function handleDownloadClick() {
 		const dataCvaDownload = processCvaDownload({
@@ -88,11 +90,11 @@ function CvaChart({
 		downloadData<(typeof dataCvaDownload)[number]>(dataCvaDownload, "CVA");
 	}
 
-	function handleSwitchChange() {
-		setCvaChartMode(
-			cvaChartMode === "allocations" ? "people" : "allocations",
-		);
-	}
+	// function handleSwitchChange() {
+	// 	setCvaChartMode(
+	// 		cvaChartMode === "allocations" ? "people" : "allocations",
+	// 	);
+	// }
 
 	return (
 		<Container
@@ -133,7 +135,7 @@ function CvaChart({
 				<NoData />
 			) : (
 				<>
-					<Box
+					{/* <Box
 						style={{
 							display: "flex",
 							width: "100%",
@@ -145,7 +147,7 @@ function CvaChart({
 							cvaChartMode={cvaChartMode}
 							handleSwitchChange={handleSwitchChange}
 						/>
-					</Box>
+					</Box> */}
 					<Box
 						mt={3}
 						style={{
