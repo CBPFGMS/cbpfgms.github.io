@@ -96,6 +96,8 @@ const constants = {
 	disclaimerWarningColor: "#eed202",
 	disclaimerText:
 		"Disclaimer: Beneficiary figures are calculated using a hybrid methodology designed to minimize double counting across activities and locations. As a result, totals may not fully reconcile when applying different filters or comparing across views.",
+	disclaimerAltText:
+		"Beneficiary figures are aggregated and include overlaps; they do not represent uniquely identified individuals.",
 	totalBeneficiariesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
 	pooledFundsShowingOrgName: [88, 508, 509, 510],

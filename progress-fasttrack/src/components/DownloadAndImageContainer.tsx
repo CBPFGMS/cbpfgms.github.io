@@ -6,7 +6,7 @@ import { DownloadStates, Charts } from "./MainContainer";
 import WarningIcon from "@mui/icons-material/Warning";
 import constants from "../utils/constants";
 
-const { disclaimerWarningColor, disclaimerText } = constants;
+const { disclaimerWarningColor, disclaimerText, disclaimerAltText } = constants;
 
 type DownloadAndImageContainerProps = {
 	handleDownloadClick: () => void;
@@ -31,6 +31,9 @@ function DownloadAndImageContainer({
 	void clickedDownload;
 	void setClickedDownload;
 	void type;
+
+	const disclaimer =
+		type === "pictogram" ? disclaimerText : disclaimerAltText;
 
 	const iconsRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +67,7 @@ function DownloadAndImageContainer({
 			{showDisclaimer && (
 				<WarningIcon
 					data-tooltip-id="tooltip"
-					data-tooltip-content={disclaimerText}
+					data-tooltip-content={disclaimer}
 					data-tooltip-place="bottom"
 					style={{
 						color: disclaimerWarningColor,
