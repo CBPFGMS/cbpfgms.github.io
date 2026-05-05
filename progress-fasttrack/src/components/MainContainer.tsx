@@ -48,9 +48,13 @@ const refIds = charts.reduce((acc, curr) => {
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer({ defaultYear }: MainContainerProps) {
-	const { data, totalBeneficiariesData, inDataLists, lists } = useContext(
-		DataContext,
-	) as DataContextType;
+	const {
+		data,
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		inDataLists,
+		lists,
+	} = useContext(DataContext) as DataContextType;
 
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
@@ -156,6 +160,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
+				totalBeneficiariesByPartnerData,
+				inDataLists,
 			}),
 		[
 			data,
@@ -165,6 +171,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			allocationType,
 			implementationStatus,
 			lists,
+			totalBeneficiariesByPartnerData,
+			inDataLists,
 		],
 	);
 

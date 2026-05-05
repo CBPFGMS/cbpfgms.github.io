@@ -2,6 +2,7 @@ import { createContext } from "react";
 import {
 	Data,
 	InDataLists,
+	TotalBeneficiariesByPartnerData,
 	TotalBeneficiariesData,
 } from "../utils/processrawdata";
 import { List } from "../utils/makelists";
@@ -11,6 +12,7 @@ export type DataContextType = {
 	lists: List;
 	inDataLists: InDataLists;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 };
 
 const DataContext = createContext<DataContextType | null>(null);

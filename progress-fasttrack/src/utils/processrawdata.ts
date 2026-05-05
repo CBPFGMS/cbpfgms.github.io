@@ -2,18 +2,24 @@ import {
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	TotalBeneficiariesObject,
+	TotalBeneficiariesByPartnerObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	cvaObjectSchema,
 	CvaObject,
 	totalBeneficiariesObjectSchema,
+	totalBeneficiariesByPartnerObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
 
-const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
-	constants;
+const {
+	beneficiariesSplitOrder,
+	beneficiaryCategories,
+	reportTypes,
+	partnersSplitOrder,
+} = constants;
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -113,6 +119,7 @@ type ProcessRawDataParams = {
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	totalBeneficiaries: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 };
 
 export type TotalBeneficiariesBreakdown = {
@@ -126,6 +133,17 @@ export type TotalBeneficiariesData = {
 	};
 };
 
+type TotalBeneficiariesByPartnerBreakdown = {
+	[key in GenderAndAge | "partner"]: number;
+};
+
+export type TotalBeneficiariesByPartnerData = {
+	[key: number]: {
+		[id: number]: TotalBeneficiariesByPartnerBreakdown[];
+		all: TotalBeneficiariesByPartnerBreakdown[];
+	};
+};
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -133,12 +151,15 @@ function processRawData({
 	listsObj,
 	setInDataLists,
 	totalBeneficiaries,
+	totalBeneficiariesByPartner,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
+	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const cvaDataMap: Map<string, CvaMapValue> = new Map();
@@ -161,15 +182,8 @@ function processRawData({
 			const projectKey = row.PFId;
 
 			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] = {
-					all: {
-						girls: 0,
-						boys: 0,
-						women: 0,
-						men: 0,
-						total: 0,
-					},
-				};
+				totalBeneficiariesData[projectKey] =
+					{} as TotalBeneficiariesData[number];
 			}
 
 			if (row.ProcessStatusId == null) {
@@ -194,6 +208,50 @@ function processRawData({
 		} else {
 			warnInvalidSchema(
 				"totalBeneficiariesData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	totalBeneficiariesByPartner.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+			const partnerValuesMen: number[] = row.BenM.split("#").map(Number);
+			const partnerValuesWomen: number[] =
+				row.BenW.split("#").map(Number);
+			const partnerValuesBoys: number[] = row.BenB.split("#").map(Number);
+			const partnerValuesGirls: number[] =
+				row.BenG.split("#").map(Number);
+
+			const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
+				partnersSplitOrder.map((type, index) => {
+					return {
+						partner: type,
+						girls: partnerValuesGirls[index],
+						boys: partnerValuesBoys[index],
+						women: partnerValuesWomen[index],
+						men: partnerValuesMen[index],
+					};
+				});
+
+			if (!totalBeneficiariesByPartnerData[projectKey]) {
+				totalBeneficiariesByPartnerData[projectKey] =
+					{} as TotalBeneficiariesByPartnerData[number];
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesByPartnerData[projectKey].all = partnersDatum;
+			} else {
+				totalBeneficiariesByPartnerData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				] = partnersDatum;
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesByPartner",
 				row,
 				JSON.stringify(parsedRow.error),
 			);
@@ -458,7 +516,7 @@ function processRawData({
 		statusesPerFund,
 	}));
 
-	return { data, totalBeneficiariesData };
+	return { data, totalBeneficiariesData, totalBeneficiariesByPartnerData };
 }
 
 function generateBeneficiariesSplitObject(

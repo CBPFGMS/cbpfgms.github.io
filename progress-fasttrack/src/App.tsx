@@ -16,6 +16,7 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		lists,
 		inDataLists,
 		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
 		loading,
 		error,
 		progress,
@@ -27,7 +28,13 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		<Error error={error} />
 	) : (
 		<DataContext.Provider
-			value={{ data, lists, inDataLists, totalBeneficiariesData }}
+			value={{
+				data,
+				lists,
+				inDataLists,
+				totalBeneficiariesData,
+				totalBeneficiariesByPartnerData,
+			}}
 		>
 			<MainContainer defaultYear={defaultYear} />
 		</DataContext.Provider>
