@@ -425,7 +425,7 @@ function RowModalProjects({ selectedRow, lists, handleClose }: RowModalProps) {
 							flexDirection="column"
 						>
 							<Typography variant="h6">
-								List of Sectors:
+								Sectors per project:
 							</Typography>
 						</Box>
 						<IconButton onClick={handleClose}>

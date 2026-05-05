@@ -104,17 +104,37 @@ function processDataPartners({
 					if (sector.includes(d.sectorId)) {
 						thisSectors.add(d.sectorId);
 						thisBudget += d.budget;
-						thisSectorDetailsForProjects.push({
-							sector: d.sectorId,
-							budget: d.budget,
-							fund: datum.fund,
-							project: datum.projectId,
-						});
-						thisSectorDetails.push({
-							sector: d.sectorId,
-							budget: d.budget,
-							fund: new Set([datum.fund]),
-						});
+
+						const foundSectorInDetails = thisSectorDetails.find(
+							e => e.sector === d.sectorId,
+						);
+						if (foundSectorInDetails) {
+							foundSectorInDetails.budget += d.budget;
+							foundSectorInDetails.fund.add(datum.fund);
+						} else {
+							thisSectorDetails.push({
+								sector: d.sectorId,
+								budget: d.budget,
+								fund: new Set([datum.fund]),
+							});
+						}
+						const foundSectorInDetailsForProjects =
+							thisSectorDetailsForProjects.find(
+								e =>
+									e.sector === d.sectorId &&
+									e.project === datum.projectId,
+							);
+						if (foundSectorInDetailsForProjects) {
+							foundSectorInDetailsForProjects.budget += d.budget;
+							foundSectorInDetailsForProjects.fund = datum.fund;
+						} else {
+							thisSectorDetailsForProjects.push({
+								sector: d.sectorId,
+								budget: d.budget,
+								fund: datum.fund,
+								project: datum.projectId,
+							});
+						}
 					}
 				});
 				dataPartners.push({
