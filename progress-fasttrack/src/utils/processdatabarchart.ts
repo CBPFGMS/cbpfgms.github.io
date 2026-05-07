@@ -2,6 +2,7 @@ import {
 	Data,
 	InDataLists,
 	TotalBeneficiariesByPartnerData,
+	TotalBeneficiariesBySectorData,
 } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
@@ -29,6 +30,7 @@ type ProcessDataBarChartParams = {
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	inDataLists: InDataLists;
 };
 
@@ -48,6 +50,7 @@ function processDataBarChart({
 	implementationStatus,
 	lists,
 	totalBeneficiariesByPartnerData,
+	totalBeneficiariesBySectorData,
 	inDataLists,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
@@ -166,20 +169,20 @@ function processDataBarChart({
 						foundSector.reached[genderAndAge as GenderAndAge] +=
 							sectorDatum.reached[genderAndAge as GenderAndAge];
 					}
-					for (const genderAndAge in sectorDatum.targeted) {
-						foundSector.targeted[genderAndAge as GenderAndAge] +=
-							sectorDatum.targeted[genderAndAge as GenderAndAge];
-					}
+					// for (const genderAndAge in sectorDatum.targeted) {
+					// 	foundSector.targeted[genderAndAge as GenderAndAge] +=
+					// 		sectorDatum.targeted[genderAndAge as GenderAndAge];
+					// }
 				} else {
 					const type = sectorDatum.sectorId;
-					const targeted = (
-						Object.entries(
-							sectorDatum.targeted,
-						) as BeneficiariesEntry[]
-					).reduce((acc, [key, value]) => {
-						acc[key] = value;
-						return acc;
-					}, {} as BeneficiariesObject);
+					// const targeted = (
+					// 	Object.entries(
+					// 		sectorDatum.targeted,
+					// 	) as BeneficiariesEntry[]
+					// ).reduce((acc, [key, value]) => {
+					// 	acc[key] = value;
+					// 	return acc;
+					// }, {} as BeneficiariesObject);
 					const reached = (
 						Object.entries(
 							sectorDatum.reached,
@@ -188,6 +191,14 @@ function processDataBarChart({
 						acc[key] = value;
 						return acc;
 					}, {} as BeneficiariesObject);
+					const targeted = beneficiaryCategories.reduce(
+						(acc, genderAndAge) => {
+							acc[genderAndAge] = 0;
+							return acc;
+						},
+						{} as BeneficiariesObject,
+					);
+
 					const obj: DatumBarChart = {
 						type,
 						targeted,
@@ -240,6 +251,52 @@ function processDataBarChart({
 						org.targeted.boys += foundPartner.boys;
 						org.targeted.women += foundPartner.women;
 						org.targeted.men += foundPartner.men;
+					}
+				});
+			}
+		});
+	});
+
+	dataSector.forEach(sect => {
+		fund.forEach(pf => {
+			if (!totalBeneficiariesBySectorData[pf]) {
+				simpleWarn(
+					`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data`,
+				);
+				return;
+			}
+
+			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const fundHasAllStatuses = allStatuses.every(pfStatus =>
+				statuses.includes(pfStatus),
+			);
+
+			if (fundHasAllStatuses) {
+				const foundPartner = totalBeneficiariesBySectorData[
+					pf
+				].all.find(totalPartners => totalPartners.sector === sect.type);
+				if (foundPartner) {
+					sect.targeted.girls += foundPartner.girls;
+					sect.targeted.boys += foundPartner.boys;
+					sect.targeted.women += foundPartner.women;
+					sect.targeted.men += foundPartner.men;
+				} else {
+					simpleWarn(
+						`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
+					);
+				}
+			} else {
+				statuses.forEach(st => {
+					const foundPartner = totalBeneficiariesBySectorData[pf][
+						st
+					]?.find(
+						totalPartners => totalPartners.sector === sect.type,
+					);
+					if (foundPartner) {
+						sect.targeted.girls += foundPartner.girls;
+						sect.targeted.boys += foundPartner.boys;
+						sect.targeted.women += foundPartner.women;
+						sect.targeted.men += foundPartner.men;
 					}
 				});
 			}

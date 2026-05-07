@@ -68,6 +68,7 @@ export type List = {
 	statuses: ListObj;
 	projectDetails: Map<number, ProjectDetails>;
 	cvaTypeNames: ListObj;
+	sectorsSplitOrder: number[];
 };
 
 const { pooledFundsShowingOrgName, orgsShowingOrgName } = constants;
@@ -97,6 +98,7 @@ function makeLists({
 		statuses: projectStatusMaster,
 		projectDetails: new Map(),
 		cvaTypeNames: {},
+		sectorsSplitOrder: [],
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -179,6 +181,7 @@ function makeLists({
 		const parsedSectorsMaster = sectorsMasterObjectSchema.safeParse(d);
 		if (parsedSectorsMaster.success) {
 			lists.sectors[d.ClustId] = d.ClustNm;
+			lists.sectorsSplitOrder.push(d.ClustId);
 		} else {
 			warnInvalidSchema(
 				"SectorsMaster",

@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 const splitRegex = /^(\d*\|\d*\|\d*\|\d*\|\d*)$/,
-	partnersSplitRegex = /^\d+#\d+#\d+#\d+$/,
+	partnersSplitRegex = /^(\d+#){3}\d+$/,
+	sectorsSplitRegex = /^(\d+#){16}\d+$/,
 	dateRegex =
 		/\b([1-9]|0[1-9]|1[012])\/([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])\/20\d\d\b/;
 
@@ -168,7 +169,7 @@ export const totalBeneficiariesObjectSchema = z.object({
 	step2: z.string(),
 	step3: z.string(),
 	step4: z.string(),
-	syncedAt: z.string(),
+	syncedAt: z.any(),
 });
 
 export const totalBeneficiariesByPartnerObjectSchema = z.object({
@@ -198,7 +199,25 @@ export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	step2: z.string(),
 	step3: z.string(),
 	step4: z.string(),
-	syncedAt: z.string(),
+	syncedAt: z.any(),
+});
+
+export const totalBeneficiariesBySectorObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	AllocationYear: z.number().int().nonnegative(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	CurrentAdminLevel: z.number().int().nonnegative(),
+	defaultAdminLevel: z.number().int().nonnegative(),
+	BenM: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
+	BenW: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
+	BenB: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
+	BenG: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
+	TotTarg: z.number().int().nonnegative(),
+	TotProjects: z.number().int().nonnegative(),
+	AllocationtypeId: z.number().int().nonnegative(),
+	syncedAt: z.any(),
 });
 
 // ********************
@@ -345,6 +364,10 @@ export type TotalBeneficiariesObject = z.infer<
 
 export type TotalBeneficiariesByPartnerObject = z.infer<
 	typeof totalBeneficiariesByPartnerObjectSchema
+>;
+
+export type TotalBeneficiariesBySectorObject = z.infer<
+	typeof totalBeneficiariesBySectorObjectSchema
 >;
 
 export type AllocationTypesMasterObject = z.infer<

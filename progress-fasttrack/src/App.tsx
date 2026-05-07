@@ -17,6 +17,7 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		inDataLists,
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
 		loading,
 		error,
 		progress,
@@ -34,6 +35,7 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 				inDataLists,
 				totalBeneficiariesData,
 				totalBeneficiariesByPartnerData,
+				totalBeneficiariesBySectorData,
 			}}
 		>
 			<MainContainer defaultYear={defaultYear} />

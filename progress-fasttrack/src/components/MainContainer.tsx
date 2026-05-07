@@ -52,6 +52,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		data,
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
 		inDataLists,
 		lists,
 	} = useContext(DataContext) as DataContextType;
@@ -161,6 +162,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				implementationStatus,
 				lists,
 				totalBeneficiariesByPartnerData,
+				totalBeneficiariesBySectorData,
 				inDataLists,
 			}),
 		[
@@ -172,6 +174,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			implementationStatus,
 			lists,
 			totalBeneficiariesByPartnerData,
+			totalBeneficiariesBySectorData,
 			inDataLists,
 		],
 	);

@@ -9,6 +9,8 @@ import {
 	CvaObject,
 	totalBeneficiariesObjectSchema,
 	totalBeneficiariesByPartnerObjectSchema,
+	TotalBeneficiariesBySectorObject,
+	totalBeneficiariesBySectorObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -120,6 +122,7 @@ type ProcessRawDataParams = {
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
 };
 
 export type TotalBeneficiariesBreakdown = {
@@ -144,6 +147,17 @@ export type TotalBeneficiariesByPartnerData = {
 	};
 };
 
+type TotalBeneficiariesBySectorBreakdown = {
+	[key in GenderAndAge | "sector"]: number;
+};
+
+export type TotalBeneficiariesBySectorData = {
+	[key: number]: {
+		[id: number]: TotalBeneficiariesBySectorBreakdown[];
+		all: TotalBeneficiariesBySectorBreakdown[];
+	};
+};
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -152,14 +166,17 @@ function processRawData({
 	setInDataLists,
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
+	totalBeneficiariesBySector,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
+	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const cvaDataMap: Map<string, CvaMapValue> = new Map();
@@ -252,6 +269,47 @@ function processRawData({
 		} else {
 			warnInvalidSchema(
 				"totalBeneficiariesByPartner",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	totalBeneficiariesBySector.forEach(row => {
+		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+			const sectorValuesMen: number[] = row.BenM.split("#").map(Number);
+			const sectorValuesWomen: number[] = row.BenW.split("#").map(Number);
+			const sectorValuesBoys: number[] = row.BenB.split("#").map(Number);
+			const sectorValuesGirls: number[] = row.BenG.split("#").map(Number);
+
+			const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
+				listsObj.sectorsSplitOrder.map((type, index) => {
+					return {
+						sector: type,
+						girls: sectorValuesGirls[index],
+						boys: sectorValuesBoys[index],
+						women: sectorValuesWomen[index],
+						men: sectorValuesMen[index],
+					};
+				});
+
+			if (!totalBeneficiariesBySectorData[projectKey]) {
+				totalBeneficiariesBySectorData[projectKey] =
+					{} as TotalBeneficiariesBySectorData[number];
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesBySectorData[projectKey].all = sectorsDatum;
+			} else {
+				totalBeneficiariesBySectorData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				] = sectorsDatum;
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesBySector",
 				row,
 				JSON.stringify(parsedRow.error),
 			);
@@ -516,7 +574,12 @@ function processRawData({
 		statusesPerFund,
 	}));
 
-	return { data, totalBeneficiariesData, totalBeneficiariesByPartnerData };
+	return {
+		data,
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+	};
 }
 
 function generateBeneficiariesSplitObject(
