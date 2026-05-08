@@ -34,7 +34,7 @@ function Dropdown({
 	inSelectionData,
 	dataProperty,
 }: DropdownProps) {
-	let isAllSelected = value.length === names.length;
+	const isAllSelected = value.length === names.length;
 
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
@@ -48,8 +48,7 @@ function Dropdown({
 			setOpenSnack(true);
 			return;
 		}
-		if (isAllSelected) {
-			isAllSelected = eventArray.length !== names.length;
+		if (isAllSelected && eventArray.length !== names.length) {
 			const missingItems: number[] = names.filter(
 				d => !eventArray.includes(d),
 			);
@@ -60,13 +59,8 @@ function Dropdown({
 		}
 	}
 
-	function calculateHeight() {
-		if (selectRef.current) {
-			const selectRect = selectRef.current.getBoundingClientRect();
-			const windowHeight = window.innerHeight;
-			const remainingSpace = windowHeight - selectRect.bottom;
-			setDropdownHeight(remainingSpace);
-		}
+	function calculateHeight(size: number) {
+		setDropdownHeight(size * 38);
 	}
 
 	const namesListMemo = useMemo(() => {
@@ -95,7 +89,7 @@ function Dropdown({
 					multiple
 					value={value}
 					onChange={handleChange}
-					onMouseEnter={calculateHeight}
+					onMouseEnter={() => calculateHeight(value.length)}
 					input={<OutlinedInput label={type} />}
 					renderValue={selected =>
 						isAllSelected
@@ -106,10 +100,8 @@ function Dropdown({
 						PaperProps: {
 							style: {
 								maxHeight: dropdownHeight,
-								marginTop: "8px",
 							},
 						},
-						disablePortal: true,
 					}}
 				>
 					{namesListMemo.map(name => (

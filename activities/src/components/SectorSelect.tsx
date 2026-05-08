@@ -15,6 +15,7 @@ import Badge from "@mui/material/Badge";
 type SectorSelectProps = {
 	sectors: number[];
 	setSectors: React.Dispatch<React.SetStateAction<number[]>>;
+	setActivities: React.Dispatch<React.SetStateAction<number[]>>;
 	selectionLevel: SelectionLevel;
 	inDataLists: InDataLists;
 	lists: List;
@@ -35,6 +36,7 @@ function SectorSelect({
 	inDataLists,
 	lists,
 	sectorsComplete,
+	setActivities,
 }: SectorSelectProps) {
 	const sectorsArray = Array.from(inDataLists.sectors).sort((a, b) => a - b);
 
@@ -47,11 +49,19 @@ function SectorSelect({
 	}, new Set<number>());
 
 	function toggleSector(sector: number) {
-		setSectors(prev =>
-			prev.find(s => s === sector)
+		setSectors(prev => {
+			const updatedSectors = prev.find(s => s === sector)
 				? prev.filter(s => s !== sector)
-				: [...prev, sector],
-		);
+				: [...prev, sector];
+			setActivities(prev =>
+				prev.filter(p =>
+					updatedSectors.some(upSector =>
+						lists.activitiesPerSector[upSector].has(p),
+					),
+				),
+			);
+			return updatedSectors;
+		});
 	}
 
 	return (

@@ -9,31 +9,35 @@ import Typography from "@mui/material/Typography";
 import MapIcon from "@mui/icons-material/Map";
 import MapFilters from "./MapFilters";
 import type { InSelectionData } from "../utils/filterData";
+import type { List } from "../utils/makelists";
+import Map from "./Map";
 
-type MapContainerProps = {
+type MapSectionProps = {
 	data: Data;
 	inSelectionData: InSelectionData;
 	inDataLists: InDataLists;
 	showMap: boolean;
+	lists: List;
 };
 
-function MapContainer({
+function MapSection({
 	data,
 	inSelectionData,
 	inDataLists,
 	showMap,
-}: MapContainerProps) {
+	lists,
+}: MapSectionProps) {
 	const [selectedFunds, setSelectedFunds] = useState<number[]>([
-			...inDataLists.funds,
+			...inSelectionData.funds,
 		]),
 		[selectedStatuses, setSelectedStatuses] = useState<number[]>([
-			...inDataLists.projectStatuses,
+			...inSelectionData.statuses,
 		]),
 		[selectedPartners, setSelectedPartners] = useState<number[]>([
-			...inDataLists.organizationTypes,
+			...inSelectionData.partners,
 		]),
 		[selectedAdminLevels, setSelectedAdminLevels] = useState<number[]>([
-			...inDataLists.adminLevels,
+			...inSelectionData.adminLevels,
 		]);
 
 	return (
@@ -42,6 +46,7 @@ function MapContainer({
 				display: "flex",
 				width: "100%",
 				justifyContent: "center",
+				mb: 6,
 			}}
 		>
 			<Paper
@@ -82,8 +87,8 @@ function MapContainer({
 							sx={{
 								display: "flex",
 								alignItems: "center",
-								gap: 1,
-								py: 1.5,
+								gap: 2,
+								py: 2,
 								px: 2,
 								mt: 4,
 								borderRadius: 2,
@@ -104,6 +109,10 @@ function MapContainer({
 								the map.
 							</Typography>
 						</Box>
+					</Box>
+				)}
+				{showMap && (
+					<Box sx={{ width: "100%", mt: 4 }}>
 						<MapFilters
 							selectedFunds={selectedFunds}
 							setSelectedFunds={setSelectedFunds}
@@ -114,7 +123,10 @@ function MapContainer({
 							selectedAdminLevels={selectedAdminLevels}
 							setSelectedAdminLevels={setSelectedAdminLevels}
 							inSelectionData={inSelectionData}
+							lists={lists}
 						/>
+						<Box sx={{ width: "100%", height: "2em" }} />
+						<Map />
 					</Box>
 				)}
 			</Paper>
@@ -122,4 +134,4 @@ function MapContainer({
 	);
 }
 
-export default MapContainer;
+export default MapSection;

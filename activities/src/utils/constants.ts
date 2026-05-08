@@ -15,6 +15,9 @@ const constants = {
 	hashtagSeparator: "##",
 	lastAdminLevel: 6,
 	filterTypes: ["Funds", "Statuses", "Partners", "Admin Levels"],
+	maxZoomValue: 12,
+	minZoomValue: 2,
+	mapHeight: 512,
 } as const;
 
 const projectStatusMaster = {

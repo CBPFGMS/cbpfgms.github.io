@@ -244,10 +244,9 @@ function ActivitySelect({
 							ListboxProps={{ style: { maxHeight: 300 } }}
 							noOptionsText="No matching activities found"
 							sx={{
-								mb: activities.length > 0 ? 2 : 0,
+								mb: activities.length > 0 ? 3 : 0,
 							}}
 						/>
-
 						{activities.length > 0 && (
 							<Fade in>
 								<Box>

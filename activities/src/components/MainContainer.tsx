@@ -5,8 +5,8 @@ import SectorSelect from "./SectorSelect";
 import { Tooltip } from "react-tooltip";
 import ActivitySelect from "./ActivitySelect";
 import Box from "@mui/material/Box";
-import MapContainer from "./MapContainer";
-import filterData from "../utils/filterData";
+import MapSection from "./MapContainer";
+import filterData, { type InSelectionData } from "../utils/filterData";
 
 type MainContainerProps = {
 	dataPromise: Promise<AppData>;
@@ -55,6 +55,7 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 			<SectorSelect
 				sectors={sectors}
 				setSectors={setSectors}
+				setActivities={setActivities}
 				selectionLevel={selectionLevel}
 				inDataLists={inDataLists}
 				lists={lists}
@@ -71,14 +72,26 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				sectorsComplete={sectorsComplete}
 			/>
 			<Box mb={4} />
-			<MapContainer
+			<MapSection
 				data={filteredData}
+				key={generateMapKey(inSelectionData)}
 				inSelectionData={inSelectionData}
 				inDataLists={inDataLists}
 				showMap={showMap}
+				lists={lists}
 			/>
 		</Container>
 	);
 }
 
 export default MainContainer;
+
+function generateMapKey(data: InSelectionData): string {
+	const parts = [
+		Array.from(data.funds).sort().join(","),
+		Array.from(data.statuses).sort().join(","),
+		Array.from(data.partners).sort().join(","),
+		Array.from(data.adminLevels).sort().join(","),
+	];
+	return parts.join("|");
+}
