@@ -10,6 +10,7 @@ const colors = {
 	activeGradientStart: "#e8732a",
 	activeGradientEnd: "#f0914f",
 	inactiveBackground: "#4a5f78",
+	unColorChip: "#0c4783",
 } as const;
 
 export default colors;

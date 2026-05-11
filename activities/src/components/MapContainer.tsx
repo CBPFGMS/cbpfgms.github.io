@@ -154,8 +154,19 @@ function MapSection({
 							lists={lists}
 						/>
 						<Box sx={{ width: "100%", height: "1em" }} />
-						<Box sx={{ width: "100%", position: "relative" }}>
-							<Map mapData={mapData} />
+						<Box
+							sx={{
+								width: "100%",
+								position: "relative",
+								border: "1px solid #bbb", // Add border here
+								borderRadius: "8px", 
+								overflow: "hidden",
+							}}
+						>
+							<Map
+								mapData={mapData}
+								lists={lists}
+							/>
 							<Chip
 								label={
 									mapData
@@ -168,8 +179,10 @@ function MapSection({
 									right: 16,
 									zIndex: 1000,
 									pointerEvents: "none",
-									backgroundColor: colors.unColorLighter + "9A",
+									backgroundColor:
+										colors.unColorChip + "BA",
 									fontWeight: 500,
+									color: "white",
 									opacity: 1,
 								}}
 							/>

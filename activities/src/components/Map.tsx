@@ -1,20 +1,31 @@
-import { useRef } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
-import type { Map as MapType } from "leaflet";
+import { useRef, useEffect } from "react";
+import {
+	MapContainer,
+	TileLayer,
+	Marker,
+	Tooltip,
+	useMap,
+} from "react-leaflet";
+import type { Map as MapType, LeafletMouseEvent } from "leaflet";
 import { constants } from "../utils/constants";
 import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import type { MapDatum } from "../utils/processmapdata";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import type { List } from "../utils/makelists";
+import calculateBounds from "../utils/calculatebounds";
 
 const { mapHeight, minZoomValue, maxZoomValue } = constants;
 
 type MapProps = {
 	mapData: MapDatum[];
+	lists: List;
 };
 
-function Map({ mapData }: MapProps) {
+const mapPadding = 10;
+
+function Map({ mapData, lists }: MapProps) {
 	const mapRef = useRef<MapType | null>(null);
 
 	return (
@@ -22,7 +33,7 @@ function Map({ mapData }: MapProps) {
 			style={{ height: `${mapHeight}px`, width: "100%" }}
 			center={[0, 0]}
 			zoom={minZoomValue}
-			scrollWheelZoom={false}
+			scrollWheelZoom={true}
 			attributionControl={false}
 			ref={mapRef}
 		>
@@ -33,18 +44,99 @@ function Map({ mapData }: MapProps) {
 				maxZoom={maxZoomValue}
 				minZoom={minZoomValue}
 			/>
-			<MarkerClusterGroup chunkedLoading maxClusterRadius={40}>
+			<MapController mapData={mapData} />
+			<MarkerClusterGroup
+				chunkedLoading
+				maxClusterRadius={40}
+				onMouseOver={(e: LeafletMouseEvent) => {
+					const cluster = e.layer;
+					const count = cluster.getChildCount();
+
+					cluster
+						.bindTooltip(
+							`This area contains ${count} locations.<br />Click to zoom in.`,
+							{
+								direction: "top",
+								opacity: 0.9,
+								offset: [0, -18],
+							},
+						)
+						.openTooltip();
+				}}
+			>
 				{mapData.map((datum, index) => (
 					<Marker
 						key={index}
 						position={[datum.latitude, datum.longitude]}
-						title={datum.locationName}
+						// title={datum.locationName}
 						// icon={customIcon}
-					></Marker>
+					>
+						<Tooltip
+							direction="auto"
+							offset={[0, -10]}
+							opacity={1}
+							permanent={false} // Only shows on hover
+						>
+							<div
+								style={{
+									textAlign: "left",
+									maxWidth: 300,
+									minWidth: 250,
+									textWrap: "wrap",
+								}}
+							>
+								Location: <strong>{datum.locationName} </strong>
+								{datum.parentLocationName && (
+									<>(in {datum.parentLocationName})</>
+								)}
+								<br />
+								<div
+									style={{
+										marginTop: "0.75em",
+									}}
+								>
+									{" "}
+									{datum.activities.length > 1
+										? "Activities: "
+										: "Activity: "}
+								</div>
+								<ul
+									style={{
+										margin: "2px 0 0 0",
+										paddingLeft: "1.2rem", // Reduces the default heavy indent
+										listStyleType: "disc",
+									}}
+								>
+									{datum.activities.map((d, index) => (
+										<li key={index}>
+											{lists.activities[d.activity] +
+												" (sector: " +
+												lists.sectors[d.sector] +
+												")"}
+										</li>
+									))}
+								</ul>
+							</div>
+						</Tooltip>
+					</Marker>
 				))}
 			</MarkerClusterGroup>
 		</MapContainer>
 	);
+}
+
+function MapController({ mapData }: { mapData: MapDatum[] }) {
+	const leafletMap = useMap();
+
+	useEffect(() => {
+		const bounds = calculateBounds(mapData);
+		leafletMap.fitBounds(bounds, {
+			padding: [mapPadding, mapPadding],
+			maxZoom: maxZoomValue,
+		});
+	}, [mapData, leafletMap]);
+
+	return null;
 }
 
 export default Map;

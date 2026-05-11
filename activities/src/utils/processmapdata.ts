@@ -64,6 +64,14 @@ function processMapData({
 				year: datum.year,
 			});
 		} else {
+			const foundActivityAndSector = foundLocation.activities.find(
+				d => d.activity === datum.activity && d.sector === datum.sector,
+			);
+
+			if (foundActivityAndSector) {
+				return;
+			}
+
 			foundLocation.activities.push({
 				activity: datum.activity,
 				sector: datum.sector,
