@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import type { Data, InDataLists } from "../utils/processrawdata";
+import type { Data } from "../utils/processrawdata";
 import colors from "../utils/colors";
 import { alpha } from "@mui/material/styles";
 import StepHeader from "./StepHeader";
@@ -11,21 +11,25 @@ import MapFilters from "./MapFilters";
 import type { InSelectionData } from "../utils/filterData";
 import type { List } from "../utils/makelists";
 import Map from "./Map";
+import processMapData from "../utils/processmapdata";
+import Chip from "@mui/material/Chip";
 
 type MapSectionProps = {
 	data: Data;
 	inSelectionData: InSelectionData;
-	inDataLists: InDataLists;
 	showMap: boolean;
 	lists: List;
+	activities: number[];
+	sectors: number[];
 };
 
 function MapSection({
 	data,
 	inSelectionData,
-	inDataLists,
 	showMap,
 	lists,
+	activities,
+	sectors,
 }: MapSectionProps) {
 	const [selectedFunds, setSelectedFunds] = useState<number[]>([
 			...inSelectionData.funds,
@@ -39,6 +43,30 @@ function MapSection({
 		[selectedAdminLevels, setSelectedAdminLevels] = useState<number[]>([
 			...inSelectionData.adminLevels,
 		]);
+
+	const activityText = activities.length === 1 ? "activity" : "activities";
+	const sectorText = sectors.length === 1 ? "sector" : "sectors";
+
+	const mapData = useMemo(() => {
+		if (!showMap) {
+			return null;
+		}
+
+		return processMapData({
+			data,
+			selectedFunds,
+			selectedStatuses,
+			selectedPartners,
+			selectedAdminLevels,
+		});
+	}, [
+		data,
+		selectedFunds,
+		selectedStatuses,
+		selectedPartners,
+		selectedAdminLevels,
+		showMap,
+	]);
 
 	return (
 		<Box
@@ -111,7 +139,7 @@ function MapSection({
 						</Box>
 					</Box>
 				)}
-				{showMap && (
+				{showMap && mapData && (
 					<Box sx={{ width: "100%", mt: 4 }}>
 						<MapFilters
 							selectedFunds={selectedFunds}
@@ -125,8 +153,27 @@ function MapSection({
 							inSelectionData={inSelectionData}
 							lists={lists}
 						/>
-						<Box sx={{ width: "100%", height: "2em" }} />
-						<Map />
+						<Box sx={{ width: "100%", height: "1em" }} />
+						<Box sx={{ width: "100%", position: "relative" }}>
+							<Map mapData={mapData} />
+							<Chip
+								label={
+									mapData
+										? `${mapData.length} locations (${activities.length} ${activityText} in ${sectors.length} ${sectorText})`
+										: "No locations"
+								}
+								sx={{
+									position: "absolute",
+									top: 16,
+									right: 16,
+									zIndex: 1000,
+									pointerEvents: "none",
+									backgroundColor: colors.unColorLighter + "9A",
+									fontWeight: 500,
+									opacity: 1,
+								}}
+							/>
+						</Box>
 					</Box>
 				)}
 			</Paper>

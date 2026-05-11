@@ -76,9 +76,10 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				data={filteredData}
 				key={generateMapKey(inSelectionData)}
 				inSelectionData={inSelectionData}
-				inDataLists={inDataLists}
 				showMap={showMap}
 				lists={lists}
+				activities={activities}
+				sectors={sectors}
 			/>
 		</Container>
 	);

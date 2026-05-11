@@ -10,6 +10,9 @@ import Snack from "./Snack";
 import type { ListObj } from "../utils/makelists";
 import type { InSelectionData } from "../utils/filterData";
 import { constants } from "../utils/constants";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 type Type = (typeof constants.filterTypes)[number];
 
@@ -37,7 +40,6 @@ function Dropdown({
 	const isAllSelected = value.length === names.length;
 
 	const selectRef = useRef<HTMLDivElement | null>(null);
-	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
 
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
@@ -59,17 +61,20 @@ function Dropdown({
 		}
 	}
 
-	function calculateHeight(size: number) {
-		setDropdownHeight(size * 38);
-	}
-
 	const namesListMemo = useMemo(() => {
 		names.sort((a, b) => namesList[a].localeCompare(namesList[b]));
 		return names;
 	}, [names, namesList]);
 
 	return (
-		<div ref={selectRef}>
+		<Box
+			sx={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "flex-end",
+			}}
+			ref={selectRef}
+		>
 			<Snack
 				openSnack={openSnack}
 				setOpenSnack={setOpenSnack}
@@ -89,7 +94,6 @@ function Dropdown({
 					multiple
 					value={value}
 					onChange={handleChange}
-					onMouseEnter={() => calculateHeight(value.length)}
 					input={<OutlinedInput label={type} />}
 					renderValue={selected =>
 						isAllSelected
@@ -99,7 +103,7 @@ function Dropdown({
 					MenuProps={{
 						PaperProps: {
 							style: {
-								maxHeight: dropdownHeight,
+								maxHeight: names.length * 38,
 							},
 						},
 					}}
@@ -126,7 +130,27 @@ function Dropdown({
 					))}
 				</Select>
 			</FormControl>
-		</div>
+			<Button
+				size="small"
+				variant="contained"
+				disabled={value.length === names.length}
+				onClick={() => {
+					setValue(names);
+				}}
+				sx={{
+					padding: "2px 8px",
+					minWidth: "auto",
+					fontSize: "0.8rem",
+					fontFamily: '"Roboto Mono", monospace',
+					fontWeight: 700,
+					textTransform: "none",
+					mt: 1,
+					borderRadius: "12px",
+				}}
+			>
+				<Typography sx={{ fontSize: "1em" }}>Select all</Typography>
+			</Button>
+		</Box>
 	);
 }
 

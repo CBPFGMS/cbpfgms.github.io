@@ -1,12 +1,20 @@
 import { useRef } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import type { Map as MapType } from "leaflet";
 import { constants } from "../utils/constants";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
+import type { MapDatum } from "../utils/processmapdata";
+import MarkerClusterGroup from "react-leaflet-cluster";
 
 const { mapHeight, minZoomValue, maxZoomValue } = constants;
 
-function Map() {
+type MapProps = {
+	mapData: MapDatum[];
+};
+
+function Map({ mapData }: MapProps) {
 	const mapRef = useRef<MapType | null>(null);
 
 	return (
@@ -25,6 +33,16 @@ function Map() {
 				maxZoom={maxZoomValue}
 				minZoom={minZoomValue}
 			/>
+			<MarkerClusterGroup chunkedLoading maxClusterRadius={40}>
+				{mapData.map((datum, index) => (
+					<Marker
+						key={index}
+						position={[datum.latitude, datum.longitude]}
+						title={datum.locationName}
+						// icon={customIcon}
+					></Marker>
+				))}
+			</MarkerClusterGroup>
 		</MapContainer>
 	);
 }
