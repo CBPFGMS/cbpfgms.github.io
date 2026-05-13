@@ -1,3 +1,4 @@
+import type { InSelectionData } from "./filterData";
 import type { Data } from "./processrawdata";
 
 type MapDataParams = {
@@ -26,8 +27,15 @@ function processMapData({
 	selectedStatuses,
 	selectedPartners,
 	selectedAdminLevels,
-}: MapDataParams): MapDatum[] {
+}: MapDataParams): { mapData: MapDatum[]; inFiltersData: InSelectionData } {
 	const mapData: MapDatum[] = [];
+
+	const inFiltersData: InSelectionData = {
+		funds: new Set<number>(),
+		statuses: new Set<number>(),
+		partners: new Set<number>(),
+		adminLevels: new Set<number>(),
+	};
 
 	data.forEach(datum => {
 		if (
@@ -77,9 +85,41 @@ function processMapData({
 				sector: datum.sector,
 			});
 		}
+
+		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedPartners.includes(datum.organizationType)
+		) {
+			inFiltersData.adminLevels.add(datum.locationLevel);
+		}
+
+		if (
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedPartners.includes(datum.organizationType) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.funds.add(datum.fund);
+		}
+
+		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedPartners.includes(datum.organizationType) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.statuses.add(datum.projectStatus);
+		}
+
+		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.partners.add(datum.organizationType);
+		}
 	});
 
-	return mapData;
+	return { mapData, inFiltersData };
 }
 
 export default processMapData;

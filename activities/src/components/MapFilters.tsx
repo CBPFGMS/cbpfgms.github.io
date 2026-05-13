@@ -14,6 +14,7 @@ type MapFiltersProps = {
 	selectedAdminLevels: number[];
 	setSelectedAdminLevels: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
+	inFiltersData: InSelectionData;
 	lists: List;
 };
 
@@ -29,6 +30,7 @@ function MapFilters({
 	selectedAdminLevels,
 	setSelectedAdminLevels,
 	inSelectionData,
+	inFiltersData,
 	lists,
 }: MapFiltersProps) {
 	const dataArrayFunds = [...inSelectionData.funds];
@@ -63,7 +65,7 @@ function MapFilters({
 					names={dataArrayFunds}
 					namesList={namesListFunds}
 					type={"Funds"}
-					inSelectionData={inSelectionData}
+					inFiltersData={inFiltersData}
 					dataProperty={"funds"}
 				/>
 			</Grid>
@@ -74,7 +76,7 @@ function MapFilters({
 					names={dataArrayStatuses}
 					namesList={namesListStatuses}
 					type={"Statuses"}
-					inSelectionData={inSelectionData}
+					inFiltersData={inFiltersData}
 					dataProperty={"statuses"}
 				/>
 			</Grid>
@@ -85,7 +87,7 @@ function MapFilters({
 					names={dataArrayPartners}
 					namesList={namesListPartners}
 					type={"Partners"}
-					inSelectionData={inSelectionData}
+					inFiltersData={inFiltersData}
 					dataProperty={"partners"}
 				/>
 			</Grid>
@@ -96,7 +98,7 @@ function MapFilters({
 					names={dataArrayAdminLevels}
 					namesList={namesListAdminLevels}
 					type={"Admin Levels"}
-					inSelectionData={inSelectionData}
+					inFiltersData={inFiltersData}
 					dataProperty={"adminLevels"}
 				/>
 			</Grid>

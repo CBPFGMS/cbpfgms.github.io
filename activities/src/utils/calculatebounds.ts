@@ -1,5 +1,6 @@
 import { extent } from "d3";
 import type { MapDatum } from "./processmapdata";
+import type { Map as MapType } from "leaflet";
 
 function calculateBounds(
 	data: MapDatum[],
@@ -22,4 +23,26 @@ function calculateBounds(
 	];
 }
 
-export default calculateBounds;
+function zoomToBounds({
+	mapData,
+	leafletMap,
+	mapPadding,
+	maxZoomValue,
+}: {
+	mapData: MapDatum[];
+	leafletMap: MapType;
+	mapPadding: number;
+	maxZoomValue: number;
+}) {
+	if (!mapData.length) {
+		return;
+	}
+
+	const bounds = calculateBounds(mapData);
+	leafletMap.fitBounds(bounds, {
+		padding: [mapPadding, mapPadding],
+		maxZoom: maxZoomValue,
+	});
+}
+
+export default zoomToBounds;

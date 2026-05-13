@@ -1,11 +1,5 @@
 import { useRef, useEffect } from "react";
-import {
-	MapContainer,
-	TileLayer,
-	Marker,
-	Tooltip,
-	useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, Popup } from "react-leaflet";
 import type { Map as MapType, LeafletMouseEvent } from "leaflet";
 import { constants } from "../utils/constants";
 import "leaflet/dist/leaflet.css";
@@ -14,24 +8,28 @@ import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import type { MapDatum } from "../utils/processmapdata";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import type { List } from "../utils/makelists";
-import calculateBounds from "../utils/calculatebounds";
+import zoomToBounds from "../utils/calculatebounds";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
+import ZoomOutButton from "./ZoomOutButton";
 
-const DefaultIcon = L.icon({
-    iconUrl: icon,
-    iconRetinaUrl: iconRetina,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41],
-});
+const createBadgeIcon = (count: number) => {
+	const badgeHtml =
+		count > 0 ? `<span class="marker-badge">${count}</span>` : "";
 
-L.Marker.prototype.options.icon = DefaultIcon;
+	return L.divIcon({
+		className: "custom-badge-icon",
+		html: `
+        <img class="badge-marker-shadow" src="${iconShadow}" />
+        <img class="badge-marker-icon" src="${icon}" />
+        ${badgeHtml}
+    `,
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [1, -34],
+	});
+};
 
 const { mapHeight, minZoomValue, maxZoomValue } = constants;
 
@@ -85,20 +83,22 @@ function Map({ mapData, lists }: MapProps) {
 					<Marker
 						key={index}
 						position={[datum.latitude, datum.longitude]}
+						eventHandlers={{
+							mouseover: e => e.target.openPopup(),
+						}}
 						// title={datum.locationName}
-						// icon={customIcon}
+						icon={createBadgeIcon(datum.activities.length)}
 					>
-						<Tooltip
-							direction="auto"
+						<Popup
+							// direction="auto"
 							offset={[0, -10]}
-							opacity={1}
-							permanent={false} // Only shows on hover
+							// opacity={1}
+							// permanent={false}
+							interactive={true}
 						>
 							<div
 								style={{
 									textAlign: "left",
-									maxWidth: 300,
-									minWidth: 250,
 									textWrap: "wrap",
 								}}
 							>
@@ -126,15 +126,17 @@ function Map({ mapData, lists }: MapProps) {
 								>
 									{datum.activities.map((d, index) => (
 										<li key={index}>
-											{lists.activities[d.activity] +
-												" (sector: " +
-												lists.sectors[d.sector] +
-												")"}
+											{lists.activities[d.activity]}
+											{" (sector: "}
+											<strong>
+												{lists.sectors[d.sector]}
+											</strong>
+											{")"}
 										</li>
 									))}
 								</ul>
 							</div>
-						</Tooltip>
+						</Popup>
 					</Marker>
 				))}
 			</MarkerClusterGroup>
@@ -146,14 +148,22 @@ function MapController({ mapData }: { mapData: MapDatum[] }) {
 	const leafletMap = useMap();
 
 	useEffect(() => {
-		const bounds = calculateBounds(mapData);
-		leafletMap.fitBounds(bounds, {
-			padding: [mapPadding, mapPadding],
-			maxZoom: maxZoomValue,
+		zoomToBounds({
+			mapData,
+			leafletMap,
+			mapPadding,
+			maxZoomValue,
 		});
 	}, [mapData, leafletMap]);
 
-	return null;
+	return (
+		<ZoomOutButton
+			mapData={mapData}
+			maxZoomValue={maxZoomValue}
+			mapPadding={mapPadding}
+			leafletMap={leafletMap}
+		/>
+	);
 }
 
 export default Map;

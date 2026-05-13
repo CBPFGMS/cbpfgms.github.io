@@ -57,7 +57,7 @@ function ActivitySelect({
 			<Paper
 				elevation={0}
 				sx={{
-					width: "80%",
+					width: "100%",
 					borderRadius: 4,
 					border: "1.5px solid",
 					borderColor:

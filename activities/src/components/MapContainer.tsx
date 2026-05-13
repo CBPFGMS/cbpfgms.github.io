@@ -47,7 +47,7 @@ function MapSection({
 	const activityText = activities.length === 1 ? "activity" : "activities";
 	const sectorText = sectors.length === 1 ? "sector" : "sectors";
 
-	const mapData = useMemo(() => {
+	const mapDataObject = useMemo(() => {
 		if (!showMap) {
 			return null;
 		}
@@ -80,7 +80,7 @@ function MapSection({
 			<Paper
 				elevation={0}
 				sx={{
-					width: "80%",
+					width: "100%",
 					p: { xs: 2.5, md: 3 },
 					transition: "all 0.3s ease",
 					borderRadius: 4,
@@ -98,7 +98,7 @@ function MapSection({
 				<StepHeader
 					number="3"
 					title="Explore the Map"
-					subtitle="Zoom in to see individual activity markers and hover over them for details. Use the menus below to filter the results."
+					subtitle="Zoom in or click a circular cluster to see individual activity markers. Hover over them for details. Use the menus below to filter the results."
 					active={showMap}
 					done={false}
 				/>
@@ -139,7 +139,7 @@ function MapSection({
 						</Box>
 					</Box>
 				)}
-				{showMap && mapData && (
+				{showMap && mapDataObject && (
 					<Box sx={{ width: "100%", mt: 4 }}>
 						<MapFilters
 							selectedFunds={selectedFunds}
@@ -151,6 +151,7 @@ function MapSection({
 							selectedAdminLevels={selectedAdminLevels}
 							setSelectedAdminLevels={setSelectedAdminLevels}
 							inSelectionData={inSelectionData}
+							inFiltersData={mapDataObject.inFiltersData}
 							lists={lists}
 						/>
 						<Box sx={{ width: "100%", height: "1em" }} />
@@ -159,18 +160,18 @@ function MapSection({
 								width: "100%",
 								position: "relative",
 								border: "1px solid #bbb", // Add border here
-								borderRadius: "8px", 
+								borderRadius: "8px",
 								overflow: "hidden",
 							}}
 						>
 							<Map
-								mapData={mapData}
+								mapData={mapDataObject.mapData}
 								lists={lists}
 							/>
 							<Chip
 								label={
-									mapData
-										? `${mapData.length} locations (${activities.length} ${activityText} in ${sectors.length} ${sectorText})`
+									mapDataObject.mapData
+										? `${mapDataObject.mapData.length} locations (${activities.length} ${activityText} in ${sectors.length} ${sectorText})`
 										: "No locations"
 								}
 								sx={{
@@ -179,13 +180,30 @@ function MapSection({
 									right: 16,
 									zIndex: 1000,
 									pointerEvents: "none",
-									backgroundColor:
-										colors.unColorChip + "BA",
+									backgroundColor: colors.unColorChip + "BA",
 									fontWeight: 500,
 									color: "white",
 									opacity: 1,
 								}}
 							/>
+						</Box>
+						<Box sx={{ width: "100%", mt: 1 }}>
+							<Typography
+								variant="body2"
+								sx={{
+									fontStyle: "italic",
+									textAlign: "left",
+									color: "text.secondary",
+								}}
+							>
+								<span style={{ fontWeight: "bold" }}>
+									Note:{" "}
+								</span>
+								the value at each circular cluster indicates how
+								many markers it contains, and the value at the
+								top of each marker indicates the number of
+								activities in that location.
+							</Typography>
 						</Box>
 					</Box>
 				)}

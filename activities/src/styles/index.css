@@ -11,7 +11,6 @@
 	--ocha-blue: #1f69b3;
 	--ocha-blue-lighter: #82b5e9;
 	--ocha-blue-darker: #144372;
-
 }
 
 #activitiesroot {
@@ -72,4 +71,99 @@ button:focus-visible {
 	button {
 		background-color: #f9f9f9;
 	}
+}
+
+/* Hide the default '×' text */
+.leaflet-popup-close-button {
+	color: transparent !important;
+	width: 24px !important;
+	height: 24px !important;
+}
+
+/* Insert your own icon or text */
+.leaflet-popup-close-button::after {
+	content: "\2715"; /* Or a Unicode icon like '\2715' */
+	color: #222;
+	background-color: #ccc;
+	padding: 0px 7px;
+	border-radius: 100%;
+	font-size: 11px;
+	position: absolute;
+	top: 6px;
+	right: 12px;
+	display: block;
+}
+
+.leaflet-popup-close-button:hover::after {
+	background-color: #aaa;
+	color: #000;
+}
+
+/* Reset the popup container to the standard arrow cursor */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	cursor: default !important;
+}
+
+/* Ensure the close button still shows the pointer */
+.leaflet-popup-close-button {
+	cursor: pointer !important;
+}
+
+/* The container is now 25x41px and its bottom-middle is at the coordinate */
+.custom-badge-icon {
+  background: none !important;
+  border: none !important;
+  position: relative;
+}
+
+/* The Blue Icon - simply fills the 25x41 container */
+.badge-marker-icon {
+  width: 25px;
+  height: 41px;
+  display: block;
+}
+
+/* The Shadow - stays anchored to the bottom tip but can be wider */
+.badge-marker-shadow {
+  position: absolute;
+  width: 41px;
+  height: 41px;
+  bottom: 0;      /* Align bottom of shadow with bottom of icon */
+  left: 0;        /* Default shadow starts slightly to the right of the tip */
+  pointer-events: none; 
+  z-index: -1;    /* Keeps it behind the marker */
+}
+
+/* The Badge - Positioned relative to the 25x41 container */
+.marker-badge {
+  position: absolute;
+  top: -10px;    /* Move it up relative to the top of the icon */
+  right: -15px;  /* Move it right relative to the icon */
+  
+  background-color: #e8732a;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 100%;
+  font-size: 11px;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Ensure the Leaflet-generated wrapper doesn't force a small width */
+.leaflet-popup-content {
+    width: auto !important;
+    /* Optional: If you want to ensure it feels consistent with MUI */
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif; 
+}
+
+/* Force the wrapper to expand to the text length up to the max-width */
+.leaflet-popup-content > div {
+    display: block;
+    width: max-content;
+    min-width: 250px;
+    max-width: 450px;
 }

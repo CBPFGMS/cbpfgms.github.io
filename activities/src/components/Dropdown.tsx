@@ -24,7 +24,7 @@ type DropdownProps = {
 	names: number[];
 	namesList: ListObj;
 	type: Type;
-	inSelectionData: InSelectionData;
+	inFiltersData: InSelectionData;
 	dataProperty: DataProperties;
 };
 
@@ -34,7 +34,7 @@ function Dropdown({
 	names,
 	namesList,
 	type,
-	inSelectionData,
+	inFiltersData,
 	dataProperty,
 }: DropdownProps) {
 	const isAllSelected = value.length === names.length;
@@ -112,7 +112,7 @@ function Dropdown({
 						<MenuItem
 							key={name}
 							value={name}
-							disabled={!inSelectionData[dataProperty].has(name)}
+							disabled={!inFiltersData[dataProperty].has(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",

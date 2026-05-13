@@ -75,7 +75,7 @@ function SectorSelect({
 			<Paper
 				elevation={0}
 				sx={{
-					width: "80%",
+					width: "100%",
 					borderRadius: 4,
 					border: "1.5px solid",
 					borderColor:
@@ -137,7 +137,8 @@ function SectorCard({ sector, selected, onClick, lists }: SectorCardProps) {
 					display: "block",
 					"& .MuiBadge-badge": {
 						color: "white",
-						backgroundColor: "#777", // Your custom hex code
+						backgroundColor: selected ? colors.unColorChip : "#777",
+						fontWeight: selected ? 900 : 500,
 					},
 				}}
 			>
@@ -169,8 +170,8 @@ function SectorCard({ sector, selected, onClick, lists }: SectorCardProps) {
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
 						selected
-							? "Click to deselect"
-							: `<div style="max-width: 200px;"><strong>${lists.sectors[sector]}</strong> encompasses ${lists.activitiesPerSector[sector]?.size} activit${lists.activitiesPerSector[sector]?.size === 1 ? "y" : "ies"}</div>`
+							? `<div style="max-width: 200px; font-family: 'Roboto', sans-serif;">Click to deselect</div>`
+							: `<div style="max-width: 200px; font-family: 'Roboto', sans-serif;"><strong>${lists.sectors[sector]}</strong> encompasses ${lists.activitiesPerSector[sector]?.size} activit${lists.activitiesPerSector[sector]?.size === 1 ? "y" : "ies"}</div>`
 					}
 					data-tooltip-place="top"
 				>
