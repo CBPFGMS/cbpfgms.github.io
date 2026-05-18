@@ -1,13 +1,18 @@
 import {
+	type OrganizationIdsMapObject,
 	type ProjectSummaryObject,
 	type SectorBeneficiaryObject,
 	type TotalBeneficiariesObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	totalBeneficiariesObjectSchema,
+	organizationIdsMapObjectSchema,
 } from "./schemas";
 import type { List } from "./makelists";
-import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
+import warnInvalidSchema, {
+	warnProjectNotFound,
+	simpleWarn,
+} from "./warninvalid";
 import { constants, projectStatusMapping } from "./constants";
 
 export type Datum = {
@@ -77,6 +82,7 @@ type ProcessRawDataParams = {
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	totalBeneficiaries: TotalBeneficiariesObject[];
+	organizationIdsMap: OrganizationIdsMapObject[];
 };
 
 export type TotalBeneficiariesData = {
@@ -89,6 +95,7 @@ function processRawData({
 	listsObj,
 	setInDataLists,
 	totalBeneficiaries,
+	organizationIdsMap,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -111,6 +118,24 @@ function processRawData({
 	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
 		new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+
+	const organizationIdsToChange: Set<number> = new Set();
+
+	organizationIdsMap.forEach(d => {
+		const parsedOrganizationIdsMap =
+			organizationIdsMapObjectSchema.safeParse(d);
+		if (parsedOrganizationIdsMap.success) {
+			d.idsList.forEach(id => {
+				organizationIdsToChange.add(id);
+			});
+		} else {
+			warnInvalidSchema(
+				"OrganizationIdsMap",
+				d,
+				JSON.stringify(parsedOrganizationIdsMap.error),
+			);
+		}
+	});
 
 	totalBeneficiaries.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
@@ -208,6 +233,20 @@ function processRawData({
 			//Temporary filter for draft projects:
 			if (row.ProjectStatusCode === "PRJ_DRFT") {
 				return;
+			}
+
+			//hardcoded: changing GlobalOrgId if needed
+			if (organizationIdsToChange.has(row.GlobalOrgId)) {
+				const thisTarget = organizationIdsMap.find(d =>
+					d.idsList.includes(row.GlobalOrgId),
+				);
+				if (thisTarget) {
+					row.GlobalOrgId = thisTarget.changesTo;
+				} else {
+					simpleWarn(
+						`Organization ID ${row.GlobalOrgId} not found in organizationIdsMap`,
+					);
+				}
 			}
 
 			const thisAllocationType =

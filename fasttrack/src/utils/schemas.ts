@@ -335,6 +335,12 @@ export const globalIndicatorsMasterObjectSchema = z.object({
 	TypeId: z.number().int().nonnegative().nullable(),
 });
 
+export const organizationIdsMapObjectSchema = z.object({
+	idsList: z.array(z.number().int().nonnegative()),
+	changesTo: z.number().int().nonnegative(),
+	description: z.string(),
+});
+
 // ********************
 // TYPES
 // ********************
@@ -389,4 +395,8 @@ export type GlobalIndicatorsMasterObject = z.infer<
 
 export type PooledFundsWithRegionMasterObject = z.infer<
 	typeof pooledFundsWithRegionMasterObjectSchema
+>;
+
+export type OrganizationIdsMapObject = z.infer<
+	typeof organizationIdsMapObjectSchema
 >;
