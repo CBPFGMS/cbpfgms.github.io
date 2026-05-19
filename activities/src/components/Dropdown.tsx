@@ -66,6 +66,11 @@ function Dropdown({
 		return names;
 	}, [names, namesList]);
 
+	const snackType =
+		type === "Statuses"
+			? "status"
+			: type.toLocaleLowerCase().substring(0, type.length - 1);
+
 	return (
 		<Box
 			sx={{
@@ -78,7 +83,7 @@ function Dropdown({
 			<Snack
 				openSnack={openSnack}
 				setOpenSnack={setOpenSnack}
-				message={`At least one ${type.toLocaleLowerCase()} must be selected`}
+				message={`At least one ${snackType} must be selected`}
 			/>
 			<FormControl
 				sx={{

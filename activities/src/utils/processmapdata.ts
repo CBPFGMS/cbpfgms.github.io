@@ -39,6 +39,38 @@ function processMapData({
 
 	data.forEach(datum => {
 		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedPartners.includes(datum.organizationType)
+		) {
+			inFiltersData.adminLevels.add(datum.locationLevel);
+		}
+
+		if (
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedPartners.includes(datum.organizationType) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.funds.add(datum.fund);
+		}
+
+		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedPartners.includes(datum.organizationType) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.statuses.add(datum.projectStatus);
+		}
+
+		if (
+			selectedFunds.includes(datum.fund) &&
+			selectedStatuses.includes(datum.projectStatus) &&
+			selectedAdminLevels.includes(datum.locationLevel)
+		) {
+			inFiltersData.partners.add(datum.organizationType);
+		}
+
+		if (
 			!selectedFunds.includes(datum.fund) ||
 			!selectedStatuses.includes(datum.projectStatus) ||
 			!selectedPartners.includes(datum.organizationType) ||
@@ -84,38 +116,6 @@ function processMapData({
 				activity: datum.activity,
 				sector: datum.sector,
 			});
-		}
-
-		if (
-			selectedFunds.includes(datum.fund) &&
-			selectedStatuses.includes(datum.projectStatus) &&
-			selectedPartners.includes(datum.organizationType)
-		) {
-			inFiltersData.adminLevels.add(datum.locationLevel);
-		}
-
-		if (
-			selectedStatuses.includes(datum.projectStatus) &&
-			selectedPartners.includes(datum.organizationType) &&
-			selectedAdminLevels.includes(datum.locationLevel)
-		) {
-			inFiltersData.funds.add(datum.fund);
-		}
-
-		if (
-			selectedFunds.includes(datum.fund) &&
-			selectedPartners.includes(datum.organizationType) &&
-			selectedAdminLevels.includes(datum.locationLevel)
-		) {
-			inFiltersData.statuses.add(datum.projectStatus);
-		}
-
-		if (
-			selectedFunds.includes(datum.fund) &&
-			selectedStatuses.includes(datum.projectStatus) &&
-			selectedAdminLevels.includes(datum.locationLevel)
-		) {
-			inFiltersData.partners.add(datum.organizationType);
 		}
 	});
 
