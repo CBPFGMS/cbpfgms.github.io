@@ -8,6 +8,7 @@ import processRawData, {
 	TotalBeneficiariesByPartnerData,
 	TotalBeneficiariesBySectorData,
 	TotalBeneficiariesData,
+	TotalBeneficiariesByBeneficiaryTypeData,
 } from "./processrawdata";
 import {
 	AllocationSourcesMasterObject,
@@ -24,6 +25,7 @@ import {
 	TotalBeneficiariesObject,
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
+	TotalBeneficiariesByBeneficiaryTypeObject,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -41,6 +43,7 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesObject[],
 	TotalBeneficiariesByPartnerObject[],
 	TotalBeneficiariesBySectorObject[],
+	TotalBeneficiariesByBeneficiaryTypeObject[],
 ];
 
 const beneficiaryTypesMasterUrl =
@@ -56,13 +59,13 @@ const beneficiaryTypesMasterUrl =
 	cvaMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiary?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
 	totalBeneficiariesByPartnerUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiaryByPartnerType?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
 	totalBeneficiariesBySectorUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiaryByCluster?year=2026&$format=csv";
-
-//fake data path on staging site: ./assets/stg-data/
+		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
+	totalBeneficiariesByBeneficiaryTypeUrl =
+		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
 
 function useData(
 	defaultFundType: number | null,
@@ -74,6 +77,7 @@ function useData(
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
 	loading: boolean;
 	error: string | null;
 	progress: number;
@@ -101,7 +105,13 @@ function useData(
 		[totalBeneficiariesBySectorData, setTotalBeneficiariesBySectorData] =
 			useState<TotalBeneficiariesBySectorData>(
 				{} as TotalBeneficiariesBySectorData,
-			);
+			),
+		[
+			totalBeneficiariesByBeneficiaryTypeData,
+			setTotalBeneficiariesByBeneficiaryTypeData,
+		] = useState<TotalBeneficiariesByBeneficiaryTypeData>(
+			{} as TotalBeneficiariesByBeneficiaryTypeData,
+		);
 
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
@@ -189,6 +199,12 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				"totalBeneficiariesByBeneficiaryType",
+				totalBeneficiariesByBeneficiaryTypeUrl,
+				"csv",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -215,6 +231,7 @@ function useData(
 			totalBeneficiaries,
 			totalBeneficiariesByPartner,
 			totalBeneficiariesBySector,
+			totalBeneficiariesByBeneficiaryType,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -232,6 +249,7 @@ function useData(
 				totalBeneficiariesData,
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
+				totalBeneficiariesByBeneficiaryTypeData,
 			} = processRawData({
 				projectSummary,
 				sectorsData,
@@ -241,6 +259,7 @@ function useData(
 				totalBeneficiaries,
 				totalBeneficiariesByPartner,
 				totalBeneficiariesBySector,
+				totalBeneficiariesByBeneficiaryType,
 			});
 
 			setData(data);
@@ -248,6 +267,9 @@ function useData(
 			setTotalBeneficiariesData(totalBeneficiariesData);
 			setTotalBeneficiariesByPartnerData(totalBeneficiariesByPartnerData);
 			setTotalBeneficiariesBySectorData(totalBeneficiariesBySectorData);
+			setTotalBeneficiariesByBeneficiaryTypeData(
+				totalBeneficiariesByBeneficiaryTypeData,
+			);
 			setLoading(false);
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps
@@ -260,6 +282,7 @@ function useData(
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
 		loading,
 		error,
 		progress,

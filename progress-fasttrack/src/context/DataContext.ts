@@ -4,6 +4,7 @@ import {
 	InDataLists,
 	TotalBeneficiariesByPartnerData,
 	TotalBeneficiariesBySectorData,
+	TotalBeneficiariesByBeneficiaryTypeData,
 	TotalBeneficiariesData,
 } from "../utils/processrawdata";
 import { List } from "../utils/makelists";
@@ -15,6 +16,7 @@ export type DataContextType = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
 };
 
 const DataContext = createContext<DataContextType | null>(null);

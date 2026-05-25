@@ -3,6 +3,7 @@ import {
 	SectorBeneficiaryObject,
 	TotalBeneficiariesObject,
 	TotalBeneficiariesByPartnerObject,
+	TotalBeneficiariesByBeneficiaryTypeObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	cvaObjectSchema,
@@ -11,6 +12,7 @@ import {
 	totalBeneficiariesByPartnerObjectSchema,
 	TotalBeneficiariesBySectorObject,
 	totalBeneficiariesBySectorObjectSchema,
+	totalBeneficiariesByBeneficiaryTypeObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
@@ -123,7 +125,10 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
 };
+
+//TODO: break this into targeted and reached
 
 export type TotalBeneficiariesBreakdown = {
 	[key in GenderAndAge | "total"]: number;
@@ -158,6 +163,17 @@ export type TotalBeneficiariesBySectorData = {
 	};
 };
 
+export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
+	[key in GenderAndAge | "beneficiaryType"]: number;
+};
+
+export type TotalBeneficiariesByBeneficiaryTypeData = {
+	[key: number]: {
+		[id: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+		all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+	};
+};
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -167,16 +183,20 @@ function processRawData({
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
+	totalBeneficiariesByBeneficiaryType,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
 	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
+	const totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData =
+		{};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const cvaDataMap: Map<string, CvaMapValue> = new Map();
@@ -310,6 +330,51 @@ function processRawData({
 		} else {
 			warnInvalidSchema(
 				"totalBeneficiariesBySector",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	totalBeneficiariesByBeneficiaryType.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+			const benTypeValuesMen: number[] = row.BenM.split("#").map(Number);
+			const benTypeValuesWomen: number[] =
+				row.BenW.split("#").map(Number);
+			const benTypeValuesBoys: number[] = row.BenB.split("#").map(Number);
+			const benTypeValuesGirls: number[] =
+				row.BenG.split("#").map(Number);
+
+			const partnersDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown[] =
+				partnersSplitOrder.map((type, index) => {
+					return {
+						beneficiaryType: type,
+						girls: benTypeValuesGirls[index],
+						boys: benTypeValuesBoys[index],
+						women: benTypeValuesWomen[index],
+						men: benTypeValuesMen[index],
+					};
+				});
+
+			if (!totalBeneficiariesByBeneficiaryTypeData[projectKey]) {
+				totalBeneficiariesByBeneficiaryTypeData[projectKey] =
+					{} as TotalBeneficiariesByBeneficiaryTypeData[number];
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesByBeneficiaryTypeData[projectKey].all =
+					partnersDatum;
+			} else {
+				totalBeneficiariesByBeneficiaryTypeData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				] = partnersDatum;
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesByBeneficiaryType",
 				row,
 				JSON.stringify(parsedRow.error),
 			);
@@ -579,6 +644,7 @@ function processRawData({
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
 	};
 }
 
