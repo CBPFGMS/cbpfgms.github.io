@@ -221,7 +221,7 @@
 			heightLeafletMap = 420,
 			heightTopSvg = 60,
 			topSvgPadding = [0, 10, 0, 10],
-			topSvgHorizontalPositions = [0.16, 0.34, 0.58, 0.76],
+			topSvgHorizontalPositions = [0.25, 0.34, 0.45, 0.7],
 			topSvgMainValueVerPadding = 12,
 			topSvgMainValueHorPadding = 2,
 			legendSvgWidth = 110,
@@ -1007,7 +1007,7 @@
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
-						topSvgMainValueHorPadding,
+						topSvgMainValueHorPadding * 5,
 				)
 				.merge(topSvgAllocationsText);
 
@@ -1033,36 +1033,36 @@
 				.attr(
 					"x",
 					width * topSvgHorizontalPositions[0] +
-						topSvgMainValueHorPadding,
+						topSvgMainValueHorPadding * 5,
 				)
 				.text("Allocated");
 
-			const temporarilyRemovingPeopleFigures = topSvg
-				.selectAll(".pbimapTopSvgBeneficiariesText")
-				.data([true])
-				.enter()
-				.append("text")
-				.attr(
-					"class",
-					"pbimapTopSvgBeneficiariesText contributionColorFill",
-				)
-				.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
-				.attr(
-					"x",
-					width * topSvgHorizontalPositions[1] -
-						48 +
-						topSvgMainValueHorPadding,
-				)
-				.text("Calculation of unique beneficiaries ")
-				.append("tspan")
-				.attr(
-					"x",
-					width * topSvgHorizontalPositions[1] -
-						48 +
-						topSvgMainValueHorPadding,
-				)
-				.attr("dy", "1.2em")
-				.text("are underway, will be published soon.");
+			// const temporarilyRemovingPeopleFigures = topSvg
+			// 	.selectAll(".pbimapTopSvgBeneficiariesText")
+			// 	.data([true])
+			// 	.enter()
+			// 	.append("text")
+			// 	.attr(
+			// 		"class",
+			// 		"pbimapTopSvgBeneficiariesText contributionColorFill",
+			// 	)
+			// 	.attr("y", heightTopSvg - topSvgMainValueVerPadding * 2.9)
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] -
+			// 			48 +
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.text("Calculation of unique beneficiaries ")
+			// 	.append("tspan")
+			// 	.attr(
+			// 		"x",
+			// 		width * topSvgHorizontalPositions[1] -
+			// 			48 +
+			// 			topSvgMainValueHorPadding,
+			// 	)
+			// 	.attr("dy", "1.2em")
+			// 	.text("are underway, will be published soon.");
 
 			// ********************************
 			// TEMPORARYLI REMOVING TOP FIGURES
