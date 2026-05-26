@@ -129,6 +129,9 @@ function Regions({
 								"Targeted people: " +
 								region.targeted.toLocaleString() +
 								"<br/>" +
+								"Reached people: " +
+								region.reached.toLocaleString() +
+								"<br/>" +
 								tooltipFundText +
 								"</div>"
 							}
@@ -220,10 +223,7 @@ function Regions({
 											: "Country"}
 									</Typography>
 								</Grid>
-								<Grid
-									size={8}
-									// size={6} //ORIGINAL SIZE
-								>
+								<Grid size={6}>
 									<Typography
 										style={{
 											fontSize: "2.5rem",
@@ -269,6 +269,54 @@ function Regions({
 											data-tooltip-place="top"
 										/>
 										People Targeted
+									</Typography>
+								</Grid>
+								<Grid size={6}>
+									<Typography
+										style={{
+											fontSize: "2.5rem",
+											color: "var(--ocha-blue)",
+											fontWeight: 900,
+											fontFamily: "Montserrat",
+										}}
+									>
+										<NumberAnimator
+											number={parseFloat(
+												formatSIFloat(region.reached),
+											)}
+											type={"decimal"}
+										/>
+										{isNaN(
+											+formatSIFloat(
+												region.reached,
+											).slice(-1),
+										)
+											? formatSIFloat(
+													region.reached,
+												).slice(-1)
+											: ""}
+									</Typography>
+									<Typography
+										style={{
+											fontSize: "1rem",
+											fontWeight: 400,
+											fontFamily: "Montserrat",
+										}}
+									>
+										<WarningIcon
+											style={{
+												fontSize: "1.2rem",
+												color: disclaimerWarningColor,
+												verticalAlign: "text-bottom",
+												marginRight: "6px",
+											}}
+											data-tooltip-id="tooltip"
+											data-tooltip-content={
+												disclaimerText
+											}
+											data-tooltip-place="top"
+										/>
+										People Reached
 									</Typography>
 								</Grid>
 							</Grid>

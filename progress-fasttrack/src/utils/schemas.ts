@@ -219,8 +219,8 @@ export const totalBeneficiariesByPartnerObjectSchema = z.object({
 		.string()
 		.regex(partnersSplitRegex, "invalid partner hashtag format")
 		.nullable(),
-	TotAch: z.number().int().nonnegative(),
-	TotAchProjects: z.number().int().nonnegative(),
+	TotAch: z.number().int().nonnegative().nullable(),
+	TotAchProjects: z.number().int().nonnegative().nullable(),
 	AllocationtypeId: z.number().int().nonnegative(),
 	step1: z.string(),
 	step2: z.string(),

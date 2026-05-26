@@ -85,8 +85,16 @@ type ProcessRawDataParams = {
 	organizationIdsMap: OrganizationIdsMapObject[];
 };
 
+type TargetedAndReached = {
+	targeted: number;
+	reached: number;
+};
+
 export type TotalBeneficiariesData = {
-	[key: number]: { [id: number]: number; all: number };
+	[key: number]: {
+		[id: number]: TargetedAndReached;
+		all: TargetedAndReached;
+	};
 };
 
 function processRawData({
@@ -143,15 +151,32 @@ function processRawData({
 			const projectKey = row.PFId;
 
 			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] = { all: 0 };
+				totalBeneficiariesData[projectKey] = {
+					all: { targeted: 0, reached: 0 },
+				};
 			}
 
 			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey].all = row.TotTarg;
+				totalBeneficiariesData[projectKey].all.targeted = row.TotTarg;
+				totalBeneficiariesData[projectKey].all.reached =
+					row.TotAch || 0;
 			} else {
+				if (
+					!totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					]
+				) {
+					totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					] = { targeted: 0, reached: 0 };
+				}
+
 				totalBeneficiariesData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
-				] = row.TotTarg;
+				].targeted = row.TotTarg;
+				totalBeneficiariesData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				].reached = row.TotAch || 0;
 			}
 		} else {
 			warnInvalidSchema(

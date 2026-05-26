@@ -23,6 +23,7 @@ export type DataTopFigures = {
 	numberOfPartners: number;
 	allocations: number;
 	targeted: number;
+	reached: number;
 };
 
 function processDataTopFigures({
@@ -43,7 +44,8 @@ function processDataTopFigures({
 		};
 
 	let allocations = 0,
-		targeted = 0;
+		targeted = 0,
+		reached = 0;
 
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
@@ -58,10 +60,12 @@ function processDataTopFigures({
 			status.includes(pfStatus),
 		);
 		if (fundHasAllStatuses) {
-			targeted += totalBeneficiariesData[pf].all;
+			targeted += totalBeneficiariesData[pf].all.targeted;
+			reached += totalBeneficiariesData[pf].all.reached;
 		} else {
 			status.forEach(st => {
-				targeted += totalBeneficiariesData[pf][st] || 0;
+				targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
+				reached += totalBeneficiariesData[pf][st]?.reached || 0;
 			});
 		}
 	});
@@ -86,6 +90,7 @@ function processDataTopFigures({
 		numberOfPartners: numberOfPartnersSet.size,
 		allocations,
 		targeted,
+		reached,
 	};
 
 	return { dataTopFigures, inSelectionData };

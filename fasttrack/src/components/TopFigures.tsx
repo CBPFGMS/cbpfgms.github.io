@@ -21,7 +21,8 @@ type CardsDatum = {
 		| "# of Projects"
 		| "# of Partners"
 		| "Allocated / Launched"
-		| "Targeted People";
+		| "Targeted People"
+		| "Reached People";
 	value: number;
 	type: NumberAnimatorProps["type"];
 	format?: boolean;
@@ -51,6 +52,12 @@ function TopFigures({ data }: TopFiguresProps) {
 			type: "decimal",
 			format: true,
 		},
+		{
+			label: "Reached People",
+			value: data.reached,
+			type: "decimal",
+			format: true,
+		},
 	];
 
 	return (
@@ -73,7 +80,7 @@ function TopFigures({ data }: TopFiguresProps) {
 				{cardsData.map((card, index) => (
 					<Grid
 						key={index}
-						size={3}
+						size={2.4}
 						className="topfigures-card"
 					>
 						<Box
@@ -93,7 +100,8 @@ function TopFigures({ data }: TopFiguresProps) {
 									"$" + card.value.toLocaleString(),
 								"data-tooltip-place": "top",
 							})}
-							{...(card.label === "Targeted People" && {
+							{...((card.label === "Targeted People" ||
+								card.label === "Reached People") && {
 								"data-tooltip-id": "tooltip",
 								"data-tooltip-html":
 									card.value.toLocaleString() + " people",
@@ -131,7 +139,8 @@ function TopFigures({ data }: TopFiguresProps) {
 								color: "#666",
 							}}
 						>
-							{card.label === "Targeted People" && (
+							{(card.label === "Targeted People" ||
+								card.label === "Reached People") && (
 								<WarningIcon
 									style={{
 										fontSize: "1.2rem",
