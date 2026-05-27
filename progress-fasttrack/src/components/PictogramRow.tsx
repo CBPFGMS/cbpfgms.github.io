@@ -30,7 +30,7 @@ function PictogramRow({
 		Array(maxNumberOfPictograms).keys()
 	);
 
-	const scale = scaleLinear<number>().domain([0, maxValue]).range([0, 100]);
+	const scale = scaleLinear<number>().domain([0, maxValue || 1]).range([0, 100]);
 
 	return (
 		<Box

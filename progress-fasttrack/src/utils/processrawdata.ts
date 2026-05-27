@@ -128,10 +128,13 @@ type ProcessRawDataParams = {
 	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
 };
 
-//TODO: break this into targeted and reached
+type TargetedAndReached = {
+	targeted: number;
+	reached: number;
+};
 
 export type TotalBeneficiariesBreakdown = {
-	[key in GenderAndAge | "total"]: number;
+	[key in GenderAndAge | "total"]: TargetedAndReached;
 };
 
 export type TotalBeneficiariesData = {
@@ -142,7 +145,9 @@ export type TotalBeneficiariesData = {
 };
 
 type TotalBeneficiariesByPartnerBreakdown = {
-	[key in GenderAndAge | "partner"]: number;
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	partner: number;
 };
 
 export type TotalBeneficiariesByPartnerData = {
@@ -153,7 +158,9 @@ export type TotalBeneficiariesByPartnerData = {
 };
 
 type TotalBeneficiariesBySectorBreakdown = {
-	[key in GenderAndAge | "sector"]: number;
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	sector: number;
 };
 
 export type TotalBeneficiariesBySectorData = {
@@ -164,7 +171,9 @@ export type TotalBeneficiariesBySectorData = {
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
-	[key in GenderAndAge | "beneficiaryType"]: number;
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	beneficiaryType: number;
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeData = {
@@ -173,6 +182,14 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 		all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 	};
 };
+
+const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
+	0,
+);
+
+const beneficiaryTypesZeroArray: number[] = new Array(
+	beneficiariesSplitOrder.length,
+).fill(0);
 
 function processRawData({
 	projectSummary,
@@ -213,6 +230,10 @@ function processRawData({
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
 
+	const sectorsZeroArray: number[] = new Array(
+		listsObj.sectorsSplitOrder.length,
+	).fill(0);
+
 	totalBeneficiaries.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -223,24 +244,35 @@ function processRawData({
 					{} as TotalBeneficiariesData[number];
 			}
 
+			const totalDatum = {
+				girls: {
+					targeted: row.BenG,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM,
+					reached: row.AchM || 0,
+				},
+				total: {
+					targeted: row.TotTarg,
+					reached: row.TotAch || 0,
+				},
+			};
+
 			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey].all = {
-					girls: row.BenG,
-					boys: row.BenB,
-					women: row.BenW,
-					men: row.BenM,
-					total: row.TotTarg,
-				};
+				totalBeneficiariesData[projectKey].all = totalDatum;
 			} else {
 				totalBeneficiariesData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
-				] = {
-					girls: row.BenG,
-					boys: row.BenB,
-					women: row.BenW,
-					men: row.BenM,
-					total: row.TotTarg,
-				};
+				] = totalDatum;
 			}
 		} else {
 			warnInvalidSchema(
@@ -262,15 +294,39 @@ function processRawData({
 			const partnerValuesBoys: number[] = row.BenB.split("#").map(Number);
 			const partnerValuesGirls: number[] =
 				row.BenG.split("#").map(Number);
+			const partnerValuesAchGirls: number[] = row.AchG
+				? row.AchG.split("#").map(Number)
+				: partnersZeroArray;
+			const partnerValuesAchBoys: number[] = row.AchB
+				? row.AchB.split("#").map(Number)
+				: partnersZeroArray;
+			const partnerValuesAchWomen: number[] = row.AchW
+				? row.AchW.split("#").map(Number)
+				: partnersZeroArray;
+			const partnerValuesAchMen: number[] = row.AchM
+				? row.AchM.split("#").map(Number)
+				: partnersZeroArray;
 
 			const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
 				partnersSplitOrder.map((type, index) => {
 					return {
 						partner: type,
-						girls: partnerValuesGirls[index],
-						boys: partnerValuesBoys[index],
-						women: partnerValuesWomen[index],
-						men: partnerValuesMen[index],
+						girls: {
+							targeted: partnerValuesGirls[index],
+							reached: partnerValuesAchGirls[index],
+						},
+						boys: {
+							targeted: partnerValuesBoys[index],
+							reached: partnerValuesAchBoys[index],
+						},
+						women: {
+							targeted: partnerValuesWomen[index],
+							reached: partnerValuesAchWomen[index],
+						},
+						men: {
+							targeted: partnerValuesMen[index],
+							reached: partnerValuesAchMen[index],
+						},
 					};
 				});
 
@@ -303,15 +359,39 @@ function processRawData({
 			const sectorValuesWomen: number[] = row.BenW.split("#").map(Number);
 			const sectorValuesBoys: number[] = row.BenB.split("#").map(Number);
 			const sectorValuesGirls: number[] = row.BenG.split("#").map(Number);
+			const sectorValuesAchGirls: number[] = row.AchG
+				? row.AchG.split("#").map(Number)
+				: sectorsZeroArray;
+			const sectorValuesAchBoys: number[] = row.AchB
+				? row.AchB.split("#").map(Number)
+				: sectorsZeroArray;
+			const sectorValuesAchWomen: number[] = row.AchW
+				? row.AchW.split("#").map(Number)
+				: sectorsZeroArray;
+			const sectorValuesAchMen: number[] = row.AchM
+				? row.AchM.split("#").map(Number)
+				: sectorsZeroArray;
 
 			const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
 				listsObj.sectorsSplitOrder.map((type, index) => {
 					return {
 						sector: type,
-						girls: sectorValuesGirls[index],
-						boys: sectorValuesBoys[index],
-						women: sectorValuesWomen[index],
-						men: sectorValuesMen[index],
+						girls: {
+							targeted: sectorValuesGirls[index],
+							reached: sectorValuesAchGirls[index],
+						},
+						boys: {
+							targeted: sectorValuesBoys[index],
+							reached: sectorValuesAchBoys[index],
+						},
+						women: {
+							targeted: sectorValuesWomen[index],
+							reached: sectorValuesAchWomen[index],
+						},
+						men: {
+							targeted: sectorValuesMen[index],
+							reached: sectorValuesAchMen[index],
+						},
 					};
 				});
 
@@ -347,15 +427,39 @@ function processRawData({
 			const benTypeValuesBoys: number[] = row.BenB.split("#").map(Number);
 			const benTypeValuesGirls: number[] =
 				row.BenG.split("#").map(Number);
+			const benTypeValuesAchGirls: number[] = row.AchG
+				? row.AchG.split("#").map(Number)
+				: beneficiaryTypesZeroArray;
+			const benTypeValuesAchBoys: number[] = row.AchB
+				? row.AchB.split("#").map(Number)
+				: beneficiaryTypesZeroArray;
+			const benTypeValuesAchWomen: number[] = row.AchW
+				? row.AchW.split("#").map(Number)
+				: beneficiaryTypesZeroArray;
+			const benTypeValuesAchMen: number[] = row.AchM
+				? row.AchM.split("#").map(Number)
+				: beneficiaryTypesZeroArray;
 
-			const partnersDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown[] =
-				partnersSplitOrder.map((type, index) => {
+			const benTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown[] =
+				beneficiariesSplitOrder.map((type, index) => {
 					return {
 						beneficiaryType: type,
-						girls: benTypeValuesGirls[index],
-						boys: benTypeValuesBoys[index],
-						women: benTypeValuesWomen[index],
-						men: benTypeValuesMen[index],
+						girls: {
+							targeted: benTypeValuesGirls[index],
+							reached: benTypeValuesAchGirls[index],
+						},
+						boys: {
+							targeted: benTypeValuesBoys[index],
+							reached: benTypeValuesAchBoys[index],
+						},
+						women: {
+							targeted: benTypeValuesWomen[index],
+							reached: benTypeValuesAchWomen[index],
+						},
+						men: {
+							targeted: benTypeValuesMen[index],
+							reached: benTypeValuesAchMen[index],
+						},
 					};
 				});
 
@@ -366,11 +470,11 @@ function processRawData({
 
 			if (row.ProcessStatusId == null) {
 				totalBeneficiariesByBeneficiaryTypeData[projectKey].all =
-					partnersDatum;
+					benTypeDatum;
 			} else {
 				totalBeneficiariesByBeneficiaryTypeData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
-				] = partnersDatum;
+				] = benTypeDatum;
 			}
 		} else {
 			warnInvalidSchema(

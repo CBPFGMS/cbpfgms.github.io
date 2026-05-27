@@ -16,7 +16,7 @@ import downloadData from "../utils/downloaddata";
 import { DatumPictogram } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
-import capitalizeString from "../utils/capitalizestring";
+// import capitalizeString from "../utils/capitalizestring";
 import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
@@ -46,18 +46,21 @@ function PictogramChart({
 	implementationStatus,
 	targetedAndReachedTotal,
 }: PictogramChartProps) {
+	//using data from new APIs
+	void dataPictogram;
+
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
 
 	const totalTargeted = targetedAndReachedTotal.targeted.total;
 
-	// const totalReached = targetedAndReachedTotal.reached.total;
-	const totalReached =
-		dataPictogram.reachedBoys +
-		dataPictogram.reachedGirls +
-		dataPictogram.reachedMen +
-		dataPictogram.reachedWomen;
+	const totalReached = targetedAndReachedTotal.reached.total;
+	// const totalReached =
+	// 	dataPictogram.reachedBoys +
+	// 	dataPictogram.reachedGirls +
+	// 	dataPictogram.reachedMen +
+	// 	dataPictogram.reachedWomen;
 
 	// const maxValue = max(Object.values(dataPictogram)) || 0;
 
@@ -325,15 +328,15 @@ function PictogramChart({
 						key={type}
 						type={type}
 						targeted={targetedAndReachedTotal.targeted[type]}
-						// reached={targetedAndReachedTotal.reached[type]}
-						reached={
-							dataPictogram[
-								("reached" +
-									capitalizeString(
-										type,
-									)) as keyof DatumPictogram
-							]
-						}
+						reached={targetedAndReachedTotal.reached[type]}
+						// reached={
+						// 	dataPictogram[
+						// 		("reached" +
+						// 			capitalizeString(
+						// 				type,
+						// 			)) as keyof DatumPictogram
+						// 	]
+						// }
 						maxNumberOfPictograms={maxNumberOfPictograms}
 						maxValue={maxValue}
 					/>
