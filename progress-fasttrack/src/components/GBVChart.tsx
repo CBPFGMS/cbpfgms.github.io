@@ -138,7 +138,7 @@ function GBVChart({
 				alignItems={"center"}
 				gap={1}
 				width={"100%"}
-				style={{ aspectRatio: "4/3" }}
+				style={{ aspectRatio: "5/3" }}
 			>
 				<GBVColumn>
 					<GBVCell
@@ -273,7 +273,7 @@ function GBVCell({
 			// data-tooltip-place="top"
 		>
 			<Typography
-				mb={0.5}
+				mb={2}
 				variant="subtitle1"
 			>
 				{title}

@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import {
 	DatumSummary,
 	DatumPictogram,
-	DatumDisability,
+	// DatumDisability,
 	DatumGBV,
 	DatumCva,
 	CvaTotalPeople,
@@ -21,7 +21,7 @@ import SummaryChart from "./SummaryChart";
 import PictogramChart from "./PictogramChart";
 import BarChart from "./BarChart";
 import { DatumBarChart } from "../utils/processdatabarchart";
-import DisabilityChart from "./DisabilityChart";
+// import DisabilityChart from "./DisabilityChart";
 import GBVChart from "./GBVChart";
 import CvaChart from "./CvaChart";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
@@ -34,7 +34,7 @@ type ChartsContainerProps = {
 	dataBeneficiaryByType: DatumBarChart[];
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
-	dataDisability: DatumDisability;
+	// dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	dataCva: DatumCva[];
 	dataCvaTotalPeople: CvaTotalPeople;
@@ -47,7 +47,7 @@ type ChartsContainerProps = {
 	beneficiaryTypesRef: Ref;
 	sectorsRef: Ref;
 	organizationsRef: Ref;
-	disabilityRef: Ref;
+	// disabilityRef: Ref;
 	gbvRef: Ref;
 	cashRef: Ref;
 	year: number[];
@@ -64,7 +64,7 @@ function ChartsContainer({
 	dataBeneficiaryByType,
 	dataSector,
 	dataOrganization,
-	dataDisability,
+	// dataDisability,
 	dataGBV,
 	dataCva,
 	dataCvaTotalPeople,
@@ -77,7 +77,7 @@ function ChartsContainer({
 	beneficiaryTypesRef,
 	sectorsRef,
 	organizationsRef,
-	disabilityRef,
+	// disabilityRef,
 	gbvRef,
 	cashRef,
 	year,
@@ -295,13 +295,14 @@ function ChartsContainer({
 				<Grid
 					container
 					direction={"row"}
+					justifyContent={"center"}
 					spacing={1}
 					size={12}
 					flexWrap={"nowrap"}
 					mt={3}
 					mb={3}
 				>
-					<Grid
+					{/* <Grid
 						size={6}
 						ref={disabilityRef}
 						id={refIds.disabilityRefId}
@@ -316,17 +317,17 @@ function ChartsContainer({
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
 						/>
-					</Grid>
-					<Divider
+					</Grid> */}
+					{/* <Divider
 						orientation="vertical"
 						flexItem
 						style={{
 							borderLeft: "3px dotted #ccc",
 							borderRight: "none",
 						}}
-					/>
+					/> */}
 					<Grid
-						size={6}
+						size={8}
 						ref={gbvRef}
 						id={refIds.gbvRefId}
 					>

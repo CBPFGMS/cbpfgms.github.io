@@ -78,7 +78,7 @@ export type CvaTotalPeople = {
 const {
 	beneficiariesStatuses,
 	beneficiaryCategories,
-	reportsForDisability,
+	// reportsForDisability,
 	reportsForGBV,
 	cvaChartTypes,
 } = constants;
@@ -96,7 +96,7 @@ function processDataSummary({
 	dataCva: DatumCva[];
 	dataCvaTotalPeople: CvaTotalPeople;
 	dataPictogram: DatumPictogram;
-	dataDisability: DatumDisability;
+	// dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
 } {
@@ -116,18 +116,18 @@ function processDataSummary({
 		reachedBoys: 0,
 		reachedGirls: 0,
 	};
-	const dataDisability: DatumDisability = {
-		targetedMen: 0,
-		targetedWomen: 0,
-		targetedBoys: 0,
-		targetedGirls: 0,
-		reachedMen: 0,
-		reachedWomen: 0,
-		reachedBoys: 0,
-		reachedGirls: 0,
-		totalReports: 0,
-		reportsWithData: 0,
-	};
+	// const dataDisability: DatumDisability = {
+	// 	targetedMen: 0,
+	// 	targetedWomen: 0,
+	// 	targetedBoys: 0,
+	// 	targetedGirls: 0,
+	// 	reachedMen: 0,
+	// 	reachedWomen: 0,
+	// 	reachedBoys: 0,
+	// 	reachedGirls: 0,
+	// 	totalReports: 0,
+	// 	reportsWithData: 0,
+	// };
 	const dataGBV: DatumGBV = {
 		allocations: 0,
 		allocationsGBVPlanned: 0,
@@ -183,32 +183,32 @@ function processDataSummary({
 			}
 
 			beneficiariesStatuses.forEach(status => {
-				const disabledKey = `disabled${capitalizeString(
-					status,
-				)}` as keyof typeof datum;
+				// const disabledKey = `disabled${capitalizeString(
+				// 	status,
+				// )}` as keyof typeof datum;
 				beneficiaryCategories.forEach(category => {
 					dataPictogram[
 						`${status}${capitalizeString(
 							category,
 						)}` as keyof DatumPictogram
 					] += datum[status][category];
-					dataDisability[
-						`${status}${capitalizeString(
-							category,
-						)}` as keyof DatumDisability
-					] += (datum[disabledKey] as Record<GenderAndAge, number>)[
-						category
-					];
+					// dataDisability[
+					// 	`${status}${capitalizeString(
+					// 		category,
+					// 	)}` as keyof DatumDisability
+					// ] += (datum[disabledKey] as Record<GenderAndAge, number>)[
+					// 	category
+					// ];
 				});
 			});
-			dataDisability.totalReports += 1;
-			if (
-				reportsForDisability.includes(
-					datum.reportType as (typeof reportsForDisability)[number],
-				)
-			) {
-				dataDisability.reportsWithData += 1;
-			}
+			// dataDisability.totalReports += 1;
+			// if (
+			// 	reportsForDisability.includes(
+			// 		datum.reportType as (typeof reportsForDisability)[number],
+			// 	)
+			// ) {
+			// 	dataDisability.reportsWithData += 1;
+			// }
 
 			dataGBV.allocations += datum.budget;
 			dataGBV.allocationsGBVPlanned += datum.budgetGBVPlanned;
@@ -331,7 +331,7 @@ function processDataSummary({
 		dataCva,
 		dataCvaTotalPeople,
 		dataPictogram,
-		dataDisability,
+		// dataDisability,
 		dataGBV,
 		inSelectionData,
 	};

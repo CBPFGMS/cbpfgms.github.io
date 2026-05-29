@@ -87,7 +87,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		useInView(chartsThreshold);
 	const [sectorsRef, inViewSectors] = useInView(chartsThreshold);
 	const [organizationsRef, inViewOrganizations] = useInView(chartsThreshold);
-	const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
+	// const [disabilityRef, inViewDisability] = useInView(chartsThreshold);
 	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
 
@@ -127,7 +127,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		dataCva,
 		dataCvaTotalPeople,
 		dataPictogram,
-		dataDisability,
+		// dataDisability,
 		dataGBV,
 		inSelectionData,
 	} = useMemo(
@@ -236,7 +236,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
-				inViewDisability={inViewDisability}
+				// inViewDisability={inViewDisability}
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
 				refIds={refIds}
@@ -259,7 +259,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
-				dataDisability={dataDisability}
+				// dataDisability={dataDisability}
 				dataGBV={dataGBV}
 				dataCva={dataCva}
 				dataCvaTotalPeople={dataCvaTotalPeople}
@@ -272,7 +272,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				beneficiaryTypesRef={beneficiaryTypesRef}
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
-				disabilityRef={disabilityRef}
+				// disabilityRef={disabilityRef}
 				gbvRef={gbvRef}
 				cashRef={cashRef}
 				year={year}

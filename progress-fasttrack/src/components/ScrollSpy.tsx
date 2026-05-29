@@ -10,7 +10,7 @@ import { RefIds } from "./MainContainer";
 import constants from "../utils/constants";
 import {
 	GBVIcon,
-	DisabilityIcon,
+	// DisabilityIcon,
 	ByTypeIcon,
 	OrgIcon,
 	CashIcon,
@@ -22,7 +22,7 @@ type ScrollSpyProps = {
 	inViewBeneficiaryTypes: boolean;
 	inViewOrganizations: boolean;
 	inViewSectors: boolean;
-	inViewDisability: boolean;
+	// inViewDisability: boolean;
 	inViewGBV: boolean;
 	inViewCash: boolean;
 	refIds: RefIds;
@@ -45,7 +45,7 @@ function ScrollSpy({
 	inViewBeneficiaryTypes,
 	inViewOrganizations,
 	inViewSectors,
-	inViewDisability,
+	// inViewDisability,
 	inViewGBV,
 	inViewCash,
 	refIds,
@@ -105,14 +105,14 @@ function ScrollSpy({
 				handleOnClick={handleOnClick}
 				Icon={ListIcon}
 			/>
-			<Tab
+			{/* <Tab
 				label="Disability"
 				inView={inViewDisability}
 				reference={refIds.disabilityRefId}
 				handleOnClick={handleOnClick}
 				Icon={DisabilityIcon}
 				ochaIcon={true}
-			/>
+			/> */}
 			<Tab
 				label="VAP"
 				inView={inViewGBV}

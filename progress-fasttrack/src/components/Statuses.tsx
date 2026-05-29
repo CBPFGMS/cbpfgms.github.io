@@ -4,18 +4,18 @@ import { ImplementationStatuses } from "./MainContainer";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
+// import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
-import colors from "../utils/colors";
+// import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
-import constants from "../utils/constants";
+// import constants from "../utils/constants";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -46,7 +46,7 @@ const statusesDescription: StatusesDescription = {
 	"Project Closure": "Project Closure",
 };
 
-const { limitScaleValueInPixels } = constants;
+// const { limitScaleValueInPixels } = constants;
 
 function Statuses({
 	dataStatuses,
@@ -115,7 +115,7 @@ function Statuses({
 			</Grid>
 			<Grid
 				container
-				spacing={2}
+				spacing={1}
 				sx={{
 					width: "100%",
 				}}
@@ -143,6 +143,191 @@ function Statuses({
 	);
 }
 
+// function Status({
+// 	handleClick,
+// 	status,
+// 	statusValue,
+// 	total,
+// 	implementationStatus,
+// }: StatusProps) {
+// 	const scale = scaleLinear<number, number>()
+// 		.domain([0, total])
+// 		.range([0, 100]);
+
+// 	const statusSelected = implementationStatus.includes(status);
+
+// 	return (
+// 		<Grid size={4}>
+// 			<Card
+// 				key={status}
+// 				variant="outlined"
+// 				sx={{
+// 					flexGrow: 1,
+// 					flex: "1 0 auto",
+// 					borderColor: statusSelected ? colors.contrastColor : null,
+// 				}}
+// 			>
+// 				<CardContent sx={{ padding: "8px 18px 8px 18px" }}>
+// 					<Grid
+// 						container
+// 						alignItems={"center"}
+// 					>
+// 						<Grid
+// 							size={8}
+// 							container
+// 						>
+// 							<Typography
+// 								variant="h6"
+// 								fontSize={"1em"}
+// 								gutterBottom
+// 							>
+// 								{status}
+// 							</Typography>
+// 							<InfoIcon
+// 								data-tooltip-id="tooltip"
+// 								data-tooltip-content={
+// 									statusesDescription[status]
+// 								}
+// 								data-tooltip-place="top"
+// 								style={{
+// 									color: "#666",
+// 									fontSize: "16px",
+// 									marginLeft: "0.1em",
+// 									alignSelf: "flex-start",
+// 									marginTop: "-0.1em",
+// 								}}
+// 							/>
+// 						</Grid>
+// 						<Grid
+// 							container
+// 							size={4}
+// 							alignSelf={"flex-start"}
+// 							justifyContent={"flex-end"}
+// 						>
+// 							<CardActions>
+// 								<Button
+// 									size="small"
+// 									style={{
+// 										backgroundColor: "whitesmoke",
+// 									}}
+// 									variant="text"
+// 									onClick={() => handleClick(status)}
+// 								>
+// 									{statusSelected ? "Remove" : "Add"}
+// 								</Button>
+// 							</CardActions>
+// 						</Grid>
+// 					</Grid>
+// 					<Typography
+// 						data-tooltip-id="tooltip"
+// 						data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
+// 						data-tooltip-place="top"
+// 						color={colors.unColor}
+// 						style={{
+// 							fontSize: "2.5em",
+// 							fontWeight: 500,
+// 							display: "inline-block",
+// 							opacity: statusSelected ? 1 : 0.75,
+// 							filter: statusSelected ? "none" : "grayscale(100%)",
+// 						}}
+// 					>
+// 						{"$"}
+// 						{statusValue < 1e3 ? (
+// 							<NumberAnimator
+// 								number={Math.floor(statusValue)}
+// 								type="integer"
+// 							/>
+// 						) : (
+// 							<span>
+// 								<NumberAnimator
+// 									number={parseFloat(
+// 										formatSIFloat(statusValue),
+// 									)}
+// 									type="decimal"
+// 								/>
+// 								{formatSIFloat(statusValue).slice(-1)}
+// 							</span>
+// 						)}
+// 					</Typography>
+// 					<Box
+// 						mt={2}
+// 						mb={0}
+// 						style={{
+// 							display: "flex",
+// 							alignItems: "center",
+// 							width: "100%",
+// 							opacity: statusSelected ? 1 : 0.75,
+// 							filter: statusSelected ? "none" : "grayscale(100%)",
+// 						}}
+// 						data-tooltip-id="tooltip"
+// 						data-tooltip-content={`The total amount of allocations for ${status} projects is $${toLocaleFixed(
+// 							statusValue,
+// 							0,
+// 							2,
+// 						)}, which represents ${(
+// 							(statusValue / total) *
+// 							100
+// 						).toFixed(
+// 							1,
+// 						)}% of the total allocations for all statuses (${toLocaleFixed(
+// 							total,
+// 							0,
+// 							2,
+// 						)}).`}
+// 						data-tooltip-place="top"
+// 					>
+// 						<Box
+// 							style={{
+// 								width: scale(statusValue) + "%",
+// 								minWidth: "1px",
+// 								height: "18px",
+// 								transitionProperty: "width",
+// 								transitionDuration: "0.75s",
+// 								display: "flex",
+// 								alignItems: "center",
+// 								backgroundColor: colors.contrastColorDarker,
+// 							}}
+// 						>
+// 							<Typography
+// 								fontSize={12}
+// 								fontWeight={700}
+// 								style={{
+// 									position: "relative",
+// 									left:
+// 										scale(statusValue) <
+// 										limitScaleValueInPixels
+// 											? "3px"
+// 											: "-3px",
+// 									marginLeft:
+// 										scale(statusValue) <
+// 										limitScaleValueInPixels
+// 											? "100%"
+// 											: "auto",
+// 									color:
+// 										scale(statusValue) <
+// 										limitScaleValueInPixels
+// 											? "#444"
+// 											: "#fff",
+// 								}}
+// 							>
+// 								<NumberAnimator
+// 									number={parseFloat(
+// 										((statusValue / total) * 100).toFixed(
+// 											2,
+// 										),
+// 									)}
+// 									type="decimal"
+// 								/>
+// 								{"%"}
+// 							</Typography>
+// 						</Box>
+// 					</Box>
+// 				</CardContent>
+// 			</Card>
+// 		</Grid>
+// 	);
+// }
+
 function Status({
 	handleClick,
 	status,
@@ -159,76 +344,83 @@ function Status({
 	return (
 		<Grid size={4}>
 			<Card
-				key={status}
 				variant="outlined"
 				sx={{
-					flexGrow: 1,
-					flex: "1 0 auto",
-					borderColor: statusSelected ? colors.contrastColor : null,
+					marginRight: 1.5,
+					flex: "1 1 auto",
+					borderRadius: "8px",
+					background: statusSelected ? "#fffefc" : "#fafafa",
+					border: statusSelected
+						? "1px solid #fac775"
+						: "1px solid #ccc",
 				}}
 			>
-				<CardContent sx={{ padding: "8px 18px 8px 18px" }}>
-					<Grid
-						container
-						alignItems={"center"}
+				<CardContent>
+					<Box
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-between",
+							alignItems: "center",
+						}}
+						mb={1}
 					>
 						<Grid
-							size={8}
-							container
+							sx={{
+								opacity: statusSelected ? 1 : 0.5,
+								filter: statusSelected
+									? "none"
+									: "grayscale(100%)",
+							}}
+							size={9}
 						>
 							<Typography
 								variant="h6"
 								fontSize={"1em"}
-								gutterBottom
 							>
+								{
+									<InfoIcon
+										data-tooltip-id="tooltip"
+										data-tooltip-content={
+											statusesDescription[status]
+										}
+										data-tooltip-place="top"
+										style={{
+											color: "#666",
+											fontSize: "18px",
+											marginRight: "0.3em",
+										}}
+									/>
+								}
 								{status}
 							</Typography>
-							<InfoIcon
-								data-tooltip-id="tooltip"
-								data-tooltip-content={
-									statusesDescription[status]
-								}
-								data-tooltip-place="top"
-								style={{
-									color: "#666",
-									fontSize: "16px",
-									marginLeft: "0.1em",
-									alignSelf: "flex-start",
-									marginTop: "-0.1em",
-								}}
-							/>
 						</Grid>
 						<Grid
-							container
-							size={4}
-							alignSelf={"flex-start"}
+							size={3}
 							justifyContent={"flex-end"}
 						>
-							<CardActions>
-								<Button
-									size="small"
-									style={{
-										backgroundColor: "whitesmoke",
-									}}
-									variant="text"
-									onClick={() => handleClick(status)}
-								>
-									{statusSelected ? "Remove" : "Add"}
-								</Button>
-							</CardActions>
+							<Box
+								onClick={() => handleClick(status)}
+								className={`status-remove-btn status-rb-amber`}
+								display={"flex"}
+								justifyContent={"center"}
+							>
+								{statusSelected ? "Remove" : "Add"}
+							</Box>
 						</Grid>
-					</Grid>
+					</Box>
 					<Typography
+						sx={{
+							opacity: statusSelected ? 1 : 0.5,
+							filter: statusSelected ? "none" : "grayscale(100%)",
+						}}
 						data-tooltip-id="tooltip"
 						data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
 						data-tooltip-place="top"
-						color={colors.unColor}
+						className={`status-cv-amber`}
 						style={{
-							fontSize: "2.5em",
+							fontSize: "43px",
 							fontWeight: 500,
-							display: "inline-block",
-							opacity: statusSelected ? 1 : 0.75,
-							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 					>
 						{"$"}
@@ -250,15 +442,12 @@ function Status({
 						)}
 					</Typography>
 					<Box
-						mt={2}
-						mb={0}
-						style={{
-							display: "flex",
-							alignItems: "center",
-							width: "100%",
-							opacity: statusSelected ? 1 : 0.75,
+						sx={{
+							opacity: statusSelected ? 1 : 0.5,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
+						mt={1}
+						className="status-card-footer"
 						data-tooltip-id="tooltip"
 						data-tooltip-content={`The total amount of allocations for ${status} projects is $${toLocaleFixed(
 							statusValue,
@@ -268,7 +457,7 @@ function Status({
 							(statusValue / total) *
 							100
 						).toFixed(
-							1,
+							2,
 						)}% of the total allocations for all statuses (${toLocaleFixed(
 							total,
 							0,
@@ -276,44 +465,22 @@ function Status({
 						)}).`}
 						data-tooltip-place="top"
 					>
-						<Box
-							style={{
-								width: scale(statusValue) + "%",
-								minWidth: "1px",
-								height: "18px",
-								transitionProperty: "width",
-								transitionDuration: "0.75s",
-								display: "flex",
-								alignItems: "center",
-								backgroundColor: colors.contrastColorDarker,
-							}}
-						>
-							<Typography
-								fontSize={12}
-								fontWeight={700}
+						<Box className={`status-prog-track status-pt-amber`}>
+							<Box
+								className={`status-prog-fill status-pf-amber`}
 								style={{
-									position: "relative",
-									left:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "3px"
-											: "-3px",
-									marginLeft:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "100%"
-											: "auto",
-									color:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "#444"
-											: "#fff",
+									width: scale(statusValue) + "%",
+									transitionProperty: "width",
+									transitionDuration: "0.75s",
 								}}
-							>
+							></Box>
+						</Box>
+						<Box className={`status-pct status-pct-amber`}>
+							<Typography fontWeight={500}>
 								<NumberAnimator
 									number={parseFloat(
 										((statusValue / total) * 100).toFixed(
-											2,
+											1,
 										),
 									)}
 									type="decimal"
