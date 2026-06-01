@@ -68,7 +68,6 @@ function TopFigures({ data }: TopFiguresProps) {
 
 	const cardStyle: React.CSSProperties = {
 		background: "#ffffff",
-		border: "0.5px solid rgba(0,0,0,0.1)",
 		borderRadius: "12px",
 		padding: "1rem 1rem 0.85rem",
 		display: "flex",
@@ -137,6 +136,7 @@ function TopFigures({ data }: TopFiguresProps) {
 							<Box
 								style={cardStyle}
 								{...tooltipProps}
+								border={"0.5px solid rgba(0,0,0,0.1)"}
 								borderLeft={
 									isReached
 										? "3px solid var(--ocha-amber)"
