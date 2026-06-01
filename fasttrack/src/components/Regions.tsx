@@ -10,7 +10,7 @@ import formatSIFloat from "../utils/formatsi";
 import type { RegionsDatumDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import downloadData from "../utils/downloaddata";
-import WarningIcon from "@mui/icons-material/Warning";
+import { WarningIcon } from "../assets/warningicon";
 import { constants } from "../utils/constants";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
@@ -248,28 +248,32 @@ function Regions({
 												).slice(-1)
 											: ""}
 									</Typography>
-									<Typography
+									<Box
 										style={{
-											fontSize: "1rem",
-											fontWeight: 400,
-											fontFamily: "Montserrat",
+											display: "flex",
+											alignItems: "center",
+											gap: "6px",
 										}}
 									>
 										<WarningIcon
-											style={{
-												fontSize: "1.2rem",
-												color: disclaimerWarningColor,
-												verticalAlign: "text-bottom",
-												marginRight: "6px",
-											}}
+											size={18}
+											color={disclaimerWarningColor}
 											data-tooltip-id="tooltip"
 											data-tooltip-content={
 												disclaimerText
 											}
 											data-tooltip-place="top"
 										/>
-										People Targeted
-									</Typography>
+										<Typography
+											style={{
+												fontSize: "1rem",
+												fontWeight: 400,
+												fontFamily: "Montserrat",
+											}}
+										>
+											People Targeted
+										</Typography>
+									</Box>
 								</Grid>
 								<Grid size={6}>
 									<Typography
@@ -296,28 +300,32 @@ function Regions({
 												).slice(-1)
 											: ""}
 									</Typography>
-									<Typography
+									<Box
 										style={{
-											fontSize: "1rem",
-											fontWeight: 400,
-											fontFamily: "Montserrat",
+											display: "flex",
+											alignItems: "center",
+											gap: "6px",
 										}}
 									>
 										<WarningIcon
-											style={{
-												fontSize: "1.2rem",
-												color: disclaimerWarningColor,
-												verticalAlign: "text-bottom",
-												marginRight: "6px",
-											}}
+											size={18}
+											color={disclaimerWarningColor}
 											data-tooltip-id="tooltip"
 											data-tooltip-content={
 												disclaimerText
 											}
 											data-tooltip-place="top"
 										/>
-										People Reached
-									</Typography>
+										<Typography
+											style={{
+												fontSize: "1rem",
+												fontWeight: 400,
+												fontFamily: "Montserrat",
+											}}
+										>
+											People Reached
+										</Typography>
+									</Box>
 								</Grid>
 							</Grid>
 						</Grid>

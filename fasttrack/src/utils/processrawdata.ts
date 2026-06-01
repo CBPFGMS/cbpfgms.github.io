@@ -88,6 +88,7 @@ type ProcessRawDataParams = {
 type TargetedAndReached = {
 	targeted: number;
 	reached: number;
+	reachedProjects: number;
 };
 
 export type TotalBeneficiariesData = {
@@ -152,7 +153,7 @@ function processRawData({
 
 			if (!totalBeneficiariesData[projectKey]) {
 				totalBeneficiariesData[projectKey] = {
-					all: { targeted: 0, reached: 0 },
+					all: { targeted: 0, reached: 0, reachedProjects: 0 },
 				};
 			}
 
@@ -160,6 +161,9 @@ function processRawData({
 				totalBeneficiariesData[projectKey].all.targeted = row.TotTarg;
 				totalBeneficiariesData[projectKey].all.reached =
 					row.TotAch || 0;
+				if (row.TotAch) {
+					totalBeneficiariesData[projectKey].all.reachedProjects++;
+				}
 			} else {
 				if (
 					!totalBeneficiariesData[projectKey][
@@ -168,7 +172,7 @@ function processRawData({
 				) {
 					totalBeneficiariesData[projectKey][
 						projectStatusMapping[row.ProcessStatusId]
-					] = { targeted: 0, reached: 0 };
+					] = { targeted: 0, reached: 0, reachedProjects: 0 };
 				}
 
 				totalBeneficiariesData[projectKey][
@@ -177,6 +181,11 @@ function processRawData({
 				totalBeneficiariesData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
 				].reached = row.TotAch || 0;
+				if (row.TotAch) {
+					totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					].reachedProjects++;
+				}
 			}
 		} else {
 			warnInvalidSchema(

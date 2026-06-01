@@ -24,6 +24,7 @@ export type DataTopFigures = {
 	allocations: number;
 	targeted: number;
 	reached: number;
+	reachedProjects: number;
 };
 
 function processDataTopFigures({
@@ -45,7 +46,8 @@ function processDataTopFigures({
 
 	let allocations = 0,
 		targeted = 0,
-		reached = 0;
+		reached = 0,
+		reachedProjects = 0;
 
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
@@ -62,10 +64,13 @@ function processDataTopFigures({
 		if (fundHasAllStatuses) {
 			targeted += totalBeneficiariesData[pf].all.targeted;
 			reached += totalBeneficiariesData[pf].all.reached;
+			reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
 		} else {
 			status.forEach(st => {
 				targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
 				reached += totalBeneficiariesData[pf][st]?.reached || 0;
+				reachedProjects +=
+					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
 			});
 		}
 	});
@@ -91,6 +96,7 @@ function processDataTopFigures({
 		allocations,
 		targeted,
 		reached,
+		reachedProjects,
 	};
 
 	return { dataTopFigures, inSelectionData };

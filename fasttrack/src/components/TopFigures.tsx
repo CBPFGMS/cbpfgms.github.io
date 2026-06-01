@@ -1,11 +1,10 @@
 import React from "react";
-import GradientPaper from "./GradientPaper";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import NumberAnimator, { type NumberAnimatorProps } from "./NumberAnimator";
 import type { DataTopFigures } from "../utils/processdatatopfigures";
 import Box from "@mui/material/Box";
-import WarningIcon from "@mui/icons-material/Warning";
+import { WarningIcon } from "../assets/warningicon";
 import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import { constants } from "../utils/constants";
@@ -26,6 +25,7 @@ type CardsDatum = {
 	value: number;
 	type: NumberAnimatorProps["type"];
 	format?: boolean;
+	subLabel?: string;
 };
 
 function TopFigures({ data }: TopFiguresProps) {
@@ -57,111 +57,233 @@ function TopFigures({ data }: TopFiguresProps) {
 			value: data.reached,
 			type: "decimal",
 			format: true,
+			subLabel: `from ${data.reachedProjects} project${data.reachedProjects > 1 ? "s" : ""} (as of ${getCustomProjectsDate(new Date())})`,
 		},
 	];
+
+	const reachedPct =
+		data.targeted > 0
+			? ((data.reached / data.targeted) * 100).toFixed(1) + "%"
+			: null;
+
+	const cardStyle: React.CSSProperties = {
+		background: "#ffffff",
+		border: "0.5px solid rgba(0,0,0,0.1)",
+		borderRadius: "12px",
+		padding: "1rem 1rem 0.85rem",
+		display: "flex",
+		flexDirection: "column",
+		height: "100%",
+		boxSizing: "border-box",
+	};
 
 	return (
 		<Paper
 			elevation={0}
 			style={{
-				padding: "1em",
-				backgroundColor: "#f8f8f8",
-				borderRadius: "8px",
-				position: "relative",
+				padding: "1.25em",
+				backgroundColor: "#f4f4f4",
+				borderRadius: "12px",
 			}}
 		>
-			<GradientPaper color={"#888888"} />
 			<Grid
 				container
-				spacing={2}
-				zIndex={10}
-				position={"relative"}
+				spacing={1.5}
+				alignItems="stretch"
 			>
-				{cardsData.map((card, index) => (
-					<Grid
-						key={index}
-						size={2.4}
-						className="topfigures-card"
-					>
-						<Box
-							mb={2}
-							style={{
-								borderTop: "1px solid black",
-								borderBottom: "1px solid black",
-								height: "3.7em",
-								overflow: "hidden",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
-							}}
-							{...(card.label === "Allocated / Launched" && {
+				{cardsData.map((card, index) => {
+					const isReached = card.label === "Reached People";
+					const needsWarning =
+						card.label === "Targeted People" ||
+						card.label === "Reached People";
+					const isAllocated = card.label === "Allocated / Launched";
+					const formattedValue = card.format
+						? parseFloat(formatSIFloat(card.value))
+						: card.value;
+					const suffix =
+						card.format &&
+						isNaN(+formatSIFloat(card.value).slice(-1))
+							? formatSIFloat(card.value).slice(-1)
+							: "";
+
+					const tooltipProps: Record<string, string> = isAllocated
+						? {
 								"data-tooltip-id": "tooltip",
 								"data-tooltip-html":
 									"$" + card.value.toLocaleString(),
 								"data-tooltip-place": "top",
-							})}
-							{...((card.label === "Targeted People" ||
-								card.label === "Reached People") && {
-								"data-tooltip-id": "tooltip",
-								"data-tooltip-html":
-									card.value.toLocaleString() + " people",
-								"data-tooltip-place": "top",
-							})}
+							}
+						: needsWarning
+							? {
+									"data-tooltip-id": "tooltip",
+									"data-tooltip-html":
+										card.value.toLocaleString() +
+										" people" +
+										(isReached
+											? " (" +
+												reachedPct +
+												" of targeted)"
+											: ""),
+									"data-tooltip-place": "top",
+								}
+							: {};
+
+					return (
+						<Grid
+							key={index}
+							size={isReached ? 2.8 : 2.3}
+							className="topfigures-card"
 						>
-							<Typography
-								style={{
-									fontSize: "2.5rem",
-									color: "var(--ocha-blue)",
-									fontWeight: 700,
-									fontFamily: "Montserrat",
-								}}
+							<Box
+								style={cardStyle}
+								{...tooltipProps}
+								borderLeft={
+									isReached
+										? "3px solid var(--ocha-amber)"
+										: "3px solid var(--ocha-blue)"
+								}
 							>
-								{card.label === "Allocated / Launched" && "$"}
-								<NumberAnimator
-									number={
-										card.format
-											? parseFloat(
-													formatSIFloat(card.value),
-												)
-											: card.value
-									}
-									type={card.type}
-								/>
-								{card.format &&
-								isNaN(+formatSIFloat(card.value).slice(-1))
-									? formatSIFloat(card.value).slice(-1)
-									: ""}
-							</Typography>
-						</Box>
-						<Typography
-							style={{
-								fontSize: "1rem",
-								color: "#666",
-							}}
-						>
-							{(card.label === "Targeted People" ||
-								card.label === "Reached People") && (
-								<WarningIcon
+								{/* Value row — always at the top */}
+								<Box
+									display="flex"
+									alignItems="baseline"
+									justifyContent="center"
+									gap="6px"
+									style={{ height: "3rem" }}
+								>
+									<Typography
+										style={{
+											fontSize: "2rem",
+											fontWeight: 700,
+											color: isReached
+												? "var(--ocha-amber)"
+												: "var(--ocha-blue)",
+											fontFamily: "Montserrat",
+											lineHeight: 1.1,
+										}}
+									>
+										{isAllocated && "$"}
+										<NumberAnimator
+											number={formattedValue}
+											type={card.type}
+										/>
+										{suffix}
+									</Typography>
+									{isReached && reachedPct && (
+										<Typography
+											style={{
+												fontSize: "0.9rem",
+												fontWeight: 600,
+												color: "var(--ocha-blue)",
+												opacity: 0.9,
+											}}
+										>
+											{"(" + reachedPct + ")"}
+										</Typography>
+									)}
+								</Box>
+
+								{/* Label row — anchored to the bottom */}
+								<Box
+									display="flex"
+									alignItems="center"
+									justifyContent="flex-start"
+									flexDirection="column"
+									gap="3px"
+									pt={1}
 									style={{
-										fontSize: "1.2rem",
-										color: disclaimerWarningColor,
-										verticalAlign: "text-bottom",
-										marginRight: "6px",
+										borderTop:
+											"0.5px solid rgba(0,0,0,0.1)",
 									}}
-									data-tooltip-id="tooltip"
-									data-tooltip-content={disclaimerText}
-									data-tooltip-place="top"
-								/>
-							)}
-							{card.label}
-						</Typography>
-					</Grid>
-				))}
+								>
+									<Box
+										display="flex"
+										flexDirection="row"
+										gap="6px"
+									>
+										{needsWarning && (
+											<WarningIcon
+												size={18}
+												color={disclaimerWarningColor}
+												data-tooltip-id="tooltip"
+												data-tooltip-content={
+													disclaimerText
+												}
+												data-tooltip-place="top"
+											/>
+										)}
+										<Typography
+											style={{
+												fontSize: "0.9rem",
+												color: "#666",
+												lineHeight: 1.35,
+											}}
+										>
+											{card.label}
+											{/* {card.subLabel && (
+											<span
+												style={{
+													display: "block",
+													fontSize: "0.72rem",
+													color: "#999",
+													marginTop: "2px",
+												}}
+											>
+												{card.subLabel}
+											</span>
+										)} */}
+										</Typography>
+									</Box>
+									{card.subLabel && (
+										<Typography
+											style={{
+												fontSize: "0.8rem",
+												color: "#666",
+											}}
+										>
+											{card.subLabel}
+										</Typography>
+									)}
+								</Box>
+							</Box>
+						</Grid>
+					);
+				})}
 			</Grid>
 		</Paper>
 	);
 }
 
-const MemoizedTopFigures = React.memo(TopFigures);
+function getCustomProjectsDate(today: Date): string {
+	const months: string[] = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	];
 
+	const currentDay = today.getDate();
+	const monthsToSubtract = currentDay > 7 ? 1 : 2;
+	const targetDate = new Date(
+		today.getFullYear(),
+		today.getMonth() - monthsToSubtract,
+		1,
+	);
+	const targetMonthIndex = targetDate.getMonth();
+	const targetMonthName = months[targetMonthIndex];
+
+	const dayString = targetMonthIndex === 1 ? "28th" : "30th";
+
+	return `${dayString} ${targetMonthName}`;
+}
+
+const MemoizedTopFigures = React.memo(TopFigures);
 export default MemoizedTopFigures;
