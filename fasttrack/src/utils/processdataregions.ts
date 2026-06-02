@@ -21,6 +21,7 @@ export type RegionsDatum = {
 	budget: number;
 	targeted: number;
 	reached: number;
+	reachedProjects: number;
 };
 
 function processDataRegions({
@@ -52,6 +53,7 @@ function processDataRegions({
 						budget: row.budget,
 						targeted: 0,
 						reached: 0,
+						reachedProjects: 0,
 					});
 				}
 			}
@@ -72,12 +74,16 @@ function processDataRegions({
 			if (fundHasAllStatuses) {
 				thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
 				thisRegion.reached += totalBeneficiariesData[pf].all.reached;
+				thisRegion.reachedProjects +=
+					totalBeneficiariesData[pf].all.reachedProjects;
 			} else {
 				status.forEach(st => {
 					thisRegion.targeted +=
 						totalBeneficiariesData[pf][st]?.targeted || 0;
 					thisRegion.reached +=
 						totalBeneficiariesData[pf][st]?.reached || 0;
+					thisRegion.reachedProjects +=
+						totalBeneficiariesData[pf][st]?.reachedProjects || 0;
 				});
 			}
 		} else {

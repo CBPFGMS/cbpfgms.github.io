@@ -12,6 +12,7 @@ import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import downloadData from "../utils/downloaddata";
 import { WarningIcon } from "../assets/warningicon";
 import { constants } from "../utils/constants";
+import { getCustomProjectsDate } from "../utils/customprojectsdate";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
 
@@ -115,6 +116,8 @@ function Regions({
 						.map(d => lists.fundNames[d])
 						.join(", ");
 					const tooltipFundText = `<div><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
+
+					const reachedSubtext = `from ${region.reachedProjects} project${region.reachedProjects > 1 ? "s" : ""} (as of ${getCustomProjectsDate(new Date())})`;
 
 					return (
 						<Grid
@@ -326,6 +329,14 @@ function Regions({
 											People Reached
 										</Typography>
 									</Box>
+									<Typography
+										style={{
+											fontSize: "0.8rem",
+											color: "#666",
+										}}
+									>
+										{reachedSubtext}
+									</Typography>
 								</Grid>
 							</Grid>
 						</Grid>
