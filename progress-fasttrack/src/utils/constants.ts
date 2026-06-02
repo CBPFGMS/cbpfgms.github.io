@@ -93,7 +93,7 @@ const constants = {
 	},
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
-	disclaimerWarningColor: "#eed202",
+	disclaimerWarningColor: "#e07b00",
 	disclaimerText:
 		"Disclaimer: Beneficiary figures are calculated using a hybrid methodology designed to minimize double counting across activities and locations. As a result, totals may not fully reconcile when applying different filters or comparing across views.",
 	disclaimerAltText:

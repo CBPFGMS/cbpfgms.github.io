@@ -3,7 +3,7 @@ import { useRef, RefObject } from "react";
 import ImageIcon from "./ImageIcon";
 import Box from "@mui/material/Box";
 import { DownloadStates, Charts } from "./MainContainer";
-import WarningIcon from "@mui/icons-material/Warning";
+import { WarningIcon } from "../assets/Warningicon";
 import constants from "../utils/constants";
 
 const { disclaimerWarningColor, disclaimerText, disclaimerAltText } = constants;
@@ -65,15 +65,22 @@ function DownloadAndImageContainer({
 				fileName={fileName}
 			/>
 			{showDisclaimer && (
+				// <WarningIcon
+				// 	data-tooltip-id="tooltip"
+				// 	data-tooltip-content={disclaimer}
+				// 	data-tooltip-place="bottom"
+				// 	style={{
+				// 		color: disclaimerWarningColor,
+				// 		verticalAlign: "text-bottom",
+				// 		fontSize: "1.2em",
+				// 	}}
+				// />
 				<WarningIcon
+					size={18}
+					color={disclaimerWarningColor}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={disclaimer}
-					data-tooltip-place="bottom"
-					style={{
-						color: disclaimerWarningColor,
-						verticalAlign: "text-bottom",
-						fontSize: "1.2em",
-					}}
+					data-tooltip-place="top"
 				/>
 			)}
 		</Box>

@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import WarningIcon from "@mui/icons-material/Warning";
+import { WarningIcon } from "../assets/Warningicon";
 import constants from "../utils/constants";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
@@ -41,16 +41,21 @@ function TopIntro() {
 					style={{
 						fontFamily: "Montserrat",
 						fontSize: "13px",
+						lineHeight: "1.2",
 					}}
 				>
-					<WarningIcon
+					<span
 						style={{
-							color: disclaimerWarningColor,
-							verticalAlign: "text-bottom",
-							marginRight: "5px",
-							fontSize: "1.2em",
+							marginRight: "6px",
+							display: "inline-block",
+							verticalAlign: "middle",
 						}}
-					/>
+					>
+						<WarningIcon
+							size={16}
+							color={disclaimerWarningColor}
+						/>
+					</span>
 					{disclaimerText}
 				</Typography>
 			</Grid>
