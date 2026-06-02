@@ -59,7 +59,9 @@ const beneficiaryTypesMasterUrl =
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 	totalBeneficiariesUrl =
+		//Dev APIs have -api-dev in the url
 		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
+	//"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v1/beneficiary?year=2026&format=csv",
 	organizationIdsMapUrl =
 		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json";
 

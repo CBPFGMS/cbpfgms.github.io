@@ -59,13 +59,18 @@ const beneficiaryTypesMasterUrl =
 	cvaMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
+		//Dev APIs have -api-dev in the url
+		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
 	totalBeneficiariesByPartnerUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
+		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
 	totalBeneficiariesBySectorUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
+		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
 	totalBeneficiariesByBeneficiaryTypeUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
+		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
 
 function useData(
 	defaultFundType: number | null,

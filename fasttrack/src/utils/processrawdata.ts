@@ -161,8 +161,9 @@ function processRawData({
 				totalBeneficiariesData[projectKey].all.targeted = row.TotTarg;
 				totalBeneficiariesData[projectKey].all.reached =
 					row.TotAch || 0;
-				if (row.TotAch) {
-					totalBeneficiariesData[projectKey].all.reachedProjects++;
+				if (row.TotAchProjects) {
+					totalBeneficiariesData[projectKey].all.reachedProjects +=
+						row.TotAchProjects;
 				}
 			} else {
 				if (
@@ -181,10 +182,10 @@ function processRawData({
 				totalBeneficiariesData[projectKey][
 					projectStatusMapping[row.ProcessStatusId]
 				].reached = row.TotAch || 0;
-				if (row.TotAch) {
+				if (row.TotAchProjects) {
 					totalBeneficiariesData[projectKey][
 						projectStatusMapping[row.ProcessStatusId]
-					].reachedProjects++;
+					].reachedProjects += row.TotAchProjects;
 				}
 			}
 		} else {
