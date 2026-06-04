@@ -13,6 +13,7 @@ import downloadData from "../utils/downloaddata";
 import { WarningIcon } from "../assets/warningicon";
 import { constants } from "../utils/constants";
 import { getCustomProjectsDate } from "../utils/customprojectsdate";
+import GradientPaper from "./GradientPaper";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
 
@@ -124,6 +125,7 @@ function Regions({
 							size={6}
 							key={index}
 							className="region-card"
+							position={"relative"}
 							data-tooltip-id="tooltip"
 							data-tooltip-html={
 								"<div style='text-align:left;'>Total allocated: $" +
@@ -140,6 +142,7 @@ function Regions({
 							}
 							data-tooltip-place="top"
 						>
+							<GradientPaper color={"#999999"} />
 							<h3>
 								<i
 									className={

@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import formatSIFloat from "../utils/formatsi";
 import { constants } from "../utils/constants";
 import { getCustomProjectsDate } from "../utils/customprojectsdate";
+import GradientPaper from "./GradientPaper";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
 
@@ -82,10 +83,13 @@ function TopFigures({ data }: TopFiguresProps) {
 			elevation={0}
 			style={{
 				padding: "1.25em",
-				backgroundColor: "#f4f4f4",
+				backgroundColor: "#f8f8f8",
 				borderRadius: "12px",
+				position: "relative",
+				overflow: "hidden",
 			}}
 		>
+			<GradientPaper color={"#999999"} />
 			<Grid
 				container
 				spacing={1.5}

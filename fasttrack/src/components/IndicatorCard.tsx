@@ -15,6 +15,7 @@ import type { SortingCriterion } from "./IndicatorTableHead";
 import IndicatorsTableBody from "./IndicatorTableBody";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
+import GradientPaper from "./GradientPaper";
 
 type IndicatorCardProps = {
 	datumIndicator: DatumIndicators;
@@ -139,6 +140,7 @@ function IndicatorCardContent({
 				boxSizing: "border-box",
 			}}
 		>
+			<GradientPaper color={"#999999"} />
 			<Box
 				display="flex"
 				mb={2}
