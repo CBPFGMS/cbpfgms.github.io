@@ -39,7 +39,7 @@ const mainCards: CardsDatum[] = [
 		image: allocatnOverImg,
 	},
 	{
-		title: "Activities Overview",
+		title: "Activities Map",
 		subtitle:
 			"Explore the geographic distribution of project activities. Review where funded activities are taking place and which partners are implementing them. Strengthen visibility of implementation coverage and field-level reach.",
 		url: "./us_activities",
