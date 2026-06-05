@@ -332,14 +332,16 @@ function Regions({
 											People Reached
 										</Typography>
 									</Box>
-									<Typography
-										style={{
-											fontSize: "0.8rem",
-											color: "#666",
-										}}
-									>
-										{reachedSubtext}
-									</Typography>
+									{!!region.reachedProjects && (
+										<Typography
+											style={{
+												fontSize: "0.8rem",
+												color: "#666",
+											}}
+										>
+											{reachedSubtext}
+										</Typography>
+									)}
 								</Grid>
 							</Grid>
 						</Grid>
