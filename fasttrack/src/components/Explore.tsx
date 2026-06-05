@@ -127,7 +127,7 @@ function Explore() {
 									width: "100%",
 									display: "flex",
 									flexDirection: "column",
-									textDecoration: "none",
+									textDecoration: "none !important",
 									borderRadius: "10px",
 									overflow: "hidden",
 									boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
@@ -285,7 +285,7 @@ function Explore() {
 											display: "flex",
 											flexDirection: "row",
 											alignItems: "stretch",
-											textDecoration: "none",
+											textDecoration: "none !important",
 											borderRadius: "8px",
 											overflow: "hidden",
 											boxShadow:
