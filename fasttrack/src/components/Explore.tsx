@@ -26,19 +26,22 @@ type CardsDatum = {
 const mainCards: CardsDatum[] = [
 	{
 		title: "Allocation Progress",
-		subtitle: "Track allocation progress and status updates",
+		subtitle:
+			"Real-time tracking of allocations from launch to implementation. Monitor key parameters, regular progress updates, and completion stages. Identify delays and follow-up needs across funds and projects.",
 		url: "./us_progress",
 		image: allocatnProgresImg,
 	},
 	{
 		title: "Allocation Overview",
-		subtitle: "Comprehensive overview of allocation distributions",
+		subtitle:
+			"View a consolidated geographic summary of allocation distributions. Compare funding levels, partners, projects, and targeted or reached people. Filter results by sector and project status for deeper analysis.",
 		url: "./us_allocations",
 		image: allocatnOverImg,
 	},
 	{
-		title: "Activities Map",
-		subtitle: "View allocation activity by location",
+		title: "Activities Overview",
+		subtitle:
+			"Explore the geographic distribution of project activities. Review where funded activities are taking place and which partners are implementing them. Strengthen visibility of implementation coverage and field-level reach.",
 		url: "./us_activities",
 		image: activitiesImg,
 	},
@@ -210,7 +213,7 @@ function Explore() {
 									</Typography>
 									<Typography
 										sx={{
-											fontSize: "0.875rem",
+											fontSize: "0.75rem",
 											color: "#666",
 											lineHeight: 1.5,
 										}}
