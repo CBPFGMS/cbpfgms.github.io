@@ -65,7 +65,7 @@ function ScrollSpy({
 			mb={2}
 			gap={2}
 			style={{
-				width: "98%",
+				width: "80%",
 			}}
 		>
 			<Tab
