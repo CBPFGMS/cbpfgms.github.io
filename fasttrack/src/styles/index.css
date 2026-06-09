@@ -285,3 +285,9 @@ button:focus-visible {
 .hiddenElement {
 	display: none !important;
 }
+
+@media (min-width: 1200px) {
+	div.container {
+		max-width: 1200px;
+	}
+}
