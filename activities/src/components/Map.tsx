@@ -13,6 +13,7 @@ import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import ZoomOutButton from "./ZoomOutButton";
+import Button from "@mui/material/Button";
 
 type MarkerClusterGroupProps = ComponentProps<typeof MarkerClusterGroup>;
 
@@ -41,7 +42,7 @@ const createBlueClusterIcon = (cluster: MarkerClusterType): L.DivIcon => {
 	const count: number = cluster.getChildCount();
 
 	let bgColor = "rgba(183, 226, 253, 0.6)";
-	let textColor = "#014468"; 
+	let textColor = "#014468";
 	let ringColor = "rgba(215, 237, 248, 0.6)";
 
 	if (count >= 20) {
@@ -94,11 +95,13 @@ const { mapHeight, minZoomValue, maxZoomValue } = constants;
 type MapProps = {
 	mapData: MapDatum[];
 	lists: List;
+	setShowList: React.Dispatch<React.SetStateAction<boolean>>;
+	setProjectsList: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const mapPadding = 10;
 
-function Map({ mapData, lists }: MapProps) {
+function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
 	const mapRef = useRef<MapType | null>(null);
 
 	return (
@@ -123,7 +126,7 @@ function Map({ mapData, lists }: MapProps) {
 				chunkedLoading
 				maxClusterRadius={40}
 				onMouseOver={(e: LeafletMouseEvent) => {
-					const cluster = e.layer;
+					const cluster = e.propagatedFrom;
 					const count = cluster.getChildCount();
 
 					cluster
@@ -194,6 +197,33 @@ function Map({ mapData, lists }: MapProps) {
 										</li>
 									))}
 								</ul>
+								<br />
+								<Button
+									variant="contained"
+									size="small"
+									sx={{
+										backgroundColor: "#4a5f78",
+										color: "white",
+										fontWeight: 500,
+										borderRadius: "8px",
+										textTransform: "none",
+										"&:hover": {
+											backgroundColor: "#607b9c",
+											color: "white",
+										},
+									}}
+									onClick={() => {
+										setProjectsList(
+											Array.from(datum.projects),
+										);
+										setShowList(true);
+									}}
+								>
+									View{" "}
+									{datum.projects.size > 1
+										? "Projects"
+										: "Project"}
+								</Button>
 							</div>
 						</Popup>
 					</Marker>

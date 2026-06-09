@@ -13,6 +13,7 @@ import type { List } from "../utils/makelists";
 import Map from "./Map";
 import processMapData from "../utils/processmapdata";
 import Chip from "@mui/material/Chip";
+import ProjectsList from "./ProjectsList";
 
 type MapSectionProps = {
 	data: Data;
@@ -43,6 +44,9 @@ function MapSection({
 		[selectedAdminLevels, setSelectedAdminLevels] = useState<number[]>([
 			...inSelectionData.adminLevels,
 		]);
+
+	const [showList, setShowList] = useState<boolean>(false);
+	const [projectsList, setProjectsList] = useState<string[]>([]);
 
 	const activityText = activities.length === 1 ? "activity" : "activities";
 	const sectorText = sectors.length === 1 ? "sector" : "sectors";
@@ -167,6 +171,8 @@ function MapSection({
 							<Map
 								mapData={mapDataObject.mapData}
 								lists={lists}
+								setShowList={setShowList}
+								setProjectsList={setProjectsList}
 							/>
 							<Chip
 								label={
@@ -205,6 +211,13 @@ function MapSection({
 								activities in that location.
 							</Typography>
 						</Box>
+						{showList && (
+							<ProjectsList
+								lists={lists}
+								projectsList={projectsList}
+								setShowList={setShowList}
+							/>
+						)}
 					</Box>
 				)}
 			</Paper>

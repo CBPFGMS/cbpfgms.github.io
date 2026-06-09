@@ -19,6 +19,7 @@ export type MapDatum = {
 	activities: { activity: number; sector: number }[];
 	fund: number;
 	year: number;
+	projects: Set<string>;
 };
 
 function processMapData({
@@ -102,20 +103,21 @@ function processMapData({
 				],
 				fund: datum.fund,
 				year: datum.year,
+				projects: new Set([datum.projectCode]),
 			});
 		} else {
+			foundLocation.projects.add(datum.projectCode);
+
 			const foundActivityAndSector = foundLocation.activities.find(
 				d => d.activity === datum.activity && d.sector === datum.sector,
 			);
 
-			if (foundActivityAndSector) {
-				return;
+			if (!foundActivityAndSector) {
+				foundLocation.activities.push({
+					activity: datum.activity,
+					sector: datum.sector,
+				});
 			}
-
-			foundLocation.activities.push({
-				activity: datum.activity,
-				sector: datum.sector,
-			});
 		}
 	});
 
