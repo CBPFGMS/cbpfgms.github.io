@@ -110,7 +110,13 @@
 		return false;
 	}
 
+	window.reloadAllocChart = d3Chart;
+
 	function d3Chart() {
+		const containerDiv = d3.select("#d3chartcontainerpbialp");
+
+		containerDiv.selectAll("*").remove();
+
 		//POLYFILLS
 
 		//Array.prototype.find()
