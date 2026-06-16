@@ -1251,7 +1251,7 @@
 				}
 
 				const cbpfsData = data.filter(function (d) {
-					return !d.cbpf.includes("RhPF");
+					return !d.cbpf.includes("(");
 				}).length;
 
 				const rhpfs = new Set();

@@ -293,7 +293,6 @@
 		if (!queryStringValues.has("viz"))
 			queryStringValues.append("viz", vizNameQueryString);
 
-		const containerDiv = d3.select("#d3chartcontainerpbialp");
 
 		const selectedResponsiveness =
 			containerDiv.node().getAttribute("data-responsive") === "true";
@@ -1258,7 +1257,7 @@
 				}
 
 				const cbpfsData = data.filter(function (d) {
-					return !d.cbpf.includes("RhPF");
+					return !d.cbpf.includes("(");
 				}).length;
 
 				const rhpfs = new Set();

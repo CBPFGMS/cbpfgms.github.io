@@ -1157,7 +1157,7 @@
 				donorsNumber = donors.length;
 
 				const cbpfsNumber = data.filter(function (d) {
-					return d.category === "CBPF" && !d.name.includes("RhPF");
+					return d.category === "CBPF" && !d.name.includes("(");
 				}).length;
 
 				// const rhpfsNumber = data.filter(function (d) {

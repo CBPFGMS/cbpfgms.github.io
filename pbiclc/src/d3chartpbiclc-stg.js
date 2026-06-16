@@ -1608,7 +1608,7 @@
 								}, []);
 
 				const dataCbpfsNonRhPF = dataCbpfs.filter(function (d) {
-					return !d.cbpf.includes("RhPF");
+					return !d.cbpf.includes("(");
 				});
 
 				const rhpfs = new Set();

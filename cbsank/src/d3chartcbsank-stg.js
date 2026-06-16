@@ -4109,7 +4109,7 @@
 					}
 				} else {
 					console.warn(
-						`cbsank, contribution data missing numeric fund ID: fund ID ${row.fundId}`,
+						`cbsank, contribution data missing numeric fund or donor ID: ${JSON.stringify(row)}`,
 					);
 				}
 			});
