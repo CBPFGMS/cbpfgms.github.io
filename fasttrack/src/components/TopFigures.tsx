@@ -137,6 +137,7 @@ function TopFigures({ data }: TopFiguresProps) {
 							key={index}
 							size={isReached ? 2.8 : 2.3}
 							className="topfigures-card"
+							zIndex={10}
 						>
 							<Box
 								style={cardStyle}
