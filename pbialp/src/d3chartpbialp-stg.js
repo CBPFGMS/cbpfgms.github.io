@@ -1846,7 +1846,11 @@
 					.append("clipPath")
 					.attr("id", "pbialpClipPathButtons")
 					.append("rect")
-					.attr("width", buttonsNumber * buttonPanel.buttonWidth)
+					.attr(
+						"width",
+						Math.min(buttonsNumber, yearsArray.length) *
+							buttonPanel.buttonWidth,
+					)
 					.attr("height", buttonPanel.height);
 
 				const clipPathGroup = buttonPanel.main
@@ -2052,7 +2056,8 @@
 						"translate(" +
 							(buttonPanel.padding[3] +
 								buttonPanel.arrowPadding +
-								buttonsNumber * buttonPanel.buttonWidth) +
+								Math.min(buttonsNumber, yearsArray.length) *
+									buttonPanel.buttonWidth) +
 							",0)",
 					);
 
@@ -2131,7 +2136,11 @@
 								Math.min(
 									0,
 									currentTranslate +
-										buttonsNumber * buttonPanel.buttonWidth,
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth,
 								) +
 								",0)",
 						)
@@ -2158,7 +2167,11 @@
 									),
 									-(
 										Math.abs(currentTranslate) +
-										buttonsNumber * buttonPanel.buttonWidth
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth
 									),
 								) +
 								",0)",
@@ -2214,14 +2227,16 @@
 
 				function repositionButtonsGroup() {
 					const firstYearIndex =
-						chartState.selectedYear[0] < yearsArray[5]
+						yearsArray.length < buttonsNumber
 							? 0
-							: chartState.selectedYear[0] >
-								  yearsArray[yearsArray.length - 4]
-								? yearsArray.length - 8
-								: yearsArray.indexOf(
-										chartState.selectedYear[0],
-									) - 4;
+							: chartState.selectedYear[0] < yearsArray[5]
+								? 0
+								: chartState.selectedYear[0] >
+									  yearsArray[yearsArray.length - 4]
+									? yearsArray.length - 8
+									: yearsArray.indexOf(
+											chartState.selectedYear[0],
+										) - 4;
 
 					buttonsGroup.attr(
 						"transform",
