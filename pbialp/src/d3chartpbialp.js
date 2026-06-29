@@ -39,7 +39,7 @@
 			if (cssLink === fontAwesomeLink) {
 				externalCSS.setAttribute(
 					"integrity",
-					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/",
 				);
 				externalCSS.setAttribute("crossorigin", "anonymous");
 			}
@@ -110,7 +110,13 @@
 		return false;
 	}
 
+	window.reloadAllocChart = d3Chart;
+
 	function d3Chart() {
+		const containerDiv = d3.select("#d3chartcontainerpbialp");
+
+		containerDiv.selectAll("*").remove();
+
 		//POLYFILLS
 
 		//Array.prototype.find()
@@ -168,7 +174,7 @@
 						callback(
 							new Blob([arr], {
 								type: type || "image/png",
-							})
+							}),
 						);
 					});
 				},
@@ -286,7 +292,9 @@
 		if (!queryStringValues.has("viz"))
 			queryStringValues.append("viz", vizNameQueryString);
 
-		const containerDiv = d3.select("#d3chartcontainerpbialp");
+		const selectedDataType = containerDiv.node().getAttribute("data-type")
+			? containerDiv.node().getAttribute("data-type")
+			: "total";
 
 		const selectedResponsiveness =
 			containerDiv.node().getAttribute("data-responsive") === "true";
@@ -322,30 +330,30 @@
 		chartState.selectedPartner =
 			queryStringValues.has("partner") &&
 			Object.keys(partnersListObject).indexOf(
-				queryStringValues.get("partner").toLowerCase()
+				queryStringValues.get("partner").toLowerCase(),
 			) > -1
 				? partnersListObject[
 						queryStringValues.get("partner").toLowerCase()
-				  ]
+					]
 				: Object.keys(partnersListObject).indexOf(
-						containerDiv
-							.node()
-							.getAttribute("data-partner")
-							.toLowerCase()
-				  ) > -1
-				? partnersListObject[
-						containerDiv
-							.node()
-							.getAttribute("data-partner")
-							.toLowerCase()
-				  ]
-				: "total";
+							containerDiv
+								.node()
+								.getAttribute("data-partner")
+								.toLowerCase(),
+					  ) > -1
+					? partnersListObject[
+							containerDiv
+								.node()
+								.getAttribute("data-partner")
+								.toLowerCase()
+						]
+					: "total";
 
 		let selectedNetFunding = queryStringValues.has("netfunding")
 			? +queryStringValues.get("netfunding")
 			: containerDiv.node().getAttribute("data-netfunding") === "true"
-			? 2
-			: 1;
+				? 2
+				: 1;
 
 		chartState.netFunding = selectedNetFunding;
 
@@ -424,7 +432,7 @@
 				.append("p")
 				.attr("id", "pbialpTooltipBestVisualizedText")
 				.html(
-					"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+					"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 				)
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
@@ -451,7 +459,7 @@
 				.attr("class", "pbialpTopPanel")
 				.attr(
 					"transform",
-					"translate(" + padding[3] + "," + padding[0] + ")"
+					"translate(" + padding[3] + "," + padding[0] + ")",
 				),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
@@ -473,7 +481,7 @@
 						(padding[0] +
 							topPanel.height +
 							panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width: width - padding[1] - padding[3],
 			height: buttonPanelHeight,
@@ -498,7 +506,7 @@
 							topPanel.height +
 							buttonPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width:
 				(width - padding[1] - padding[3] - panelVerticalPadding) *
@@ -522,7 +530,7 @@
 							topPanel.height +
 							buttonPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width:
 				(width - padding[1] - padding[3] - panelVerticalPadding) *
@@ -560,7 +568,7 @@
 			.attr("width", lollipopPanel.width)
 			.attr(
 				"transform",
-				"translate(0," + -lollipopPanel.padding[0] + ")"
+				"translate(0," + -lollipopPanel.padding[0] + ")",
 			);
 
 		const xScaleLollipop = d3.scaleLinear();
@@ -614,7 +622,7 @@
 					parallelPanelHeight -
 					parallelPanel.padding[0] -
 					parallelPanel.padding[2]
-				)
+				),
 			)
 			.tickPadding(parallelTickPadding);
 
@@ -652,7 +660,7 @@
 				"transform",
 				"translate(0," +
 					(parallelPanel.height - parallelPanel.padding[2]) +
-					")"
+					")",
 			);
 
 		const groupYAxisLollipop = lollipopPanel.main
@@ -669,9 +677,21 @@
 		if (!isScriptLoaded(jsPdf)) loadScript(jsPdf, null);
 
 		if (isPfbiSite && !isBookmarkPage) {
+			const dataSuffix =
+				selectedDataType === "total"
+					? "Total"
+					: selectedDataType === "without-us"
+						? "WithoutUS"
+						: selectedDataType === "us-only"
+							? "USOnly"
+							: "Total";
 			Promise.all([
-				window.cbpfbiDataObject.allocationsData,
-				window.cbpfbiDataObject.launchedAllocationsData,
+				window.cbpfbiDataObject[
+					"allocationsDataNSFTOption" + dataSuffix
+				],
+				window.cbpfbiDataObject[
+					"launchedAllocationsDataNSFTOption" + dataSuffix
+				],
 				window.cbpfbiDataObject.masterRegionalFunds,
 			]).then(allData => csvCallback(allData));
 		} else {
@@ -680,19 +700,19 @@
 					classPrefix + "data",
 					file,
 					"allocations data",
-					"csv"
+					"csv",
 				),
 				fetchFile(
 					"launchedAllocationsData",
 					launchedAllocationsDataUrl,
 					"launched allocations data",
-					"csv"
+					"csv",
 				),
 				fetchFile(
 					"masterRegionalFunds",
 					masterRegionalFundsUrl,
 					"master regional funds data",
-					"json"
+					"json",
 				),
 			]).then(allData => csvCallback(allData));
 		}
@@ -707,14 +727,14 @@
 					method === "csv"
 						? d3.csvParse(
 								JSON.parse(localStorage.getItem(fileName)).data,
-								d3.autoType
-						  )
+								d3.autoType,
+							)
 						: JSON.parse(localStorage.getItem(fileName)).data;
 				console.info(
 					classPrefix +
 						" chart info: " +
 						warningString +
-						" from local storage"
+						" from local storage",
 				);
 				return Promise.resolve(fetchedData);
 			} else {
@@ -730,7 +750,7 @@
 										? d3.csvFormat(fetchedData)
 										: fetchedData,
 								timestamp: currentDate.getTime(),
-							})
+							}),
 						);
 					} catch (error) {
 						console.info(classPrefix + " chart, " + error);
@@ -739,7 +759,7 @@
 						classPrefix +
 							" chart info: " +
 							warningString +
-							" from API"
+							" from API",
 					);
 					return fetchedData;
 				});
@@ -794,7 +814,7 @@
 					draw(
 						rawData,
 						rawLaunchedAllocationsData,
-						masterRegionalFunds
+						masterRegionalFunds,
 					);
 				}
 			}
@@ -805,7 +825,7 @@
 		function draw(
 			rawData,
 			rawLaunchedAllocationsData,
-			masterRegionalFunds
+			masterRegionalFunds,
 		) {
 			let data = processData(rawData, rawLaunchedAllocationsData);
 
@@ -821,7 +841,7 @@
 			chartState.selectedCbpfs = chartState.selectedCbpfs.filter(
 				function (d) {
 					return allCbpfs.indexOf(d) > -1;
-				}
+				},
 			);
 
 			createTitle();
@@ -943,7 +963,7 @@
 						.append("span")
 						.attr(
 							"class",
-							d.clicked ? "fas fa-pause" : "fas fa-play"
+							d.clicked ? "fas fa-pause" : "fas fa-play",
 						);
 
 					if (d.clicked) {
@@ -956,7 +976,7 @@
 
 					function loopButtons() {
 						const index = yearsArray.indexOf(
-							chartState.selectedYear[0]
+							chartState.selectedYear[0],
 						);
 
 						chartState.selectedYear[0] =
@@ -974,11 +994,11 @@
 							chartState.selectedYear[0] < yearsArray[5]
 								? 0
 								: chartState.selectedYear[0] >
-								  yearsArray[yearsArray.length - 4]
-								? yearsArray.length - 8
-								: yearsArray.indexOf(
-										chartState.selectedYear[0]
-								  ) - 4;
+									  yearsArray[yearsArray.length - 4]
+									? yearsArray.length - 8
+									: yearsArray.indexOf(
+											chartState.selectedYear[0],
+										) - 4;
 
 						const currentTranslate = -(
 							buttonPanel.buttonWidth * firstYearIndex
@@ -990,7 +1010,7 @@
 								.style("fill", "#ccc");
 							svg.select(".pbialpLeftArrowGroup").attr(
 								"pointer-events",
-								"none"
+								"none",
 							);
 						} else {
 							svg.select(".pbialpLeftArrowGroup")
@@ -998,7 +1018,7 @@
 								.style("fill", "#666");
 							svg.select(".pbialpLeftArrowGroup").attr(
 								"pointer-events",
-								"all"
+								"all",
 							);
 						}
 
@@ -1012,7 +1032,7 @@
 								.style("fill", "#ccc");
 							svg.select(".pbialpRightArrowGroup").attr(
 								"pointer-events",
-								"none"
+								"none",
 							);
 						} else {
 							svg.select(".pbialpRightArrowGroup")
@@ -1020,7 +1040,7 @@
 								.style("fill", "#666");
 							svg.select(".pbialpRightArrowGroup").attr(
 								"pointer-events",
-								"all"
+								"all",
 							);
 						}
 
@@ -1030,7 +1050,7 @@
 							.attrTween("transform", function () {
 								return d3.interpolateString(
 									this.getAttribute("transform"),
-									"translate(" + currentTranslate + ",0)"
+									"translate(" + currentTranslate + ",0)",
 								);
 							});
 					}
@@ -1117,7 +1137,7 @@
 						.append("p")
 						.attr("id", "pbialpBestVisualizedText")
 						.html(
-							"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+							"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 						)
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
@@ -1181,7 +1201,7 @@
 							padding[3] +
 							"," +
 							(height - padding[2] / 1.5) +
-							")"
+							")",
 					)
 					.attr("pointer-events", "none");
 
@@ -1224,7 +1244,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialpLegendText pbialpLegendTextNetFunding"
+						"pbialpLegendText pbialpLegendTextNetFunding",
 					)
 					.style("opacity", chartState.netFunding === 1 ? 0 : 1)
 					.attr("y", 16)
@@ -1233,7 +1253,7 @@
 					.append("tspan")
 					.style("fill", "#666")
 					.text(
-						"National Partners includes funding to National NGOs, Government/Others and Private Contractors."
+						"National Partners includes funding to National NGOs, Government/Others and Private Contractors.",
 					);
 
 				//end of createLegend
@@ -1281,7 +1301,7 @@
 					partnersTotals[chartState.selectedPartner];
 
 				const mainValue = chartState.selectedYear.some(
-					e => yearsWithUnderApprovalAboveMin[e]
+					e => yearsWithUnderApprovalAboveMin[e],
 				)
 					? totalLaunched
 					: totalAllocated;
@@ -1304,13 +1324,13 @@
 					.append("g")
 					.attr(
 						"class",
-						"pbialptopPanelMoneyBag contributionColorFill"
+						"pbialptopPanelMoneyBag contributionColorFill",
 					)
 					.attr(
 						"transform",
 						"translate(" +
 							topPanel.moneyBagPadding +
-							",6) scale(0.5)"
+							",6) scale(0.5)",
 					)
 					.each(function (_, i, n) {
 						moneyBagdAttribute.forEach(function (d) {
@@ -1362,7 +1382,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialptopPanelMainValue contributionColorFill"
+						"pbialptopPanelMainValue contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
@@ -1371,7 +1391,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelMainValue
@@ -1388,8 +1408,8 @@
 									? d
 									: siString.substring(
 											0,
-											siString.length - 1
-									  ));
+											siString.length - 1,
+										));
 						};
 					});
 
@@ -1405,13 +1425,13 @@
 					.merge(topPanelMainText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 2.8
+						topPanel.height - topPanel.mainValueVerPadding * 2.8,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelMainText.text(function (d) {
@@ -1421,12 +1441,12 @@
 						(unit === "k"
 							? "Thousand"
 							: unit === "M"
-							? "Million"
-							: unit === "G"
-							? "Billion"
-							: "") +
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "") +
 						(chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e]
+							e => yearsWithUnderApprovalAboveMin[e],
 						)
 							? " in Allocations"
 							: " Allocated")
@@ -1445,13 +1465,13 @@
 					.merge(topPanelSubText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.3
+						topPanel.height - topPanel.mainValueVerPadding * 1.3,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelSubText.text(function (d) {
@@ -1461,7 +1481,7 @@
 							: "years\u002A";
 					return (
 						(chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e]
+							e => yearsWithUnderApprovalAboveMin[e],
 						)
 							? "Launched in "
 							: "in ") + yearsText
@@ -1487,18 +1507,18 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialptopPanelAllocatedValue contributionColorFill"
+						"pbialptopPanelAllocatedValue contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 3.2
+						topPanel.height - topPanel.mainValueVerPadding * 3.2,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] -
-							topPanel.mainValueHorPadding / 2
+							topPanel.mainValueHorPadding / 2,
 					)
 					.merge(topPanelAllocatedValue);
 
@@ -1508,10 +1528,10 @@
 					.style(
 						"opacity",
 						chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e]
+							e => yearsWithUnderApprovalAboveMin[e],
 						)
 							? 1
-							: 0
+							: 0,
 					)
 					.tween("text", function (d) {
 						const node = this;
@@ -1524,8 +1544,8 @@
 									? d
 									: siString.substring(
 											0,
-											siString.length - 1
-									  ));
+											siString.length - 1,
+										));
 						};
 					});
 
@@ -1540,13 +1560,13 @@
 					.attr("text-anchor", "start")
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 3.2
+						topPanel.height - topPanel.mainValueVerPadding * 3.2,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding / 2
+							topPanel.mainValueHorPadding / 2,
 					)
 					.merge(topPanelAllocatedText);
 
@@ -1554,10 +1574,10 @@
 					.style(
 						"opacity",
 						chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e]
+							e => yearsWithUnderApprovalAboveMin[e],
 						)
 							? 1
-							: 0
+							: 0,
 					)
 					.text(function (d) {
 						const valueSI = formatSIFloat(d);
@@ -1566,10 +1586,10 @@
 							(unit === "k"
 								? "Thousand"
 								: unit === "M"
-								? "Million"
-								: unit === "G"
-								? "Billion"
-								: "") + " Allocated"
+									? "Million"
+									: unit === "G"
+										? "Billion"
+										: "") + " Allocated"
 						);
 					});
 
@@ -1592,7 +1612,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialptopPanelUnderApprovalValue contributionColorFill"
+						"pbialptopPanelUnderApprovalValue contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.attr("y", topPanel.height - topPanel.mainValueVerPadding)
@@ -1600,7 +1620,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] -
-							topPanel.mainValueHorPadding / 2
+							topPanel.mainValueHorPadding / 2,
 					)
 					.merge(topPanelUnderApprovalValue);
 
@@ -1618,8 +1638,8 @@
 									? d
 									: siString.substring(
 											0,
-											siString.length - 1
-									  ));
+											siString.length - 1,
+										));
 						};
 					});
 
@@ -1637,7 +1657,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding / 2
+							topPanel.mainValueHorPadding / 2,
 					)
 					.merge(topPanelUnderApprovalText);
 
@@ -1648,10 +1668,10 @@
 						(unit === "k"
 							? "Thousand"
 							: unit === "M"
-							? "Million"
-							: unit === "G"
-							? "Billion"
-							: "") + " Under Approval"
+								? "Million"
+								: unit === "G"
+									? "Billion"
+									: "") + " Under Approval"
 					);
 				});
 
@@ -1666,7 +1686,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialptopPanelCbpfsNumber contributionColorFill"
+						"pbialptopPanelCbpfsNumber contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
@@ -1674,13 +1694,14 @@
 					.attr(
 						"y",
 						topPanel.height -
-							topPanel.mainValueVerPadding * (rhpfsData ? 2.7 : 1)
+							topPanel.mainValueVerPadding *
+								(rhpfsData ? 2.7 : 1),
 					)
 					.attr(
 						"x",
 						topPanel.width -
 							topPanel.leftPadding[2] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelCbpfsNumber
@@ -1708,7 +1729,7 @@
 						"x",
 						topPanel.width -
 							topPanel.leftPadding[2] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.merge(topPanelCbpfsText)
@@ -1717,7 +1738,7 @@
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(rhpfsData ? 2.85 : 1.9)
+								(rhpfsData ? 2.85 : 1.9),
 					)
 					.text(cbpfsData > 1 ? "CBPFs" : "CBPF");
 
@@ -1732,7 +1753,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbialptopPanelRhpfsNumber contributionColorFill"
+						"pbialptopPanelRhpfsNumber contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelRhpfsNumber)
@@ -1740,13 +1761,14 @@
 					.attr(
 						"y",
 						topPanel.height -
-							topPanel.mainValueVerPadding * (cbpfsData ? 0.8 : 1)
+							topPanel.mainValueVerPadding *
+								(cbpfsData ? 0.8 : 1),
 					)
 					.attr(
 						"x",
 						topPanel.width -
 							topPanel.leftPadding[2] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelRhpfsNumber
@@ -1774,7 +1796,7 @@
 						"x",
 						topPanel.width -
 							topPanel.leftPadding[2] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.style("cursor", "default")
@@ -1783,7 +1805,8 @@
 					.attr(
 						"y",
 						topPanel.height -
-							topPanel.mainValueVerPadding * (cbpfsData ? 1 : 1.9)
+							topPanel.mainValueVerPadding *
+								(cbpfsData ? 1 : 1.9),
 					)
 					.text(rhpfsData > 1 ? "Regional funds" : "Regional fund");
 
@@ -1818,7 +1841,11 @@
 					.append("clipPath")
 					.attr("id", "pbialpClipPathButtons")
 					.append("rect")
-					.attr("width", buttonsNumber * buttonPanel.buttonWidth)
+					.attr(
+						"width",
+						Math.min(buttonsNumber, yearsArray.length) *
+							buttonPanel.buttonWidth,
+					)
 					.attr("height", buttonPanel.height);
 
 				const clipPathGroup = buttonPanel.main
@@ -1829,7 +1856,7 @@
 						"translate(" +
 							(buttonPanel.padding[3] +
 								buttonPanel.arrowPadding) +
-							",0)"
+							",0)",
 					)
 					.attr("clip-path", "url(#pbialpClipPathButtons)");
 
@@ -1849,12 +1876,12 @@
 					.attr("class", "pbialpbuttonsRects")
 					.attr(
 						"width",
-						buttonPanel.buttonWidth - buttonPanel.buttonPadding
+						buttonPanel.buttonWidth - buttonPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2
+							buttonPanel.buttonVerticalPadding * 2,
 					)
 					.attr("y", buttonPanel.buttonVerticalPadding)
 					.attr("x", function (_, i) {
@@ -1901,7 +1928,7 @@
 							(buttonPanel.padding[3] +
 								3 * buttonPanel.arrowPadding +
 								buttonsNumber * buttonPanel.buttonWidth) +
-							",0)"
+							",0)",
 					)
 					.style("cursor", "pointer");
 
@@ -1940,7 +1967,7 @@
 					.text(
 						chartState.netFunding === 1
 							? "National NGO"
-							: "Nat. Partners"
+							: "Nat. Partners",
 					)
 					.append("tspan")
 					.style("fill", underApprovalColor)
@@ -1949,7 +1976,7 @@
 				buttonsPartnersContainer.attr("transform", function (_, i) {
 					if (i) {
 						const previousTransform = parseTransform(
-							d3.select(this.previousSibling).attr("transform")
+							d3.select(this.previousSibling).attr("transform"),
 						)[0];
 						return (
 							"translate(" +
@@ -1978,7 +2005,7 @@
 					.attr(
 						"height",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2
+							buttonPanel.buttonVerticalPadding * 2,
 					)
 					.attr("y", buttonPanel.buttonVerticalPadding)
 					.attr("x", 0)
@@ -1994,7 +2021,7 @@
 					.style("cursor", "pointer")
 					.attr(
 						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)"
+						"translate(" + buttonPanel.padding[3] + ",0)",
 					);
 
 				const leftArrowRect = leftArrow
@@ -2010,7 +2037,7 @@
 					.attr(
 						"y",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1
+							buttonPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25c4");
@@ -2024,8 +2051,9 @@
 						"translate(" +
 							(buttonPanel.padding[3] +
 								buttonPanel.arrowPadding +
-								buttonsNumber * buttonPanel.buttonWidth) +
-							",0)"
+								Math.min(buttonsNumber, yearsArray.length) *
+									buttonPanel.buttonWidth) +
+							",0)",
 					);
 
 				const rightArrowRect = rightArrow
@@ -2041,7 +2069,7 @@
 					.attr(
 						"y",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1
+							buttonPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25ba");
@@ -2072,7 +2100,7 @@
 				d3.select("body").on("d3ChartsYear.pbialp", function () {
 					clickButtonsRects(
 						validateCustomEventYear(+d3.event.detail),
-						true
+						true,
 					);
 					repositionButtonsGroup();
 					checkArrows();
@@ -2090,7 +2118,7 @@
 				leftArrow.on("click", function () {
 					leftArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
@@ -2103,9 +2131,13 @@
 								Math.min(
 									0,
 									currentTranslate +
-										buttonsNumber * buttonPanel.buttonWidth
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth,
 								) +
-								",0)"
+								",0)",
 						)
 						.on("end", checkArrows);
 				});
@@ -2113,7 +2145,7 @@
 				rightArrow.on("click", function () {
 					rightArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
@@ -2130,17 +2162,21 @@
 									),
 									-(
 										Math.abs(currentTranslate) +
-										buttonsNumber * buttonPanel.buttonWidth
-									)
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth
+									),
 								) +
-								",0)"
+								",0)",
 						)
 						.on("end", checkArrows);
 				});
 
 				function checkArrows() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2166,7 +2202,7 @@
 
 				function checkCurrentTranslate() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2186,19 +2222,22 @@
 
 				function repositionButtonsGroup() {
 					const firstYearIndex =
-						chartState.selectedYear[0] < yearsArray[5]
+						yearsArray.length < buttonsNumber
 							? 0
-							: chartState.selectedYear[0] >
-							  yearsArray[yearsArray.length - 4]
-							? yearsArray.length - 8
-							: yearsArray.indexOf(chartState.selectedYear[0]) -
-							  4;
+							: chartState.selectedYear[0] < yearsArray[5]
+								? 0
+								: chartState.selectedYear[0] >
+									  yearsArray[yearsArray.length - 4]
+									? yearsArray.length - 8
+									: yearsArray.indexOf(
+											chartState.selectedYear[0],
+										) - 4;
 
 					buttonsGroup.attr(
 						"transform",
 						"translate(" +
 							-(buttonPanel.buttonWidth * firstYearIndex) +
-							",0)"
+							",0)",
 					);
 				}
 
@@ -2213,15 +2252,15 @@
 						(a.cbpf.toLowerCase() < b.cbpf.toLowerCase()
 							? -1
 							: a.cbpf.toLowerCase() > b.cbpf.toLowerCase()
-							? 1
-							: 0)
+								? 1
+								: 0)
 					);
 				});
 
 				yScaleLollipop.domain(
 					cbpfsArray.map(function (d) {
 						return d.cbpf;
-					})
+					}),
 				);
 
 				let lollipopPanelTitle = lollipopPanel.main
@@ -2285,7 +2324,7 @@
 							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
 								2 +
 								stickHeight) +
-							")"
+							")",
 					);
 
 				const cbpfLabelEnter = cbpfGroupEnter
@@ -2293,7 +2332,7 @@
 					.attr("class", "pbialpCbpfLabel")
 					.attr(
 						"x",
-						lollipopPanel.padding[3] + lollipopPanel.labelPadding
+						lollipopPanel.padding[3] + lollipopPanel.labelPadding,
 					)
 					.attr("y", verticalLabelPadding)
 					.text(formatNumberSI(0));
@@ -2348,7 +2387,7 @@
 								: d[
 										"underApproval-" +
 											chartState.selectedPartner
-								  ];
+									];
 						return thisUnderApproval === 0 ? 0 : 1;
 					})
 					.attr("transform", function (d) {
@@ -2358,7 +2397,7 @@
 								: d[
 										"underApproval-" +
 											chartState.selectedPartner
-								  ];
+									];
 						const thisPadding =
 							xScaleLollipop(d[chartState.selectedPartner]) -
 								xScaleLollipop(thisUnderApproval) <
@@ -2369,7 +2408,7 @@
 							"translate(" +
 							Math.min(
 								xScaleLollipop(thisUnderApproval),
-								xScaleLollipop(d[chartState.selectedPartner])
+								xScaleLollipop(d[chartState.selectedPartner]),
 							) +
 							"," +
 							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
@@ -2398,13 +2437,13 @@
 								: d[
 										"underApproval-" +
 											chartState.selectedPartner
-								  ];
+									];
 						let thisPartner,
 							thisPartnerPercentage,
 							thisPartnerRoundPercentage;
 						if (chartState.selectedPartner !== "total") {
 							thisPartner = d.parallelData.find(
-								e => e.partner === chartState.selectedPartner
+								e => e.partner === chartState.selectedPartner,
 							);
 							thisPartnerPercentage = thisPartner.percentage;
 							thisPartnerRoundPercentage =
@@ -2412,7 +2451,7 @@
 						}
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
-							d[chartState.selectedPartner]
+							d[chartState.selectedPartner],
 						);
 						return function (t) {
 							if (thisUnderApproval === 0) {
@@ -2422,7 +2461,7 @@
 										thisPartnerPercentage === 0)
 								) {
 									d3.select(node).text(
-										formatNumberSI(i(t)).replace("G", "B")
+										formatNumberSI(i(t)).replace("G", "B"),
 									);
 								} else {
 									d3.select(node)
@@ -2430,22 +2469,24 @@
 											i(1)
 												? formatNumberSI(i(t)).replace(
 														"G",
-														"B"
-												  )
-												: 0
+														"B",
+													)
+												: 0,
 										)
 										.append("tspan")
 										.text(" \u2014 ")
 										.append("tspan")
 										.attr(
 											"fill",
-											d3.color(highlightColor).darker(0.5)
+											d3
+												.color(highlightColor)
+												.darker(0.5),
 										)
 										.text(
 											thisPartnerRoundPercentage
 												? thisPartnerRoundPercentage +
 														"%"
-												: "<1%"
+												: "<1%",
 										);
 								}
 							} else {
@@ -2458,13 +2499,13 @@
 										.text(
 											formatNumberSI(i(t)).replace(
 												"G",
-												"B"
-											)
+												"B",
+											),
 										)
 										.append("tspan")
 										.attr(
 											"class",
-											"pbialpCbpfLabelPercentage"
+											"pbialpCbpfLabelPercentage",
 										)
 										.attr("dy", "-0.5px")
 										.text(" (")
@@ -2472,11 +2513,10 @@
 										.style("fill", underApprovalColor)
 										.text(
 											d3
-												.formatPrefix(
-													".0",
-													thisUnderApproval
-												)(thisUnderApproval)
-												.replace("G", "B")
+												.formatPrefix(".0", thisUnderApproval)(
+													thisUnderApproval,
+												)
+												.replace("G", "B"),
 										)
 										.append("tspan")
 										.style("fill", "#aaa")
@@ -2487,14 +2527,14 @@
 											i(1)
 												? formatNumberSI(i(t)).replace(
 														"G",
-														"B"
-												  )
-												: 0
+														"B",
+													)
+												: 0,
 										)
 										.append("tspan")
 										.attr(
 											"class",
-											"pbialpCbpfLabelPercentage"
+											"pbialpCbpfLabelPercentage",
 										)
 										.attr("dy", "-0.5px")
 										.text(" (")
@@ -2502,11 +2542,10 @@
 										.style("fill", underApprovalColor)
 										.text(
 											d3
-												.formatPrefix(
-													".0",
-													thisUnderApproval
-												)(thisUnderApproval)
-												.replace("G", "B")
+												.formatPrefix(".0", thisUnderApproval)(
+													thisUnderApproval,
+												)
+												.replace("G", "B"),
 										)
 										.append("tspan")
 										.style("fill", "#aaa")
@@ -2518,13 +2557,15 @@
 										.append("tspan")
 										.attr(
 											"fill",
-											d3.color(highlightColor).darker(0.5)
+											d3
+												.color(highlightColor)
+												.darker(0.5),
 										)
 										.text(
 											thisPartnerRoundPercentage
 												? thisPartnerRoundPercentage +
 														"%"
-												: "<1%"
+												: "<1%",
 										);
 								}
 							}
@@ -2532,7 +2573,7 @@
 					});
 
 				const cbpfTooltipRectangle = cbpfGroup.select(
-					".pbialpCbpfTooltipRectangle"
+					".pbialpCbpfTooltipRectangle",
 				);
 
 				cbpfTooltipRectangle
@@ -2541,7 +2582,7 @@
 					.on("click", clickTooltipRectangle);
 
 				xAxisLollipop.tickSizeInner(
-					-(lollipopGroupHeight * cbpfsArray.length)
+					-(lollipopGroupHeight * cbpfsArray.length),
 				);
 
 				groupYAxisLollipop
@@ -2549,7 +2590,7 @@
 					.duration(duration)
 					.attr(
 						"transform",
-						"translate(" + lollipopPanel.padding[3] + ",0)"
+						"translate(" + lollipopPanel.padding[3] + ",0)",
 					)
 					.call(yAxisLollipop);
 
@@ -2627,13 +2668,14 @@
 						chartState.selectedPartner === "total"
 							? "Allocations by Partner Type and Modality:"
 							: "Allocations for this Partner Type (" +
-							  (chartState.selectedPartner === "National NGO" &&
-							  chartState.netFunding === 2
+								(chartState.selectedPartner ===
+									"National NGO" &&
+								chartState.netFunding === 2
 									? "National Partners"
 									: partnersTextScale(
-											chartState.selectedPartner
-									  )) +
-							  ") by Modality, in %:";
+											chartState.selectedPartner,
+										)) +
+								") by Modality, in %:";
 
 					if (datum[thisTotal]) {
 						tooltip
@@ -2645,10 +2687,10 @@
 									(chartState.selectedPartner === "total"
 										? "All Partners"
 										: chartState.selectedPartner ===
-												"National NGO" &&
-										  chartState.netFunding === 2
-										? "National Partners"
-										: chartState.selectedPartner) +
+													"National NGO" &&
+											  chartState.netFunding === 2
+											? "National Partners"
+											: chartState.selectedPartner) +
 									")<br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 									lollipopTooltipWidth +
 									"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" +
@@ -2657,23 +2699,23 @@
 									lollipopTooltipWidth +
 									"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard <span style='color: #888;'>(" +
 									formatPercent(
-										datum[thisStandard] / datum[thisTotal]
+										datum[thisStandard] / datum[thisTotal],
 									) +
 									")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 									formatMoney0Decimals(datum[thisStandard]) +
 									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve <span style='color: #888;'>(" +
 									formatPercent(
-										datum[thisReserve] / datum[thisTotal]
+										datum[thisReserve] / datum[thisTotal],
 									) +
 									")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 									formatMoney0Decimals(datum[thisReserve]) +
 									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" +
 									formatMoney0Decimals(
-										datum[thisUnderApproval]
+										datum[thisUnderApproval],
 									) +
 									"</span></div></div><div style='margin-top:6px;'>" +
 									tooltipChartTitle +
-									"<div><div id=pbialpLollipopTooltipChart></div>"
+									"<div><div id=pbialpLollipopTooltipChart></div>",
 							);
 
 						createTooltipBar(
@@ -2682,7 +2724,7 @@
 							lollipopTooltipWidth,
 							thisTotal,
 							thisStandard,
-							thisReserve
+							thisReserve,
 						);
 
 						if (chartState.selectedPartner === "total") {
@@ -2706,9 +2748,9 @@
 									formatMoney0Decimals(datum[thisTotal]) +
 									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 									formatMoney0Decimals(
-										datum[thisUnderApproval]
+										datum[thisUnderApproval],
 									) +
-									"</span></div></div>"
+									"</span></div></div>",
 							);
 					}
 
@@ -2738,7 +2780,10 @@
 									tooltipBox.height +
 									lollipopGroupHeight
 								? thisOffsetTop - tooltipBox.height - 4 + "px"
-								: thisOffsetTop + lollipopGroupHeight + 4 + "px"
+								: thisOffsetTop +
+										lollipopGroupHeight +
+										4 +
+										"px",
 						)
 						.style("left", thisOffsetLeft + "px");
 				}
@@ -2750,7 +2795,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(
-							datum.cbpf
+							datum.cbpf,
 						);
 						if (index > -1) {
 							chartState.selectedCbpfs.splice(index, 1);
@@ -2797,7 +2842,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(
-							datum.cbpf
+							datum.cbpf,
 						);
 						chartState.selectedCbpfs.splice(index, 1);
 					} else {
@@ -2839,11 +2884,11 @@
 					rawLaunchedAllocationsData.forEach(function (row) {
 						if (
 							chartState.selectedYear.includes(
-								row.AllocationYear
+								row.AllocationYear,
 							) &&
 							(!chartState.selectedCbpfs.length ||
 								chartState.selectedCbpfs.includes(
-									row.PooledFundName
+									row.PooledFundName,
 								))
 						) {
 							topValuesLaunchedData.launched +=
@@ -2876,14 +2921,14 @@
 							return e.parallelData.find(function (f) {
 								return f.partner === d;
 							}).value;
-						})
+						}),
 					);
 					averageData.push({
 						total: total,
 						partner: d,
 						percentage: total / totalAllocations || 0,
 						roundPercentage: Math.round(
-							(total / totalAllocations || 0) * 100
+							(total / totalAllocations || 0) * 100,
 						),
 					});
 				});
@@ -2905,14 +2950,14 @@
 							(parallelPanel.width -
 								parallelPanel.padding[3] -
 								parallelPanel.padding[1]) /
-								2
+								2,
 					)
 					.attr("text-anchor", "middle")
 					.merge(parallelPanelTitle)
 					.text(
 						chartState.netFunding === 1
 							? "Allocations by Partner Type"
-							: "Allocations by Partner Type (including sub-impl. partners)"
+							: "Allocations by Partner Type (including sub-impl. partners)",
 					);
 
 				const percentNumbersGroups = parallelPanel.main
@@ -2938,7 +2983,7 @@
 					.attr("class", "pbialpPercentNumbersText")
 					.attr(
 						"y",
-						parallelPanelHeight - parallelPanel.padding[2] + 14
+						parallelPanelHeight - parallelPanel.padding[2] + 14,
 					)
 					.attr("x", 4)
 					.attr("text-anchor", "middle")
@@ -2977,7 +3022,7 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.enter()
 					.append("circle")
@@ -3010,7 +3055,7 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.transition()
 					.duration(duration)
@@ -3054,7 +3099,7 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.enter()
 					.append("circle")
@@ -3074,13 +3119,13 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.enter()
 					.append("text")
 					.attr(
 						"class",
-						"pbialpPercentagesText pbialpPercentagesAverage"
+						"pbialpPercentagesText pbialpPercentagesAverage",
 					)
 					.attr("filter", "url(#backgroundFilter)")
 					.attr("x", function (d) {
@@ -3101,7 +3146,7 @@
 					});
 
 				cbpfParallelGroupAverage = cbpfParallelGroupAverageEnter.merge(
-					cbpfParallelGroupAverage
+					cbpfParallelGroupAverage,
 				);
 
 				cbpfParallelGroupAverage.raise();
@@ -3125,7 +3170,7 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.transition()
 					.duration(duration)
@@ -3144,7 +3189,7 @@
 						},
 						function (d) {
 							return d.partner;
-						}
+						},
 					)
 					.text(function (d) {
 						return formatSIFloat(d.total).replace("G", "B");
@@ -3201,7 +3246,7 @@
 							(width - padding[1] - netFundingGroupPadding) +
 							"," +
 							(height - padding[2] / 2) +
-							")"
+							")",
 					)
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
@@ -3224,7 +3269,7 @@
 					.style("fill", "none")
 					.style(
 						"stroke",
-						chartState.netFunding === 2 ? "darkslategray" : "white"
+						chartState.netFunding === 2 ? "darkslategray" : "white",
 					);
 
 				const netFundingText = netFundingGroup
@@ -3243,7 +3288,7 @@
 							(width - padding[1] - showAverageGroupPadding) +
 							"," +
 							(height - padding[2] / 2) +
-							")"
+							")",
 					)
 					.style("cursor", "pointer")
 					.attr("pointer-events", "all");
@@ -3279,18 +3324,18 @@
 					if (queryStringValues.has("netfunding")) {
 						queryStringValues.set(
 							"netfunding",
-							chartState.netFunding
+							chartState.netFunding,
 						);
 					} else {
 						queryStringValues.append(
 							"netfunding",
-							chartState.netFunding
+							chartState.netFunding,
 						);
 					}
 
 					netFundingInnerCheck.style(
 						"stroke",
-						chartState.netFunding === 2 ? "darkslategray" : "white"
+						chartState.netFunding === 2 ? "darkslategray" : "white",
 					);
 
 					svg.selectAll(".pbialpbuttonsPartnersText")
@@ -3300,7 +3345,7 @@
 						.text(
 							chartState.netFunding === 1
 								? "National NGO"
-								: "Nat. Partners"
+								: "Nat. Partners",
 						)
 						.append("tspan")
 						.style("fill", underApprovalColor)
@@ -3308,7 +3353,7 @@
 
 					svg.select(".pbialpLegendTextNetFunding").style(
 						"opacity",
-						chartState.netFunding === 1 ? 0 : 1
+						chartState.netFunding === 1 ? 0 : 1,
 					);
 
 					data = processData(rawData, rawLaunchedAllocationsData);
@@ -3341,7 +3386,7 @@
 
 					innerCheck.style(
 						"stroke",
-						showAverage ? "darkslategray" : "white"
+						showAverage ? "darkslategray" : "white",
 					);
 
 					parallelPanel.main
@@ -3370,7 +3415,7 @@
 					.append("svg")
 					.attr(
 						"viewBox",
-						"0 0 " + width + " " + (height + topDivHeight + 2)
+						"0 0 " + width + " " + (height + topDivHeight + 2),
 					);
 
 				const helpButtons = [
@@ -3532,7 +3577,7 @@
 					.attr("y", 264)
 					.attr("pointer-events", "none")
 					.text(
-						"Hover over the elements surrounded by a blue rectangle to get additional information"
+						"Hover over the elements surrounded by a blue rectangle to get additional information",
 					)
 					.call(wrapText2, 350);
 
@@ -3589,7 +3634,7 @@
 						chartState.selectedCbpfs.length === 0 &&
 							thisCbpf === undefined
 							? 1
-							: 0
+							: 0,
 					);
 
 				const lastCbpf = data.find(function (d) {
@@ -3709,7 +3754,7 @@
 						return (
 							"translate(" +
 							(xScaleParallel(
-								partnerList[partnerList.length - 1]
+								partnerList[partnerList.length - 1],
 							) +
 								selectedCbpfLabelPadding) +
 							"," +
@@ -3892,7 +3937,7 @@
 
 				selectedAverage.style(
 					"fill",
-					d3.color(highlightColor).darker(0.5)
+					d3.color(highlightColor).darker(0.5),
 				);
 
 				selectedPercentageText.style("fill", highlightColor);
@@ -3960,7 +4005,7 @@
 				chartState.selectedCbpfs = chartState.selectedCbpfs.filter(
 					function (d) {
 						return allCbpfs.indexOf(d) > -1;
-					}
+					},
 				);
 
 				data.forEach(function (d) {
@@ -3995,7 +4040,7 @@
 						return e === chartState.selectedPartner
 							? unBlue
 							: "#eaeaea";
-					}
+					},
 				);
 
 				d3.selectAll(".pbialpbuttonsPartnersText").style(
@@ -4004,7 +4049,7 @@
 						return e === chartState.selectedPartner
 							? "white"
 							: "#444";
-					}
+					},
 				);
 
 				if (queryStringValues.has("partner")) {
@@ -4039,11 +4084,11 @@
 							formatPercent(
 								partnersUnderApproval.total /
 									(partnersTotals.total +
-										partnersUnderApproval.total)
+										partnersUnderApproval.total),
 							) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 							formatMoney0Decimals(partnersUnderApproval.total) +
-							"</span></div></div>"
+							"</span></div></div>",
 					);
 
 				tooltip
@@ -4148,7 +4193,7 @@
 					.attr("id", "pbialpInnerTooltipDiv");
 
 				innerTooltip.html(
-					"Click for selecting a single year. Double-click or ALT + click for selecting multiple years."
+					"Click for selecting a single year. Double-click or ALT + click for selecting multiple years.",
 				);
 
 				const containerSize = containerDiv
@@ -4173,17 +4218,17 @@
 									padding[1] +
 									"px"
 							: thisSize.left +
+										thisSize.width / 2 -
+										containerSize.left <
+								  tooltipSize.width / 2 +
+										buttonPanel.padding[3] +
+										padding[0]
+								? buttonPanel.padding[3] + padding[0] + "px"
+								: thisSize.left +
 									thisSize.width / 2 -
-									containerSize.left <
-							  tooltipSize.width / 2 +
-									buttonPanel.padding[3] +
-									padding[0]
-							? buttonPanel.padding[3] + padding[0] + "px"
-							: thisSize.left +
-							  thisSize.width / 2 -
-							  containerSize.left -
-							  tooltipSize.width / 2 +
-							  "px"
+									containerSize.left -
+									tooltipSize.width / 2 +
+									"px",
 					)
 					.style(
 						"top",
@@ -4198,7 +4243,7 @@
 									containerSize.top -
 									tooltipSize.height -
 									4 +
-									"px"
+									"px",
 					);
 
 				d3.select(this).style("fill", unBlue);
@@ -4264,7 +4309,7 @@
 								formatMoney0Decimals(datum.reserve) +
 								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;margin-top:8px;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;margin-top:8px;'>$" +
 								formatMoney0Decimals(datum.underApproval) +
-								"</div></div>"
+								"</div></div>",
 						);
 
 					createTooltipBar(
@@ -4273,7 +4318,7 @@
 						parallelTooltipWidth,
 						"value",
 						"standard",
-						"reserve"
+						"reserve",
 					);
 				} else {
 					tooltip
@@ -4284,7 +4329,7 @@
 								"</span></strong><br style='line-height:170%;'/>Partner: " +
 								datum.partner +
 								"<br style='line-height:170%;'/>Allocations: $" +
-								formatMoney0Decimals(datum.value)
+								formatMoney0Decimals(datum.value),
 						);
 				}
 
@@ -4317,7 +4362,7 @@
 								padding[3] -
 								tooltipBox.height
 							? thisOffsetTop - tooltipBox.height - 8 + "px"
-							: thisOffsetTop + 20 + "px"
+							: thisOffsetTop + 20 + "px",
 					)
 					.style("left", thisOffsetLeft + "px");
 
@@ -4335,7 +4380,7 @@
 				containerWidth,
 				total,
 				property1,
-				property2
+				property2,
 			) {
 				const containerDiv = d3.select("#" + container);
 
@@ -4359,7 +4404,7 @@
 						"border-right",
 						scaleDiv(datum[property1]) < 1
 							? "0px solid white"
-							: "1px solid white"
+							: "1px solid white",
 					);
 
 				div1.transition()
@@ -4448,7 +4493,7 @@
 							tooltipSvgWidth -
 							tooltipSvgpadding[1] -
 							tooltipSvgpadding[3]
-						)
+						),
 					);
 
 				const tooltipGY = tooltipSvg
@@ -4458,7 +4503,7 @@
 						"transform",
 						"translate(" +
 							(tooltipSvgWidth - tooltipSvgpadding[1]) +
-							",0)"
+							",0)",
 					)
 					.call(tooltipYAxis);
 
@@ -4571,7 +4616,7 @@
 						"transform",
 						"translate(0," +
 							(tooltipSvgHeight - tooltipSvgpadding[2]) +
-							")"
+							")",
 					)
 					.call(tooltipXAxis);
 
@@ -4687,7 +4732,7 @@
 								startAngle: 0,
 								endAngle: 0,
 							},
-							d
+							d,
 						);
 						if (d.data.partner === chartState.selectedPartner) {
 							return function (t) {
@@ -4771,7 +4816,7 @@
 						"transform",
 						"translate(0," +
 							(tooltipSvgHeight - tooltipSvgpadding[2]) +
-							")"
+							")",
 					)
 					.call(tooltipAxis);
 
@@ -4786,15 +4831,15 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
 								acc +
 								(index >= chartState.selectedCbpfs.length - 2
 									? index >
-									  chartState.selectedCbpfs.length - 2
+										chartState.selectedCbpfs.length - 2
 										? curr
 										: curr + " and "
 									: curr + ", ")
@@ -4851,7 +4896,7 @@
 					padding[3] +
 					"," +
 					(height - padding[2] / 1.5) +
-					")"
+					")",
 			);
 
 			svg.select(".pbialpNetFundingGroup")
@@ -4863,7 +4908,7 @@
 						(width - padding[1] - netFundingGroupPadding) +
 						"," +
 						(height - padding[2] / 2) +
-						")"
+						")",
 				);
 
 			svg.select(".pbialpShowAverageGroup")
@@ -4875,7 +4920,7 @@
 						(width - padding[1] - showAverageGroupPadding) +
 						"," +
 						(height - padding[2] / 2) +
-						")"
+						")",
 				);
 
 			//end of resizeSvg
@@ -4901,7 +4946,7 @@
 					.text(d);
 
 				const fakeTextLength = Math.ceil(
-					fakeText.node().getComputedTextLength()
+					fakeText.node().getComputedTextLength(),
 				);
 
 				textSizeArray.push(fakeTextLength);
@@ -4947,14 +4992,14 @@
 		function translateAxes() {
 			groupYAxisLollipop.attr(
 				"transform",
-				"translate(" + lollipopPanel.padding[3] + ",0)"
+				"translate(" + lollipopPanel.padding[3] + ",0)",
 			);
 		}
 
 		function parseTransform(translate) {
 			const group = document.createElementNS(
 				"http://www.w3.org/2000/svg",
-				"g"
+				"g",
 			);
 
 			group.setAttributeNS(null, "transform", translate);
@@ -5039,7 +5084,7 @@
 					safeDivide(
 						aggregatedLaunchedValues[year].underApproval,
 						aggregatedLaunchedValues[year].approved,
-						aggregatedLaunchedValues[year].launched
+						aggregatedLaunchedValues[year].launched,
 					);
 				yearsWithUnderApprovalAboveMin[year] =
 					underApprovalPercent > minimumUnderApprovalPercentage ||
@@ -5170,9 +5215,9 @@
 					(a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase()
 						? -1
 						: a["CBPF Name"].toLowerCase() >
-						  b["CBPF Name"].toLowerCase()
-						? 1
-						: 0)
+							  b["CBPF Name"].toLowerCase()
+							? 1
+							: 0)
 				);
 			});
 
@@ -5258,7 +5303,7 @@
 
 				if (
 					temporarySet.indexOf(
-						row.AllocationYear + row.PooledFundName
+						row.AllocationYear + row.PooledFundName,
 					) > -1
 				) {
 					const tempObject = aggregatedAllocations.find(function (d) {
@@ -5381,7 +5426,7 @@
 		function createSnapshot(type, fromContextMenu) {
 			if (isInternetExplorer) {
 				alert(
-					"This functionality is not supported by Internet Explorer"
+					"This functionality is not supported by Internet Explorer",
 				);
 				return;
 			}
@@ -5406,14 +5451,14 @@
 				downloadingDivSvg,
 				200,
 				175,
-				downloadingDivText
+				downloadingDivText,
 			);
 
 			const svgRealSize = svg.node().getBoundingClientRect();
 
 			svg.attr("width", svgRealSize.width).attr(
 				"height",
-				svgRealSize.height
+				svgRealSize.height,
 			);
 
 			const listOfStyles = [
@@ -5518,7 +5563,7 @@
 			};
 
 			d3.image(
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png"
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png",
 			).then(function (logo) {
 				let pdfTextPosition;
 
@@ -5531,7 +5576,7 @@
 					210 - pdfMargins.left - pdfMargins.right,
 					{
 						fontSize: 12,
-					}
+					},
 				);
 
 				const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
@@ -5600,7 +5645,7 @@
 					},
 					function (position) {
 						pdfTextPosition = position;
-					}
+					},
 				);
 
 				const sourceDimentions = containerDiv
@@ -5615,7 +5660,7 @@
 					pdfTextPosition.y + 2,
 					widthInMilimeters,
 					widthInMilimeters *
-						(sourceDimentions.height / sourceDimentions.width)
+						(sourceDimentions.height / sourceDimentions.width),
 				);
 
 				const currentDate = new Date();
@@ -5623,7 +5668,7 @@
 				pdf.save(
 					"AllocationsByOrgType_" +
 						csvDateFormat(currentDate) +
-						".pdf"
+						".pdf",
 				);
 
 				removeProgressWheel();
@@ -5651,7 +5696,7 @@
 						pdfMargins.top + 9,
 						5,
 						9,
-						"F"
+						"F",
 					);
 
 					pdf.addImage(
@@ -5660,7 +5705,7 @@
 						pdfMargins.left + 2,
 						pdfMargins.top,
 						90,
-						18
+						18,
 					);
 
 					pdf.setFillColor(236, 161, 84);
@@ -5673,7 +5718,7 @@
 					pdf.text(
 						footer,
 						pdfMargins.left,
-						297 - pdfMargins.bottom + 10
+						297 - pdfMargins.bottom + 10,
 					);
 				}
 
@@ -5688,15 +5733,15 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
 								acc +
 								(index >= chartState.selectedCbpfs.length - 2
 									? index >
-									  chartState.selectedCbpfs.length - 2
+										chartState.selectedCbpfs.length - 2
 										? curr
 										: curr + " and "
 									: curr + ", ")
@@ -5715,7 +5760,7 @@
 				.attr("class", "pbialpd3chartwheelGroup")
 				.attr(
 					"transform",
-					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
+					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")",
 				);
 
 			const loadingText = wheelGroup
@@ -5878,9 +5923,9 @@
 						text.text() === "Red Cross/Crescent Movement"
 							? ["Red Cross/", "Crescent Movement"]
 							: text.text() === "National NGO" &&
-							  chartState.netFunding === 2
-							? ["National", "Partners"]
-							: text.text().split(" "),
+								  chartState.netFunding === 2
+								? ["National", "Partners"]
+								: text.text().split(" "),
 					lineNumber = 0,
 					lineHeight = 1.1,
 					y = text.attr("y"),
