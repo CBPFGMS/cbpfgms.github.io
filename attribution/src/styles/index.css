@@ -1,0 +1,35 @@
+#attributionroot {
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	--ocha-blue: #1f69b3;
+	--ocha-blue-lighter: #82b5e9;
+	--ocha-blue-darker: #144372;
+	--ocha-amber: #ba7517;
+}
+
+a {
+	font-weight: 500;
+	color: #646cff;
+	text-decoration: inherit;
+}
+a:hover {
+	color: #535bf2;
+}
+
+h1 {
+	font-size: 3.2em;
+	line-height: 1.1;
+}
+
+@media (min-width: 1200px) {
+	div.container {
+		max-width: 1200px;
+	}
+}
