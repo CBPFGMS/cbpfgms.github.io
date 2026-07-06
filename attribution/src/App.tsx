@@ -6,14 +6,27 @@ import PageController from "./components/PageController";
 import { fetchAppData } from "./utils/api";
 import DataContext from "./context/DataContext";
 
-function App() {
-	const dataPromise = useMemo(() => fetchAppData(), []);
+type AppProps = {
+	startYear: number | null;
+	defaultFundType: number | null;
+};
+
+const queryStringDonor = new URLSearchParams(window.location.search).get(
+	"donor",
+);
+const selectedDonor = queryStringDonor ? parseInt(queryStringDonor) : null;
+
+function App({ startYear, defaultFundType }: AppProps) {
+	const dataPromise = useMemo(
+		() => fetchAppData(startYear, defaultFundType),
+		[startYear, defaultFundType],
+	);
 
 	return (
 		<ErrorBoundary FallbackComponent={Error}>
 			<Suspense fallback={<Loading />}>
 				<DataContext.Provider value={dataPromise}>
-					<PageController />
+					<PageController selectedDonor={selectedDonor} />
 				</DataContext.Provider>
 			</Suspense>
 		</ErrorBoundary>

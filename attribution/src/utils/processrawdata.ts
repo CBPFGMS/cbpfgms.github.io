@@ -1,0 +1,461 @@
+import {
+	type OrganizationIdsMapObject,
+	type ProjectSummaryObject,
+	type SectorBeneficiaryObject,
+	type TotalBeneficiariesObject,
+	projectSummaryObjectSchema,
+	sectorBeneficiaryObjectSchema,
+	totalBeneficiariesObjectSchema,
+	organizationIdsMapObjectSchema,
+} from "./schemas";
+import type { List } from "./makelists";
+import warnInvalidSchema, {
+	warnProjectNotFound,
+	simpleWarn,
+} from "./warninvalid";
+import { constants, projectStatusMapping } from "./constants";
+
+export type Datum = {
+	reached: BeneficiariesObject;
+	targeted: BeneficiariesObject;
+	fund: number;
+	year: number;
+	projectCode: string;
+	projectId: number;
+	projectStatus: number;
+	allocationSource: number;
+	organizationType: number;
+	organizationId: number;
+	allocationType: number;
+	allocationTypeId: number;
+	endDate: Date;
+	budget: number;
+	sectorData: SectorDatum[];
+	reportType: ReportType;
+};
+
+export type Data = Datum[];
+
+type SectorDatum = {
+	sectorId: number;
+	percentage: number;
+	budget: number;
+	reached: BeneficiariesObject;
+	targeted: BeneficiariesObject;
+};
+
+type SectorMapValue = {
+	projectCode: string;
+	projectId: number;
+	sectors: SectorDatum[];
+};
+
+export type GenderAndAge = (typeof constants.beneficiaryCategories)[number];
+
+export type ReportType = (typeof constants.reportTypes)[number];
+
+export type BeneficiariesObject = {
+	[K in GenderAndAge]: number;
+};
+
+export type InDataLists = {
+	years: Set<number>;
+	sectors: Set<number>;
+	allocationTypes: Set<number>;
+	allocationSources: Set<number>;
+	funds: Set<number>;
+	organizationTypes: Set<number>;
+	organizations: Set<number>;
+	projectStatuses: Set<number>;
+	statusesPerFund: { [key: number]: Set<number> };
+};
+
+type SetType<T> = {
+	[P in keyof T]: T[P] extends Set<infer U> ? U : never;
+};
+
+type InDataListsValues = SetType<InDataLists>;
+
+type ProcessRawDataParams = {
+	projectSummary: ProjectSummaryObject[];
+	sectorsData: SectorBeneficiaryObject[];
+	listsObj: List;
+	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
+	totalBeneficiaries: TotalBeneficiariesObject[];
+	organizationIdsMap: OrganizationIdsMapObject[];
+};
+
+type TargetedAndReached = {
+	targeted: number;
+	reached: number;
+	reachedProjects: number;
+};
+
+export type TotalBeneficiariesData = {
+	[key: number]: {
+		[id: number]: TargetedAndReached;
+		all: TargetedAndReached;
+	};
+};
+
+function processRawData({
+	projectSummary,
+	sectorsData,
+	listsObj,
+	setInDataLists,
+	totalBeneficiaries,
+	organizationIdsMap,
+}: ProcessRawDataParams): {
+	data: Data;
+	totalBeneficiariesData: TotalBeneficiariesData;
+} {
+	const data: Data = [];
+	const totalBeneficiariesData: TotalBeneficiariesData = {};
+
+	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
+
+	const yearsSet: Set<InDataListsValues["years"]> = new Set();
+	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
+	const allocationTypesSet: Set<InDataListsValues["allocationTypes"]> =
+		new Set();
+	const allocationSourcesSet: Set<InDataListsValues["allocationSources"]> =
+		new Set();
+	const fundsSet: Set<InDataListsValues["funds"]> = new Set();
+	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
+		new Set();
+	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
+	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
+		new Set();
+	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+
+	const organizationIdsToChange: Set<number> = new Set();
+
+	organizationIdsMap.forEach(d => {
+		const parsedOrganizationIdsMap =
+			organizationIdsMapObjectSchema.safeParse(d);
+		if (parsedOrganizationIdsMap.success) {
+			d.idsList.forEach(id => {
+				organizationIdsToChange.add(id);
+			});
+		} else {
+			warnInvalidSchema(
+				"OrganizationIdsMap",
+				d,
+				JSON.stringify(parsedOrganizationIdsMap.error),
+			);
+		}
+	});
+
+	totalBeneficiaries.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const projectKey = row.PFId;
+
+			if (!totalBeneficiariesData[projectKey]) {
+				totalBeneficiariesData[projectKey] = {
+					all: { targeted: 0, reached: 0, reachedProjects: 0 },
+				};
+			}
+
+			if (row.ProcessStatusId == null) {
+				totalBeneficiariesData[projectKey].all.targeted = row.TotTarg;
+				totalBeneficiariesData[projectKey].all.reached =
+					row.TotAch || 0;
+				if (row.TotAchProjects) {
+					totalBeneficiariesData[projectKey].all.reachedProjects +=
+						row.TotAchProjects;
+				}
+			} else {
+				if (
+					!totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					]
+				) {
+					totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					] = { targeted: 0, reached: 0, reachedProjects: 0 };
+				}
+
+				totalBeneficiariesData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				].targeted = row.TotTarg;
+				totalBeneficiariesData[projectKey][
+					projectStatusMapping[row.ProcessStatusId]
+				].reached = row.TotAch || 0;
+				if (row.TotAchProjects) {
+					totalBeneficiariesData[projectKey][
+						projectStatusMapping[row.ProcessStatusId]
+					].reachedProjects += row.TotAchProjects;
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"totalBeneficiariesData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	sectorsData.forEach(row => {
+		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			sectorsSet.add(row.GlobalClusterId);
+			if (!sectorsDataMap.has(row.ChfProjectCode)) {
+				sectorsDataMap.set(row.ChfProjectCode, {
+					projectCode: row.ChfProjectCode,
+					projectId: row.ChfId,
+					sectors: [
+						{
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage,
+							reached: {
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
+							},
+							targeted: {
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
+							},
+							budget: Math.floor(row.CALCBudgetByCluster),
+						},
+					],
+				});
+			} else {
+				const projectData = sectorsDataMap.get(row.ChfProjectCode);
+				if (projectData) {
+					projectData.sectors.push({
+						sectorId: row.GlobalClusterId,
+						percentage: row.Percentage,
+						reached: {
+							girls: row.ActualGirls || 0,
+							boys: row.ActualBoys || 0,
+							women: row.ActualWomen || 0,
+							men: row.ActualMen || 0,
+						},
+						targeted: {
+							girls: row.TargetGirls || 0,
+							boys: row.TargetBoys || 0,
+							women: row.TargetWomen || 0,
+							men: row.TargetMen || 0,
+						},
+						budget: Math.floor(row.CALCBudgetByCluster),
+					});
+				} else {
+					warnProjectNotFound(
+						row.ChfProjectCode,
+						row,
+						"Project not found in sectorsDataMap",
+					);
+				}
+			}
+		} else {
+			warnInvalidSchema(
+				"sectorsData",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	projectSummary.forEach(row => {
+		const parsedRow = projectSummaryObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			//Temporary filter for draft projects:
+			if (row.ProjectStatusCode === "PRJ_DRFT") {
+				return;
+			}
+
+			//hardcoded: changing GlobalOrgId if needed
+			if (organizationIdsToChange.has(row.GlobalOrgId)) {
+				const thisTarget = organizationIdsMap.find(d =>
+					d.idsList.includes(row.GlobalOrgId),
+				);
+				if (thisTarget) {
+					row.GlobalOrgId = thisTarget.changesTo;
+				} else {
+					simpleWarn(
+						`Organization ID ${row.GlobalOrgId} not found in organizationIdsMap`,
+					);
+				}
+			}
+
+			const thisAllocationType =
+				listsObj.allocationTypesCompleteList[
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+				];
+			const thisOrganization =
+				listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
+			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
+
+			if (!thisAllocationType) {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in allocation types",
+				);
+			}
+
+			if (!thisOrganization) {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in organizations",
+				);
+			}
+
+			if (!thisSectorData) {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in sectors data",
+				);
+			}
+
+			//In case we need to check what projects are missing from emergencies data
+			// if (!thisEmergenciesData) {
+			// 	warnProjectNotFound(
+			// 		row.ChfProjectCode,
+			// 		row,
+			// 		"Project not found in emergencies data"
+			// 	);
+			// }
+
+			if (thisAllocationType) {
+				listsObj.projectDetails.set(row.ChfId, {
+					year: thisAllocationType.AllocationYear,
+					fund: row.PooledFundId,
+					allocationSource: thisAllocationType.AllocationSourceId,
+					allocationType: parseFloat(
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
+					),
+					endDate: new Date(row.EndDate),
+					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
+					reportType: row.RptCode ?? 0,
+					projectName: row.ChfProjectCode,
+				});
+			}
+
+			if (thisAllocationType && thisOrganization && thisSectorData) {
+				yearsSet.add(thisAllocationType.AllocationYear);
+				fundsSet.add(row.PooledFundId);
+				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
+				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
+				organizationsSet.add(thisOrganization.GlobalOrgId);
+				projectStatusesSet.add(
+					projectStatusMapping[row.ProcessSTatusID],
+				);
+				allocationTypesSet.add(
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+				);
+
+				if (statusesPerFund[row.PooledFundId]) {
+					statusesPerFund[row.PooledFundId].add(
+						projectStatusMapping[row.ProcessSTatusID],
+					);
+				} else {
+					statusesPerFund[row.PooledFundId] = new Set([
+						projectStatusMapping[row.ProcessSTatusID],
+					]);
+				}
+
+				const objDatum: Datum = {
+					fund: row.PooledFundId,
+					year: thisAllocationType.AllocationYear,
+					projectCode: row.ChfProjectCode,
+					projectId: row.ChfId,
+					projectStatus: projectStatusMapping[row.ProcessSTatusID],
+					allocationSource: thisAllocationType.AllocationSourceId,
+					organizationType: thisOrganization.OrganizationTypeId,
+					organizationId: thisOrganization.GlobalOrgId,
+					allocationType: parseFloat(
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
+					),
+					allocationTypeId: row.AllocationtypeId,
+					endDate: new Date(row.EndDate),
+					budget: Math.floor(row.Budget),
+					sectorData: thisSectorData.sectors,
+					reached: generateBeneficiariesObjectSummary(row, "reached"),
+					targeted: generateBeneficiariesObjectSummary(
+						row,
+						"targeted",
+					),
+					reportType: row.RptCode ?? 0,
+				};
+
+				data.push(objDatum);
+			}
+		} else {
+			warnInvalidSchema(
+				"projectSummary",
+				row,
+				JSON.stringify(parsedRow.error),
+			);
+		}
+	});
+
+	setInDataLists(() => ({
+		years: yearsSet,
+		sectors: sectorsSet,
+		allocationTypes: allocationTypesSet,
+		allocationSources: allocationSourcesSet,
+		funds: fundsSet,
+		organizationTypes: organizationTypesSet,
+		organizations: organizationsSet,
+		projectStatuses: projectStatusesSet,
+		statusesPerFund,
+	}));
+
+	return { data, totalBeneficiariesData };
+}
+
+function generateBeneficiariesObjectSummary(
+	row: ProjectSummaryObject,
+	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted",
+): BeneficiariesObject {
+	let girls = 0,
+		boys = 0,
+		women = 0,
+		men = 0;
+
+	if (type === "reached") {
+		girls = row.AchG || 0;
+		boys = row.AchB || 0;
+		women = row.AchW || 0;
+		men = row.AchM || 0;
+	}
+
+	if (type === "targeted") {
+		girls = row.BenG || 0;
+		boys = row.BenB || 0;
+		women = row.BenW || 0;
+		men = row.BenM || 0;
+	}
+
+	if (type === "disabledReached") {
+		girls = row.AchDisabledG || 0;
+		boys = row.AchDisabledB || 0;
+		women = row.AchDisabledW || 0;
+		men = row.AchDisabledM || 0;
+	}
+
+	if (type === "disabledTargeted") {
+		girls = row.DisabledG || 0;
+		boys = row.DisabledB || 0;
+		women = row.DisabledW || 0;
+		men = row.DisabledM || 0;
+	}
+
+	return {
+		girls,
+		boys,
+		women,
+		men,
+	};
+}
+
+export default processRawData;

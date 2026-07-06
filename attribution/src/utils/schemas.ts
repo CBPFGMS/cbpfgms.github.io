@@ -239,21 +239,33 @@ export const projectSummaryAggregatedObjectSchema = z.object({
 	AYr: z.number().int().nonnegative(),
 });
 
+// export const contributionsObjectSchema = z.object({
+// 	FiscalYear: z.number().int().nonnegative(),
+// 	GMSDonorName: z.string(),
+// 	GMSDonorISO2Code: z.string(),
+// 	PooledFundName: z.string(),
+// 	PooledFundISO2Code: z.string(),
+// 	PaidAmt: z.number(),
+// 	PledgeAmt: z.number(),
+// 	PledgeAmtLocalCurrency: z.string(),
+// 	PledgeAmtCurrencyExchangeRate: z.number(),
+// 	PaidAmtLocalCurrency: z.string(),
+// 	PaidAmtCurrencyExchangeRate: z.number(),
+// 	PledgeAmtLocal: z.number(),
+// 	PaidAmtLocal: z.number(),
+// 	IsTransfer: z.coerce.boolean(),
+// });
+
 export const contributionsObjectSchema = z.object({
-	FiscalYear: z.number().int().nonnegative(),
-	GMSDonorName: z.string(),
-	GMSDonorISO2Code: z.string(),
 	PooledFundName: z.string(),
-	PooledFundISO2Code: z.string(),
-	PaidAmt: z.number(),
-	PledgeAmt: z.number(),
-	PledgeAmtLocalCurrency: z.string(),
-	PledgeAmtCurrencyExchangeRate: z.number(),
-	PaidAmtLocalCurrency: z.string(),
-	PaidAmtCurrencyExchangeRate: z.number(),
-	PledgeAmtLocal: z.number(),
-	PaidAmtLocal: z.number(),
-	IsTransfer: z.coerce.boolean(),
+	PooledFundId: z.number(),
+	FiscalYear: z.number(),
+	DonorName: z.string(),
+	DonorCode: z.number(),
+	GMSDonorId: z.number(),
+	GMSDonorName: z.string(),
+	ContributionAmt: z.number(),
+	ContributionPercent: z.number(),
 });
 
 // ********************
@@ -371,6 +383,24 @@ export const pooledFundsWithRegionMasterObjectSchema = z.object({
 	AreaType: z.string(),
 });
 
+export const donorsMasterObjectSchema = z.object({
+	DonorName: z.string(),
+	CountryName: z.string().nullable(),
+	DonorID: z.number(),
+	DonorMapID: z.number(),
+	DonorNativeCurrency: z.string().nullable(),
+	DonorNativeCurrencyAbbrv: z.string().nullable(),
+	GNP: z.number(),
+	GDP: z.number(),
+	Population: z.number(),
+	FootNote: z.string().nullable(),
+	FootNote_Date: z.string().nullable(),
+	Longitude: z.number().nullable(),
+	Latitude: z.number().nullable(),
+	CountryISO2: z.string().nullable(),
+	CountryISO3: z.string().nullable(),
+});
+
 // ********************
 // TYPES
 // ********************
@@ -416,3 +446,5 @@ export type SectorsMasterObject = z.infer<typeof sectorsMasterObjectSchema>;
 export type PooledFundsWithRegionMasterObject = z.infer<
 	typeof pooledFundsWithRegionMasterObjectSchema
 >;
+
+export type DonorsMasterObject = z.infer<typeof donorsMasterObjectSchema>;

@@ -1,37 +1,32 @@
 import {
 	type AllocationSourcesMasterObject,
 	type AllocationTypesMasterObject,
-	type BeneficiaryTypesMasterObject,
 	type OrganizationMasterObject,
 	type OrganizationTypesMasterObject,
 	type PooledFundsMasterObject,
 	type SectorsMasterObject,
-	type GlobalIndicatorsMasterObject,
 	type PooledFundsWithRegionMasterObject,
+	type DonorsMasterObject,
 	pooledFundsMasterObjectSchema,
-	beneficiaryTypesMasterObjectSchema,
 	allocationTypesMasterObjectSchema,
 	allocationSourcesMasterObjectSchema,
 	organizationTypesMasterObjectSchema,
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
-	globalIndicatorsMasterObjectSchema,
 	pooledFundsWithRegionMasterObjectSchema,
+	donorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import type { GenderAndAge, ReportType } from "./processrawdata";
-import { constants, projectStatusMaster } from "./constants";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
 	organizationMaster: OrganizationMasterObject[];
-	beneficiaryTypesMaster: BeneficiaryTypesMasterObject[];
 	pooledFundsMaster: PooledFundsMasterObject[];
 	allocationSourcesMaster: AllocationSourcesMasterObject[];
 	organizationTypesMaster: OrganizationTypesMasterObject[];
 	sectorsMaster: SectorsMasterObject[];
-	globalIndicatorsMaster: GlobalIndicatorsMasterObject[];
 	pooledFundsWithRegionMaster: PooledFundsWithRegionMasterObject[];
+	donorsMaster: DonorsMasterObject[];
 };
 
 export type ListObj = {
@@ -46,13 +41,6 @@ type OrganizationListObj = {
 	[key: number]: OrganizationMasterObject;
 };
 
-export type GlobalIndicatorsDetails = {
-	[K in GenderAndAge]: boolean;
-} & {
-	unit: GlobalIndicatorsMasterObject["UnitAb"];
-	unitName: GlobalIndicatorsMasterObject["UnitNm"];
-};
-
 export type Regions = {
 	regionName: string;
 	funds: Set<number>;
@@ -65,8 +53,11 @@ export type ProjectDetails = {
 	allocationType: number;
 	endDate: Date;
 	projectStatusId: number;
-	reportType: ReportType;
 	projectName: string;
+};
+
+type NullableListObj = {
+	[key: number]: string | null;
 };
 
 export type List = {
@@ -82,24 +73,23 @@ export type List = {
 	organizationsCompleteList: OrganizationListObj;
 	sectors: ListObj;
 	globalIndicators: ListObj;
-	globalIndicatorsDetails: Map<number, GlobalIndicatorsDetails>;
 	projectDetails: Map<number, ProjectDetails>;
 	regions: Regions[];
-	projectStatus: ListObj;
+	donorNonGMSNames: ListObj;
+	donorGMSNames: ListObj;
+	donorISO2Codes: NullableListObj;
+	donorISO3Codes: NullableListObj;
 };
-
-const { pooledFundsShowingOrgName, orgsShowingOrgName } = constants;
 
 function makeLists({
 	allocationTypesMaster,
 	organizationMaster,
-	beneficiaryTypesMaster,
 	pooledFundsMaster,
 	allocationSourcesMaster,
 	organizationTypesMaster,
 	sectorsMaster,
-	globalIndicatorsMaster,
 	pooledFundsWithRegionMaster,
+	donorsMaster,
 }: MakeListParams): List {
 	const lists: List = {
 		fundNames: {},
@@ -114,10 +104,12 @@ function makeLists({
 		organizationsCompleteList: {},
 		sectors: {},
 		globalIndicators: {},
-		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
 		regions: [],
-		projectStatus: projectStatusMaster,
+		donorNonGMSNames: {},
+		donorGMSNames: {},
+		donorISO2Codes: {},
+		donorISO3Codes: {},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -157,20 +149,6 @@ function makeLists({
 				"PooledFundsWithRegionMaster",
 				d,
 				JSON.stringify(parsedPooledFundsWithRegionMaster.error),
-			);
-		}
-	});
-
-	beneficiaryTypesMaster.forEach(d => {
-		const parsedBeneficiariesMaster =
-			beneficiaryTypesMasterObjectSchema.safeParse(d);
-		if (parsedBeneficiariesMaster.success) {
-			lists.beneficiaryTypes[d.BeneficiaryTypeId] = d.BeneficiaryType;
-		} else {
-			warnInvalidSchema(
-				"BeneficiaryTypesMaster",
-				d,
-				JSON.stringify(parsedBeneficiariesMaster.error),
 			);
 		}
 	});
@@ -239,16 +217,7 @@ function makeLists({
 		const parsedOrganizationMaster =
 			organizationMasterObjectSchema.safeParse(d);
 		if (parsedOrganizationMaster.success) {
-			const showOrgName =
-				(pooledFundsShowingOrgName as readonly number[]).includes(
-					d.PooledFundId,
-				) &&
-				(orgsShowingOrgName as readonly number[]).includes(
-					d.GlobalUniqueId,
-				);
-			lists.organizations[d.GlobalOrgId] = showOrgName
-				? d.OrganizationName
-				: d.GlobalOrgName;
+			lists.organizations[d.GlobalOrgId] = d.GlobalOrgName;
 			lists.organizationsCompleteList[d.GlobalOrgId] = d;
 		} else {
 			warnInvalidSchema(
@@ -259,24 +228,17 @@ function makeLists({
 		}
 	});
 
-	globalIndicatorsMaster.forEach(d => {
-		const parsedGlobalIndicatorsMaster =
-			globalIndicatorsMasterObjectSchema.safeParse(d);
-		if (parsedGlobalIndicatorsMaster.success) {
-			lists.globalIndicators[d.Id] = d.Name;
-			lists.globalIndicatorsDetails.set(d.Id, {
-				women: Boolean(d.HasW),
-				men: Boolean(d.HasM),
-				girls: Boolean(d.HasG),
-				boys: Boolean(d.HasB),
-				unit: d.UnitAb,
-				unitName: d.UnitNm,
-			});
+	donorsMaster.forEach(d => {
+		const parsedDonorsMaster = donorsMasterObjectSchema.safeParse(d);
+		if (parsedDonorsMaster.success) {
+			lists.donorGMSNames[d.DonorID] = d.DonorName;
+			lists.donorISO2Codes[d.DonorID] = d.CountryISO2;
+			lists.donorISO3Codes[d.DonorID] = d.CountryISO3;
 		} else {
 			warnInvalidSchema(
-				"GlobalIndicatorsMaster",
+				"DonorsMaster",
 				d,
-				JSON.stringify(parsedGlobalIndicatorsMaster.error),
+				JSON.stringify(parsedDonorsMaster.error),
 			);
 		}
 	});

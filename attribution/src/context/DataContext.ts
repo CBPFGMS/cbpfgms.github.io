@@ -1,24 +1,6 @@
 import { createContext } from "react";
-import type {
-	AllocationsData,
-	InAllocationsDataLists,
-} from "../utils/processrawdata";
-import type {
-	ContributionsData,
-	InContributionsDataLists,
-} from "../utils/processrawdata";
-import type { LocationsData } from "../utils/processlocationsdata";
-import type { List } from "../utils/makelists";
+import type { AppData } from "../utils/api";
 
-export type DataContextType = {
-	allocationsData: AllocationsData;
-	allocationsInDataLists: InAllocationsDataLists;
-	contributionsData: ContributionsData;
-	contributionsInDataLists: InContributionsDataLists;
-	locationsData: LocationsData;
-	lists: List;
-};
-
-const DataContext = createContext<DataContextType | null>(null);
+const DataContext = createContext<Promise<AppData> | null>(null);
 
 export default DataContext;

@@ -2,66 +2,101 @@ import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import type {
 	PooledFundsMasterObject,
-	ProjectSummaryAggregatedObject,
-	ProjectSummaryObject,
-	ActivitiesObject,
 	SectorsMasterObject,
 	OrganizationTypesMasterObject,
 	AllocationSourcesMasterObject,
-	ActivitiesMasterObject,
+	ContributionsObject,
+	DonorsMasterObject,
+	PooledFundsWithRegionMasterObject,
+	AllocationTypesMasterObject,
+	OrganizationMasterObject,
 } from "./schemas";
 import makeLists, { type List } from "./makelists";
-import processRawData, { type InDataLists, type Data } from "./processrawdata";
+// import processRawData, {
+// 	type AllocationsData,
+// 	type InAllocationsDataLists,
+// } from "./processrawdata";
+import processContributionsData, {
+	type ContributionsData,
+	type InContributionsDataLists,
+} from "./processcontributionsdata";
+// import processLocationsData, {
+// 	type LocationsData,
+// } from "../utils/processlocationsdata";
+import { constants } from "./constants";
 
 export type AppData = {
-	data: Data;
-	inDataLists: InDataLists;
+	// allocationsData: AllocationsData;
+	// allocationsInDataLists: InAllocationsDataLists;
+	contributionsData: ContributionsData;
+	inContributionsDataLists: InContributionsDataLists;
+	// locationsData: LocationsData;
 	lists: List;
 };
 
 type ReceiveDataArgs = [
-	ProjectSummaryAggregatedObject[],
-	ProjectSummaryObject[],
-	ActivitiesObject[],
+	ContributionsObject[],
+	AllocationTypesMasterObject[],
+	OrganizationMasterObject[],
 	PooledFundsMasterObject[],
 	SectorsMasterObject[],
 	OrganizationTypesMasterObject[],
 	AllocationSourcesMasterObject[],
-	ActivitiesMasterObject[],
+	PooledFundsWithRegionMasterObject[],
+	DonorsMasterObject[],
 ];
 
-const baseUrl =
-	"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/";
+const { fundType, currentYear } = constants;
 
-const pooledFundsMasterUrl = `${baseUrl}MstPooledFund.csv`,
-	sectorsMasterUrl = `${baseUrl}MstClusters.csv`,
-	organizationTypesMasterUrl = `${baseUrl}MstOrgType.csv`,
-	allocationSourcesMasterUrl = `${baseUrl}MstAllocationSource.csv`,
-	activitiesMasterUrl = `${baseUrl}MstActivities.csv`;
+// const baseUrl =
+// 	"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/";
 
-export async function fetchAppData(startYear: number | null): Promise<AppData> {
+const pooledFundsMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
+	allocationSourcesMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstAllocationSource?$format=csv",
+	organizationTypesMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstOrgType?$format=csv",
+	sectorsMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstClusters?$format=csv",
+	pooledFundWithRegionMasterUrl =
+		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
+	donorsMaster =
+		"https://cbpfapi.unocha.org/vo2/odata/DonorMaster?$format=csv";
+
+export async function fetchAppData(
+	startYear: number | null,
+	defaultFundType: number | null,
+): Promise<AppData> {
 	// const yearRange = startYear
 	// 	? `${startYear}_${new Date().getFullYear()}`
 	// 	: "";
 
-	const projectSummaryUrl = `${baseUrl}ProjectSummaryV2_${startYear}.csv`;
+	// const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
 
-	const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
+	const selectedFundType = defaultFundType ? defaultFundType : fundType,
+		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
-	const activitiesUrl = `${baseUrl}LocationActivities_${startYear}.csv`;
+	const contributionsUrl = "contributions.csv",
+		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
+		organizationMasterUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
 
 	return Promise.all([
-		fetchFileDB<ProjectSummaryAggregatedObject[]>(
-			"projectSummaryAggregated",
-			projectSummaryAggregatedUrl,
+		fetchFileDB<ContributionsObject[]>(
+			"contributions",
+			contributionsUrl,
 			"csv",
 		),
-		fetchFileDB<ProjectSummaryObject[]>(
-			"projectSummary",
-			projectSummaryUrl,
+		fetchFileDB<AllocationTypesMasterObject[]>(
+			"allocationTypesMaster",
+			allocationTypesMasterUrl,
 			"csv",
 		),
-		fetchFileDB<ActivitiesObject[]>("activities", activitiesUrl, "csv"),
+		fetchFileDB<OrganizationMasterObject[]>(
+			"organizationMaster",
+			organizationMasterUrl,
+			"csv",
+		),
 		fetchFile<PooledFundsMasterObject[]>(
 			"pooledFundsMaster",
 			pooledFundsMasterUrl,
@@ -82,11 +117,12 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 			allocationSourcesMasterUrl,
 			"csv",
 		),
-		fetchFile<ActivitiesMasterObject[]>(
-			"activitiesMaster",
-			activitiesMasterUrl,
-			"csv",
+		fetchFile<PooledFundsWithRegionMasterObject[]>(
+			"pooledFundsWithRegionMaster",
+			pooledFundWithRegionMasterUrl,
+			"json",
 		),
+		fetchFile<DonorsMasterObject[]>("donorsMaster", donorsMaster, "csv"),
 	])
 		.then(receiveData)
 		.catch((error: unknown) => {
@@ -95,33 +131,43 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 		});
 
 	function receiveData([
-		projectSummaryAggregated,
-		projectSummary,
-		activities,
+		contributions,
+		allocationTypesMaster,
+		organizationMaster,
 		pooledFundsMaster,
 		sectorsMaster,
 		organizationTypesMaster,
 		allocationSourcesMaster,
-		activitiesMaster,
+		pooledFundsWithRegionMaster,
+		donorsMaster,
 	]: ReceiveDataArgs): AppData {
 		const lists = makeLists({
 			pooledFundsMaster,
 			allocationSourcesMaster,
 			organizationTypesMaster,
+			allocationTypesMaster,
+			organizationMaster,
 			sectorsMaster,
-			activitiesMaster,
+			pooledFundsWithRegionMaster,
+			donorsMaster,
 		});
 
-		const { data, inDataLists } = processRawData({
-			projectSummaryAggregated,
-			projectSummary,
-			activities,
-			lists,
-		});
+		const { contributionsData, inContributionsDataLists } =
+			processContributionsData({
+				contributions,
+				lists,
+			});
+
+		// const { data, inDataLists } = processRawData({
+		// 	projectSummaryAggregated,
+		// 	projectSummary,
+		// 	activities,
+		// 	lists,
+		// });
 
 		return {
-			data,
-			inDataLists,
+			contributionsData,
+			inContributionsDataLists,
 			lists,
 		};
 	}
