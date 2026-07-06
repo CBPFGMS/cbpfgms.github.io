@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
 
 type InvalidDonorProps = {
 	setDonor: React.Dispatch<React.SetStateAction<number | null>>;
@@ -8,17 +8,27 @@ type InvalidDonorProps = {
 
 function InvalidDonor({ setDonor }: InvalidDonorProps) {
 	return (
-		<Box>
+		<Container
+			sx={{
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				justifyContent: "center",
+				paddingTop: "4em",
+				gap: "1em",
+			}}
+		>
 			<Typography
-				variant="h6"
-				component="h1"
+				variant="h5"
 				gutterBottom
+				sx={{
+					textTransform: "uppercase",
+				}}
 			>
 				Invalid Donor
 			</Typography>
 			<Typography
 				variant="body1"
-				component="p"
 				gutterBottom
 			>
 				The donor you are looking for is not in our database. Please try
@@ -29,9 +39,9 @@ function InvalidDonor({ setDonor }: InvalidDonorProps) {
 				color="primary"
 				onClick={() => setDonor(null)}
 			>
-				Go Back
+				Select donor
 			</Button>
-		</Box>
+		</Container>
 	);
 }
 

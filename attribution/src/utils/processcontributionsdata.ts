@@ -76,7 +76,7 @@ function processContributionsData({
 			warnInvalidSchema(
 				"contributions",
 				row,
-				JSON.stringify(parsedContributions.error),
+				parsedContributions.error.message,
 			);
 		}
 	});

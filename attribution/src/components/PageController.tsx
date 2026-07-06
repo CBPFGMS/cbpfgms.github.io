@@ -13,13 +13,13 @@ function PageController({ selectedDonor }: PageControllerProps) {
 		return <DonorSelector />;
 	}
 
-	const validDonor = true;
+	const validDonor = false;
 
 	if (!validDonor) {
 		return <InvalidDonor setDonor={setDonor} />;
 	}
 
-	return <></>;
+	return <>Page Controller</>;
 }
 
 export default PageController;

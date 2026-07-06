@@ -122,7 +122,7 @@ function makeLists({
 			warnInvalidSchema(
 				"PooledFundsMaster",
 				d,
-				JSON.stringify(parsedFundMaster.error),
+				parsedFundMaster.error.message,
 			);
 		}
 	});
@@ -148,7 +148,7 @@ function makeLists({
 			warnInvalidSchema(
 				"PooledFundsWithRegionMaster",
 				d,
-				JSON.stringify(parsedPooledFundsWithRegionMaster.error),
+				parsedPooledFundsWithRegionMaster.error.message,
 			);
 		}
 	});
@@ -167,7 +167,7 @@ function makeLists({
 			warnInvalidSchema(
 				"AllocationTypeMaster",
 				d,
-				JSON.stringify(parsedAllocationTypeMaster.error),
+				parsedAllocationTypeMaster.error.message,
 			);
 		}
 	});
@@ -181,7 +181,7 @@ function makeLists({
 			warnInvalidSchema(
 				"AllocationSourcesMaster",
 				d,
-				JSON.stringify(parsedAllocationSourcesMaster.error),
+				parsedAllocationSourcesMaster.error.message,
 			);
 		}
 	});
@@ -195,7 +195,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationTypesMaster",
 				d,
-				JSON.stringify(parsedOrganizationTypesMaster.error),
+				parsedOrganizationTypesMaster.error.message,
 			);
 		}
 	});
@@ -208,7 +208,7 @@ function makeLists({
 			warnInvalidSchema(
 				"SectorsMaster",
 				d,
-				JSON.stringify(parsedSectorsMaster.error),
+				parsedSectorsMaster.error.message,
 			);
 		}
 	});
@@ -223,7 +223,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationMaster",
 				d,
-				JSON.stringify(parsedOrganizationMaster.error),
+				parsedOrganizationMaster.error.message,
 			);
 		}
 	});
@@ -238,7 +238,7 @@ function makeLists({
 			warnInvalidSchema(
 				"DonorsMaster",
 				d,
-				JSON.stringify(parsedDonorsMaster.error),
+				parsedDonorsMaster.error.message,
 			);
 		}
 	});
