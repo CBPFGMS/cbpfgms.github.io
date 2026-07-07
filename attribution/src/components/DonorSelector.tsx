@@ -7,18 +7,26 @@ import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import { useAppData } from "../hooks/useappdata";
 import colors from "../utils/colors";
+import { flags } from "../assets/flags24";
+import { addQueryParam } from "../utils/querystrings";
 
 type Donor = {
 	donorName: string;
 	donorISOCode: string | null;
+	donorID: number;
 };
 
-function DonorSelector() {
+type DonorSelectorProps = {
+	setDonor: React.Dispatch<React.SetStateAction<number | null>>;
+};
+
+function DonorSelector({ setDonor }: DonorSelectorProps) {
 	const { inContributionsDataLists, lists } = useAppData();
 
 	const data: Donor[] = [...inContributionsDataLists.donors].map(d => ({
 		donorName: lists.donorGMSNames[d],
-		donorISOCode: lists.donorISO3Codes[d],
+		donorISOCode: lists.donorISO2Codes[d],
+		donorID: d,
 	}));
 
 	const groupedDonors = useMemo(() => {
@@ -36,6 +44,7 @@ function DonorSelector() {
 				groups[letter].push({
 					donorName: donor.donorName,
 					donorISOCode: donor.donorISOCode,
+					donorID: donor.donorID,
 				});
 			});
 
@@ -117,9 +126,12 @@ function DonorSelector() {
 											component="button"
 											underline="none"
 											onClick={() => {
-												// TODO: Add your country selection logic
+												addQueryParam(donor.donorID);
+												setDonor(donor.donorID);
 											}}
 											sx={{
+												display: "inline-flex",
+												alignItems: "center",
 												textAlign: "left",
 												fontSize: "0.95rem",
 												color: "text.primary",
@@ -136,6 +148,20 @@ function DonorSelector() {
 												},
 											}}
 										>
+											{donor.donorISOCode && (
+												<img
+													src={
+														flags[
+															donor.donorISOCode.toLowerCase()
+														]
+													}
+													style={{
+														width: 24,
+														height: 24,
+														paddingRight: "0.5em",
+													}}
+												/>
+											)}
 											{donor.donorName}
 										</Link>
 									))}

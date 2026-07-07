@@ -5,6 +5,7 @@ import warnInvalidSchema from "./warninvalid";
 type ProcessContributionsDataParams = {
 	contributions: ContributionsObject[];
 	lists: List;
+	startYear: number | null;
 };
 
 type donorDatum = {
@@ -23,6 +24,7 @@ export type InContributionsDataLists = {
 	years: Set<number>;
 	donors: Set<number>;
 	fundsPerDonor: { [key: number]: Set<number> };
+	yearsPerDonor: { [key: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -34,6 +36,7 @@ type InContributionsDataListsValues = SetType<InContributionsDataLists>;
 function processContributionsData({
 	contributions,
 	lists,
+	startYear,
 }: ProcessContributionsDataParams): {
 	contributionsData: ContributionsData;
 	inContributionsDataLists: InContributionsDataLists;
@@ -43,10 +46,15 @@ function processContributionsData({
 	const yearsSet: Set<InContributionsDataListsValues["years"]> = new Set();
 	const donorsSet: Set<InContributionsDataListsValues["donors"]> = new Set();
 	const fundsPerDonor: InContributionsDataLists["fundsPerDonor"] = {};
+	const yearsPerDonor: InContributionsDataLists["yearsPerDonor"] = {};
 
 	contributions.forEach(row => {
 		const parsedContributions = contributionsObjectSchema.safeParse(row);
 		if (parsedContributions.success) {
+			if (startYear && row.FiscalYear < startYear) {
+				return;
+			}
+
 			const thisDonor = row.GMSDonorId;
 
 			lists.donorNonGMSNames[row.DonorCode] = row.DonorName;
@@ -55,8 +63,10 @@ function processContributionsData({
 			donorsSet.add(thisDonor);
 			if (!fundsPerDonor[thisDonor]) {
 				fundsPerDonor[thisDonor] = new Set([row.PooledFundId]);
+				yearsPerDonor[thisDonor] = new Set([row.FiscalYear]);
 			} else {
 				fundsPerDonor[thisDonor].add(row.PooledFundId);
+				yearsPerDonor[thisDonor].add(row.FiscalYear);
 			}
 
 			const objDatum: donorDatum = {
@@ -85,6 +95,7 @@ function processContributionsData({
 		years: yearsSet,
 		donors: donorsSet,
 		fundsPerDonor,
+		yearsPerDonor,
 	};
 
 	return {

@@ -156,6 +156,7 @@ export async function fetchAppData(
 			processContributionsData({
 				contributions,
 				lists,
+				startYear,
 			});
 
 		// const { data, inDataLists } = processRawData({
