@@ -135,6 +135,7 @@ export const emergenciesObjectSchema = z.object({
 	PooledFundId: z.number().int().nonnegative(),
 	PooledFundName: z.string(),
 	CHFProjectCode: z.string(),
+	OrganizationName: z.string().nullable(),
 	OrganizationAcronym: z.string().nullable(),
 	OrganizationType: z.string().nullable(),
 	AllocationTypeName: z.string().nullable(),
