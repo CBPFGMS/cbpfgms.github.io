@@ -17,12 +17,10 @@ type donorDatum = {
 	year: number;
 	contribution: number;
 	percentage: number;
-	nonGMSDonorCode: number;
+	donor: number;
 };
 
-export type ContributionsData = {
-	[key: number]: donorDatum[];
-};
+export type ContributionsData = donorDatum[];
 
 export type InContributionsDataLists = {
 	years: Set<number>;
@@ -46,13 +44,15 @@ function processContributionsData({
 	contributionsData: ContributionsData;
 	inContributionsDataLists: InContributionsDataLists;
 } {
-	const contributionsData: ContributionsData = {};
+	const contributionsData: ContributionsData = [];
 
 	const yearsSet: Set<InContributionsDataListsValues["years"]> = new Set();
 	const donorsSet: Set<InContributionsDataListsValues["donors"]> = new Set();
 	const fundsPerDonorAndYear: InContributionsDataLists["fundsPerDonorAndYear"] =
 		{};
 	const yearsPerDonor: InContributionsDataLists["yearsPerDonor"] = {};
+
+	let test = 0;
 
 	contributions.forEach(row => {
 		const parsedContributions = contributionsObjectSchema.safeParse(row);
@@ -64,6 +64,10 @@ function processContributionsData({
 			//No attribution for future donations
 			if (row.FiscalYear > currentYear) {
 				return;
+			}
+
+			if(row.PooledFundId === 86 && row.GMSDonorId === 11){
+				test += row.ContributionAmt;
 			}
 
 			const thisDonor = row.GMSDonorId;
@@ -91,19 +95,13 @@ function processContributionsData({
 				yearsPerDonor[thisDonor].add(row.FiscalYear);
 			}
 
-			const objDatum: donorDatum = {
+			contributionsData.push({
 				fund: row.PooledFundId,
 				year: row.FiscalYear,
 				contribution: row.ContributionAmt,
 				percentage: row.ContributionPercent,
-				nonGMSDonorCode: row.DonorCode,
-			};
-
-			if (!contributionsData[thisDonor]) {
-				contributionsData[thisDonor] = [objDatum];
-			} else {
-				contributionsData[thisDonor].push(objDatum);
-			}
+				donor: row.GMSDonorId,
+			});
 		} else {
 			warnInvalidSchema(
 				"contributions",
@@ -112,6 +110,8 @@ function processContributionsData({
 			);
 		}
 	});
+
+	console.log(test);
 
 	const missingFlags = Array.from(donorsSet).reduce<string[]>((acc, curr) => {
 		const donorIsoCode = lists.donorISO2Codes[curr]!.toLowerCase();

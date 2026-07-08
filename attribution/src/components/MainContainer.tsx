@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Container from "@mui/material/Container";
 import { useAppData } from "../hooks/useappdata";
-import { constants } from "../utils/constants";
+// import { constants } from "../utils/constants";
 import TopSelectors from "./TopSelectors";
 import DonorHeader from "./DonorHeader";
+import calculateAttributions from "../utils/calculateattributions";
+import { Tooltip } from "react-tooltip";
+import TopAttributionCard from "./TopAttributionCard";
 
 type MainContainerProps = {
 	donor: number;
@@ -22,6 +25,18 @@ function MainContainer({ donor }: MainContainerProps) {
 		Array.from(inContributionsDataLists.fundsPerDonorAndYear[donor][year]),
 	);
 
+	const attributions = useMemo(
+		() =>
+			calculateAttributions({
+				donor,
+				contributionsData,
+				year,
+				hasUS,
+				funds,
+			}),
+		[donor, contributionsData, year, hasUS, funds],
+	);
+
 	return (
 		<Container
 			disableGutters={true}
@@ -30,6 +45,10 @@ function MainContainer({ donor }: MainContainerProps) {
 				paddingRight: "12px",
 			}}
 		>
+			<Tooltip
+				id="tooltip"
+				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+			/>
 			<TopSelectors
 				setYear={setYear}
 				year={year}
@@ -42,6 +61,11 @@ function MainContainer({ donor }: MainContainerProps) {
 				donor={donor}
 				lists={lists}
 				missingFlags={inContributionsDataLists.missingFlags}
+			/>
+			<TopAttributionCard
+				donor={donor}
+				funds={funds}
+				attributions={attributions}
 			/>
 		</Container>
 	);

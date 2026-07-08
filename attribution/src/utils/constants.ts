@@ -26,4 +26,5 @@ export const constants = {
 		"Disclaimer: Beneficiary figures are calculated using a hybrid methodology designed to minimize double counting across activities and locations. As a result, totals may not fully reconcile when applying different filters or comparing across views.",
 	totalBeneficiairesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
+	USCode: 102,
 } as const;

@@ -1,5 +1,7 @@
 import type { ContributionsData } from "./processcontributionsdata";
-import { simpleWarn } from "./warninvalid";
+import { constants } from "./constants";
+
+const { USCode } = constants;
 
 type AttributionObject = {
 	total: number;
@@ -7,7 +9,7 @@ type AttributionObject = {
 	percentage: number;
 };
 
-type Attributions = {
+export type Attributions = {
 	[key: number]: AttributionObject;
 } & { global: AttributionObject };
 
@@ -22,17 +24,48 @@ type CalculateAttributionsParams = {
 function calculateAttributions({
 	donor,
 	contributionsData,
+	year,
+	hasUS,
+	funds,
 }: CalculateAttributionsParams): Attributions {
-	const attributions: Attributions = { global: 0 };
+	const attributions: Attributions = {
+		global: { total: 0, donor: 0, percentage: 0 },
+	};
 
-	if (contributionsData[donor]) {
-		contributionsData[donor].forEach(datum => {
-			attributions[datum.fund] = {
-		});
-	} else {
-		simpleWarn(
-			`Fatal error: Donor ID ${donor} not found in contributions data`,
-		);
+	console.log(contributionsData);
+	console.log(funds);
+	console.log(year);
+	console.log(hasUS);
+	console.log(donor);
+
+	contributionsData.forEach(datum => {
+		if (!hasUS && datum.donor === USCode) {
+			return;
+		}
+		if (funds.includes(datum.fund) && year === datum.year) {
+			attributions.global.total += datum.contribution;
+			if (datum.donor === donor) {
+				attributions.global.donor += datum.contribution;
+			}
+
+			if (!attributions[datum.fund]) {
+				attributions[datum.fund] = {
+					total: datum.contribution,
+					donor: datum.donor === donor ? datum.contribution : 0,
+					percentage: 0,
+				};
+			} else {
+				attributions[datum.fund].total += datum.contribution;
+				if (datum.donor === donor) {
+					attributions[datum.fund].donor += datum.contribution;
+				}
+			}
+		}
+	});
+
+	for (const fund in attributions) {
+		attributions[fund].percentage =
+			attributions[fund].donor / attributions[fund].total;
 	}
 
 	return attributions;

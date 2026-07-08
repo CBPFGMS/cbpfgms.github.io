@@ -13,11 +13,13 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^9.1.2",
+    "@react-spring/web": "^10.1.2",
     "d3": "^7.9.0",
     "idb": "^8.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-error-boundary": "^6.1.2",
+    "react-tooltip": "^6.0.8",
     "zod": "^4.4.3"
   },
   "devDependencies": {
