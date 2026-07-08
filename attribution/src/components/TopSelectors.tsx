@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import type { InContributionsDataLists } from "../utils/processcontributionsdata";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
-import { grey } from "@mui/material/colors";
 
 type TopSelectorsProps = {
 	setYear: React.Dispatch<React.SetStateAction<number>>;
@@ -15,18 +14,20 @@ type TopSelectorsProps = {
 
 const buttonsStyle = {
 	"& .MuiToggleButton-root": {
-		color: grey[700], // Unselected text color
-		borderColor: grey[400], // Border color
-		backgroundColor: grey[100], // Unselected background
+		color: "rgba(0, 0, 0, 0.87)",
+		borderColor: "1px solid rgba(0, 0, 0, 0.12)",
+		backgroundColor: "transparent",
+		paddingRight: "1.5em",
+		paddingLeft: "1.5em",
+		fontFamily: "Roboto",
+		fontSize: "0.875rem",
 		"&:hover": {
-			backgroundColor: grey[200],
+			backgroundColor: "rgba(0, 0, 0, 0.04)",
 		},
-		// Styles when the button is active/selected
 		"&.Mui-selected": {
-			color: "#fff",
-			backgroundColor: grey[700],
+			backgroundColor: "rgba(0, 0, 0, 0.08)",
 			"&:hover": {
-				backgroundColor: grey[800],
+				backgroundColor: "rgba(0, 0, 0, 0.12)",
 			},
 		},
 	},

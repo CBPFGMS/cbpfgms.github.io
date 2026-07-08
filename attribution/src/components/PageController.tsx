@@ -1,7 +1,4 @@
-import { useState } from "react";
-import DonorSelector from "./DonorSelector";
 import InvalidDonor from "./InvalidDonor";
-import { clearAllParams } from "../utils/querystrings";
 import { useAppData } from "../hooks/useappdata";
 import MainContainer from "./MainContainer";
 
@@ -11,25 +8,16 @@ type PageControllerProps = {
 
 function PageController({ selectedDonor }: PageControllerProps) {
 	const { inContributionsDataLists } = useAppData();
-	const [donor, setDonor] = useState<number | null>(selectedDonor);
 
-	if (donor === null) {
-		return <DonorSelector setDonor={setDonor} />;
-	}
-
-	const validDonor = inContributionsDataLists.donors.has(donor);
+	const validDonor =
+		selectedDonor !== null &&
+		inContributionsDataLists.donors.has(selectedDonor);
 
 	if (!validDonor) {
-		clearAllParams();
-		return <InvalidDonor setDonor={setDonor} />;
+		return <InvalidDonor />;
 	}
 
-	return (
-		<MainContainer
-			donor={donor}
-			setDonor={setDonor}
-		/>
-	);
+	return <MainContainer donor={selectedDonor} />;
 }
 
 export default PageController;

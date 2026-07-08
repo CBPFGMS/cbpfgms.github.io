@@ -1,46 +1,46 @@
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 
-type InvalidDonorProps = {
-	setDonor: React.Dispatch<React.SetStateAction<number | null>>;
-};
-
-function InvalidDonor({ setDonor }: InvalidDonorProps) {
+function InvalidDonor() {
 	return (
 		<Container
 			sx={{
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
-				justifyContent: "center",
-				paddingTop: "4em",
 				gap: "1em",
+				height: "100%",
 			}}
 		>
-			<Typography
-				variant="h5"
-				gutterBottom
+			<Box sx={{ height: "30%" }}></Box>
+			<Box
 				sx={{
-					textTransform: "uppercase",
+					width: "50%",
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+					justifyContent: "center",
 				}}
 			>
-				Invalid Donor
-			</Typography>
-			<Typography
-				variant="body1"
-				gutterBottom
-			>
-				The donor you are looking for is not in our database. Please try
-				again.
-			</Typography>
-			<Button
-				variant="contained"
-				color="primary"
-				onClick={() => setDonor(null)}
-			>
-				Select donor
-			</Button>
+				<Typography
+					variant="h5"
+					gutterBottom
+					sx={{
+						textTransform: "uppercase",
+						marginBottom: "1em",
+					}}
+				>
+					Invalid Donor
+				</Typography>
+				<Typography
+					variant="body1"
+					gutterBottom
+				>
+					The donor you are looking for is not in our database. Please
+					contact support for obtaining a valid page link.
+				</Typography>
+			</Box>
 		</Container>
 	);
 }

@@ -3,19 +3,24 @@ import Container from "@mui/material/Container";
 import { useAppData } from "../hooks/useappdata";
 import { constants } from "../utils/constants";
 import TopSelectors from "./TopSelectors";
+import DonorHeader from "./DonorHeader";
 
 type MainContainerProps = {
 	donor: number;
-	setDonor: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
-const { currentYear } = constants;
+function MainContainer({ donor }: MainContainerProps) {
+	const { contributionsData, inContributionsDataLists, lists } = useAppData();
 
-function MainContainer({ donor, setDonor }: MainContainerProps) {
-	const { contributionsData, inContributionsDataLists } = useAppData();
+	const lastDonorYear = Array.from(
+		inContributionsDataLists.yearsPerDonor[donor],
+	).sort((a, b) => b - a)[0];
 
 	const [hasUS, setHasUS] = useState<boolean>(false);
-	const [year, setYear] = useState<number>(currentYear);
+	const [year, setYear] = useState<number>(lastDonorYear);
+	const [funds, setFunds] = useState<number[]>(
+		Array.from(inContributionsDataLists.fundsPerDonorAndYear[donor][year]),
+	);
 
 	return (
 		<Container
@@ -25,14 +30,19 @@ function MainContainer({ donor, setDonor }: MainContainerProps) {
 				paddingRight: "12px",
 			}}
 		>
-			{/* <TopSelectors
+			<TopSelectors
 				setYear={setYear}
 				year={year}
 				hasUS={hasUS}
 				setHasUS={setHasUS}
 				inContributionsDataLists={inContributionsDataLists}
 				donor={donor}
-			/> */}
+			/>
+			<DonorHeader
+				donor={donor}
+				lists={lists}
+				missingFlags={inContributionsDataLists.missingFlags}
+			/>
 		</Container>
 	);
 }

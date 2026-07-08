@@ -1,20 +1,20 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
 
 function Loading() {
 	return (
-		<div
-			style={{
-				width: "100%",
-				height: "100%",
+		<Container
+			sx={{
 				display: "flex",
 				flexDirection: "column",
-				justifyContent: "center",
 				alignItems: "center",
-				marginTop: "4em",
+				gap: "1em",
+				height: "100%",
 			}}
 		>
+			<Box sx={{ height: "30%" }}></Box>
 			<Box sx={{ display: "flex", justifyContent: "center" }}>
 				<CircularProgress />
 			</Box>
@@ -25,7 +25,7 @@ function Loading() {
 			>
 				Loading data
 			</Typography>
-		</div>
+		</Container>
 	);
 }
 

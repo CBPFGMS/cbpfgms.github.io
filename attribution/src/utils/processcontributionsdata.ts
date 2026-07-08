@@ -1,6 +1,10 @@
 import type { List } from "./makelists";
 import { type ContributionsObject, contributionsObjectSchema } from "./schemas";
-import warnInvalidSchema from "./warninvalid";
+import warnInvalidSchema, { simpleWarn } from "./warninvalid";
+import { constants } from "./constants";
+import { flagsCDNList } from "../assets/flagscdnlist";
+
+const { currentYear } = constants;
 
 type ProcessContributionsDataParams = {
 	contributions: ContributionsObject[];
@@ -23,8 +27,9 @@ export type ContributionsData = {
 export type InContributionsDataLists = {
 	years: Set<number>;
 	donors: Set<number>;
-	fundsPerDonor: { [key: number]: Set<number> };
+	fundsPerDonorAndYear: { [key: number]: { [key: number]: Set<number> } };
 	yearsPerDonor: { [key: number]: Set<number> };
+	missingFlags: string[];
 };
 
 type SetType<T> = {
@@ -45,7 +50,8 @@ function processContributionsData({
 
 	const yearsSet: Set<InContributionsDataListsValues["years"]> = new Set();
 	const donorsSet: Set<InContributionsDataListsValues["donors"]> = new Set();
-	const fundsPerDonor: InContributionsDataLists["fundsPerDonor"] = {};
+	const fundsPerDonorAndYear: InContributionsDataLists["fundsPerDonorAndYear"] =
+		{};
 	const yearsPerDonor: InContributionsDataLists["yearsPerDonor"] = {};
 
 	contributions.forEach(row => {
@@ -55,17 +61,33 @@ function processContributionsData({
 				return;
 			}
 
+			//No attribution for future donations
+			if (row.FiscalYear > currentYear) {
+				return;
+			}
+
 			const thisDonor = row.GMSDonorId;
 
 			lists.donorNonGMSNames[row.DonorCode] = row.DonorName;
 
 			yearsSet.add(row.FiscalYear);
 			donorsSet.add(thisDonor);
-			if (!fundsPerDonor[thisDonor]) {
-				fundsPerDonor[thisDonor] = new Set([row.PooledFundId]);
+			if (!fundsPerDonorAndYear[thisDonor]) {
+				fundsPerDonorAndYear[thisDonor] = {};
+				fundsPerDonorAndYear[thisDonor][row.FiscalYear] = new Set([
+					row.PooledFundId,
+				]);
 				yearsPerDonor[thisDonor] = new Set([row.FiscalYear]);
 			} else {
-				fundsPerDonor[thisDonor].add(row.PooledFundId);
+				if (!fundsPerDonorAndYear[thisDonor][row.FiscalYear]) {
+					fundsPerDonorAndYear[thisDonor][row.FiscalYear] = new Set([
+						row.PooledFundId,
+					]);
+				} else {
+					fundsPerDonorAndYear[thisDonor][row.FiscalYear].add(
+						row.PooledFundId,
+					);
+				}
 				yearsPerDonor[thisDonor].add(row.FiscalYear);
 			}
 
@@ -91,11 +113,24 @@ function processContributionsData({
 		}
 	});
 
+	const missingFlags = Array.from(donorsSet).reduce<string[]>((acc, curr) => {
+		const donorIsoCode = lists.donorISO2Codes[curr]!.toLowerCase();
+		if (!flagsCDNList[donorIsoCode]) {
+			acc.push(donorIsoCode);
+		}
+		return acc;
+	}, []);
+
+	simpleWarn(
+		`The following donors are missing flags: ${missingFlags.join(", ")}`,
+	);
+
 	const inContributionsDataLists: InContributionsDataLists = {
 		years: yearsSet,
 		donors: donorsSet,
-		fundsPerDonor,
+		fundsPerDonorAndYear,
 		yearsPerDonor,
+		missingFlags,
 	};
 
 	return {
