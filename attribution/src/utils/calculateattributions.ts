@@ -32,20 +32,16 @@ function calculateAttributions({
 		global: { total: 0, donor: 0, percentage: 0 },
 	};
 
-	console.log(contributionsData);
-	console.log(funds);
-	console.log(year);
-	console.log(hasUS);
-	console.log(donor);
-
 	contributionsData.forEach(datum => {
 		if (!hasUS && datum.donor === USCode) {
 			return;
 		}
-		if (funds.includes(datum.fund) && year === datum.year) {
-			attributions.global.total += datum.contribution;
-			if (datum.donor === donor) {
-				attributions.global.donor += datum.contribution;
+		if (year === datum.year) {
+			if (funds.includes(datum.fund)) {
+				attributions.global.total += datum.contribution;
+				if (datum.donor === donor) {
+					attributions.global.donor += datum.contribution;
+				}
 			}
 
 			if (!attributions[datum.fund]) {

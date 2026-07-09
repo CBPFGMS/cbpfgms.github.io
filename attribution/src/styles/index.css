@@ -123,6 +123,14 @@ h1 {
 .attrib-remove-btn {
 	font-size: 14px;
 	font-weight: normal;
+	padding: 4px;
+	border-radius: 20px;
+	border: 1px solid;
+	cursor: pointer;
+}
+.attrib-info-btn {
+	font-size: 14px;
+	font-weight: normal;
 	padding: 4px 14px;
 	border-radius: 20px;
 	border: 1px solid;

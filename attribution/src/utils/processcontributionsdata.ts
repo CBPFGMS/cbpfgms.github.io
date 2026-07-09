@@ -52,8 +52,6 @@ function processContributionsData({
 		{};
 	const yearsPerDonor: InContributionsDataLists["yearsPerDonor"] = {};
 
-	let test = 0;
-
 	contributions.forEach(row => {
 		const parsedContributions = contributionsObjectSchema.safeParse(row);
 		if (parsedContributions.success) {
@@ -64,10 +62,6 @@ function processContributionsData({
 			//No attribution for future donations
 			if (row.FiscalYear > currentYear) {
 				return;
-			}
-
-			if(row.PooledFundId === 86 && row.GMSDonorId === 11){
-				test += row.ContributionAmt;
 			}
 
 			const thisDonor = row.GMSDonorId;
@@ -110,8 +104,6 @@ function processContributionsData({
 			);
 		}
 	});
-
-	console.log(test);
 
 	const missingFlags = Array.from(donorsSet).reduce<string[]>((acc, curr) => {
 		const donorIsoCode = lists.donorISO2Codes[curr]!.toLowerCase();

@@ -7,6 +7,7 @@ import DonorHeader from "./DonorHeader";
 import calculateAttributions from "../utils/calculateattributions";
 import { Tooltip } from "react-tooltip";
 import TopAttributionCard from "./TopAttributionCard";
+import AttributionCardsContainer from "./AttributionCardsContainer";
 
 type MainContainerProps = {
 	donor: number;
@@ -56,6 +57,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				setHasUS={setHasUS}
 				inContributionsDataLists={inContributionsDataLists}
 				donor={donor}
+				setFunds={setFunds}
 			/>
 			<DonorHeader
 				donor={donor}
@@ -64,8 +66,18 @@ function MainContainer({ donor }: MainContainerProps) {
 			/>
 			<TopAttributionCard
 				donor={donor}
-				funds={funds}
 				attributions={attributions}
+				lists={lists}
+			/>
+			<AttributionCardsContainer
+				attributions={attributions}
+				lists={lists}
+				donor={donor}
+				funds={funds}
+				allFunds={Array.from(
+					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
+				)}
+				setFunds={setFunds}
 			/>
 		</Container>
 	);

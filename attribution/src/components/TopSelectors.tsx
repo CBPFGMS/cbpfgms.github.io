@@ -10,6 +10,7 @@ type TopSelectorsProps = {
 	setHasUS: React.Dispatch<React.SetStateAction<boolean>>;
 	inContributionsDataLists: InContributionsDataLists;
 	donor: number;
+	setFunds: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 const buttonsStyle = {
@@ -40,6 +41,7 @@ function TopSelectors({
 	setHasUS,
 	inContributionsDataLists,
 	donor,
+	setFunds,
 }: TopSelectorsProps) {
 	const years = Array.from(
 		inContributionsDataLists.yearsPerDonor[donor],
@@ -50,6 +52,11 @@ function TopSelectors({
 		value: typeof year,
 	) {
 		setYear(value);
+		setFunds(
+			Array.from(
+				inContributionsDataLists.fundsPerDonorAndYear[donor][value],
+			),
+		);
 	}
 
 	function handleChangeHasUS(
