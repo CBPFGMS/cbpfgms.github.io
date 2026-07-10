@@ -27,4 +27,5 @@ export const constants = {
 	totalBeneficiairesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
 	USCode: 102,
+	sortByOptions: ["attribution", "donation", "total", "alphabetical"],
 } as const;

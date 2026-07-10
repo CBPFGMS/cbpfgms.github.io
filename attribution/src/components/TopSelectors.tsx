@@ -63,7 +63,9 @@ function TopSelectors({
 		_event: React.MouseEvent<HTMLElement, MouseEvent>,
 		value: typeof hasUS,
 	) {
-		setHasUS(value);
+		if (value !== null) {
+			setHasUS(value);
+		}
 	}
 
 	return (
