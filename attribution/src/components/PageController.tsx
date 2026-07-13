@@ -3,15 +3,13 @@ import { useAppData } from "../hooks/useappdata";
 import MainContainer from "./MainContainer";
 
 type PageControllerProps = {
-	selectedDonor: number | null;
+	selectedDonor: number;
 };
 
 function PageController({ selectedDonor }: PageControllerProps) {
 	const { inContributionsDataLists } = useAppData();
 
-	const validDonor =
-		selectedDonor !== null &&
-		inContributionsDataLists.donors.has(selectedDonor);
+	const validDonor = inContributionsDataLists.donors.has(selectedDonor);
 
 	if (!validDonor) {
 		return <InvalidDonor />;

@@ -234,3 +234,12 @@ h1 {
 		max-width: 1200px;
 	}
 }
+
+#attributionroot button,
+#attributionroot input[type="button"],
+#attributionroot input[type="submit"],
+#attributionroot input[type="reset"],
+#attributionroot a {
+    outline: none;
+    box-shadow: none; /* Some frameworks/browsers use box-shadow for focus */
+}

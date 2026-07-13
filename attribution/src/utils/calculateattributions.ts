@@ -19,6 +19,7 @@ type CalculateAttributionsParams = {
 	year: number;
 	hasUS: boolean;
 	funds: number[];
+	allFunds: number[];
 };
 
 function calculateAttributions({
@@ -27,6 +28,7 @@ function calculateAttributions({
 	year,
 	hasUS,
 	funds,
+	allFunds,
 }: CalculateAttributionsParams): Attributions {
 	const attributions: Attributions = {
 		global: { total: 0, donor: 0, percentage: 0 },
@@ -44,25 +46,30 @@ function calculateAttributions({
 				}
 			}
 
-			if (!attributions[datum.fund]) {
-				attributions[datum.fund] = {
-					total: datum.contribution,
-					donor: datum.donor === donor ? datum.contribution : 0,
-					percentage: 0,
-				};
-			} else {
-				attributions[datum.fund].total += datum.contribution;
-				if (datum.donor === donor) {
-					attributions[datum.fund].donor += datum.contribution;
+			if (allFunds.includes(datum.fund)) {
+				if (!attributions[datum.fund]) {
+					attributions[datum.fund] = {
+						total: datum.contribution,
+						donor: datum.donor === donor ? datum.contribution : 0,
+						percentage: 0,
+					};
+				} else {
+					attributions[datum.fund].total += datum.contribution;
+					if (datum.donor === donor) {
+						attributions[datum.fund].donor += datum.contribution;
+					}
 				}
 			}
 		}
 	});
 
 	for (const fund in attributions) {
-		attributions[fund].percentage =
-			attributions[fund].donor / attributions[fund].total;
+		attributions[fund].percentage = attributions[fund].total
+			? attributions[fund].donor / attributions[fund].total
+			: 0;
 	}
+
+	console.log(attributions);
 
 	return attributions;
 }

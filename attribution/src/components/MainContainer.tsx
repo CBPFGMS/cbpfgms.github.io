@@ -34,8 +34,18 @@ function MainContainer({ donor }: MainContainerProps) {
 				year,
 				hasUS,
 				funds,
+				allFunds: Array.from(
+					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
+				),
 			}),
-		[donor, contributionsData, year, hasUS, funds],
+		[
+			donor,
+			contributionsData,
+			year,
+			hasUS,
+			funds,
+			inContributionsDataLists,
+		],
 	);
 
 	return (
@@ -68,6 +78,10 @@ function MainContainer({ donor }: MainContainerProps) {
 				donor={donor}
 				attributions={attributions}
 				lists={lists}
+				funds={funds}
+				allFunds={Array.from(
+					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
+				)}
 			/>
 			<AttributionCardsContainer
 				attributions={attributions}

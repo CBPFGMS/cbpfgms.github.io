@@ -163,6 +163,7 @@ function AttributionCardsContainer({
 								{
 									<NorthIcon
 										sx={{
+											fontSize: "16px",
 											transform:
 												sortOrder === "desc"
 													? "rotate(180deg)"

@@ -5,6 +5,7 @@ import Error from "./components/Error";
 import PageController from "./components/PageController";
 import { fetchAppData } from "./utils/api";
 import DataContext from "./context/DataContext";
+import InvalidDonor from "./components/InvalidDonor";
 
 type AppProps = {
 	startYear: number | null;
@@ -21,6 +22,10 @@ function App({ startYear, defaultFundType }: AppProps) {
 		() => fetchAppData(startYear, defaultFundType),
 		[startYear, defaultFundType],
 	);
+
+	if (selectedDonor === null) {
+		return <InvalidDonor />;
+	}
 
 	return (
 		<ErrorBoundary FallbackComponent={Error}>

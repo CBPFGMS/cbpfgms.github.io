@@ -379,7 +379,7 @@ export const pooledFundsWithRegionMasterObjectSchema = z.object({
 	longitude: z.union([z.number(), z.string()]),
 	CBPFFundStatus: z.string().nullable(),
 	CBPFId: z.union([z.number().int().nonnegative(), z.string()]),
-	CERFId: z.union([z.number().int().nonnegative(), z.string()]),
+	CERFId: z.union([z.number().int().nonnegative(), z.string()]).nullable(),
 	AreaType: z.string(),
 });
 

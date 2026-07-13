@@ -8,21 +8,29 @@ import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import type { List } from "../utils/makelists";
 import toLocaleFixed from "../utils/localefixed";
+import InfoIcon from "@mui/icons-material/Info";
+import createFundsList from "../utils/createfundslist";
 
 type TopAttributionCardProps = {
 	donor: number;
 	attributions: Attributions;
 	lists: List;
+	funds: number[];
+	allFunds: number[];
 };
 
 function TopAttributionCard({
 	donor,
 	attributions,
 	lists,
+	funds,
+	allFunds,
 }: TopAttributionCardProps) {
 	const percentage = attributions.global.percentage;
 	const totalValue = attributions.global.total;
 	const donorValue = attributions.global.donor;
+
+	const allFundsSelected = allFunds.length === funds.length;
 
 	return (
 		<Box
@@ -55,15 +63,37 @@ function TopAttributionCard({
 						}}
 					>
 						<Grid size={9}>
-							<Typography
-								variant="h6"
+							<Box
 								sx={{
-									fontSize: "1.1em",
+									display: "flex",
+									alignItems: "center",
+									flexDirection: "row",
 								}}
-								className="attrib-cl-amber"
 							>
-								Global attribution
-							</Typography>
+								<Typography
+									variant="h6"
+									sx={{
+										fontSize: "1.1em",
+									}}
+									className="attrib-cl-amber"
+								>
+									Global attribution
+								</Typography>
+								{!allFundsSelected && (
+									<InfoIcon
+										data-tooltip-id="tooltip"
+										data-tooltip-content={`Global attribution refers only to the selected fund${funds.length > 1 ? "s" : ""}: ${createFundsList({ funds, lists })}`}
+										data-tooltip-place="top"
+										style={{
+											color: "#666",
+											fontSize: "20px",
+											marginLeft: "0.1em",
+											alignSelf: "flex-start",
+											marginTop: "-0.1em",
+										}}
+									/>
+								)}
+							</Box>
 						</Grid>
 						<Grid
 							size={3}
