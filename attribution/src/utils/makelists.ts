@@ -52,7 +52,6 @@ export type ProjectDetails = {
 	allocationSource: number;
 	allocationType: number;
 	endDate: Date;
-	projectStatusId: number;
 	projectName: string;
 };
 
@@ -79,6 +78,7 @@ export type List = {
 	donorGMSNames: ListObj;
 	donorISO2Codes: NullableListObj;
 	donorISO3Codes: NullableListObj;
+	sectorsSplitOrder: number[];
 };
 
 function makeLists({
@@ -110,6 +110,7 @@ function makeLists({
 		donorGMSNames: {},
 		donorISO2Codes: {},
 		donorISO3Codes: {},
+		sectorsSplitOrder: [],
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -204,6 +205,7 @@ function makeLists({
 		const parsedSectorsMaster = sectorsMasterObjectSchema.safeParse(d);
 		if (parsedSectorsMaster.success) {
 			lists.sectors[d.ClustId] = d.ClustNm;
+			lists.sectorsSplitOrder.push(d.ClustId);
 		} else {
 			warnInvalidSchema(
 				"SectorsMaster",

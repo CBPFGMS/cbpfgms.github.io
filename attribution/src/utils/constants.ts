@@ -2,6 +2,7 @@ export const constants = {
 	rootElementId: "attributionroot",
 	fundType: 1,
 	currentYear: new Date().getFullYear(),
+	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	beneficiaryCategories: ["women", "girls", "men", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],
 	pageName: "CBPFAttribution",
@@ -28,4 +29,8 @@ export const constants = {
 		"Calculation of unique beneficiaries are underway, will be published soon.",
 	USCode: 102,
 	sortByOptions: ["attribution", "donation", "total", "alphabetical"],
+	partnersSplitOrder: [3, 2, 1, 4],
+	hasDisabledIds: [7, 8, 9],
+	hasGBVIds: [1, 2, 3],
+	hasGenderEqualityIds: [5, 6, 25],
 } as const;

@@ -69,8 +69,6 @@ function calculateAttributions({
 			: 0;
 	}
 
-	console.log(attributions);
-
 	return attributions;
 }
 

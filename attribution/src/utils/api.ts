@@ -10,6 +10,11 @@ import type {
 	PooledFundsWithRegionMasterObject,
 	AllocationTypesMasterObject,
 	OrganizationMasterObject,
+	ProjectSummaryObject,
+	SectorBeneficiaryObject,
+	TotalBeneficiariesObject,
+	TotalBeneficiariesByPartnerObject,
+	TotalBeneficiariesBySectorObject,
 } from "./schemas";
 import makeLists, { type List } from "./makelists";
 // import processRawData, {
@@ -36,6 +41,11 @@ export type AppData = {
 
 type ReceiveDataArgs = [
 	ContributionsObject[],
+	ProjectSummaryObject[],
+	SectorBeneficiaryObject[],
+	TotalBeneficiariesObject[],
+	TotalBeneficiariesByPartnerObject[],
+	TotalBeneficiariesBySectorObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
 	PooledFundsMasterObject[],
@@ -62,7 +72,13 @@ const pooledFundsMasterUrl =
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 	donorsMaster =
-		"https://cbpfapi.unocha.org/vo2/odata/DonorMaster?$format=csv";
+		"https://cbpfapi.unocha.org/vo2/odata/DonorMaster?$format=csv",
+	totalBeneficiariesUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv", //TODO: check year query string
+	totalBeneficiariesByPartnerUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv", //TODO: check year query string
+	totalBeneficiariesBySectorUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv"; //TODO: check year query string
 
 export async function fetchAppData(
 	startYear: number | null,
@@ -77,14 +93,41 @@ export async function fetchAppData(
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
-	const contributionsUrl = "contributions.csv",
+	const contributionsUrl = "contributions.csv", //TODO: change for live API
+		projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
+		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
-		organizationMasterUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
+		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
 
 	return Promise.all([
 		fetchFileDB<ContributionsObject[]>(
 			"contributions",
 			contributionsUrl,
+			"csv",
+		),
+		fetchFileDB<ProjectSummaryObject[]>(
+			"projectSummary",
+			projectSummaryUrl,
+			"csv",
+		),
+		fetchFileDB<SectorBeneficiaryObject[]>(
+			"sectors",
+			sectorsDataUrl,
+			"csv",
+		),
+		fetchFileDB<TotalBeneficiariesObject[]>(
+			"totalBeneficiaries",
+			totalBeneficiariesUrl,
+			"csv",
+		),
+		fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
+			"totalBeneficiariesByPartner",
+			totalBeneficiariesByPartnerUrl,
+			"csv",
+		),
+		fetchFileDB<TotalBeneficiariesBySectorObject[]>(
+			"totalBeneficiariesBySector",
+			totalBeneficiariesBySectorUrl,
 			"csv",
 		),
 		fetchFileDB<AllocationTypesMasterObject[]>(
@@ -132,6 +175,11 @@ export async function fetchAppData(
 
 	function receiveData([
 		contributions,
+		projectSummary,
+		sectorsData,
+		totalBeneficiaries,
+		totalBeneficiariesByPartner,
+		totalBeneficiariesBySector,
 		allocationTypesMaster,
 		organizationMaster,
 		pooledFundsMaster,
@@ -159,12 +207,14 @@ export async function fetchAppData(
 				startYear,
 			});
 
-		// const { data, inDataLists } = processRawData({
-		// 	projectSummaryAggregated,
-		// 	projectSummary,
-		// 	activities,
-		// 	lists,
-		// });
+		const { allocationsData, inAllocationsDataList } = processRawData({
+			projectSummary,
+			sectorsData,
+			totalBeneficiaries,
+			totalBeneficiariesByPartner,
+			totalBeneficiariesBySector,
+			lists,
+		});
 
 		return {
 			contributionsData,
