@@ -10,6 +10,7 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import { constants } from "../utils/constants";
 import NorthIcon from "@mui/icons-material/North";
+import IconsLegend from "./IconsLegend";
 
 type AttributionCardsContainerProps = {
 	attributions: Attributions;
@@ -96,7 +97,7 @@ function AttributionCardsContainer({
 				justifyContent: "center",
 				alignItems: "center",
 				marginTop: "3em",
-				marginBottom: "3em",
+				marginBottom: "2.5em",
 				flexDirection: "column",
 			}}
 		>
@@ -204,6 +205,7 @@ function AttributionCardsContainer({
 					);
 				})}
 			</Grid>
+			<IconsLegend donorName={lists.donorGMSNames[donor]} />
 		</Box>
 	);
 }

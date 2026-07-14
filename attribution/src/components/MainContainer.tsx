@@ -8,6 +8,7 @@ import calculateAttributions from "../utils/calculateattributions";
 import { Tooltip } from "react-tooltip";
 import TopAttributionCard from "./TopAttributionCard";
 import AttributionCardsContainer from "./AttributionCardsContainer";
+import SectionDivider from "./SectionDivider";
 
 type MainContainerProps = {
 	donor: number;
@@ -93,6 +94,13 @@ function MainContainer({ donor }: MainContainerProps) {
 				)}
 				setFunds={setFunds}
 			/>
+			<SectionDivider title="At a glance" />
+			<div style={{ marginTop: "5em" }}></div>
+			<SectionDivider title="Allocated values" />
+			<div style={{ marginTop: "5em" }}></div>
+			<SectionDivider title="Partners" />
+			<div style={{ marginTop: "5em" }}></div>
+			<SectionDivider title="Locations" />
 		</Container>
 	);
 }
