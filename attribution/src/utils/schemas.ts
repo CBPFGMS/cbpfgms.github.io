@@ -46,10 +46,9 @@ export const projectSummaryObjectSchema = z.object({
 	GAMId: z.number().nullable(),
 	GlbPrjStatusId: z.number().nullable(),
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
-	GlobalOrgId: z.number().int().nonnegative(), //change to GlobalOrgID
-	DisabilityMarkerId: z.number().int().nonnegative(),
-	GenderEqualityMarkerId: z.number().int().nonnegative(),
-	GBVMarkerId: z.number().int().nonnegative(),
+	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
+	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
+	GBVMarkerId: z.number().int().nonnegative().nullable(),
 	GAMRefNumber: z.string().nullable(),
 	PartnerProjectRisk: z.string().nullable(),
 	PartnerRisk: z.string().nullable(),
@@ -122,9 +121,6 @@ export const projectSummaryObjectSchema = z.object({
 	PrjApprDate: z.coerce.date().nullable(), //TEMPORARY
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
-	ProjectStatusCode: z.string().nullable(),
-	ProcessStatus: z.string(),
-	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
@@ -416,7 +412,7 @@ export const organizationMasterObjectSchema = z.object({
 	IsEligible: z.string().nullable(),
 	EligibleSince: z.coerce.date().nullable(),
 	FirstAllocationDate: z.coerce.date().nullable(),
-	GlobalOrgId: z.number().int().nonnegative(),
+	GlobalOrgId: z.number().int().nonnegative().nullable(),
 	GlobalOrgName: z.string(),
 	GlobalOrgAcronym: z.string(),
 	GlobalUniqueId: z.number().int().nonnegative(),

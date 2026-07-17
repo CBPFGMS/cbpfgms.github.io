@@ -97,7 +97,6 @@ function AttributionCardsContainer({
 				justifyContent: "center",
 				alignItems: "center",
 				marginTop: "3em",
-				marginBottom: "2.5em",
 				flexDirection: "column",
 			}}
 		>

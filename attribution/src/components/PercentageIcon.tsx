@@ -5,10 +5,12 @@ type TooltipProps =
 	| {
 			showTooltip: true;
 			donorName: string;
+			attribution: number;
 	  }
 	| {
 			showTooltip?: false;
 			donorName?: never;
+			attribution?: never;
 	  };
 
 type PercentageIconProps = {
@@ -19,6 +21,7 @@ function PercentageIcon({
 	size = 22,
 	showTooltip = false,
 	donorName,
+	attribution,
 }: PercentageIconProps) {
 	const iconSize = Math.round(size * 0.72);
 	const borderRadius = Math.round(size * 0.36);
@@ -27,7 +30,7 @@ function PercentageIcon({
 		<Box
 			{...(showTooltip && {
 				"data-tooltip-id": "tooltip",
-				"data-tooltip-content": `This value was calculated based on ${donorName}'s attribution percentage.`,
+				"data-tooltip-content": `This value is ${attribution}% (which is ${donorName}'s attribution percentage) of the total value.`,
 				"data-tooltip-place": "top",
 			})}
 			sx={{

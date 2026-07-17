@@ -240,6 +240,14 @@ h1 {
 #attributionroot input[type="submit"],
 #attributionroot input[type="reset"],
 #attributionroot a {
-    outline: none;
-    box-shadow: none; /* Some frameworks/browsers use box-shadow for focus */
+	outline: none;
+	box-shadow: none; /* Some frameworks/browsers use box-shadow for focus */
+}
+
+.topfigures-card {
+	transition: transform 0.3s ease;
+}
+
+.topfigures-card:hover {
+	transform: translateY(-6px);
 }

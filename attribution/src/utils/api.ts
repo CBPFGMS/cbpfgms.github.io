@@ -17,10 +17,13 @@ import type {
 	TotalBeneficiariesBySectorObject,
 } from "./schemas";
 import makeLists, { type List } from "./makelists";
-// import processRawData, {
-// 	type AllocationsData,
-// 	type InAllocationsDataLists,
-// } from "./processrawdata";
+import processRawData, {
+	type AllocationsData,
+	type InAllocationsDataLists,
+	type TotalBeneficiariesByPartnerData,
+	type TotalBeneficiariesBySectorData,
+	type TotalBeneficiariesData,
+} from "./processrawdata";
 import processContributionsData, {
 	type ContributionsData,
 	type InContributionsDataLists,
@@ -31,10 +34,13 @@ import processContributionsData, {
 import { constants } from "./constants";
 
 export type AppData = {
-	// allocationsData: AllocationsData;
-	// allocationsInDataLists: InAllocationsDataLists;
+	allocationsData: AllocationsData;
+	inAllocationsDataLists: InAllocationsDataLists;
 	contributionsData: ContributionsData;
 	inContributionsDataLists: InContributionsDataLists;
+	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	// locationsData: LocationsData;
 	lists: List;
 };
@@ -207,7 +213,13 @@ export async function fetchAppData(
 				startYear,
 			});
 
-		const { allocationsData, inAllocationsDataList } = processRawData({
+		const {
+			allocationsData,
+			inAllocationsDataLists,
+			totalBeneficiariesData,
+			totalBeneficiariesByPartnerData,
+			totalBeneficiariesBySectorData,
+		} = processRawData({
 			projectSummary,
 			sectorsData,
 			totalBeneficiaries,
@@ -219,6 +231,11 @@ export async function fetchAppData(
 		return {
 			contributionsData,
 			inContributionsDataLists,
+			allocationsData,
+			inAllocationsDataLists,
+			totalBeneficiariesData,
+			totalBeneficiariesByPartnerData,
+			totalBeneficiariesBySectorData,
 			lists,
 		};
 	}

@@ -6,7 +6,7 @@ export const constants = {
 	beneficiaryCategories: ["women", "girls", "men", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],
 	pageName: "CBPFAttribution",
-	localStorageTime: 60 * 60 * 1000, //1 hour
+	localStorageTime: 60 * 60 * 1000 * 100, //1 hour -- 100 hours, temporary!!!
 	consoleStyle: "background-color: #0d6cb6; color: white; padding: 2px;",
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
 	charts: [
@@ -33,4 +33,5 @@ export const constants = {
 	hasDisabledIds: [7, 8, 9],
 	hasGBVIds: [1, 2, 3],
 	hasGenderEqualityIds: [5, 6, 25],
+	localizationMarkers: ["1.1", "1.2", "1.4"],
 } as const;

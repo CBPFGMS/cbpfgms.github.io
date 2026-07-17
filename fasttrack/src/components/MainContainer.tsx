@@ -73,8 +73,6 @@ function MainContainer() {
 		);
 	}, [status]);
 
-	void clickedDownload;
-
 	const filteredDataIndicators = useMemo(
 		() =>
 			processDataIndicators({

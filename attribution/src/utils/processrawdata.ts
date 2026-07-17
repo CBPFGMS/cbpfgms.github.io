@@ -14,8 +14,13 @@ import type { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import { constants } from "./constants";
 
-const { partnersSplitOrder, hasDisabledIds, hasGBVIds, hasGenderEqualityIds } =
-	constants;
+const {
+	partnersSplitOrder,
+	hasDisabledIds,
+	hasGBVIds,
+	hasGenderEqualityIds,
+	localizationMarkers,
+} = constants;
 
 export type AllocationsDatum = {
 	fund: number;
@@ -34,6 +39,7 @@ export type AllocationsDatum = {
 	hasGBV: boolean;
 	hasGenderEquality: boolean;
 	hasWomenLedOrgs: boolean;
+	isLocalised: boolean;
 };
 
 export type AllocationsData = AllocationsDatum[];
@@ -76,7 +82,7 @@ type InAllocationsDataListsValues = SetType<InAllocationsDataLists>;
 type ProcessRawDataParams = {
 	projectSummary: ProjectSummaryObject[];
 	sectorsData: SectorBeneficiaryObject[];
-	listsObj: List;
+	lists: List;
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
@@ -122,7 +128,7 @@ const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
 function processRawData({
 	projectSummary,
 	sectorsData,
-	listsObj,
+	lists,
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
@@ -156,7 +162,7 @@ function processRawData({
 		new Set();
 
 	const sectorsZeroArray: number[] = new Array(
-		listsObj.sectorsSplitOrder.length,
+		lists.sectorsSplitOrder.length,
 	).fill(0);
 
 	totalBeneficiaries.forEach(row => {
@@ -290,7 +296,7 @@ function processRawData({
 				: sectorsZeroArray;
 
 			const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
-				listsObj.sectorsSplitOrder.map((type, index) => {
+				lists.sectorsSplitOrder.map((type, index) => {
 					return {
 						sector: type,
 						girls: {
@@ -340,7 +346,7 @@ function processRawData({
 					sectors: [
 						{
 							sectorId: row.GlobalClusterId,
-							percentage: row.Percentage,
+							percentage: row.Percentage / 100,
 							reached: {
 								girls: row.ActualGirls || 0,
 								boys: row.ActualBoys || 0,
@@ -361,7 +367,7 @@ function processRawData({
 				if (projectData) {
 					projectData.sectors.push({
 						sectorId: row.GlobalClusterId,
-						percentage: row.Percentage,
+						percentage: row.Percentage / 100,
 						reached: {
 							girls: row.ActualGirls || 0,
 							boys: row.ActualBoys || 0,
@@ -392,11 +398,11 @@ function processRawData({
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =
-				listsObj.allocationTypesCompleteList[
+				lists.allocationTypesCompleteList[
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				listsObj.organizationsCompleteList[row.GlobalOrgId];
+				lists.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {
@@ -428,12 +434,12 @@ function processRawData({
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalOrgId);
+				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
-				listsObj.projectDetails.set(row.ChfId, {
+				lists.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
@@ -444,6 +450,9 @@ function processRawData({
 					projectName: row.ChfProjectCode,
 				});
 
+				const thisLocalisationMarker =
+					thisOrganization.LocalizationMarker?.split(" ")[0];
+
 				const objDatum: AllocationsDatum = {
 					fund: row.PooledFundId,
 					year: thisAllocationType.AllocationYear,
@@ -451,7 +460,7 @@ function processRawData({
 					projectId: row.ChfId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalOrgId,
+					organizationId: thisOrganization.GlobalUniqueId,
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
@@ -459,16 +468,27 @@ function processRawData({
 					endDate: new Date(row.EndDate),
 					budget: row.Budget,
 					sectorData: thisSectorData.sectors,
-					hasDisabled: (hasDisabledIds as readonly number[]).includes(
-						row.DisabilityMarkerId,
-					),
-					hasGBV: (hasGBVIds as readonly number[]).includes(
-						row.GBVMarkerId,
-					),
-					hasGenderEquality: (
-						hasGenderEqualityIds as readonly number[]
-					).includes(row.GenderEqualityMarkerId),
-					hasWomenLedOrgs: true, //TODO: use real data
+					hasDisabled:
+						row.DisabilityMarkerId !== null &&
+						(hasDisabledIds as readonly number[]).includes(
+							row.DisabilityMarkerId,
+						),
+					hasGBV:
+						row.GBVMarkerId !== null &&
+						(hasGBVIds as readonly number[]).includes(
+							row.GBVMarkerId,
+						),
+					hasGenderEquality:
+						row.GenderEqualityMarkerId !== null &&
+						(hasGenderEqualityIds as readonly number[]).includes(
+							row.GenderEqualityMarkerId,
+						),
+					hasWomenLedOrgs: thisOrganization.OrgIsWLO === "TRUE",
+					isLocalised:
+						thisLocalisationMarker !== undefined &&
+						(localizationMarkers as readonly string[]).includes(
+							thisLocalisationMarker,
+						),
 				};
 
 				allocationsData.push(objDatum);

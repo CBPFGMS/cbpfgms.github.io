@@ -9,13 +9,24 @@ import { Tooltip } from "react-tooltip";
 import TopAttributionCard from "./TopAttributionCard";
 import AttributionCardsContainer from "./AttributionCardsContainer";
 import SectionDivider from "./SectionDivider";
+import processDataTopFigures from "../utils/processdatatopfigures";
+import TopFigures from "./TopFigures";
+import KeyFigures from "./KeyFigures";
+import processDataKeyFigures from "../utils/processdatakeyfigures";
 
 type MainContainerProps = {
 	donor: number;
 };
 
 function MainContainer({ donor }: MainContainerProps) {
-	const { contributionsData, inContributionsDataLists, lists } = useAppData();
+	const {
+		contributionsData,
+		inContributionsDataLists,
+		lists,
+		allocationsData,
+		inAllocationsDataLists,
+		totalBeneficiariesData,
+	} = useAppData();
 
 	const lastDonorYear = Array.from(
 		inContributionsDataLists.yearsPerDonor[donor],
@@ -49,9 +60,34 @@ function MainContainer({ donor }: MainContainerProps) {
 		],
 	);
 
+	const dataTopFigures = useMemo(
+		() =>
+			processDataTopFigures({
+				allocationsData,
+				totalBeneficiariesData,
+				funds,
+				globalAttribution: attributions.global.percentage,
+				year,
+			}),
+		[allocationsData, totalBeneficiariesData, funds, attributions, year],
+	);
+
+	const dataKeyFigures = useMemo(
+		() =>
+			processDataKeyFigures({
+				allocationsData,
+				funds,
+				globalAttribution: attributions.global.percentage,
+				lists,
+				year,
+			}),
+		[allocationsData, funds, attributions, lists, year],
+	);
+
 	return (
 		<Container
 			disableGutters={true}
+			maxWidth={false}
 			style={{
 				paddingLeft: "12px",
 				paddingRight: "12px",
@@ -95,7 +131,16 @@ function MainContainer({ donor }: MainContainerProps) {
 				setFunds={setFunds}
 			/>
 			<SectionDivider title="At a glance" />
-			<div style={{ marginTop: "5em" }}></div>
+			<TopFigures
+				data={dataTopFigures}
+				attribution={attributions.global.percentage}
+				donorName={lists.donorGMSNames[donor]}
+			/>
+			<KeyFigures
+				data={dataKeyFigures}
+				attribution={attributions.global.percentage}
+				donorName={lists.donorGMSNames[donor]}
+			/>
 			<SectionDivider title="Allocated values" />
 			<div style={{ marginTop: "5em" }}></div>
 			<SectionDivider title="Partners" />

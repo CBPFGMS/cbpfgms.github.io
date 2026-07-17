@@ -8,8 +8,8 @@ function SectionDivider({ title }: { title: string }) {
 				display: "flex",
 				alignItems: "center",
 				gap: "10px",
-				marginBottom: "14px",
-				marginTop: "6px",
+				marginBottom: "48px",
+				marginTop: "24px",
 				fontFamily: "Roboto, sans-serif",
 			}}
 		>

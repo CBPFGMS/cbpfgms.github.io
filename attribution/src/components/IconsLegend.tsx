@@ -3,14 +3,14 @@ import AbsoluteIcon from "./AbsoluteIcon";
 import PercentageIcon from "./PercentageIcon";
 import Typography from "@mui/material/Typography";
 
-const boxStyle = {
+const boxStyle: React.CSSProperties = {
 	flexDirection: "row",
 	display: "flex",
 	justifyContent: "center",
 	alignItems: "center",
 };
 
-const textStyle = {
+const textStyle: React.CSSProperties = {
 	fontWeight: 400,
 	color: "#323437",
 	lineHeight: "1.5",
