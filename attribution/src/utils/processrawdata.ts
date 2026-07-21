@@ -98,7 +98,7 @@ export type TotalBeneficiariesBreakdown = {
 };
 
 export type TotalBeneficiariesData = {
-	[key: number]: TotalBeneficiariesBreakdown;
+	[year: number]: { [fundId: number]: TotalBeneficiariesBreakdown };
 };
 
 type TotalBeneficiariesByPartnerBreakdown = {
@@ -108,7 +108,9 @@ type TotalBeneficiariesByPartnerBreakdown = {
 };
 
 export type TotalBeneficiariesByPartnerData = {
-	[key: number]: TotalBeneficiariesByPartnerBreakdown[];
+	[year: number]: {
+		[fundId: number]: TotalBeneficiariesByPartnerBreakdown[];
+	};
 };
 
 type TotalBeneficiariesBySectorBreakdown = {
@@ -118,7 +120,7 @@ type TotalBeneficiariesBySectorBreakdown = {
 };
 
 export type TotalBeneficiariesBySectorData = {
-	[key: number]: TotalBeneficiariesBySectorBreakdown[];
+	[year: number]: { [fundId: number]: TotalBeneficiariesBySectorBreakdown[] };
 };
 
 const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
@@ -168,38 +170,39 @@ function processRawData({
 	totalBeneficiaries.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			const projectKey = row.PFId;
+			if (row.ProcessStatusId === null) {
+				const totalDatum = {
+					girls: {
+						targeted: row.BenG,
+						reached: row.AchG || 0,
+					},
+					boys: {
+						targeted: row.BenB,
+						reached: row.AchB || 0,
+					},
+					women: {
+						targeted: row.BenW,
+						reached: row.AchW || 0,
+					},
+					men: {
+						targeted: row.BenM,
+						reached: row.AchM || 0,
+					},
+					total: {
+						targeted: row.TotTarg,
+						reached: row.TotAch || 0,
+					},
+				};
 
-			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] =
-					{} as TotalBeneficiariesData[number];
-			}
+				const foundYear = totalBeneficiariesData[row.AllocationYear];
 
-			const totalDatum = {
-				girls: {
-					targeted: row.BenG,
-					reached: row.AchG || 0,
-				},
-				boys: {
-					targeted: row.BenB,
-					reached: row.AchB || 0,
-				},
-				women: {
-					targeted: row.BenW,
-					reached: row.AchW || 0,
-				},
-				men: {
-					targeted: row.BenM,
-					reached: row.AchM || 0,
-				},
-				total: {
-					targeted: row.TotTarg,
-					reached: row.TotAch || 0,
-				},
-			};
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey] = totalDatum;
+				if (!foundYear) {
+					totalBeneficiariesData[row.AllocationYear] = {
+						[row.PFId]: totalDatum,
+					};
+				} else {
+					foundYear[row.PFId] = totalDatum;
+				}
 			}
 		} else {
 			warnInvalidSchema(
@@ -214,56 +217,61 @@ function processRawData({
 		const parsedRow =
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			const projectKey = row.PFId;
-			const partnerValuesMen: number[] = row.BenM.split("#").map(Number);
-			const partnerValuesWomen: number[] =
-				row.BenW.split("#").map(Number);
-			const partnerValuesBoys: number[] = row.BenB.split("#").map(Number);
-			const partnerValuesGirls: number[] =
-				row.BenG.split("#").map(Number);
-			const partnerValuesAchGirls: number[] = row.AchG
-				? row.AchG.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchBoys: number[] = row.AchB
-				? row.AchB.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchWomen: number[] = row.AchW
-				? row.AchW.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchMen: number[] = row.AchM
-				? row.AchM.split("#").map(Number)
-				: partnersZeroArray;
+			if (row.ProcessStatusId === null) {
+				const partnerValuesMen: number[] =
+					row.BenM.split("#").map(Number);
+				const partnerValuesWomen: number[] =
+					row.BenW.split("#").map(Number);
+				const partnerValuesBoys: number[] =
+					row.BenB.split("#").map(Number);
+				const partnerValuesGirls: number[] =
+					row.BenG.split("#").map(Number);
+				const partnerValuesAchGirls: number[] = row.AchG
+					? row.AchG.split("#").map(Number)
+					: partnersZeroArray;
+				const partnerValuesAchBoys: number[] = row.AchB
+					? row.AchB.split("#").map(Number)
+					: partnersZeroArray;
+				const partnerValuesAchWomen: number[] = row.AchW
+					? row.AchW.split("#").map(Number)
+					: partnersZeroArray;
+				const partnerValuesAchMen: number[] = row.AchM
+					? row.AchM.split("#").map(Number)
+					: partnersZeroArray;
 
-			const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
-				partnersSplitOrder.map((type, index) => {
-					return {
-						partner: type,
-						girls: {
-							targeted: partnerValuesGirls[index],
-							reached: partnerValuesAchGirls[index],
-						},
-						boys: {
-							targeted: partnerValuesBoys[index],
-							reached: partnerValuesAchBoys[index],
-						},
-						women: {
-							targeted: partnerValuesWomen[index],
-							reached: partnerValuesAchWomen[index],
-						},
-						men: {
-							targeted: partnerValuesMen[index],
-							reached: partnerValuesAchMen[index],
-						},
+				const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
+					partnersSplitOrder.map((type, index) => {
+						return {
+							partner: type,
+							girls: {
+								targeted: partnerValuesGirls[index],
+								reached: partnerValuesAchGirls[index],
+							},
+							boys: {
+								targeted: partnerValuesBoys[index],
+								reached: partnerValuesAchBoys[index],
+							},
+							women: {
+								targeted: partnerValuesWomen[index],
+								reached: partnerValuesAchWomen[index],
+							},
+							men: {
+								targeted: partnerValuesMen[index],
+								reached: partnerValuesAchMen[index],
+							},
+						};
+					});
+
+				const foundYear =
+					totalBeneficiariesByPartnerData[row.AllocationYear];
+
+				if (!foundYear) {
+					totalBeneficiariesByPartnerData[row.AllocationYear] = {
+						[row.PFId]: partnersDatum,
 					};
-				});
-
-			if (!totalBeneficiariesByPartnerData[projectKey]) {
-				totalBeneficiariesByPartnerData[projectKey] =
-					{} as TotalBeneficiariesByPartnerData[number];
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesByPartnerData[projectKey] = partnersDatum;
+				} else {
+					foundYear[row.PFId] = partnersDatum;
+				}
 			}
 		} else {
 			warnInvalidSchema(
@@ -277,54 +285,61 @@ function processRawData({
 	totalBeneficiariesBySector.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			const projectKey = row.PFId;
-			const sectorValuesMen: number[] = row.BenM.split("#").map(Number);
-			const sectorValuesWomen: number[] = row.BenW.split("#").map(Number);
-			const sectorValuesBoys: number[] = row.BenB.split("#").map(Number);
-			const sectorValuesGirls: number[] = row.BenG.split("#").map(Number);
-			const sectorValuesAchGirls: number[] = row.AchG
-				? row.AchG.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchBoys: number[] = row.AchB
-				? row.AchB.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchWomen: number[] = row.AchW
-				? row.AchW.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchMen: number[] = row.AchM
-				? row.AchM.split("#").map(Number)
-				: sectorsZeroArray;
+			if (row.ProcessStatusId === null) {
+				const sectorValuesMen: number[] =
+					row.BenM.split("#").map(Number);
+				const sectorValuesWomen: number[] =
+					row.BenW.split("#").map(Number);
+				const sectorValuesBoys: number[] =
+					row.BenB.split("#").map(Number);
+				const sectorValuesGirls: number[] =
+					row.BenG.split("#").map(Number);
+				const sectorValuesAchGirls: number[] = row.AchG
+					? row.AchG.split("#").map(Number)
+					: sectorsZeroArray;
+				const sectorValuesAchBoys: number[] = row.AchB
+					? row.AchB.split("#").map(Number)
+					: sectorsZeroArray;
+				const sectorValuesAchWomen: number[] = row.AchW
+					? row.AchW.split("#").map(Number)
+					: sectorsZeroArray;
+				const sectorValuesAchMen: number[] = row.AchM
+					? row.AchM.split("#").map(Number)
+					: sectorsZeroArray;
 
-			const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
-				lists.sectorsSplitOrder.map((type, index) => {
-					return {
-						sector: type,
-						girls: {
-							targeted: sectorValuesGirls[index],
-							reached: sectorValuesAchGirls[index],
-						},
-						boys: {
-							targeted: sectorValuesBoys[index],
-							reached: sectorValuesAchBoys[index],
-						},
-						women: {
-							targeted: sectorValuesWomen[index],
-							reached: sectorValuesAchWomen[index],
-						},
-						men: {
-							targeted: sectorValuesMen[index],
-							reached: sectorValuesAchMen[index],
-						},
+				const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
+					lists.sectorsSplitOrder.map((type, index) => {
+						return {
+							sector: type,
+							girls: {
+								targeted: sectorValuesGirls[index],
+								reached: sectorValuesAchGirls[index],
+							},
+							boys: {
+								targeted: sectorValuesBoys[index],
+								reached: sectorValuesAchBoys[index],
+							},
+							women: {
+								targeted: sectorValuesWomen[index],
+								reached: sectorValuesAchWomen[index],
+							},
+							men: {
+								targeted: sectorValuesMen[index],
+								reached: sectorValuesAchMen[index],
+							},
+						};
+					});
+
+				const foundYear =
+					totalBeneficiariesBySectorData[row.AllocationYear];
+
+				if (!foundYear) {
+					totalBeneficiariesBySectorData[row.AllocationYear] = {
+						[row.PFId]: sectorsDatum,
 					};
-				});
-
-			if (!totalBeneficiariesBySectorData[projectKey]) {
-				totalBeneficiariesBySectorData[projectKey] =
-					{} as TotalBeneficiariesBySectorData[number];
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesBySectorData[projectKey] = sectorsDatum;
+				} else {
+					foundYear[row.PFId] = sectorsDatum;
+				}
 			}
 		} else {
 			warnInvalidSchema(
@@ -483,7 +498,7 @@ function processRawData({
 						(hasGenderEqualityIds as readonly number[]).includes(
 							row.GenderEqualityMarkerId,
 						),
-					hasWomenLedOrgs: thisOrganization.OrgIsWLO === "TRUE",
+					hasWomenLedOrgs: thisOrganization.OrgIsWLO?.toLocaleLowerCase() === "true",
 					isLocalised:
 						thisLocalisationMarker !== undefined &&
 						(localizationMarkers as readonly string[]).includes(

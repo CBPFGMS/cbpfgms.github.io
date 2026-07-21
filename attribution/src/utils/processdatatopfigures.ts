@@ -37,15 +37,21 @@ function processDataTopFigures({
 		reached = 0;
 
 	funds.forEach(pf => {
-		if (!totalBeneficiariesData[pf]) {
+		if (!totalBeneficiariesData[year]) {
+			simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
+			return;
+		}
+		if (!totalBeneficiariesData[year][pf]) {
 			simpleWarn(
-				`Pooled fund code ${pf} not found in the totalBeneficiaries data`,
+				`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${year}`,
 			);
 			return;
 		}
 
-		targeted += totalBeneficiariesData[pf].total.targeted;
-		reached += totalBeneficiariesData[pf].total.reached;
+		const thisYearData = totalBeneficiariesData[year];
+
+		targeted += thisYearData[pf].total.targeted;
+		reached += thisYearData[pf].total.reached;
 	});
 
 	allocationsData.forEach(row => {

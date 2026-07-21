@@ -6,11 +6,13 @@ type TooltipProps =
 			showTooltip: true;
 			donorName: string;
 			attribution: number;
+			plural?: boolean;
 	  }
 	| {
 			showTooltip?: false;
 			donorName?: never;
 			attribution?: never;
+			plural?: never;
 	  };
 
 type PercentageIconProps = {
@@ -22,15 +24,18 @@ function PercentageIcon({
 	showTooltip = false,
 	donorName,
 	attribution,
+	plural = false,
 }: PercentageIconProps) {
 	const iconSize = Math.round(size * 0.72);
 	const borderRadius = Math.round(size * 0.36);
+
+	const valuesText = plural ? "These values are" : "This value is";
 
 	return (
 		<Box
 			{...(showTooltip && {
 				"data-tooltip-id": "tooltip",
-				"data-tooltip-content": `This value is ${attribution}% (which is ${donorName}'s attribution percentage) of the total value.`,
+				"data-tooltip-content": `${valuesText} ${attribution}% (which is ${donorName}'s attribution percentage) of the total value${plural ? "s" : ""}.`,
 				"data-tooltip-place": "top",
 			})}
 			sx={{

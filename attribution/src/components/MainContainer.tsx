@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import Container from "@mui/material/Container";
 import { useAppData } from "../hooks/useappdata";
-// import { constants } from "../utils/constants";
+import { constants } from "../utils/constants";
 import TopSelectors from "./TopSelectors";
 import DonorHeader from "./DonorHeader";
 import calculateAttributions from "../utils/calculateattributions";
@@ -13,10 +13,17 @@ import processDataTopFigures from "../utils/processdatatopfigures";
 import TopFigures from "./TopFigures";
 import KeyFigures from "./KeyFigures";
 import processDataKeyFigures from "../utils/processdatakeyfigures";
+import processDataTotalBeneficiaries from "../utils/processdatatotalben";
+import processDataBarChart from "../utils/processdatabarchart";
+import ChartsContainer from "./ChartsContainer";
+
+export type Charts = (typeof constants.charts)[number];
 
 type MainContainerProps = {
 	donor: number;
 };
+
+const { USCode } = constants;
 
 function MainContainer({ donor }: MainContainerProps) {
 	const {
@@ -24,15 +31,17 @@ function MainContainer({ donor }: MainContainerProps) {
 		inContributionsDataLists,
 		lists,
 		allocationsData,
-		inAllocationsDataLists,
+		// inAllocationsDataLists,
 		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
 	} = useAppData();
 
 	const lastDonorYear = Array.from(
 		inContributionsDataLists.yearsPerDonor[donor],
 	).sort((a, b) => b - a)[0];
 
-	const [hasUS, setHasUS] = useState<boolean>(false);
+	const [hasUS, setHasUS] = useState<boolean>(donor === USCode);
 	const [year, setYear] = useState<number>(lastDonorYear);
 	const [funds, setFunds] = useState<number[]>(
 		Array.from(inContributionsDataLists.fundsPerDonorAndYear[donor][year]),
@@ -83,6 +92,46 @@ function MainContainer({ donor }: MainContainerProps) {
 			}),
 		[allocationsData, funds, attributions, lists, year],
 	);
+
+	const targetedAndReachedTotal = useMemo(
+		() =>
+			processDataTotalBeneficiaries({
+				totalBeneficiariesData,
+				funds,
+				globalAttribution: attributions.global.percentage,
+				year,
+			}),
+		[totalBeneficiariesData, funds, attributions, year],
+	);
+
+	const { dataSector, dataOrganization } = useMemo(
+		() =>
+			processDataBarChart({
+				allocationsData,
+				year,
+				funds,
+				totalBeneficiariesByPartnerData,
+				totalBeneficiariesBySectorData,
+			}),
+		[
+			allocationsData,
+			year,
+			funds,
+			totalBeneficiariesByPartnerData,
+			totalBeneficiariesBySectorData,
+		],
+	);
+
+	// const { dataPartners, maxBudgetValue } = useMemo(
+	// 	() =>
+	// 		processDataPartners({
+	// 			data,
+	// 			fund,
+	// 			status,
+	// 			sector,
+	// 		}),
+	// 	[data, fund, status, sector],
+	// );
 
 	return (
 		<Container
@@ -142,9 +191,26 @@ function MainContainer({ donor }: MainContainerProps) {
 				donorName={lists.donorGMSNames[donor]}
 			/>
 			<SectionDivider title="Allocated values" />
-			<div style={{ marginTop: "5em" }}></div>
+			<ChartsContainer
+				targetedAndReachedTotal={targetedAndReachedTotal}
+				dataSector={dataSector}
+				dataOrganization={dataOrganization}
+				lists={lists}
+				attribution={attributions.global.percentage}
+				donorName={lists.donorGMSNames[donor]}
+			/>
 			<SectionDivider title="Partners" />
-			<div style={{ marginTop: "5em" }}></div>
+			{/* <Partners
+				data={dataPartners}
+				maxBudgetValue={maxBudgetValue}
+				lists={lists}
+				dataSectors={dataSectors}
+				sector={sector}
+				setSector={setSector}
+				clickedDownload={clickedDownload}
+				setClickedDownload={setClickedDownload}
+				dataPartnersDownload={dataPartnersDownload}
+			/> */}
 			<SectionDivider title="Locations" />
 		</Container>
 	);

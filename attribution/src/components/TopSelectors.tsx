@@ -2,6 +2,9 @@ import Box from "@mui/material/Box";
 import type { InContributionsDataLists } from "../utils/processcontributionsdata";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
+import { constants } from "../utils/constants";
+
+const { USCode } = constants;
 
 type TopSelectorsProps = {
 	setYear: React.Dispatch<React.SetStateAction<number>>;
@@ -93,15 +96,17 @@ function TopSelectors({
 					</ToggleButton>
 				))}
 			</ToggleButtonGroup>
-			<ToggleButtonGroup
-				value={hasUS}
-				exclusive
-				sx={buttonsStyle}
-				onChange={handleChangeHasUS}
-			>
-				<ToggleButton value={false}>Without US</ToggleButton>
-				<ToggleButton value={true}>With US</ToggleButton>
-			</ToggleButtonGroup>
+			{donor !== USCode && (
+				<ToggleButtonGroup
+					value={hasUS}
+					exclusive
+					sx={buttonsStyle}
+					onChange={handleChangeHasUS}
+				>
+					<ToggleButton value={false}>Without US</ToggleButton>
+					<ToggleButton value={true}>With US</ToggleButton>
+				</ToggleButtonGroup>
+			)}
 		</Box>
 	);
 }

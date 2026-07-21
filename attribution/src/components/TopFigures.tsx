@@ -101,6 +101,7 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 			>
 				{cardsData.map((card, index) => {
 					const isReached = card.label === "Reached People";
+					const isTargeted = card.label === "Targeted People";
 					const needsWarning =
 						card.label === "Targeted People" ||
 						card.label === "Reached People";
@@ -170,7 +171,7 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 								sx={{
 									...cardStyle,
 									border: "0.5px solid rgba(0,0,0,0.1)",
-									borderLeft: isReached
+									borderLeft: isTargeted
 										? "3px solid var(--ocha-amber)"
 										: "3px solid var(--ocha-blue)",
 								}}
@@ -190,7 +191,7 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 										style={{
 											fontSize: "2rem",
 											fontWeight: 700,
-											color: isReached
+											color: isTargeted
 												? "var(--ocha-amber)"
 												: "var(--ocha-blue)",
 											fontFamily: "Montserrat",

@@ -125,6 +125,9 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 									transform: "scale(1.2)",
 								},
 							}}
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`$${toLocaleFixed(card.value, 0, 2)}`}
+							data-tooltip-place="bottom"
 						>
 							<Box
 								sx={{
@@ -180,9 +183,6 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 									padding: "22px 12px 12px 12px",
 									textAlign: "center",
 								}}
-								data-tooltip-id="tooltip"
-								data-tooltip-content={`$${toLocaleFixed(card.value, 0, 2)}`}
-								data-tooltip-place="top"
 							>
 								<Typography
 									style={{
