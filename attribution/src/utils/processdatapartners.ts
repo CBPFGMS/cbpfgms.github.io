@@ -1,11 +1,12 @@
-import type { Data } from "./processrawdata";
+import type { AllocationsData } from "./processrawdata";
 import { max } from "d3";
 
 type ProcessDataPartnersParams = {
-	data: Data;
-	fund: number[];
-	status: number[];
+	allocationsData: AllocationsData;
+	funds: number[];
 	sector: number[];
+	year: number;
+	globalAttribution: number;
 };
 
 type SectorDetailsDatum = {
@@ -31,44 +32,47 @@ export type PartnersDatum = {
 };
 
 function processDataPartners({
-	data,
-	fund,
-	status,
+	allocationsData,
+	funds,
 	sector,
+	year,
+	globalAttribution,
 }: ProcessDataPartnersParams): {
-	dataPartners: PartnersDatum[];
+	data: PartnersDatum[];
 	maxBudgetValue: number;
 } {
-	const dataPartners: PartnersDatum[] = [];
+	const data: PartnersDatum[] = [];
 
-	data.forEach(datum => {
+	allocationsData.forEach(datum => {
 		const sectors = datum.sectorData.map(d => d.sectorId);
 		if (
-			fund.includes(datum.fund) &&
-			status.includes(datum.projectStatus) &&
-			sectors.some(d => sector.includes(d))
+			funds.includes(datum.fund) &&
+			sectors.some(d => sector.includes(d)) &&
+			year === datum.year
 		) {
-			const foundPartner = dataPartners.find(
+			const foundPartner = data.find(
 				d => d.partner === datum.organizationId,
 			);
 
 			if (foundPartner) {
 				datum.sectorData.forEach(d => {
 					if (sector.includes(d.sectorId)) {
+						const attributedBudget = d.budget * globalAttribution;
+
 						foundPartner.sectors.add(d.sectorId);
-						foundPartner.budget += d.budget;
+						foundPartner.budget += attributedBudget;
 
 						const foundSectorInDetails =
 							foundPartner.sectorsDetails.find(
 								e => e.sector === d.sectorId,
 							);
 						if (foundSectorInDetails) {
-							foundSectorInDetails.budget += d.budget;
+							foundSectorInDetails.budget += attributedBudget;
 							foundSectorInDetails.fund.add(datum.fund);
 						} else {
 							foundPartner.sectorsDetails.push({
 								sector: d.sectorId,
-								budget: d.budget,
+								budget: attributedBudget,
 								fund: new Set([datum.fund]),
 							});
 						}
@@ -80,12 +84,13 @@ function processDataPartners({
 									e.project === datum.projectId,
 							);
 						if (foundSectorInDetailsForProjects) {
-							foundSectorInDetailsForProjects.budget += d.budget;
+							foundSectorInDetailsForProjects.budget +=
+								attributedBudget;
 							foundSectorInDetailsForProjects.fund = datum.fund;
 						} else {
 							foundPartner.sectorsDetailsForProjects.push({
 								sector: d.sectorId,
-								budget: d.budget,
+								budget: attributedBudget,
 								fund: datum.fund,
 								project: datum.projectId,
 							});
@@ -102,19 +107,21 @@ function processDataPartners({
 					[];
 				datum.sectorData.forEach(d => {
 					if (sector.includes(d.sectorId)) {
+						const attributedBudget = d.budget * globalAttribution;
+
 						thisSectors.add(d.sectorId);
-						thisBudget += d.budget;
+						thisBudget += attributedBudget;
 
 						const foundSectorInDetails = thisSectorDetails.find(
 							e => e.sector === d.sectorId,
 						);
 						if (foundSectorInDetails) {
-							foundSectorInDetails.budget += d.budget;
+							foundSectorInDetails.budget += attributedBudget;
 							foundSectorInDetails.fund.add(datum.fund);
 						} else {
 							thisSectorDetails.push({
 								sector: d.sectorId,
-								budget: d.budget,
+								budget: attributedBudget,
 								fund: new Set([datum.fund]),
 							});
 						}
@@ -125,19 +132,20 @@ function processDataPartners({
 									e.project === datum.projectId,
 							);
 						if (foundSectorInDetailsForProjects) {
-							foundSectorInDetailsForProjects.budget += d.budget;
+							foundSectorInDetailsForProjects.budget +=
+								attributedBudget;
 							foundSectorInDetailsForProjects.fund = datum.fund;
 						} else {
 							thisSectorDetailsForProjects.push({
 								sector: d.sectorId,
-								budget: d.budget,
+								budget: attributedBudget,
 								fund: datum.fund,
 								project: datum.projectId,
 							});
 						}
 					}
 				});
-				dataPartners.push({
+				data.push({
 					partner: datum.organizationId,
 					sectors: thisSectors,
 					budget: thisBudget,
@@ -150,9 +158,9 @@ function processDataPartners({
 		}
 	});
 
-	const maxBudgetValue = max(dataPartners, d => d.budget) || 0;
+	const maxBudgetValue = max(data, d => d.budget) || 0;
 
-	return { dataPartners, maxBudgetValue };
+	return { data, maxBudgetValue };
 }
 
 export default processDataPartners;

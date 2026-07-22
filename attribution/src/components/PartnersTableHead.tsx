@@ -3,7 +3,6 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { constants } from "../utils/constants";
-import type { SortingOrder } from "./IndicatorCard";
 import Box from "@mui/material/Box";
 import type { SortingCriterion } from "./Partners";
 import colors from "../utils/colors";
@@ -19,6 +18,8 @@ type PartnersTableHeadProps = {
 type Titles = {
 	[K in (typeof partnersHeader)[number]]: string;
 };
+
+type SortingOrder = "asc" | "desc";
 
 const { partnersHeader, columnWidthsPartners } = constants;
 

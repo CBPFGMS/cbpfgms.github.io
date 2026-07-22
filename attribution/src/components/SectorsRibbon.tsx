@@ -31,10 +31,12 @@ function SectorsRibbon({
 	return (
 		<Grid
 			container
-			alignItems={"stretch"}
-			justifyContent={"flex-start"}
-			gap={1}
-			mb={4}
+			sx={{
+				alignItems: "stretch",
+				justifyContent: "flex-start",
+				marginBottom: 4,
+				gap: 1,
+			}}
 		>
 			{dataSectors.sectors.map((datum, index) => {
 				const tooltipSectorsText = sector.includes(datum.sector)
@@ -55,7 +57,7 @@ function SectorsRibbon({
 							border: "1px solid #146eb4",
 							filter: sector.includes(datum.sector)
 								? "none"
-								: "grayscale(1) opacity(0.75)",
+								: "grayscale(1) opacity(0.4)",
 						}}
 						data-tooltip-id="tooltip"
 						data-tooltip-html={tooltipSectorsText}
@@ -65,7 +67,7 @@ function SectorsRibbon({
 					>
 						<Box>
 							<Box
-								style={{
+								sx={{
 									width: "26px",
 									height: "26px",
 									background: "#146eb4",
@@ -77,8 +79,8 @@ function SectorsRibbon({
 									fontSize: "1.5rem",
 									marginRight: "20px",
 									flexShrink: "0",
+									marginBottom: 0.5,
 								}}
-								mb={0.5}
 							>
 								<img
 									src={clustersIconsData[datum.sector]}
@@ -96,8 +98,8 @@ function SectorsRibbon({
 									fontSize: "0.9rem",
 									fontFamily: "Montserrat",
 									lineHeight: 1.2,
+									marginBottom: 1,
 								}}
-								mb={1}
 							>
 								{lists.sectors[datum.sector]}
 							</Typography>
@@ -109,8 +111,8 @@ function SectorsRibbon({
 									color: "#666",
 									fontWeight: 900,
 									fontFamily: "Montserrat",
+									marginBottom: 0.5,
 								}}
-								mb={0.5}
 							>
 								${formatSIFloat(datum.budget)}
 								{" ("}

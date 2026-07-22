@@ -314,14 +314,18 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 			<Fade in={Boolean(selectedRow)}>
 				<Box sx={modalStyle}>
 					<Box
-						display="flex"
-						justifyContent="space-between"
-						alignItems="center"
-						mb={2}
+						sx={{
+							marginBottom: 2,
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+						}}
 					>
 						<Box
-							display="flex"
-							flexDirection="column"
+							sx={{
+								display: "flex",
+								flexDirection: "column",
+							}}
 						>
 							<Typography variant="h6">
 								List of Sectors:
@@ -415,14 +419,18 @@ function RowModalProjects({ selectedRow, lists, handleClose }: RowModalProps) {
 			<Fade in={Boolean(selectedRow)}>
 				<Box sx={modalStyle}>
 					<Box
-						display="flex"
-						justifyContent="space-between"
-						alignItems="center"
-						mb={2}
+						sx={{
+							marginBottom: 2,
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+						}}
 					>
 						<Box
-							display="flex"
-							flexDirection="column"
+							sx={{
+								display: "flex",
+								flexDirection: "column",
+							}}
 						>
 							<Typography variant="h6">
 								Sectors per project:

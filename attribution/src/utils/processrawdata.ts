@@ -47,6 +47,7 @@ export type AllocationsData = AllocationsDatum[];
 type SectorDatum = {
 	sectorId: number;
 	percentage: number;
+	budget: number;
 	reached: BeneficiariesObject;
 	targeted: BeneficiariesObject;
 };
@@ -71,6 +72,7 @@ export type InAllocationsDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	sectorsPerYear: Map<number, Set<number>>;
 };
 
 type SetType<T> = {
@@ -162,6 +164,8 @@ function processRawData({
 	> = new Set();
 	const organizationsSet: Set<InAllocationsDataListsValues["organizations"]> =
 		new Set();
+	const sectorsPerYearMap: (typeof inAllocationsDataLists)["sectorsPerYear"] =
+		new Map();
 
 	const sectorsZeroArray: number[] = new Array(
 		lists.sectorsSplitOrder.length,
@@ -374,6 +378,7 @@ function processRawData({
 								women: row.TargetWomen || 0,
 								men: row.TargetMen || 0,
 							},
+							budget: row.CALCBudgetByCluster,
 						},
 					],
 				});
@@ -395,6 +400,7 @@ function processRawData({
 							women: row.TargetWomen || 0,
 							men: row.TargetMen || 0,
 						},
+						budget: row.CALCBudgetByCluster,
 					});
 				} else {
 					warnProjectNotFound(
@@ -454,6 +460,20 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
+				const thisYearSectors = sectorsPerYearMap.get(
+					thisAllocationType.AllocationYear,
+				);
+				if (thisYearSectors) {
+					thisSectorData.sectors.forEach(d => {
+						thisYearSectors.add(d.sectorId);
+					});
+				} else {
+					sectorsPerYearMap.set(
+						thisAllocationType.AllocationYear,
+						new Set(thisSectorData.sectors.map(d => d.sectorId)),
+					);
+				}
+
 				lists.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
@@ -498,7 +518,9 @@ function processRawData({
 						(hasGenderEqualityIds as readonly number[]).includes(
 							row.GenderEqualityMarkerId,
 						),
-					hasWomenLedOrgs: thisOrganization.OrgIsWLO?.toLocaleLowerCase() === "true",
+					hasWomenLedOrgs:
+						thisOrganization.OrgIsWLO?.toLocaleLowerCase() ===
+						"true",
 					isLocalised:
 						thisLocalisationMarker !== undefined &&
 						(localizationMarkers as readonly string[]).includes(
@@ -521,6 +543,7 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
+		sectorsPerYear: sectorsPerYearMap,
 	};
 
 	return {

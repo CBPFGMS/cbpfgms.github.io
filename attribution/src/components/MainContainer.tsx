@@ -16,6 +16,7 @@ import processDataKeyFigures from "../utils/processdatakeyfigures";
 import processDataTotalBeneficiaries from "../utils/processdatatotalben";
 import processDataBarChart from "../utils/processdatabarchart";
 import ChartsContainer from "./ChartsContainer";
+import Partners from "./Partners";
 
 export type Charts = (typeof constants.charts)[number];
 
@@ -31,7 +32,7 @@ function MainContainer({ donor }: MainContainerProps) {
 		inContributionsDataLists,
 		lists,
 		allocationsData,
-		// inAllocationsDataLists,
+		inAllocationsDataLists,
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
@@ -122,17 +123,6 @@ function MainContainer({ donor }: MainContainerProps) {
 		],
 	);
 
-	// const { dataPartners, maxBudgetValue } = useMemo(
-	// 	() =>
-	// 		processDataPartners({
-	// 			data,
-	// 			fund,
-	// 			status,
-	// 			sector,
-	// 		}),
-	// 	[data, fund, status, sector],
-	// );
-
 	return (
 		<Container
 			disableGutters={true}
@@ -200,17 +190,14 @@ function MainContainer({ donor }: MainContainerProps) {
 				donorName={lists.donorGMSNames[donor]}
 			/>
 			<SectionDivider title="Partners" />
-			{/* <Partners
-				data={dataPartners}
-				maxBudgetValue={maxBudgetValue}
+			<Partners
+				allocationsData={allocationsData}
+				funds={funds}
+				year={year}
 				lists={lists}
-				dataSectors={dataSectors}
-				sector={sector}
-				setSector={setSector}
-				clickedDownload={clickedDownload}
-				setClickedDownload={setClickedDownload}
-				dataPartnersDownload={dataPartnersDownload}
-			/> */}
+				inDataSectors={inAllocationsDataLists.sectorsPerYear}
+				attribution={attributions.global.percentage}
+			/>
 			<SectionDivider title="Locations" />
 		</Container>
 	);

@@ -1,33 +1,32 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import type { PartnersDatum } from "../utils/processdatapartners";
 import type { List } from "../utils/makelists";
-import type { DownloadStates } from "./MainContainer";
 import { ascending, descending, sort } from "d3";
 import Table from "@mui/material/Table";
 import TableContainer from "@mui/material/TableContainer";
 import { constants } from "../utils/constants";
 import PartnersTableHead from "./PartnersTableHead";
 import PartnersTableBody from "./PartnersTableBody";
-import type { SectorsData } from "../utils/processdatasectors";
+import processDataSectors from "../utils/processdatasectors";
 import SectorsRibbon from "./SectorsRibbon";
 import InfoIcon from "@mui/icons-material/Info";
-import DownloadAndImageContainer from "./DownloadAndImageContainer";
-import type { PartnersDatumDownload } from "../utils/processdownload";
-import downloadData from "../utils/downloaddata";
+import type {
+	AllocationsData,
+	InAllocationsDataLists,
+} from "../utils/processrawdata";
+import processDataPartners, {
+	type PartnersDatum,
+} from "../utils/processdatapartners";
 
 type PartnersProps = {
-	data: PartnersDatum[];
-	maxBudgetValue: number;
+	allocationsData: AllocationsData;
 	lists: List;
-	dataSectors: SectorsData;
-	sector: number[];
-	setSector: React.Dispatch<React.SetStateAction<number[]>>;
-	clickedDownload: DownloadStates;
-	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
-	dataPartnersDownload: () => PartnersDatumDownload[];
+	funds: number[];
+	year: number;
+	inDataSectors: InAllocationsDataLists["sectorsPerYear"];
+	attribution: number;
 };
 
 export type SortingCriterion = (typeof constants.partnersHeader)[number];
@@ -37,19 +36,40 @@ type SortingOrder = "asc" | "desc";
 type SortAccessor = (e: PartnersDatum) => string | number;
 
 function Partners({
-	data,
-	maxBudgetValue,
+	allocationsData,
+	funds,
+	year,
 	lists,
-	dataSectors,
-	sector,
-	setSector,
-	clickedDownload,
-	setClickedDownload,
-	dataPartnersDownload,
+	inDataSectors,
+	attribution,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
-		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc");
+		[sortingOrder, setSortingOrder] = useState<SortingOrder>("desc"),
+		[sector, setSector] = useState<number[]>([...inDataSectors.get(year)!]);
+
+	const { data, maxBudgetValue } = useMemo(
+		() =>
+			processDataPartners({
+				allocationsData,
+				funds,
+				sector,
+				year,
+				globalAttribution: attribution,
+			}),
+		[allocationsData, funds, sector, year, attribution],
+	);
+
+	const dataSectors = useMemo(
+		() =>
+			processDataSectors({
+				allocationsData,
+				funds,
+				setSector,
+				globalAttribution: attribution,
+			}),
+		[allocationsData, funds, attribution],
+	);
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
 		sortAccessor: SortAccessor = e => {
@@ -69,40 +89,23 @@ function Partners({
 
 	const tableRef = useRef(null);
 
-	const ref = useRef<HTMLDivElement>(null);
-
-	function handleDownloadClick() {
-		const dataPartners = dataPartnersDownload();
-		downloadData<(typeof dataPartners)[number]>(
-			dataPartners,
-			"implementing_partners",
-		);
-	}
-
 	return (
-		<Box ref={ref}>
+		<Box>
 			<Grid
 				container
 				spacing={2}
-				position={"relative"}
 			>
-				<DownloadAndImageContainer
-					handleDownloadClick={handleDownloadClick}
-					clickedDownload={clickedDownload}
-					setClickedDownload={setClickedDownload}
-					type="partners"
-					refElement={ref}
-					fileName="Implementing_Partners"
-				/>
 				<Grid
 					size={12}
-					mb={3}
+					sx={{
+						marginBottom: 3,
+					}}
 				>
 					<Typography
 						style={{
 							color: "var(--ocha-blue)",
 							fontWeight: 700,
-							margin: "30px 0 22px 0",
+							marginBottom: "22px",
 							textAlign: "center",
 							fontSize: "2rem",
 							fontFamily: "Montserrat",
@@ -112,10 +115,7 @@ function Partners({
 					</Typography>
 				</Grid>
 			</Grid>
-			<Box
-				style={{ display: "flex" }}
-				mb={1}
-			>
+			<Box sx={{ display: "flex", marginBottom: 1 }}>
 				<Typography
 					style={{
 						fontSize: "0.9rem",
@@ -144,10 +144,7 @@ function Partners({
 				sector={sector}
 				setSector={setSector}
 			/>
-			<Box
-				style={{ display: "flex" }}
-				mb={1}
-			>
+			<Box style={{ display: "flex", marginBottom: 1 }}>
 				<Typography
 					style={{
 						fontSize: "0.9rem",
