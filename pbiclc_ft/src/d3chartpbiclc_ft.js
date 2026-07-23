@@ -2922,7 +2922,9 @@
 				let cbpfsArray;
 
 				if (chartState.selectedDonors.length === 0) {
-					cbpfsArray = data.dataCbpfs;
+					cbpfsArray = data.dataCbpfs.filter(
+						d => d[chartState.selectedContribution] > 0,
+					);
 				} else {
 					const selectedDonorsData = data.dataDonors
 						.filter(function (d) {
@@ -2956,7 +2958,9 @@
 							return e.isoCode === d.isoCode;
 						}).clicked;
 					});
-					cbpfsArray = mergedArray;
+					cbpfsArray = mergedArray.filter(
+						d => d[chartState.selectedContribution] > 0,
+					);
 				}
 
 				let donorCountry;
