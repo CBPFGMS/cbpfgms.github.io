@@ -7,12 +7,16 @@ import Box from "@mui/material/Box";
 import type { SortingCriterion } from "./Partners";
 import colors from "../utils/colors";
 import InfoIcon from "@mui/icons-material/Info";
+import PercentageIcon from "./PercentageIcon";
+import AbsoluteIcon from "./AbsoluteIcon";
 
 type PartnersTableHeadProps = {
 	sortingCriterion: SortingCriterion;
 	setSortingCriterion: React.Dispatch<React.SetStateAction<SortingCriterion>>;
 	sortingOrder: SortingOrder;
 	setSortingOrder: React.Dispatch<React.SetStateAction<SortingOrder>>;
+	attribution: number;
+	donorName: string;
 };
 
 type Titles = {
@@ -28,6 +32,8 @@ function PartnersTableHead({
 	setSortingOrder,
 	sortingCriterion,
 	sortingOrder,
+	attribution,
+	donorName,
 }: PartnersTableHeadProps) {
 	const titles: Titles = {
 		partner: "Organization Name",
@@ -49,68 +55,102 @@ function PartnersTableHead({
 	return (
 		<TableHead>
 			<TableRow>
-				{partnersHeader.map((header, index) => (
-					<TableCell
-						key={header}
-						style={{
-							width: columnWidthsPartners[index],
-							fontSize: "1em",
-						}}
-						sx={{ backgroundColor: "#f3f3f3" }}
-						onClick={() => handleClick(header)}
-						sortDirection={
-							sortingCriterion === header ? sortingOrder : "desc"
-						}
-					>
+				{partnersHeader.map((header, index) => {
+					const Icon = (
 						<Box
 							sx={{
-								display: "flex",
-								height: "100%",
-								alignItems: "center",
-								justifyContent:
-									header === "partner" || header === "budget"
-										? "flex-start"
-										: "center",
+								marginRight: "0.5em",
 							}}
 						>
-							<TableSortLabel
-								active={sortingCriterion === header}
-								direction={
-									sortingCriterion === header
-										? sortingOrder
-										: "desc"
-								}
+							{header === "budget" ? (
+								<PercentageIcon
+									size={22}
+									showTooltip={true}
+									donorName={donorName}
+									attribution={
+										Math.round(attribution * 1000) / 10
+									}
+								/>
+							) : (
+								<AbsoluteIcon
+									size={22}
+									showTooltip={true}
+									donorName={donorName}
+								/>
+							)}
+						</Box>
+					);
+					const showIcon =
+						header === "budget" ||
+						header === "projects" ||
+						header === "funds";
+					return (
+						<TableCell
+							key={header}
+							style={{
+								width: columnWidthsPartners[index],
+								fontSize: "1em",
+							}}
+							sx={{ backgroundColor: "#f3f3f3" }}
+							onClick={() => handleClick(header)}
+							sortDirection={
+								sortingCriterion === header
+									? sortingOrder
+									: "desc"
+							}
+						>
+							<Box
 								sx={{
-									"&.Mui-active": {
-										color:
-											header === sortingCriterion
-												? colors.unColor
-												: null,
-										fontWeight:
-											header === sortingCriterion
-												? 900
-												: null,
-									},
+									display: "flex",
+									height: "100%",
+									alignItems: "center",
+									justifyContent:
+										header === "partner" ||
+										header === "budget"
+											? "flex-start"
+											: "center",
 								}}
 							>
-								{titles[header]}
-								{header === "projects" && (
-									<InfoIcon
-										data-tooltip-id="tooltip"
-										data-tooltip-content="Click on the # of projects for a detailed projects information"
-										data-tooltip-place="top"
-										style={{
-											color: "#666",
-											fontSize: "16px",
-											alignSelf: "flex-start",
-											marginTop: "1em",
-										}}
-									/>
-								)}
-							</TableSortLabel>
-						</Box>
-					</TableCell>
-				))}
+								<TableSortLabel
+									active={sortingCriterion === header}
+									direction={
+										sortingCriterion === header
+											? sortingOrder
+											: "desc"
+									}
+									sx={{
+										"&.Mui-active": {
+											color:
+												header === sortingCriterion
+													? colors.unColor
+													: null,
+											fontWeight:
+												header === sortingCriterion
+													? 900
+													: null,
+										},
+									}}
+								>
+									{showIcon && Icon}
+									{titles[header]}
+									{header === "projects" && (
+										<InfoIcon
+											data-tooltip-id="tooltip"
+											data-tooltip-content="Click on the # of projects for a detailed projects information"
+											data-tooltip-place="top"
+											style={{
+												color: "#666",
+												fontSize: "16px",
+												alignSelf: "flex-start",
+												marginTop: "1em",
+											}}
+										/>
+									)}
+								</TableSortLabel>
+							</Box>
+						</TableCell>
+					);
+				})}
 			</TableRow>
 		</TableHead>
 	);

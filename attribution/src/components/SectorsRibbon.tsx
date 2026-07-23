@@ -6,12 +6,15 @@ import type { SectorsData } from "../utils/processdatasectors";
 import { clustersIconsData } from "../assets/clustericons";
 import type { List } from "../utils/makelists";
 import formatSIFloat from "../utils/formatsi";
+import PercentageIcon from "./PercentageIcon";
 
 type SectorsRibbonProps = {
 	dataSectors: SectorsData;
 	sector: number[];
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	lists: List;
+	attribution: number;
+	donorName: string;
 };
 
 function SectorsRibbon({
@@ -19,6 +22,8 @@ function SectorsRibbon({
 	sector,
 	setSector,
 	lists,
+	attribution,
+	donorName,
 }: SectorsRibbonProps) {
 	function handleClick(d: number) {
 		if (sector.includes(d)) {
@@ -104,31 +109,49 @@ function SectorsRibbon({
 								{lists.sectors[datum.sector]}
 							</Typography>
 						</Box>
-						<Box>
-							<Typography
-								style={{
-									fontSize: "0.8rem",
-									color: "#666",
-									fontWeight: 900,
-									fontFamily: "Montserrat",
-									marginBottom: 0.5,
+						<Box sx={{ width: "100%" }}>
+							<Box
+								sx={{
+									display: "flex",
+									alignItems: "center",
+									flexDirection: "row",
+									marginBottom: 0.75,
+									marginTop: 0.75,
+									gap: "6px",
 								}}
 							>
-								${formatSIFloat(datum.budget)}
-								{" ("}
-								{!Math.round(datum.percentage * 100) && "<"}
-								{Math.round(datum.percentage * 100) || 1}
-								{"%)"}
-							</Typography>
+								<PercentageIcon
+									size={18}
+									showTooltip={true}
+									donorName={donorName}
+									attribution={
+										Math.round(attribution * 1000) / 10
+									}
+								/>
+								<Typography
+									sx={{
+										fontSize: "0.8rem",
+										color: "#666",
+										fontWeight: 900,
+										fontFamily: "Montserrat",
+									}}
+								>
+									${formatSIFloat(datum.budget)}
+									{" ("}
+									{!Math.round(datum.percentage * 100) && "<"}
+									{Math.round(datum.percentage * 100) || 1}
+									{"%)"}
+								</Typography>
+							</Box>
 							<Box
-								style={{
+								sx={{
 									width: "100%",
 									height: "6px",
 									background: "#ccc",
 								}}
 							>
 								<Box
-									style={{
+									sx={{
 										width: `${Math.round(
 											datum.percentage * 100,
 										)}%`,

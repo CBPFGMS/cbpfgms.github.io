@@ -27,6 +27,7 @@ type PartnersProps = {
 	year: number;
 	inDataSectors: InAllocationsDataLists["sectorsPerYear"];
 	attribution: number;
+	donorName: string;
 };
 
 export type SortingCriterion = (typeof constants.partnersHeader)[number];
@@ -42,6 +43,7 @@ function Partners({
 	lists,
 	inDataSectors,
 	attribution,
+	donorName,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
@@ -143,6 +145,8 @@ function Partners({
 				lists={lists}
 				sector={sector}
 				setSector={setSector}
+				attribution={attribution}
+				donorName={donorName}
 			/>
 			<Box style={{ display: "flex", marginBottom: 1 }}>
 				<Typography
@@ -158,7 +162,7 @@ function Partners({
 					for detailed breakdown by project.
 				</Typography>
 			</Box>
-			<Box sx={{ width: "100%	", borderBottom: "1px solid #aaa" }}>
+			<Box sx={{ width: "100%", marginBottom: "42px" }}>
 				<TableContainer
 					ref={tableRef}
 					sx={{
@@ -175,6 +179,8 @@ function Partners({
 							sortingCriterion={sortingCriterion}
 							setSortingOrder={setSortingOrder}
 							sortingOrder={sortingOrder}
+							attribution={attribution}
+							donorName={donorName}
 						/>
 						<PartnersTableBody
 							data={sortedData}
@@ -183,6 +189,14 @@ function Partners({
 						/>
 					</Table>
 				</TableContainer>
+				<Box
+					sx={{
+						width: "100%",
+						height: "22px",
+						backgroundColor: "#f3f3f3",
+						borderTop: "1px solid #e0e0e0",
+					}}
+				></Box>
 			</Box>
 		</Box>
 	);

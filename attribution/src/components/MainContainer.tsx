@@ -197,6 +197,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				lists={lists}
 				inDataSectors={inAllocationsDataLists.sectorsPerYear}
 				attribution={attributions.global.percentage}
+				donorName={lists.donorGMSNames[donor]}
 			/>
 			<SectionDivider title="Locations" />
 		</Container>
