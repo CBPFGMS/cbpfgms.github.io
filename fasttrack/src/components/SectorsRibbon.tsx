@@ -55,7 +55,7 @@ function SectorsRibbon({
 							border: "1px solid #146eb4",
 							filter: sector.includes(datum.sector)
 								? "none"
-								: "grayscale(1) opacity(0.75)",
+								: "grayscale(1) opacity(0.4)",
 						}}
 						data-tooltip-id="tooltip"
 						data-tooltip-html={tooltipSectorsText}
@@ -102,7 +102,7 @@ function SectorsRibbon({
 								{lists.sectors[datum.sector]}
 							</Typography>
 						</Box>
-						<Box>
+						<Box style={{ width: "100%" }}>
 							<Typography
 								style={{
 									fontSize: "0.8rem",
