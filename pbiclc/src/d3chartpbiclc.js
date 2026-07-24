@@ -39,7 +39,7 @@
 			if (cssLink === fontAwesomeLink) {
 				externalCSS.setAttribute(
 					"integrity",
-					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/",
 				);
 				externalCSS.setAttribute("crossorigin", "anonymous");
 			}
@@ -168,7 +168,7 @@
 						callback(
 							new Blob([arr], {
 								type: type || "image/png",
-							})
+							}),
 						);
 					});
 				},
@@ -531,10 +531,12 @@
 			contributionType.indexOf(queryStringValues.get("contribution")) > -1
 				? queryStringValues.get("contribution")
 				: contributionType.indexOf(
-						containerDiv.node().getAttribute("data-contribution")
-				  ) > -1
-				? containerDiv.node().getAttribute("data-contribution")
-				: "total";
+							containerDiv
+								.node()
+								.getAttribute("data-contribution"),
+					  ) > -1
+					? containerDiv.node().getAttribute("data-contribution")
+					: "total";
 
 		const lazyLoad =
 			containerDiv.node().getAttribute("data-lazyload") === "true";
@@ -616,7 +618,7 @@
 				.append("p")
 				.attr("id", "pbiclcTooltipBestVisualizedText")
 				.html(
-					"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+					"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 				)
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
@@ -643,7 +645,7 @@
 				.attr("class", "pbiclcTopPanel")
 				.attr(
 					"transform",
-					"translate(" + padding[3] + "," + padding[0] + ")"
+					"translate(" + padding[3] + "," + padding[0] + ")",
 				),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
@@ -665,7 +667,7 @@
 						(padding[0] +
 							topPanel.height +
 							panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width: width - padding[1] - padding[3],
 			height: buttonPanelHeight,
@@ -691,7 +693,7 @@
 							topPanel.height +
 							buttonPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
 			padding: [44, 72, 4, 0],
@@ -713,7 +715,7 @@
 							topPanel.height +
 							buttonPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
 			padding: [44, 72, 4, 0],
@@ -825,14 +827,14 @@
 					classPrefix + "data",
 					dataUrl,
 					"contributions data",
-					"csv"
+					"csv",
 				),
 				fetchFile("flags", flagsUrl, "flags data", "json"),
 				fetchFile(
 					"masterRegionalFunds",
 					masterRegionalFundsUrl,
 					"master regional funds data",
-					"json"
+					"json",
 				),
 			]).then(allData => csvCallback(allData));
 		}
@@ -846,14 +848,14 @@
 				const fetchedData =
 					method === "csv"
 						? d3.csvParse(
-								JSON.parse(localStorage.getItem(fileName)).data
-						  )
+								JSON.parse(localStorage.getItem(fileName)).data,
+							)
 						: JSON.parse(localStorage.getItem(fileName)).data;
 				console.info(
 					classPrefix +
 						" chart info: " +
 						warningString +
-						" from local storage"
+						" from local storage",
 				);
 				return Promise.resolve(fetchedData);
 			} else {
@@ -868,7 +870,7 @@
 										? d3.csvFormat(fetchedData)
 										: fetchedData,
 								timestamp: currentDate.getTime(),
-							})
+							}),
 						);
 					} catch (error) {
 						console.info(classPrefix + " chart, " + error);
@@ -877,7 +879,7 @@
 						classPrefix +
 							" chart info: " +
 							warningString +
-							" from API"
+							" from API",
 					);
 					return fetchedData;
 				});
@@ -1078,13 +1080,13 @@
 				chartState.selectedDonors = chartState.selectedDonors.filter(
 					function (d) {
 						return allDonors.indexOf(d) > -1;
-					}
+					},
 				);
 
 				chartState.selectedCbpfs = chartState.selectedCbpfs.filter(
 					function (d) {
 						return allCbpfs.indexOf(d) > -1;
-					}
+					},
 				);
 
 				data.dataDonors.forEach(function (d) {
@@ -1129,7 +1131,7 @@
 						return e === chartState.selectedContribution
 							? unBlue
 							: "#eaeaea";
-					}
+					},
 				);
 
 				d3.selectAll(".pbiclcbuttonsContributionsText").style(
@@ -1138,12 +1140,12 @@
 						return e === chartState.selectedContribution
 							? "white"
 							: "#444";
-					}
+					},
 				);
 
 				d3.select(".pbiclcSvgLegend").style(
 					"opacity",
-					chartState.selectedContribution === "total" ? 1 : 0
+					chartState.selectedContribution === "total" ? 1 : 0,
 				);
 
 				createTopPanel();
@@ -1284,7 +1286,7 @@
 						.append("span")
 						.attr(
 							"class",
-							d.clicked ? "fas fa-pause" : "fas fa-play"
+							d.clicked ? "fas fa-pause" : "fas fa-play",
 						);
 
 					if (d.clicked) {
@@ -1297,7 +1299,7 @@
 
 					function loopButtons() {
 						const index = yearsArray.indexOf(
-							chartState.selectedYear[0]
+							chartState.selectedYear[0],
 						);
 
 						chartState.selectedYear[0] =
@@ -1316,16 +1318,17 @@
 							yearsArray[buttonsNumber / 2]
 								? 0
 								: chartState.selectedYear[0] >
-										yearsArray[
-											yearsArray.length -
-												buttonsNumber / 2
-										] ||
-								  chartState.selectedYear[0] === allYearsOption
-								? yearsArray.length - buttonsNumber
-								: yearsArray.indexOf(
-										chartState.selectedYear[0]
-								  ) -
-								  buttonsNumber / 2;
+											yearsArray[
+												yearsArray.length -
+													buttonsNumber / 2
+											] ||
+									  chartState.selectedYear[0] ===
+											allYearsOption
+									? yearsArray.length - buttonsNumber
+									: yearsArray.indexOf(
+											chartState.selectedYear[0],
+										) -
+										buttonsNumber / 2;
 
 						const currentTranslate = -(
 							buttonPanel.buttonWidth * firstYearIndex
@@ -1337,7 +1340,7 @@
 								.style("fill", "#ccc");
 							svg.select(".pbiclcLeftArrowGroup").attr(
 								"pointer-events",
-								"none"
+								"none",
 							);
 						} else {
 							svg.select(".pbiclcLeftArrowGroup")
@@ -1345,7 +1348,7 @@
 								.style("fill", "#666");
 							svg.select(".pbiclcLeftArrowGroup").attr(
 								"pointer-events",
-								"all"
+								"all",
 							);
 						}
 
@@ -1359,7 +1362,7 @@
 								.style("fill", "#ccc");
 							svg.select(".pbiclcRightArrowGroup").attr(
 								"pointer-events",
-								"none"
+								"none",
 							);
 						} else {
 							svg.select(".pbiclcRightArrowGroup")
@@ -1367,7 +1370,7 @@
 								.style("fill", "#666");
 							svg.select(".pbiclcRightArrowGroup").attr(
 								"pointer-events",
-								"all"
+								"all",
 							);
 						}
 
@@ -1377,7 +1380,7 @@
 							.attrTween("transform", function () {
 								return d3.interpolateString(
 									this.getAttribute("transform"),
-									"translate(" + currentTranslate + ",0)"
+									"translate(" + currentTranslate + ",0)",
 								);
 							});
 					}
@@ -1464,7 +1467,7 @@
 						.append("p")
 						.attr("id", "pbiclcBestVisualizedText")
 						.html(
-							"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+							"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 						)
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
@@ -1524,78 +1527,84 @@
 					!chartState.selectedCbpfs.length
 						? data.dataDonors
 						: chartState.selectedDonors.length
-						? data.dataDonors.filter(function (d) {
-								return (
-									chartState.selectedDonors.indexOf(
-										d.isoCode
-									) > -1
-								);
-						  })
-						: data.dataDonors.reduce(function (acc, curr) {
-								curr.donations.forEach(function (d) {
-									if (
-										chartState.selectedCbpfs.indexOf(
-											d.isoCode
+							? data.dataDonors.filter(function (d) {
+									return (
+										chartState.selectedDonors.indexOf(
+											d.isoCode,
 										) > -1
-									) {
-										const found = acc.find(function (e) {
-											return e.donor === curr.donor;
-										});
-										if (found) {
-											found.paid += d.paid;
-											found.pledge += d.pledge;
-											found.total += d.total;
-										} else {
-											acc.push({
-												donor: curr.donor,
-												paid: d.paid,
-												pledge: d.pledge,
-												total: d.total,
-											});
+									);
+								})
+							: data.dataDonors.reduce(function (acc, curr) {
+									curr.donations.forEach(function (d) {
+										if (
+											chartState.selectedCbpfs.indexOf(
+												d.isoCode,
+											) > -1
+										) {
+											const found = acc.find(
+												function (e) {
+													return (
+														e.donor === curr.donor
+													);
+												},
+											);
+											if (found) {
+												found.paid += d.paid;
+												found.pledge += d.pledge;
+												found.total += d.total;
+											} else {
+												acc.push({
+													donor: curr.donor,
+													paid: d.paid,
+													pledge: d.pledge,
+													total: d.total,
+												});
+											}
 										}
-									}
-								});
-								return acc;
-						  }, []);
+									});
+									return acc;
+								}, []);
 
 				const dataCbpfs =
 					!chartState.selectedDonors.length &&
 					!chartState.selectedCbpfs.length
 						? data.dataCbpfs
 						: chartState.selectedCbpfs.length
-						? data.dataCbpfs.filter(function (d) {
-								return (
-									chartState.selectedCbpfs.indexOf(
-										d.isoCode
-									) > -1
-								);
-						  })
-						: data.dataCbpfs.reduce(function (acc, curr) {
-								curr.donors.forEach(function (d) {
-									if (
-										chartState.selectedDonors.indexOf(
-											d.isoCode
+							? data.dataCbpfs.filter(function (d) {
+									return (
+										chartState.selectedCbpfs.indexOf(
+											d.isoCode,
 										) > -1
-									) {
-										const found = acc.find(function (e) {
-											return e.cbpf === curr.cbpf;
-										});
-										if (found) {
-											found.paid += d.paid;
-											found.pledge += d.pledge;
-											found.total += d.total;
-										} else {
-											acc.push({
-												cbpf: curr.cbpf,
-												paid: d.paid,
-												pledge: d.pledge,
-												total: d.total,
-											});
+									);
+								})
+							: data.dataCbpfs.reduce(function (acc, curr) {
+									curr.donors.forEach(function (d) {
+										if (
+											chartState.selectedDonors.indexOf(
+												d.isoCode,
+											) > -1
+										) {
+											const found = acc.find(
+												function (e) {
+													return e.cbpf === curr.cbpf;
+												},
+											);
+											if (found) {
+												found.paid += d.paid;
+												found.pledge += d.pledge;
+												found.total += d.total;
+											} else {
+												acc.push({
+													cbpf: curr.cbpf,
+													paid: d.paid,
+													pledge: d.pledge,
+													total: d.total,
+												});
+											}
 										}
-									}
-								});
-								return acc;
-						  }, []);
+									});
+									return acc;
+								}, []);
 
 				const dataCbpfsNonRhPF = dataCbpfs.filter(function (d) {
 					return !d.cbpf.includes("(");
@@ -1633,13 +1642,13 @@
 					.append("g")
 					.attr(
 						"class",
-						"pbiclctopPanelMoneyBag contributionColorFill"
+						"pbiclctopPanelMoneyBag contributionColorFill",
 					)
 					.attr(
 						"transform",
 						"translate(" +
 							topPanel.moneyBagPadding +
-							",6) scale(0.5)"
+							",6) scale(0.5)",
 					)
 					.each(function (_, i, n) {
 						moneyBagdAttribute.forEach(function (d) {
@@ -1686,7 +1695,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbiclctopPanelMainValue contributionColorFill"
+						"pbiclctopPanelMainValue contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
@@ -1695,7 +1704,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelMainValue
@@ -1712,8 +1721,8 @@
 									? d
 									: siString.substring(
 											0,
-											siString.length - 1
-									  ));
+											siString.length - 1,
+										));
 						};
 					});
 
@@ -1730,13 +1739,13 @@
 					.merge(topPanelMainText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 2.7
+						topPanel.height - topPanel.mainValueVerPadding * 2.7,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				const receivedOrDonated = chartState.selectedDonors.length
@@ -1760,10 +1769,10 @@
 							(unit === "k"
 								? "Thousand"
 								: unit === "M"
-								? "Million"
-								: unit === "G"
-								? "Billion"
-								: "") +
+									? "Million"
+									: unit === "G"
+										? "Billion"
+										: "") +
 							receivedOrDonated +
 							yearsText
 						);
@@ -1782,13 +1791,13 @@
 					.merge(topPanelSubText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.2
+						topPanel.height - topPanel.mainValueVerPadding * 1.2,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelSubText
@@ -1801,8 +1810,8 @@
 							(chartState.selectedContribution === "total"
 								? "Contributions"
 								: chartState.selectedContribution === "pledge"
-								? "Pledged"
-								: "Paid") +
+									? "Pledged"
+									: "Paid") +
 							")"
 						);
 					});
@@ -1816,7 +1825,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbiclctopPanelDonorsNumber contributionColorFill"
+						"pbiclctopPanelDonorsNumber contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelDonorsNumber)
@@ -1825,7 +1834,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelDonorsNumber
@@ -1851,7 +1860,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.merge(topPanelDonorsText)
@@ -1859,14 +1868,16 @@
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(chartState.selectedDonors.length ? 2.5 : 1.9)
+								(chartState.selectedDonors.length ? 2.5 : 1.9),
 					)
 					.text(dataDonors.length > 1 ? "Donors" : "Donor");
 
 				let topPanelCbpfsNumber = mainValueGroup
 					.selectAll(".pbiclctopPanelCbpfsNumber")
 					.data(
-						dataCbpfsNonRhPF.length ? [dataCbpfsNonRhPF.length] : []
+						dataCbpfsNonRhPF.length
+							? [dataCbpfsNonRhPF.length]
+							: [],
 					);
 
 				topPanelCbpfsNumber.exit().remove();
@@ -1876,7 +1887,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbiclctopPanelCbpfsNumber allocationColorFill"
+						"pbiclctopPanelCbpfsNumber allocationColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelCbpfsNumber)
@@ -1885,13 +1896,13 @@
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(dataCbpfsRhPF.length ? 2.7 : 1)
+								(dataCbpfsRhPF.length ? 2.7 : 1),
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[2] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelCbpfsNumber
@@ -1908,7 +1919,9 @@
 				let topPanelCbpfsText = mainValueGroup
 					.selectAll(".pbiclctopPanelCbpfsText")
 					.data(
-						dataCbpfsNonRhPF.length ? [dataCbpfsNonRhPF.length] : []
+						dataCbpfsNonRhPF.length
+							? [dataCbpfsNonRhPF.length]
+							: [],
 					);
 
 				topPanelCbpfsText.exit().remove();
@@ -1921,7 +1934,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[2] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.merge(topPanelCbpfsText)
@@ -1930,7 +1943,7 @@
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(dataCbpfsRhPF.length ? 2.85 : 1.9)
+								(dataCbpfsRhPF.length ? 2.85 : 1.9),
 					)
 					.text(dataCbpfsNonRhPF.length > 1 ? "CBPFs" : "CBPF");
 
@@ -1948,19 +1961,19 @@
 					.merge(topPanelRfNumber)
 					.style(
 						"font-size",
-						dataCbpfsNonRhPF.length ? "22px" : "48px"
+						dataCbpfsNonRhPF.length ? "22px" : "48px",
 					)
 					.attr(
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(dataCbpfsNonRhPF.length ? 0.8 : 1)
+								(dataCbpfsNonRhPF.length ? 0.8 : 1),
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[2] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelRfNumber
@@ -1988,25 +2001,25 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[2] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.style("cursor", "default")
 					.merge(topPanelRfText)
 					.style(
 						"font-size",
-						dataCbpfsNonRhPF.length ? "15px" : "20px"
+						dataCbpfsNonRhPF.length ? "15px" : "20px",
 					)
 					.attr(
 						"y",
 						topPanel.height -
 							topPanel.mainValueVerPadding *
-								(dataCbpfsNonRhPF.length ? 1 : 1.9)
+								(dataCbpfsNonRhPF.length ? 1 : 1.9),
 					)
 					.text(
 						dataCbpfsRhPF.length > 1
 							? "Regional funds"
-							: "Regional fund"
+							: "Regional fund",
 					);
 
 				topPanelRfText
@@ -2053,7 +2066,7 @@
 						"translate(" +
 							(buttonPanel.padding[3] +
 								buttonPanel.arrowPadding) +
-							",0)"
+							",0)",
 					)
 					.attr("clip-path", "url(#pbiclcclip)");
 
@@ -2073,12 +2086,12 @@
 					.attr("class", "pbiclcbuttonsRects")
 					.attr(
 						"width",
-						buttonPanel.buttonWidth - buttonPanel.buttonPadding
+						buttonPanel.buttonWidth - buttonPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2
+							buttonPanel.buttonVerticalPadding * 2,
 					)
 					.attr("y", buttonPanel.buttonVerticalPadding)
 					.attr("x", function (_, i) {
@@ -2125,7 +2138,7 @@
 						"transform",
 						"translate(" +
 							buttonPanel.buttonContributionsPadding +
-							",0)"
+							",0)",
 					)
 					.style("cursor", "pointer");
 
@@ -2140,12 +2153,12 @@
 					.attr(
 						"width",
 						buttonPanel.buttonContributionsWidth -
-							buttonPanel.buttonPadding
+							buttonPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2
+							buttonPanel.buttonVerticalPadding * 2,
 					)
 					.attr("y", buttonPanel.buttonVerticalPadding)
 					.attr("x", function (_, i) {
@@ -2193,7 +2206,7 @@
 					.style("cursor", "pointer")
 					.attr(
 						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)"
+						"translate(" + buttonPanel.padding[3] + ",0)",
 					);
 
 				const leftArrowRect = leftArrow
@@ -2209,7 +2222,7 @@
 					.attr(
 						"y",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1
+							buttonPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25c4");
@@ -2224,7 +2237,7 @@
 							(buttonPanel.padding[3] +
 								buttonPanel.arrowPadding +
 								buttonsNumber * buttonPanel.buttonWidth) +
-							",0)"
+							",0)",
 					);
 
 				const rightArrowRect = rightArrow
@@ -2240,7 +2253,7 @@
 					.attr(
 						"y",
 						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2.1
+							buttonPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25ba");
@@ -2271,7 +2284,7 @@
 				d3.select("body").on("d3ChartsYear.pbiclc", function () {
 					clickButtonsRects(
 						validateCustomEventYear(+d3.event.detail),
-						true
+						true,
 					);
 					repositionButtonsGroup();
 					checkArrows();
@@ -2289,7 +2302,7 @@
 				leftArrow.on("click", function () {
 					leftArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 					rightArrow.select("text").style("fill", "#666");
 					rightArrow.attr("pointer-events", "all");
@@ -2302,9 +2315,9 @@
 								Math.min(
 									0,
 									currentTranslate +
-										buttonsNumber * buttonPanel.buttonWidth
+										buttonsNumber * buttonPanel.buttonWidth,
 								) +
-								",0)"
+								",0)",
 						)
 						.on("end", checkArrows);
 				});
@@ -2312,7 +2325,7 @@
 				rightArrow.on("click", function () {
 					rightArrow.attr("pointer-events", "none");
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 					leftArrow.select("text").style("fill", "#666");
 					leftArrow.attr("pointer-events", "all");
@@ -2330,16 +2343,16 @@
 									-(
 										Math.abs(currentTranslate) +
 										buttonsNumber * buttonPanel.buttonWidth
-									)
+									),
 								) +
-								",0)"
+								",0)",
 						)
 						.on("end", checkArrows);
 				});
 
 				function checkArrows() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2365,7 +2378,7 @@
 
 				function checkCurrentTranslate() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2388,16 +2401,17 @@
 						chartState.selectedYear[0] < yearsArray[5]
 							? 0
 							: chartState.selectedYear[0] >
-							  yearsArray[yearsArray.length - 4]
-							? yearsArray.length - 8
-							: yearsArray.indexOf(chartState.selectedYear[0]) -
-							  4;
+								  yearsArray[yearsArray.length - 4]
+								? yearsArray.length - 8
+								: yearsArray.indexOf(
+										chartState.selectedYear[0],
+									) - 4;
 
 					buttonsGroup.attr(
 						"transform",
 						"translate(" +
 							-(buttonPanel.buttonWidth * firstYearIndex) +
-							",0)"
+							",0)",
 					);
 				}
 
@@ -2420,7 +2434,7 @@
 							return d.donors;
 						});
 					const mergedArray = JSON.parse(
-						JSON.stringify(selectedCbpfsData)
+						JSON.stringify(selectedCbpfsData),
 					).reduce(function (acc, curr) {
 						curr.forEach(function (d) {
 							const found = acc.find(function (e) {
@@ -2456,18 +2470,18 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
 								acc +
 								(index >= chartState.selectedCbpfs.length - 2
 									? index >
-									  chartState.selectedCbpfs.length - 2
+										chartState.selectedCbpfs.length - 2
 										? isoAlpha2to3[curr.toUpperCase()]
 										: isoAlpha2to3[curr.toUpperCase()] +
-										  " and "
+											" and "
 									: isoAlpha2to3[curr.toUpperCase()] + ", ")
 							);
 						}, "");
@@ -2482,15 +2496,15 @@
 						(a.donor.toLowerCase() < b.donor.toLowerCase()
 							? -1
 							: a.donor.toLowerCase() > b.donor.toLowerCase()
-							? 1
-							: 0)
+								? 1
+								: 0)
 					);
 				});
 
 				yScaleDonors.domain(
 					donorsArray.map(function (d) {
 						return d.donor;
-					})
+					}),
 				);
 
 				yScaleDonors.range([
@@ -2589,7 +2603,7 @@
 					.style("fill", paidColor)
 					.style(
 						"opacity",
-						chartState.selectedContribution === "total" ? 1 : 0
+						chartState.selectedContribution === "total" ? 1 : 0,
 					)
 					.attr(
 						"transform",
@@ -2599,7 +2613,7 @@
 							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
 								2 +
 								stickHeight) +
-							")"
+							")",
 					);
 
 				const donorLabelEnter = donorGroupEnter
@@ -2607,7 +2621,7 @@
 					.attr("class", "pbiclcDonorLabel")
 					.attr(
 						"x",
-						donorsPanel.padding[3] + donorsPanel.labelPadding
+						donorsPanel.padding[3] + donorsPanel.labelPadding,
 					)
 					.attr("y", verticalLabelPadding)
 					.text(formatNumberSI(0));
@@ -2699,7 +2713,7 @@
 						const node = this;
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
-							d[chartState.selectedContribution]
+							d[chartState.selectedContribution],
 						);
 
 						function populateLabel(selection) {
@@ -2712,11 +2726,8 @@
 								.style("fill", paidColor)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d.paid
-										)(d.paid)
-										.replace("G", "B")
+										.formatPrefix(".0", d.paid)(d.paid)
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.style("fill", "#aaa")
@@ -2725,11 +2736,8 @@
 								.style("fill", pledgedColor)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d.pledge
-										)(d.pledge)
-										.replace("G", "B")
+										.formatPrefix(".0", d.pledge)(d.pledge)
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.style("fill", "#aaa")
@@ -2741,11 +2749,10 @@
 								.select(node)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d[chartState.selectedContribution]
-										)(i(t))
-										.replace("G", "B")
+										.formatPrefix(".0", d[
+												chartState.selectedContribution
+											])(i(t))
+										.replace("G", "B"),
 								);
 							if (
 								chartState.selectedContribution === "total" &&
@@ -2775,7 +2782,7 @@
 					});
 
 				const donorTooltipRectangle = donorGroup.select(
-					".pbiclcDonorTooltipRectangle"
+					".pbiclcDonorTooltipRectangle",
 				);
 
 				donorTooltipRectangle
@@ -2784,7 +2791,7 @@
 					.on("click", clickTooltipRectangle);
 
 				xAxisDonors.tickSizeInner(
-					-(lollipopGroupHeight * donorsArray.length)
+					-(lollipopGroupHeight * donorsArray.length),
 				);
 
 				groupYAxisDonors
@@ -2799,7 +2806,7 @@
 					.duration(duration)
 					.attr(
 						"transform",
-						"translate(" + donorsPanel.padding[3] + ",0)"
+						"translate(" + donorsPanel.padding[3] + ",0)",
 					)
 					.call(yAxisDonors);
 
@@ -2836,7 +2843,7 @@
 							const isoCode = Object.keys(countryNames).find(
 								function (e) {
 									return countryNames[e] === d;
-								}
+								},
 							);
 							return chartState.selectedDonors.indexOf(isoCode) >
 								-1
@@ -2859,7 +2866,7 @@
 								formatPercentCustom(datum.pledge, datum.total) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 								formatMoney0Decimals(datum.pledge) +
-								"</span></div></div>"
+								"</span></div></div>",
 						);
 
 					const thisBox = this.getBoundingClientRect();
@@ -2891,7 +2898,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedDonors.indexOf(
-							datum.isoCode
+							datum.isoCode,
 						);
 						if (index > -1) {
 							chartState.selectedDonors.splice(index, 1);
@@ -2916,7 +2923,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedDonors.indexOf(
-							datum.isoCode
+							datum.isoCode,
 						);
 						chartState.selectedDonors.splice(index, 1);
 					} else {
@@ -2966,7 +2973,7 @@
 					} else {
 						donorGroup.style("opacity", function (d) {
 							return chartState.selectedDonors.indexOf(
-								d.isoCode
+								d.isoCode,
 							) > -1
 								? 1
 								: fadeOpacity;
@@ -2977,10 +2984,10 @@
 								const isoCode = Object.keys(countryNames).find(
 									function (e) {
 										return countryNames[e] === d;
-									}
+									},
 								);
 								return chartState.selectedDonors.indexOf(
-									isoCode
+									isoCode,
 								) > -1
 									? 1
 									: fadeOpacity;
@@ -2995,7 +3002,9 @@
 				let cbpfsArray;
 
 				if (chartState.selectedDonors.length === 0) {
-					cbpfsArray = data.dataCbpfs;
+					cbpfsArray = data.dataCbpfs.filter(
+						d => d[chartState.selectedContribution] > 0,
+					);
 				} else {
 					const selectedDonorsData = data.dataDonors
 						.filter(function (d) {
@@ -3008,7 +3017,7 @@
 							return d.donations;
 						});
 					const mergedArray = JSON.parse(
-						JSON.stringify(selectedDonorsData)
+						JSON.stringify(selectedDonorsData),
 					).reduce(function (acc, curr) {
 						curr.forEach(function (d) {
 							const found = acc.find(function (e) {
@@ -3029,7 +3038,9 @@
 							return e.isoCode === d.isoCode;
 						}).clicked;
 					});
-					cbpfsArray = mergedArray;
+					cbpfsArray = mergedArray.filter(
+						d => d[chartState.selectedContribution] > 0,
+					);
 				}
 
 				let donorCountry;
@@ -3044,18 +3055,18 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
 								acc +
 								(index >= chartState.selectedDonors.length - 2
 									? index >
-									  chartState.selectedDonors.length - 2
+										chartState.selectedDonors.length - 2
 										? isoAlpha2to3[curr.toUpperCase()]
 										: isoAlpha2to3[curr.toUpperCase()] +
-										  " and "
+											" and "
 									: isoAlpha2to3[curr.toUpperCase()] + ", ")
 							);
 						}, "");
@@ -3070,15 +3081,15 @@
 						(a.cbpf.toLowerCase() < b.cbpf.toLowerCase()
 							? -1
 							: a.cbpf.toLowerCase() > b.cbpf.toLowerCase()
-							? 1
-							: 0)
+								? 1
+								: 0)
 					);
 				});
 
 				yScaleCbpfs.domain(
 					cbpfsArray.map(function (d) {
 						return d.cbpf;
-					})
+					}),
 				);
 
 				yScaleCbpfs.range([
@@ -3157,7 +3168,7 @@
 					.style("fill", paidColor)
 					.style(
 						"opacity",
-						chartState.selectedContribution === "total" ? 1 : 0
+						chartState.selectedContribution === "total" ? 1 : 0,
 					)
 					.attr(
 						"transform",
@@ -3167,7 +3178,7 @@
 							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
 								2 +
 								stickHeight) +
-							")"
+							")",
 					);
 
 				const cbpfLabelEnter = cbpfGroupEnter
@@ -3258,7 +3269,7 @@
 						const node = this;
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
-							d[chartState.selectedContribution]
+							d[chartState.selectedContribution],
 						);
 
 						function populateLabel(selection) {
@@ -3271,11 +3282,8 @@
 								.style("fill", paidColor)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d.paid
-										)(d.paid)
-										.replace("G", "B")
+										.formatPrefix(".0", d.paid)(d.paid)
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.style("fill", "#aaa")
@@ -3284,11 +3292,8 @@
 								.style("fill", pledgedColor)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d.pledge
-										)(d.pledge)
-										.replace("G", "B")
+										.formatPrefix(".0", d.pledge)(d.pledge)
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.style("fill", "#aaa")
@@ -3300,11 +3305,10 @@
 								.select(node)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d[chartState.selectedContribution]
-										)(i(t))
-										.replace("G", "B")
+										.formatPrefix(".0", d[
+												chartState.selectedContribution
+											])(i(t))
+										.replace("G", "B"),
 								);
 							if (
 								chartState.selectedContribution === "total" &&
@@ -3327,7 +3331,7 @@
 					});
 
 				const cbpfTooltipRectangle = cbpfGroup.select(
-					".pbiclcCbpfTooltipRectangle"
+					".pbiclcCbpfTooltipRectangle",
 				);
 
 				cbpfTooltipRectangle
@@ -3336,7 +3340,7 @@
 					.on("click", clickTooltipRectangle);
 
 				xAxisCbpfs.tickSizeInner(
-					-(lollipopGroupHeight * cbpfsArray.length)
+					-(lollipopGroupHeight * cbpfsArray.length),
 				);
 
 				groupYAxisCbpfs
@@ -3351,7 +3355,7 @@
 					.duration(duration)
 					.attr(
 						"transform",
-						"translate(" + cbpfsPanel.padding[3] + ",0)"
+						"translate(" + cbpfsPanel.padding[3] + ",0)",
 					)
 					.call(yAxisCbpfs);
 
@@ -3388,7 +3392,7 @@
 							const isoCode = Object.keys(countryNames).find(
 								function (e) {
 									return countryNames[e] === d;
-								}
+								},
 							);
 							return chartState.selectedCbpfs.indexOf(isoCode) >
 								-1
@@ -3411,7 +3415,7 @@
 								formatPercentCustom(datum.pledge, datum.total) +
 								")</span>:</div><div style='display:flex;flex:0 38%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 								formatMoney0Decimals(datum.pledge) +
-								"</span></div></div>"
+								"</span></div></div>",
 						);
 
 					const thisBox = this.getBoundingClientRect();
@@ -3443,7 +3447,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(
-							datum.isoCode
+							datum.isoCode,
 						);
 						if (index > -1) {
 							chartState.selectedCbpfs.splice(index, 1);
@@ -3468,7 +3472,7 @@
 
 					if (!datum.clicked) {
 						const index = chartState.selectedCbpfs.indexOf(
-							datum.isoCode
+							datum.isoCode,
 						);
 						chartState.selectedCbpfs.splice(index, 1);
 					} else {
@@ -3528,10 +3532,10 @@
 								const isoCode = Object.keys(countryNames).find(
 									function (e) {
 										return countryNames[e] === d;
-									}
+									},
 								);
 								return chartState.selectedCbpfs.indexOf(
-									isoCode
+									isoCode,
 								) > -1
 									? 1
 									: fadeOpacity;
@@ -3556,18 +3560,18 @@
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total paid <span style='color: #888;'>(" +
 							formatPercentCustom(
 								contributionsTotals.paid,
-								contributionsTotals.total
+								contributionsTotals.total,
 							) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 							formatMoney0Decimals(contributionsTotals.paid) +
 							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Total pledge <span style='color: #888;'>(" +
 							formatPercentCustom(
 								contributionsTotals.pledge,
-								contributionsTotals.total
+								contributionsTotals.total,
 							) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 							formatMoney0Decimals(contributionsTotals.pledge) +
-							"</span></div></div>"
+							"</span></div></div>",
 					);
 
 				tooltip
@@ -3674,7 +3678,7 @@
 				innerTooltip.html(
 					d === allYearsOption
 						? "Click to show all years"
-						: "Click for selecting a single year. Double-click or ALT + click for selecting multiple years."
+						: "Click for selecting a single year. Double-click or ALT + click for selecting multiple years.",
 				);
 
 				const containerSize = containerDiv
@@ -3699,17 +3703,17 @@
 									padding[1] +
 									"px"
 							: thisSize.left +
+										thisSize.width / 2 -
+										containerSize.left <
+								  tooltipSize.width / 2 +
+										buttonPanel.padding[3] +
+										padding[0]
+								? buttonPanel.padding[3] + padding[0] + "px"
+								: thisSize.left +
 									thisSize.width / 2 -
-									containerSize.left <
-							  tooltipSize.width / 2 +
-									buttonPanel.padding[3] +
-									padding[0]
-							? buttonPanel.padding[3] + padding[0] + "px"
-							: thisSize.left +
-							  thisSize.width / 2 -
-							  containerSize.left -
-							  tooltipSize.width / 2 +
-							  "px"
+									containerSize.left -
+									tooltipSize.width / 2 +
+									"px",
 					)
 					.style(
 						"top",
@@ -3724,7 +3728,7 @@
 									containerSize.top -
 									tooltipSize.height -
 									4 +
-									"px"
+									"px",
 					);
 
 				d3.select(this).style("fill", unBlue);
@@ -3772,12 +3776,12 @@
 
 				const biggestLabelLengthDonors = calculateBiggestLabel(
 					data.dataDonors,
-					"donor"
+					"donor",
 				);
 
 				const biggestLabelLengthCbpfs = calculateBiggestLabel(
 					data.dataCbpfs,
-					"cbpf"
+					"cbpf",
 				);
 
 				setRanges(biggestLabelLengthDonors, biggestLabelLengthCbpfs);
@@ -3806,7 +3810,7 @@
 								chartState.selectedYear.indexOf(+d.FiscalYear) >
 								-1
 							);
-					  });
+						});
 
 			filteredData.forEach(function (d) {
 				if (tempSetDonors.indexOf(d.GMSDonorName) > -1) {
@@ -3817,7 +3821,7 @@
 					const foundDonations = tempObject.donations.filter(
 						function (e) {
 							return e.cbpf === d.PooledFundName;
-						}
+						},
 					)[0];
 
 					if (foundDonations) {
@@ -3942,7 +3946,7 @@
 								chartState.selectedYear[0] ===
 									allYearsOption) &&
 							chartState.selectedDonors.indexOf(
-								d.GMSDonorISO2Code.toLowerCase()
+								d.GMSDonorISO2Code.toLowerCase(),
 							) > -1
 						);
 					} else {
@@ -3952,7 +3956,7 @@
 								chartState.selectedYear[0] ===
 									allYearsOption) &&
 							chartState.selectedCbpfs.indexOf(
-								d.PooledFundISO2Code.toLowerCase()
+								d.PooledFundISO2Code.toLowerCase(),
 							) > -1
 						);
 					}
@@ -3964,16 +3968,16 @@
 						b.GMSDonorName.toLowerCase()
 							? -1
 							: a.GMSDonorName.toLowerCase() >
-							  b.GMSDonorName.toLowerCase()
-							? 1
-							: 0) ||
+								  b.GMSDonorName.toLowerCase()
+								? 1
+								: 0) ||
 						(a.PooledFundName.toLowerCase() <
 						b.PooledFundName.toLowerCase()
 							? -1
 							: a.PooledFundName.toLowerCase() >
-							  b.PooledFundName.toLowerCase()
-							? 1
-							: 0)
+								  b.PooledFundName.toLowerCase()
+								? 1
+								: 0)
 					);
 				});
 
@@ -4093,7 +4097,7 @@
 					.text(d);
 
 				const fakeTextLength = Math.ceil(
-					fakeText.node().getComputedTextLength()
+					fakeText.node().getComputedTextLength(),
 				);
 
 				textSizeArray.push(fakeTextLength);
@@ -4113,7 +4117,7 @@
 				}),
 				d3.max(cbpfs, function (d) {
 					return d[property];
-				})
+				}),
 			);
 
 			xScaleDonors.domain([0, Math.floor(maxXValue * 1.05)]);
@@ -4128,7 +4132,7 @@
 					yAxisDonors.tickSizeInner(),
 				labelSizeCbpfs +
 					yAxisCbpfs.tickPadding() +
-					yAxisCbpfs.tickSizeInner()
+					yAxisCbpfs.tickSizeInner(),
 			);
 
 			donorsPanel.padding[3] = labelSize;
@@ -4159,19 +4163,19 @@
 		function translateAxes() {
 			groupYAxisDonors.attr(
 				"transform",
-				"translate(" + donorsPanel.padding[3] + ",0)"
+				"translate(" + donorsPanel.padding[3] + ",0)",
 			);
 
 			groupYAxisCbpfs.attr(
 				"transform",
-				"translate(" + cbpfsPanel.padding[3] + ",0)"
+				"translate(" + cbpfsPanel.padding[3] + ",0)",
 			);
 		}
 
 		function parseTransform(translate) {
 			const group = document.createElementNS(
 				"http://www.w3.org/2000/svg",
-				"g"
+				"g",
 			);
 
 			group.setAttributeNS(null, "transform", translate);
@@ -4207,8 +4211,8 @@
 						return a.toLowerCase() < b.toLowerCase()
 							? -1
 							: a.toLowerCase() > b.toLowerCase()
-							? 1
-							: 0;
+								? 1
+								: 0;
 					})
 					.reduce(function (acc, curr, index) {
 						return (
@@ -4264,7 +4268,7 @@
 				.append("svg")
 				.attr(
 					"viewBox",
-					"0 0 " + width + " " + (height + topDivHeight)
+					"0 0 " + width + " " + (height + topDivHeight),
 				);
 
 			const helpButtons = [
@@ -4419,7 +4423,7 @@
 				.attr("y", 264)
 				.attr("pointer-events", "none")
 				.text(
-					"Hover over the elements surrounded by a blue rectangle to get additional information"
+					"Hover over the elements surrounded by a blue rectangle to get additional information",
 				)
 				.call(wrapText2, 350);
 
@@ -4502,7 +4506,7 @@
 		function createSnapshot(type, fromContextMenu) {
 			if (isInternetExplorer) {
 				alert(
-					"This functionality is not supported by Internet Explorer"
+					"This functionality is not supported by Internet Explorer",
 				);
 				return;
 			}
@@ -4527,14 +4531,14 @@
 				downloadingDivSvg,
 				200,
 				175,
-				downloadingDivText
+				downloadingDivText,
 			);
 
 			const svgRealSize = svg.node().getBoundingClientRect();
 
 			svg.attr("width", svgRealSize.width).attr(
 				"height",
-				svgRealSize.height
+				svgRealSize.height,
 			);
 
 			const listOfStyles = [
@@ -4640,7 +4644,7 @@
 			};
 
 			d3.image(
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png"
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png",
 			).then(function (logo) {
 				let pdf;
 
@@ -4677,7 +4681,7 @@
 					210 - pdfMargins.left - pdfMargins.right,
 					{
 						fontSize: 12,
-					}
+					},
 				);
 
 				const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
@@ -4720,8 +4724,8 @@
 					chartState.selectedContribution === "total"
 						? "Total (Paid + Pledged)"
 						: chartState.selectedContribution === "paid"
-						? "Paid"
-						: "Pledged";
+							? "Paid"
+							: "Pledged";
 
 				const selectedCountry =
 					!chartState.selectedDonors.length &&
@@ -4750,7 +4754,7 @@
 					},
 					function (position) {
 						pdfTextPosition = position;
-					}
+					},
 				);
 
 				pdf.addImage(
@@ -4759,13 +4763,13 @@
 					pdfMargins.left,
 					pdfTextPosition.y + 2,
 					widthInMilimeters,
-					heightInMilimeters
+					heightInMilimeters,
 				);
 
 				const currentDate = new Date();
 
 				pdf.save(
-					"CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf"
+					"CBPFcontributions_" + csvDateFormat(currentDate) + ".pdf",
 				);
 
 				removeProgressWheel();
@@ -4793,7 +4797,7 @@
 						pdfMargins.top + 9,
 						5,
 						9,
-						"F"
+						"F",
 					);
 
 					pdf.addImage(
@@ -4802,7 +4806,7 @@
 						pdfMargins.left + 2,
 						pdfMargins.top,
 						90,
-						18
+						18,
 					);
 
 					pdf.setFillColor(236, 161, 84);
@@ -4815,7 +4819,7 @@
 					pdf.text(
 						footer,
 						pdfMargins.left,
-						pdfHeight - pdfMargins.bottom + 10
+						pdfHeight - pdfMargins.bottom + 10,
 					);
 				}
 
@@ -4836,8 +4840,8 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
@@ -4862,7 +4866,7 @@
 				.attr("class", "pbiclcd3chartwheelGroup")
 				.attr(
 					"transform",
-					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
+					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")",
 				);
 
 			const loadingText = wheelGroup
