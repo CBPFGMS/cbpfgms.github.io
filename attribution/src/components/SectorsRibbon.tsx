@@ -65,7 +65,7 @@ function SectorsRibbon({
 								: "grayscale(1) opacity(0.4)",
 						}}
 						data-tooltip-id="tooltip"
-						data-tooltip-html={tooltipSectorsText}
+						data-tooltip-content={tooltipSectorsText}
 						data-tooltip-place="top"
 						size={1.9}
 						onClick={() => handleClick(datum.sector)}

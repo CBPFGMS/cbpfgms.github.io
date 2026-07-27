@@ -4694,6 +4694,12 @@
 				if (d.GMSDonorName.indexOf("Macedonia") > -1) {
 					d.GMSDonorName = "Macedonia";
 				}
+				if (d.GMSDonorName.indexOf("through UNF") > -1) {
+					d.GMSDonorName = "Private donations";
+				}
+				if (d.PooledFundName.indexOf("Asia Pacific Regional") > -1) {
+					d.PooledFundName = "Asia Pacific RHPF";
+				}
 			});
 
 			const data = {
