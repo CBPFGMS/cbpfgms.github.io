@@ -97,6 +97,7 @@ function TopFigures({ data }: TopFiguresProps) {
 			>
 				{cardsData.map((card, index) => {
 					const isReached = card.label === "Reached People";
+					const isTargeted = card.label === "Targeted People";
 					const needsWarning =
 						card.label === "Targeted People" ||
 						card.label === "Reached People";
@@ -144,7 +145,7 @@ function TopFigures({ data }: TopFiguresProps) {
 								{...tooltipProps}
 								border={"0.5px solid rgba(0,0,0,0.1)"}
 								borderLeft={
-									isReached
+									isTargeted
 										? "3px solid var(--ocha-amber)"
 										: "3px solid var(--ocha-blue)"
 								}
@@ -161,7 +162,7 @@ function TopFigures({ data }: TopFiguresProps) {
 										style={{
 											fontSize: "2rem",
 											fontWeight: 700,
-											color: isReached
+											color: isTargeted
 												? "var(--ocha-amber)"
 												: "var(--ocha-blue)",
 											fontFamily: "Montserrat",
