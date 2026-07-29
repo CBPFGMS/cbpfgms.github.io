@@ -53,12 +53,11 @@ function UnsupportedScreenNotice() {
 			justifyContent="center"
 			textAlign="center"
 			sx={{
-				minHeight: "100vh",
 				px: 4,
 				bgcolor: "background.default",
 			}}
 		>
-			<ExpandIcon sx={{ fontSize: 56, color: "primary.main", mb: 3 }} />
+			<ExpandIcon sx={{ fontSize: 76, color: "primary.main", mb: 3 }} />
 
 			<Typography
 				variant="h5"
