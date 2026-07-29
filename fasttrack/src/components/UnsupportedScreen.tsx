@@ -55,6 +55,8 @@ function UnsupportedScreenNotice() {
 			sx={{
 				px: 4,
 				bgcolor: "background.default",
+				paddingTop: "5em",
+				paddingBottom: "5em",
 			}}
 		>
 			<ExpandIcon sx={{ fontSize: 76, color: "primary.main", mb: 3 }} />
