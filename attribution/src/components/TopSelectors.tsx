@@ -19,12 +19,12 @@ type TopSelectorsProps = {
 const buttonsStyle = {
 	"& .MuiToggleButton-root": {
 		color: "rgba(0, 0, 0, 0.87)",
-		borderColor: "1px solid rgba(0, 0, 0, 0.12)",
 		backgroundColor: "transparent",
 		paddingRight: "1.5em",
 		paddingLeft: "1.5em",
 		fontFamily: "Roboto",
 		fontSize: "0.875rem",
+		textTransform: "capitalize",
 		"&:hover": {
 			backgroundColor: "rgba(0, 0, 0, 0.04)",
 		},
@@ -103,8 +103,8 @@ function TopSelectors({
 					sx={buttonsStyle}
 					onChange={handleChangeHasUS}
 				>
-					<ToggleButton value={false}>Without US</ToggleButton>
-					<ToggleButton value={true}>With US</ToggleButton>
+					<ToggleButton value={false}>Without U.S.</ToggleButton>
+					<ToggleButton value={true}>With U.S.</ToggleButton>
 				</ToggleButtonGroup>
 			)}
 		</Box>

@@ -1,5 +1,5 @@
 import type { List } from "./makelists";
-import type { AllocationsData } from "./processrawdata";
+import type { AllocationsData, LocalizationData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 
 export type InSelectionData = {
@@ -9,6 +9,7 @@ export type InSelectionData = {
 
 type ProcessDataKeyFiguresParams = {
 	allocationsData: AllocationsData;
+	localizationData: LocalizationData;
 	funds: number[];
 	globalAttribution: number;
 	lists: List;
@@ -32,6 +33,7 @@ export type DataKeyFigures = {
 
 function processDataKeyFigures({
 	allocationsData,
+	localizationData,
 	funds,
 	globalAttribution,
 	lists,
@@ -77,10 +79,6 @@ function processDataKeyFigures({
 				wlo += row.budget;
 				totalWlo += row.budget;
 			}
-			if (row.isLocalised) {
-				localization += row.budget;
-				totalLocalization += row.budget;
-			}
 			const thisProtection = row.sectorData.find(
 				sector => sector.sectorId === protectionId,
 			);
@@ -88,6 +86,13 @@ function processDataKeyFigures({
 				protection += thisProtection.percentage * row.budget;
 				totalProtection += thisProtection.percentage * row.budget;
 			}
+		}
+	});
+
+	localizationData.forEach(row => {
+		if (funds.includes(row.fund) && row.year === year) {
+			localization += row.budget;
+			totalLocalization += row.budget;
 		}
 	});
 

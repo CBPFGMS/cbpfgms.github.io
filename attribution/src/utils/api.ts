@@ -15,11 +15,13 @@ import type {
 	TotalBeneficiariesObject,
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
+	AllocationsByYearAndFundObject,
 } from "./schemas";
 import makeLists, { type List } from "./makelists";
 import processRawData, {
 	type AllocationsData,
 	type InAllocationsDataLists,
+	type LocalizationData,
 	type TotalBeneficiariesByPartnerData,
 	type TotalBeneficiariesBySectorData,
 	type TotalBeneficiariesData,
@@ -41,7 +43,7 @@ export type AppData = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
-	// locationsData: LocationsData;
+	localizationData: LocalizationData;
 	lists: List;
 };
 
@@ -52,6 +54,7 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesObject[],
 	TotalBeneficiariesByPartnerObject[],
 	TotalBeneficiariesBySectorObject[],
+	AllocationsByYearAndFundObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
 	PooledFundsMasterObject[],
@@ -90,16 +93,14 @@ export async function fetchAppData(
 	startYear: number | null,
 	defaultFundType: number | null,
 ): Promise<AppData> {
-	// const yearRange = startYear
-	// 	? `${startYear}_${new Date().getFullYear()}`
-	// 	: "";
-
 	// const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
 
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
-	const contributionsUrl = "contributions.csv", //TODO: change for live API
+	const contributionsUrl =
+			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=AR_QUERY_2&PoolfundCodeAbbrv=&FiscalYear=&$format=csv",
+		allocationsByYearAndFundUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationBudgetTotalsByYearAndFund?&ShowAllPooledFunds=1&AllocationYearFrom=${startYear}&AllocationYearTo=${currentYear}&FundingType=2&$format=csv`,
 		projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
@@ -134,6 +135,11 @@ export async function fetchAppData(
 		fetchFileDB<TotalBeneficiariesBySectorObject[]>(
 			"totalBeneficiariesBySector",
 			totalBeneficiariesBySectorUrl,
+			"csv",
+		),
+		fetchFileDB<AllocationsByYearAndFundObject[]>(
+			"allocationsByYearAndFund",
+			allocationsByYearAndFundUrl,
 			"csv",
 		),
 		fetchFileDB<AllocationTypesMasterObject[]>(
@@ -186,6 +192,7 @@ export async function fetchAppData(
 		totalBeneficiaries,
 		totalBeneficiariesByPartner,
 		totalBeneficiariesBySector,
+		allocationsByYearAndFund,
 		allocationTypesMaster,
 		organizationMaster,
 		pooledFundsMaster,
@@ -219,12 +226,14 @@ export async function fetchAppData(
 			totalBeneficiariesData,
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
+			localizationData,
 		} = processRawData({
 			projectSummary,
 			sectorsData,
 			totalBeneficiaries,
 			totalBeneficiariesByPartner,
 			totalBeneficiariesBySector,
+			allocationsByYearAndFund,
 			lists,
 		});
 
@@ -236,6 +245,7 @@ export async function fetchAppData(
 			totalBeneficiariesData,
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
+			localizationData,
 			lists,
 		};
 	}

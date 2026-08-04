@@ -36,6 +36,7 @@ function MainContainer({ donor }: MainContainerProps) {
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
+		localizationData,
 	} = useAppData();
 
 	const lastDonorYear = Array.from(
@@ -86,12 +87,13 @@ function MainContainer({ donor }: MainContainerProps) {
 		() =>
 			processDataKeyFigures({
 				allocationsData,
+				localizationData,
 				funds,
 				globalAttribution: attributions.global.percentage,
 				lists,
 				year,
 			}),
-		[allocationsData, funds, attributions, lists, year],
+		[allocationsData, localizationData, funds, attributions, lists, year],
 	);
 
 	const targetedAndReachedTotal = useMemo(

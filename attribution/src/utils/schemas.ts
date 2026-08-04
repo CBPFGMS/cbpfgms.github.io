@@ -367,6 +367,23 @@ export const totalBeneficiariesBySectorObjectSchema = z.object({
 	syncedAtAchieved: z.any(),
 });
 
+export const allocationsByYearAndFundObjectSchema = z.object({
+	AllocationYear: z.number().int().nonnegative(),
+	OrganizationType: z.string(),
+	PooledFundName: z.string(),
+	ApprovedBudget: z.number().nonnegative(),
+	ApprovedReserveBudget: z.number().nonnegative().nullable(),
+	ApprovedReserveBudgetPercentage: z.number().min(0).max(100).nullable(),
+	ApprovedStandardBudget: z.number().nonnegative().nullable(),
+	ApprovedStandardBudgetPercentage: z.number().min(0).max(100).nullable(),
+	PipelineBudget: z.number().nonnegative().nullable(),
+	PipelineReserveBudget: z.number().nonnegative().nullable(),
+	PipelineReserveBudgetPercentage: z.number().min(0).max(100).nullable(),
+	PipelineStandardBudget: z.number().nonnegative().nullable(),
+	PipelineStandardBudgetPercentage: z.number().min(0).max(100).nullable(),
+	FundingType: z.literal(2),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -558,4 +575,8 @@ export type TotalBeneficiariesByPartnerObject = z.infer<
 
 export type TotalBeneficiariesBySectorObject = z.infer<
 	typeof totalBeneficiariesBySectorObjectSchema
+>;
+
+export type AllocationsByYearAndFundObject = z.infer<
+	typeof allocationsByYearAndFundObjectSchema
 >;

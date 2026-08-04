@@ -4,23 +4,23 @@ import {
 	type TotalBeneficiariesObject,
 	type TotalBeneficiariesByPartnerObject,
 	type TotalBeneficiariesBySectorObject,
+	type AllocationsByYearAndFundObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	totalBeneficiariesObjectSchema,
 	totalBeneficiariesByPartnerObjectSchema,
 	totalBeneficiariesBySectorObjectSchema,
+	allocationsByYearAndFundObjectSchema,
 } from "./schemas";
 import type { List } from "./makelists";
-import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
+import warnInvalidSchema, {
+	simpleWarn,
+	warnProjectNotFound,
+} from "./warninvalid";
 import { constants } from "./constants";
 
-const {
-	partnersSplitOrder,
-	hasDisabledIds,
-	hasGBVIds,
-	hasGenderEqualityIds,
-	localizationMarkers,
-} = constants;
+const { partnersSplitOrder, hasDisabledIds, hasGBVIds, hasGenderEqualityIds } =
+	constants;
 
 export type AllocationsDatum = {
 	fund: number;
@@ -39,10 +39,17 @@ export type AllocationsDatum = {
 	hasGBV: boolean;
 	hasGenderEquality: boolean;
 	hasWomenLedOrgs: boolean;
-	isLocalised: boolean;
 };
 
 export type AllocationsData = AllocationsDatum[];
+
+type LocalizationDatum = {
+	fund: number;
+	year: number;
+	budget: number;
+};
+
+export type LocalizationData = LocalizationDatum[];
 
 type SectorDatum = {
 	sectorId: number;
@@ -88,6 +95,7 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
+	allocationsByYearAndFund: AllocationsByYearAndFundObject[];
 };
 
 type TargetedAndReached = {
@@ -136,17 +144,20 @@ function processRawData({
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
+	allocationsByYearAndFund,
 }: ProcessRawDataParams): {
 	allocationsData: AllocationsData;
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	inAllocationsDataLists: InAllocationsDataLists;
+	localizationData: LocalizationData;
 } {
 	const allocationsData: AllocationsData = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
 	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
+	const localizationData: LocalizationData = [];
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
@@ -354,6 +365,49 @@ function processRawData({
 		}
 	});
 
+	allocationsByYearAndFund.forEach(row => {
+		const parsedRow = allocationsByYearAndFundObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			const thisYear = row.AllocationYear;
+			const thisFundId = lists.fundIdsByName[row.PooledFundName];
+
+			if (!thisFundId) {
+				simpleWarn(
+					`Fund with name ${row.PooledFundName} not found in the funds master`,
+				);
+				return;
+			}
+
+			if (
+				!row.OrganizationType.includes("National") &&
+				!row.OrganizationType.includes("Red") &&
+				!row.OrganizationType.includes("Others")
+			) {
+				return;
+			}
+
+			const foundYearAndFund = localizationData.find(
+				e => e.fund === thisFundId && e.year === thisYear,
+			);
+
+			if (foundYearAndFund) {
+				foundYearAndFund.budget += row.ApprovedBudget;
+			} else {
+				localizationData.push({
+					fund: thisFundId,
+					year: thisYear,
+					budget: row.ApprovedBudget,
+				});
+			}
+		} else {
+			warnInvalidSchema(
+				"allocationsByYearAndFund",
+				row,
+				parsedRow.error.message,
+			);
+		}
+	});
+
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -485,9 +539,6 @@ function processRawData({
 					projectName: row.ChfProjectCode,
 				});
 
-				const thisLocalisationMarker =
-					thisOrganization.LocalizationMarker?.split(" ")[0];
-
 				const objDatum: AllocationsDatum = {
 					fund: row.PooledFundId,
 					year: thisAllocationType.AllocationYear,
@@ -521,11 +572,6 @@ function processRawData({
 					hasWomenLedOrgs:
 						thisOrganization.OrgIsWLO?.toLocaleLowerCase() ===
 						"true",
-					isLocalised:
-						thisLocalisationMarker !== undefined &&
-						(localizationMarkers as readonly string[]).includes(
-							thisLocalisationMarker,
-						),
 				};
 
 				allocationsData.push(objDatum);
@@ -552,6 +598,7 @@ function processRawData({
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
 		inAllocationsDataLists,
+		localizationData,
 	};
 }
 
