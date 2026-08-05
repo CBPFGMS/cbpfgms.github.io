@@ -115,6 +115,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				funds,
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
+				globalAttribution: attributions.global.percentage,
 			}),
 		[
 			allocationsData,
@@ -122,6 +123,7 @@ function MainContainer({ donor }: MainContainerProps) {
 			funds,
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
+			attributions,
 		],
 	);
 

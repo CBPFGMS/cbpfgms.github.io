@@ -21,6 +21,7 @@ type ProcessDataBarChartParams = {
 	funds: number[];
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	globalAttribution: number;
 };
 
 const { beneficiaryCategories } = constants;
@@ -31,6 +32,7 @@ function processDataBarChart({
 	funds,
 	totalBeneficiariesByPartnerData,
 	totalBeneficiariesBySectorData,
+	globalAttribution,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -169,6 +171,28 @@ function processDataBarChart({
 				);
 			}
 		});
+	});
+
+	dataOrganization.forEach(org => {
+		org.reached.girls *= globalAttribution;
+		org.reached.boys *= globalAttribution;
+		org.reached.women *= globalAttribution;
+		org.reached.men *= globalAttribution;
+		org.targeted.girls *= globalAttribution;
+		org.targeted.boys *= globalAttribution;
+		org.targeted.women *= globalAttribution;
+		org.targeted.men *= globalAttribution;
+	});
+
+	dataSector.forEach(sect => {
+		sect.reached.girls *= globalAttribution;
+		sect.reached.boys *= globalAttribution;
+		sect.reached.women *= globalAttribution;
+		sect.reached.men *= globalAttribution;
+		sect.targeted.girls *= globalAttribution;
+		sect.targeted.boys *= globalAttribution;
+		sect.targeted.women *= globalAttribution;
+		sect.targeted.men *= globalAttribution;
 	});
 
 	dataOrganization.sort(

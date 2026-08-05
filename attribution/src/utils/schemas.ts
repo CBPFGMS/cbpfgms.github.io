@@ -2,27 +2,6 @@ import { z } from "zod";
 
 //regex for the beneficiary types
 const splitRegex = /^(\d*\|\d*\|\d*\|\d*\|\d*)$/;
-//this regex allows only digits and double hashtag symbol, e.g: "5396##7936##18031##16737". Eventually a trailing part with "|||" and another set of digits and double hashtags can be added, e.g: "5396##7936##18031##16737|||5396##7936##18031##16737". This is used for the sector and administrative location aggregation fields.
-const digitsPipesAndHashtagRegex =
-		/^\d+(?:##\d+){3}(?:\|\|\|\d+(?:##\d+){3})*$/,
-	digitsPipesAndHashtagErrorMessage =
-		"String doesn't match the expected format of digits and double hashtags (e.g., '5396##7936##18031##16737' or '5396##7936##18031##16737|||5396##7936##18031##16737')";
-
-//this regex checks for a correct latitude/longitude pair, comma separated.
-const latLongRegex = /^[-+]?\d+(\.\d+)?,\s*[-+]?\d+(\.\d+)?$/,
-	latLongErrorMessage =
-		"String must be a valid coordinate pair (e.g., '15.56, 32.51')";
-
-const digitsAndHashtagRegex = /^(?:\d|##)+$/,
-	digitsAndHashtagErrorMessage =
-		"String doesn't match the expected format of digits and double hashtags (e.g., '5396##7936##18031##16737')";
-
-const digitsDotsAndPipesRegex = /^\d+(\.\d+)?(\|{3}\d+(\.\d+)?)*$/,
-	digitsDotsAndPipesErrorMessage =
-		"String doesn't match the expected format of digits and triple pipes (e.g., '5396|||7936|||18031|||16737')";
-
-const partnersSplitRegex = /^(\d+#){3}\d+$/,
-	sectorsSplitRegex = /^(\d+#){16}\d+$/;
 
 // ********************
 // DATA SCHEMAS
@@ -145,99 +124,6 @@ export const sectorBeneficiaryObjectSchema = z.object({
 	SubmissionDate: z.coerce.date().nullable(),
 });
 
-export const projectSummaryAggregatedObjectSchema = z.object({
-	PFId: z.number().int().nonnegative(),
-	PrjCode: z.string(),
-	ClstAgg: z.union([z.string(), z.number()]),
-	ClstPrct: z.union([z.string(), z.number()]),
-	AdmLocTypeIdAgg: z
-		.string()
-		.regex(digitsAndHashtagRegex, digitsAndHashtagErrorMessage),
-	LocationBeneficiaryID: z.number().int().nonnegative(),
-	AdmLoc1: z.string(),
-	AdmLoc2: z.string().nullable(),
-	AdmLoc3: z.string().nullable(),
-	AdmLoc4: z.string().nullable(),
-	AdmLoc5: z.string().nullable(),
-	AdmLoc6: z.string().nullable(),
-	AdmLocBenClustAgg1: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage),
-	AdmLocBenClustAgg2: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
-		.nullable(),
-	AdmLocBenClustAgg3: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
-		.nullable(),
-	AdmLocBenClustAgg4: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
-		.nullable(),
-	AdmLocBenClustAgg5: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
-		.nullable(),
-	AdmLocBenClustAgg6: z
-		.string()
-		.regex(digitsPipesAndHashtagRegex, digitsPipesAndHashtagErrorMessage)
-		.nullable(),
-	AdmLocCord1: z.string().regex(latLongRegex, latLongErrorMessage),
-	AdmLocCord2: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocCord3: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocCord4: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocCord5: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocCord6: z.string().regex(latLongRegex, latLongErrorMessage).nullable(),
-	AdmLocClustBdg1: z.union([
-		z.number(),
-		z
-			.string()
-			.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-	]),
-	AdmLocClustBdg2: z
-		.union([
-			z.number(),
-			z
-				.string()
-				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-		])
-		.nullable(),
-	AdmLocClustBdg3: z
-		.union([
-			z.number(),
-			z
-				.string()
-				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-		])
-		.nullable(),
-	AdmLocClustBdg4: z
-		.union([
-			z.number(),
-			z
-				.string()
-				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-		])
-		.nullable(),
-	AdmLocClustBdg5: z
-		.union([
-			z.number(),
-			z
-				.string()
-				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-		])
-		.nullable(),
-	AdmLocClustBdg6: z
-		.union([
-			z.number(),
-			z
-				.string()
-				.regex(digitsDotsAndPipesRegex, digitsDotsAndPipesErrorMessage),
-		])
-		.nullable(),
-	AYr: z.number().int().nonnegative(),
-});
-
 export const contributionsObjectSchema = z.object({
 	PooledFundName: z.string(),
 	PooledFundId: z.number(),
@@ -253,18 +139,16 @@ export const contributionsObjectSchema = z.object({
 export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	ImplementationYear: z.number().int().nonnegative(),
 	CurrentAdminLevel: z.number().int().nonnegative(),
 	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z.number().int().nonnegative(),
-	BenW: z.number().int().nonnegative(),
-	BenB: z.number().int().nonnegative(),
-	BenG: z.number().int().nonnegative(),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	Budget: z.number().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	Budget: z.number().nonnegative().nullable(),
 	AchM: z.number().int().nonnegative().nullable(),
 	AchW: z.number().int().nonnegative().nullable(),
 	AchB: z.number().int().nonnegative().nullable(),
@@ -272,99 +156,68 @@ export const totalBeneficiariesObjectSchema = z.object({
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
 	BudgetAchieved: z.number().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	step1: z.string(),
-	step2: z.string(),
-	step3: z.string(),
-	step4: z.string(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string(),
 });
 
 export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	ImplementationYear: z.number().int().nonnegative(),
 	CurrentAdminLevel: z.number().int().nonnegative(),
 	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenW: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenB: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenG: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	AchM: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchW: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchB: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchG: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
+	PartnerType: z.string(),
+	PartnerTypeId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	step1: z.string(),
-	step2: z.string(),
-	step3: z.string(),
-	step4: z.string(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string(),
 });
 
 export const totalBeneficiariesBySectorObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	ImplementationYear: z.number().int().nonnegative(),
 	CurrentAdminLevel: z.number().int().nonnegative(),
 	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenW: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenB: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenG: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	AchM: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchW: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchB: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchG: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
+	GlobalCluster: z.string(),
+	GlobalClusterId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string(),
 });
 
 export const allocationsByYearAndFundObjectSchema = z.object({
@@ -525,10 +378,6 @@ export type ProjectSummaryObject = z.infer<typeof projectSummaryObjectSchema>;
 
 export type SectorBeneficiaryObject = z.infer<
 	typeof sectorBeneficiaryObjectSchema
->;
-
-export type ProjectSummaryAggregatedObject = z.infer<
-	typeof projectSummaryAggregatedObjectSchema
 >;
 
 export type ContributionsObject = z.infer<typeof contributionsObjectSchema>;

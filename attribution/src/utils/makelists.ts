@@ -78,7 +78,6 @@ export type List = {
 	donorGMSNames: ListObj;
 	donorISO2Codes: NullableListObj;
 	donorISO3Codes: NullableListObj;
-	sectorsSplitOrder: number[];
 	fundIdsByName: { [key: string]: number };
 };
 
@@ -111,7 +110,6 @@ function makeLists({
 		donorGMSNames: {},
 		donorISO2Codes: {},
 		donorISO3Codes: {},
-		sectorsSplitOrder: [],
 		fundIdsByName: {},
 	};
 
@@ -208,7 +206,6 @@ function makeLists({
 		const parsedSectorsMaster = sectorsMasterObjectSchema.safeParse(d);
 		if (parsedSectorsMaster.success) {
 			lists.sectors[d.ClustId] = d.ClustNm;
-			lists.sectorsSplitOrder.push(d.ClustId);
 		} else {
 			warnInvalidSchema(
 				"SectorsMaster",

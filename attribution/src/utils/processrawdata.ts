@@ -19,8 +19,7 @@ import warnInvalidSchema, {
 } from "./warninvalid";
 import { constants } from "./constants";
 
-const { partnersSplitOrder, hasDisabledIds, hasGBVIds, hasGenderEqualityIds } =
-	constants;
+const { hasDisabledIds, hasGBVIds, hasGenderEqualityIds } = constants;
 
 export type AllocationsDatum = {
 	fund: number;
@@ -133,10 +132,6 @@ export type TotalBeneficiariesBySectorData = {
 	[year: number]: { [fundId: number]: TotalBeneficiariesBySectorBreakdown[] };
 };
 
-const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
-	0,
-);
-
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -178,46 +173,40 @@ function processRawData({
 	const sectorsPerYearMap: (typeof inAllocationsDataLists)["sectorsPerYear"] =
 		new Map();
 
-	const sectorsZeroArray: number[] = new Array(
-		lists.sectorsSplitOrder.length,
-	).fill(0);
-
 	totalBeneficiaries.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			if (row.ProcessStatusId === null) {
-				const totalDatum = {
-					girls: {
-						targeted: row.BenG,
-						reached: row.AchG || 0,
-					},
-					boys: {
-						targeted: row.BenB,
-						reached: row.AchB || 0,
-					},
-					women: {
-						targeted: row.BenW,
-						reached: row.AchW || 0,
-					},
-					men: {
-						targeted: row.BenM,
-						reached: row.AchM || 0,
-					},
-					total: {
-						targeted: row.TotTarg,
-						reached: row.TotAch || 0,
-					},
+			const totalDatum: TotalBeneficiariesBreakdown = {
+				girls: {
+					targeted: row.BenG || 0,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB || 0,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW || 0,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM || 0,
+					reached: row.AchM || 0,
+				},
+				total: {
+					targeted: row.TotTarg || 0,
+					reached: row.TotAch || 0,
+				},
+			};
+
+			const foundYear = totalBeneficiariesData[row.ImplementationYear];
+
+			if (!foundYear) {
+				totalBeneficiariesData[row.ImplementationYear] = {
+					[row.PFId]: totalDatum,
 				};
-
-				const foundYear = totalBeneficiariesData[row.AllocationYear];
-
-				if (!foundYear) {
-					totalBeneficiariesData[row.AllocationYear] = {
-						[row.PFId]: totalDatum,
-					};
-				} else {
-					foundYear[row.PFId] = totalDatum;
-				}
+			} else {
+				foundYear[row.PFId] = totalDatum;
 			}
 		} else {
 			warnInvalidSchema(
@@ -232,60 +221,39 @@ function processRawData({
 		const parsedRow =
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			if (row.ProcessStatusId === null) {
-				const partnerValuesMen: number[] =
-					row.BenM.split("#").map(Number);
-				const partnerValuesWomen: number[] =
-					row.BenW.split("#").map(Number);
-				const partnerValuesBoys: number[] =
-					row.BenB.split("#").map(Number);
-				const partnerValuesGirls: number[] =
-					row.BenG.split("#").map(Number);
-				const partnerValuesAchGirls: number[] = row.AchG
-					? row.AchG.split("#").map(Number)
-					: partnersZeroArray;
-				const partnerValuesAchBoys: number[] = row.AchB
-					? row.AchB.split("#").map(Number)
-					: partnersZeroArray;
-				const partnerValuesAchWomen: number[] = row.AchW
-					? row.AchW.split("#").map(Number)
-					: partnersZeroArray;
-				const partnerValuesAchMen: number[] = row.AchM
-					? row.AchM.split("#").map(Number)
-					: partnersZeroArray;
+			const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
+				partner: row.PartnerTypeId,
+				girls: {
+					targeted: row.BenG || 0,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB || 0,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW || 0,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM || 0,
+					reached: row.AchM || 0,
+				},
+			};
 
-				const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
-					partnersSplitOrder.map((type, index) => {
-						return {
-							partner: type,
-							girls: {
-								targeted: partnerValuesGirls[index],
-								reached: partnerValuesAchGirls[index],
-							},
-							boys: {
-								targeted: partnerValuesBoys[index],
-								reached: partnerValuesAchBoys[index],
-							},
-							women: {
-								targeted: partnerValuesWomen[index],
-								reached: partnerValuesAchWomen[index],
-							},
-							men: {
-								targeted: partnerValuesMen[index],
-								reached: partnerValuesAchMen[index],
-							},
-						};
-					});
+			const foundYear =
+				totalBeneficiariesByPartnerData[row.ImplementationYear];
 
-				const foundYear =
-					totalBeneficiariesByPartnerData[row.AllocationYear];
-
-				if (!foundYear) {
-					totalBeneficiariesByPartnerData[row.AllocationYear] = {
-						[row.PFId]: partnersDatum,
-					};
+			if (!foundYear) {
+				totalBeneficiariesByPartnerData[row.ImplementationYear] = {
+					[row.PFId]: [partnersDatum],
+				};
+			} else {
+				const foundFund = foundYear[row.PFId];
+				if (!foundFund) {
+					foundYear[row.PFId] = [partnersDatum];
 				} else {
-					foundYear[row.PFId] = partnersDatum;
+					foundFund.push(partnersDatum);
 				}
 			}
 		} else {
@@ -300,60 +268,39 @@ function processRawData({
 	totalBeneficiariesBySector.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 		if (parsedRow.success) {
-			if (row.ProcessStatusId === null) {
-				const sectorValuesMen: number[] =
-					row.BenM.split("#").map(Number);
-				const sectorValuesWomen: number[] =
-					row.BenW.split("#").map(Number);
-				const sectorValuesBoys: number[] =
-					row.BenB.split("#").map(Number);
-				const sectorValuesGirls: number[] =
-					row.BenG.split("#").map(Number);
-				const sectorValuesAchGirls: number[] = row.AchG
-					? row.AchG.split("#").map(Number)
-					: sectorsZeroArray;
-				const sectorValuesAchBoys: number[] = row.AchB
-					? row.AchB.split("#").map(Number)
-					: sectorsZeroArray;
-				const sectorValuesAchWomen: number[] = row.AchW
-					? row.AchW.split("#").map(Number)
-					: sectorsZeroArray;
-				const sectorValuesAchMen: number[] = row.AchM
-					? row.AchM.split("#").map(Number)
-					: sectorsZeroArray;
+			const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
+				sector: row.GlobalClusterId,
+				girls: {
+					targeted: row.BenG || 0,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB || 0,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW || 0,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM || 0,
+					reached: row.AchM || 0,
+				},
+			};
 
-				const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
-					lists.sectorsSplitOrder.map((type, index) => {
-						return {
-							sector: type,
-							girls: {
-								targeted: sectorValuesGirls[index],
-								reached: sectorValuesAchGirls[index],
-							},
-							boys: {
-								targeted: sectorValuesBoys[index],
-								reached: sectorValuesAchBoys[index],
-							},
-							women: {
-								targeted: sectorValuesWomen[index],
-								reached: sectorValuesAchWomen[index],
-							},
-							men: {
-								targeted: sectorValuesMen[index],
-								reached: sectorValuesAchMen[index],
-							},
-						};
-					});
+			const foundYear =
+				totalBeneficiariesBySectorData[row.ImplementationYear];
 
-				const foundYear =
-					totalBeneficiariesBySectorData[row.AllocationYear];
-
-				if (!foundYear) {
-					totalBeneficiariesBySectorData[row.AllocationYear] = {
-						[row.PFId]: sectorsDatum,
-					};
+			if (!foundYear) {
+				totalBeneficiariesBySectorData[row.ImplementationYear] = {
+					[row.PFId]: [sectorsDatum],
+				};
+			} else {
+				const foundFund = foundYear[row.PFId];
+				if (!foundFund) {
+					foundYear[row.PFId] = [sectorsDatum];
 				} else {
-					foundYear[row.PFId] = sectorsDatum;
+					foundFund.push(sectorsDatum);
 				}
 			}
 		} else {
