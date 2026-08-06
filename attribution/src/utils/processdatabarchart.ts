@@ -130,10 +130,6 @@ function processDataBarChart({
 				org.reached.boys += foundPartner.boys.reached;
 				org.reached.women += foundPartner.women.reached;
 				org.reached.men += foundPartner.men.reached;
-			} else {
-				simpleWarn(
-					`Partner ${org.type} not found in totalBeneficiariesByPartner data`,
-				);
 			}
 		});
 	});
@@ -165,10 +161,6 @@ function processDataBarChart({
 				sect.reached.boys += foundPartner.boys.reached;
 				sect.reached.women += foundPartner.women.reached;
 				sect.reached.men += foundPartner.men.reached;
-			} else {
-				simpleWarn(
-					`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
-				);
 			}
 		});
 	});

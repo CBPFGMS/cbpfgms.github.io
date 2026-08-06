@@ -74,7 +74,11 @@ function AttributionCardsContainer({
 	}
 
 	function handleClickKeepOnly(thisFund: number) {
-		setFunds([thisFund]);
+		if (funds.length === 1 && funds.includes(thisFund)) {
+			setFunds(allFunds);
+		} else {
+			setFunds([thisFund]);
+		}
 	}
 
 	function handleChangeSortBy(

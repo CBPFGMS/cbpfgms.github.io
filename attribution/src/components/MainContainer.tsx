@@ -203,7 +203,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				attribution={attributions.global.percentage}
 				donorName={lists.donorGMSNames[donor]}
 			/>
-			<SectionDivider title="Locations" />
+			{/* <SectionDivider title="Locations" /> */}
 		</Container>
 	);
 }

@@ -61,7 +61,7 @@ function AttributionCards({
 						display: "flex",
 						flexGrow: 1,
 						"&:last-child": {
-							paddingBottom: "16px", // or whatever value you want, theme spacing units
+							paddingBottom: "16px",
 						},
 					}}
 				>
@@ -81,9 +81,6 @@ function AttributionCards({
 								flexDirection: "row",
 								alignItems: "center",
 								marginBottom: "1em",
-								pointerEvents: isTheOnlySelectedFund
-									? "none"
-									: "unset",
 								gap: "0.5em",
 							}}
 						>
@@ -111,7 +108,9 @@ function AttributionCards({
 									justifyContent: "center",
 								}}
 							>
-								Keep Only
+								{isTheOnlySelectedFund
+									? "Add all"
+									: "Keep Only"}
 							</Box>
 						</Box>
 						<Box
