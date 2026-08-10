@@ -3,6 +3,7 @@ import type { AllocationsData } from "./processrawdata";
 type ProcessDataSectorsParams = {
 	allocationsData: AllocationsData;
 	funds: number[];
+	year: number;
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	globalAttribution: number;
 };
@@ -19,6 +20,7 @@ export type SectorsData = {
 function processDataSectors({
 	allocationsData,
 	funds,
+	year,
 	setSector,
 	globalAttribution,
 }: ProcessDataSectorsParams): SectorsData {
@@ -28,7 +30,7 @@ function processDataSectors({
 	};
 
 	allocationsData.forEach(datum => {
-		if (funds.includes(datum.fund)) {
+		if (funds.includes(datum.fund) && year === datum.year) {
 			sectorsData.total += datum.budget * globalAttribution;
 
 			datum.sectorData.forEach(sectorDatum => {

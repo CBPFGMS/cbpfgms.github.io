@@ -17,6 +17,7 @@ import processDataTotalBeneficiaries from "../utils/processdatatotalben";
 import processDataBarChart from "../utils/processdatabarchart";
 import ChartsContainer from "./ChartsContainer";
 import Partners from "./Partners";
+import NoData from "./NoData";
 
 export type Charts = (typeof constants.charts)[number];
 
@@ -127,6 +128,8 @@ function MainContainer({ donor }: MainContainerProps) {
 		],
 	);
 
+	const hasNoData = targetedAndReachedTotal.targeted.total === 0;
+
 	return (
 		<Container
 			disableGutters={true}
@@ -173,37 +176,46 @@ function MainContainer({ donor }: MainContainerProps) {
 				)}
 				setFunds={setFunds}
 			/>
-			<SectionDivider title="At a glance" />
-			<TopFigures
-				data={dataTopFigures}
-				attribution={attributions.global.percentage}
-				donorName={lists.donorGMSNames[donor]}
-			/>
-			<KeyFigures
-				data={dataKeyFigures}
-				attribution={attributions.global.percentage}
-				donorName={lists.donorGMSNames[donor]}
-			/>
-			<SectionDivider title="Allocated values" />
-			<ChartsContainer
-				targetedAndReachedTotal={targetedAndReachedTotal}
-				dataSector={dataSector}
-				dataOrganization={dataOrganization}
-				lists={lists}
-				attribution={attributions.global.percentage}
-				donorName={lists.donorGMSNames[donor]}
-			/>
-			<SectionDivider title="Partners" />
-			<Partners
-				allocationsData={allocationsData}
-				funds={funds}
-				year={year}
-				lists={lists}
-				inDataSectors={inAllocationsDataLists.sectorsPerYear}
-				attribution={attributions.global.percentage}
-				donorName={lists.donorGMSNames[donor]}
-			/>
-			{/* <SectionDivider title="Locations" /> */}
+			{hasNoData ? (
+				<>
+					<SectionDivider title="Allocations" />
+					<NoData />
+				</>
+			) : (
+				<>
+					<SectionDivider title="At a glance" />
+					<TopFigures
+						data={dataTopFigures}
+						attribution={attributions.global.percentage}
+						donorName={lists.donorGMSNames[donor]}
+					/>
+					<KeyFigures
+						data={dataKeyFigures}
+						attribution={attributions.global.percentage}
+						donorName={lists.donorGMSNames[donor]}
+					/>
+					<SectionDivider title="Allocated values" />
+					<ChartsContainer
+						targetedAndReachedTotal={targetedAndReachedTotal}
+						dataSector={dataSector}
+						dataOrganization={dataOrganization}
+						lists={lists}
+						attribution={attributions.global.percentage}
+						donorName={lists.donorGMSNames[donor]}
+					/>
+					<SectionDivider title="Partners" />
+					<Partners
+						allocationsData={allocationsData}
+						funds={funds}
+						year={year}
+						lists={lists}
+						inDataSectors={inAllocationsDataLists.sectorsPerYear}
+						attribution={attributions.global.percentage}
+						donorName={lists.donorGMSNames[donor]}
+					/>
+					{/* <SectionDivider title="Locations" /> */}
+				</>
+			)}
 		</Container>
 	);
 }

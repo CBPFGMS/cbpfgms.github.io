@@ -67,6 +67,7 @@ function Partners({
 			processDataSectors({
 				allocationsData,
 				funds,
+				year,
 				setSector,
 				globalAttribution: attribution,
 			}),
@@ -92,30 +93,23 @@ function Partners({
 	const tableRef = useRef(null);
 
 	return (
-		<Box>
-			<Grid
-				container
-				spacing={2}
-			>
-				<Grid
-					size={12}
-					sx={{
-						marginBottom: 3,
+		<Grid
+			container
+			spacing={2}
+		>
+			<Grid size={12}>
+				<Typography
+					style={{
+						color: "var(--ocha-blue)",
+						fontWeight: 700,
+						marginBottom: "22px",
+						textAlign: "center",
+						fontSize: "2rem",
+						fontFamily: "Montserrat",
 					}}
 				>
-					<Typography
-						style={{
-							color: "var(--ocha-blue)",
-							fontWeight: 700,
-							marginBottom: "22px",
-							textAlign: "center",
-							fontSize: "2rem",
-							fontFamily: "Montserrat",
-						}}
-					>
-						Implementing Partners
-					</Typography>
-				</Grid>
+					Implementing Partners
+				</Typography>
 			</Grid>
 			<Box sx={{ display: "flex", marginBottom: 1 }}>
 				<Typography
@@ -198,7 +192,7 @@ function Partners({
 					}}
 				></Box>
 			</Box>
-		</Box>
+		</Grid>
 	);
 }
 

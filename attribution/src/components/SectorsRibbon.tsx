@@ -36,11 +36,11 @@ function SectorsRibbon({
 	return (
 		<Grid
 			container
+			spacing={2}
 			sx={{
 				alignItems: "stretch",
-				justifyContent: "flex-start",
+				justifyContent: "space-between",
 				marginBottom: 4,
-				gap: 1,
 			}}
 		>
 			{dataSectors.sectors.map((datum, index) => {
@@ -67,7 +67,7 @@ function SectorsRibbon({
 						data-tooltip-id="tooltip"
 						data-tooltip-content={tooltipSectorsText}
 						data-tooltip-place="top"
-						size={1.9}
+						size={2}
 						onClick={() => handleClick(datum.sector)}
 					>
 						<Box>
