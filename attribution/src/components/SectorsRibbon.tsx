@@ -39,7 +39,7 @@ function SectorsRibbon({
 			spacing={2}
 			sx={{
 				alignItems: "stretch",
-				justifyContent: "space-between",
+				justifyContent: "flex-start",
 				marginBottom: 4,
 			}}
 		>

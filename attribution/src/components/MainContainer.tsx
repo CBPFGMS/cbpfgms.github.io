@@ -46,9 +46,11 @@ function MainContainer({ donor }: MainContainerProps) {
 
 	const [hasUS, setHasUS] = useState<boolean>(donor === USCode);
 	const [year, setYear] = useState<number>(lastDonorYear);
-	const [funds, setFunds] = useState<number[]>(
-		Array.from(inContributionsDataLists.fundsPerDonorAndYear[donor][year]),
+
+	const allFunds = Array.from(
+		inContributionsDataLists.fundsPerDonorAndYear[donor][year],
 	);
+	const [funds, setFunds] = useState<number[]>(allFunds);
 
 	const attributions = useMemo(
 		() =>
@@ -58,18 +60,9 @@ function MainContainer({ donor }: MainContainerProps) {
 				year,
 				hasUS,
 				funds,
-				allFunds: Array.from(
-					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
-				),
+				allFunds: allFunds,
 			}),
-		[
-			donor,
-			contributionsData,
-			year,
-			hasUS,
-			funds,
-			inContributionsDataLists,
-		],
+		[donor, contributionsData, year, hasUS, funds, allFunds],
 	);
 
 	const dataTopFigures = useMemo(
@@ -151,6 +144,9 @@ function MainContainer({ donor }: MainContainerProps) {
 				inContributionsDataLists={inContributionsDataLists}
 				donor={donor}
 				setFunds={setFunds}
+				lists={lists}
+				funds={funds}
+				attributions={attributions}
 			/>
 			<DonorHeader
 				donor={donor}
@@ -162,18 +158,14 @@ function MainContainer({ donor }: MainContainerProps) {
 				attributions={attributions}
 				lists={lists}
 				funds={funds}
-				allFunds={Array.from(
-					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
-				)}
+				allFunds={allFunds}
 			/>
 			<AttributionCardsContainer
 				attributions={attributions}
 				lists={lists}
 				donor={donor}
 				funds={funds}
-				allFunds={Array.from(
-					inContributionsDataLists.fundsPerDonorAndYear[donor][year],
-				)}
+				allFunds={allFunds}
 				setFunds={setFunds}
 			/>
 			{hasNoData ? (

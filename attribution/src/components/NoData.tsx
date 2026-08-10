@@ -17,6 +17,7 @@ export default function NoData() {
 				width: "100%",
 				py: { xs: 6, sm: 8 },
 				px: 3,
+				boxSizing: "border-box",
 				borderRadius: 3,
 				border: "1px dashed",
 				borderColor: "divider",

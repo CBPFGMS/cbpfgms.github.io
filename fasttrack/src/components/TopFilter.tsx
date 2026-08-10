@@ -27,9 +27,6 @@ function TopFilter({
 }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
-	void status;
-	void setStatus;
-
 	return (
 		<Grid
 			container
