@@ -186,6 +186,9 @@ function AttributionCardsContainer({
 			<Grid
 				container
 				spacing={2}
+				sx={{
+					width: "100%",
+				}}
 			>
 				{sortedFunds.map(fund => {
 					return (
