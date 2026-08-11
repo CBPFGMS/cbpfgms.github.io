@@ -13,7 +13,8 @@ type Charts =
 	| "Sectors"
 	| "Targeted_and_reached_people"
 	| "Gender_with_age_marker"
-	| "CVA";
+	| "CVA"
+	| "Attribution";
 
 type ApiType = "data" | "master";
 
@@ -387,6 +388,30 @@ export const apiList: ApiList = [
 		queryString: "?SPCode=MstCVAType",
 		charts: ["Progress_dashboard", "CVA"],
 		apiType: "master",
+	},
+	{
+		id: 42,
+		apiName: "BDT2-Beneficiary",
+		url: "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiary/",
+		queryString: "?isByLocation=false&$format=csv",
+		charts: ["Attribution"],
+		apiType: "data",
+	},
+	{
+		id: 43,
+		apiName: "BDT2-BeneficiaryByPartnerType",
+		url: "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/",
+		queryString: "?isByLocation=false&$format=csv",
+		charts: ["Attribution"],
+		apiType: "data",
+	},
+	{
+		id: 44,
+		apiName: "BDT2-BeneficiaryBySector",
+		url: "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/",
+		queryString: "?isByLocation=false&$format=csv",
+		charts: ["Attribution"],
+		apiType: "data",
 	},
 ] as const;
 

@@ -89,14 +89,6 @@ const pooledFundsMasterUrl =
 	totalBeneficiariesBySectorUrl =
 		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&$format=csv";
 
-// old totalben urls
-// 	totalBeneficiariesUrl =
-// 	"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
-// totalBeneficiariesByPartnerUrl =
-// 	"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
-// totalBeneficiariesBySectorUrl =
-// 	"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv";
-
 export async function fetchAppData(
 	startYear: number | null,
 	defaultFundType: number | null,
