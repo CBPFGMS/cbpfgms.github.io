@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { apiList } from "./apilist";
 import { type LineChartDatum } from "./processdata";
-import chartstate from "./chartstate";
+import chartState from "./chartstate";
 import { type ApiSelect } from "./createselect";
 
 const width = 1100;
@@ -22,7 +22,7 @@ const yAxis = d3.axisLeft<number>(yScale).ticks(4).tickPadding(10);
 
 const xAxis = d3
 	.axisBottom<Date>(xScale)
-	.tickFormat(d3.timeFormat("%b %y"))
+	// .tickFormat(d3.timeFormat("%b %y"))
 	.tickSizeOuter(0);
 
 const lineGenerator = d3
@@ -30,8 +30,8 @@ const lineGenerator = d3
 	.x(d => xScale(d.date))
 	.defined(
 		d =>
-			d[chartstate.lineChartApi] !== null &&
-			d[chartstate.lineChartApi] !== 0
+			d[chartState.lineChartApi] !== null &&
+			d[chartState.lineChartApi] !== 0,
 	)
 	.curve(d3.curveMonotoneX);
 
@@ -40,9 +40,12 @@ export function createLineChart(
 	tooltip: d3.Selection<HTMLDivElement, unknown, HTMLElement, any>,
 	minDate: Date,
 	maxDate: Date,
-	apiSelect: ApiSelect
+	apiSelect: ApiSelect,
 ) {
-	xScale.domain([minDate, maxDate]);
+	xScale.domain([
+		d3.timeDay.offset(minDate, -1),
+		d3.timeDay.offset(maxDate, 1),
+	]);
 
 	yAxis.tickSize(-(width - padding.left - padding.right));
 
@@ -75,16 +78,16 @@ export function createLineChart(
 		const selectedApiId = parseInt(selectedValue, 10);
 		if (!isNaN(selectedApiId)) {
 			apiSelect.property("value", selectedValue);
-			chartstate.lineChartApi = selectedApiId;
+			chartState.lineChartApi = selectedApiId;
 
 			drawLine();
 		}
 	});
 
 	function drawLine() {
-		lineGenerator.y(d => yScale(d[chartstate.lineChartApi] ?? 0));
+		lineGenerator.y(d => yScale(d[chartState.lineChartApi] ?? 0));
 
-		const maxTime = d3.max(lineChartData, d => d[chartstate.lineChartApi]);
+		const maxTime = d3.max(lineChartData, d => d[chartState.lineChartApi]);
 
 		yScale.domain([0, maxTime ?? 0]);
 
@@ -117,7 +120,7 @@ export function createLineChart(
 			.append("circle")
 			.attr("class", "point")
 			.attr("cx", d => xScale(d.date))
-			.attr("cy", d => yScale(d[chartstate.lineChartApi] ?? 0))
+			.attr("cy", d => yScale(d[chartState.lineChartApi] ?? 0))
 			.attr("r", circleRadius)
 			.attr("fill", "teal");
 
@@ -127,13 +130,13 @@ export function createLineChart(
 			.transition()
 			.duration(duration)
 			.style("opacity", d =>
-				d[chartstate.lineChartApi] === null ||
-				d[chartstate.lineChartApi] === 0
+				d[chartState.lineChartApi] === null ||
+				d[chartState.lineChartApi] === 0
 					? 0
-					: 1
+					: 1,
 			)
 			.attr("cx", d => xScale(d.date))
-			.attr("cy", d => yScale(d[chartstate.lineChartApi] ?? 0));
+			.attr("cy", d => yScale(d[chartState.lineChartApi] ?? 0));
 
 		xAxisGroup.transition().duration(duration).call(xAxis);
 		yAxisGroup.transition().duration(duration).call(yAxis);
@@ -168,10 +171,10 @@ export function createLineChart(
 
 			if (d) {
 				const api = apiList.find(
-					api => api.id === chartstate.lineChartApi
+					api => api.id === chartState.lineChartApi,
 				);
 				const apiName = api ? api.apiName : "Unknown API";
-				const apiValue = d[chartstate.lineChartApi];
+				const apiValue = d[chartState.lineChartApi];
 				const value =
 					apiValue !== null && apiValue !== 0
 						? apiValue.toFixed(2) + " ms"

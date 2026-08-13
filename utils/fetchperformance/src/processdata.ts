@@ -69,7 +69,7 @@ export function processData(rawData: Datum[]): {
 			l =>
 				l.date.getFullYear() === datum.date.getFullYear() &&
 				l.date.getMonth() === datum.date.getMonth() &&
-				l.date.getDate() === datum.date.getDate()
+				l.date.getDate() === datum.date.getDate(),
 		);
 		if (lineDatum) {
 			if (
@@ -86,7 +86,7 @@ export function processData(rawData: Datum[]): {
 				date: new Date(
 					datum.date.getFullYear(),
 					datum.date.getMonth(),
-					datum.date.getDate()
+					datum.date.getDate(),
 				),
 			};
 			apiIdsList.forEach(id => {
@@ -110,7 +110,7 @@ export function processData(rawData: Datum[]): {
 				l =>
 					l.date.getFullYear() === datum.date.getFullYear() &&
 					l.date.getMonth() === datum.date.getMonth() &&
-					l.date.getDate() === datum.date.getDate()
+					l.date.getDate() === datum.date.getDate(),
 			);
 			if (lollipopDatum) {
 				lollipopDatum.numberOfErrors += 1;
@@ -123,7 +123,7 @@ export function processData(rawData: Datum[]): {
 					date: new Date(
 						datum.date.getFullYear(),
 						datum.date.getMonth(),
-						datum.date.getDate()
+						datum.date.getDate(),
 					),
 					numberOfErrors: 1,
 					apisWithErrors: [
@@ -153,7 +153,7 @@ export function processData(rawData: Datum[]): {
 	Object.keys(tempData).forEach(key => {
 		maxNumberOfCalls = Math.max(
 			maxNumberOfCalls,
-			tempData[parseInt(key)].numberOfCalls
+			tempData[parseInt(key)].numberOfCalls,
 		);
 	});
 
@@ -169,6 +169,17 @@ export function processData(rawData: Datum[]): {
 		d.averageFileSize =
 			tempDatum.size.reduce((a, b) => a + b, 0) / tempDatum.numberOfCalls;
 	});
+
+	minimumDate = new Date(
+		minimumDate.getFullYear(),
+		minimumDate.getMonth(),
+		minimumDate.getDate(),
+	);
+	maximumDate = new Date(
+		maximumDate.getFullYear(),
+		maximumDate.getMonth(),
+		maximumDate.getDate(),
+	);
 
 	return {
 		barChartData,
