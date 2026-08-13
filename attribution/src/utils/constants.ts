@@ -28,6 +28,8 @@ export const constants = {
 	totalBeneficiairesText:
 		"Calculation of unique beneficiaries are underway, will be published soon.",
 	USCode: 102,
+	firstNSFTYear: 2026,
+	USProjectsString: "-NSFT-",
 	sortByOptions: ["attribution", "donation", "total", "alphabetical"],
 	partnersSplitOrder: [3, 2, 1, 4],
 	hasDisabledIds: [7, 8, 9],

@@ -10,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import type { Attributions } from "../utils/calculateattributions";
 import formatSIFloat from "../utils/formatsi";
 
-const { USCode } = constants;
+const { USCode, firstNSFTYear } = constants;
 
 type TopSelectorsProps = {
 	setYear: React.Dispatch<React.SetStateAction<number>>;
@@ -74,6 +74,7 @@ function TopSelectors({
 				inContributionsDataLists.fundsPerDonorAndYear[donor][value],
 			),
 		);
+		setHasUS(value < firstNSFTYear);
 	}
 
 	function handleChangeHasUS(
@@ -152,7 +153,7 @@ function TopSelectors({
 					}}
 				/>
 			)}
-			{donor !== USCode && (
+			{donor !== USCode && year >= firstNSFTYear && (
 				<ToggleButtonGroup
 					value={hasUS}
 					exclusive
