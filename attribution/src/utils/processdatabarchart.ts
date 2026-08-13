@@ -22,9 +22,10 @@ type ProcessDataBarChartParams = {
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	globalAttribution: number;
+	hasUS: boolean;
 };
 
-const { beneficiaryCategories } = constants;
+const { beneficiaryCategories, USProjectsString } = constants;
 
 function processDataBarChart({
 	allocationsData,
@@ -33,6 +34,7 @@ function processDataBarChart({
 	totalBeneficiariesByPartnerData,
 	totalBeneficiariesBySectorData,
 	globalAttribution,
+	hasUS,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -41,6 +43,9 @@ function processDataBarChart({
 	const dataSector: DatumBarChart[] = [];
 
 	allocationsData.forEach(datum => {
+		if (!hasUS && datum.projectCode.includes(USProjectsString)) {
+			return;
+		}
 		if (year === datum.year && funds.includes(datum.fund)) {
 			const foundOrganization = dataOrganization.find(
 				d => d.type === datum.organizationType,

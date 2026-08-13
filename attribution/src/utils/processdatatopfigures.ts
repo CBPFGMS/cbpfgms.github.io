@@ -1,5 +1,6 @@
 import type { AllocationsData, TotalBeneficiariesData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
+import { constants } from "./constants";
 
 export type InSelectionData = {
 	funds: Set<number>;
@@ -12,6 +13,7 @@ type ProcessDataTopFiguresParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	globalAttribution: number;
 	year: number;
+	hasUS: boolean;
 };
 
 export type DataTopFigures = {
@@ -22,12 +24,15 @@ export type DataTopFigures = {
 	reached: number;
 };
 
+const { USProjectsString } = constants;
+
 function processDataTopFigures({
 	allocationsData,
 	funds,
 	totalBeneficiariesData,
 	globalAttribution,
 	year,
+	hasUS,
 }: ProcessDataTopFiguresParams): DataTopFigures {
 	const numberOfProjectsSet = new Set<number>(),
 		numberOfPartnersSet = new Set<number>();
@@ -55,6 +60,9 @@ function processDataTopFigures({
 	});
 
 	allocationsData.forEach(row => {
+		if (!hasUS && row.projectCode.includes(USProjectsString)) {
+			return;
+		}
 		if (funds.includes(row.fund) && row.year === year) {
 			numberOfProjectsSet.add(row.projectId);
 			numberOfPartnersSet.add(row.organizationId);

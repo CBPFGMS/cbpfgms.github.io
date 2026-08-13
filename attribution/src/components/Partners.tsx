@@ -28,6 +28,7 @@ type PartnersProps = {
 	inDataSectors: InAllocationsDataLists["sectorsPerYear"];
 	attribution: number;
 	donorName: string;
+	hasUS: boolean;
 };
 
 export type SortingCriterion = (typeof constants.partnersHeader)[number];
@@ -44,6 +45,7 @@ function Partners({
 	inDataSectors,
 	attribution,
 	donorName,
+	hasUS,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
 			useState<SortingCriterion>("budget"),
@@ -58,8 +60,9 @@ function Partners({
 				sector,
 				year,
 				globalAttribution: attribution,
+				hasUS,
 			}),
-		[allocationsData, funds, sector, year, attribution],
+		[allocationsData, funds, sector, year, attribution, hasUS],
 	);
 
 	const dataSectors = useMemo(

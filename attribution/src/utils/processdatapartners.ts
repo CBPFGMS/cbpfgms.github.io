@@ -1,5 +1,6 @@
 import type { AllocationsData } from "./processrawdata";
 import { max } from "d3";
+import { constants } from "./constants";
 
 type ProcessDataPartnersParams = {
 	allocationsData: AllocationsData;
@@ -7,6 +8,7 @@ type ProcessDataPartnersParams = {
 	sector: number[];
 	year: number;
 	globalAttribution: number;
+	hasUS: boolean;
 };
 
 type SectorDetailsDatum = {
@@ -31,12 +33,15 @@ export type PartnersDatum = {
 	sectorsDetails: SectorDetailsDatum[];
 };
 
+const { USProjectsString } = constants;
+
 function processDataPartners({
 	allocationsData,
 	funds,
 	sector,
 	year,
 	globalAttribution,
+	hasUS,
 }: ProcessDataPartnersParams): {
 	data: PartnersDatum[];
 	maxBudgetValue: number;
@@ -44,6 +49,9 @@ function processDataPartners({
 	const data: PartnersDatum[] = [];
 
 	allocationsData.forEach(datum => {
+		if (!hasUS && datum.projectCode.includes(USProjectsString)) {
+			return;
+		}
 		const sectors = datum.sectorData.map(d => d.sectorId);
 		if (
 			funds.includes(datum.fund) &&

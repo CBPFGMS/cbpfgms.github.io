@@ -73,8 +73,16 @@ function MainContainer({ donor }: MainContainerProps) {
 				funds,
 				globalAttribution: attributions.global.percentage,
 				year,
+				hasUS,
 			}),
-		[allocationsData, totalBeneficiariesData, funds, attributions, year],
+		[
+			allocationsData,
+			totalBeneficiariesData,
+			funds,
+			attributions,
+			year,
+			hasUS,
+		],
 	);
 
 	const dataKeyFigures = useMemo(
@@ -86,8 +94,17 @@ function MainContainer({ donor }: MainContainerProps) {
 				globalAttribution: attributions.global.percentage,
 				lists,
 				year,
+				hasUS,
 			}),
-		[allocationsData, localizationData, funds, attributions, lists, year],
+		[
+			allocationsData,
+			localizationData,
+			funds,
+			attributions,
+			lists,
+			year,
+			hasUS,
+		],
 	);
 
 	const targetedAndReachedTotal = useMemo(
@@ -110,6 +127,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
 				globalAttribution: attributions.global.percentage,
+				hasUS,
 			}),
 		[
 			allocationsData,
@@ -118,6 +136,7 @@ function MainContainer({ donor }: MainContainerProps) {
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
 			attributions,
+			hasUS,
 		],
 	);
 
@@ -204,6 +223,7 @@ function MainContainer({ donor }: MainContainerProps) {
 						inDataSectors={inAllocationsDataLists.sectorsPerYear}
 						attribution={attributions.global.percentage}
 						donorName={lists.donorGMSNames[donor]}
+						hasUS={hasUS}
 					/>
 					{/* <SectionDivider title="Locations" /> */}
 				</>

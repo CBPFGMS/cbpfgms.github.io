@@ -1,6 +1,7 @@
 import type { List } from "./makelists";
 import type { AllocationsData, LocalizationData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
+import { constants } from "./constants";
 
 export type InSelectionData = {
 	funds: Set<number>;
@@ -14,6 +15,7 @@ type ProcessDataKeyFiguresParams = {
 	globalAttribution: number;
 	lists: List;
 	year: number;
+	hasUS: boolean;
 };
 
 export type DataKeyFigures = {
@@ -31,6 +33,8 @@ export type DataKeyFigures = {
 	totalProtection: number;
 };
 
+const { USProjectsString } = constants;
+
 function processDataKeyFigures({
 	allocationsData,
 	localizationData,
@@ -38,6 +42,7 @@ function processDataKeyFigures({
 	globalAttribution,
 	lists,
 	year,
+	hasUS,
 }: ProcessDataKeyFiguresParams): DataKeyFigures {
 	let localization = 0,
 		disability = 0,
@@ -62,6 +67,9 @@ function processDataKeyFigures({
 	}
 
 	allocationsData.forEach(row => {
+		if (!hasUS && row.projectCode.includes(USProjectsString)) {
+			return;
+		}
 		if (funds.includes(row.fund) && row.year === year) {
 			if (row.hasDisabled) {
 				disability += row.budget;
