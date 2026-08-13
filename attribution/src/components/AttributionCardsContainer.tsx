@@ -206,6 +206,7 @@ function AttributionCardsContainer({
 								funds={funds}
 								handleClick={handleClick}
 								handleClickKeepOnly={handleClickKeepOnly}
+								isTheOnlyCard={allFunds.length === 1}
 							/>
 						</Grid>
 					);

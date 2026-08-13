@@ -6,9 +6,11 @@ import { constants } from "../utils/constants";
 import { useSticky } from "../hooks/useSticky";
 import DropdownFunds from "./DropdownFunds";
 import type { List } from "../utils/makelists";
-import TextField from "@mui/material/TextField";
 import type { Attributions } from "../utils/calculateattributions";
 import formatSIFloat from "../utils/formatsi";
+import Chip from "@mui/material/Chip";
+import LanguageIcon from "@mui/icons-material/Language";
+import colors from "../utils/colors";
 
 const { USCode, firstNSFTYear } = constants;
 
@@ -23,6 +25,7 @@ type TopSelectorsProps = {
 	lists: List;
 	funds: number[];
 	attributions: Attributions;
+	flagSrc: string;
 };
 
 const buttonsStyle = {
@@ -57,6 +60,7 @@ function TopSelectors({
 	lists,
 	funds,
 	attributions,
+	flagSrc,
 }: TopSelectorsProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
@@ -135,23 +139,36 @@ function TopSelectors({
 				/>
 			)}
 			{isSticky && (
-				<TextField
-					label="Global attribution"
-					value={`${Math.round(attributions.global.percentage * 1000) / 10}% ($${formatSIFloat(attributions.global.donor)})`}
-					variant="outlined"
-					focused
-					slotProps={{
-						input: {
-							readOnly: true,
-						},
-					}}
-					sx={{
-						pointerEvents: "none",
-						"& .MuiInputBase-input": {
-							padding: "8.5px 14px",
-						},
-					}}
-				/>
+				<Box
+					sx={{ display: "flex", alignItems: "center", gap: "0.4em" }}
+				>
+					<img
+						src={flagSrc}
+						width="48px"
+						style={{
+							borderRadius: "0.3rem",
+							boxShadow: "0 0.5rem 0.5rem rgba(0, 0, 0, 0.1)",
+						}}
+						alt={`${lists.donorGMSNames[donor]} flag`}
+					/>
+					<Chip
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`Global attribution of ${lists.donorGMSNames[donor]}`}
+						data-tooltip-place="bottom"
+						icon={
+							<LanguageIcon sx={{ color: "#fff !important" }} />
+						}
+						label={`${Math.round(attributions.global.percentage * 1000) / 10}% ($${formatSIFloat(attributions.global.donor)})`}
+						size="medium"
+						sx={{
+							color: "#fff",
+							backgroundColor: colors.unColorChipLighter,
+							fontWeight: 600,
+							fontSize: "1rem",
+							height: 36,
+						}}
+					/>
+				</Box>
 			)}
 			{donor !== USCode && year >= firstNSFTYear && (
 				<ToggleButtonGroup

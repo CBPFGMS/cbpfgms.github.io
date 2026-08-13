@@ -18,6 +18,7 @@ import processDataBarChart from "../utils/processdatabarchart";
 import ChartsContainer from "./ChartsContainer";
 import Partners from "./Partners";
 import NoData from "./NoData";
+import getFlagSrc from "../utils/flagsrc";
 
 export type Charts = (typeof constants.charts)[number];
 
@@ -142,6 +143,12 @@ function MainContainer({ donor }: MainContainerProps) {
 
 	const hasNoData = targetedAndReachedTotal.targeted.total === 0;
 
+	const flagSrc = getFlagSrc({
+		donor,
+		lists,
+		missingFlags: inContributionsDataLists.missingFlags,
+	});
+
 	return (
 		<Container
 			disableGutters={true}
@@ -166,11 +173,12 @@ function MainContainer({ donor }: MainContainerProps) {
 				lists={lists}
 				funds={funds}
 				attributions={attributions}
+				flagSrc={flagSrc}
 			/>
 			<DonorHeader
 				donor={donor}
 				lists={lists}
-				missingFlags={inContributionsDataLists.missingFlags}
+				flagSrc={flagSrc}
 			/>
 			<TopAttributionCard
 				donor={donor}

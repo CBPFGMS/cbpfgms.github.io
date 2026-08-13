@@ -1,21 +1,14 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { List } from "../utils/makelists";
-import { flags60 } from "../assets/flags60";
 
 type DonorHeaderProps = {
 	donor: number;
 	lists: List;
-	missingFlags: string[];
+	flagSrc: string;
 };
 
-function DonorHeader({ donor, lists, missingFlags }: DonorHeaderProps) {
-	const flagSrc =
-		donor === 200
-			? "https://flagcdn.com/gb-sct.svg" //Hardcoded: in flagsCDN Scotland is gb-sct, not gb-sc
-			: missingFlags.includes(lists.donorISO2Codes[donor]!.toLowerCase())
-				? flags60[lists.donorISO2Codes[donor]!.toLowerCase()]
-				: `https://flagcdn.com/${lists.donorISO2Codes[donor]!.toLowerCase()}.svg`;
+function DonorHeader({ donor, lists, flagSrc }: DonorHeaderProps) {
 
 	return (
 		<Box

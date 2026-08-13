@@ -16,6 +16,7 @@ type AttributionCardsProps = {
 	funds: number[];
 	handleClick: (thisFund: number) => void;
 	handleClickKeepOnly: (thisFund: number) => void;
+	isTheOnlyCard: boolean;
 };
 
 function AttributionCards({
@@ -28,6 +29,7 @@ function AttributionCards({
 	funds,
 	handleClick,
 	handleClickKeepOnly,
+	isTheOnlyCard,
 }: AttributionCardsProps) {
 	const fundSelected = funds.includes(fund);
 	const isTheOnlySelectedFund = fundSelected && funds.length === 1;
@@ -95,6 +97,9 @@ function AttributionCards({
 									filter: isTheOnlySelectedFund
 										? "grayscale(100%)"
 										: "none",
+									pointerEvents: isTheOnlySelectedFund
+										? "none"
+										: "auto",
 								}}
 							>
 								{fundSelected ? "Remove" : "Add"}
@@ -106,9 +111,16 @@ function AttributionCards({
 									display: "flex",
 									flex: 1,
 									justifyContent: "center",
+									opacity: isTheOnlyCard ? 0.5 : 1,
+									filter: isTheOnlyCard
+										? "grayscale(100%)"
+										: "none",
+									pointerEvents: isTheOnlyCard
+										? "none"
+										: "auto",
 								}}
 							>
-								{isTheOnlySelectedFund
+								{isTheOnlySelectedFund && !isTheOnlyCard
 									? "Add all"
 									: "Keep Only"}
 							</Box>
