@@ -38,7 +38,8 @@ function MainContainer({ donor }: MainContainerProps) {
 		totalBeneficiariesData,
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
-		localizationData,
+		localizationDataWithUS,
+		localizationDataWithoutUS,
 	} = useAppData();
 
 	const lastDonorYear = Array.from(
@@ -90,7 +91,8 @@ function MainContainer({ donor }: MainContainerProps) {
 		() =>
 			processDataKeyFigures({
 				allocationsData,
-				localizationData,
+				localizationDataWithUS,
+				localizationDataWithoutUS,
 				funds,
 				globalAttribution: attributions.global.percentage,
 				lists,
@@ -99,7 +101,8 @@ function MainContainer({ donor }: MainContainerProps) {
 			}),
 		[
 			allocationsData,
-			localizationData,
+			localizationDataWithUS,
+			localizationDataWithoutUS,
 			funds,
 			attributions,
 			lists,

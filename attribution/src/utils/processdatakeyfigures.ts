@@ -10,7 +10,8 @@ export type InSelectionData = {
 
 type ProcessDataKeyFiguresParams = {
 	allocationsData: AllocationsData;
-	localizationData: LocalizationData;
+	localizationDataWithUS: LocalizationData;
+	localizationDataWithoutUS: LocalizationData;
 	funds: number[];
 	globalAttribution: number;
 	lists: List;
@@ -37,7 +38,8 @@ const { USProjectsString } = constants;
 
 function processDataKeyFigures({
 	allocationsData,
-	localizationData,
+	localizationDataWithUS,
+	localizationDataWithoutUS,
 	funds,
 	globalAttribution,
 	lists,
@@ -96,6 +98,10 @@ function processDataKeyFigures({
 			}
 		}
 	});
+
+	const localizationData = hasUS
+		? localizationDataWithUS
+		: localizationDataWithoutUS;
 
 	localizationData.forEach(row => {
 		if (funds.includes(row.fund) && row.year === year) {

@@ -94,7 +94,8 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
-	allocationsByYearAndFund: AllocationsByYearAndFundObject[];
+	allocationsByYearAndFundWithUS: AllocationsByYearAndFundObject[];
+	allocationsByYearAndFundWithoutUS: AllocationsByYearAndFundObject[];
 };
 
 type TargetedAndReached = {
@@ -139,20 +140,23 @@ function processRawData({
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
-	allocationsByYearAndFund,
+	allocationsByYearAndFundWithUS,
+	allocationsByYearAndFundWithoutUS,
 }: ProcessRawDataParams): {
 	allocationsData: AllocationsData;
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	inAllocationsDataLists: InAllocationsDataLists;
-	localizationData: LocalizationData;
+	localizationDataWithUS: LocalizationData;
+	localizationDataWithoutUS: LocalizationData;
 } {
 	const allocationsData: AllocationsData = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
 	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
-	const localizationData: LocalizationData = [];
+	const localizationDataWithUS: LocalizationData = [];
+	const localizationDataWithoutUS: LocalizationData = [];
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
@@ -312,48 +316,16 @@ function processRawData({
 		}
 	});
 
-	allocationsByYearAndFund.forEach(row => {
-		const parsedRow = allocationsByYearAndFundObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const thisYear = row.AllocationYear;
-			const thisFundId = lists.fundIdsByName[row.PooledFundName];
-
-			if (!thisFundId) {
-				simpleWarn(
-					`Fund with name ${row.PooledFundName} not found in the funds master`,
-				);
-				return;
-			}
-
-			if (
-				!row.OrganizationType.includes("National") &&
-				!row.OrganizationType.includes("Red") &&
-				!row.OrganizationType.includes("Others")
-			) {
-				return;
-			}
-
-			const foundYearAndFund = localizationData.find(
-				e => e.fund === thisFundId && e.year === thisYear,
-			);
-
-			if (foundYearAndFund) {
-				foundYearAndFund.budget += row.ApprovedBudget;
-			} else {
-				localizationData.push({
-					fund: thisFundId,
-					year: thisYear,
-					budget: row.ApprovedBudget,
-				});
-			}
-		} else {
-			warnInvalidSchema(
-				"allocationsByYearAndFund",
-				row,
-				parsedRow.error.message,
-			);
-		}
-	});
+	populateLocalizationData(
+		allocationsByYearAndFundWithUS,
+		localizationDataWithUS,
+		"allocationsByYearAndFundWithUS",
+	);
+	populateLocalizationData(
+		allocationsByYearAndFundWithoutUS,
+		localizationDataWithoutUS,
+		"allocationsByYearAndFundWithoutUS",
+	);
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -545,8 +517,55 @@ function processRawData({
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
 		inAllocationsDataLists,
-		localizationData,
+		localizationDataWithUS,
+		localizationDataWithoutUS,
 	};
+
+	function populateLocalizationData(
+		source: AllocationsByYearAndFundObject[],
+		target: LocalizationData,
+		schemaName: string,
+	): void {
+		source.forEach(row => {
+			const parsedRow =
+				allocationsByYearAndFundObjectSchema.safeParse(row);
+			if (parsedRow.success) {
+				const thisYear = row.AllocationYear;
+				const thisFundId = lists.fundIdsByName[row.PooledFundName];
+
+				if (!thisFundId) {
+					simpleWarn(
+						`Fund with name ${row.PooledFundName} not found in the funds master`,
+					);
+					return;
+				}
+
+				if (
+					!row.OrganizationType.includes("National") &&
+					!row.OrganizationType.includes("Red") &&
+					!row.OrganizationType.includes("Others")
+				) {
+					return;
+				}
+
+				const foundYearAndFund = target.find(
+					e => e.fund === thisFundId && e.year === thisYear,
+				);
+
+				if (foundYearAndFund) {
+					foundYearAndFund.budget += row.ApprovedBudget;
+				} else {
+					target.push({
+						fund: thisFundId,
+						year: thisYear,
+						budget: row.ApprovedBudget,
+					});
+				}
+			} else {
+				warnInvalidSchema(schemaName, row, parsedRow.error.message);
+			}
+		});
+	}
 }
 
 export default processRawData;
