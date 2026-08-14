@@ -41,6 +41,7 @@ function SectorsRibbon({
 				alignItems: "stretch",
 				justifyContent: "flex-start",
 				marginBottom: 4,
+				width: "100%",
 			}}
 		>
 			{dataSectors.sectors.map((datum, index) => {

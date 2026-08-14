@@ -1,4 +1,5 @@
 import type { AllocationsData } from "./processrawdata";
+import { constants } from "./constants";
 
 type ProcessDataSectorsParams = {
 	allocationsData: AllocationsData;
@@ -6,6 +7,7 @@ type ProcessDataSectorsParams = {
 	year: number;
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	globalAttribution: number;
+	hasUS: boolean;
 };
 
 export type SectorsData = {
@@ -17,12 +19,15 @@ export type SectorsData = {
 	}[];
 };
 
+const { USProjectsString } = constants;
+
 function processDataSectors({
 	allocationsData,
 	funds,
 	year,
 	setSector,
 	globalAttribution,
+	hasUS,
 }: ProcessDataSectorsParams): SectorsData {
 	const sectorsData: SectorsData = {
 		total: 0,
@@ -30,6 +35,9 @@ function processDataSectors({
 	};
 
 	allocationsData.forEach(datum => {
+		if (!hasUS && datum.projectCode.includes(USProjectsString)) {
+			return;
+		}
 		if (funds.includes(datum.fund) && year === datum.year) {
 			sectorsData.total += datum.budget * globalAttribution;
 

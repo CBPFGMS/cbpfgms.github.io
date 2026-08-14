@@ -73,8 +73,9 @@ function Partners({
 				year,
 				setSector,
 				globalAttribution: attribution,
+				hasUS,
 			}),
-		[allocationsData, funds, attribution],
+		[allocationsData, funds, year, attribution, hasUS],
 	);
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
