@@ -6,10 +6,10 @@ type DonorHeaderProps = {
 	donor: number;
 	lists: List;
 	flagSrc: string;
+	faviconFlag: string;
 };
 
-function DonorHeader({ donor, lists, flagSrc }: DonorHeaderProps) {
-
+function DonorHeader({ donor, lists, flagSrc, faviconFlag }: DonorHeaderProps) {
 	return (
 		<Box
 			sx={{
@@ -21,6 +21,12 @@ function DonorHeader({ donor, lists, flagSrc }: DonorHeaderProps) {
 				marginTop: "5em",
 			}}
 		>
+			<title>{`${lists.donorGMSNames[donor]} attribution overview`}</title>
+			<link
+				rel="icon"
+				type="image/png"
+				href={faviconFlag}
+			/>
 			<img
 				src={flagSrc}
 				width="76px"

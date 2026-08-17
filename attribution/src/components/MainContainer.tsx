@@ -146,7 +146,7 @@ function MainContainer({ donor }: MainContainerProps) {
 
 	const hasNoData = targetedAndReachedTotal.targeted.total === 0;
 
-	const flagSrc = getFlagSrc({
+	const { flagSrc, faviconFlag } = getFlagSrc({
 		donor,
 		lists,
 		missingFlags: inContributionsDataLists.missingFlags,
@@ -182,6 +182,7 @@ function MainContainer({ donor }: MainContainerProps) {
 				donor={donor}
 				lists={lists}
 				flagSrc={flagSrc}
+				faviconFlag={faviconFlag}
 			/>
 			<TopAttributionCard
 				donor={donor}

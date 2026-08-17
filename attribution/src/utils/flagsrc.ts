@@ -7,7 +7,10 @@ type GetFlagSrcProps = {
 	missingFlags: string[];
 };
 
-function getFlagSrc({ donor, lists, missingFlags }: GetFlagSrcProps): string {
+function getFlagSrc({ donor, lists, missingFlags }: GetFlagSrcProps): {
+	flagSrc: string;
+	faviconFlag: string;
+} {
 	const flagSrc =
 		donor === 200
 			? "https://flagcdn.com/gb-sct.svg" //Hardcoded: in flagsCDN Scotland is gb-sct, not gb-sc
@@ -15,7 +18,12 @@ function getFlagSrc({ donor, lists, missingFlags }: GetFlagSrcProps): string {
 				? flags60[lists.donorISO2Codes[donor]!.toLowerCase()]
 				: `https://flagcdn.com/${lists.donorISO2Codes[donor]!.toLowerCase()}.svg`;
 
-	return flagSrc;
+	const faviconFlag =
+		donor === 200 || missingFlags.includes(donor.toString())
+			? flagSrc
+			: `https://flagcdn.com/w40/${lists.donorISO2Codes[donor]!.toLowerCase()}.png`;
+
+	return { flagSrc, faviconFlag };
 }
 
 export default getFlagSrc;
