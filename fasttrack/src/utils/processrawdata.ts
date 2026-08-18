@@ -95,7 +95,6 @@ type TargetedAndReached = {
 
 export type TotalBeneficiariesData = {
 	[key: number]: {
-		[id: number]: TargetedAndReached;
 		all: TargetedAndReached;
 	};
 };
@@ -402,18 +401,18 @@ function processRawData({
 				warnInvalidSchema(invalidSchema, row, parsedRow.error.message);
 			}
 
-			const projectKey = row.PFId;
+			const fund = row.PFId;
 
-			if (!target[projectKey]) {
-				target[projectKey] = {
+			if (!target[fund]) {
+				target[fund] = {
 					all: { targeted: 0, reached: 0, reachedProjects: 0 },
 				};
 			}
 
-			target[projectKey].all.targeted = row.TotTarg || 0;
-			target[projectKey].all.reached = row.TotAch || 0;
+			target[fund].all.targeted = row.TotTarg || 0;
+			target[fund].all.reached = row.TotAch || 0;
 			if (row.TotAchProjects) {
-				target[projectKey].all.reachedProjects += row.TotAchProjects;
+				target[fund].all.reachedProjects += row.TotAchProjects;
 			}
 		});
 	}

@@ -1,8 +1,4 @@
-import type {
-	Data,
-	InDataLists,
-	TotalBeneficiariesData,
-} from "./processrawdata";
+import type { Data, TotalBeneficiariesData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 
 export type InSelectionData = {
@@ -15,7 +11,6 @@ type ProcessDataTopFiguresParams = {
 	fund: number[];
 	status: number[];
 	totalBeneficiariesData: TotalBeneficiariesData;
-	inDataLists: InDataLists;
 };
 
 export type DataTopFigures = {
@@ -32,7 +27,6 @@ function processDataTopFigures({
 	fund,
 	status,
 	totalBeneficiariesData,
-	inDataLists,
 }: ProcessDataTopFiguresParams): {
 	dataTopFigures: DataTopFigures;
 	inSelectionData: InSelectionData;
@@ -57,22 +51,9 @@ function processDataTopFigures({
 			return;
 		}
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
-		const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			status.includes(pfStatus),
-		);
-		if (fundHasAllStatuses) {
-			targeted += totalBeneficiariesData[pf].all.targeted;
-			reached += totalBeneficiariesData[pf].all.reached;
-			reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
-		} else {
-			status.forEach(st => {
-				targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
-				reached += totalBeneficiariesData[pf][st]?.reached || 0;
-				reachedProjects +=
-					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
-			});
-		}
+		targeted += totalBeneficiariesData[pf].all.targeted;
+		reached += totalBeneficiariesData[pf].all.reached;
+		reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
 	});
 
 	data.forEach(row => {

@@ -118,9 +118,8 @@ function MainContainer() {
 				totalBeneficiariesData,
 				fund,
 				status,
-				inDataLists,
 			}),
-		[data, totalBeneficiariesData, fund, status, inDataLists],
+		[data, totalBeneficiariesData, fund, status],
 	);
 
 	const { dataPartners, maxBudgetValue } = useMemo(
