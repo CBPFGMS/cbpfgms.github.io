@@ -1,8 +1,4 @@
-import type {
-	Data,
-	InDataLists,
-	TotalBeneficiariesData,
-} from "./processrawdata";
+import type { Data, TotalBeneficiariesData } from "./processrawdata";
 import type { List } from "./makelists";
 import { simpleWarn } from "./warninvalid";
 
@@ -12,7 +8,6 @@ type ProcessDataRegionsParams = {
 	lists: List;
 	status: number[];
 	totalBeneficiariesData: TotalBeneficiariesData;
-	inDataLists: InDataLists;
 };
 
 export type RegionsDatum = {
@@ -29,7 +24,6 @@ function processDataRegions({
 	fund,
 	lists,
 	status,
-	inDataLists,
 	totalBeneficiariesData,
 }: ProcessDataRegionsParams): RegionsDatum[] {
 	const dataRegions: RegionsDatum[] = [];
@@ -67,25 +61,10 @@ function processDataRegions({
 
 		const thisRegion = dataRegions.find(d => d.funds.has(pf));
 		if (thisRegion) {
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			const fundHasAllStatuses = allStatuses.every(pfStatus =>
-				status.includes(pfStatus),
-			);
-			if (fundHasAllStatuses) {
-				thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
-				thisRegion.reached += totalBeneficiariesData[pf].all.reached;
-				thisRegion.reachedProjects +=
-					totalBeneficiariesData[pf].all.reachedProjects;
-			} else {
-				status.forEach(st => {
-					thisRegion.targeted +=
-						totalBeneficiariesData[pf][st]?.targeted || 0;
-					thisRegion.reached +=
-						totalBeneficiariesData[pf][st]?.reached || 0;
-					thisRegion.reachedProjects +=
-						totalBeneficiariesData[pf][st]?.reachedProjects || 0;
-				});
-			}
+			thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
+			thisRegion.reached += totalBeneficiariesData[pf].all.reached;
+			thisRegion.reachedProjects +=
+				totalBeneficiariesData[pf].all.reachedProjects;
 		} else {
 			simpleWarn(`Pooled fund code ${pf} not found in the regions data`);
 		}
