@@ -39,6 +39,8 @@ type ReceiveDataArgs = [
 	GlobalIndicatorsMasterObject[],
 	PooledFundsWithRegionMasterObject[],
 	TotalBeneficiariesObject[],
+	TotalBeneficiariesObject[],
+	TotalBeneficiariesObject[],
 	OrganizationIdsMapObject[],
 ];
 
@@ -59,9 +61,11 @@ const beneficiaryTypesMasterUrl =
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 	totalBeneficiariesUrl =
-		//Dev APIs have -api-dev in the url
-		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2/beneficiary?year=2026&format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv",
+	totalBeneficiariesTranche1Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv",
+	totalBeneficiariesTranche2Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv",
 	organizationIdsMapUrl =
 		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json";
 
@@ -76,6 +80,8 @@ function useData(
 	lists: List;
 	inDataLists: InDataLists;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 	loading: boolean;
 	error: string | null;
 	progress: number;
@@ -94,6 +100,10 @@ function useData(
 			GlobalIndicatorsObject[]
 		>([] as GlobalIndicatorsObject[]),
 		[totalBeneficiariesData, setTotalBeneficiariesData] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
+		[totalBeneficiariesTranche1Data, setTotalBeneficiariesTranche1Data] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
+		[totalBeneficiariesTranche2Data, setTotalBeneficiariesTranche2Data] =
 			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
@@ -185,6 +195,18 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiariesTranche1",
+				totalBeneficiariesTranche1Url,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiariesTranche2",
+				totalBeneficiariesTranche2Url,
+				"csv",
+				setProgress,
+			),
 			fetchFile<OrganizationIdsMapObject[]>(
 				"organizationIdsMap",
 				organizationIdsMapUrl,
@@ -216,6 +238,8 @@ function useData(
 			globalIndicatorsMaster,
 			pooledFundsWithRegionMaster,
 			totalBeneficiaries,
+			totalBeneficiariesTranche1,
+			totalBeneficiariesTranche2,
 			organizationIdsMap,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
@@ -230,18 +254,27 @@ function useData(
 				pooledFundsWithRegionMaster,
 			});
 
-			const { data, totalBeneficiariesData } = processRawData({
+			const {
+				data,
+				totalBeneficiariesData,
+				totalBeneficiariesTranche1Data,
+				totalBeneficiariesTranche2Data,
+			} = processRawData({
 				projectSummary,
 				sectorsData,
 				listsObj,
 				setInDataLists,
 				totalBeneficiaries,
+				totalBeneficiariesTranche1,
+				totalBeneficiariesTranche2,
 				organizationIdsMap,
 			});
 
 			setData(data);
 			setDataIndicators(globalIndicatorsData);
 			setTotalBeneficiariesData(totalBeneficiariesData);
+			setTotalBeneficiariesTranche1Data(totalBeneficiariesTranche1Data);
+			setTotalBeneficiariesTranche2Data(totalBeneficiariesTranche2Data);
 			setLists(listsObj);
 			setLoading(false);
 		}
@@ -254,6 +287,8 @@ function useData(
 		lists,
 		inDataLists,
 		totalBeneficiariesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
 		loading,
 		error,
 		progress,

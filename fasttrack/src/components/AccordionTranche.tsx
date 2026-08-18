@@ -1,36 +1,29 @@
-import { useContext, useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import Accordion from "@mui/material/Accordion";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import DataContext, { type DataContextType } from "../context/DataContext";
-import Dropdown from "./Dropdown";
-import Button from "@mui/material/Button";
+import CheckboxLabel from "./Checkbox";
 import Box from "@mui/material/Box";
-import type { ListObj } from "../utils/makelists";
+import type { Tranche } from "./MainContainer";
 
-type AccordionComponentProps = {
-	value: number[];
-	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+type AccordionComponentTrancheProps = {
+	value: Tranche;
+	setValue: React.Dispatch<React.SetStateAction<Tranche>>;
 };
 
-function AccordionComponent({ value, setValue }: AccordionComponentProps) {
+function AccordionComponentTranche({
+	value,
+	setValue,
+}: AccordionComponentTrancheProps) {
 	const [expanded, setExpanded] = useState<boolean>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
 	const accordionRef = useRef<HTMLDivElement>(null);
 
-	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
-	const dataArray = [...inDataLists.funds];
-	const namesList = lists.fundNames;
-
 	function handleAccordionExpand() {
 		setExpanded(!expanded);
-	}
-
-	function handleSelectAll() {
-		setValue(dataArray);
 	}
 
 	function handleClickAway() {
@@ -93,11 +86,9 @@ function AccordionComponent({ value, setValue }: AccordionComponentProps) {
 								paddingRight: "8px",
 							}}
 						>
-							{value.length === dataArray.length
-								? `All funds selected`
-								: value.length < 4
-									? createListFromArray(value, namesList)
-									: `${value.length} funds selected`}
+							{value === "all"
+								? `All tranches selected`
+								: `Tranche ${value} selected`}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
@@ -106,33 +97,12 @@ function AccordionComponent({ value, setValue }: AccordionComponentProps) {
 							m={1}
 							mb={2}
 						>
-							Select the fund. Multiple funds are allowed.
+							Select the tranche. Multiple tranches are allowed.
 						</Typography>
-						<Dropdown
+						<CheckboxLabel
 							value={value}
 							setValue={setValue}
-							names={dataArray}
-							namesList={namesList}
 						/>
-
-						<Box
-							style={{
-								display: "flex",
-								flexDirection: "row",
-							}}
-						>
-							<Button
-								variant="contained"
-								size="small"
-								onClick={handleSelectAll}
-								style={{
-									marginLeft: "8px",
-									marginTop: "0px",
-								}}
-							>
-								Select all
-							</Button>
-						</Box>
 					</AccordionDetails>
 				</Accordion>
 			</ClickAwayListener>
@@ -140,25 +110,4 @@ function AccordionComponent({ value, setValue }: AccordionComponentProps) {
 	);
 }
 
-function isValidKey(key: number, obj: ListObj): boolean {
-	return key in obj;
-}
-
-function createListFromArray(arr: number[], namesList: ListObj): string {
-	const list = arr.reduce(function (acc, curr, index) {
-		const currentValue = isValidKey(curr, namesList)
-			? namesList[curr]
-			: curr.toString();
-		return (
-			acc +
-			(index >= arr.length - 2
-				? index > arr.length - 2
-					? currentValue
-					: currentValue + " and "
-				: currentValue + ", ")
-		);
-	}, "");
-	return list;
-}
-
-export default AccordionComponent;
+export default AccordionComponentTranche;

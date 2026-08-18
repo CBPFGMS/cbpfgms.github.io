@@ -13,6 +13,8 @@ export type DataContextType = {
 	lists: List;
 	inDataLists: InDataLists;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 };
 
 const DataContext = createContext<DataContextType | null>(null);

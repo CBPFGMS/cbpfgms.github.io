@@ -15,6 +15,8 @@ function App({ defaultFundType, startYear }: AppProps) {
 		lists,
 		inDataLists,
 		totalBeneficiariesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
 		loading,
 		error,
 		progress,
@@ -32,6 +34,8 @@ function App({ defaultFundType, startYear }: AppProps) {
 				lists,
 				inDataLists,
 				totalBeneficiariesData,
+				totalBeneficiariesTranche1Data,
+				totalBeneficiariesTranche2Data,
 			}}
 		>
 			<MainContainer />

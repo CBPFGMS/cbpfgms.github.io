@@ -82,6 +82,8 @@ type ProcessRawDataParams = {
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	totalBeneficiaries: TotalBeneficiariesObject[];
+	totalBeneficiariesTranche1: TotalBeneficiariesObject[];
+	totalBeneficiariesTranche2: TotalBeneficiariesObject[];
 	organizationIdsMap: OrganizationIdsMapObject[];
 };
 
@@ -104,13 +106,19 @@ function processRawData({
 	listsObj,
 	setInDataLists,
 	totalBeneficiaries,
+	totalBeneficiariesTranche1,
+	totalBeneficiariesTranche2,
 	organizationIdsMap,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
+	const totalBeneficiariesTranche1Data: TotalBeneficiariesData = {};
+	const totalBeneficiariesTranche2Data: TotalBeneficiariesData = {};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 
@@ -146,56 +154,21 @@ function processRawData({
 		}
 	});
 
-	totalBeneficiaries.forEach(row => {
-		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const projectKey = row.PFId;
-
-			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] = {
-					all: { targeted: 0, reached: 0, reachedProjects: 0 },
-				};
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey].all.targeted = row.TotTarg;
-				totalBeneficiariesData[projectKey].all.reached =
-					row.TotAch || 0;
-				if (row.TotAchProjects) {
-					totalBeneficiariesData[projectKey].all.reachedProjects +=
-						row.TotAchProjects;
-				}
-			} else {
-				if (
-					!totalBeneficiariesData[projectKey][
-						projectStatusMapping[row.ProcessStatusId]
-					]
-				) {
-					totalBeneficiariesData[projectKey][
-						projectStatusMapping[row.ProcessStatusId]
-					] = { targeted: 0, reached: 0, reachedProjects: 0 };
-				}
-
-				totalBeneficiariesData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				].targeted = row.TotTarg;
-				totalBeneficiariesData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				].reached = row.TotAch || 0;
-				if (row.TotAchProjects) {
-					totalBeneficiariesData[projectKey][
-						projectStatusMapping[row.ProcessStatusId]
-					].reachedProjects += row.TotAchProjects;
-				}
-			}
-		} else {
-			warnInvalidSchema(
-				"totalBeneficiariesData",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
-		}
-	});
+	populateTotalBeneficiariesData(
+		totalBeneficiaries,
+		totalBeneficiariesData,
+		"totalBeneficiaries",
+	);
+	populateTotalBeneficiariesData(
+		totalBeneficiariesTranche1,
+		totalBeneficiariesTranche1Data,
+		"totalBeneficiariesTranche1",
+	);
+	populateTotalBeneficiariesData(
+		totalBeneficiariesTranche2,
+		totalBeneficiariesTranche2Data,
+		"totalBeneficiariesTranche2",
+	);
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -410,7 +383,40 @@ function processRawData({
 		statusesPerFund,
 	}));
 
-	return { data, totalBeneficiariesData };
+	return {
+		data,
+		totalBeneficiariesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
+	};
+
+	function populateTotalBeneficiariesData(
+		source: TotalBeneficiariesObject[],
+		target: TotalBeneficiariesData,
+		invalidSchema: string,
+	): void {
+		source.forEach(row => {
+			const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+
+			if (!parsedRow.success) {
+				warnInvalidSchema(invalidSchema, row, parsedRow.error.message);
+			}
+
+			const projectKey = row.PFId;
+
+			if (!target[projectKey]) {
+				target[projectKey] = {
+					all: { targeted: 0, reached: 0, reachedProjects: 0 },
+				};
+			}
+
+			target[projectKey].all.targeted = row.TotTarg || 0;
+			target[projectKey].all.reached = row.TotAch || 0;
+			if (row.TotAchProjects) {
+				target[projectKey].all.reachedProjects += row.TotAchProjects;
+			}
+		});
+	}
 }
 
 function generateBeneficiariesObjectSummary(

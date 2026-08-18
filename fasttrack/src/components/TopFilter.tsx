@@ -5,8 +5,10 @@ import type { InSelectionData } from "../utils/processdatatopfigures";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import AccordionComponent from "./Accordion";
+import AccordionComponentTranche from "./AccordionTranche";
 import DropdownStatus from "./DropdownStatus";
 import type { List } from "../utils/makelists";
+import type { Tranche } from "./MainContainer";
 
 type TopFilterProps = {
 	inSelectionData: InSelectionData;
@@ -14,6 +16,8 @@ type TopFilterProps = {
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	status: number[];
 	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
+	tranche: Tranche;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 	lists: List;
 };
 
@@ -23,6 +27,8 @@ function TopFilter({
 	setFund,
 	status,
 	setStatus,
+	tranche,
+	setTranche,
 	lists,
 }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
@@ -52,16 +58,39 @@ function TopFilter({
 				style={{
 					display: "flex",
 					flexDirection: "row",
-					gap: "2em",
 					width: "100%",
 					alignItems: "center",
+					justifyContent: isSticky ? "space-between" : "flex-start",
 				}}
 			>
-				<Typography variant="h6">Select Fund:</Typography>
-				<Grid size={4}>
+				<Typography
+					variant={isSticky ? "body1" : "h6"}
+					sx={{ paddingRight: "0.5em" }}
+				>
+					Select Fund:
+				</Typography>
+				<Grid
+					size={isSticky ? 3 : 4}
+					sx={{ paddingRight: "2em" }}
+				>
 					<AccordionComponent
 						value={fund}
 						setValue={setFund}
+					/>
+				</Grid>
+				<Typography
+					variant={isSticky ? "body1" : "h6"}
+					sx={{ paddingRight: "0.5em" }}
+				>
+					Select Tranche:
+				</Typography>
+				<Grid
+					size={3}
+					sx={{ paddingRight: "2em" }}
+				>
+					<AccordionComponentTranche
+						value={tranche}
+						setValue={setTranche}
 					/>
 				</Grid>
 				{isSticky && (

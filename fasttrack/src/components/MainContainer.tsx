@@ -25,6 +25,7 @@ import Regions from "./Regions";
 import Sectors from "./Sectors";
 import ProjectStatuses from "./Statuses";
 import FlowContainer from "./FlowContainer";
+import { processTotalBeneficiariesWithTranche } from "../utils/processtranche";
 
 const { charts } = constants;
 
@@ -34,6 +35,8 @@ export type DownloadStates = {
 	[K in Charts]: boolean;
 };
 
+export type Tranche = 1 | 2 | "all";
+
 const downloadStates = charts.reduce(
 	(acc, chart) => ((acc[chart] = false), acc),
 	{} as DownloadStates,
@@ -42,8 +45,15 @@ const downloadStates = charts.reduce(
 const queryStringValues = new URLSearchParams(location.search);
 
 function MainContainer() {
-	const { data, dataIndicators, totalBeneficiariesData, inDataLists, lists } =
-		useContext(DataContext) as DataContextType;
+	const {
+		data,
+		dataIndicators,
+		totalBeneficiariesData: totalBeneficiariesAllTranchesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
+		inDataLists,
+		lists,
+	} = useContext(DataContext) as DataContextType;
 
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[clickedDownload, setClickedDownload] =
@@ -51,7 +61,24 @@ function MainContainer() {
 	const [status, setStatus] = useState<number[]>([
 			...inDataLists.projectStatuses,
 		]),
-		[sector, setSector] = useState<number[]>([...inDataLists.sectors]);
+		[sector, setSector] = useState<number[]>([...inDataLists.sectors]),
+		[tranche, setTranche] = useState<Tranche>("all");
+
+	const totalBeneficiariesData = useMemo(
+		() =>
+			processTotalBeneficiariesWithTranche({
+				totalBeneficiariesAllTranchesData,
+				totalBeneficiariesTranche1Data,
+				totalBeneficiariesTranche2Data,
+				tranche,
+			}),
+		[
+			totalBeneficiariesAllTranchesData,
+			totalBeneficiariesTranche1Data,
+			totalBeneficiariesTranche2Data,
+			tranche,
+		],
+	);
 
 	const dataStatuses = useMemo(
 		() =>
@@ -167,10 +194,12 @@ function MainContainer() {
 	useUpdateQueryString({
 		fund,
 		status,
+		tranche,
 		inDataLists,
 		queryStringValues,
 		setFund,
 		setStatus,
+		setTranche,
 		setClickedDownload,
 		downloadStates,
 		dataStatuses,
@@ -194,6 +223,8 @@ function MainContainer() {
 				setFund={setFund}
 				status={status}
 				setStatus={setStatus}
+				tranche={tranche}
+				setTranche={setTranche}
 				lists={lists}
 			/>
 			<ProjectStatuses
