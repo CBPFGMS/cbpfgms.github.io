@@ -51,9 +51,9 @@ function processDataTopFigures({
 			return;
 		}
 
-		targeted += totalBeneficiariesData[pf].all.targeted;
-		reached += totalBeneficiariesData[pf].all.reached;
-		reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
+		targeted += totalBeneficiariesData[pf].targeted;
+		reached += totalBeneficiariesData[pf].reached;
+		reachedProjects += totalBeneficiariesData[pf].reachedProjects;
 	});
 
 	data.forEach(row => {

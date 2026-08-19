@@ -61,10 +61,10 @@ function processDataRegions({
 
 		const thisRegion = dataRegions.find(d => d.funds.has(pf));
 		if (thisRegion) {
-			thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
-			thisRegion.reached += totalBeneficiariesData[pf].all.reached;
+			thisRegion.targeted += totalBeneficiariesData[pf].targeted;
+			thisRegion.reached += totalBeneficiariesData[pf].reached;
 			thisRegion.reachedProjects +=
-				totalBeneficiariesData[pf].all.reachedProjects;
+				totalBeneficiariesData[pf].reachedProjects;
 		} else {
 			simpleWarn(`Pooled fund code ${pf} not found in the regions data`);
 		}

@@ -94,9 +94,7 @@ type TargetedAndReached = {
 };
 
 export type TotalBeneficiariesData = {
-	[key: number]: {
-		all: TargetedAndReached;
-	};
+	[key: number]: TargetedAndReached;
 };
 
 function processRawData({
@@ -404,15 +402,13 @@ function processRawData({
 			const fund = row.PFId;
 
 			if (!target[fund]) {
-				target[fund] = {
-					all: { targeted: 0, reached: 0, reachedProjects: 0 },
-				};
+				target[fund] = { targeted: 0, reached: 0, reachedProjects: 0 };
 			}
 
-			target[fund].all.targeted = row.TotTarg || 0;
-			target[fund].all.reached = row.TotAch || 0;
+			target[fund].targeted = row.TotTarg || 0;
+			target[fund].reached = row.TotAch || 0;
 			if (row.TotAchProjects) {
-				target[fund].all.reachedProjects += row.TotAchProjects;
+				target[fund].reachedProjects += row.TotAchProjects;
 			}
 		});
 	}

@@ -146,10 +146,7 @@ export type TotalBeneficiariesBreakdown = {
 };
 
 export type TotalBeneficiariesData = {
-	[key: number]: {
-		[id: number]: TotalBeneficiariesBreakdown;
-		all: TotalBeneficiariesBreakdown;
-	};
+	[key: number]: TotalBeneficiariesBreakdown;
 };
 
 type TotalBeneficiariesByPartnerBreakdown = {
@@ -159,10 +156,7 @@ type TotalBeneficiariesByPartnerBreakdown = {
 };
 
 export type TotalBeneficiariesByPartnerData = {
-	[key: number]: {
-		[id: number]: TotalBeneficiariesByPartnerBreakdown[];
-		all: TotalBeneficiariesByPartnerBreakdown[];
-	};
+	[key: number]: TotalBeneficiariesByPartnerBreakdown[];
 };
 
 type TotalBeneficiariesBySectorBreakdown = {
@@ -172,10 +166,7 @@ type TotalBeneficiariesBySectorBreakdown = {
 };
 
 export type TotalBeneficiariesBySectorData = {
-	[key: number]: {
-		[id: number]: TotalBeneficiariesBySectorBreakdown[];
-		all: TotalBeneficiariesBySectorBreakdown[];
-	};
+	[key: number]: TotalBeneficiariesBySectorBreakdown[];
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
@@ -185,10 +176,7 @@ export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeData = {
-	[key: number]: {
-		[id: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
-		all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
-	};
+	[key: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 };
 
 const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
