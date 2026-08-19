@@ -14,9 +14,17 @@ export type DataContextType = {
 	lists: List;
 	inDataLists: InDataLists;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche1Data: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche2Data: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche1Data: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche2Data: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche1Data: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche2Data: TotalBeneficiariesByBeneficiaryTypeData;
 };
 
 const DataContext = createContext<DataContextType | null>(null);

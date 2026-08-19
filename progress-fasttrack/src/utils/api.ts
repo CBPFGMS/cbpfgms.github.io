@@ -41,8 +41,16 @@ type ReceiveDataArgs = [
 	SectorsMasterObject[],
 	CvaMasterObject[],
 	TotalBeneficiariesObject[],
+	TotalBeneficiariesObject[],
+	TotalBeneficiariesObject[],
+	TotalBeneficiariesByPartnerObject[],
+	TotalBeneficiariesByPartnerObject[],
 	TotalBeneficiariesByPartnerObject[],
 	TotalBeneficiariesBySectorObject[],
+	TotalBeneficiariesBySectorObject[],
+	TotalBeneficiariesBySectorObject[],
+	TotalBeneficiariesByBeneficiaryTypeObject[],
+	TotalBeneficiariesByBeneficiaryTypeObject[],
 	TotalBeneficiariesByBeneficiaryTypeObject[],
 ];
 
@@ -59,18 +67,29 @@ const beneficiaryTypesMasterUrl =
 	cvaMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
 	totalBeneficiariesUrl =
-		//Dev APIs have -api-dev in the url
-		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiary?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv",
+	totalBeneficiariesTranche1Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv",
+	totalBeneficiariesTranche2Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv",
 	totalBeneficiariesByPartnerUrl =
-		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByPartnerType?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche_2026&$format=csv",
+	totalBeneficiariesByPartnerTranche1Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche1_2026&$format=csv",
+	totalBeneficiariesByPartnerTranche2Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche2_2026&$format=csv",
 	totalBeneficiariesBySectorUrl =
-		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByCluster?year=2026&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche_2026&$format=csv",
+	totalBeneficiariesBySectorTranche1Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche1_2026&$format=csv",
+	totalBeneficiariesBySectorTranche2Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche2_2026&$format=csv",
 	totalBeneficiariesByBeneficiaryTypeUrl =
-		//"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
-		"https://pfbi-eastus2-api-site.azurewebsites.net/beneficiary/api/v2//beneficiaryByBenType?year=2026&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche_2026&$format=csv",
+	totalBeneficiariesByBeneficiaryTypeTranche1Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche1_2026&$format=csv",
+	totalBeneficiariesByBeneficiaryTypeTranche2Url =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche2_2026&$format=csv";
 
 function useData(
 	defaultFundType: number | null,
@@ -80,9 +99,17 @@ function useData(
 	lists: List;
 	inDataLists: InDataLists;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche1Data: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche2Data: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche1Data: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche2Data: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche1Data: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche2Data: TotalBeneficiariesByBeneficiaryTypeData;
 	loading: boolean;
 	error: string | null;
 	progress: number;
@@ -103,17 +130,57 @@ function useData(
 		),
 		[totalBeneficiariesData, setTotalBeneficiariesData] =
 			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
+		[totalBeneficiariesTranche1Data, setTotalBeneficiariesTranche1Data] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
+		[totalBeneficiariesTranche2Data, setTotalBeneficiariesTranche2Data] =
+			useState<TotalBeneficiariesData>({} as TotalBeneficiariesData),
 		[totalBeneficiariesByPartnerData, setTotalBeneficiariesByPartnerData] =
 			useState<TotalBeneficiariesByPartnerData>(
 				{} as TotalBeneficiariesByPartnerData,
 			),
+		[
+			totalBeneficiariesByPartnerTranche1Data,
+			setTotalBeneficiariesByPartnerTranche1Data,
+		] = useState<TotalBeneficiariesByPartnerData>(
+			{} as TotalBeneficiariesByPartnerData,
+		),
+		[
+			totalBeneficiariesByPartnerTranche2Data,
+			setTotalBeneficiariesByPartnerTranche2Data,
+		] = useState<TotalBeneficiariesByPartnerData>(
+			{} as TotalBeneficiariesByPartnerData,
+		),
 		[totalBeneficiariesBySectorData, setTotalBeneficiariesBySectorData] =
 			useState<TotalBeneficiariesBySectorData>(
 				{} as TotalBeneficiariesBySectorData,
 			),
 		[
+			totalBeneficiariesBySectorTranche1Data,
+			setTotalBeneficiariesBySectorTranche1Data,
+		] = useState<TotalBeneficiariesBySectorData>(
+			{} as TotalBeneficiariesBySectorData,
+		),
+		[
+			totalBeneficiariesBySectorTranche2Data,
+			setTotalBeneficiariesBySectorTranche2Data,
+		] = useState<TotalBeneficiariesBySectorData>(
+			{} as TotalBeneficiariesBySectorData,
+		),
+		[
 			totalBeneficiariesByBeneficiaryTypeData,
 			setTotalBeneficiariesByBeneficiaryTypeData,
+		] = useState<TotalBeneficiariesByBeneficiaryTypeData>(
+			{} as TotalBeneficiariesByBeneficiaryTypeData,
+		),
+		[
+			totalBeneficiariesByBeneficiaryTypeTranche1Data,
+			setTotalBeneficiariesByBeneficiaryTypeTranche1Data,
+		] = useState<TotalBeneficiariesByBeneficiaryTypeData>(
+			{} as TotalBeneficiariesByBeneficiaryTypeData,
+		),
+		[
+			totalBeneficiariesByBeneficiaryTypeTranche2Data,
+			setTotalBeneficiariesByBeneficiaryTypeTranche2Data,
 		] = useState<TotalBeneficiariesByBeneficiaryTypeData>(
 			{} as TotalBeneficiariesByBeneficiaryTypeData,
 		);
@@ -192,9 +259,33 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiariesTranche1",
+				totalBeneficiariesTranche1Url,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesObject[]>(
+				"totalBeneficiariesTranche2",
+				totalBeneficiariesTranche2Url,
+				"csv",
+				setProgress,
+			),
 			fetchFile<TotalBeneficiariesByPartnerObject[]>(
 				"totalBeneficiariesByPartner",
 				totalBeneficiariesByPartnerUrl,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesByPartnerObject[]>(
+				"totalBeneficiariesByPartnerTranche1",
+				totalBeneficiariesByPartnerTranche1Url,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesByPartnerObject[]>(
+				"totalBeneficiariesByPartnerTranche2",
+				totalBeneficiariesByPartnerTranche2Url,
 				"csv",
 				setProgress,
 			),
@@ -204,9 +295,33 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<TotalBeneficiariesBySectorObject[]>(
+				"totalBeneficiariesBySectorTranche1",
+				totalBeneficiariesBySectorTranche1Url,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesBySectorObject[]>(
+				"totalBeneficiariesBySectorTranche2",
+				totalBeneficiariesBySectorTranche2Url,
+				"csv",
+				setProgress,
+			),
 			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
 				"totalBeneficiariesByBeneficiaryType",
 				totalBeneficiariesByBeneficiaryTypeUrl,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				"totalBeneficiariesByBeneficiaryTypeTranche1",
+				totalBeneficiariesByBeneficiaryTypeTranche1Url,
+				"csv",
+				setProgress,
+			),
+			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				"totalBeneficiariesByBeneficiaryTypeTranche2",
+				totalBeneficiariesByBeneficiaryTypeTranche2Url,
 				"csv",
 				setProgress,
 			),
@@ -234,9 +349,17 @@ function useData(
 			sectorsMaster,
 			cvaMaster,
 			totalBeneficiaries,
+			totalBeneficiariesTranche1,
+			totalBeneficiariesTranche2,
 			totalBeneficiariesByPartner,
+			totalBeneficiariesByPartnerTranche1,
+			totalBeneficiariesByPartnerTranche2,
 			totalBeneficiariesBySector,
+			totalBeneficiariesBySectorTranche1,
+			totalBeneficiariesBySectorTranche2,
 			totalBeneficiariesByBeneficiaryType,
+			totalBeneficiariesByBeneficiaryTypeTranche1,
+			totalBeneficiariesByBeneficiaryTypeTranche2,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -252,9 +375,17 @@ function useData(
 			const {
 				data,
 				totalBeneficiariesData,
+				totalBeneficiariesTranche1Data,
+				totalBeneficiariesTranche2Data,
 				totalBeneficiariesByPartnerData,
+				totalBeneficiariesByPartnerTranche1Data,
+				totalBeneficiariesByPartnerTranche2Data,
 				totalBeneficiariesBySectorData,
+				totalBeneficiariesBySectorTranche1Data,
+				totalBeneficiariesBySectorTranche2Data,
 				totalBeneficiariesByBeneficiaryTypeData,
+				totalBeneficiariesByBeneficiaryTypeTranche1Data,
+				totalBeneficiariesByBeneficiaryTypeTranche2Data,
 			} = processRawData({
 				projectSummary,
 				sectorsData,
@@ -262,18 +393,46 @@ function useData(
 				listsObj,
 				setInDataLists,
 				totalBeneficiaries,
+				totalBeneficiariesTranche1,
+				totalBeneficiariesTranche2,
 				totalBeneficiariesByPartner,
+				totalBeneficiariesByPartnerTranche1,
+				totalBeneficiariesByPartnerTranche2,
 				totalBeneficiariesBySector,
+				totalBeneficiariesBySectorTranche1,
+				totalBeneficiariesBySectorTranche2,
 				totalBeneficiariesByBeneficiaryType,
+				totalBeneficiariesByBeneficiaryTypeTranche1,
+				totalBeneficiariesByBeneficiaryTypeTranche2,
 			});
 
 			setData(data);
 			setLists(listsObj);
 			setTotalBeneficiariesData(totalBeneficiariesData);
+			setTotalBeneficiariesTranche1Data(totalBeneficiariesTranche1Data);
+			setTotalBeneficiariesTranche2Data(totalBeneficiariesTranche2Data);
 			setTotalBeneficiariesByPartnerData(totalBeneficiariesByPartnerData);
+			setTotalBeneficiariesByPartnerTranche1Data(
+				totalBeneficiariesByPartnerTranche1Data,
+			);
+			setTotalBeneficiariesByPartnerTranche2Data(
+				totalBeneficiariesByPartnerTranche2Data,
+			);
 			setTotalBeneficiariesBySectorData(totalBeneficiariesBySectorData);
+			setTotalBeneficiariesBySectorTranche1Data(
+				totalBeneficiariesBySectorTranche1Data,
+			);
+			setTotalBeneficiariesBySectorTranche2Data(
+				totalBeneficiariesBySectorTranche2Data,
+			);
 			setTotalBeneficiariesByBeneficiaryTypeData(
 				totalBeneficiariesByBeneficiaryTypeData,
+			);
+			setTotalBeneficiariesByBeneficiaryTypeTranche1Data(
+				totalBeneficiariesByBeneficiaryTypeTranche1Data,
+			);
+			setTotalBeneficiariesByBeneficiaryTypeTranche2Data(
+				totalBeneficiariesByBeneficiaryTypeTranche2Data,
 			);
 			setLoading(false);
 		}
@@ -285,9 +444,17 @@ function useData(
 		lists,
 		inDataLists,
 		totalBeneficiariesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
 		totalBeneficiariesByPartnerData,
+		totalBeneficiariesByPartnerTranche1Data,
+		totalBeneficiariesByPartnerTranche2Data,
 		totalBeneficiariesBySectorData,
+		totalBeneficiariesBySectorTranche1Data,
+		totalBeneficiariesBySectorTranche2Data,
 		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByBeneficiaryTypeTranche1Data,
+		totalBeneficiariesByBeneficiaryTypeTranche2Data,
 		loading,
 		error,
 		progress,

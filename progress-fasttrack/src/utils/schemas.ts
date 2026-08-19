@@ -1,9 +1,6 @@
 import { z } from "zod";
 
 const splitRegex = /^(\d*\|\d*\|\d*\|\d*\|\d*)$/,
-	partnersSplitRegex = /^(\d+#){3}\d+$/,
-	sectorsSplitRegex = /^(\d+#){16}\d+$/,
-	beneficiaryTypesSplitRegex = /^(\d+#){4}\d+$/,
 	dateRegex =
 		/\b([1-9]|0[1-9]|1[012])\/([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])\/20\d\d\b/;
 
@@ -153,190 +150,108 @@ export const cvaObjectSchema = z.object({
 export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
-	CurrentAdminLevel: z.number().int().nonnegative(),
-	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z.number().int().nonnegative(),
-	BenW: z.number().int().nonnegative(),
-	BenB: z.number().int().nonnegative(),
-	BenG: z.number().int().nonnegative(),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	Budget: z.number().nonnegative(),
+	ImplementationYear: z.number().int().nonnegative().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
 	AchM: z.number().int().nonnegative().nullable(),
 	AchW: z.number().int().nonnegative().nullable(),
 	AchB: z.number().int().nonnegative().nullable(),
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	BudgetAchieved: z.number().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	step1: z.string(),
-	step2: z.string(),
-	step3: z.string(),
-	step4: z.string(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string().nullable(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
-	CurrentAdminLevel: z.number().int().nonnegative(),
-	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenW: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenB: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	BenG: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format"),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	AchM: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchW: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchB: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
-	AchG: z
-		.string()
-		.regex(partnersSplitRegex, "invalid partner hashtag format")
-		.nullable(),
+	ImplementationYear: z.number().int().nonnegative().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	PartnerType: z.string(),
+	PartnerTypeId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	step1: z.string(),
-	step2: z.string(),
-	step3: z.string(),
-	step4: z.string(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string().nullable(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesBySectorObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
-	CurrentAdminLevel: z.number().int().nonnegative(),
-	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenW: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenB: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	BenG: z.string().regex(sectorsSplitRegex, "invalid sector hashtag format"),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	AchM: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchW: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchB: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
-	AchG: z
-		.string()
-		.regex(sectorsSplitRegex, "invalid sector hashtag format")
-		.nullable(),
+	ImplementationYear: z.number().int().nonnegative().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	GlobalCluster: z.string(),
+	GlobalClusterId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number(),
+	Steps: z.string().nullable(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
-	AllocationYear: z.number().int().nonnegative(),
-	ProcessStatus: z.string().nullable(),
-	ProcessStatusId: z.number().int().nonnegative().nullable(),
-	CurrentAdminLevel: z.number().int().nonnegative(),
-	defaultAdminLevel: z.number().int().nonnegative(),
-	BenM: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		),
-	BenW: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		),
-	BenB: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		),
-	BenG: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		),
-	TotTarg: z.number().int().nonnegative(),
-	TotProjects: z.number().int().nonnegative(),
-	AchM: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		)
-		.nullable(),
-	AchW: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		)
-		.nullable(),
-	AchB: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		)
-		.nullable(),
-	AchG: z
-		.string()
-		.regex(
-			beneficiaryTypesSplitRegex,
-			"invalid beneficiary type hashtag format",
-		)
-		.nullable(),
+	ImplementationYear: z.number().int().nonnegative().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	BeneficiaryType: z.string(),
+	BeneficiaryTypeName: z.string(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	AllocationtypeId: z.number().int().nonnegative(),
-	step1: z.string(),
-	step3: z.string(),
-	step4: z.string(),
-	syncedAt: z.any(),
-	syncedAtAchieved: z.any(),
+	TemplateId: z.number().int().nonnegative().nullable(),
+	Steps: z.string().nullable(),
+	Pcode: z.string().nullable(),
+	LocPath: z.string().nullable(),
+	AdminName: z.string().nullable(),
+	syncedAt: z.string().nullable(),
+	DedupRunId: z.number().int().nonnegative().nullable(),
 });
 
 // ********************

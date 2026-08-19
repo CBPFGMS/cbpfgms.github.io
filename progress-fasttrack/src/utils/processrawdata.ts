@@ -123,9 +123,17 @@ type ProcessRawDataParams = {
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
 	totalBeneficiaries: TotalBeneficiariesObject[];
+	totalBeneficiariesTranche1: TotalBeneficiariesObject[];
+	totalBeneficiariesTranche2: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesByPartnerTranche1: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesByPartnerTranche2: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesBySectorTranche1: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesBySectorTranche2: TotalBeneficiariesBySectorObject[];
 	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
+	totalBeneficiariesByBeneficiaryTypeTranche1: TotalBeneficiariesByBeneficiaryTypeObject[];
+	totalBeneficiariesByBeneficiaryTypeTranche2: TotalBeneficiariesByBeneficiaryTypeObject[];
 };
 
 type TargetedAndReached = {
@@ -198,15 +206,31 @@ function processRawData({
 	listsObj,
 	setInDataLists,
 	totalBeneficiaries,
+	totalBeneficiariesTranche1,
+	totalBeneficiariesTranche2,
 	totalBeneficiariesByPartner,
+	totalBeneficiariesByPartnerTranche1,
+	totalBeneficiariesByPartnerTranche2,
 	totalBeneficiariesBySector,
+	totalBeneficiariesBySectorTranche1,
+	totalBeneficiariesBySectorTranche2,
 	totalBeneficiariesByBeneficiaryType,
+	totalBeneficiariesByBeneficiaryTypeTranche1,
+	totalBeneficiariesByBeneficiaryTypeTranche2,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
+	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche1Data: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesByPartnerTranche2Data: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche1Data: TotalBeneficiariesBySectorData;
+	totalBeneficiariesBySectorTranche2Data: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche1Data: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByBeneficiaryTypeTranche2Data: TotalBeneficiariesByBeneficiaryTypeData;
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
