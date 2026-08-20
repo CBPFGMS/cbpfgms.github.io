@@ -8,11 +8,16 @@ import type { Tranche } from "./MainContainer";
 type CheckboxProps = {
 	value: Tranche;
 	setValue: React.Dispatch<React.SetStateAction<Tranche>>;
+	fromTopContainer?: boolean;
 };
 
 type TranchesNumbers = 1 | 2;
 
-function CheckboxLabel({ value, setValue }: CheckboxProps) {
+function CheckboxLabel({
+	value,
+	setValue,
+	fromTopContainer = false,
+}: CheckboxProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	function handleChange(tranche: TranchesNumbers, value: Tranche) {
@@ -36,7 +41,12 @@ function CheckboxLabel({ value, setValue }: CheckboxProps) {
 				setOpenSnack={setOpenSnack}
 				message={`At least one tranche must be selected`}
 			/>
-			<FormGroup>
+			<FormGroup
+				row={fromTopContainer}
+				sx={{
+					gap: fromTopContainer ? "16px" : "0px",
+				}}
+			>
 				{tranches.map((tranche, index) => (
 					<FormControlLabel
 						key={index}

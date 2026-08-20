@@ -78,21 +78,25 @@ function TopFilter({
 						setValue={setFund}
 					/>
 				</Grid>
-				<Typography
-					variant={isSticky ? "body1" : "h6"}
-					sx={{ paddingRight: "0.5em" }}
-				>
-					Select Tranche:
-				</Typography>
-				<Grid
-					size={3}
-					sx={{ paddingRight: "2em" }}
-				>
-					<AccordionComponentTranche
-						value={tranche}
-						setValue={setTranche}
-					/>
-				</Grid>
+				{isSticky && (
+					<>
+						<Typography
+							variant={isSticky ? "body1" : "h6"}
+							sx={{ paddingRight: "0.5em" }}
+						>
+							Select Tranche:
+						</Typography>
+						<Grid
+							size={3}
+							sx={{ paddingRight: "2em" }}
+						>
+							<AccordionComponentTranche
+								value={tranche}
+								setValue={setTranche}
+							/>
+						</Grid>
+					</>
+				)}
 				{isSticky && (
 					<Grid size={3}>
 						<DropdownStatus

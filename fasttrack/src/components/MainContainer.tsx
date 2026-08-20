@@ -26,6 +26,7 @@ import Sectors from "./Sectors";
 import ProjectStatuses from "./Statuses";
 import FlowContainer from "./FlowContainer";
 import { processTotalBeneficiariesWithTranche } from "../utils/processtranche";
+import TranchesTopCheckbox from "./TranchesTopCheckbox";
 
 const { charts } = constants;
 
@@ -214,6 +215,10 @@ function MainContainer() {
 			<Tooltip
 				id="tooltip"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+			/>
+			<TranchesTopCheckbox
+				tranche={tranche}
+				setTranche={setTranche}
 			/>
 			<TopFilter
 				inSelectionData={inSelectionData}
