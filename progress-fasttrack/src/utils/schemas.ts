@@ -231,6 +231,7 @@ export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
 	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	BeneficiaryTypeId: z.number().int().nonnegative(), //IMPORTANT: this columns still doesn't exist
 	BeneficiaryType: z.string(),
 	BeneficiaryTypeName: z.string(),
 	BenM: z.number().int().nonnegative().nullable(),

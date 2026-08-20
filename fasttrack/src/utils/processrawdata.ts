@@ -386,32 +386,6 @@ function processRawData({
 		totalBeneficiariesTranche1Data,
 		totalBeneficiariesTranche2Data,
 	};
-
-	function populateTotalBeneficiariesData(
-		source: TotalBeneficiariesObject[],
-		target: TotalBeneficiariesData,
-		invalidSchema: string,
-	): void {
-		source.forEach(row => {
-			const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
-
-			if (!parsedRow.success) {
-				warnInvalidSchema(invalidSchema, row, parsedRow.error.message);
-			}
-
-			const fund = row.PFId;
-
-			if (!target[fund]) {
-				target[fund] = { targeted: 0, reached: 0, reachedProjects: 0 };
-			}
-
-			target[fund].targeted = row.TotTarg || 0;
-			target[fund].reached = row.TotAch || 0;
-			if (row.TotAchProjects) {
-				target[fund].reachedProjects += row.TotAchProjects;
-			}
-		});
-	}
 }
 
 function generateBeneficiariesObjectSummary(
@@ -457,6 +431,33 @@ function generateBeneficiariesObjectSummary(
 		women,
 		men,
 	};
+}
+
+function populateTotalBeneficiariesData(
+	source: TotalBeneficiariesObject[],
+	target: TotalBeneficiariesData,
+	invalidSchema: string,
+): void {
+	source.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(invalidSchema, row, parsedRow.error.message);
+			return;
+		}
+
+		const fund = row.PFId;
+
+		if (!target[fund]) {
+			target[fund] = { targeted: 0, reached: 0, reachedProjects: 0 };
+		}
+
+		target[fund].targeted = row.TotTarg || 0;
+		target[fund].reached = row.TotAch || 0;
+		if (row.TotAchProjects) {
+			target[fund].reachedProjects += row.TotAchProjects;
+		}
+	});
 }
 
 export default processRawData;

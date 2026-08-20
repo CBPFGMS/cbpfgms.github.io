@@ -3,6 +3,7 @@ import {
 	SectorBeneficiaryObject,
 	TotalBeneficiariesObject,
 	TotalBeneficiariesByPartnerObject,
+	TotalBeneficiariesBySectorObject,
 	TotalBeneficiariesByBeneficiaryTypeObject,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
@@ -10,7 +11,6 @@ import {
 	CvaObject,
 	totalBeneficiariesObjectSchema,
 	totalBeneficiariesByPartnerObjectSchema,
-	TotalBeneficiariesBySectorObject,
 	totalBeneficiariesBySectorObjectSchema,
 	totalBeneficiariesByBeneficiaryTypeObjectSchema,
 } from "./schemas";
@@ -18,12 +18,8 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
 
-const {
-	beneficiariesSplitOrder,
-	beneficiaryCategories,
-	reportTypes,
-	partnersSplitOrder,
-} = constants;
+const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
+	constants;
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -179,14 +175,6 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 	[key: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 };
 
-const partnersZeroArray: number[] = new Array(partnersSplitOrder.length).fill(
-	0,
-);
-
-const beneficiaryTypesZeroArray: number[] = new Array(
-	beneficiariesSplitOrder.length,
-).fill(0);
-
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -222,9 +210,23 @@ function processRawData({
 } {
 	const data: Data = [];
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
+	const totalBeneficiariesTranche1Data: TotalBeneficiariesData = {};
+	const totalBeneficiariesTranche2Data: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
+	const totalBeneficiariesByPartnerTranche1Data: TotalBeneficiariesByPartnerData =
+		{};
+	const totalBeneficiariesByPartnerTranche2Data: TotalBeneficiariesByPartnerData =
+		{};
 	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
+	const totalBeneficiariesBySectorTranche1Data: TotalBeneficiariesBySectorData =
+		{};
+	const totalBeneficiariesBySectorTranche2Data: TotalBeneficiariesBySectorData =
+		{};
 	const totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData =
+		{};
+	const totalBeneficiariesByBeneficiaryTypeTranche1Data: TotalBeneficiariesByBeneficiaryTypeData =
+		{};
+	const totalBeneficiariesByBeneficiaryTypeTranche2Data: TotalBeneficiariesByBeneficiaryTypeData =
 		{};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
@@ -242,260 +244,66 @@ function processRawData({
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
 
-	const sectorsZeroArray: number[] = new Array(
-		listsObj.sectorsSplitOrder.length,
-	).fill(0);
-
-	totalBeneficiaries.forEach(row => {
-		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const projectKey = row.PFId;
-
-			if (!totalBeneficiariesData[projectKey]) {
-				totalBeneficiariesData[projectKey] =
-					{} as TotalBeneficiariesData[number];
-			}
-
-			const totalDatum = {
-				girls: {
-					targeted: row.BenG,
-					reached: row.AchG || 0,
-				},
-				boys: {
-					targeted: row.BenB,
-					reached: row.AchB || 0,
-				},
-				women: {
-					targeted: row.BenW,
-					reached: row.AchW || 0,
-				},
-				men: {
-					targeted: row.BenM,
-					reached: row.AchM || 0,
-				},
-				total: {
-					targeted: row.TotTarg,
-					reached: row.TotAch || 0,
-				},
-			};
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesData[projectKey].all = totalDatum;
-			} else {
-				totalBeneficiariesData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				] = totalDatum;
-			}
-		} else {
-			warnInvalidSchema(
-				"totalBeneficiariesData",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
-		}
-	});
-
-	totalBeneficiariesByPartner.forEach(row => {
-		const parsedRow =
-			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const projectKey = row.PFId;
-			const partnerValuesMen: number[] = row.BenM.split("#").map(Number);
-			const partnerValuesWomen: number[] =
-				row.BenW.split("#").map(Number);
-			const partnerValuesBoys: number[] = row.BenB.split("#").map(Number);
-			const partnerValuesGirls: number[] =
-				row.BenG.split("#").map(Number);
-			const partnerValuesAchGirls: number[] = row.AchG
-				? row.AchG.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchBoys: number[] = row.AchB
-				? row.AchB.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchWomen: number[] = row.AchW
-				? row.AchW.split("#").map(Number)
-				: partnersZeroArray;
-			const partnerValuesAchMen: number[] = row.AchM
-				? row.AchM.split("#").map(Number)
-				: partnersZeroArray;
-
-			const partnersDatum: TotalBeneficiariesByPartnerBreakdown[] =
-				partnersSplitOrder.map((type, index) => {
-					return {
-						partner: type,
-						girls: {
-							targeted: partnerValuesGirls[index],
-							reached: partnerValuesAchGirls[index],
-						},
-						boys: {
-							targeted: partnerValuesBoys[index],
-							reached: partnerValuesAchBoys[index],
-						},
-						women: {
-							targeted: partnerValuesWomen[index],
-							reached: partnerValuesAchWomen[index],
-						},
-						men: {
-							targeted: partnerValuesMen[index],
-							reached: partnerValuesAchMen[index],
-						},
-					};
-				});
-
-			if (!totalBeneficiariesByPartnerData[projectKey]) {
-				totalBeneficiariesByPartnerData[projectKey] =
-					{} as TotalBeneficiariesByPartnerData[number];
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesByPartnerData[projectKey].all = partnersDatum;
-			} else {
-				totalBeneficiariesByPartnerData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				] = partnersDatum;
-			}
-		} else {
-			warnInvalidSchema(
-				"totalBeneficiariesByPartner",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
-		}
-	});
-
-	totalBeneficiariesBySector.forEach(row => {
-		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const projectKey = row.PFId;
-			const sectorValuesMen: number[] = row.BenM.split("#").map(Number);
-			const sectorValuesWomen: number[] = row.BenW.split("#").map(Number);
-			const sectorValuesBoys: number[] = row.BenB.split("#").map(Number);
-			const sectorValuesGirls: number[] = row.BenG.split("#").map(Number);
-			const sectorValuesAchGirls: number[] = row.AchG
-				? row.AchG.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchBoys: number[] = row.AchB
-				? row.AchB.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchWomen: number[] = row.AchW
-				? row.AchW.split("#").map(Number)
-				: sectorsZeroArray;
-			const sectorValuesAchMen: number[] = row.AchM
-				? row.AchM.split("#").map(Number)
-				: sectorsZeroArray;
-
-			const sectorsDatum: TotalBeneficiariesBySectorBreakdown[] =
-				listsObj.sectorsSplitOrder.map((type, index) => {
-					return {
-						sector: type,
-						girls: {
-							targeted: sectorValuesGirls[index],
-							reached: sectorValuesAchGirls[index],
-						},
-						boys: {
-							targeted: sectorValuesBoys[index],
-							reached: sectorValuesAchBoys[index],
-						},
-						women: {
-							targeted: sectorValuesWomen[index],
-							reached: sectorValuesAchWomen[index],
-						},
-						men: {
-							targeted: sectorValuesMen[index],
-							reached: sectorValuesAchMen[index],
-						},
-					};
-				});
-
-			if (!totalBeneficiariesBySectorData[projectKey]) {
-				totalBeneficiariesBySectorData[projectKey] =
-					{} as TotalBeneficiariesBySectorData[number];
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesBySectorData[projectKey].all = sectorsDatum;
-			} else {
-				totalBeneficiariesBySectorData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				] = sectorsDatum;
-			}
-		} else {
-			warnInvalidSchema(
-				"totalBeneficiariesBySector",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
-		}
-	});
-
-	totalBeneficiariesByBeneficiaryType.forEach(row => {
-		const parsedRow =
-			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const projectKey = row.PFId;
-			const benTypeValuesMen: number[] = row.BenM.split("#").map(Number);
-			const benTypeValuesWomen: number[] =
-				row.BenW.split("#").map(Number);
-			const benTypeValuesBoys: number[] = row.BenB.split("#").map(Number);
-			const benTypeValuesGirls: number[] =
-				row.BenG.split("#").map(Number);
-			const benTypeValuesAchGirls: number[] = row.AchG
-				? row.AchG.split("#").map(Number)
-				: beneficiaryTypesZeroArray;
-			const benTypeValuesAchBoys: number[] = row.AchB
-				? row.AchB.split("#").map(Number)
-				: beneficiaryTypesZeroArray;
-			const benTypeValuesAchWomen: number[] = row.AchW
-				? row.AchW.split("#").map(Number)
-				: beneficiaryTypesZeroArray;
-			const benTypeValuesAchMen: number[] = row.AchM
-				? row.AchM.split("#").map(Number)
-				: beneficiaryTypesZeroArray;
-
-			const benTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown[] =
-				beneficiariesSplitOrder.map((type, index) => {
-					return {
-						beneficiaryType: type,
-						girls: {
-							targeted: benTypeValuesGirls[index],
-							reached: benTypeValuesAchGirls[index],
-						},
-						boys: {
-							targeted: benTypeValuesBoys[index],
-							reached: benTypeValuesAchBoys[index],
-						},
-						women: {
-							targeted: benTypeValuesWomen[index],
-							reached: benTypeValuesAchWomen[index],
-						},
-						men: {
-							targeted: benTypeValuesMen[index],
-							reached: benTypeValuesAchMen[index],
-						},
-					};
-				});
-
-			if (!totalBeneficiariesByBeneficiaryTypeData[projectKey]) {
-				totalBeneficiariesByBeneficiaryTypeData[projectKey] =
-					{} as TotalBeneficiariesByBeneficiaryTypeData[number];
-			}
-
-			if (row.ProcessStatusId == null) {
-				totalBeneficiariesByBeneficiaryTypeData[projectKey].all =
-					benTypeDatum;
-			} else {
-				totalBeneficiariesByBeneficiaryTypeData[projectKey][
-					projectStatusMapping[row.ProcessStatusId]
-				] = benTypeDatum;
-			}
-		} else {
-			warnInvalidSchema(
-				"totalBeneficiariesByBeneficiaryType",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
-		}
-	});
+	populateTotalBeneficiariesData(
+		totalBeneficiaries,
+		totalBeneficiariesData,
+		"totalBeneficiaries",
+	);
+	populateTotalBeneficiariesData(
+		totalBeneficiariesTranche1,
+		totalBeneficiariesTranche1Data,
+		"totalBeneficiariesTranche1",
+	);
+	populateTotalBeneficiariesData(
+		totalBeneficiariesTranche2,
+		totalBeneficiariesTranche2Data,
+		"totalBeneficiariesTranche2",
+	);
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartner,
+		totalBeneficiariesByPartnerData,
+		"totalBeneficiariesByPartner",
+	);
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartnerTranche1,
+		totalBeneficiariesByPartnerTranche1Data,
+		"totalBeneficiariesByPartnerTranche1",
+	);
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartnerTranche2,
+		totalBeneficiariesByPartnerTranche2Data,
+		"totalBeneficiariesByPartnerTranche2",
+	);
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySector,
+		totalBeneficiariesBySectorData,
+		"totalBeneficiariesBySector",
+	);
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySectorTranche1,
+		totalBeneficiariesBySectorTranche1Data,
+		"totalBeneficiariesBySectorTranche1",
+	);
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySectorTranche2,
+		totalBeneficiariesBySectorTranche2Data,
+		"totalBeneficiariesBySectorTranche2",
+	);
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryType,
+		totalBeneficiariesByBeneficiaryTypeData,
+		"totalBeneficiariesByBeneficiaryType",
+	);
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryTypeTranche1,
+		totalBeneficiariesByBeneficiaryTypeTranche1Data,
+		"totalBeneficiariesByBeneficiaryTypeTranche1",
+	);
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryTypeTranche2,
+		totalBeneficiariesByBeneficiaryTypeTranche2Data,
+		"totalBeneficiariesByBeneficiaryTypeTranche2",
+	);
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -552,11 +360,7 @@ function processRawData({
 				}
 			}
 		} else {
-			warnInvalidSchema(
-				"sectorsData",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
+			warnInvalidSchema("sectorsData", row, parsedRow.error.message);
 		}
 	});
 
@@ -600,7 +404,7 @@ function processRawData({
 				}
 			}
 		} else {
-			warnInvalidSchema("cvaData", row, JSON.stringify(parsedRow.error));
+			warnInvalidSchema("cvaData", row, parsedRow.error.message);
 		}
 	});
 
@@ -736,11 +540,7 @@ function processRawData({
 				data.push(objDatum);
 			}
 		} else {
-			warnInvalidSchema(
-				"projectSummary",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
+			warnInvalidSchema("projectSummary", row, parsedRow.error.message);
 		}
 	});
 
@@ -758,9 +558,17 @@ function processRawData({
 	return {
 		data,
 		totalBeneficiariesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
 		totalBeneficiariesByPartnerData,
+		totalBeneficiariesByPartnerTranche1Data,
+		totalBeneficiariesByPartnerTranche2Data,
 		totalBeneficiariesBySectorData,
+		totalBeneficiariesBySectorTranche1Data,
+		totalBeneficiariesBySectorTranche2Data,
 		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByBeneficiaryTypeTranche1Data,
+		totalBeneficiariesByBeneficiaryTypeTranche2Data,
 	};
 }
 
@@ -843,6 +651,174 @@ function generateBeneficiariesObjectSummary(
 		women,
 		men,
 	};
+}
+
+function populateTotalBeneficiariesData(
+	source: TotalBeneficiariesObject[],
+	target: TotalBeneficiariesData,
+	sourceName: string,
+) {
+	source.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+		const fund = row.PFId;
+
+		target[fund] = {
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+			total: {
+				targeted: row.TotTarg || 0,
+				reached: row.TotAch || 0,
+			},
+		};
+	});
+}
+
+function populateTotalBeneficiariesByPartnerData(
+	source: TotalBeneficiariesByPartnerObject[],
+	target: TotalBeneficiariesByPartnerData,
+	sourceName: string,
+) {
+	source.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+
+		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
+			partner: row.PartnerTypeId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		if (!target[row.PFId]) {
+			target[row.PFId] = [partnersDatum];
+		} else {
+			target[row.PFId].push(partnersDatum);
+		}
+	});
+}
+
+function populateTotalBeneficiariesBySectorData(
+	source: TotalBeneficiariesBySectorObject[],
+	target: TotalBeneficiariesBySectorData,
+	sourceName: string,
+) {
+	source.forEach(row => {
+		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+
+		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
+			sector: row.GlobalClusterId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		if (!target[row.PFId]) {
+			target[row.PFId] = [sectorsDatum];
+		} else {
+			target[row.PFId].push(sectorsDatum);
+		}
+	});
+}
+
+function populateTotalBeneficiariesByBeneficiaryTypeData(
+	source: TotalBeneficiariesByBeneficiaryTypeObject[],
+	target: TotalBeneficiariesByBeneficiaryTypeData,
+	sourceName: string,
+) {
+	source.forEach(row => {
+		row.BeneficiaryTypeId =
+			beneficiariesSplitOrder[Math.floor(Math.random() * 5)]; //TODO: TEMPORARY, remove
+
+		const parsedRow =
+			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+
+		const beneficiaryTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown =
+			{
+				beneficiaryType: row.BeneficiaryTypeId,
+				girls: {
+					targeted: row.BenG || 0,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB || 0,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW || 0,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM || 0,
+					reached: row.AchM || 0,
+				},
+			};
+
+		if (!target[row.PFId]) {
+			target[row.PFId] = [beneficiaryTypeDatum];
+		} else {
+			target[row.PFId].push(beneficiaryTypeDatum);
+		}
+	});
 }
 
 export default processRawData;
