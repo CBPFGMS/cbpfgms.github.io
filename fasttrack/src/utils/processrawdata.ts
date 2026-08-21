@@ -3,12 +3,12 @@ import {
 	type ProjectSummaryObject,
 	type SectorBeneficiaryObject,
 	type TotalBeneficiariesObject,
+	type TemplatesMasterJson,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	totalBeneficiariesObjectSchema,
 	organizationIdsMapObjectSchema,
 	templatesMasterObjectSchema,
-	type TemplatesMasterJson,
 } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema, {

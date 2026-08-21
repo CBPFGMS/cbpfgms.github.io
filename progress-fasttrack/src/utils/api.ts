@@ -26,6 +26,7 @@ import {
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
 	TotalBeneficiariesByBeneficiaryTypeObject,
+	TemplatesMasterJson,
 } from "./schemas";
 
 type ReceiveDataArgs = [
@@ -52,6 +53,7 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesByBeneficiaryTypeObject[],
 	TotalBeneficiariesByBeneficiaryTypeObject[],
 	TotalBeneficiariesByBeneficiaryTypeObject[],
+	TemplatesMasterJson,
 ];
 
 const beneficiaryTypesMasterUrl =
@@ -89,7 +91,9 @@ const beneficiaryTypesMasterUrl =
 	totalBeneficiariesByBeneficiaryTypeTranche1Url =
 		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche1_2026&$format=csv",
 	totalBeneficiariesByBeneficiaryTypeTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche2_2026&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche2_2026&$format=csv",
+	templatesMasterUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/templates/?includeProjectCode=1";
 
 function useData(
 	defaultFundType: number | null,
@@ -325,6 +329,12 @@ function useData(
 				"csv",
 				setProgress,
 			),
+			fetchFile<TemplatesMasterJson>(
+				"templatesMaster",
+				templatesMasterUrl,
+				"json",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -360,6 +370,7 @@ function useData(
 			totalBeneficiariesByBeneficiaryType,
 			totalBeneficiariesByBeneficiaryTypeTranche1,
 			totalBeneficiariesByBeneficiaryTypeTranche2,
+			templatesMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -404,6 +415,7 @@ function useData(
 				totalBeneficiariesByBeneficiaryType,
 				totalBeneficiariesByBeneficiaryTypeTranche1,
 				totalBeneficiariesByBeneficiaryTypeTranche2,
+				templatesMaster,
 			});
 
 			setData(data);

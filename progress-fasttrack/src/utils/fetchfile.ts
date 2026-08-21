@@ -6,11 +6,11 @@ const { localStorageTime, pageName, consoleStyle } = constants;
 
 const currentDate = new Date();
 
-async function fetchFile<T extends object[]>(
+async function fetchFile<T>(
 	fileName: string,
 	url: string,
 	method: "csv" | "json",
-	setProgress: React.Dispatch<React.SetStateAction<number>>
+	setProgress: React.Dispatch<React.SetStateAction<number>>,
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}`;
 	const localData = localStorage.getItem(combinedName);
@@ -25,7 +25,7 @@ async function fetchFile<T extends object[]>(
 				: JSON.parse(localData).data;
 		console.info(
 			`%cInfo: data file ${fileName} retrieved from localStorage`,
-			consoleStyle
+			consoleStyle,
 		);
 		return fetchedData;
 	} else {
@@ -50,22 +50,22 @@ async function fetchFile<T extends object[]>(
 								? csvFormat(fetchedData as object[])
 								: fetchedData,
 						timeStamp: currentDate.getTime(),
-					})
+					}),
 				);
 			} catch (error) {
 				console.warn(
-					`Error saving the file ${fileName} in localStorage. Error: ${error}.`
+					`Error saving the file ${fileName} in localStorage. Error: ${error}.`,
 				);
 			}
 			console.info(
 				`%cInfo: data file ${fileName} obtained from API call`,
-				consoleStyle
+				consoleStyle,
 			);
 
 			return fetchedData;
 		} catch (error) {
 			console.warn(
-				`Error fetching the file ${fileName} from API. Error: ${error}.`
+				`Error fetching the file ${fileName} from API. Error: ${error}.`,
 			);
 			return Promise.reject(error);
 		}

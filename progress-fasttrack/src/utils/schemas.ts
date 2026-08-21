@@ -383,6 +383,19 @@ export const cvaMasterObjectSchema = z.object({
 	IsActive: z.boolean(),
 });
 
+export const templatesMasterObjectSchema = z.object({
+	AllocationTitles: z.array(z.string()),
+	AllocationTypeIds: z.array(z.number()),
+	GroupNames: z.array(z.string()).nonempty(),
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ProjectCodes: z.array(z.string()).nonempty(),
+	TemplateName: z.string().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullable(),
+	scope: z.string().nullable(),
+	status: z.string().nullable(),
+});
+
 // ********************
 // TYPES
 // ********************
@@ -442,3 +455,8 @@ export type SectorsMasterObject = z.infer<typeof sectorsMasterObjectSchema>;
 export type CvaObject = z.infer<typeof cvaObjectSchema>;
 
 export type CvaMasterObject = z.infer<typeof cvaMasterObjectSchema>;
+
+export type TemplatesMasterJson = {
+	count: number;
+	data: z.infer<typeof templatesMasterObjectSchema>[];
+};

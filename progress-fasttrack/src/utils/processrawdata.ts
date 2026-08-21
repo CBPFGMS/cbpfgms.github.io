@@ -5,18 +5,21 @@ import {
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
 	TotalBeneficiariesByBeneficiaryTypeObject,
+	CvaObject,
+	TemplatesMasterJson,
 	projectSummaryObjectSchema,
 	sectorBeneficiaryObjectSchema,
 	cvaObjectSchema,
-	CvaObject,
 	totalBeneficiariesObjectSchema,
 	totalBeneficiariesByPartnerObjectSchema,
 	totalBeneficiariesBySectorObjectSchema,
 	totalBeneficiariesByBeneficiaryTypeObjectSchema,
+	templatesMasterObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
+import type { Tranche } from "../components/MainContainer";
 
 const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
 	constants;
@@ -104,6 +107,8 @@ export type InDataLists = {
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	statusesPerFund: { [key: number]: Set<number> };
+	fundsPerTranche: { [key: number]: Set<number> };
+	projectsPerTranche: { [key: number]: Set<string> };
 };
 
 type SetType<T> = {
@@ -130,6 +135,7 @@ type ProcessRawDataParams = {
 	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
 	totalBeneficiariesByBeneficiaryTypeTranche1: TotalBeneficiariesByBeneficiaryTypeObject[];
 	totalBeneficiariesByBeneficiaryTypeTranche2: TotalBeneficiariesByBeneficiaryTypeObject[];
+	templatesMaster: TemplatesMasterJson;
 };
 
 type TargetedAndReached = {
@@ -175,6 +181,8 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 	[key: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 };
 
+const { tranche1Name, tranche2Name } = constants;
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -193,6 +201,7 @@ function processRawData({
 	totalBeneficiariesByBeneficiaryType,
 	totalBeneficiariesByBeneficiaryTypeTranche1,
 	totalBeneficiariesByBeneficiaryTypeTranche2,
+	templatesMaster,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -243,6 +252,37 @@ function processRawData({
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
+	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
+
+	templatesMaster.data.forEach(row => {
+		const parsedRow = templatesMasterObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema("templatesMaster", row, parsedRow.error.message);
+			return;
+		}
+
+		const thisTranche: Tranche = row.GroupNames.includes(tranche1Name)
+			? 1
+			: row.GroupNames.includes(tranche2Name)
+				? 2
+				: "all";
+
+		if (thisTranche !== "all") {
+			(fundsPerTranche[thisTranche] ??= new Set([row.PFId])).add(
+				row.PFId,
+			);
+
+			if (projectsPerTranche[thisTranche] === undefined) {
+				projectsPerTranche[thisTranche] = new Set(row.ProjectCodes);
+			} else {
+				row.ProjectCodes.forEach(projectCode => {
+					projectsPerTranche[thisTranche].add(projectCode);
+				});
+			}
+		}
+	});
 
 	populateTotalBeneficiariesData(
 		totalBeneficiaries,
@@ -553,6 +593,8 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 		statusesPerFund,
+		fundsPerTranche,
+		projectsPerTranche,
 	}));
 
 	return {

@@ -97,13 +97,6 @@ function AccordionComponentTranche({
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
-						<Typography
-							variant="body2"
-							m={1}
-							mb={2}
-						>
-							Select the tranche. Multiple tranches are allowed.
-						</Typography>
 						<CheckboxLabel
 							value={value}
 							setValue={setValue}

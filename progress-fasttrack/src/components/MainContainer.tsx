@@ -33,6 +33,8 @@ export type RefIds = {
 
 export type ImplementationStatuses = (typeof implementationStatuses)[number];
 
+export type Tranche = (typeof constants.tranches)[number];
+
 const downloadStates = charts.reduce(
 	(acc, chart) => ((acc[chart] = false), acc),
 	{} as DownloadStates,
@@ -70,7 +72,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			ImplementationStatuses[]
 		>([...implementationStatuses]),
 		[clickedDownload, setClickedDownload] =
-			useState<DownloadStates>(downloadStates);
+			useState<DownloadStates>(downloadStates),
+		[tranche, setTranche] = useState<Tranche>("all");
 
 	const [titleRef, inViewTitle] = useInView({
 			threshold: 0.999,
