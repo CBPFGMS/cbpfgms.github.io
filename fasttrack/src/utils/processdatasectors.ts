@@ -1,10 +1,13 @@
-import type { Data } from "./processrawdata";
+import type { Tranche } from "../components/MainContainer";
+import type { Data, InDataLists } from "./processrawdata";
 
 type ProcessDataSectorsParams = {
 	data: Data;
 	fund: number[];
 	status: number[];
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 export type SectorsData = {
@@ -21,6 +24,8 @@ function processDataSectors({
 	fund,
 	status,
 	setSector,
+	tranche,
+	inDataLists,
 }: ProcessDataSectorsParams): SectorsData {
 	const sectorsData: SectorsData = {
 		total: 0,
@@ -28,6 +33,13 @@ function processDataSectors({
 	};
 
 	data.forEach(datum => {
+		if (
+			tranche !== "all" &&
+			!inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode)
+		) {
+			return;
+		}
+
 		if (fund.includes(datum.fund) && status.includes(datum.projectStatus)) {
 			sectorsData.total += datum.budget;
 

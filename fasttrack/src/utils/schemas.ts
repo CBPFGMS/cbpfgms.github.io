@@ -132,36 +132,6 @@ export const sectorBeneficiaryObjectSchema = z.object({
 		.nullable(),
 });
 
-// export const totalBeneficiariesObjectSchema = z.object({
-// 	PFId: z.number().int().nonnegative(),
-// 	PFName: z.string(),
-// 	AllocationYear: z.number().int().nonnegative(),
-// 	ProcessStatus: z.string().nullable(),
-// 	ProcessStatusId: z.number().int().nonnegative().nullable(),
-// 	CurrentAdminLevel: z.number().int().nonnegative(),
-// 	defaultAdminLevel: z.number().int().nonnegative(),
-// 	BenM: z.number().int().nonnegative(),
-// 	BenW: z.number().int().nonnegative(),
-// 	BenB: z.number().int().nonnegative(),
-// 	BenG: z.number().int().nonnegative(),
-// 	TotTarg: z.number().int().nonnegative(),
-// 	TotProjects: z.number().int().nonnegative(),
-// 	Budget: z.number().nonnegative(),
-// 	AchM: z.number().int().nonnegative().nullable(),
-// 	AchW: z.number().int().nonnegative().nullable(),
-// 	AchB: z.number().int().nonnegative().nullable(),
-// 	AchG: z.number().int().nonnegative().nullable(),
-// 	TotAch: z.number().int().nonnegative().nullable(),
-// 	TotAchProjects: z.number().int().nonnegative().nullable(),
-// 	BudgetAchieved: z.number().nonnegative().nullable(),
-// 	AllocationtypeId: z.number().int().nonnegative(),
-// 	step1: z.string(),
-// 	step2: z.string(),
-// 	step3: z.string(),
-// 	step4: z.string(),
-// 	syncedAt: z.string(),
-// });
-
 export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
@@ -326,6 +296,25 @@ export const pooledFundsWithRegionMasterObjectSchema = z.object({
 	AreaType: z.string(),
 });
 
+export const templatesMasterObjectSchema = z.object({
+	AllocationTitles: z.array(z.string()),
+	AllocationTypeIds: z.array(z.number()),
+	GroupNames: z.array(z.string()).nonempty(),
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ProjectCodes: z.array(z.string()).nonempty(),
+	TemplateName: z.string().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullable(),
+	scope: z.string().nullable(),
+	status: z.string().nullable(),
+});
+
+export const organizationIdsMapObjectSchema = z.object({
+	idsList: z.array(z.number().int().nonnegative()),
+	changesTo: z.number().int().nonnegative(),
+	description: z.string(),
+});
+
 // ********************
 // GLOBAL INDICATOR SCHEMA
 // ********************
@@ -365,12 +354,6 @@ export const globalIndicatorsMasterObjectSchema = z.object({
 	Active: z.number().int().nonnegative().nullable(),
 	Code: z.string(),
 	TypeId: z.number().int().nonnegative().nullable(),
-});
-
-export const organizationIdsMapObjectSchema = z.object({
-	idsList: z.array(z.number().int().nonnegative()),
-	changesTo: z.number().int().nonnegative(),
-	description: z.string(),
 });
 
 // ********************
@@ -432,3 +415,8 @@ export type PooledFundsWithRegionMasterObject = z.infer<
 export type OrganizationIdsMapObject = z.infer<
 	typeof organizationIdsMapObjectSchema
 >;
+
+export type TemplatesMasterJson = {
+	count: number;
+	data: z.infer<typeof templatesMasterObjectSchema>[];
+};

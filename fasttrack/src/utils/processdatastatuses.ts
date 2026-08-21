@@ -1,4 +1,5 @@
-import type { Data } from "./processrawdata";
+import type { Tranche } from "../components/MainContainer";
+import type { Data, InDataLists } from "./processrawdata";
 
 export type DataStatuses = {
 	[key: number]: number;
@@ -8,17 +9,25 @@ type ProcessDataStatusesParams = {
 	data: Data;
 	fund: number[];
 	setStatus: React.Dispatch<React.SetStateAction<number[]>>;
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 function processDataStatuses({
 	data,
 	fund,
 	setStatus,
+	tranche,
+	inDataLists,
 }: ProcessDataStatusesParams): DataStatuses {
 	const dataStatuses: DataStatuses = {};
 
 	data.forEach(datum => {
-		if (fund.includes(datum.fund)) {
+		if (
+			fund.includes(datum.fund) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
+		) {
 			dataStatuses[datum.projectStatus] =
 				(dataStatuses[datum.projectStatus] ?? 0) + datum.budget;
 		}

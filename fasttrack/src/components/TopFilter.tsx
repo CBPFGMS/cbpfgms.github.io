@@ -76,6 +76,7 @@ function TopFilter({
 					<AccordionComponent
 						value={fund}
 						setValue={setFund}
+						inSelectionData={inSelectionData}
 					/>
 				</Grid>
 				{isSticky && (

@@ -7,6 +7,8 @@ import {
 	sectorBeneficiaryObjectSchema,
 	totalBeneficiariesObjectSchema,
 	organizationIdsMapObjectSchema,
+	templatesMasterObjectSchema,
+	type TemplatesMasterJson,
 } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema, {
@@ -14,6 +16,7 @@ import warnInvalidSchema, {
 	simpleWarn,
 } from "./warninvalid";
 import { constants, projectStatusMapping } from "./constants";
+import type { Tranche } from "../components/MainContainer";
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -68,6 +71,8 @@ export type InDataLists = {
 	organizations: Set<number>;
 	projectStatuses: Set<number>;
 	statusesPerFund: { [key: number]: Set<number> };
+	fundsPerTranche: { [key: number]: Set<number> };
+	projectsPerTranche: { [key: number]: Set<string> };
 };
 
 type SetType<T> = {
@@ -85,6 +90,7 @@ type ProcessRawDataParams = {
 	totalBeneficiariesTranche1: TotalBeneficiariesObject[];
 	totalBeneficiariesTranche2: TotalBeneficiariesObject[];
 	organizationIdsMap: OrganizationIdsMapObject[];
+	templatesMaster: TemplatesMasterJson;
 };
 
 type TargetedAndReached = {
@@ -97,6 +103,8 @@ export type TotalBeneficiariesData = {
 	[key: number]: TargetedAndReached;
 };
 
+const { tranche1Name, tranche2Name } = constants;
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -106,6 +114,7 @@ function processRawData({
 	totalBeneficiariesTranche1,
 	totalBeneficiariesTranche2,
 	organizationIdsMap,
+	templatesMaster,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -118,7 +127,6 @@ function processRawData({
 	const totalBeneficiariesTranche2Data: TotalBeneficiariesData = {};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
-
 	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
 	const allocationTypesSet: Set<InDataListsValues["allocationTypes"]> =
@@ -132,23 +140,55 @@ function processRawData({
 	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
 		new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
-
+	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
+	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
 	const organizationIdsToChange: Set<number> = new Set();
 
-	organizationIdsMap.forEach(d => {
+	templatesMaster.data.forEach(row => {
+		const parsedRow = templatesMasterObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema("templatesMaster", row, parsedRow.error.message);
+			return;
+		}
+
+		const thisTranche: Tranche = row.GroupNames.includes(tranche1Name)
+			? 1
+			: row.GroupNames.includes(tranche2Name)
+				? 2
+				: "all";
+
+		if (thisTranche !== "all") {
+			(fundsPerTranche[thisTranche] ??= new Set([row.PFId])).add(
+				row.PFId,
+			);
+
+			if (projectsPerTranche[thisTranche] === undefined) {
+				projectsPerTranche[thisTranche] = new Set(row.ProjectCodes);
+			} else {
+				row.ProjectCodes.forEach(projectCode => {
+					projectsPerTranche[thisTranche].add(projectCode);
+				});
+			}
+		}
+	});
+
+	organizationIdsMap.forEach(row => {
 		const parsedOrganizationIdsMap =
-			organizationIdsMapObjectSchema.safeParse(d);
-		if (parsedOrganizationIdsMap.success) {
-			d.idsList.forEach(id => {
-				organizationIdsToChange.add(id);
-			});
-		} else {
+			organizationIdsMapObjectSchema.safeParse(row);
+
+		if (!parsedOrganizationIdsMap.success) {
 			warnInvalidSchema(
 				"OrganizationIdsMap",
-				d,
-				JSON.stringify(parsedOrganizationIdsMap.error),
+				row,
+				parsedOrganizationIdsMap.error.message,
 			);
+			return;
 		}
+
+		row.idsList.forEach(id => {
+			organizationIdsToChange.add(id);
+		});
 	});
 
 	populateTotalBeneficiariesData(
@@ -169,36 +209,19 @@ function processRawData({
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			sectorsSet.add(row.GlobalClusterId);
-			if (!sectorsDataMap.has(row.ChfProjectCode)) {
-				sectorsDataMap.set(row.ChfProjectCode, {
-					projectCode: row.ChfProjectCode,
-					projectId: row.ChfId,
-					sectors: [
-						{
-							sectorId: row.GlobalClusterId,
-							percentage: row.Percentage,
-							reached: {
-								girls: row.ActualGirls || 0,
-								boys: row.ActualBoys || 0,
-								women: row.ActualWomen || 0,
-								men: row.ActualMen || 0,
-							},
-							targeted: {
-								girls: row.TargetGirls || 0,
-								boys: row.TargetBoys || 0,
-								women: row.TargetWomen || 0,
-								men: row.TargetMen || 0,
-							},
-							budget: Math.floor(row.CALCBudgetByCluster),
-						},
-					],
-				});
-			} else {
-				const projectData = sectorsDataMap.get(row.ChfProjectCode);
-				if (projectData) {
-					projectData.sectors.push({
+
+		if (!parsedRow.success) {
+			warnInvalidSchema("sectorsData", row, parsedRow.error.message);
+			return;
+		}
+
+		sectorsSet.add(row.GlobalClusterId);
+		if (!sectorsDataMap.has(row.ChfProjectCode)) {
+			sectorsDataMap.set(row.ChfProjectCode, {
+				projectCode: row.ChfProjectCode,
+				projectId: row.ChfId,
+				sectors: [
+					{
 						sectorId: row.GlobalClusterId,
 						percentage: row.Percentage,
 						reached: {
@@ -214,157 +237,155 @@ function processRawData({
 							men: row.TargetMen || 0,
 						},
 						budget: Math.floor(row.CALCBudgetByCluster),
-					});
-				} else {
-					warnProjectNotFound(
-						row.ChfProjectCode,
-						row,
-						"Project not found in sectorsDataMap",
-					);
-				}
-			}
+					},
+				],
+			});
 		} else {
-			warnInvalidSchema(
-				"sectorsData",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
+			const projectData = sectorsDataMap.get(row.ChfProjectCode);
+			if (projectData) {
+				projectData.sectors.push({
+					sectorId: row.GlobalClusterId,
+					percentage: row.Percentage,
+					reached: {
+						girls: row.ActualGirls || 0,
+						boys: row.ActualBoys || 0,
+						women: row.ActualWomen || 0,
+						men: row.ActualMen || 0,
+					},
+					targeted: {
+						girls: row.TargetGirls || 0,
+						boys: row.TargetBoys || 0,
+						women: row.TargetWomen || 0,
+						men: row.TargetMen || 0,
+					},
+					budget: Math.floor(row.CALCBudgetByCluster),
+				});
+			} else {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in sectorsDataMap",
+				);
+			}
 		}
 	});
 
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			//Temporary filter for draft projects:
-			if (row.ProjectStatusCode === "PRJ_DRFT") {
-				return;
-			}
 
-			//hardcoded: changing GlobalOrgId if needed
-			if (organizationIdsToChange.has(row.GlobalOrgId)) {
-				const thisTarget = organizationIdsMap.find(d =>
-					d.idsList.includes(row.GlobalOrgId),
-				);
-				if (thisTarget) {
-					row.GlobalOrgId = thisTarget.changesTo;
-				} else {
-					simpleWarn(
-						`Organization ID ${row.GlobalOrgId} not found in organizationIdsMap`,
-					);
-				}
-			}
+		if (!parsedRow.success) {
+			warnInvalidSchema("projectSummary", row, parsedRow.error.message);
+			return;
+		}
+		//Temporary filter for draft projects:
+		if (row.ProjectStatusCode === "PRJ_DRFT") {
+			return;
+		}
 
-			const thisAllocationType =
-				listsObj.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				];
-			const thisOrganization =
-				listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
-			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
-
-			if (!thisAllocationType) {
-				warnProjectNotFound(
-					row.ChfProjectCode,
-					row,
-					"Project not found in allocation types",
+		//hardcoded: changing GlobalOrgId if needed
+		if (organizationIdsToChange.has(row.GlobalOrgId)) {
+			const thisTarget = organizationIdsMap.find(d =>
+				d.idsList.includes(row.GlobalOrgId),
+			);
+			if (thisTarget) {
+				row.GlobalOrgId = thisTarget.changesTo;
+			} else {
+				simpleWarn(
+					`Organization ID ${row.GlobalOrgId} not found in organizationIdsMap`,
 				);
 			}
+		}
 
-			if (!thisOrganization) {
-				warnProjectNotFound(
-					row.ChfProjectCode,
-					row,
-					"Project not found in organizations",
-				);
-			}
+		const thisAllocationType =
+			listsObj.allocationTypesCompleteList[
+				parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+			];
+		const thisOrganization =
+			listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
+		const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
-			if (!thisSectorData) {
-				warnProjectNotFound(
-					row.ChfProjectCode,
-					row,
-					"Project not found in sectors data",
-				);
-			}
+		if (!thisAllocationType) {
+			warnProjectNotFound(
+				row.ChfProjectCode,
+				row,
+				"Project not found in allocation types",
+			);
+		}
 
-			//In case we need to check what projects are missing from emergencies data
-			// if (!thisEmergenciesData) {
-			// 	warnProjectNotFound(
-			// 		row.ChfProjectCode,
-			// 		row,
-			// 		"Project not found in emergencies data"
-			// 	);
-			// }
+		if (!thisOrganization) {
+			warnProjectNotFound(
+				row.ChfProjectCode,
+				row,
+				"Project not found in organizations",
+			);
+		}
 
-			if (thisAllocationType) {
-				listsObj.projectDetails.set(row.ChfId, {
-					year: thisAllocationType.AllocationYear,
-					fund: row.PooledFundId,
-					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
-					endDate: new Date(row.EndDate),
-					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
-					reportType: row.RptCode ?? 0,
-					projectName: row.ChfProjectCode,
-				});
-			}
+		if (!thisSectorData) {
+			warnProjectNotFound(
+				row.ChfProjectCode,
+				row,
+				"Project not found in sectors data",
+			);
+		}
 
-			if (thisAllocationType && thisOrganization && thisSectorData) {
-				yearsSet.add(thisAllocationType.AllocationYear);
-				fundsSet.add(row.PooledFundId);
-				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
-				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalOrgId);
-				projectStatusesSet.add(
+		if (thisAllocationType) {
+			listsObj.projectDetails.set(row.ChfId, {
+				year: thisAllocationType.AllocationYear,
+				fund: row.PooledFundId,
+				allocationSource: thisAllocationType.AllocationSourceId,
+				allocationType: parseFloat(
+					`${row.PooledFundId}.${row.AllocationtypeId}`,
+				),
+				endDate: new Date(row.EndDate),
+				projectStatusId: projectStatusMapping[row.ProcessSTatusID],
+				reportType: row.RptCode ?? 0,
+				projectName: row.ChfProjectCode,
+			});
+		}
+
+		if (thisAllocationType && thisOrganization && thisSectorData) {
+			yearsSet.add(thisAllocationType.AllocationYear);
+			fundsSet.add(row.PooledFundId);
+			allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
+			organizationTypesSet.add(thisOrganization.OrganizationTypeId);
+			organizationsSet.add(thisOrganization.GlobalOrgId);
+			projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
+			allocationTypesSet.add(
+				parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+			);
+
+			if (statusesPerFund[row.PooledFundId]) {
+				statusesPerFund[row.PooledFundId].add(
 					projectStatusMapping[row.ProcessSTatusID],
 				);
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
-				);
-
-				if (statusesPerFund[row.PooledFundId]) {
-					statusesPerFund[row.PooledFundId].add(
-						projectStatusMapping[row.ProcessSTatusID],
-					);
-				} else {
-					statusesPerFund[row.PooledFundId] = new Set([
-						projectStatusMapping[row.ProcessSTatusID],
-					]);
-				}
-
-				const objDatum: Datum = {
-					fund: row.PooledFundId,
-					year: thisAllocationType.AllocationYear,
-					projectCode: row.ChfProjectCode,
-					projectId: row.ChfId,
-					projectStatus: projectStatusMapping[row.ProcessSTatusID],
-					allocationSource: thisAllocationType.AllocationSourceId,
-					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalOrgId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
-					allocationTypeId: row.AllocationtypeId,
-					endDate: new Date(row.EndDate),
-					budget: Math.floor(row.Budget),
-					sectorData: thisSectorData.sectors,
-					reached: generateBeneficiariesObjectSummary(row, "reached"),
-					targeted: generateBeneficiariesObjectSummary(
-						row,
-						"targeted",
-					),
-					reportType: row.RptCode ?? 0,
-				};
-
-				data.push(objDatum);
+			} else {
+				statusesPerFund[row.PooledFundId] = new Set([
+					projectStatusMapping[row.ProcessSTatusID],
+				]);
 			}
-		} else {
-			warnInvalidSchema(
-				"projectSummary",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
+
+			const objDatum: Datum = {
+				fund: row.PooledFundId,
+				year: thisAllocationType.AllocationYear,
+				projectCode: row.ChfProjectCode,
+				projectId: row.ChfId,
+				projectStatus: projectStatusMapping[row.ProcessSTatusID],
+				allocationSource: thisAllocationType.AllocationSourceId,
+				organizationType: thisOrganization.OrganizationTypeId,
+				organizationId: thisOrganization.GlobalOrgId,
+				allocationType: parseFloat(
+					`${row.PooledFundId}.${row.AllocationtypeId}`,
+				),
+				allocationTypeId: row.AllocationtypeId,
+				endDate: new Date(row.EndDate),
+				budget: Math.floor(row.Budget),
+				sectorData: thisSectorData.sectors,
+				reached: generateBeneficiariesObjectSummary(row, "reached"),
+				targeted: generateBeneficiariesObjectSummary(row, "targeted"),
+				reportType: row.RptCode ?? 0,
+			};
+
+			data.push(objDatum);
 		}
 	});
 
@@ -378,6 +399,8 @@ function processRawData({
 		organizations: organizationsSet,
 		projectStatuses: projectStatusesSet,
 		statusesPerFund,
+		fundsPerTranche,
+		projectsPerTranche,
 	}));
 
 	return {

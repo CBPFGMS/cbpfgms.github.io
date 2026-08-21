@@ -22,6 +22,7 @@ import type {
 	GlobalIndicatorsObject,
 	TotalBeneficiariesObject,
 	OrganizationIdsMapObject,
+	TemplatesMasterJson,
 } from "./schemas";
 import { constants } from "./constants";
 
@@ -42,6 +43,7 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesObject[],
 	TotalBeneficiariesObject[],
 	OrganizationIdsMapObject[],
+	TemplatesMasterJson,
 ];
 
 const { fundType } = constants;
@@ -67,7 +69,9 @@ const beneficiaryTypesMasterUrl =
 	totalBeneficiariesTranche2Url =
 		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv",
 	organizationIdsMapUrl =
-		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json";
+		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json",
+	templatesMasterUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/templates/?includeProjectCode=1";
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -213,6 +217,12 @@ function useData(
 				"json",
 				setProgress,
 			),
+			fetchFile<TemplatesMasterJson>(
+				"templatesMaster",
+				templatesMasterUrl,
+				"json",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -241,6 +251,7 @@ function useData(
 			totalBeneficiariesTranche1,
 			totalBeneficiariesTranche2,
 			organizationIdsMap,
+			templatesMaster,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -268,6 +279,7 @@ function useData(
 				totalBeneficiariesTranche1,
 				totalBeneficiariesTranche2,
 				organizationIdsMap,
+				templatesMaster,
 			});
 
 			setData(data);

@@ -1,4 +1,5 @@
-import type { Data } from "./processrawdata";
+import type { Tranche } from "../components/MainContainer";
+import type { Data, InDataLists } from "./processrawdata";
 import { max } from "d3";
 
 type ProcessDataPartnersParams = {
@@ -6,6 +7,8 @@ type ProcessDataPartnersParams = {
 	fund: number[];
 	status: number[];
 	sector: number[];
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 type SectorDetailsDatum = {
@@ -35,6 +38,8 @@ function processDataPartners({
 	fund,
 	status,
 	sector,
+	tranche,
+	inDataLists,
 }: ProcessDataPartnersParams): {
 	dataPartners: PartnersDatum[];
 	maxBudgetValue: number;
@@ -42,6 +47,13 @@ function processDataPartners({
 	const dataPartners: PartnersDatum[] = [];
 
 	data.forEach(datum => {
+		if (
+			tranche !== "all" &&
+			!inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode)
+		) {
+			return;
+		}
+
 		const sectors = datum.sectorData.map(d => d.sectorId);
 		if (
 			fund.includes(datum.fund) &&

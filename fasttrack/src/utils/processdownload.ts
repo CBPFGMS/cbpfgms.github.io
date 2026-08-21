@@ -1,6 +1,7 @@
+import type { Tranche } from "../components/MainContainer";
 import type { List } from "./makelists";
 import type { AllSectorsDatum } from "./processdataindicators";
-import type { Data } from "./processrawdata";
+import type { Data, InDataLists } from "./processrawdata";
 
 type BaseDownloadDatum = {
 	Year: number;
@@ -55,6 +56,8 @@ type ProcessDownloadParams = {
 	lists: List;
 	fund: number[];
 	status: number[];
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 type ProcessIndicatorsDownloadParams = {
@@ -69,11 +72,13 @@ export function processPartnersDownload({
 	lists,
 	fund,
 	status,
+	tranche,
+	inDataLists,
 }: ProcessDownloadParams) {
 	const partnersDataDownload: PartnersDatumDownload[] = [];
 
 	data.forEach(datum => {
-		if (checkRow(datum, fund, status)) {
+		if (checkRow(datum, fund, status, tranche, inDataLists)) {
 			const baseDownloadDatum = populateBaseDownloadDatum(datum, lists);
 			delete baseDownloadDatum.Budget;
 			datum.sectorData.forEach(sectorDatum => {
@@ -95,11 +100,13 @@ export function processRegionsDownload({
 	lists,
 	fund,
 	status,
+	tranche,
+	inDataLists,
 }: ProcessDownloadParams) {
 	const regionsDataDownload: RegionsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		if (checkRow(datum, fund, status)) {
+		if (checkRow(datum, fund, status, tranche, inDataLists)) {
 			const baseDownloadDatum = populateBaseDownloadDatum(datum, lists);
 			const thisRegion = lists.regions.find(d =>
 				d.funds.has(datum.fund),
@@ -124,11 +131,13 @@ export function processSectorsDownload({
 	lists,
 	fund,
 	status,
+	tranche,
+	inDataLists,
 }: ProcessDownloadParams) {
 	const sectorsDataDownload: SectorsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		if (checkRow(datum, fund, status)) {
+		if (checkRow(datum, fund, status, tranche, inDataLists)) {
 			const baseDownloadDatum = populateBaseDownloadDatum(datum, lists);
 			delete baseDownloadDatum.Budget;
 			datum.sectorData.forEach(sectorDatum => {
@@ -191,6 +200,13 @@ function checkRow(
 	datum: Data[number],
 	fund: number[],
 	status: number[],
+	tranche: Tranche,
+	inDataLists: InDataLists,
 ): boolean {
-	return fund.includes(datum.fund) && status.includes(datum.projectStatus);
+	return (
+		fund.includes(datum.fund) &&
+		status.includes(datum.projectStatus) &&
+		(tranche === "all" ||
+			inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
+	);
 }

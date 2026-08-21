@@ -6,7 +6,7 @@ const { localStorageTime, pageName, consoleStyle } = constants;
 
 const currentDate = new Date();
 
-async function fetchFile<T extends object[]>(
+async function fetchFile<T>(
 	fileName: string,
 	url: string,
 	method: "csv" | "json",

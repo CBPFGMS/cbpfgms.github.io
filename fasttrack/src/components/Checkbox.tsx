@@ -4,6 +4,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Snack from "./Snack";
 import { useState } from "react";
 import type { Tranche } from "./MainContainer";
+import { constants } from "../utils/constants";
 
 type CheckboxProps = {
 	value: Tranche;
@@ -11,7 +12,7 @@ type CheckboxProps = {
 	fromTopContainer?: boolean;
 };
 
-type TranchesNumbers = 1 | 2;
+const tranches: readonly Tranche[] = constants.tranches;
 
 function CheckboxLabel({
 	value,
@@ -20,7 +21,7 @@ function CheckboxLabel({
 }: CheckboxProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
-	function handleChange(tranche: TranchesNumbers, value: Tranche) {
+	function handleChange(tranche: (typeof tranches)[number], value: Tranche) {
 		if (value === tranche) {
 			setOpenSnack(true);
 			return;
@@ -32,7 +33,7 @@ function CheckboxLabel({
 		}
 	}
 
-	const tranches: TranchesNumbers[] = [1, 2];
+	const trancheNumbers = tranches.filter(d => d !== "all");
 
 	return (
 		<>
@@ -47,7 +48,7 @@ function CheckboxLabel({
 					gap: fromTopContainer ? "16px" : "0px",
 				}}
 			>
-				{tranches.map((tranche, index) => (
+				{trancheNumbers.map((tranche, index) => (
 					<FormControlLabel
 						key={index}
 						control={

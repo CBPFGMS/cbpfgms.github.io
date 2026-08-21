@@ -8,12 +8,14 @@ import Checkbox from "@mui/material/Checkbox";
 import { useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
 import type { ListObj } from "../utils/makelists";
+import type { InSelectionData } from "../utils/processdatatopfigures";
 
 type DropdownProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	names: number[];
 	namesList: ListObj;
+	inSelectionData: InSelectionData;
 };
 
 function Dropdown({
@@ -21,6 +23,7 @@ function Dropdown({
 	setValue,
 	names,
 	namesList,
+	inSelectionData,
 }: DropdownProps) {
 	let isAllSelected = value.length === names.length;
 
@@ -105,7 +108,7 @@ function Dropdown({
 						<MenuItem
 							key={name}
 							value={name}
-							// disabled={!inSelectionData.funds.has(name)}
+							disabled={!inSelectionData.funds.has(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",

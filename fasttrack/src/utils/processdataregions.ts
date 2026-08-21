@@ -1,6 +1,11 @@
-import type { Data, TotalBeneficiariesData } from "./processrawdata";
+import type {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 import type { List } from "./makelists";
 import { simpleWarn } from "./warninvalid";
+import type { Tranche } from "../components/MainContainer";
 
 type ProcessDataRegionsParams = {
 	data: Data;
@@ -8,6 +13,8 @@ type ProcessDataRegionsParams = {
 	lists: List;
 	status: number[];
 	totalBeneficiariesData: TotalBeneficiariesData;
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 export type RegionsDatum = {
@@ -25,11 +32,18 @@ function processDataRegions({
 	lists,
 	status,
 	totalBeneficiariesData,
+	tranche,
+	inDataLists,
 }: ProcessDataRegionsParams): RegionsDatum[] {
 	const dataRegions: RegionsDatum[] = [];
 
 	data.forEach(row => {
-		if (fund.includes(row.fund) && status.includes(row.projectStatus)) {
+		if (
+			fund.includes(row.fund) &&
+			status.includes(row.projectStatus) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(row.projectCode))
+		) {
 			const thisRegion = lists.regions.find(d =>
 				d.funds.has(row.fund),
 			)?.regionName;

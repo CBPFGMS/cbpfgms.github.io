@@ -1,4 +1,9 @@
-import type { Data, TotalBeneficiariesData } from "./processrawdata";
+import type { Tranche } from "../components/MainContainer";
+import type {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 
 export type InSelectionData = {
@@ -11,6 +16,8 @@ type ProcessDataTopFiguresParams = {
 	fund: number[];
 	status: number[];
 	totalBeneficiariesData: TotalBeneficiariesData;
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 export type DataTopFigures = {
@@ -27,6 +34,8 @@ function processDataTopFigures({
 	fund,
 	status,
 	totalBeneficiariesData,
+	tranche,
+	inDataLists,
 }: ProcessDataTopFiguresParams): {
 	dataTopFigures: DataTopFigures;
 	inSelectionData: InSelectionData;
@@ -57,6 +66,13 @@ function processDataTopFigures({
 	});
 
 	data.forEach(row => {
+		if (
+			tranche !== "all" &&
+			!inDataLists.projectsPerTranche[tranche]?.has(row.projectCode)
+		) {
+			return;
+		}
+
 		if (fund.includes(row.fund) && status.includes(row.projectStatus)) {
 			numberOfProjectsSet.add(row.projectId);
 			numberOfPartnersSet.add(row.organizationId);

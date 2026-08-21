@@ -35,6 +35,9 @@ const constants = {
 	pooledFundsShowingOrgName: [88, 508, 509, 510],
 	orgsShowingOrgName: [17014, 17025, 17026, 17027],
 	trancheCheckboxId: "tranche-checkbox-container",
+	tranches: [1, 2, "all"],
+	tranche1Name: "US_Tranche1_2026",
+	tranche2Name: "US_Tranche2_2026",
 } as const;
 
 const projectStatusMaster = {

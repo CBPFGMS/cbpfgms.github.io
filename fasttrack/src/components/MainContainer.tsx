@@ -36,7 +36,7 @@ export type DownloadStates = {
 	[K in Charts]: boolean;
 };
 
-export type Tranche = 1 | 2 | "all";
+export type Tranche = (typeof constants.tranches)[number];
 
 const downloadStates = charts.reduce(
 	(acc, chart) => ((acc[chart] = false), acc),
@@ -87,8 +87,10 @@ function MainContainer() {
 				data,
 				fund,
 				setStatus,
+				tranche,
+				inDataLists,
 			}),
-		[data, fund],
+		[data, fund, tranche, inDataLists],
 	);
 
 	useEffect(() => {
@@ -108,8 +110,10 @@ function MainContainer() {
 				lists,
 				fund,
 				status,
+				tranche,
+				inDataLists,
 			}),
-		[dataIndicators, lists, fund, status],
+		[dataIndicators, lists, fund, status, tranche, inDataLists],
 	);
 
 	const { dataTopFigures, inSelectionData } = useMemo(
@@ -119,8 +123,10 @@ function MainContainer() {
 				totalBeneficiariesData,
 				fund,
 				status,
+				tranche,
+				inDataLists,
 			}),
-		[data, totalBeneficiariesData, fund, status],
+		[data, totalBeneficiariesData, fund, status, tranche, inDataLists],
 	);
 
 	const { dataPartners, maxBudgetValue } = useMemo(
@@ -130,8 +136,10 @@ function MainContainer() {
 				fund,
 				status,
 				sector,
+				tranche,
+				inDataLists,
 			}),
-		[data, fund, status, sector],
+		[data, fund, status, sector, tranche, inDataLists],
 	);
 
 	const dataRegions = useMemo(
@@ -142,8 +150,18 @@ function MainContainer() {
 				lists,
 				status,
 				totalBeneficiariesData,
+				tranche,
+				inDataLists,
 			}),
-		[data, fund, lists, status, totalBeneficiariesData],
+		[
+			data,
+			fund,
+			lists,
+			status,
+			totalBeneficiariesData,
+			tranche,
+			inDataLists,
+		],
 	);
 
 	const dataSectors = useMemo(
@@ -153,8 +171,10 @@ function MainContainer() {
 				fund,
 				status,
 				setSector,
+				tranche,
+				inDataLists,
 			}),
-		[data, fund, status],
+		[data, fund, status, tranche, inDataLists],
 	);
 
 	const dataPartnersDownload = useCallback(
@@ -164,8 +184,10 @@ function MainContainer() {
 				lists,
 				fund,
 				status,
+				tranche,
+				inDataLists,
 			}),
-		[data, lists, fund, status],
+		[data, lists, fund, status, tranche, inDataLists],
 	);
 
 	const dataRegionsDownload = useCallback(
@@ -175,8 +197,10 @@ function MainContainer() {
 				lists,
 				fund,
 				status,
+				tranche,
+				inDataLists,
 			}),
-		[data, lists, fund, status],
+		[data, lists, fund, status, tranche, inDataLists],
 	);
 
 	const dataSectorsDownload = useCallback(
@@ -186,8 +210,10 @@ function MainContainer() {
 				lists,
 				fund,
 				status,
+				tranche,
+				inDataLists,
 			}),
-		[data, lists, fund, status],
+		[data, lists, fund, status, tranche, inDataLists],
 	);
 
 	useUpdateQueryString({

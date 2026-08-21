@@ -10,13 +10,19 @@ import Dropdown from "./Dropdown";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import type { ListObj } from "../utils/makelists";
+import type { InSelectionData } from "../utils/processdatatopfigures";
 
 type AccordionComponentProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
+	inSelectionData: InSelectionData;
 };
 
-function AccordionComponent({ value, setValue }: AccordionComponentProps) {
+function AccordionComponent({
+	value,
+	setValue,
+	inSelectionData,
+}: AccordionComponentProps) {
 	const [expanded, setExpanded] = useState<boolean>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
 	const accordionRef = useRef<HTMLDivElement>(null);
@@ -113,6 +119,7 @@ function AccordionComponent({ value, setValue }: AccordionComponentProps) {
 							setValue={setValue}
 							names={dataArray}
 							namesList={namesList}
+							inSelectionData={inSelectionData}
 						/>
 
 						<Box

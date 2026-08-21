@@ -2,11 +2,16 @@ import type {
 	GlobalIndicatorsObject,
 	GlobalIndicatorsMasterObject,
 } from "./schemas";
-import type { BeneficiariesObject, GenderAndAge } from "./processrawdata";
+import type {
+	BeneficiariesObject,
+	GenderAndAge,
+	InDataLists,
+} from "./processrawdata";
 import { sum, mean } from "d3";
 import { constants } from "./constants";
 import type { List, GlobalIndicatorsDetails } from "./makelists";
 import { warnProjectNotFound } from "./warninvalid";
+import type { Tranche } from "../components/MainContainer";
 
 export type DatumIndicators = {
 	sector: number;
@@ -55,6 +60,8 @@ type ProcessDataIndicatorsParams = {
 	lists: List;
 	fund: number[];
 	status: number[];
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
 type StatusKey = "Tgt" | "Ach";
@@ -66,6 +73,8 @@ function processDataIndicators({
 	lists,
 	fund,
 	status,
+	tranche,
+	inDataLists,
 }: ProcessDataIndicatorsParams): DatumIndicators[] {
 	const filteredDataIndicators: DatumIndicators[] = [];
 
@@ -100,7 +109,11 @@ function processDataIndicators({
 
 		if (
 			fund.includes(thisProjectDetails.fund) &&
-			status.includes(thisProjectDetails.projectStatusId)
+			status.includes(thisProjectDetails.projectStatusId) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(
+					row.CHFProjectCode,
+				))
 		) {
 			const foundSector = filteredDataIndicators.find(
 				datum => datum.sector === row.GlbClstrId,
