@@ -5,11 +5,14 @@ import Snack from "./Snack";
 import { useState } from "react";
 import type { Tranche } from "./MainContainer";
 import { constants } from "../utils/constants";
+import type { InDataLists } from "../utils/processrawdata";
 
 type CheckboxProps = {
 	value: Tranche;
 	setValue: React.Dispatch<React.SetStateAction<Tranche>>;
 	fromTopContainer?: boolean;
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	inDataLists: InDataLists;
 };
 
 const tranches: readonly Tranche[] = constants.tranches;
@@ -18,18 +21,26 @@ function CheckboxLabel({
 	value,
 	setValue,
 	fromTopContainer = false,
+	setFund,
+	inDataLists,
 }: CheckboxProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
-	function handleChange(tranche: (typeof tranches)[number], value: Tranche) {
+	function handleChange(
+		tranche: (typeof trancheNumbers)[number],
+		value: Tranche,
+	) {
 		if (value === tranche) {
 			setOpenSnack(true);
 			return;
 		}
 		if (value === "all") {
-			setValue(tranches.filter(d => d !== tranche)[0]);
+			const thisTranche = trancheNumbers.filter(d => d !== tranche)[0];
+			setValue(thisTranche);
+			setFund([...inDataLists.fundsPerTranche[thisTranche]]);
 		} else {
 			setValue("all");
+			setFund([...inDataLists.funds]);
 		}
 	}
 

@@ -245,6 +245,8 @@ function MainContainer() {
 			<TranchesTopCheckbox
 				tranche={tranche}
 				setTranche={setTranche}
+				setFund={setFund}
+				inDataLists={inDataLists}
 			/>
 			<TopFilter
 				inSelectionData={inSelectionData}
@@ -255,6 +257,7 @@ function MainContainer() {
 				tranche={tranche}
 				setTranche={setTranche}
 				lists={lists}
+				inDataLists={inDataLists}
 			/>
 			<ProjectStatuses
 				dataStatuses={dataStatuses}

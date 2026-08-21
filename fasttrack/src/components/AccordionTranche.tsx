@@ -8,15 +8,20 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckboxLabel from "./Checkbox";
 import Box from "@mui/material/Box";
 import type { Tranche } from "./MainContainer";
+import type { InDataLists } from "../utils/processrawdata";
 
 type AccordionComponentTrancheProps = {
 	value: Tranche;
 	setValue: React.Dispatch<React.SetStateAction<Tranche>>;
+	setFund: React.Dispatch<React.SetStateAction<number[]>>;
+	inDataLists: InDataLists;
 };
 
 function AccordionComponentTranche({
 	value,
 	setValue,
+	setFund,
+	inDataLists,
 }: AccordionComponentTrancheProps) {
 	const [expanded, setExpanded] = useState<boolean>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
@@ -102,6 +107,8 @@ function AccordionComponentTranche({
 						<CheckboxLabel
 							value={value}
 							setValue={setValue}
+							setFund={setFund}
+							inDataLists={inDataLists}
 						/>
 					</AccordionDetails>
 				</Accordion>

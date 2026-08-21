@@ -9,6 +9,7 @@ import AccordionComponentTranche from "./AccordionTranche";
 import DropdownStatus from "./DropdownStatus";
 import type { List } from "../utils/makelists";
 import type { Tranche } from "./MainContainer";
+import type { InDataLists } from "../utils/processrawdata";
 
 type TopFilterProps = {
 	inSelectionData: InSelectionData;
@@ -19,6 +20,7 @@ type TopFilterProps = {
 	tranche: Tranche;
 	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 	lists: List;
+	inDataLists: InDataLists;
 };
 
 function TopFilter({
@@ -30,6 +32,7 @@ function TopFilter({
 	tranche,
 	setTranche,
 	lists,
+	inDataLists,
 }: TopFilterProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
@@ -94,6 +97,8 @@ function TopFilter({
 							<AccordionComponentTranche
 								value={tranche}
 								setValue={setTranche}
+								setFund={setFund}
+								inDataLists={inDataLists}
 							/>
 						</Grid>
 					</>
