@@ -1,6 +1,6 @@
 import {
 	Data,
-	InDataLists,
+	// InDataLists,
 	TotalBeneficiariesByBeneficiaryTypeData,
 	TotalBeneficiariesByPartnerData,
 	TotalBeneficiariesBySectorData,
@@ -12,7 +12,7 @@ import constants from "./constants";
 import { sum } from "d3";
 // import { GenderAndAge } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
-import flipObject from "./flipobject";
+// import flipObject from "./flipobject";
 
 export type DatumBarChart = {
 	type: number;
@@ -33,7 +33,7 @@ type ProcessDataBarChartParams = {
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
-	inDataLists: InDataLists;
+	// inDataLists: InDataLists;
 };
 
 // type BeneficiariesEntry = [
@@ -54,7 +54,7 @@ function processDataBarChart({
 	totalBeneficiariesByPartnerData,
 	totalBeneficiariesBySectorData,
 	totalBeneficiariesByBeneficiaryTypeData,
-	inDataLists,
+	// inDataLists,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -78,11 +78,11 @@ function processDataBarChart({
 		dataBeneficiaryByType.push(obj);
 	});
 
-	const numericStatuses = flipObject(lists.statuses);
+	// const numericStatuses = flipObject(lists.statuses);
 
-	const statuses = implementationStatus.map(
-		implSt => +numericStatuses[implSt as ImplementationStatuses],
-	);
+	// const statuses = implementationStatus.map(
+	// 	implSt => +numericStatuses[implSt as ImplementationStatuses],
+	// );
 
 	data.forEach(datum => {
 		const thisStatus = lists.statuses[
@@ -237,47 +237,27 @@ function processDataBarChart({
 				return;
 			}
 
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			const fundHasAllStatuses = allStatuses.every(pfStatus =>
-				statuses.includes(pfStatus),
-			);
+			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
+			// 	statuses.includes(pfStatus),
+			// );
 
-			if (fundHasAllStatuses) {
-				const foundPartner = totalBeneficiariesByPartnerData[
-					pf
-				].all.find(totalPartners => totalPartners.partner === org.type);
-				if (foundPartner) {
-					org.targeted.girls += foundPartner.girls.targeted;
-					org.targeted.boys += foundPartner.boys.targeted;
-					org.targeted.women += foundPartner.women.targeted;
-					org.targeted.men += foundPartner.men.targeted;
-					org.reached.girls += foundPartner.girls.reached;
-					org.reached.boys += foundPartner.boys.reached;
-					org.reached.women += foundPartner.women.reached;
-					org.reached.men += foundPartner.men.reached;
-				} else {
-					simpleWarn(
-						`Partner ${org.type} not found in totalBeneficiariesByPartner data`,
-					);
-				}
+			const foundPartner = totalBeneficiariesByPartnerData[pf].find(
+				totalPartners => totalPartners.partner === org.type,
+			);
+			if (foundPartner) {
+				org.targeted.girls += foundPartner.girls.targeted;
+				org.targeted.boys += foundPartner.boys.targeted;
+				org.targeted.women += foundPartner.women.targeted;
+				org.targeted.men += foundPartner.men.targeted;
+				org.reached.girls += foundPartner.girls.reached;
+				org.reached.boys += foundPartner.boys.reached;
+				org.reached.women += foundPartner.women.reached;
+				org.reached.men += foundPartner.men.reached;
 			} else {
-				statuses.forEach(st => {
-					const foundPartner = totalBeneficiariesByPartnerData[pf][
-						st
-					]?.find(
-						totalPartners => totalPartners.partner === org.type,
-					);
-					if (foundPartner) {
-						org.targeted.girls += foundPartner.girls.targeted;
-						org.targeted.boys += foundPartner.boys.targeted;
-						org.targeted.women += foundPartner.women.targeted;
-						org.targeted.men += foundPartner.men.targeted;
-						org.reached.girls += foundPartner.girls.reached;
-						org.reached.boys += foundPartner.boys.reached;
-						org.reached.women += foundPartner.women.reached;
-						org.reached.men += foundPartner.men.reached;
-					}
-				});
+				simpleWarn(
+					`Partner ${org.type} not found in totalBeneficiariesByPartner data`,
+				);
 			}
 		});
 	});
@@ -291,47 +271,27 @@ function processDataBarChart({
 				return;
 			}
 
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			const fundHasAllStatuses = allStatuses.every(pfStatus =>
-				statuses.includes(pfStatus),
-			);
+			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
+			// 	statuses.includes(pfStatus),
+			// );
 
-			if (fundHasAllStatuses) {
-				const foundPartner = totalBeneficiariesBySectorData[
-					pf
-				].all.find(totalPartners => totalPartners.sector === sect.type);
-				if (foundPartner) {
-					sect.targeted.girls += foundPartner.girls.targeted;
-					sect.targeted.boys += foundPartner.boys.targeted;
-					sect.targeted.women += foundPartner.women.targeted;
-					sect.targeted.men += foundPartner.men.targeted;
-					sect.reached.girls += foundPartner.girls.reached;
-					sect.reached.boys += foundPartner.boys.reached;
-					sect.reached.women += foundPartner.women.reached;
-					sect.reached.men += foundPartner.men.reached;
-				} else {
-					simpleWarn(
-						`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
-					);
-				}
+			const foundSector = totalBeneficiariesBySectorData[pf].find(
+				totalPartners => totalPartners.sector === sect.type,
+			);
+			if (foundSector) {
+				sect.targeted.girls += foundSector.girls.targeted;
+				sect.targeted.boys += foundSector.boys.targeted;
+				sect.targeted.women += foundSector.women.targeted;
+				sect.targeted.men += foundSector.men.targeted;
+				sect.reached.girls += foundSector.girls.reached;
+				sect.reached.boys += foundSector.boys.reached;
+				sect.reached.women += foundSector.women.reached;
+				sect.reached.men += foundSector.men.reached;
 			} else {
-				statuses.forEach(st => {
-					const foundPartner = totalBeneficiariesBySectorData[pf][
-						st
-					]?.find(
-						totalPartners => totalPartners.sector === sect.type,
-					);
-					if (foundPartner) {
-						sect.targeted.girls += foundPartner.girls.targeted;
-						sect.targeted.boys += foundPartner.boys.targeted;
-						sect.targeted.women += foundPartner.women.targeted;
-						sect.targeted.men += foundPartner.men.targeted;
-						sect.reached.girls += foundPartner.girls.reached;
-						sect.reached.boys += foundPartner.boys.reached;
-						sect.reached.women += foundPartner.women.reached;
-						sect.reached.men += foundPartner.men.reached;
-					}
-				});
+				simpleWarn(
+					`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
+				);
 			}
 		});
 	});
@@ -345,50 +305,29 @@ function processDataBarChart({
 				return;
 			}
 
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			const fundHasAllStatuses = allStatuses.every(pfStatus =>
-				statuses.includes(pfStatus),
-			);
+			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
+			// 	statuses.includes(pfStatus),
+			// );
 
-			if (fundHasAllStatuses) {
-				const foundPartner = totalBeneficiariesByBeneficiaryTypeData[
-					pf
-				].all.find(
-					totalPartners =>
-						totalPartners.beneficiaryType === benType.type,
-				);
-				if (foundPartner) {
-					benType.targeted.girls += foundPartner.girls.targeted;
-					benType.targeted.boys += foundPartner.boys.targeted;
-					benType.targeted.women += foundPartner.women.targeted;
-					benType.targeted.men += foundPartner.men.targeted;
-					benType.reached.girls += foundPartner.girls.reached;
-					benType.reached.boys += foundPartner.boys.reached;
-					benType.reached.women += foundPartner.women.reached;
-					benType.reached.men += foundPartner.men.reached;
-				} else {
-					simpleWarn(
-						`Partner ${benType.type} not found in totalBeneficiariesByBeneficiaryType data`,
-					);
-				}
+			const foundBenType = totalBeneficiariesByBeneficiaryTypeData[
+				pf
+			].find(
+				totalPartners => totalPartners.beneficiaryType === benType.type,
+			);
+			if (foundBenType) {
+				benType.targeted.girls += foundBenType.girls.targeted;
+				benType.targeted.boys += foundBenType.boys.targeted;
+				benType.targeted.women += foundBenType.women.targeted;
+				benType.targeted.men += foundBenType.men.targeted;
+				benType.reached.girls += foundBenType.girls.reached;
+				benType.reached.boys += foundBenType.boys.reached;
+				benType.reached.women += foundBenType.women.reached;
+				benType.reached.men += foundBenType.men.reached;
 			} else {
-				statuses.forEach(st => {
-					const foundPartner =
-						totalBeneficiariesByBeneficiaryTypeData[pf][st]?.find(
-							totalPartners =>
-								totalPartners.beneficiaryType === benType.type,
-						);
-					if (foundPartner) {
-						benType.targeted.girls += foundPartner.girls.targeted;
-						benType.targeted.boys += foundPartner.boys.targeted;
-						benType.targeted.women += foundPartner.women.targeted;
-						benType.targeted.men += foundPartner.men.targeted;
-						benType.reached.girls += foundPartner.girls.reached;
-						benType.reached.boys += foundPartner.boys.reached;
-						benType.reached.women += foundPartner.women.reached;
-						benType.reached.men += foundPartner.men.reached;
-					}
-				});
+				simpleWarn(
+					`Partner ${benType.type} not found in totalBeneficiariesByBeneficiaryType data`,
+				);
 			}
 		});
 	});

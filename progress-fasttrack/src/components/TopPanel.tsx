@@ -2,7 +2,7 @@ import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
 import colors from "../utils/colors";
-import { RefIds } from "./MainContainer";
+import { RefIds, Tranche } from "./MainContainer";
 import ScrollSpy from "./ScrollSpy";
 import { InSelectionData } from "../utils/processdatasummary";
 import { ImplementationStatuses } from "./MainContainer";
@@ -35,6 +35,8 @@ type TopPanelProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
+	tranche: Tranche;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 };
 
 function TopPanel({
@@ -61,6 +63,8 @@ function TopPanel({
 	implementationStatus,
 	setImplementationStatus,
 	inSelectionData,
+	tranche,
+	setTranche,
 }: TopPanelProps) {
 	return (
 		<Grid
@@ -131,6 +135,8 @@ function TopPanel({
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}
+						tranche={tranche}
+						setTranche={setTranche}
 					/>
 				)}
 			</Grid>

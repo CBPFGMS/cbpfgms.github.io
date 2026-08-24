@@ -99,17 +99,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			processDataTotalBeneficiaries({
 				totalBeneficiariesData,
 				fund,
-				implementationStatus,
-				inDataLists,
-				lists,
 			}),
-		[
-			totalBeneficiariesData,
-			fund,
-			implementationStatus,
-			inDataLists,
-			lists,
-		],
+		[totalBeneficiariesData, fund],
 	);
 
 	const dataStatuses = useMemo(
@@ -168,7 +159,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
 				totalBeneficiariesByBeneficiaryTypeData,
-				inDataLists,
 			}),
 		[
 			data,
@@ -181,7 +171,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
 			totalBeneficiariesByBeneficiaryTypeData,
-			inDataLists,
 		],
 	);
 
@@ -243,6 +232,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
 				refIds={refIds}
+				tranche={tranche}
+				setTranche={setTranche}
 			/>
 			<TopIntro />
 			<FiltersContainer
@@ -251,6 +242,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setImplementationStatus={setImplementationStatus}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
+				tranche={tranche}
+				setTranche={setTranche}
 			/>
 			<Box
 				mt={4}

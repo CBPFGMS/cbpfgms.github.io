@@ -5,7 +5,7 @@ import GradientPaper from "./GradientPaper";
 import { InSelectionData } from "../utils/processdatasummary";
 import Selectors from "./Selectors";
 import Statuses from "./Statuses";
-import { ImplementationStatuses } from "./MainContainer";
+import { ImplementationStatuses, Tranche } from "./MainContainer";
 import { DataStatuses } from "../utils/processdatastatuses";
 import React from "react";
 
@@ -25,6 +25,8 @@ type FiltersContainerProps = {
 	inSelectionData: InSelectionData;
 	menusRef: (node?: Element | null | undefined) => void;
 	dataStatuses: DataStatuses;
+	tranche: Tranche;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 };
 
 function FiltersContainer({
@@ -41,6 +43,8 @@ function FiltersContainer({
 	implementationStatus,
 	setImplementationStatus,
 	dataStatuses,
+	tranche,
+	setTranche,
 }: FiltersContainerProps) {
 	return (
 		<Grid
@@ -87,6 +91,8 @@ function FiltersContainer({
 						// allocationType={allocationType}
 						// setAllocationType={setAllocationType}
 						inSelectionData={inSelectionData}
+						tranche={tranche}
+						setTranche={setTranche}
 					/>
 				</Grid>
 				<Grid

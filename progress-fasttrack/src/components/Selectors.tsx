@@ -1,6 +1,8 @@
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Grid2";
 import { InSelectionData } from "../utils/processdatasummary";
+import { Tranche } from "./MainContainer";
+import AccordionComponentTranche from "./AccordionTranche";
 
 type SelectorsProps = {
 	// year: number[];
@@ -12,6 +14,8 @@ type SelectorsProps = {
 	// allocationSource: number[];
 	// setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
+	tranche: Tranche;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 };
 
 function Selectors({
@@ -24,11 +28,13 @@ function Selectors({
 	// allocationType,
 	// setAllocationType,
 	inSelectionData,
+	tranche,
+	setTranche,
 }: SelectorsProps) {
 	return (
 		<Grid
 			container
-			spacing={1}
+			spacing={2}
 		>
 			{/* <Grid size={2}>
 				<AccordionComponent
@@ -59,17 +65,14 @@ function Selectors({
 					setValue={setAllocationType}
 					inSelectionData={inSelectionData}
 				/>
-			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
-				<AccordionComponent
-					type="Allocation Source"
-					dataProperty="allocationSources"
-					filterType="checkbox"
-					value={allocationSource}
-					setValue={setAllocationSource}
-					inSelectionData={inSelectionData}
-				/>
 			</Grid> */}
+			<Grid size={3.2}>
+				<AccordionComponentTranche
+					value={tranche}
+					setValue={setTranche}
+					setFund={setFund}
+				/>
+			</Grid>
 		</Grid>
 	);
 }

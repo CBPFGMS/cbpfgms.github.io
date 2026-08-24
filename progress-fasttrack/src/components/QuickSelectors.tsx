@@ -4,9 +4,9 @@ import Dropdown from "./Dropdown";
 import DataContext, { DataContextType } from "../context/DataContext";
 import { InSelectionData } from "../utils/processdatasummary";
 // import { makeYearsList } from "../utils/makeyearslist";
-import { ImplementationStatuses } from "./MainContainer";
+import { ImplementationStatuses, Tranche } from "./MainContainer";
 import DropdownStatus from "./DropdownStatus";
-
+import DropdownTranche from "./DropdownTranche";
 
 type SelectorsProps = {
 	// year: number[];
@@ -22,6 +22,8 @@ type SelectorsProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
+	tranche: Tranche;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 };
 
 function QuickSelectors({
@@ -36,6 +38,8 @@ function QuickSelectors({
 	setFund,
 	// setYear,
 	setImplementationStatus,
+	tranche,
+	setTranche,
 }: SelectorsProps) {
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 
@@ -57,7 +61,7 @@ function QuickSelectors({
 			display={"flex"}
 			flexDirection={"row"}
 			marginLeft={"4em"}
-			gap={1}
+			gap={2}
 		>
 			{/* <Dropdown
 				value={year}
@@ -104,6 +108,11 @@ function QuickSelectors({
 				setValue={setImplementationStatus}
 				names={dataArrayImplementationStatuses}
 				inSelectionData={inSelectionData}
+			/>
+			<DropdownTranche
+				value={tranche}
+				setValue={setTranche}
+				setFund={setFund}
 			/>
 		</Box>
 	);

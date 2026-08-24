@@ -32,7 +32,10 @@ type AccordionComponentProps = {
 	inSelectionData: InSelectionData;
 };
 
-type InDataListsWithoutStatusesPerFund = Omit<InDataLists, "statusesPerFund">;
+type InDataListsWithoutStatusesPerFund = Omit<
+	InDataLists,
+	"statusesPerFund" | "fundsPerTranche" | "projectsPerTranche"
+>;
 
 function AccordionComponent({
 	type,
