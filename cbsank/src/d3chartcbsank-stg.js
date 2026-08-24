@@ -2667,7 +2667,7 @@
 								)
 									console.warn(
 										"Missing flag: " + row.name,
-										d,
+										row,
 									);
 								return (
 									flagsData[
