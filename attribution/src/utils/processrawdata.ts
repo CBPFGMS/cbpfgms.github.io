@@ -179,140 +179,158 @@ function processRawData({
 
 	totalBeneficiaries.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const totalDatum: TotalBeneficiariesBreakdown = {
-				girls: {
-					targeted: row.BenG || 0,
-					reached: row.AchG || 0,
-				},
-				boys: {
-					targeted: row.BenB || 0,
-					reached: row.AchB || 0,
-				},
-				women: {
-					targeted: row.BenW || 0,
-					reached: row.AchW || 0,
-				},
-				men: {
-					targeted: row.BenM || 0,
-					reached: row.AchM || 0,
-				},
-				total: {
-					targeted: row.TotTarg || 0,
-					reached: row.TotAch || 0,
-				},
-			};
 
-			const foundYear = totalBeneficiariesData[row.ImplementationYear];
-
-			if (!foundYear) {
-				totalBeneficiariesData[row.ImplementationYear] = {
-					[row.PFId]: totalDatum,
-				};
-			} else {
-				foundYear[row.PFId] = totalDatum;
-			}
-		} else {
+		if (!parsedRow.success) {
 			warnInvalidSchema(
 				"totalBeneficiariesData",
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		if (row.ProcessStatusId !== null) {
+			return;
+		}
+
+		const totalDatum: TotalBeneficiariesBreakdown = {
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+			total: {
+				targeted: row.TotTarg || 0,
+				reached: row.TotAch || 0,
+			},
+		};
+
+		const foundYear = totalBeneficiariesData[row.ImplementationYear];
+
+		if (!foundYear) {
+			totalBeneficiariesData[row.ImplementationYear] = {
+				[row.PFId]: totalDatum,
+			};
+		} else {
+			foundYear[row.PFId] = totalDatum;
 		}
 	});
 
 	totalBeneficiariesByPartner.forEach(row => {
 		const parsedRow =
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
-				partner: row.PartnerTypeId,
-				girls: {
-					targeted: row.BenG || 0,
-					reached: row.AchG || 0,
-				},
-				boys: {
-					targeted: row.BenB || 0,
-					reached: row.AchB || 0,
-				},
-				women: {
-					targeted: row.BenW || 0,
-					reached: row.AchW || 0,
-				},
-				men: {
-					targeted: row.BenM || 0,
-					reached: row.AchM || 0,
-				},
-			};
 
-			const foundYear =
-				totalBeneficiariesByPartnerData[row.ImplementationYear];
-
-			if (!foundYear) {
-				totalBeneficiariesByPartnerData[row.ImplementationYear] = {
-					[row.PFId]: [partnersDatum],
-				};
-			} else {
-				const foundFund = foundYear[row.PFId];
-				if (!foundFund) {
-					foundYear[row.PFId] = [partnersDatum];
-				} else {
-					foundFund.push(partnersDatum);
-				}
-			}
-		} else {
+		if (!parsedRow.success) {
 			warnInvalidSchema(
 				"totalBeneficiariesByPartner",
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		if (row.ProcessStatusId !== null) {
+			return;
+		}
+
+		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
+			partner: row.PartnerTypeId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		const foundYear =
+			totalBeneficiariesByPartnerData[row.ImplementationYear];
+
+		if (!foundYear) {
+			totalBeneficiariesByPartnerData[row.ImplementationYear] = {
+				[row.PFId]: [partnersDatum],
+			};
+		} else {
+			const foundFund = foundYear[row.PFId];
+			if (!foundFund) {
+				foundYear[row.PFId] = [partnersDatum];
+			} else {
+				foundFund.push(partnersDatum);
+			}
 		}
 	});
 
 	totalBeneficiariesBySector.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
-		if (parsedRow.success) {
-			const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
-				sector: row.GlobalClusterId,
-				girls: {
-					targeted: row.BenG || 0,
-					reached: row.AchG || 0,
-				},
-				boys: {
-					targeted: row.BenB || 0,
-					reached: row.AchB || 0,
-				},
-				women: {
-					targeted: row.BenW || 0,
-					reached: row.AchW || 0,
-				},
-				men: {
-					targeted: row.BenM || 0,
-					reached: row.AchM || 0,
-				},
-			};
 
-			const foundYear =
-				totalBeneficiariesBySectorData[row.ImplementationYear];
-
-			if (!foundYear) {
-				totalBeneficiariesBySectorData[row.ImplementationYear] = {
-					[row.PFId]: [sectorsDatum],
-				};
-			} else {
-				const foundFund = foundYear[row.PFId];
-				if (!foundFund) {
-					foundYear[row.PFId] = [sectorsDatum];
-				} else {
-					foundFund.push(sectorsDatum);
-				}
-			}
-		} else {
+		if (!parsedRow.success) {
 			warnInvalidSchema(
 				"totalBeneficiariesBySector",
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		if (row.ProcessStatusId !== null) {
+			return;
+		}
+
+		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
+			sector: row.GlobalClusterId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		const foundYear =
+			totalBeneficiariesBySectorData[row.ImplementationYear];
+
+		if (!foundYear) {
+			totalBeneficiariesBySectorData[row.ImplementationYear] = {
+				[row.PFId]: [sectorsDatum],
+			};
+		} else {
+			const foundFund = foundYear[row.PFId];
+			if (!foundFund) {
+				foundYear[row.PFId] = [sectorsDatum];
+			} else {
+				foundFund.push(sectorsDatum);
+			}
 		}
 	});
 

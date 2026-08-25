@@ -69,9 +69,6 @@ type ReceiveDataArgs = [
 
 const { fundType, currentYear } = constants;
 
-// const baseUrl =
-// 	"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/master/utils/FT_allocations_overview_static/data/";
-
 const pooledFundsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 	allocationSourcesMasterUrl =
@@ -85,18 +82,16 @@ const pooledFundsMasterUrl =
 	donorsMaster =
 		"https://cbpfapi.unocha.org/vo2/odata/DonorMaster?$format=csv",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiary/?isByLocation=false&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiary/?isByLocation=false&$format=csv",
 	totalBeneficiariesByPartnerUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&$format=csv",
 	totalBeneficiariesBySectorUrl =
-		"https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&$format=csv";
 
 export async function fetchAppData(
 	startYear: number | null,
 	defaultFundType: number | null,
 ): Promise<AppData> {
-	// const projectSummaryAggregatedUrl = `${baseUrl}ProjectSummaryAggV2_${startYear}.csv`;
-
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
