@@ -64,20 +64,16 @@ function TopSelectors({
 }: TopSelectorsProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
-	const years = Array.from(
-		inContributionsDataLists.yearsPerDonor[donor],
-	).sort((a, b) => a - b);
+	const years = Array.from(inContributionsDataLists.years).sort(
+		(a, b) => a - b,
+	);
 
 	function handleChangeYear(
 		_event: React.MouseEvent<HTMLElement, MouseEvent>,
 		value: typeof year,
 	) {
 		setYear(value);
-		setFunds(
-			Array.from(
-				inContributionsDataLists.fundsPerDonorAndYear[donor][value],
-			),
-		);
+		setFunds(Array.from(inContributionsDataLists.fundsPerYear[value]));
 		setHasUS(value < firstNSFTYear);
 	}
 
@@ -131,9 +127,7 @@ function TopSelectors({
 					funds={funds}
 					setValue={setFunds}
 					allFunds={Array.from(
-						inContributionsDataLists.fundsPerDonorAndYear[donor][
-							year
-						],
+						inContributionsDataLists.fundsPerYear[year],
 					)}
 					namesList={lists.fundNames}
 				/>

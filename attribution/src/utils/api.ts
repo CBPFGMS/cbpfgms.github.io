@@ -5,7 +5,7 @@ import type {
 	SectorsMasterObject,
 	OrganizationTypesMasterObject,
 	AllocationSourcesMasterObject,
-	ContributionsObject,
+	ContributionsJson,
 	DonorsMasterObject,
 	PooledFundsWithRegionMasterObject,
 	AllocationTypesMasterObject,
@@ -34,6 +34,7 @@ import processContributionsData, {
 // 	type LocationsData,
 // } from "../utils/processlocationsdata";
 import { constants } from "./constants";
+import generateRange from "./generateRange";
 
 export type AppData = {
 	allocationsData: AllocationsData;
@@ -49,7 +50,6 @@ export type AppData = {
 };
 
 type ReceiveDataArgs = [
-	ContributionsObject[],
 	ProjectSummaryObject[],
 	SectorBeneficiaryObject[],
 	TotalBeneficiariesObject[],
@@ -91,25 +91,46 @@ const pooledFundsMasterUrl =
 export async function fetchAppData(
 	startYear: number | null,
 	defaultFundType: number | null,
+	selectedDonor: number,
 ): Promise<AppData> {
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
-	const contributionsUrl =
-			"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=AR_QUERY_2&PoolfundCodeAbbrv=&FiscalYear=&$format=csv",
-		allocationsByYearAndFundUrlWithUS = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=1&AllocationYearTo=${currentYear}&FundingType=2&ShowNSFT=&$format=csv`,
+	const allocationsByYearAndFundUrlWithUS = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=1&AllocationYearTo=${currentYear}&FundingType=2&ShowNSFT=&$format=csv`,
 		allocationsByYearAndFundUrlWithoutUS = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=1&AllocationYearTo=${currentYear}&FundingType=2&ShowNSFT=0&$format=csv`,
 		projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
 
-	return Promise.all([
-		fetchFileDB<ContributionsObject[]>(
-			"contributions",
-			contributionsUrl,
-			"csv",
+	const contributionsBaseUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net/donor_attribution/api/public/donors?";
+
+	const yearsRangeArray = startYear
+		? generateRange(startYear, currentYear, 1)
+		: [currentYear];
+
+	const contributionsUrlsWithoutUS = yearsRangeArray.map(
+		year =>
+			`${contributionsBaseUrl}year=${year}&donorId=${selectedDonor}&excludeUsa=1`,
+	);
+
+	const contributionsUrlsWithUS = yearsRangeArray.map(
+		year => `${contributionsBaseUrl}year=${year}&donorId=${selectedDonor}`,
+	);
+
+	const combinedContributionsUrls = [
+		...contributionsUrlsWithoutUS,
+		...contributionsUrlsWithUS,
+	];
+
+	const dynamicPromises = Promise.all(
+		combinedContributionsUrls.map(url =>
+			fetchFileDB<ContributionsJson>("contributions", url, "json"),
 		),
+	);
+
+	const staticPromises = Promise.all([
 		fetchFileDB<ProjectSummaryObject[]>(
 			"projectSummary",
 			projectSummaryUrl,
@@ -181,31 +202,37 @@ export async function fetchAppData(
 			"json",
 		),
 		fetchFile<DonorsMasterObject[]>("donorsMaster", donorsMaster, "csv"),
-	])
-		.then(receiveData)
+	]);
+
+	return Promise.all([staticPromises, dynamicPromises])
+		.then(([staticResults, dynamicContributionsResults]) =>
+			receiveData(staticResults, dynamicContributionsResults),
+		)
 		.catch((error: unknown) => {
 			console.error("Error fetching app data:", error);
 			throw error;
 		});
 
-	function receiveData([
-		contributions,
-		projectSummary,
-		sectorsData,
-		totalBeneficiaries,
-		totalBeneficiariesByPartner,
-		totalBeneficiariesBySector,
-		allocationsByYearAndFundWithUS,
-		allocationsByYearAndFundWithoutUS,
-		allocationTypesMaster,
-		organizationMaster,
-		pooledFundsMaster,
-		sectorsMaster,
-		organizationTypesMaster,
-		allocationSourcesMaster,
-		pooledFundsWithRegionMaster,
-		donorsMaster,
-	]: ReceiveDataArgs): AppData {
+	function receiveData(
+		[
+			projectSummary,
+			sectorsData,
+			totalBeneficiaries,
+			totalBeneficiariesByPartner,
+			totalBeneficiariesBySector,
+			allocationsByYearAndFundWithUS,
+			allocationsByYearAndFundWithoutUS,
+			allocationTypesMaster,
+			organizationMaster,
+			pooledFundsMaster,
+			sectorsMaster,
+			organizationTypesMaster,
+			allocationSourcesMaster,
+			pooledFundsWithRegionMaster,
+			donorsMaster,
+		]: ReceiveDataArgs,
+		dynamicContributionsResults: ContributionsJson[],
+	): AppData {
 		const lists = makeLists({
 			pooledFundsMaster,
 			allocationSourcesMaster,
@@ -219,9 +246,7 @@ export async function fetchAppData(
 
 		const { contributionsData, inContributionsDataLists } =
 			processContributionsData({
-				contributions,
-				lists,
-				startYear,
+				dynamicContributionsResults,
 			});
 
 		const {

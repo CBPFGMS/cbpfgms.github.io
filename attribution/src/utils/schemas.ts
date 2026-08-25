@@ -125,15 +125,16 @@ export const sectorBeneficiaryObjectSchema = z.object({
 });
 
 export const contributionsObjectSchema = z.object({
-	PooledFundName: z.string(),
-	PooledFundId: z.number(),
-	FiscalYear: z.number(),
-	DonorName: z.string(),
-	DonorCode: z.number(),
-	GMSDonorId: z.number(),
-	GMSDonorName: z.string(),
-	ContributionAmt: z.number(),
-	ContributionPercent: z.number(),
+	attributedAmount: z.number().nonnegative(),
+	directAmount: z.number().nullable(),
+	isPassThrough: z.boolean(),
+	passedOnwardAmount: z.number().nullable(),
+	pooledFundId: z.number().int().nonnegative(),
+	pooledFundName: z.string().nullable(),
+	retainedAmount: z.number().nullable(),
+	shareOfDonorPercent: z.number().nullable(),
+	shareOfFundPercent: z.number().nonnegative(),
+	viaTransferAmount: z.number().nullable(),
 });
 
 export const totalBeneficiariesObjectSchema = z.object({
@@ -381,7 +382,23 @@ export type SectorBeneficiaryObject = z.infer<
 	typeof sectorBeneficiaryObjectSchema
 >;
 
-export type ContributionsObject = z.infer<typeof contributionsObjectSchema>;
+export type ContributionsJson = {
+	donors: [
+		{
+			attributedToDestinationFunds: number;
+			contributedAmount: number;
+			destinationFundCount: number;
+			donorId: string;
+			donorName: string;
+			pooledFundCount: number;
+			pooledFunds: z.infer<typeof contributionsObjectSchema>[];
+		},
+	];
+	meta: {
+		excludesUsa: boolean;
+		fiscalYear: number;
+	};
+};
 
 export type AllocationTypesMasterObject = z.infer<
 	typeof allocationTypesMasterObjectSchema

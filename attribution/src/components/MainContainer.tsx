@@ -42,29 +42,26 @@ function MainContainer({ donor }: MainContainerProps) {
 		localizationDataWithoutUS,
 	} = useAppData();
 
-	const lastDonorYear = Array.from(
-		inContributionsDataLists.yearsPerDonor[donor],
-	).sort((a, b) => b - a)[0];
+	const lastDonorYear = Array.from(inContributionsDataLists.years).sort(
+		(a, b) => b - a,
+	)[0];
 
 	const [hasUS, setHasUS] = useState<boolean>(donor === USCode);
 	const [year, setYear] = useState<number>(lastDonorYear);
 
-	const allFunds = Array.from(
-		inContributionsDataLists.fundsPerDonorAndYear[donor][year],
-	);
+	const allFunds = Array.from(inContributionsDataLists.fundsPerYear[year]);
 	const [funds, setFunds] = useState<number[]>(allFunds);
 
 	const attributions = useMemo(
 		() =>
 			calculateAttributions({
-				donor,
 				contributionsData,
 				year,
 				hasUS,
 				funds,
-				allFunds: allFunds,
+				allFunds,
 			}),
-		[donor, contributionsData, year, hasUS, funds, allFunds],
+		[contributionsData, year, hasUS, funds, allFunds],
 	);
 
 	const dataTopFigures = useMemo(
@@ -149,7 +146,6 @@ function MainContainer({ donor }: MainContainerProps) {
 	const { flagSrc, faviconFlag } = getFlagSrc({
 		donor,
 		lists,
-		missingFlags: inContributionsDataLists.missingFlags,
 	});
 
 	return (

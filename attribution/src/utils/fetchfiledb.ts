@@ -21,10 +21,16 @@ const dbPromise: Promise<IDBPDatabase<LocalDatabase>> = openDB<LocalDatabase>(
 	},
 );
 
-async function fetchFileDB<T extends object[]>(
+type ExtractRow<T> = T extends (infer U)[]
+	? U extends object
+		? U
+		: object
+	: object;
+
+async function fetchFileDB<T>(
 	fileName: string,
 	url: string,
-	method: string,
+	method: "csv" | "json",
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}`;
 	const currentDate = new Date();
@@ -47,7 +53,7 @@ async function fetchFileDB<T extends object[]>(
 		const fetchMethod =
 			method === "csv"
 				? () =>
-						csv<T[number]>(url, autoType).then(
+						csv<ExtractRow<T>>(url, autoType).then(
 							data => data as unknown as T,
 						)
 				: () => json<T>(url);

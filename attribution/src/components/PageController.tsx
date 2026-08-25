@@ -7,9 +7,9 @@ type PageControllerProps = {
 };
 
 function PageController({ selectedDonor }: PageControllerProps) {
-	const { inContributionsDataLists } = useAppData();
+	const { lists } = useAppData();
 
-	const validDonor = inContributionsDataLists.donors.has(selectedDonor);
+	const validDonor = lists.validDonors.has(selectedDonor);
 
 	if (!validDonor) {
 		return <InvalidDonor />;

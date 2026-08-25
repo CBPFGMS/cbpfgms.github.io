@@ -1,7 +1,4 @@
 import type { ContributionsData } from "./processcontributionsdata";
-import { constants } from "./constants";
-
-const { USCode } = constants;
 
 type AttributionObject = {
 	total: number;
@@ -14,7 +11,6 @@ export type Attributions = {
 } & { global: AttributionObject };
 
 type CalculateAttributionsParams = {
-	donor: number;
 	contributionsData: ContributionsData;
 	year: number;
 	hasUS: boolean;
@@ -23,7 +19,6 @@ type CalculateAttributionsParams = {
 };
 
 function calculateAttributions({
-	donor,
 	contributionsData,
 	year,
 	hasUS,
@@ -35,39 +30,29 @@ function calculateAttributions({
 	};
 
 	contributionsData.forEach(datum => {
-		if (!hasUS && datum.donor === USCode) {
+		if (!hasUS && datum.hasUS) {
 			return;
 		}
 		if (year === datum.year) {
+			const totalContributions = datum.contribution / datum.percentage;
 			if (funds.includes(datum.fund)) {
-				attributions.global.total += datum.contribution;
-				if (datum.donor === donor) {
-					attributions.global.donor += datum.contribution;
-				}
+				attributions.global.total += totalContributions;
+				attributions.global.donor += datum.contribution;
 			}
 
 			if (allFunds.includes(datum.fund)) {
-				if (!attributions[datum.fund]) {
-					attributions[datum.fund] = {
-						total: datum.contribution,
-						donor: datum.donor === donor ? datum.contribution : 0,
-						percentage: 0,
-					};
-				} else {
-					attributions[datum.fund].total += datum.contribution;
-					if (datum.donor === donor) {
-						attributions[datum.fund].donor += datum.contribution;
-					}
-				}
+				attributions[datum.fund] = {
+					total: totalContributions,
+					donor: datum.contribution,
+					percentage: datum.percentage,
+				};
 			}
 		}
 	});
 
-	for (const fund in attributions) {
-		attributions[fund].percentage = attributions[fund].total
-			? attributions[fund].donor / attributions[fund].total
-			: 0;
-	}
+	attributions.global.percentage = attributions.global.total
+		? attributions.global.donor / attributions.global.total
+		: 0;
 
 	return attributions;
 }

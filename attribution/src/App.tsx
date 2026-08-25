@@ -18,10 +18,10 @@ const queryStringDonor = new URLSearchParams(window.location.search).get(
 const selectedDonor = queryStringDonor ? parseInt(queryStringDonor) : null;
 
 function App({ startYear, defaultFundType }: AppProps) {
-	const dataPromise = useMemo(
-		() => fetchAppData(startYear, defaultFundType),
-		[startYear, defaultFundType],
-	);
+	const dataPromise = useMemo(() => {
+		if (selectedDonor === null) return null;
+		return fetchAppData(startYear, defaultFundType, selectedDonor);
+	}, [startYear, defaultFundType])!;
 
 	if (selectedDonor === null) {
 		return <InvalidDonor />;
