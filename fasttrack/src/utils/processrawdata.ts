@@ -100,7 +100,10 @@ type TargetedAndReached = {
 };
 
 export type TotalBeneficiariesData = {
-	[key: number]: TargetedAndReached;
+	[fund: number]: {
+		[status: number]: TargetedAndReached;
+		all: TargetedAndReached;
+	};
 };
 
 const { tranche1Name, tranche2Name } = constants;
@@ -472,13 +475,25 @@ function populateTotalBeneficiariesData(
 		const fund = row.PFId;
 
 		if (!target[fund]) {
-			target[fund] = { targeted: 0, reached: 0, reachedProjects: 0 };
+			target[fund] = {
+				all: { targeted: 0, reached: 0, reachedProjects: 0 },
+			};
 		}
 
-		target[fund].targeted = row.TotTarg || 0;
-		target[fund].reached = row.TotAch || 0;
-		if (row.TotAchProjects) {
-			target[fund].reachedProjects += row.TotAchProjects;
+		if (row.ProcessStatusId === null) {
+			target[fund].all.targeted = row.TotTarg || 0;
+			target[fund].all.reached = row.TotAch || 0;
+			target[fund].all.reachedProjects = row.TotAchProjects || 0;
+		} else {
+			const thisMappedStatus = projectStatusMapping[row.ProcessStatusId];
+
+			if (!target[fund][thisMappedStatus]) {
+				target[fund][thisMappedStatus] = {
+					targeted: row.TotTarg || 0,
+					reached: row.TotAch || 0,
+					reachedProjects: row.TotAchProjects || 0,
+				};
+			}
 		}
 	});
 }

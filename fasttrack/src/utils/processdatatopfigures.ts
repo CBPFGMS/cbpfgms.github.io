@@ -60,9 +60,23 @@ function processDataTopFigures({
 			return;
 		}
 
-		targeted += totalBeneficiariesData[pf].targeted;
-		reached += totalBeneficiariesData[pf].reached;
-		reachedProjects += totalBeneficiariesData[pf].reachedProjects;
+		const allStatuses = [...inDataLists.statusesPerFund[pf]];
+		const fundHasAllStatuses = allStatuses.every(pfStatus =>
+			status.includes(pfStatus),
+		);
+
+		if (fundHasAllStatuses) {
+			targeted += totalBeneficiariesData[pf].all.targeted;
+			reached += totalBeneficiariesData[pf].all.reached;
+			reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
+		} else {
+			status.forEach(st => {
+				targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
+				reached += totalBeneficiariesData[pf][st]?.reached || 0;
+				reachedProjects +=
+					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
+			});
+		}
 	});
 
 	data.forEach(row => {

@@ -137,6 +137,8 @@ export const totalBeneficiariesObjectSchema = z.object({
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
 	defaultAdminLevel: z.number().int().nonnegative().nullish(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BenM: z.number().int().nonnegative().nullable(),
 	BenW: z.number().int().nonnegative().nullable(),
 	BenB: z.number().int().nonnegative().nullable(),
