@@ -1,6 +1,6 @@
 import {
 	Data,
-	// InDataLists,
+	InDataLists,
 	TotalBeneficiariesByBeneficiaryTypeData,
 	TotalBeneficiariesByPartnerData,
 	TotalBeneficiariesBySectorData,
@@ -10,12 +10,12 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import { BeneficiariesObject } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";
-// import { GenderAndAge } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
-// import flipObject from "./flipobject";
+import flipObject from "./flipobject";
 
 export type DatumBarChart = {
 	type: number;
+	fundsWithType: Set<number>;
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
 };
@@ -24,16 +24,13 @@ export type BeneficiaryTypesList = (typeof beneficiariesSplitOrder)[number];
 
 type ProcessDataBarChartParams = {
 	data: Data;
-	year: number[];
 	fund: number[];
-	allocationSource: number[];
-	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
-	// inDataLists: InDataLists;
+	inDataLists: InDataLists;
 };
 
 // type BeneficiariesEntry = [
@@ -45,16 +42,13 @@ const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
 
 function processDataBarChart({
 	data,
-	year,
 	fund,
-	allocationSource,
-	allocationType,
 	implementationStatus,
 	lists,
 	totalBeneficiariesByPartnerData,
 	totalBeneficiariesBySectorData,
 	totalBeneficiariesByBeneficiaryTypeData,
-	// inDataLists,
+	inDataLists,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -64,25 +58,25 @@ function processDataBarChart({
 	const dataOrganization: DatumBarChart[] = [];
 	const dataSector: DatumBarChart[] = [];
 
-	beneficiariesSplitOrder.forEach(type => {
-		const targeted = beneficiaryCategories.reduce((acc, genderAndAge) => {
-			acc[genderAndAge] = 0;
-			return acc;
-		}, {} as BeneficiariesObject);
-		const reached = beneficiaryCategories.reduce((acc, genderAndAge) => {
-			acc[genderAndAge] = 0;
-			return acc;
-		}, {} as BeneficiariesObject);
-		const obj: DatumBarChart = { type, targeted, reached };
+	// beneficiariesSplitOrder.forEach(type => {
+	// 	const targeted = beneficiaryCategories.reduce((acc, genderAndAge) => {
+	// 		acc[genderAndAge] = 0;
+	// 		return acc;
+	// 	}, {} as BeneficiariesObject);
+	// 	const reached = beneficiaryCategories.reduce((acc, genderAndAge) => {
+	// 		acc[genderAndAge] = 0;
+	// 		return acc;
+	// 	}, {} as BeneficiariesObject);
+	// 	const obj: DatumBarChart = { type, targeted, reached };
 
-		dataBeneficiaryByType.push(obj);
-	});
+	// 	dataBeneficiaryByType.push(obj);
+	// });
 
-	// const numericStatuses = flipObject(lists.statuses);
+	const numericStatuses = flipObject(lists.statuses);
 
-	// const statuses = implementationStatus.map(
-	// 	implSt => +numericStatuses[implSt as ImplementationStatuses],
-	// );
+	const statuses = implementationStatus.map(
+		implSt => +numericStatuses[implSt as ImplementationStatuses],
+	);
 
 	data.forEach(datum => {
 		const thisStatus = lists.statuses[
@@ -90,10 +84,10 @@ function processDataBarChart({
 		] as ImplementationStatuses;
 		if (
 			implementationStatus.includes(thisStatus) &&
-			year.includes(datum.year) &&
-			fund.includes(datum.fund) &&
-			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			// year.includes(datum.year) &&
+			fund.includes(datum.fund)
+			// allocationSource.includes(datum.allocationSource) &&
+			// allocationType.includes(datum.allocationType)
 		) {
 			// for (const type in datum.reachedByBeneficiaryType) {
 			// 	const foundType = dataBeneficiaryByType.find(
@@ -127,6 +121,7 @@ function processDataBarChart({
 			);
 
 			if (foundOrganization) {
+				foundOrganization.fundsWithType.add(datum.fund);
 				// for (const genderAndAge in datum.reached) {
 				// 	foundOrganization.reached[genderAndAge as GenderAndAge] +=
 				// 		datum.reached[genderAndAge as GenderAndAge];
@@ -164,7 +159,12 @@ function processDataBarChart({
 					{} as BeneficiariesObject,
 				);
 
-				const obj: DatumBarChart = { type, targeted, reached };
+				const obj: DatumBarChart = {
+					type,
+					targeted,
+					reached,
+					fundsWithType: new Set([datum.fund]),
+				};
 
 				dataOrganization.push(obj);
 			}
@@ -175,6 +175,7 @@ function processDataBarChart({
 				);
 
 				if (foundSector) {
+					foundSector.fundsWithType.add(datum.fund);
 					// for (const genderAndAge in sectorDatum.reached) {
 					// 	foundSector.reached[genderAndAge as GenderAndAge] +=
 					// 		sectorDatum.reached[genderAndAge as GenderAndAge];
@@ -220,6 +221,7 @@ function processDataBarChart({
 						type,
 						targeted,
 						reached,
+						fundsWithType: new Set([datum.fund]),
 					};
 
 					dataSector.push(obj);
@@ -230,6 +232,10 @@ function processDataBarChart({
 
 	dataOrganization.forEach(org => {
 		fund.forEach(pf => {
+			if (!org.fundsWithType.has(pf)) {
+				return;
+			}
+
 			if (!totalBeneficiariesByPartnerData[pf]) {
 				simpleWarn(
 					`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
@@ -237,33 +243,79 @@ function processDataBarChart({
 				return;
 			}
 
-			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			// 	statuses.includes(pfStatus),
-			// );
+			const thisFundData = totalBeneficiariesByPartnerData[pf];
 
-			const foundPartner = totalBeneficiariesByPartnerData[pf].find(
-				totalPartners => totalPartners.partner === org.type,
+			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const fundHasAllStatuses = allStatuses.every(pfStatus =>
+				statuses.includes(pfStatus),
 			);
-			if (foundPartner) {
-				org.targeted.girls += foundPartner.girls.targeted;
-				org.targeted.boys += foundPartner.boys.targeted;
-				org.targeted.women += foundPartner.women.targeted;
-				org.targeted.men += foundPartner.men.targeted;
-				org.reached.girls += foundPartner.girls.reached;
-				org.reached.boys += foundPartner.boys.reached;
-				org.reached.women += foundPartner.women.reached;
-				org.reached.men += foundPartner.men.reached;
-			} else {
-				simpleWarn(
-					`Partner ${org.type} not found in totalBeneficiariesByPartner data`,
+
+			if (fundHasAllStatuses) {
+				const foundPartner = thisFundData.all.find(
+					totalPartners => totalPartners.partner === org.type,
 				);
+				if (foundPartner) {
+					org.targeted.girls += foundPartner.girls.targeted;
+					org.targeted.boys += foundPartner.boys.targeted;
+					org.targeted.women += foundPartner.women.targeted;
+					org.targeted.men += foundPartner.men.targeted;
+					org.reached.girls += foundPartner.girls.reached;
+					org.reached.boys += foundPartner.boys.reached;
+					org.reached.women += foundPartner.women.reached;
+					org.reached.men += foundPartner.men.reached;
+				} else {
+					simpleWarn(
+						`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+					);
+				}
+			} else {
+				statuses.forEach(st => {
+					const foundPartner = thisFundData[st]?.find(
+						totalPartners => totalPartners.partner === org.type,
+					);
+					if (foundPartner) {
+						org.targeted.girls += foundPartner.girls.targeted;
+						org.targeted.boys += foundPartner.boys.targeted;
+						org.targeted.women += foundPartner.women.targeted;
+						org.targeted.men += foundPartner.men.targeted;
+						org.reached.girls += foundPartner.girls.reached;
+						org.reached.boys += foundPartner.boys.reached;
+						org.reached.women += foundPartner.women.reached;
+						org.reached.men += foundPartner.men.reached;
+					} else {
+						simpleWarn(
+							`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf} and status ${st}`,
+						);
+					}
+				});
 			}
+
+			// const foundPartner = totalBeneficiariesByPartnerData[pf].find(
+			// 	totalPartners => totalPartners.partner === org.type,
+			// );
+			// if (foundPartner) {
+			// 	org.targeted.girls += foundPartner.girls.targeted;
+			// 	org.targeted.boys += foundPartner.boys.targeted;
+			// 	org.targeted.women += foundPartner.women.targeted;
+			// 	org.targeted.men += foundPartner.men.targeted;
+			// 	org.reached.girls += foundPartner.girls.reached;
+			// 	org.reached.boys += foundPartner.boys.reached;
+			// 	org.reached.women += foundPartner.women.reached;
+			// 	org.reached.men += foundPartner.men.reached;
+			// } else {
+			// 	simpleWarn(
+			// 		`Partner ${org.type} not found in totalBeneficiariesByPartner data`,
+			// 	);
+			// }
 		});
 	});
 
 	dataSector.forEach(sect => {
 		fund.forEach(pf => {
+			if (!sect.fundsWithType.has(pf)) {
+				return;
+			}
+
 			if (!totalBeneficiariesBySectorData[pf]) {
 				simpleWarn(
 					`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data`,
@@ -271,33 +323,79 @@ function processDataBarChart({
 				return;
 			}
 
-			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			// 	statuses.includes(pfStatus),
-			// );
+			const thisFundData = totalBeneficiariesBySectorData[pf];
 
-			const foundSector = totalBeneficiariesBySectorData[pf].find(
-				totalPartners => totalPartners.sector === sect.type,
+			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const fundHasAllStatuses = allStatuses.every(pfStatus =>
+				statuses.includes(pfStatus),
 			);
-			if (foundSector) {
-				sect.targeted.girls += foundSector.girls.targeted;
-				sect.targeted.boys += foundSector.boys.targeted;
-				sect.targeted.women += foundSector.women.targeted;
-				sect.targeted.men += foundSector.men.targeted;
-				sect.reached.girls += foundSector.girls.reached;
-				sect.reached.boys += foundSector.boys.reached;
-				sect.reached.women += foundSector.women.reached;
-				sect.reached.men += foundSector.men.reached;
-			} else {
-				simpleWarn(
-					`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
+
+			if (fundHasAllStatuses) {
+				const foundSector = thisFundData.all.find(
+					totalSectors => totalSectors.sector === sect.type,
 				);
+				if (foundSector) {
+					sect.targeted.girls += foundSector.girls.targeted;
+					sect.targeted.boys += foundSector.boys.targeted;
+					sect.targeted.women += foundSector.women.targeted;
+					sect.targeted.men += foundSector.men.targeted;
+					sect.reached.girls += foundSector.girls.reached;
+					sect.reached.boys += foundSector.boys.reached;
+					sect.reached.women += foundSector.women.reached;
+					sect.reached.men += foundSector.men.reached;
+				} else {
+					simpleWarn(
+						`Sector ${sect.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+					);
+				}
+			} else {
+				statuses.forEach(st => {
+					const foundSector = thisFundData[st]?.find(
+						totalSectors => totalSectors.sector === sect.type,
+					);
+					if (foundSector) {
+						sect.targeted.girls += foundSector.girls.targeted;
+						sect.targeted.boys += foundSector.boys.targeted;
+						sect.targeted.women += foundSector.women.targeted;
+						sect.targeted.men += foundSector.men.targeted;
+						sect.reached.girls += foundSector.girls.reached;
+						sect.reached.boys += foundSector.boys.reached;
+						sect.reached.women += foundSector.women.reached;
+						sect.reached.men += foundSector.men.reached;
+					} else {
+						simpleWarn(
+							`Sector ${sect.type} not found in totalBeneficiariesByPartner data for fund ${pf} and status ${st}`,
+						);
+					}
+				});
 			}
+
+			// const foundSector = totalBeneficiariesBySectorData[pf].find(
+			// 	totalPartners => totalPartners.sector === sect.type,
+			// );
+			// if (foundSector) {
+			// 	sect.targeted.girls += foundSector.girls.targeted;
+			// 	sect.targeted.boys += foundSector.boys.targeted;
+			// 	sect.targeted.women += foundSector.women.targeted;
+			// 	sect.targeted.men += foundSector.men.targeted;
+			// 	sect.reached.girls += foundSector.girls.reached;
+			// 	sect.reached.boys += foundSector.boys.reached;
+			// 	sect.reached.women += foundSector.women.reached;
+			// 	sect.reached.men += foundSector.men.reached;
+			// } else {
+			// 	simpleWarn(
+			// 		`Sector ${sect.type} not found in totalBeneficiariesBySector data`,
+			// 	);
+			// }
 		});
 	});
 
 	dataBeneficiaryByType.forEach(benType => {
 		fund.forEach(pf => {
+			if (!benType.fundsWithType.has(pf)) {
+				return;
+			}
+
 			if (!totalBeneficiariesByBeneficiaryTypeData[pf]) {
 				simpleWarn(
 					`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
@@ -305,29 +403,52 @@ function processDataBarChart({
 				return;
 			}
 
-			// const allStatuses = [...inDataLists.statusesPerFund[pf]];
-			// const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			// 	statuses.includes(pfStatus),
-			// );
-
-			const foundBenType = totalBeneficiariesByBeneficiaryTypeData[
-				pf
-			].find(
-				totalPartners => totalPartners.beneficiaryType === benType.type,
+			const thisFundData = totalBeneficiariesByBeneficiaryTypeData[pf];
+			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const fundHasAllStatuses = allStatuses.every(pfStatus =>
+				statuses.includes(pfStatus),
 			);
-			if (foundBenType) {
-				benType.targeted.girls += foundBenType.girls.targeted;
-				benType.targeted.boys += foundBenType.boys.targeted;
-				benType.targeted.women += foundBenType.women.targeted;
-				benType.targeted.men += foundBenType.men.targeted;
-				benType.reached.girls += foundBenType.girls.reached;
-				benType.reached.boys += foundBenType.boys.reached;
-				benType.reached.women += foundBenType.women.reached;
-				benType.reached.men += foundBenType.men.reached;
-			} else {
-				simpleWarn(
-					`Partner ${benType.type} not found in totalBeneficiariesByBeneficiaryType data`,
+
+			if (fundHasAllStatuses) {
+				const foundBenType = thisFundData.all.find(
+					totalBenType =>
+						totalBenType.beneficiaryType === benType.type,
 				);
+				if (foundBenType) {
+					benType.targeted.girls += foundBenType.girls.targeted;
+					benType.targeted.boys += foundBenType.boys.targeted;
+					benType.targeted.women += foundBenType.women.targeted;
+					benType.targeted.men += foundBenType.men.targeted;
+					benType.reached.girls += foundBenType.girls.reached;
+					benType.reached.boys += foundBenType.boys.reached;
+					benType.reached.women += foundBenType.women.reached;
+					benType.reached.men += foundBenType.men.reached;
+				} else {
+					simpleWarn(
+						`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data`,
+					);
+				}
+			} else {
+				statuses.forEach(st => {
+					const foundBenType = thisFundData[st]?.find(
+						totalBenType =>
+							totalBenType.beneficiaryType === benType.type,
+					);
+					if (foundBenType) {
+						benType.targeted.girls += foundBenType.girls.targeted;
+						benType.targeted.boys += foundBenType.boys.targeted;
+						benType.targeted.women += foundBenType.women.targeted;
+						benType.targeted.men += foundBenType.men.targeted;
+						benType.reached.girls += foundBenType.girls.reached;
+						benType.reached.boys += foundBenType.boys.reached;
+						benType.reached.women += foundBenType.women.reached;
+						benType.reached.men += foundBenType.men.reached;
+					} else {
+						simpleWarn(
+							`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf} and status ${st}`,
+						);
+					}
+				});
 			}
 		});
 	});

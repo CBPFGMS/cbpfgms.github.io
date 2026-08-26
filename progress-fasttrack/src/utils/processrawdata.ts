@@ -148,7 +148,10 @@ export type TotalBeneficiariesBreakdown = {
 };
 
 export type TotalBeneficiariesData = {
-	[key: number]: TotalBeneficiariesBreakdown;
+	[fund: number]: {
+		[status: number]: TotalBeneficiariesBreakdown;
+		all: TotalBeneficiariesBreakdown;
+	};
 };
 
 type TotalBeneficiariesByPartnerBreakdown = {
@@ -158,7 +161,10 @@ type TotalBeneficiariesByPartnerBreakdown = {
 };
 
 export type TotalBeneficiariesByPartnerData = {
-	[key: number]: TotalBeneficiariesByPartnerBreakdown[];
+	[fund: number]: {
+		[status: number]: TotalBeneficiariesByPartnerBreakdown[];
+		all: TotalBeneficiariesByPartnerBreakdown[];
+	};
 };
 
 type TotalBeneficiariesBySectorBreakdown = {
@@ -168,7 +174,10 @@ type TotalBeneficiariesBySectorBreakdown = {
 };
 
 export type TotalBeneficiariesBySectorData = {
-	[key: number]: TotalBeneficiariesBySectorBreakdown[];
+	[fund: number]: {
+		[status: number]: TotalBeneficiariesBySectorBreakdown[];
+		all: TotalBeneficiariesBySectorBreakdown[];
+	};
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
@@ -178,7 +187,10 @@ export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
 };
 
 export type TotalBeneficiariesByBeneficiaryTypeData = {
-	[key: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+	[fund: number]: {
+		[status: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+		all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+	};
 };
 
 const { tranche1Name, tranche2Name } = constants;
@@ -709,7 +721,11 @@ function populateTotalBeneficiariesData(
 		}
 		const fund = row.PFId;
 
-		target[fund] = {
+		if (!target[fund]) {
+			target[fund] = {} as TotalBeneficiariesData[number];
+		}
+
+		const totalDatum = {
 			girls: {
 				targeted: row.BenG || 0,
 				reached: row.AchG || 0,
@@ -731,6 +747,13 @@ function populateTotalBeneficiariesData(
 				reached: row.TotAch || 0,
 			},
 		};
+
+		if (row.ProcessStatusId == null) {
+			target[fund].all = totalDatum;
+		} else {
+			target[fund][projectStatusMapping[row.ProcessStatusId]] =
+				totalDatum;
+		}
 	});
 }
 
@@ -746,6 +769,12 @@ function populateTotalBeneficiariesByPartnerData(
 		if (!parsedRow.success) {
 			warnInvalidSchema(sourceName, row, parsedRow.error.message);
 			return;
+		}
+
+		const fund = row.PFId;
+
+		if (!target[fund]) {
+			target[fund] = {} as TotalBeneficiariesByPartnerData[number];
 		}
 
 		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
@@ -768,10 +797,19 @@ function populateTotalBeneficiariesByPartnerData(
 			},
 		};
 
-		if (!target[row.PFId]) {
-			target[row.PFId] = [partnersDatum];
+		if (row.ProcessStatusId === null) {
+			if (!target[fund].all) {
+				target[fund].all = [partnersDatum];
+			} else {
+				target[fund].all.push(partnersDatum);
+			}
 		} else {
-			target[row.PFId].push(partnersDatum);
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			if (!target[fund][thisStatus]) {
+				target[fund][thisStatus] = [partnersDatum];
+			} else {
+				target[fund][thisStatus].push(partnersDatum);
+			}
 		}
 	});
 }
@@ -787,6 +825,12 @@ function populateTotalBeneficiariesBySectorData(
 		if (!parsedRow.success) {
 			warnInvalidSchema(sourceName, row, parsedRow.error.message);
 			return;
+		}
+
+		const fund = row.PFId;
+
+		if (!target[fund]) {
+			target[fund] = {} as TotalBeneficiariesBySectorData[number];
 		}
 
 		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
@@ -809,10 +853,19 @@ function populateTotalBeneficiariesBySectorData(
 			},
 		};
 
-		if (!target[row.PFId]) {
-			target[row.PFId] = [sectorsDatum];
+		if (row.ProcessStatusId === null) {
+			if (!target[fund].all) {
+				target[fund].all = [sectorsDatum];
+			} else {
+				target[fund].all.push(sectorsDatum);
+			}
 		} else {
-			target[row.PFId].push(sectorsDatum);
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			if (!target[fund][thisStatus]) {
+				target[fund][thisStatus] = [sectorsDatum];
+			} else {
+				target[fund][thisStatus].push(sectorsDatum);
+			}
 		}
 	});
 }
@@ -823,15 +876,19 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 	sourceName: string,
 ) {
 	source.forEach(row => {
-		row.BeneficiaryTypeId =
-			beneficiariesSplitOrder[Math.floor(Math.random() * 5)]; //TODO: TEMPORARY, remove
-
 		const parsedRow =
 			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
 			warnInvalidSchema(sourceName, row, parsedRow.error.message);
 			return;
+		}
+
+		const fund = row.PFId;
+
+		if (!target[fund]) {
+			target[fund] =
+				{} as TotalBeneficiariesByBeneficiaryTypeData[number];
 		}
 
 		const beneficiaryTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown =
@@ -855,10 +912,19 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 				},
 			};
 
-		if (!target[row.PFId]) {
-			target[row.PFId] = [beneficiaryTypeDatum];
+		if (row.ProcessStatusId === null) {
+			if (!target[fund].all) {
+				target[fund].all = [beneficiaryTypeDatum];
+			} else {
+				target[fund].all.push(beneficiaryTypeDatum);
+			}
 		} else {
-			target[row.PFId].push(beneficiaryTypeDatum);
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			if (!target[fund][thisStatus]) {
+				target[fund][thisStatus] = [beneficiaryTypeDatum];
+			} else {
+				target[fund][thisStatus].push(beneficiaryTypeDatum);
+			}
 		}
 	});
 }

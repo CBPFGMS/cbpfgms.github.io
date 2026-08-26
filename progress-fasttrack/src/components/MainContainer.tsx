@@ -14,6 +14,7 @@ import processDataStatuses from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
 import processDataTotalBeneficiaries from "../utils/processdatatotalben";
+import { processTotalBeneficiariesWithTranche } from "../utils/processtranche";
 
 const { implementationStatuses, charts } = constants;
 
@@ -52,10 +53,21 @@ const queryStringValues = new URLSearchParams(location.search);
 function MainContainer({ defaultYear }: MainContainerProps) {
 	const {
 		data,
-		totalBeneficiariesData,
-		totalBeneficiariesByPartnerData,
-		totalBeneficiariesBySectorData,
-		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesData: totalBeneficiariesAllTranchesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
+		totalBeneficiariesByPartnerData:
+			totalBeneficiariesByPartnerAllTranchesData,
+		totalBeneficiariesByPartnerTranche1Data,
+		totalBeneficiariesByPartnerTranche2Data,
+		totalBeneficiariesBySectorData:
+			totalBeneficiariesBySectorAllTranchesData,
+		totalBeneficiariesBySectorTranche1Data,
+		totalBeneficiariesBySectorTranche2Data,
+		totalBeneficiariesByBeneficiaryTypeData:
+			totalBeneficiariesByBeneficiaryTypeAllTranchesData,
+		totalBeneficiariesByBeneficiaryTypeTranche1Data,
+		totalBeneficiariesByBeneficiaryTypeTranche2Data,
 		inDataLists,
 		lists,
 	} = useContext(DataContext) as DataContextType;
@@ -94,13 +106,43 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [gbvRef, inViewGBV] = useInView(chartsThreshold);
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
 
+	const {
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
+	} = processTotalBeneficiariesWithTranche({
+		totalBeneficiariesAllTranchesData,
+		totalBeneficiariesTranche1Data,
+		totalBeneficiariesTranche2Data,
+		totalBeneficiariesByPartnerAllTranchesData,
+		totalBeneficiariesByPartnerTranche1Data,
+		totalBeneficiariesByPartnerTranche2Data,
+		totalBeneficiariesBySectorAllTranchesData,
+		totalBeneficiariesBySectorTranche1Data,
+		totalBeneficiariesBySectorTranche2Data,
+		totalBeneficiariesByBeneficiaryTypeAllTranchesData,
+		totalBeneficiariesByBeneficiaryTypeTranche1Data,
+		totalBeneficiariesByBeneficiaryTypeTranche2Data,
+		tranche,
+	});
+
 	const targetedAndReachedTotal = useMemo(
 		() =>
 			processDataTotalBeneficiaries({
 				totalBeneficiariesData,
 				fund,
+				implementationStatus,
+				inDataLists,
+				lists,
 			}),
-		[totalBeneficiariesData, fund],
+		[
+			totalBeneficiariesData,
+			fund,
+			implementationStatus,
+			inDataLists,
+			lists,
+		],
 	);
 
 	const dataStatuses = useMemo(
@@ -121,7 +163,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		dataCva,
 		dataCvaTotalPeople,
 		dataPictogram,
-		// dataDisability,
 		dataGBV,
 		inSelectionData,
 	} = useMemo(
@@ -150,27 +191,23 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		() =>
 			processDataBarChart({
 				data,
-				year,
 				fund,
-				allocationSource,
-				allocationType,
 				implementationStatus,
 				lists,
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
 				totalBeneficiariesByBeneficiaryTypeData,
+				inDataLists,
 			}),
 		[
 			data,
-			year,
 			fund,
-			allocationSource,
-			allocationType,
 			implementationStatus,
 			lists,
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
 			totalBeneficiariesByBeneficiaryTypeData,
+			inDataLists,
 		],
 	);
 
@@ -228,7 +265,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewBeneficiaryTypes={inViewBeneficiaryTypes}
 				inViewOrganizations={inViewOrganizations}
 				inViewSectors={inViewSectors}
-				// inViewDisability={inViewDisability}
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
 				refIds={refIds}
@@ -255,7 +291,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
-				// dataDisability={dataDisability}
 				dataGBV={dataGBV}
 				dataCva={dataCva}
 				dataCvaTotalPeople={dataCvaTotalPeople}
@@ -268,7 +303,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				beneficiaryTypesRef={beneficiaryTypesRef}
 				sectorsRef={sectorsRef}
 				organizationsRef={organizationsRef}
-				// disabilityRef={disabilityRef}
 				gbvRef={gbvRef}
 				cashRef={cashRef}
 				year={year}
