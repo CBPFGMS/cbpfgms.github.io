@@ -7,7 +7,10 @@ import {
 	activitiesObjectSchema,
 } from "./schemas";
 import type { List } from "./makelists";
-import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
+import warnInvalidSchema, {
+	warnProjectNotFound,
+	simpleWarn,
+} from "./warninvalid";
 import { constants, projectStatusMapping } from "./constants";
 
 export type Datum = {
@@ -96,6 +99,14 @@ function processRawData({
 			const locationId = row.LocationBeneficiaryId;
 			const compositeKey = `${locationId}|${row.GlobalStandardActivityID}|${row.GlobalClusterId}`;
 
+			//TEMPORARY FILTER CHECKING IF THE ACTIVITY ID EXISTS IN THE ACTIVITY MASTER
+			if (!lists.activities[row.GlobalStandardActivityID]) {
+				simpleWarn(
+					`Activity ID ${row.GlobalStandardActivityID} not found in the Activity Master`,
+				);
+				return;
+			}
+
 			if (lists.activitiesPerSector[row.GlobalClusterId]) {
 				lists.activitiesPerSector[row.GlobalClusterId].add(
 					row.GlobalStandardActivityID,
@@ -122,7 +133,7 @@ function processRawData({
 			warnInvalidSchema(
 				"Location Activities",
 				row,
-				JSON.stringify(parsedRow.error),
+				parsedRow.error.message,
 			);
 		}
 	});
@@ -139,11 +150,7 @@ function processRawData({
 				projectStatusId: projectStatusMapping[row.PrjStsId],
 			});
 		} else {
-			warnInvalidSchema(
-				"Project Summary",
-				row,
-				JSON.stringify(parsedRow.error),
-			);
+			warnInvalidSchema("Project Summary", row, parsedRow.error.message);
 		}
 	});
 
@@ -253,7 +260,7 @@ function processRawData({
 			warnInvalidSchema(
 				"Project Summary Aggregated",
 				row,
-				JSON.stringify(parsedRow.error),
+				parsedRow.error.message,
 			);
 		}
 	});

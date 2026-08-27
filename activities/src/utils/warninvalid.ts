@@ -36,6 +36,12 @@ function warnFetchError(url: string, message: string) {
 	}
 }
 
-export { warnProjectNotFound, warnFetchError };
+function simpleWarn(message: string) {
+	if (!isProdSite) {
+		console.warn(message);
+	}
+}
+
+export { warnProjectNotFound, warnFetchError, simpleWarn };
 
 export default warnInvalidSchema;
