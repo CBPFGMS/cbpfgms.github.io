@@ -30,7 +30,7 @@ function calculateAttributions({
 	};
 
 	contributionsData.forEach(datum => {
-		if (!hasUS && datum.hasUS) {
+		if ((!hasUS && datum.hasUS) || (hasUS && !datum.hasUS)) {
 			return;
 		}
 		if (year === datum.year) {
