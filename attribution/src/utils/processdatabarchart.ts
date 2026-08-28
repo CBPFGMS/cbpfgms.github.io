@@ -11,6 +11,7 @@ import { simpleWarn } from "./warninvalid";
 
 export type DatumBarChart = {
 	type: number;
+	fundsWithType: Set<number>;
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
 };
@@ -51,6 +52,10 @@ function processDataBarChart({
 				d => d.type === datum.organizationType,
 			);
 
+			if (foundOrganization) {
+				foundOrganization.fundsWithType.add(datum.fund);
+			}
+
 			if (!foundOrganization) {
 				const type = datum.organizationType;
 				const targeted = beneficiaryCategories.reduce(
@@ -68,7 +73,12 @@ function processDataBarChart({
 					{} as BeneficiariesObject,
 				);
 
-				const obj: DatumBarChart = { type, targeted, reached };
+				const obj: DatumBarChart = {
+					type,
+					targeted,
+					reached,
+					fundsWithType: new Set([datum.fund]),
+				};
 
 				dataOrganization.push(obj);
 			}
@@ -77,6 +87,10 @@ function processDataBarChart({
 				const foundSector = dataSector.find(
 					d => d.type === sectorDatum.sectorId,
 				);
+
+				if (foundSector) {
+					foundSector.fundsWithType.add(datum.fund);
+				}
 
 				if (!foundSector) {
 					const type = sectorDatum.sectorId;
@@ -99,6 +113,7 @@ function processDataBarChart({
 						type,
 						targeted,
 						reached,
+						fundsWithType: new Set([datum.fund]),
 					};
 
 					dataSector.push(obj);
@@ -109,6 +124,10 @@ function processDataBarChart({
 
 	dataOrganization.forEach(org => {
 		funds.forEach(pf => {
+			if (!org.fundsWithType.has(pf)) {
+				return;
+			}
+
 			if (!totalBeneficiariesByPartnerData[year]) {
 				simpleWarn(
 					`Year ${year} not found in the totalBeneficiariesByPartner data`,
@@ -141,6 +160,10 @@ function processDataBarChart({
 
 	dataSector.forEach(sect => {
 		funds.forEach(pf => {
+			if (!sect.fundsWithType.has(pf)) {
+				return;
+			}
+
 			if (!totalBeneficiariesBySectorData[year]) {
 				simpleWarn(
 					`Year ${year} not found in the totalBeneficiariesBySector data`,

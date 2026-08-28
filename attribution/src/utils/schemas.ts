@@ -392,8 +392,11 @@ export type ContributionsJson = {
 			donorName: string;
 			pooledFundCount: number;
 			pooledFunds: z.infer<typeof contributionsObjectSchema>[];
-		},
+		}?,
 	];
+	filters: {
+		donorId: string;
+	};
 	meta: {
 		excludesUsa: boolean;
 		fiscalYear: number;

@@ -125,8 +125,12 @@ export async function fetchAppData(
 	];
 
 	const dynamicPromises = Promise.all(
-		combinedContributionsUrls.map(url =>
-			fetchFileDB<ContributionsJson>("contributions", url, "json"),
+		combinedContributionsUrls.map((url, index) =>
+			fetchFileDB<ContributionsJson>(
+				`donor${selectedDonor}_contributions${index}`,
+				url,
+				"json",
+			),
 		),
 	);
 

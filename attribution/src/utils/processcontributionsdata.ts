@@ -39,6 +39,14 @@ function processContributionsData({
 
 	dynamicContributionsResults.forEach(contribution => {
 		const thisYear = contribution.meta.fiscalYear;
+
+		if (contribution.donors[0] === undefined) {
+			console.warn(
+				`No contribution found for donor ${contribution.filters.donorId} in year ${thisYear}`,
+			);
+			return;
+		}
+
 		yearsSet.add(thisYear);
 
 		contribution.donors[0].pooledFunds.forEach(row => {

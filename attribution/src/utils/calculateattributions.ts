@@ -34,7 +34,8 @@ function calculateAttributions({
 			return;
 		}
 		if (year === datum.year) {
-			const totalContributions = datum.contribution / datum.percentage;
+			const decimalPercentage = datum.percentage / 100;
+			const totalContributions = datum.contribution / decimalPercentage;
 			if (funds.includes(datum.fund)) {
 				attributions.global.total += totalContributions;
 				attributions.global.donor += datum.contribution;
@@ -44,7 +45,7 @@ function calculateAttributions({
 				attributions[datum.fund] = {
 					total: totalContributions,
 					donor: datum.contribution,
-					percentage: datum.percentage,
+					percentage: decimalPercentage,
 				};
 			}
 		}

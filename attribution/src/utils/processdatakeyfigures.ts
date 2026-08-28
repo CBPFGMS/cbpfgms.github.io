@@ -46,13 +46,7 @@ function processDataKeyFigures({
 	year,
 	hasUS,
 }: ProcessDataKeyFiguresParams): DataKeyFigures {
-	let localization = 0,
-		disability = 0,
-		genderEquality = 0,
-		gbv = 0,
-		wlo = 0,
-		protection = 0,
-		totalLocalization = 0,
+	let totalLocalization = 0,
 		totalDisability = 0,
 		totalGenderEquality = 0,
 		totalGbv = 0,
@@ -74,26 +68,21 @@ function processDataKeyFigures({
 		}
 		if (funds.includes(row.fund) && row.year === year) {
 			if (row.hasDisabled) {
-				disability += row.budget;
 				totalDisability += row.budget;
 			}
 			if (row.hasGBV) {
-				gbv += row.budget;
 				totalGbv += row.budget;
 			}
 			if (row.hasGenderEquality) {
-				genderEquality += row.budget;
 				totalGenderEquality += row.budget;
 			}
 			if (row.hasWomenLedOrgs) {
-				wlo += row.budget;
 				totalWlo += row.budget;
 			}
 			const thisProtection = row.sectorData.find(
 				sector => sector.sectorId === protectionId,
 			);
 			if (thisProtection) {
-				protection += thisProtection.percentage * row.budget;
 				totalProtection += thisProtection.percentage * row.budget;
 			}
 		}
@@ -105,18 +94,17 @@ function processDataKeyFigures({
 
 	localizationData.forEach(row => {
 		if (funds.includes(row.fund) && row.year === year) {
-			localization += row.budget;
 			totalLocalization += row.budget;
 		}
 	});
 
 	//multiply by global attribution
-	localization *= globalAttribution;
-	disability *= globalAttribution;
-	genderEquality *= globalAttribution;
-	gbv *= globalAttribution;
-	wlo *= globalAttribution;
-	protection *= globalAttribution;
+	const localization = totalLocalization * globalAttribution;
+	const disability = totalDisability * globalAttribution;
+	const genderEquality = totalGenderEquality * globalAttribution;
+	const gbv = totalGbv * globalAttribution;
+	const wlo = totalWlo * globalAttribution;
+	const protection = totalProtection * globalAttribution;
 
 	const dataKeyFigures: DataKeyFigures = {
 		localization,
