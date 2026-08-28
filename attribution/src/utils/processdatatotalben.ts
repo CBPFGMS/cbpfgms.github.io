@@ -44,7 +44,7 @@ function processDataTotalBeneficiaries({
 		}
 		if (!totalBeneficiariesData[year][pf]) {
 			simpleWarn(
-				`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${year}`,
+				`Pooled fund code ${pf}, present in the attributions data, was not found in the totalBeneficiaries data (allocations) for year ${year}`,
 			);
 			return;
 		}

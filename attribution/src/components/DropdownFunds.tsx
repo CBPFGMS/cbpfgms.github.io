@@ -24,15 +24,12 @@ function DropdownFunds({
 }: DropdownFundsProps) {
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
-	const [isAllSelected, setIsAllSelected] = useState<boolean>(
-		allFunds.length === funds.length,
-	);
+	const isAllSelected = allFunds.length === funds.length;
 
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	function handleChange(event: SelectChangeEvent<typeof funds>) {
 		const eventArray: number[] = [event.target.value as number[]].flat();
-		setIsAllSelected(eventArray.length === allFunds.length);
 		if (eventArray.length === 0) {
 			setValue(funds);
 			setOpenSnack(true);
