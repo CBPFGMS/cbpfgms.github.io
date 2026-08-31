@@ -40,14 +40,16 @@ function CvaTypesChart({
 		setTooltipData(null);
 	}
 
-	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
+	//const property = cvaChartMode === "allocations" ? "Allocations" : "People";
+	const property = "Allocations";
+
 	const maxValue =
 		max(dataCva, d =>
-			Math.max(d[`targeted${property}`], d[`reached${property}`])
+			Math.max(d[`targeted${property}`], d[`reached${property}`]),
 		) ?? 0;
 
 	const sortedData = dataCva.toSorted(
-		(a, b) => b[`targeted${property}`] - a[`targeted${property}`]
+		(a, b) => b[`targeted${property}`] - a[`targeted${property}`],
 	);
 
 	return (
@@ -165,16 +167,18 @@ function CvaTypesChart({
 					>
 						<BarChartRow
 							type={d.cvaType}
-							targeted={
-								cvaChartMode === "allocations"
-									? d.targetedAllocations
-									: d.targetedPeople
-							}
-							reached={
-								cvaChartMode === "allocations"
-									? d.reachedAllocations
-									: d.reachedPeople
-							}
+							// targeted={
+							// 	cvaChartMode === "allocations"
+							// 		? d.targetedAllocations
+							// 		: d.targetedPeople
+							// }
+							// reached={
+							// 	cvaChartMode === "allocations"
+							// 		? d.reachedAllocations
+							// 		: d.reachedPeople
+							// }
+							targeted={d.targetedAllocations}
+							reached={d.reachedAllocations}
 							maxValue={maxValue}
 							list={lists.cvaTypeNames}
 							chartType="cash"

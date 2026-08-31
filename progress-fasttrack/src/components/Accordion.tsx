@@ -34,7 +34,10 @@ type AccordionComponentProps = {
 
 type InDataListsWithoutStatusesPerFund = Omit<
 	InDataLists,
-	"statusesPerFund" | "fundsPerTranche" | "projectsPerTranche"
+	| "statusesPerFund"
+	| "fundsPerTranche"
+	| "projectsPerTranche"
+	| "fundsPerBeneficiaryType"
 >;
 
 function AccordionComponent({

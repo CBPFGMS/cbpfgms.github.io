@@ -1,9 +1,6 @@
-import { BeneficiariesObject, Data } from "./processrawdata";
+import { Data } from "./processrawdata";
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
-import constants from "./constants";
-
-const { beneficiariesSplitOrder } = constants;
 
 type BaseDownloadDatum = {
 	Year: number;
@@ -176,42 +173,50 @@ export function processDisabilityDownload({
 	allocationType,
 	implementationStatus,
 }: ProcessDownloadParams): DisabilityDatumDownload[] {
+	void implementationStatus;
+	void fund;
+	void year;
+	void allocationSource;
+	void allocationType;
+	void lists;
+	void data;
+
 	const disabilityDataDownload: DisabilityDatumDownload[] = [];
 
-	data.forEach(datum => {
-		const thisStatus = lists.statuses[
-			datum.projectStatusId
-		] as ImplementationStatuses;
-		if (
-			checkRow(
-				thisStatus,
-				datum,
-				year,
-				fund,
-				allocationSource,
-				allocationType,
-				implementationStatus,
-			)
-		) {
-			const baseDownloadDatum = populateBaseDownloadDatum(
-				datum,
-				lists,
-				thisStatus,
-			);
+	// data.forEach(datum => {
+	// 	const thisStatus = lists.statuses[
+	// 		datum.projectStatusId
+	// 	] as ImplementationStatuses;
+	// 	if (
+	// 		checkRow(
+	// 			thisStatus,
+	// 			datum,
+	// 			year,
+	// 			fund,
+	// 			allocationSource,
+	// 			allocationType,
+	// 			implementationStatus,
+	// 		)
+	// 	) {
+	// 		const baseDownloadDatum = populateBaseDownloadDatum(
+	// 			datum,
+	// 			lists,
+	// 			thisStatus,
+	// 		);
 
-			disabilityDataDownload.push({
-				...baseDownloadDatum,
-				"Targeted Women": datum.disabledTargeted.women,
-				"Targeted Men": datum.disabledTargeted.men,
-				"Targeted Girls": datum.disabledTargeted.girls,
-				"Targeted Boys": datum.disabledTargeted.boys,
-				"Reached Women": datum.disabledReached.women,
-				"Reached Men": datum.disabledReached.men,
-				"Reached Girls": datum.disabledReached.girls,
-				"Reached Boys": datum.disabledReached.boys,
-			});
-		}
-	});
+	// 		disabilityDataDownload.push({
+	// 			...baseDownloadDatum,
+	// 			"Targeted Women": datum.disabledTargeted.women,
+	// 			"Targeted Men": datum.disabledTargeted.men,
+	// 			"Targeted Girls": datum.disabledTargeted.girls,
+	// 			"Targeted Boys": datum.disabledTargeted.boys,
+	// 			"Reached Women": datum.disabledReached.women,
+	// 			"Reached Men": datum.disabledReached.men,
+	// 			"Reached Girls": datum.disabledReached.girls,
+	// 			"Reached Boys": datum.disabledReached.boys,
+	// 		});
+	// 	}
+	// });
 
 	return disabilityDataDownload;
 }
@@ -270,81 +275,89 @@ export function processBeneficiaryTypesDownload({
 	allocationType,
 	implementationStatus,
 }: ProcessDownloadParams): BeneficiaryTypesDatumDownload[] {
+	void implementationStatus;
+	void fund;
+	void year;
+	void allocationSource;
+	void allocationType;
+	void lists;
+	void data;
+
 	const beneficiaryTypesDataDownload: BeneficiaryTypesDatumDownload[] = [];
 
-	data.forEach(datum => {
-		const thisStatus = lists.statuses[
-			datum.projectStatusId
-		] as ImplementationStatuses;
-		if (
-			checkRow(
-				thisStatus,
-				datum,
-				year,
-				fund,
-				allocationSource,
-				allocationType,
-				implementationStatus,
-			)
-		) {
-			const baseDownloadDatum = populateBaseDownloadDatum(
-				datum,
-				lists,
-				thisStatus,
-			);
+	// data.forEach(datum => {
+	// 	const thisStatus = lists.statuses[
+	// 		datum.projectStatusId
+	// 	] as ImplementationStatuses;
+	// 	if (
+	// 		checkRow(
+	// 			thisStatus,
+	// 			datum,
+	// 			year,
+	// 			fund,
+	// 			allocationSource,
+	// 			allocationType,
+	// 			implementationStatus,
+	// 		)
+	// 	) {
+	// 		const baseDownloadDatum = populateBaseDownloadDatum(
+	// 			datum,
+	// 			lists,
+	// 			thisStatus,
+	// 		);
 
-			beneficiariesSplitOrder.forEach(beneficiaryTypeAsNumber => {
-				if (
-					checkIfNonZero(
-						datum.targetedByBeneficiaryType[
-							beneficiaryTypeAsNumber
-						],
-					) ||
-					checkIfNonZero(
-						datum.reachedByBeneficiaryType[beneficiaryTypeAsNumber],
-					)
-				) {
-					beneficiaryTypesDataDownload.push({
-						...baseDownloadDatum,
-						"Beneficiary Type":
-							lists.beneficiaryTypes[beneficiaryTypeAsNumber],
-						"Targeted Women":
-							datum.targetedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].women,
-						"Targeted Men":
-							datum.targetedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].men,
-						"Targeted Girls":
-							datum.targetedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].girls,
-						"Targeted Boys":
-							datum.targetedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].boys,
-						"Reached Women":
-							datum.reachedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].women,
-						"Reached Men":
-							datum.reachedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].men,
-						"Reached Girls":
-							datum.reachedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].girls,
-						"Reached Boys":
-							datum.reachedByBeneficiaryType[
-								beneficiaryTypeAsNumber
-							].boys,
-					});
-				}
-			});
-		}
-	});
+	// 		beneficiariesSplitOrder.forEach(beneficiaryTypeAsNumber => {
+	// 			if (
+	// 				checkIfNonZero(
+	// 					datum.targetedByBeneficiaryType[
+	// 						beneficiaryTypeAsNumber
+	// 					],
+	// 				) ||
+	// 				checkIfNonZero(
+	// 					datum.reachedByBeneficiaryType[beneficiaryTypeAsNumber],
+	// 				)
+	// 			) {
+	// 				beneficiaryTypesDataDownload.push({
+	// 					...baseDownloadDatum,
+	// 					"Beneficiary Type":
+	// 						lists.beneficiaryTypes[beneficiaryTypeAsNumber],
+	// 					"Targeted Women":
+	// 						datum.targetedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].women,
+	// 					"Targeted Men":
+	// 						datum.targetedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].men,
+	// 					"Targeted Girls":
+	// 						datum.targetedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].girls,
+	// 					"Targeted Boys":
+	// 						datum.targetedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].boys,
+	// 					"Reached Women":
+	// 						datum.reachedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].women,
+	// 					"Reached Men":
+	// 						datum.reachedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].men,
+	// 					"Reached Girls":
+	// 						datum.reachedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].girls,
+	// 					"Reached Boys":
+	// 						datum.reachedByBeneficiaryType[
+	// 							beneficiaryTypeAsNumber
+	// 						].boys,
+	// 				});
+	// 			}
+	// 		});
+	// 	}
+	// });
 
 	return beneficiaryTypesDataDownload;
 }
@@ -504,9 +517,9 @@ export function processCvaDownload({
 	return cvaDataDownload;
 }
 
-function checkIfNonZero(obj: BeneficiariesObject): boolean {
-	return Object.values(obj).some(value => value > 0);
-}
+// function checkIfNonZero(obj: BeneficiariesObject): boolean {
+// 	return Object.values(obj).some(value => value > 0);
+// }
 
 function populateBaseDownloadDatum(
 	datum: Data[number],

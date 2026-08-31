@@ -28,16 +28,18 @@ function CvaSectorsTooltip({
 }: CvaSectorsTooltipProps) {
 	const open = Boolean(anchorEl);
 
-	const property = cvaChartMode === "allocations" ? "Allocations" : "People";
+	//const property = cvaChartMode === "allocations" ? "Allocations" : "People";
+
+	const property = "Allocations";
 
 	const sortedData = data?.sectorData.toSorted(
-		(a, b) => b[`targeted${property}`] - a[`targeted${property}`]
+		(a, b) => b[`targeted${property}`] - a[`targeted${property}`],
 	);
 
 	const maxValue = sortedData
-		? max(sortedData, d =>
-				Math.max(d[`targeted${property}`], d[`reached${property}`])
-		  ) ?? 0
+		? (max(sortedData, d =>
+				Math.max(d[`targeted${property}`], d[`reached${property}`]),
+			) ?? 0)
 		: 0;
 
 	return (

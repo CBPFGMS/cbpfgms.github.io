@@ -3,14 +3,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
-import {
-	DatumSummary,
-	DatumPictogram,
-	// DatumDisability,
-	DatumGBV,
-	DatumCva,
-	CvaTotalPeople,
-} from "../utils/processdatasummary";
+import { DatumSummary, DatumGBV, DatumCva } from "../utils/processdatasummary";
 import {
 	DownloadStates,
 	RefIds,
@@ -30,14 +23,11 @@ type Ref = (node?: Element | null | undefined) => void;
 
 type ChartsContainerProps = {
 	dataSummary: DatumSummary[];
-	dataPictogram: DatumPictogram;
 	dataBeneficiaryByType: DatumBarChart[];
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
-	// dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	dataCva: DatumCva[];
-	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	lists: List;
@@ -60,14 +50,12 @@ type ChartsContainerProps = {
 
 function ChartsContainer({
 	dataSummary,
-	dataPictogram,
 	dataBeneficiaryByType,
 	dataSector,
 	dataOrganization,
 	// dataDisability,
 	dataGBV,
 	dataCva,
-	dataCvaTotalPeople,
 	setClickedDownload,
 	clickedDownload,
 	lists,
@@ -156,7 +144,6 @@ function ChartsContainer({
 						id={refIds.pictogramRefId}
 					>
 						<PictogramChart
-							dataPictogram={dataPictogram}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
 							year={year}
@@ -379,7 +366,6 @@ function ChartsContainer({
 									targetedAndReachedTotal
 								}
 								dataCva={dataCva}
-								dataCvaTotalPeople={dataCvaTotalPeople}
 								clickedDownload={clickedDownload}
 								setClickedDownload={setClickedDownload}
 								year={year}

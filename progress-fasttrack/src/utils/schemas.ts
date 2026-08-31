@@ -239,7 +239,7 @@ export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	defaultAdminLevel: z.number().int().nonnegative().nullish(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
-	BeneficiaryTypeId: z.number().int().nonnegative(), //IMPORTANT: this columns still doesn't exist
+	BeneficiaryTypeId: z.number().int().nonnegative(),
 	BeneficiaryType: z.string(),
 	BeneficiaryTypeName: z.string(),
 	BenM: z.number().int().nonnegative().nullable(),
@@ -345,8 +345,13 @@ export const projectStatusMasterObjectSchema = z.object({
 });
 
 export const beneficiaryTypesMasterObjectSchema = z.object({
-	BeneficiaryTypeId: z.number().int().nonnegative(),
-	BeneficiaryType: z.string(),
+	Id: z.number().int().nonnegative(),
+	BeneficiaryTypeName: z.string(),
+	BeneficiaryTypeCode: z.string(),
+	InstanceDatabaseId: z.number().int().nonnegative(),
+	InstanceDatabaseCode: z.string(),
+	LegacyId: z.number().int().nonnegative(),
+	DisplayOrder: z.number().int().nonnegative(),
 });
 
 export const pooledFundsMasterObjectSchema = z.object({

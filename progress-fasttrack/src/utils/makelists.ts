@@ -118,7 +118,8 @@ function makeLists({
 		const parsedBeneficiariesMaster =
 			beneficiaryTypesMasterObjectSchema.safeParse(d);
 		if (parsedBeneficiariesMaster.success) {
-			lists.beneficiaryTypes[d.BeneficiaryTypeId] = d.BeneficiaryType;
+			lists.beneficiaryTypes[d.InstanceDatabaseId] =
+				d.BeneficiaryTypeName;
 		} else {
 			warnInvalidSchema(
 				"BeneficiaryTypesMaster",

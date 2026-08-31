@@ -57,7 +57,7 @@ type ReceiveDataArgs = [
 ];
 
 const beneficiaryTypesMasterUrl =
-		"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=BENEF_TYPE_MST",
 	pooledFundsMasterUrl =
 		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv",
 	allocationSourcesMasterUrl =
@@ -224,7 +224,7 @@ function useData(
 			fetchFile<BeneficiaryTypesMasterObject[]>(
 				"beneficiaryTypesMaster",
 				beneficiaryTypesMasterUrl,
-				"csv",
+				"json",
 				setProgress,
 			),
 			fetchFile<PooledFundsMasterObject[]>(

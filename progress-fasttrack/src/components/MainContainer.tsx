@@ -158,14 +158,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		[data, year, fund, allocationSource, allocationType, lists],
 	);
 
-	const {
-		dataSummary,
-		dataCva,
-		dataCvaTotalPeople,
-		dataPictogram,
-		dataGBV,
-		inSelectionData,
-	} = useMemo(
+	const { dataSummary, dataCva, dataGBV, inSelectionData } = useMemo(
 		() =>
 			processDataSummary({
 				data,
@@ -287,13 +280,11 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			/>
 			<ChartsContainer
 				dataSummary={dataSummary}
-				dataPictogram={dataPictogram}
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
 				dataGBV={dataGBV}
 				dataCva={dataCva}
-				dataCvaTotalPeople={dataCvaTotalPeople}
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				lists={lists}

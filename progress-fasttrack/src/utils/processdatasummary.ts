@@ -2,8 +2,6 @@ import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import constants from "./constants";
-import capitalizeString from "./capitalizestring";
-import { GenderAndAge } from "./processrawdata";
 
 export type InSelectionData = {
 	years: Set<number>;
@@ -31,14 +29,6 @@ export type DatumSummary = {
 	underImplementation: number;
 };
 
-export type DatumPictogram = {
-	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
-};
-
-export type DatumDisability = {
-	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
-} & Report;
-
 export type DatumGBV = {
 	allocations: number;
 	allocationsGBVPlanned: number;
@@ -57,8 +47,6 @@ export type Report = {
 type CvaReachedAndTargeted = {
 	targetedAllocations: number;
 	reachedAllocations: number;
-	targetedPeople: number;
-	reachedPeople: number;
 };
 
 type CvaSector = {
@@ -70,18 +58,7 @@ export type DatumCva = {
 	sectorData: CvaSector[];
 } & CvaReachedAndTargeted;
 
-export type CvaTotalPeople = {
-	cvaTotalTargetedPeople: number;
-	cvaTotalReachedPeople: number;
-};
-
-const {
-	beneficiariesStatuses,
-	beneficiaryCategories,
-	// reportsForDisability,
-	reportsForGBV,
-	cvaChartTypes,
-} = constants;
+const { reportsForGBV, cvaChartTypes } = constants;
 
 function processDataSummary({
 	data,
@@ -94,40 +71,12 @@ function processDataSummary({
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataCva: DatumCva[];
-	dataCvaTotalPeople: CvaTotalPeople;
-	dataPictogram: DatumPictogram;
-	// dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
 } {
 	const dataSummary: DatumSummary[] = [];
 	const dataCva: DatumCva[] = [];
-	const dataCvaTotalPeople: CvaTotalPeople = {
-		cvaTotalTargetedPeople: 0,
-		cvaTotalReachedPeople: 0,
-	};
-	const dataPictogram: DatumPictogram = {
-		targetedMen: 0,
-		targetedWomen: 0,
-		targetedBoys: 0,
-		targetedGirls: 0,
-		reachedMen: 0,
-		reachedWomen: 0,
-		reachedBoys: 0,
-		reachedGirls: 0,
-	};
-	// const dataDisability: DatumDisability = {
-	// 	targetedMen: 0,
-	// 	targetedWomen: 0,
-	// 	targetedBoys: 0,
-	// 	targetedGirls: 0,
-	// 	reachedMen: 0,
-	// 	reachedWomen: 0,
-	// 	reachedBoys: 0,
-	// 	reachedGirls: 0,
-	// 	totalReports: 0,
-	// 	reportsWithData: 0,
-	// };
+
 	const dataGBV: DatumGBV = {
 		allocations: 0,
 		allocationsGBVPlanned: 0,
@@ -182,34 +131,6 @@ function processDataSummary({
 				});
 			}
 
-			beneficiariesStatuses.forEach(status => {
-				// const disabledKey = `disabled${capitalizeString(
-				// 	status,
-				// )}` as keyof typeof datum;
-				beneficiaryCategories.forEach(category => {
-					dataPictogram[
-						`${status}${capitalizeString(
-							category,
-						)}` as keyof DatumPictogram
-					] += datum[status][category];
-					// dataDisability[
-					// 	`${status}${capitalizeString(
-					// 		category,
-					// 	)}` as keyof DatumDisability
-					// ] += (datum[disabledKey] as Record<GenderAndAge, number>)[
-					// 	category
-					// ];
-				});
-			});
-			// dataDisability.totalReports += 1;
-			// if (
-			// 	reportsForDisability.includes(
-			// 		datum.reportType as (typeof reportsForDisability)[number],
-			// 	)
-			// ) {
-			// 	dataDisability.reportsWithData += 1;
-			// }
-
 			dataGBV.allocations += datum.budget;
 			dataGBV.allocationsGBVPlanned += datum.budgetGBVPlanned;
 			dataGBV.allocationsGBVReached += datum.budgetGBVReached;
@@ -232,13 +153,6 @@ function processDataSummary({
 				dataGBV.reportsWithData += 1;
 			}
 
-			if (datum.cvaTotalTargetedPeople)
-				dataCvaTotalPeople.cvaTotalTargetedPeople +=
-					datum.cvaTotalTargetedPeople;
-			if (datum.cvaTotalReachedPeople)
-				dataCvaTotalPeople.cvaTotalReachedPeople +=
-					datum.cvaTotalReachedPeople;
-
 			if (datum.cvaData) {
 				datum.cvaData.forEach(cva => {
 					let cvaDatum = dataCva.find(
@@ -252,8 +166,6 @@ function processDataSummary({
 							sectorData: [],
 							targetedAllocations: 0,
 							reachedAllocations: 0,
-							targetedPeople: 0,
-							reachedPeople: 0,
 						};
 						dataCva.push(cvaDatum);
 					}
@@ -267,20 +179,14 @@ function processDataSummary({
 							sector: cva.sectorId,
 							targetedAllocations: 0,
 							reachedAllocations: 0,
-							targetedPeople: 0,
-							reachedPeople: 0,
 						};
 						cvaDatum.sectorData.push(sectorData);
 					}
 
 					sectorData.targetedAllocations += cva.targetedAllocations;
 					sectorData.reachedAllocations += cva.reachedAllocations;
-					sectorData.targetedPeople += cva.targetedPeople;
-					sectorData.reachedPeople += cva.reachedPeople;
 					cvaDatum.targetedAllocations += cva.targetedAllocations;
 					cvaDatum.reachedAllocations += cva.reachedAllocations;
-					cvaDatum.targetedPeople += cva.targetedPeople;
-					cvaDatum.reachedPeople += cva.reachedPeople;
 				});
 			}
 		}
@@ -329,9 +235,6 @@ function processDataSummary({
 	return {
 		dataSummary,
 		dataCva,
-		dataCvaTotalPeople,
-		dataPictogram,
-		// dataDisability,
 		dataGBV,
 		inSelectionData,
 	};

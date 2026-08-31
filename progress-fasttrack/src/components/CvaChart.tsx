@@ -1,9 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import {
-	CvaTotalPeople,
-	DatumCva,
-	DatumSummary,
-} from "../utils/processdatasummary";
+import { DatumCva, DatumSummary } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import DataContext, { DataContextType } from "../context/DataContext";
@@ -30,7 +26,6 @@ type CvaChartProps = {
 	dataSummary: DatumSummary[];
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 	dataCva: DatumCva[];
-	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
@@ -46,7 +41,6 @@ function CvaChart({
 	dataSummary,
 	targetedAndReachedTotal,
 	dataCva,
-	dataCvaTotalPeople,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -171,11 +165,12 @@ function CvaChart({
 										? total
 										: totalPeopleTargeted
 								}
-								cvaValue={
-									cvaChartMode === "allocations"
-										? cvaTargeted
-										: dataCvaTotalPeople.cvaTotalTargetedPeople
-								}
+								cvaValue={cvaTargeted}
+								// cvaValue={
+								// 	cvaChartMode === "allocations"
+								// 		? cvaTargeted
+								// 		: dataCvaTotalPeople.cvaTotalTargetedPeople
+								// }
 								cvaMode={cvaChartMode}
 								cvaGoal="targeted"
 							/>
@@ -194,11 +189,12 @@ function CvaChart({
 										? total
 										: totalPeopleReached
 								}
-								cvaValue={
-									cvaChartMode === "allocations"
-										? cvaReached
-										: dataCvaTotalPeople.cvaTotalReachedPeople
-								}
+								cvaValue={cvaReached}
+								// cvaValue={
+								// 	cvaChartMode === "allocations"
+								// 		? cvaReached
+								// 		: dataCvaTotalPeople.cvaTotalReachedPeople
+								// }
 								cvaMode={cvaChartMode}
 								cvaGoal="reached"
 							/>
@@ -217,11 +213,12 @@ function CvaChart({
 							dataCva={dataCva}
 							cvaChartMode={cvaChartMode}
 							lists={lists}
-							totalValue={
-								cvaChartMode === "allocations"
-									? cvaTargeted
-									: dataCvaTotalPeople.cvaTotalTargetedPeople
-							}
+							totalValue={cvaTargeted}
+							// totalValue={
+							// 	cvaChartMode === "allocations"
+							// 		? cvaTargeted
+							// 		: dataCvaTotalPeople.cvaTotalTargetedPeople
+							// }
 						></CvaTypesChart>
 					</Box>
 				</>

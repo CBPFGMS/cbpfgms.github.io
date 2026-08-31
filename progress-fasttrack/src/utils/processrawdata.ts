@@ -21,16 +21,11 @@ import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
 import type { Tranche } from "../components/MainContainer";
 
-const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
-	constants;
+const { beneficiaryCategories, reportTypes } = constants;
 
 export type Datum = {
 	reached: BeneficiariesObject;
 	targeted: BeneficiariesObject;
-	reachedByBeneficiaryType: BeneficiaryTypes;
-	targetedByBeneficiaryType: BeneficiaryTypes;
-	disabledReached: BeneficiariesObject;
-	disabledTargeted: BeneficiariesObject;
 	fund: number;
 	year: number;
 	projectCode: string;
@@ -51,8 +46,6 @@ export type Datum = {
 	sectorData: SectorDatum[];
 	reportType: ReportType;
 	cvaData: CvaDatum[] | null;
-	cvaTotalTargetedPeople: number | null;
-	cvaTotalReachedPeople: number | null;
 };
 
 export type ReportType = (typeof reportTypes)[number];
@@ -88,10 +81,6 @@ type CvaMapValue = {
 	cva: CvaDatum[];
 };
 
-type BeneficiaryTypes = {
-	[K in (typeof beneficiariesSplitOrder)[number]]: BeneficiariesObject;
-};
-
 export type GenderAndAge = (typeof beneficiaryCategories)[number];
 
 export type BeneficiariesObject = {
@@ -106,9 +95,10 @@ export type InDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
-	statusesPerFund: { [key: number]: Set<number> };
-	fundsPerTranche: { [key: number]: Set<number> };
-	projectsPerTranche: { [key: number]: Set<string> };
+	statusesPerFund: { [fund: number]: Set<number> };
+	fundsPerTranche: { [tranche: number]: Set<number> };
+	projectsPerTranche: { [tranche: number]: Set<string> };
+	fundsPerBeneficiaryType: { [beneficiaryType: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -266,6 +256,7 @@ function processRawData({
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
 	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
 	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
+	const fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"] = {};
 
 	templatesMaster.data.forEach(row => {
 		const parsedRow = templatesMasterObjectSchema.safeParse(row);
@@ -345,16 +336,19 @@ function processRawData({
 		totalBeneficiariesByBeneficiaryType,
 		totalBeneficiariesByBeneficiaryTypeData,
 		"totalBeneficiariesByBeneficiaryType",
+		fundsPerBeneficiaryType,
 	);
 	populateTotalBeneficiariesByBeneficiaryTypeData(
 		totalBeneficiariesByBeneficiaryTypeTranche1,
 		totalBeneficiariesByBeneficiaryTypeTranche1Data,
 		"totalBeneficiariesByBeneficiaryTypeTranche1",
+		fundsPerBeneficiaryType,
 	);
 	populateTotalBeneficiariesByBeneficiaryTypeData(
 		totalBeneficiariesByBeneficiaryTypeTranche2,
 		totalBeneficiariesByBeneficiaryTypeTranche2Data,
 		"totalBeneficiariesByBeneficiaryTypeTranche2",
+		fundsPerBeneficiaryType,
 	);
 
 	sectorsData.forEach(row => {
@@ -542,11 +536,6 @@ function processRawData({
 					reportType: row.RptCode ?? 0,
 				});
 
-				const reachedByBeneficiaryType: BeneficiaryTypes =
-					generateBeneficiariesSplitObject(row, "Ach");
-				const targetedByBeneficiaryType: BeneficiaryTypes =
-					generateBeneficiariesSplitObject(row, "Ben");
-
 				const objDatum: Datum = {
 					fund: row.PooledFundId,
 					year: thisAllocationType.AllocationYear,
@@ -569,24 +558,12 @@ function processRawData({
 						row,
 						"targeted",
 					),
-					disabledReached: generateBeneficiariesObjectSummary(
-						row,
-						"disabledReached",
-					),
-					disabledTargeted: generateBeneficiariesObjectSummary(
-						row,
-						"disabledTargeted",
-					),
-					reachedByBeneficiaryType,
-					targetedByBeneficiaryType,
 					budgetGBVPlanned: row.GBVBudget || 0,
 					budgetGBVReached: row.AchGBVBudget || 0,
 					targetedGBV: row.GBVPeopleTgt || 0,
 					reachedGBV: row.AchGBVPeople || 0,
 					reportType: row.RptCode ?? 0,
 					cvaData: thisCvaData ? thisCvaData.cva : null,
-					cvaTotalTargetedPeople: row.CVATotPeople,
-					cvaTotalReachedPeople: row.AchCVATotPeople,
 				};
 
 				data.push(objDatum);
@@ -607,6 +584,7 @@ function processRawData({
 		statusesPerFund,
 		fundsPerTranche,
 		projectsPerTranche,
+		fundsPerBeneficiaryType,
 	}));
 
 	return {
@@ -624,42 +602,6 @@ function processRawData({
 		totalBeneficiariesByBeneficiaryTypeTranche1Data,
 		totalBeneficiariesByBeneficiaryTypeTranche2Data,
 	};
-}
-
-function generateBeneficiariesSplitObject(
-	row: ProjectSummaryObject,
-	type: "Ach" | "Ben",
-): BeneficiaryTypes {
-	const zeroSplit = [0, 0, 0, 0, 0];
-	const girlsColumn = row[`${type}GSplit`],
-		boysColumn = row[`${type}BSplit`],
-		womenColumn = row[`${type}WSplit`],
-		menColumn = row[`${type}MSplit`];
-
-	const girlsSplit =
-		girlsColumn !== null ? girlsColumn.split("|").map(Number) : zeroSplit;
-
-	const boysSplit =
-		boysColumn !== null ? boysColumn.split("|").map(Number) : zeroSplit;
-
-	const womenSplit =
-		womenColumn !== null ? womenColumn.split("|").map(Number) : zeroSplit;
-
-	const menSplit =
-		menColumn !== null ? menColumn.split("|").map(Number) : zeroSplit;
-
-	const splitObj = {} as BeneficiaryTypes;
-
-	beneficiariesSplitOrder.forEach((type, index) => {
-		splitObj[type] = {
-			girls: girlsSplit[index],
-			boys: boysSplit[index],
-			women: womenSplit[index],
-			men: menSplit[index],
-		};
-	});
-
-	return splitObj;
 }
 
 function generateBeneficiariesObjectSummary(
@@ -874,6 +816,7 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 	source: TotalBeneficiariesByBeneficiaryTypeObject[],
 	target: TotalBeneficiariesByBeneficiaryTypeData,
 	sourceName: string,
+	fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"],
 ) {
 	source.forEach(row => {
 		const parsedRow =
@@ -885,6 +828,12 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 		}
 
 		const fund = row.PFId;
+
+		if (!fundsPerBeneficiaryType[row.BeneficiaryTypeId]) {
+			fundsPerBeneficiaryType[row.BeneficiaryTypeId] = new Set();
+		}
+
+		fundsPerBeneficiaryType[row.BeneficiaryTypeId].add(fund);
 
 		if (!target[fund]) {
 			target[fund] =

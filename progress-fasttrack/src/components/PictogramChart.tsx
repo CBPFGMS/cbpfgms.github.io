@@ -13,7 +13,6 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
-import { DatumPictogram } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 // import capitalizeString from "../utils/capitalizestring";
@@ -22,7 +21,6 @@ import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 type PictogramChartProps = {
-	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
@@ -36,7 +34,6 @@ type PictogramChartProps = {
 const { beneficiaryCategories } = constants;
 
 function PictogramChart({
-	dataPictogram,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -46,9 +43,6 @@ function PictogramChart({
 	implementationStatus,
 	targetedAndReachedTotal,
 }: PictogramChartProps) {
-	//using data from new APIs
-	void dataPictogram;
-
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
