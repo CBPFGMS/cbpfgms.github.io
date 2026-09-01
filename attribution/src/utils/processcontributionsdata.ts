@@ -9,6 +9,7 @@ type donorDatum = {
 	fund: number;
 	year: number;
 	contribution: number;
+	totalContribution: number;
 	percentage: number;
 	hasUS: boolean;
 };
@@ -76,6 +77,7 @@ function processContributionsData({
 				fund: row.pooledFundId,
 				year: thisYear,
 				contribution: row.attributedAmount,
+				totalContribution: row.pooledFundTotal,
 				percentage: row.shareOfFundPercent,
 				hasUS: !contribution.meta.excludesUsa,
 			});

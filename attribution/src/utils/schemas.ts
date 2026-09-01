@@ -131,6 +131,7 @@ export const contributionsObjectSchema = z.object({
 	passedOnwardAmount: z.number().nullable(),
 	pooledFundId: z.number().int().nonnegative(),
 	pooledFundName: z.string().nullable(),
+	pooledFundTotal: z.number().nonnegative(),
 	retainedAmount: z.number().nullable(),
 	shareOfDonorPercent: z.number().nullable(),
 	shareOfFundPercent: z.number().nonnegative(),
