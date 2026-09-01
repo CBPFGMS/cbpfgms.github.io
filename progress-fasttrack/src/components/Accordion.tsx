@@ -6,16 +6,14 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DataContext, { DataContextType } from "../context/DataContext";
+import { Tranche } from "./MainContainer";
 import Dropdown from "./Dropdown";
-import CheckboxLabel from "./Checkbox";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import Search from "./Search";
 import { InSelectionData } from "../utils/processdatasummary";
 import { InDataLists } from "../utils/processrawdata";
-import { List, ListObj } from "../utils/makelists";
+import { ListObj } from "../utils/makelists";
 import constants from "../utils/constants";
-import { makeYearsList } from "../utils/makeyearslist";
 
 const { filterTypes } = constants;
 
@@ -30,6 +28,7 @@ type AccordionComponentProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
+	tranche: Tranche;
 };
 
 type InDataListsWithoutStatusesPerFund = Omit<
@@ -43,11 +42,13 @@ type InDataListsWithoutStatusesPerFund = Omit<
 function AccordionComponent({
 	type,
 	dataProperty,
-	filterType,
 	value,
 	setValue,
 	inSelectionData,
+	tranche,
 }: AccordionComponentProps) {
+	void inSelectionData;
+
 	const [expanded, setExpanded] = useState<string | false>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
 	const accordionRef = useRef<HTMLDivElement>(null);
@@ -56,41 +57,41 @@ function AccordionComponent({
 	const dataArray = [
 		...inDataLists[dataProperty as keyof InDataListsWithoutStatusesPerFund],
 	];
-	let namesList: ListObj;
+	const fundsInTranche =
+		tranche !== "all"
+			? [...inDataLists.fundsPerTranche[tranche]]
+			: dataArray;
+	const namesList = lists.fundNames;
 
 	const handleAccordionExpand =
 		(panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
 			setExpanded(isExpanded ? panel : false);
 		};
 
-	function handleDeselectAll() {
-		setValue([]);
-	}
-
 	function handleSelectAll() {
-		setValue(dataArray);
+		setValue(fundsInTranche);
 	}
 
 	function handleClickAway() {
 		setExpanded(false);
 	}
 
-	switch (type) {
-		case "Fund":
-			namesList = lists.fundNames;
-			break;
-		case "Year":
-			namesList = makeYearsList(dataArray);
-			break;
-		case "Allocation Source":
-			namesList = lists.allocationSources;
-			break;
-		case "Allocation Name":
-			namesList = lists.allocationTypes;
-			break;
-		default:
-			namesList = lists[dataProperty as keyof List] as never;
-	}
+	// switch (type) {
+	// 	case "Fund":
+	// 		namesList = lists.fundNames;
+	// 		break;
+	// 	case "Year":
+	// 		namesList = makeYearsList(dataArray);
+	// 		break;
+	// 	case "Allocation Source":
+	// 		namesList = lists.allocationSources;
+	// 		break;
+	// 	case "Allocation Name":
+	// 		namesList = lists.allocationTypes;
+	// 		break;
+	// 	default:
+	// 		namesList = lists[dataProperty as keyof List] as never;
+	// }
 
 	useEffect(() => {
 		if (accordionRef.current) {
@@ -147,8 +148,8 @@ function AccordionComponent({
 								textAlign: "center",
 							}}
 						>
-							{value.length === dataArray.length
-								? `All ${type.toLocaleLowerCase()}s selected`
+							{value.length === fundsInTranche.length
+								? `All ${type.toLocaleLowerCase()}s selected${tranche !== "all" ? ` (for tranche ${tranche})` : ""}`
 								: value.length === 1
 									? isValidKey(value[0], namesList)
 										? namesList[value[0]]
@@ -164,77 +165,38 @@ function AccordionComponent({
 							m={1}
 							mb={2}
 						>
-							Select the {type.toLocaleLowerCase()}
-							{filterType === "dropdowncheck" &&
-								`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
+							Select the {type.toLocaleLowerCase()}. Multiple{" "}
+							{type.toLocaleLowerCase()}s are allowed.
 						</Typography>
-						{filterType === "dropdowncheck" && (
-							<Dropdown
-								value={value}
-								setValue={setValue}
-								names={dataArray}
-								namesList={namesList}
-								type={type}
-								inSelectionData={inSelectionData}
-								dataProperty={dataProperty}
-								fromQuickSelectors={false}
-							/>
-						)}
-						{filterType === "search" && (
-							<Search
-								value={value}
-								setValue={setValue}
-								names={dataArray}
-								namesList={namesList}
-								inSelectionData={inSelectionData}
-								dataProperty={dataProperty}
-							/>
-						)}
-						{filterType === "checkbox" && (
-							<CheckboxLabel
-								value={value}
-								setValue={setValue}
-								names={dataArray}
-								namesList={namesList}
-								inSelectionData={inSelectionData}
-								dataProperty={dataProperty}
-							/>
-						)}
-						{(filterType === "dropdowncheck" ||
-							filterType === "search") && (
-							<Box
+
+						<Dropdown
+							value={value}
+							setValue={setValue}
+							names={dataArray}
+							namesList={namesList}
+							type={type}
+							fromQuickSelectors={false}
+							fundsInTranche={fundsInTranche}
+						/>
+						<Box
+							style={{
+								display: "flex",
+								flexDirection:
+									type === "Year" ? "column" : "row",
+							}}
+						>
+							<Button
+								variant="contained"
+								size="small"
+								onClick={handleSelectAll}
 								style={{
-									display: "flex",
-									flexDirection:
-										type === "Year" ? "column" : "row",
+									marginLeft: "8px",
+									marginTop: type === "Year" ? "8px" : "0px",
 								}}
 							>
-								<Button
-									variant="contained"
-									size="small"
-									onClick={handleDeselectAll}
-									style={{
-										marginLeft: "8px",
-										marginTop:
-											type === "Year" ? "8px" : "0px",
-									}}
-								>
-									Deselect all
-								</Button>
-								<Button
-									variant="contained"
-									size="small"
-									onClick={handleSelectAll}
-									style={{
-										marginLeft: "8px",
-										marginTop:
-											type === "Year" ? "8px" : "0px",
-									}}
-								>
-									Select all
-								</Button>
-							</Box>
-						)}
+								Select all
+							</Button>
+						</Box>
 					</AccordionDetails>
 				</Accordion>
 			</ClickAwayListener>

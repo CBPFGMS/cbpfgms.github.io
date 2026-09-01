@@ -56,6 +56,11 @@ function QuickSelectors({
 	// const namesListAllocationTypes = lists.allocationTypes;
 	// const namesListAllocationSources = lists.allocationSources;
 
+	const fundsInTranche =
+		tranche !== "all"
+			? [...inDataLists.fundsPerTranche[tranche]]
+			: dataArrayFunds;
+
 	return (
 		<Box
 			display={"flex"}
@@ -79,9 +84,8 @@ function QuickSelectors({
 				names={dataArrayFunds}
 				namesList={namesListFunds}
 				type={"Fund"}
-				inSelectionData={inSelectionData}
-				dataProperty={"funds"}
 				fromQuickSelectors={true}
+				fundsInTranche={fundsInTranche}
 			/>
 			{/* <Dropdown
 				value={allocationType}

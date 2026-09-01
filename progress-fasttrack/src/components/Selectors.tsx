@@ -54,6 +54,7 @@ function Selectors({
 					value={fund}
 					setValue={setFund}
 					inSelectionData={inSelectionData}
+					tranche={tranche}
 				/>
 			</Grid>
 			{/* <Grid sx={{ flexGrow: 1 }}>

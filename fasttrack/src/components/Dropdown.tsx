@@ -16,6 +16,7 @@ type DropdownProps = {
 	names: number[];
 	namesList: ListObj;
 	inSelectionData: InSelectionData;
+	fundsInTranche: number[];
 };
 
 function Dropdown({
@@ -24,8 +25,11 @@ function Dropdown({
 	names,
 	namesList,
 	inSelectionData,
+	fundsInTranche,
 }: DropdownProps) {
-	let isAllSelected = value.length === names.length;
+	void inSelectionData;
+
+	let isAllSelected = value.length === fundsInTranche.length;
 
 	// const [isAllSelected, setIsAllSelected] = useState<boolean>(
 	// 	value.length === names.length,
@@ -45,8 +49,8 @@ function Dropdown({
 		}
 		if (isAllSelected) {
 			// eslint-disable-next-line
-			isAllSelected = eventArray.length !== names.length;
-			const missingItems: number[] = names.filter(
+			isAllSelected = eventArray.length !== fundsInTranche.length;
+			const missingItems: number[] = fundsInTranche.filter(
 				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
@@ -91,7 +95,12 @@ function Dropdown({
 					onMouseEnter={calculateHeight}
 					input={<OutlinedInput label={"Fund"} />}
 					renderValue={selected =>
-						(selected as number[]).map(d => namesList[d]).join(", ")
+						(selected as number[])
+							.sort((a, b) =>
+								namesList[a].localeCompare(namesList[b]),
+							)
+							.map(d => namesList[d])
+							.join(", ")
 					}
 					MenuProps={{
 						PaperProps: {
@@ -108,7 +117,7 @@ function Dropdown({
 						<MenuItem
 							key={name}
 							value={name}
-							disabled={!inSelectionData.funds.has(name)}
+							disabled={!fundsInTranche.includes(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",

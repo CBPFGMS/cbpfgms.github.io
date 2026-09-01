@@ -6,7 +6,7 @@ import {
 	TotalBeneficiariesBySectorData,
 } from "./processrawdata";
 import { List } from "./makelists";
-import { ImplementationStatuses } from "../components/MainContainer";
+import { ImplementationStatuses, Tranche } from "../components/MainContainer";
 import { BeneficiariesObject } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";
@@ -29,6 +29,7 @@ type ProcessDataBarChartParams = {
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
 	inDataLists: InDataLists;
+	tranche: Tranche;
 };
 
 const { beneficiaryCategories } = constants;
@@ -42,6 +43,7 @@ function processDataBarChart({
 	totalBeneficiariesBySectorData,
 	totalBeneficiariesByBeneficiaryTypeData,
 	inDataLists,
+	tranche,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -80,7 +82,9 @@ function processDataBarChart({
 		] as ImplementationStatuses;
 		if (
 			implementationStatus.includes(thisStatus) &&
-			fund.includes(datum.fund)
+			fund.includes(datum.fund) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
 		) {
 			const foundOrganization = dataOrganization.find(
 				d => d.type === datum.organizationType,

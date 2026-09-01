@@ -8,8 +8,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
 import { ListObj } from "../utils/makelists";
-import { InSelectionData } from "../utils/processdatasummary";
-import { DataProperties, Type } from "./Accordion";
+import { Type } from "./Accordion";
 
 type DropdownProps = {
 	value: number[];
@@ -17,9 +16,8 @@ type DropdownProps = {
 	names: number[];
 	namesList: ListObj;
 	type: Type;
-	inSelectionData: InSelectionData;
-	dataProperty: DataProperties;
 	fromQuickSelectors: boolean;
+	fundsInTranche: number[];
 };
 
 function Dropdown({
@@ -28,11 +26,10 @@ function Dropdown({
 	names,
 	namesList,
 	type,
-	inSelectionData,
-	dataProperty,
 	fromQuickSelectors,
+	fundsInTranche,
 }: DropdownProps) {
-	let isAllSelected = value.length === names.length;
+	let isAllSelected = value.length === fundsInTranche.length;
 
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
@@ -47,9 +44,9 @@ function Dropdown({
 			return;
 		}
 		if (isAllSelected) {
-			isAllSelected = eventArray.length !== names.length;
-			const missingItems: number[] = names.filter(
-				d => !eventArray.includes(d)
+			isAllSelected = eventArray.length !== fundsInTranche.length;
+			const missingItems: number[] = fundsInTranche.filter(
+				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
 		} else {
@@ -69,7 +66,7 @@ function Dropdown({
 
 	const namesListMemo = useMemo(() => {
 		names.sort((a, b) =>
-			type === "Year" ? b - a : namesList[a].localeCompare(namesList[b])
+			type === "Year" ? b - a : namesList[a].localeCompare(namesList[b]),
 		);
 		return names;
 	}, [names, namesList, type]);
@@ -87,7 +84,7 @@ function Dropdown({
 						? {
 								maxWidth: "100%",
 								minWidth: "100%",
-						  }
+							}
 						: { m: 1, maxWidth: "95%", minWidth: "95%" }
 				}
 				size={fromQuickSelectors ? "small" : "medium"}
@@ -106,9 +103,14 @@ function Dropdown({
 							? isAllSelected
 								? "All selected"
 								: type === "Year" && selected.length === 1
-								? selected
-								: `${selected.length} selected`
+									? selected
+									: `${selected.length} selected`
 							: (selected as number[])
+									.sort((a, b) =>
+										namesList[a].localeCompare(
+											namesList[b],
+										),
+									)
 									.map(d => namesList[d])
 									.join(", ")
 					}
@@ -126,7 +128,7 @@ function Dropdown({
 						<MenuItem
 							key={name}
 							value={name}
-							disabled={!(inSelectionData[dataProperty] as Set<number>).has(name)}
+							disabled={!fundsInTranche.includes(name)}
 							style={{
 								whiteSpace: "normal",
 								padding: "1px",

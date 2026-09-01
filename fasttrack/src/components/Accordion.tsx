@@ -11,17 +11,20 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import type { ListObj } from "../utils/makelists";
 import type { InSelectionData } from "../utils/processdatatopfigures";
+import type { Tranche } from "./MainContainer";
 
 type AccordionComponentProps = {
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
+	tranche: Tranche;
 };
 
 function AccordionComponent({
 	value,
 	setValue,
 	inSelectionData,
+	tranche,
 }: AccordionComponentProps) {
 	const [expanded, setExpanded] = useState<boolean>(false);
 	const [boxHeight, setBoxHeight] = useState<number>(0);
@@ -31,12 +34,17 @@ function AccordionComponent({
 	const dataArray = [...inDataLists.funds];
 	const namesList = lists.fundNames;
 
+	const fundsInTranche =
+		tranche !== "all"
+			? [...inDataLists.fundsPerTranche[tranche]]
+			: dataArray;
+
 	function handleAccordionExpand() {
 		setExpanded(!expanded);
 	}
 
 	function handleSelectAll() {
-		setValue(dataArray);
+		setValue(fundsInTranche);
 	}
 
 	function handleClickAway() {
@@ -99,8 +107,8 @@ function AccordionComponent({
 								paddingRight: "8px",
 							}}
 						>
-							{value.length === dataArray.length
-								? `All funds selected`
+							{value.length === fundsInTranche.length
+								? `All funds selected${tranche !== "all" ? ` (for tranche ${tranche})` : ""}`
 								: value.length < 4
 									? createListFromArray(value, namesList)
 									: `${value.length} funds selected`}
@@ -120,6 +128,7 @@ function AccordionComponent({
 							names={dataArray}
 							namesList={namesList}
 							inSelectionData={inSelectionData}
+							fundsInTranche={fundsInTranche}
 						/>
 
 						<Box

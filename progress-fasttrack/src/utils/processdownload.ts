@@ -73,6 +73,10 @@ type ProcessDownloadParams = {
 	implementationStatus: ImplementationStatuses[];
 };
 
+//ADD THIS TO ALL FUNCTIONS:
+// (tranche === "all" ||
+// 			inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
+
 export function processSummaryDownload({
 	data,
 	lists,

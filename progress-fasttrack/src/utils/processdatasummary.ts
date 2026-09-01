@@ -1,6 +1,6 @@
-import { Data } from "./processrawdata";
+import { Data, InDataLists } from "./processrawdata";
 import { List } from "./makelists";
-import { ImplementationStatuses } from "../components/MainContainer";
+import { ImplementationStatuses, Tranche } from "../components/MainContainer";
 import constants from "./constants";
 
 export type InSelectionData = {
@@ -19,6 +19,8 @@ type ProcessDataSummaryParams = {
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
+	inDataLists: InDataLists;
+	tranche: Tranche;
 };
 
 export type DatumSummary = {
@@ -68,6 +70,8 @@ function processDataSummary({
 	allocationType,
 	implementationStatus,
 	lists,
+	inDataLists,
+	tranche,
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataCva: DatumCva[];
@@ -105,7 +109,9 @@ function processDataSummary({
 			year.includes(datum.year) &&
 			fund.includes(datum.fund) &&
 			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			allocationType.includes(datum.allocationType) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
 		) {
 			const foundYear = dataSummary.find(
 				summary => summary.year === datum.year,

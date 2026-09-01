@@ -80,6 +80,7 @@ function TopFilter({
 						value={fund}
 						setValue={setFund}
 						inSelectionData={inSelectionData}
+						tranche={tranche}
 					/>
 				</Grid>
 				{isSticky && (

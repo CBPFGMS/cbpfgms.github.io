@@ -1,6 +1,7 @@
 import { Data } from "./processrawdata";
 import { List } from "./makelists";
-import { ImplementationStatuses } from "../components/MainContainer";
+import { InDataLists } from "./processrawdata";
+import { ImplementationStatuses, Tranche } from "../components/MainContainer";
 import constants from "./constants";
 
 export type DataStatuses = {
@@ -14,6 +15,8 @@ type ProcessDataStatusesParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	lists: List;
+	inDataLists: InDataLists;
+	tranche: Tranche;
 };
 
 const { implementationStatuses } = constants;
@@ -25,6 +28,8 @@ function processDataStatuses({
 	allocationSource,
 	allocationType,
 	lists,
+	inDataLists,
+	tranche,
 }: ProcessDataStatusesParams): DataStatuses {
 	const dataStatuses: DataStatuses = implementationStatuses.reduce(
 		(acc, curr) => {
@@ -42,7 +47,9 @@ function processDataStatuses({
 			year.includes(datum.year) &&
 			fund.includes(datum.fund) &&
 			allocationSource.includes(datum.allocationSource) &&
-			allocationType.includes(datum.allocationType)
+			allocationType.includes(datum.allocationType) &&
+			(tranche === "all" ||
+				inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode))
 		) {
 			dataStatuses[status] += datum.budget;
 		}

@@ -154,8 +154,19 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource,
 				allocationType,
 				lists,
+				inDataLists,
+				tranche,
 			}),
-		[data, year, fund, allocationSource, allocationType, lists],
+		[
+			data,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			lists,
+			inDataLists,
+			tranche,
+		],
 	);
 
 	const { dataSummary, dataCva, dataGBV, inSelectionData } = useMemo(
@@ -168,6 +179,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
+				inDataLists,
+				tranche,
 			}),
 		[
 			data,
@@ -177,6 +190,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			allocationType,
 			implementationStatus,
 			lists,
+			inDataLists,
+			tranche,
 		],
 	);
 
@@ -191,6 +206,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				totalBeneficiariesBySectorData,
 				totalBeneficiariesByBeneficiaryTypeData,
 				inDataLists,
+				tranche,
 			}),
 		[
 			data,
@@ -201,6 +217,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			totalBeneficiariesBySectorData,
 			totalBeneficiariesByBeneficiaryTypeData,
 			inDataLists,
+			tranche,
 		],
 	);
 
