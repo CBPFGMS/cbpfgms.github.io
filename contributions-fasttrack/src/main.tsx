@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./styles/index.css";
 import App from "./App.tsx";
 import UnsupportedScreen from "./components/UnsupportedScreen.tsx";
+import { constants } from "./utils/constants.ts";
 
-const rootElement = document.getElementById("attributionroot")!;
-const startYearString = rootElement.dataset.startyear,
-	defaultFundTypeString = rootElement?.dataset.fundtype;
+const rootElement = document.getElementById(constants.rootElementId)!;
+const startYearString = rootElement.dataset.startyear;
 
 const isWideEnough = window.matchMedia("(min-width: 1320px)").matches;
 
@@ -15,20 +15,8 @@ const startYear =
 		? null
 		: parseInt(startYearString);
 
-const defaultFundType =
-	!defaultFundTypeString || !parseInt(defaultFundTypeString)
-		? null
-		: parseInt(defaultFundTypeString);
-
 createRoot(rootElement).render(
 	<StrictMode>
-		{isWideEnough ? (
-			<App
-				startYear={startYear}
-				defaultFundType={defaultFundType}
-			/>
-		) : (
-			<UnsupportedScreen />
-		)}
+		{isWideEnough ? <App startYear={startYear} /> : <UnsupportedScreen />}
 	</StrictMode>,
 );

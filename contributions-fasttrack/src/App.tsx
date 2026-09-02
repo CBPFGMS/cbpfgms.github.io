@@ -4,17 +4,14 @@ import Loading from "./components/Loading";
 import Error from "./components/Error";
 import { fetchAppData } from "./utils/api";
 import DataContext from "./context/DataContext";
+import MainContainer from "./components/MainContainer";
 
 type AppProps = {
 	startYear: number | null;
-	defaultFundType: number | null;
 };
 
-function App({ startYear, defaultFundType }: AppProps) {
-	const dataPromise = useMemo(
-		() => fetchAppData(startYear, defaultFundType),
-		[startYear, defaultFundType],
-	);
+function App({ startYear }: AppProps) {
+	const dataPromise = useMemo(() => fetchAppData(startYear), [startYear]);
 
 	return (
 		<ErrorBoundary FallbackComponent={Error}>
