@@ -234,8 +234,10 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		setFund,
 		setImplementationStatus,
 		setYear,
+		setTranche,
 		year,
 		downloadStates,
+		tranche,
 		defaultYear,
 	});
 

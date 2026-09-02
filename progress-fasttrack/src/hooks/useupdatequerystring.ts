@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {
 	DownloadStates,
 	ImplementationStatuses,
+	Tranche,
 } from "../components/MainContainer";
 import { InDataLists } from "../utils/processrawdata";
 import constants from "../utils/constants";
@@ -16,12 +17,14 @@ type UpdateQueryStringParams = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
+	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 	inDataLists: InDataLists;
 	year: number[];
 	fund: number[];
 	allocationType: number[];
 	allocationSource: number[];
 	implementationStatus: ImplementationStatuses[];
+	tranche: Tranche;
 	downloadStates: DownloadStates;
 	defaultYear: number;
 };
@@ -41,7 +44,9 @@ function useUpdateQueryString({
 	setFund,
 	setImplementationStatus,
 	setYear,
+	setTranche,
 	year,
+	tranche,
 	downloadStates,
 	defaultYear,
 }: UpdateQueryStringParams): void {
@@ -55,6 +60,7 @@ function useUpdateQueryString({
 		const implementationStatusParam = getStringArrayParam(
 			"implementationStatus",
 		);
+		const trancheParam = queryStringValues.get("tranche");
 
 		if (allocationTypesParam) setAllocationType(allocationTypesParam);
 		if (allocationSourcesParam) setAllocationSource(allocationSourcesParam);
@@ -63,6 +69,7 @@ function useUpdateQueryString({
 		if (implementationStatusParam) {
 			setImplementationStatus(implementationStatusParam);
 		}
+		if (trancheParam) setTranche(+trancheParam as Tranche);
 		return () => {};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -86,13 +93,15 @@ function useUpdateQueryString({
 			implementationStatusesFiltered.length
 				? ""
 				: `implementationStatus=${implementationStatus}`;
+		const trancheParam = tranche === "all" ? "" : `tranche=${tranche}`;
 
 		if (
 			allocationTypesParam ||
 			allocationSourcesParam ||
 			fundParam ||
 			yearParam ||
-			implementationStatusParam
+			implementationStatusParam ||
+			trancheParam
 		) {
 			const params = buildQueryStringParams([
 				allocationTypesParam,
@@ -100,6 +109,7 @@ function useUpdateQueryString({
 				fundParam,
 				yearParam,
 				implementationStatusParam,
+				trancheParam,
 			]);
 
 			window.history.replaceState({}, "", `?${params}`);
