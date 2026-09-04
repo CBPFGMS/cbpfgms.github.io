@@ -114,7 +114,7 @@ function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
 			ref={mapRef}
 		>
 			<TileLayer
-				url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+				url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2fta_1_bb42f2c74653f9c341ab574a"
 				attribution="&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> &copy; <a href='https://carto.com/attributions'>CARTO</a>"
 				subdomains={"abcd"}
 				maxZoom={maxZoomValue}
