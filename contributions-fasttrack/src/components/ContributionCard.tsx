@@ -166,6 +166,7 @@ function ContributionCard({
 									color: typeSelected
 										? colors.unColorDarker
 										: "#555",
+									width: "fit-content",
 								}}
 								data-tooltip-id="tooltip"
 								data-tooltip-content={`$${topValuesDatum.value.toLocaleString()}`}

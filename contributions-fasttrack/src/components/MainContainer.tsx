@@ -7,6 +7,8 @@ import { Tooltip } from "react-tooltip";
 import TopSelectors from "./TopSelector";
 import processTopValues from "../utils/processtopvalues";
 import ContributionCardsContainer from "./ContributionCardsContainer";
+import processContributions from "../utils/processcontributions";
+import Chart from "./Chart";
 
 const { currentYear, contributionTypes } = constants;
 
@@ -28,6 +30,7 @@ function MainContainer() {
 	const [contributionType, setContributionType] = useState<ContributionType>(
 		contributionTypes[0],
 	);
+	const [isStacked, setIsStacked] = useState<boolean>(false);
 
 	const topValuesData = useMemo(
 		() =>
@@ -40,7 +43,15 @@ function MainContainer() {
 		[contributionsData, lists, year, tranche],
 	);
 
-	console.log(topValuesData);
+	const data = useMemo(
+		() =>
+			processContributions({
+				contributionsData,
+				year,
+				tranche,
+			}),
+		[contributionsData, year, tranche],
+	);
 
 	return (
 		<Container
@@ -68,6 +79,12 @@ function MainContainer() {
 				contributionType={contributionType}
 				setContributionType={setContributionType}
 				lists={lists}
+			/>
+			<Box sx={{ mb: 5 }} />
+			<Chart
+				data={data}
+				isStacked={isStacked}
+				contributionType={contributionType}
 			/>
 		</Container>
 	);

@@ -9,4 +9,5 @@ export const constants = {
 	tranches: [1, 2, "all"],
 	contributionTypes: ["total", "paid", "pledged"],
 	minWidth: 1200,
+	sortByOptions: ["contributions", "alphabetical"],
 } as const;

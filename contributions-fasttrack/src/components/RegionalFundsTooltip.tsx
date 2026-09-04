@@ -60,7 +60,7 @@ function RegionalFundsTooltip({
 									) || [],
 								);
 								return (
-									<Box>
+									<Box key={regionalFund}>
 										<Typography
 											sx={{
 												fontSize: "15px",
