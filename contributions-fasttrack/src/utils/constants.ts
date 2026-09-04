@@ -12,6 +12,6 @@ export const constants = {
 	sortByOptions: ["contributions", "alphabetical"],
 	chartRowHeight: 36,
 	transitionDuration: 750,
-	chartTopPadding: 52,
+	chartTopPadding: 18,
 	chartPadding: 16,
 } as const;

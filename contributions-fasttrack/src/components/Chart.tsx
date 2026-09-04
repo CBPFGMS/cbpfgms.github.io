@@ -9,6 +9,7 @@ import { useState } from "react";
 import SortChart from "./SortChart";
 import { useTransition, animated } from "@react-spring/web";
 import Legend from "./Legend";
+import ChartAxis from "./ChartAxis";
 
 type ChartProps = {
 	data: Data;
@@ -112,13 +113,12 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 					borderRadius: "8px",
 					position: "relative",
 					border: "1px solid #e0e0e0",
-					height: `${chartRowHeight * sortedFunds.length + chartPadding + chartTopPadding}px`,
+					height: `calc(${chartRowHeight * sortedFunds.length + chartPadding + chartTopPadding}px + 1em)`,
 					transition: `height ${transitionDuration}ms ease-in-out`,
 					overflowAnchor: "none",
-					paddingTop: `${chartTopPadding}px`,
-					paddingBottom: `${chartPadding}px`,
 				}}
 			>
+				<ChartAxis maxValue={maxValue} />
 				<Box
 					sx={{
 						width: "100%",
@@ -126,6 +126,8 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 						justifyContent: "center",
 						alignItems: "center",
 						flexDirection: "column",
+						position: "relative",
+						zIndex: 1,
 					}}
 				>
 					{transitions((style, row) => (
