@@ -12,6 +12,7 @@ export type List = {
 	regionalFundNames: { [fundAbbreviation: string]: string };
 	fundsInRegionalFunds: { [fundAbbreviation: string]: Set<string> };
 	parentRegionalFundForFund: { [fundName: string]: string };
+	fundNames: { [fundName: string]: string };
 };
 
 function makeLists({ regionalFundsMaster }: MakeListParams): List {
@@ -19,6 +20,7 @@ function makeLists({ regionalFundsMaster }: MakeListParams): List {
 		regionalFundNames: {},
 		fundsInRegionalFunds: {},
 		parentRegionalFundForFund: {},
+		fundNames: {},
 	};
 
 	regionalFundsMaster.forEach(row => {
@@ -34,11 +36,13 @@ function makeLists({ regionalFundsMaster }: MakeListParams): List {
 			return;
 		}
 
-		lists.regionalFundNames[row.RFundAbbrv] = row.RFundTitle;
-		const funds = (lists.fundsInRegionalFunds[row.RFundAbbrv] ??=
-			new Set<string>());
-		funds.add(row.RFundName);
-		lists.parentRegionalFundForFund[row.RFundName] = row.RFundAbbrv;
+		lists.regionalFundNames[row.RFundAbbrv.toLowerCase()] = row.RFundTitle;
+		const funds = (lists.fundsInRegionalFunds[
+			row.RFundAbbrv.toLowerCase()
+		] ??= new Set<string>());
+		funds.add(row.RFundName.toLowerCase());
+		lists.parentRegionalFundForFund[row.RFundName.toLowerCase()] =
+			row.RFundAbbrv.toLowerCase();
 	});
 
 	return lists;

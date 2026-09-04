@@ -8,7 +8,9 @@ import { constants } from "./utils/constants.ts";
 const rootElement = document.getElementById(constants.rootElementId)!;
 const startYearString = rootElement.dataset.startyear;
 
-const isWideEnough = window.matchMedia("(min-width: 1320px)").matches;
+const isWideEnough = window.matchMedia(
+	`(min-width: ${constants.minWidth}px)`,
+).matches;
 
 const startYear =
 	!startYearString || !parseInt(startYearString)

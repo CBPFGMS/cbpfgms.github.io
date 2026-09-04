@@ -11,7 +11,7 @@ function formatSIFloat(value: number): string {
 		value,
 	)(value).replace("G", "B");
 	if (parseInt(result) === 1000) {
-		const lastDigit = result[result.length - 1];
+		const lastDigit = result.at(-1) ?? "";
 		const units = { k: "M", M: "B" };
 		return (
 			1 +

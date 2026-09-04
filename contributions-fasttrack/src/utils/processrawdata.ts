@@ -2,13 +2,14 @@ import { type ContributionsObject, contributionsObjectSchema } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema from "./warninvalid";
 import { constants } from "./constants";
+import type { Tranche } from "../components/MainContainer";
 
 type ProcessRawDataParams = {
 	contributionsDataRaw: ContributionsObject[];
 	lists: List;
 };
 
-export type Tranche = 1 | 2;
+export type TrancheNumbers = Exclude<Tranche, "all">;
 
 type ContributionsDatum = {
 	year: number;
@@ -17,7 +18,7 @@ type ContributionsDatum = {
 	paidAmount: number;
 	pledgedAmount: number;
 	totalAmount: number;
-	tranche: Tranche;
+	tranche: TrancheNumbers;
 };
 
 export type ContributionsData = ContributionsDatum[];
@@ -48,7 +49,10 @@ function processRawData({
 
 	contributionsDataRaw.forEach(datum => {
 		//FIX: temporaryly creating a date value
-		datum.DatePaid = new Date("2026-01-01");
+		datum.DatePaid =
+			Math.random() > 0.5
+				? new Date("2026-08-01")
+				: new Date("2026-06-01");
 
 		const parsedDatum = contributionsObjectSchema.safeParse(datum);
 
@@ -73,6 +77,9 @@ function processRawData({
 
 		inContributionsData.years.add(datum.FiscalYear);
 
+		lists.fundNames[datum.PooledFundISO2Code.toLowerCase()] =
+			datum.PooledFundName;
+
 		let fundsInYear = inContributionsData.fundsPerYear.get(
 			datum.FiscalYear,
 		);
@@ -80,10 +87,10 @@ function processRawData({
 			fundsInYear = new Set<string>();
 			inContributionsData.fundsPerYear.set(datum.FiscalYear, fundsInYear);
 		}
-		fundsInYear.add(datum.PooledFundISO2Code);
+		fundsInYear.add(datum.PooledFundISO2Code.toLowerCase());
 
 		const parentRegionalFund =
-			lists.parentRegionalFundForFund[datum.PooledFundName];
+			lists.parentRegionalFundForFund[datum.PooledFundName.toLowerCase()];
 
 		if (parentRegionalFund) {
 			let fundsInYearAndRegionalFund =
@@ -106,14 +113,15 @@ function processRawData({
 					fundsForRegionalFund,
 				);
 			}
-			fundsForRegionalFund.add(datum.PooledFundISO2Code);
+			fundsForRegionalFund.add(datum.PooledFundISO2Code.toLowerCase());
 		}
 
-		const thisTranche: Tranche = datum.DatePaid <= cutOffDate ? 1 : 2;
+		const thisTranche: TrancheNumbers =
+			datum.DatePaid <= cutOffDate ? 1 : 2;
 
 		contributionsData.push({
 			year: datum.FiscalYear,
-			fundISOCode: datum.PooledFundISO2Code,
+			fundISOCode: datum.PooledFundISO2Code.toLowerCase(),
 			fundName: datum.PooledFundName,
 			paidAmount: datum.PaidAmt,
 			pledgedAmount: datum.PledgeAmt,

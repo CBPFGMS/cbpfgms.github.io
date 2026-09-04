@@ -5,6 +5,7 @@ import Error from "./components/Error";
 import { fetchAppData } from "./utils/api";
 import DataContext from "./context/DataContext";
 import MainContainer from "./components/MainContainer";
+import Header from "./components/Header";
 
 type AppProps = {
 	startYear: number | null;
@@ -15,6 +16,7 @@ function App({ startYear }: AppProps) {
 
 	return (
 		<ErrorBoundary FallbackComponent={Error}>
+			<Header year={startYear} />
 			<Suspense fallback={<Loading />}>
 				<DataContext.Provider value={dataPromise}>
 					<MainContainer />
