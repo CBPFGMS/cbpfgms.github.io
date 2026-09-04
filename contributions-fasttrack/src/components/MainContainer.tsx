@@ -63,7 +63,12 @@ function MainContainer() {
 		>
 			<Tooltip
 				id="tooltip"
-				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
+				style={{
+					zIndex: 9999,
+					maxWidth: "400px",
+					textAlign: "center",
+					whiteSpace: "pre-line",
+				}}
 			/>
 			<Box sx={{ mb: 3 }} />
 			<TopSelectors
@@ -79,6 +84,8 @@ function MainContainer() {
 				contributionType={contributionType}
 				setContributionType={setContributionType}
 				lists={lists}
+				isStacked={isStacked}
+				setIsStacked={setIsStacked}
 			/>
 			<Box sx={{ mb: 5 }} />
 			<Chart

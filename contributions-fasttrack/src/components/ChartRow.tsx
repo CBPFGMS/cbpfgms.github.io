@@ -6,6 +6,7 @@ import type { ContributionType } from "./MainContainer";
 import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
+import { constants } from "../utils/constants";
 
 type ChartRowProps = {
 	data: Data[number];
@@ -13,6 +14,8 @@ type ChartRowProps = {
 	maxValue: number;
 	contributionType: ContributionType;
 };
+
+const { chartRowHeight } = constants;
 
 function ChartRow({
 	data,
@@ -26,6 +29,17 @@ function ChartRow({
 
 	const thisValue = data[contributionType];
 
+	const thisStackedValue =
+		isStacked && contributionType === "total" ? data.pledged : 0;
+
+	const firstBarValue =
+		isStacked && contributionType === "total" ? data.paid : thisValue;
+
+	const tooltipText =
+		isStacked && contributionType === "total"
+			? `Total: $${data.total.toLocaleString()}\nPaid: $${data.paid.toLocaleString()}\nPledged: $${data.pledged.toLocaleString()}`
+			: `$${thisValue.toLocaleString()}`;
+
 	return (
 		<Box
 			style={{
@@ -33,8 +47,7 @@ function ChartRow({
 				flexDirection: "row",
 				alignItems: "center",
 				width: "100%",
-				paddingTop: "4px",
-				paddingBottom: "4px",
+				height: `${chartRowHeight}px`,
 			}}
 		>
 			<Box
@@ -51,7 +64,7 @@ function ChartRow({
 					sx={{
 						color: "#333",
 						border: "none",
-						fontSize: 15,
+						fontSize: 16,
 						fontWeight: 400,
 						paddingRight: "8px",
 					}}
@@ -67,7 +80,7 @@ function ChartRow({
 					alignItems: "center",
 				}}
 				data-tooltip-id="tooltip"
-				data-tooltip-content={`$${thisValue.toLocaleString()}`}
+				data-tooltip-content={tooltipText}
 				data-tooltip-place="top"
 			>
 				<Box
@@ -80,7 +93,7 @@ function ChartRow({
 				>
 					<Box
 						style={{
-							width: scale(thisValue) + "%",
+							width: scale(firstBarValue) + "%",
 							minWidth: "1px",
 							height: "14px",
 							transitionProperty: "width",
@@ -90,9 +103,20 @@ function ChartRow({
 							backgroundColor: colors.unColor,
 						}}
 					></Box>
+					<Box
+						style={{
+							width: scale(thisStackedValue) + "%",
+							height: "14px",
+							transitionProperty: "width",
+							transitionDuration: "0.75s",
+							display: "flex",
+							alignItems: "center",
+							backgroundColor: colors.contrastColor,
+						}}
+					></Box>
 					<Typography
 						sx={{
-							fontSize: 14,
+							fontSize: 15,
 							fontWeight: 700,
 							marginLeft: 0,
 							color: "#444",

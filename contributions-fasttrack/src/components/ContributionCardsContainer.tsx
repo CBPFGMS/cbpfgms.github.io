@@ -10,6 +10,8 @@ type CardsContainerProps = {
 	contributionType: ContributionType;
 	setContributionType: React.Dispatch<React.SetStateAction<ContributionType>>;
 	lists: List;
+	isStacked: boolean;
+	setIsStacked: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const { contributionTypes } = constants;
@@ -19,6 +21,8 @@ function CardsContainer({
 	contributionType,
 	setContributionType,
 	lists,
+	isStacked,
+	setIsStacked,
 }: CardsContainerProps) {
 	return (
 		<Grid
@@ -40,6 +44,8 @@ function CardsContainer({
 							type={type}
 							setContributionType={setContributionType}
 							lists={lists}
+							isStacked={isStacked}
+							setIsStacked={setIsStacked}
 						/>
 					</Grid>
 				);

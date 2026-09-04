@@ -13,6 +13,8 @@ import formatSIFloat from "../utils/formatsi";
 import colors from "../utils/colors";
 import InfoIcon from "@mui/icons-material/Info";
 import RegionalFundsTooltip from "./RegionalFundsTooltip";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 
 type ContributionCardProps = {
 	topValuesDatum: TopValuesDatum;
@@ -20,6 +22,8 @@ type ContributionCardProps = {
 	type: ContributionType;
 	setContributionType: React.Dispatch<React.SetStateAction<ContributionType>>;
 	lists: List;
+	isStacked: boolean;
+	setIsStacked: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const infoIconStyle = {
@@ -43,6 +47,8 @@ function ContributionCard({
 	type,
 	setContributionType,
 	lists,
+	isStacked,
+	setIsStacked,
 }: ContributionCardProps) {
 	const typeSelected = contributionType === type;
 
@@ -201,57 +207,101 @@ function ContributionCard({
 							sx={{
 								display: "flex",
 								flexDirection: "row",
-								alignItems: "baseline",
+								gap: "0.5em",
+								justifyContent: "space-between",
 							}}
 						>
-							<Typography
-								sx={smallValueStyle}
-								data-tooltip-id="tooltip"
-								//data-tooltip-content={`${donorName} attribution for ${fundName}: ${(percentage * 100).toFixed(1)}%`}
-								data-tooltip-place="top"
+							<Box>
+								<Box
+									sx={{
+										display: "flex",
+										flexDirection: "row",
+										alignItems: "baseline",
+									}}
+								>
+									<Typography
+										sx={smallValueStyle}
+										data-tooltip-id="tooltip"
+										//data-tooltip-content={`${donorName} attribution for ${fundName}: ${(percentage * 100).toFixed(1)}%`}
+										data-tooltip-place="top"
+									>
+										<NumberAnimator
+											number={topValuesDatum.cbpfs.size}
+											type="decimal"
+										/>
+									</Typography>
+									<Typography sx={smallTextStyle}>
+										CBPFs
+									</Typography>
+								</Box>
+								<Box
+									sx={{
+										display: "flex",
+										flexDirection: "row",
+										alignItems: "baseline",
+									}}
+									className="Popper-trigger"
+									onMouseEnter={handlePopperTriggerMouseEnter}
+									onMouseLeave={handlePopperTriggerMouseLeave}
+								>
+									<Typography
+										sx={smallValueStyle}
+										data-tooltip-id="tooltip"
+										//data-tooltip-content={`${donorName} attribution for ${fundName}: ${(percentage * 100).toFixed(1)}%`}
+										data-tooltip-place="top"
+									>
+										{topValuesDatum.cbpfs.size > 9 && (
+											<span style={{ opacity: 0 }}>
+												0
+											</span>
+										)}
+										<NumberAnimator
+											number={
+												topValuesDatum
+													.fundsPerRegionalFund.size
+											}
+											type="decimal"
+										/>
+									</Typography>
+									<Typography sx={smallTextStyle}>
+										Regional Funds
+									</Typography>
+									<InfoIcon style={infoIconStyle} />
+									<RegionalFundsTooltip
+										anchorEl={anchorEl}
+										topValuesDatum={topValuesDatum}
+										lists={lists}
+									/>
+								</Box>
+							</Box>
+							<Box
+								sx={{
+									maxWidth: "32%",
+									alignSelf: "flex-end",
+								}}
 							>
-								<NumberAnimator
-									number={topValuesDatum.cbpfs.size}
-									type="decimal"
-								/>
-							</Typography>
-							<Typography sx={smallTextStyle}>CBPFs</Typography>
-						</Box>
-						<Box
-							sx={{
-								display: "flex",
-								flexDirection: "row",
-								alignItems: "baseline",
-							}}
-							className="Popper-trigger"
-							onMouseEnter={handlePopperTriggerMouseEnter}
-							onMouseLeave={handlePopperTriggerMouseLeave}
-						>
-							<Typography
-								sx={smallValueStyle}
-								data-tooltip-id="tooltip"
-								//data-tooltip-content={`${donorName} attribution for ${fundName}: ${(percentage * 100).toFixed(1)}%`}
-								data-tooltip-place="top"
-							>
-								{topValuesDatum.cbpfs.size > 9 && (
-									<span style={{ opacity: 0 }}>0</span>
+								{typeSelected && type === "total" && (
+									<FormControlLabel
+										control={
+											<Checkbox
+												checked={isStacked}
+												onChange={e =>
+													setIsStacked(
+														e.target.checked,
+													)
+												}
+											/>
+										}
+										label="Show breakdown"
+										sx={{
+											"& .MuiFormControlLabel-label": {
+												fontSize: "0.8rem",
+											},
+											marginRight: "0px",
+										}}
+									/>
 								)}
-								<NumberAnimator
-									number={
-										topValuesDatum.fundsPerRegionalFund.size
-									}
-									type="decimal"
-								/>
-							</Typography>
-							<Typography sx={smallTextStyle}>
-								Regional Funds
-							</Typography>
-							<InfoIcon style={infoIconStyle} />
-							<RegionalFundsTooltip
-								anchorEl={anchorEl}
-								topValuesDatum={topValuesDatum}
-								lists={lists}
-							/>
+							</Box>
 						</Box>
 					</Box>
 				</CardContent>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSpring, animated } from "@react-spring/web";
+import { constants } from "../utils/constants";
 
 export type NumberAnimatorProps = {
 	number: number;
@@ -11,11 +12,12 @@ function NumberAnimator({ number, type }: NumberAnimatorProps) {
 	const props = useSpring({
 		from: { number: prevNumber },
 		to: { number },
-		config: { duration: 750 },
+		config: { duration: constants.transitionDuration },
 		reset: true,
 		onRest: () => setPrevNumber(number),
 	});
-	const decimals = number % 1 ? number.toString().split(".")[1]?.length ?? 0 : 0;
+	const decimals =
+		number % 1 ? (number.toString().split(".")[1]?.length ?? 0) : 0;
 
 	return (
 		<animated.span>

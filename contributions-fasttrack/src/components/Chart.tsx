@@ -7,6 +7,7 @@ import type { ContributionType } from "./MainContainer";
 import { constants } from "../utils/constants";
 import { useState } from "react";
 import SortChart from "./SortChart";
+import { useTransition, animated } from "@react-spring/web";
 
 type ChartProps = {
 	data: Data;
@@ -17,6 +18,8 @@ type ChartProps = {
 export type SortOrder = "asc" | "desc";
 
 export type SortBy = (typeof constants.sortByOptions)[number];
+
+const { chartRowHeight, transitionDuration, chartPadding } = constants;
 
 function Chart({ data, isStacked, contributionType }: ChartProps) {
 	const maxValue = max(data, row => row[contributionType]) || 0;
@@ -45,6 +48,26 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 			return comparison * direction;
 		})
 		.filter(row => row[contributionType] > 0);
+
+	const transitions = useTransition(sortedFunds, {
+		keys: row => row.name,
+		from: { y: 0, opacity: 0 },
+		enter: row => ({
+			y:
+				sortedFunds.findIndex(r => r.name === row.name) *
+					chartRowHeight +
+				chartPadding,
+			opacity: 1,
+		}),
+		update: row => ({
+			y:
+				sortedFunds.findIndex(r => r.name === row.name) *
+					chartRowHeight +
+				chartPadding,
+		}),
+		leave: { opacity: 0 },
+		config: { tension: 210, friction: 20 },
+	});
 
 	function handleChangeSortBy(
 		_event: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -75,6 +98,11 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 					borderRadius: "8px",
 					position: "relative",
 					border: "1px solid #e0e0e0",
+					height: `${chartRowHeight * sortedFunds.length + 2 * chartPadding}px`,
+					transition: `height ${transitionDuration}ms ease-in-out`,
+					overflowAnchor: "none",
+					paddingTop: `${chartPadding}px`,
+					paddingBottom: `${chartPadding}px`,
 				}}
 			>
 				<Box
@@ -86,14 +114,27 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 						flexDirection: "column",
 					}}
 				>
-					{sortedFunds.map(row => (
-						<ChartRow
-							key={row.name}
-							data={row}
-							isStacked={isStacked}
-							maxValue={maxValue}
-							contributionType={contributionType}
-						/>
+					{transitions((style, row) => (
+						<animated.div
+							style={{
+								position: "absolute",
+								top: 0,
+								left: 0,
+								right: 0,
+								opacity: style.opacity,
+								transform: style.y.to(
+									y => `translateY(${y}px)`,
+								),
+							}}
+						>
+							<ChartRow
+								key={row.name}
+								data={row}
+								isStacked={isStacked}
+								maxValue={maxValue}
+								contributionType={contributionType}
+							/>
+						</animated.div>
 					))}
 				</Box>
 			</Paper>

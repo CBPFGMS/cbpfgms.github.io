@@ -10,4 +10,7 @@ export const constants = {
 	contributionTypes: ["total", "paid", "pledged"],
 	minWidth: 1200,
 	sortByOptions: ["contributions", "alphabetical"],
+	chartRowHeight: 36,
+	transitionDuration: 750,
+	chartPadding: 16,
 } as const;
