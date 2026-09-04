@@ -8,6 +8,7 @@ import { constants } from "../utils/constants";
 import { useState } from "react";
 import SortChart from "./SortChart";
 import { useTransition, animated } from "@react-spring/web";
+import Legend from "./Legend";
 
 type ChartProps = {
 	data: Data;
@@ -19,7 +20,8 @@ export type SortOrder = "asc" | "desc";
 
 export type SortBy = (typeof constants.sortByOptions)[number];
 
-const { chartRowHeight, transitionDuration, chartPadding } = constants;
+const { chartRowHeight, transitionDuration, chartPadding, chartTopPadding } =
+	constants;
 
 function Chart({ data, isStacked, contributionType }: ChartProps) {
 	const maxValue = max(data, row => row[contributionType]) || 0;
@@ -56,14 +58,14 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 			y:
 				sortedFunds.findIndex(r => r.name === row.name) *
 					chartRowHeight +
-				chartPadding,
+				chartTopPadding,
 			opacity: 1,
 		}),
 		update: row => ({
 			y:
 				sortedFunds.findIndex(r => r.name === row.name) *
 					chartRowHeight +
-				chartPadding,
+				chartTopPadding,
 		}),
 		leave: { opacity: 0 },
 		config: { tension: 210, friction: 20 },
@@ -83,11 +85,23 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 
 	return (
 		<>
-			<SortChart
-				sortBy={sortBy}
-				sortOrder={sortOrder}
-				handleChangeSortBy={handleChangeSortBy}
-			/>
+			<Box
+				style={{
+					display: "flex",
+					justifyContent: "flex-start",
+					alignItems: "center",
+					flexDirection: "row",
+					marginBottom: "1em",
+					marginTop: "0.5em",
+				}}
+			>
+				<SortChart
+					sortBy={sortBy}
+					sortOrder={sortOrder}
+					handleChangeSortBy={handleChangeSortBy}
+				/>
+				{isStacked && contributionType === "total" && <Legend />}
+			</Box>
 			<Paper
 				elevation={0}
 				style={{
@@ -98,10 +112,10 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 					borderRadius: "8px",
 					position: "relative",
 					border: "1px solid #e0e0e0",
-					height: `${chartRowHeight * sortedFunds.length + 2 * chartPadding}px`,
+					height: `${chartRowHeight * sortedFunds.length + chartPadding + chartTopPadding}px`,
 					transition: `height ${transitionDuration}ms ease-in-out`,
 					overflowAnchor: "none",
-					paddingTop: `${chartPadding}px`,
+					paddingTop: `${chartTopPadding}px`,
 					paddingBottom: `${chartPadding}px`,
 				}}
 			>

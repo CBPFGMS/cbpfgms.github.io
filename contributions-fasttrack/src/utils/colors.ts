@@ -12,6 +12,8 @@ const colors = {
 	inactiveBackground: "#4a5f78",
 	unColorChip: "#0c4783",
 	unColorChipLighter: "#185fa5",
+	unColorTotal: "#418fde",
+	unColorPledged: "#f79a3b",
 } as const;
 
 export default colors;

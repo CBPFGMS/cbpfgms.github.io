@@ -100,7 +100,7 @@ function ChartRow({
 							transitionDuration: "0.75s",
 							display: "flex",
 							alignItems: "center",
-							backgroundColor: colors.unColor,
+							backgroundColor: colors.unColorTotal,
 						}}
 					></Box>
 					<Box
@@ -111,7 +111,7 @@ function ChartRow({
 							transitionDuration: "0.75s",
 							display: "flex",
 							alignItems: "center",
-							backgroundColor: colors.contrastColor,
+							backgroundColor: colors.unColorPledged,
 						}}
 					></Box>
 					<Typography

@@ -21,13 +21,10 @@ function SortChart({ sortBy, sortOrder, handleChangeSortBy }: SortChartProps) {
 	return (
 		<Box
 			sx={{
-				width: "100%",
 				display: "flex",
 				justifyContent: "flex-start",
 				alignItems: "center",
 				flexDirection: "row",
-				marginBottom: "1em",
-				marginTop: "0.5em",
 			}}
 		>
 			<Typography
