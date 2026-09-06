@@ -696,7 +696,7 @@
 						")",
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 72, 4, 0],
+			padding: [44, 22, 4, 0],
 			labelPadding: 6,
 		};
 
@@ -718,7 +718,7 @@
 						")",
 				),
 			width: (width - padding[1] - padding[3] - panelVerticalPadding) / 2,
-			padding: [44, 72, 4, 0],
+			padding: [44, 34, 4, 0],
 			labelPadding: 6,
 		};
 
@@ -1148,6 +1148,12 @@
 					chartState.selectedContribution === "total" ? 1 : 0,
 				);
 
+				setDomains(
+					data.dataDonors,
+					data.dataCbpfs,
+					chartState.selectedContribution,
+				);
+
 				createTopPanel();
 
 				createDonorsPanel();
@@ -1166,34 +1172,7 @@
 					.attr("class", "pbiclcSvgLegend")
 					.attr("y", height - legendPadding)
 					.attr("x", padding[3] + 2)
-					.text("Figures represent: ")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", "#666")
-					.text("Total ")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.text("(")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", paidColor)
-					.text("Paid")
-					.append("tspan")
-					.style("fill", "#666")
-					.style("font-weight", "normal")
-					.text("/")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", pledgedColor)
-					.text("Pledged")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.style("fill", "#666")
-					.text(")")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.style("fill", "#666")
-					.text(". The arrow (")
+					.text("The arrow (")
 					.append("tspan")
 					.style("fill", paidColor)
 					.text("\u25B2")
@@ -2716,33 +2695,33 @@
 							d[chartState.selectedContribution],
 						);
 
-						function populateLabel(selection) {
-							selection
-								.append("tspan")
-								.attr("class", "pbiclcDonorLabelPercentage")
-								.attr("dy", "-0.5px")
-								.text(" (")
-								.append("tspan")
-								.style("fill", paidColor)
-								.text(
-									d3
-										.formatPrefix(".0", d.paid)(d.paid)
-										.replace("G", "B"),
-								)
-								.append("tspan")
-								.style("fill", "#aaa")
-								.text("/")
-								.append("tspan")
-								.style("fill", pledgedColor)
-								.text(
-									d3
-										.formatPrefix(".0", d.pledge)(d.pledge)
-										.replace("G", "B"),
-								)
-								.append("tspan")
-								.style("fill", "#aaa")
-								.text(")");
-						}
+						// function populateLabel(selection) {
+						// 	selection
+						// 		.append("tspan")
+						// 		.attr("class", "pbiclcDonorLabelPercentage")
+						// 		.attr("dy", "-0.5px")
+						// 		.text(" (")
+						// 		.append("tspan")
+						// 		.style("fill", paidColor)
+						// 		.text(
+						// 			d3
+						// 				.formatPrefix(".0", d.paid)(d.paid)
+						// 				.replace("G", "B"),
+						// 		)
+						// 		.append("tspan")
+						// 		.style("fill", "#aaa")
+						// 		.text("/")
+						// 		.append("tspan")
+						// 		.style("fill", pledgedColor)
+						// 		.text(
+						// 			d3
+						// 				.formatPrefix(".0", d.pledge)(d.pledge)
+						// 				.replace("G", "B"),
+						// 		)
+						// 		.append("tspan")
+						// 		.style("fill", "#aaa")
+						// 		.text(")");
+						// }
 
 						return function (t) {
 							const thisLabel = d3
@@ -2754,14 +2733,14 @@
 											])(i(t))
 										.replace("G", "B"),
 								);
-							if (
-								chartState.selectedContribution === "total" &&
-								d.pledge
-							) {
-								thisLabel.call(populateLabel);
-							} else {
-								thisLabel.append("tspan").text(null);
-							}
+							// if (
+							// 	chartState.selectedContribution === "total" &&
+							// 	d.pledge
+							// ) {
+							// 	thisLabel.call(populateLabel);
+							// } else {
+							// 	thisLabel.append("tspan").text(null);
+							// }
 						};
 					})
 					.on("end", function (d) {
@@ -3272,33 +3251,33 @@
 							d[chartState.selectedContribution],
 						);
 
-						function populateLabel(selection) {
-							selection
-								.append("tspan")
-								.attr("class", "pbiclcDonorLabelPercentage")
-								.attr("dy", "-0.5px")
-								.text(" (")
-								.append("tspan")
-								.style("fill", paidColor)
-								.text(
-									d3
-										.formatPrefix(".0", d.paid)(d.paid)
-										.replace("G", "B"),
-								)
-								.append("tspan")
-								.style("fill", "#aaa")
-								.text("/")
-								.append("tspan")
-								.style("fill", pledgedColor)
-								.text(
-									d3
-										.formatPrefix(".0", d.pledge)(d.pledge)
-										.replace("G", "B"),
-								)
-								.append("tspan")
-								.style("fill", "#aaa")
-								.text(")");
-						}
+						// function populateLabel(selection) {
+						// 	selection
+						// 		.append("tspan")
+						// 		.attr("class", "pbiclcDonorLabelPercentage")
+						// 		.attr("dy", "-0.5px")
+						// 		.text(" (")
+						// 		.append("tspan")
+						// 		.style("fill", paidColor)
+						// 		.text(
+						// 			d3
+						// 				.formatPrefix(".0", d.paid)(d.paid)
+						// 				.replace("G", "B"),
+						// 		)
+						// 		.append("tspan")
+						// 		.style("fill", "#aaa")
+						// 		.text("/")
+						// 		.append("tspan")
+						// 		.style("fill", pledgedColor)
+						// 		.text(
+						// 			d3
+						// 				.formatPrefix(".0", d.pledge)(d.pledge)
+						// 				.replace("G", "B"),
+						// 		)
+						// 		.append("tspan")
+						// 		.style("fill", "#aaa")
+						// 		.text(")");
+						// }
 
 						return function (t) {
 							const thisLabel = d3
@@ -3310,14 +3289,14 @@
 											])(i(t))
 										.replace("G", "B"),
 								);
-							if (
-								chartState.selectedContribution === "total" &&
-								d.pledge
-							) {
-								thisLabel.call(populateLabel);
-							} else {
-								thisLabel.append("tspan").text(null);
-							}
+							// if (
+							// 	chartState.selectedContribution === "total" &&
+							// 	d.pledge
+							// ) {
+							// 	thisLabel.call(populateLabel);
+							// } else {
+							// 	thisLabel.append("tspan").text(null);
+							// }
 						};
 					});
 
@@ -3786,7 +3765,11 @@
 
 				setRanges(biggestLabelLengthDonors, biggestLabelLengthCbpfs);
 
-				setDomains(data.dataDonors, data.dataCbpfs, "total");
+				setDomains(
+					data.dataDonors,
+					data.dataCbpfs,
+					chartState.selectedContribution,
+				);
 
 				//end of recalculateAndResize
 			}
@@ -4111,18 +4094,19 @@
 		}
 
 		function setDomains(donors, cbpfs, property) {
-			const maxXValue = Math.max(
+			const maxValueDonors =
 				d3.max(donors, function (d) {
 					return d[property];
-				}),
+				}) || 1e3;
+
+			const maxValueCbpfs =
 				d3.max(cbpfs, function (d) {
 					return d[property];
-				}),
-			);
+				}) || 1e3;
 
-			xScaleDonors.domain([0, Math.floor(maxXValue * 1.05)]);
+			xScaleDonors.domain([0, Math.floor(maxValueDonors * 1.05)]);
 
-			xScaleCbpfs.domain([0, Math.floor(maxXValue * 1.05)]);
+			xScaleCbpfs.domain([0, Math.floor(maxValueCbpfs * 1.05)]);
 		}
 
 		function setRanges(labelSizeDonors, labelSizeCbpfs) {
