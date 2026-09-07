@@ -19,7 +19,8 @@ import warnInvalidSchema, {
 } from "./warninvalid";
 import { constants } from "./constants";
 
-const { hasDisabledIds, hasGBVIds, hasGenderEqualityIds } = constants;
+const { hasDisabledIds, hasGBVIds, hasGenderEqualityIds, firstNSFTYear } =
+	constants;
 
 export type AllocationsDatum = {
 	fund: number;
@@ -94,6 +95,9 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesUs: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartnerUs: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySectorUs: TotalBeneficiariesBySectorObject[];
 	allocationsByYearAndFundWithUS: AllocationsByYearAndFundObject[];
 	allocationsByYearAndFundWithoutUS: AllocationsByYearAndFundObject[];
 };
@@ -101,6 +105,8 @@ type ProcessRawDataParams = {
 type TargetedAndReached = {
 	targeted: number;
 	reached: number;
+	targetedWithoutUS?: number;
+	reachedWithoutUS?: number;
 };
 
 export type TotalBeneficiariesBreakdown = {
@@ -140,6 +146,9 @@ function processRawData({
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
+	totalBeneficiariesUs,
+	totalBeneficiariesByPartnerUs,
+	totalBeneficiariesBySectorUs,
 	allocationsByYearAndFundWithUS,
 	allocationsByYearAndFundWithoutUS,
 }: ProcessRawDataParams): {
@@ -189,10 +198,6 @@ function processRawData({
 			return;
 		}
 
-		if (row.ProcessStatusId !== null) {
-			return;
-		}
-
 		const totalDatum: TotalBeneficiariesBreakdown = {
 			girls: {
 				targeted: row.BenG || 0,
@@ -216,6 +221,19 @@ function processRawData({
 			},
 		};
 
+		if (row.ImplementationYear >= firstNSFTYear) {
+			totalDatum.girls.targetedWithoutUS = row.BenG || 0;
+			totalDatum.girls.reachedWithoutUS = row.AchG || 0;
+			totalDatum.boys.targetedWithoutUS = row.BenB || 0;
+			totalDatum.boys.reachedWithoutUS = row.AchB || 0;
+			totalDatum.women.targetedWithoutUS = row.BenW || 0;
+			totalDatum.women.reachedWithoutUS = row.AchW || 0;
+			totalDatum.men.targetedWithoutUS = row.BenM || 0;
+			totalDatum.men.reachedWithoutUS = row.AchM || 0;
+			totalDatum.total.targetedWithoutUS = row.TotTarg || 0;
+			totalDatum.total.reachedWithoutUS = row.TotAch || 0;
+		}
+
 		const foundYear = totalBeneficiariesData[row.ImplementationYear];
 
 		if (!foundYear) {
@@ -225,6 +243,71 @@ function processRawData({
 		} else {
 			foundYear[row.PFId] = totalDatum;
 		}
+	});
+
+	totalBeneficiariesUs.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(
+				"totalBeneficiariesDataUS",
+				row,
+				parsedRow.error.message,
+			);
+			//TODO: put the return back when the data has ImplementationYear
+			//return;
+		}
+
+		let foundYear;
+		if (row.ImplementationYear === null) {
+			foundYear = totalBeneficiariesData[firstNSFTYear];
+		} else {
+			foundYear = totalBeneficiariesData[row.ImplementationYear];
+		}
+
+		if (!foundYear) {
+			simpleWarn(
+				`No data found for totalBeneficiariesUs ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		const foundFund = foundYear[row.PFId];
+		if (!foundFund) {
+			simpleWarn(
+				`No data found for totalBeneficiariesUs PFId: ${row.PFId} in ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		foundFund.total.targetedWithoutUS =
+			foundFund.total.targeted - (row.TotTarg || 0);
+		foundFund.total.reachedWithoutUS =
+			foundFund.total.reached - (row.TotAch || 0);
+		foundFund.girls.targetedWithoutUS =
+			foundFund.girls.targeted - (row.BenG || 0);
+		foundFund.girls.reachedWithoutUS =
+			foundFund.girls.reached - (row.AchG || 0);
+		foundFund.boys.targetedWithoutUS =
+			foundFund.boys.targeted - (row.BenB || 0);
+		foundFund.boys.reachedWithoutUS =
+			foundFund.boys.reached - (row.AchB || 0);
+		foundFund.women.targetedWithoutUS =
+			foundFund.women.targeted - (row.BenW || 0);
+		foundFund.women.reachedWithoutUS =
+			foundFund.women.reached - (row.AchW || 0);
+		foundFund.men.targetedWithoutUS =
+			foundFund.men.targeted - (row.BenM || 0);
+		foundFund.men.reachedWithoutUS =
+			foundFund.men.reached - (row.AchM || 0);
 	});
 
 	totalBeneficiariesByPartner.forEach(row => {
@@ -237,10 +320,6 @@ function processRawData({
 				row,
 				parsedRow.error.message,
 			);
-			return;
-		}
-
-		if (row.ProcessStatusId !== null) {
 			return;
 		}
 
@@ -264,6 +343,17 @@ function processRawData({
 			},
 		};
 
+		if (row.ImplementationYear >= firstNSFTYear) {
+			partnersDatum.girls.targetedWithoutUS = row.BenG || 0;
+			partnersDatum.girls.reachedWithoutUS = row.AchG || 0;
+			partnersDatum.boys.targetedWithoutUS = row.BenB || 0;
+			partnersDatum.boys.reachedWithoutUS = row.AchB || 0;
+			partnersDatum.women.targetedWithoutUS = row.BenW || 0;
+			partnersDatum.women.reachedWithoutUS = row.AchW || 0;
+			partnersDatum.men.targetedWithoutUS = row.BenM || 0;
+			partnersDatum.men.reachedWithoutUS = row.AchM || 0;
+		}
+
 		const foundYear =
 			totalBeneficiariesByPartnerData[row.ImplementationYear];
 
@@ -281,6 +371,82 @@ function processRawData({
 		}
 	});
 
+	totalBeneficiariesByPartnerUs.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(
+				"totalBeneficiariesByPartnerUs",
+				row,
+				parsedRow.error.message,
+			);
+			//TODO: put the return back when the data has ImplementationYear
+			//return;
+		}
+
+		let foundYear;
+		if (row.ImplementationYear === null) {
+			foundYear = totalBeneficiariesByPartnerData[firstNSFTYear];
+		} else {
+			foundYear = totalBeneficiariesByPartnerData[row.ImplementationYear];
+		}
+
+		if (!foundYear) {
+			simpleWarn(
+				`No data found for totalBeneficiariesByPartnersUs ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		const foundFund = foundYear[row.PFId];
+		if (!foundFund) {
+			simpleWarn(
+				`No data found for totalBeneficiariesByPartnersUs PFId: ${row.PFId} in ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		const foundPartner = foundFund.find(
+			partner => partner.partner === row.PartnerTypeId,
+		);
+		if (!foundPartner) {
+			simpleWarn(
+				`No data found for totalBeneficiariesByPartnersUs PartnerTypeId: ${row.PartnerTypeId} in PFId: ${row.PFId} and ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		foundPartner.girls.targetedWithoutUS =
+			foundPartner.girls.targeted - (row.BenG || 0);
+		foundPartner.girls.reachedWithoutUS =
+			foundPartner.girls.reached - (row.AchG || 0);
+		foundPartner.boys.targetedWithoutUS =
+			foundPartner.boys.targeted - (row.BenB || 0);
+		foundPartner.boys.reachedWithoutUS =
+			foundPartner.boys.reached - (row.AchB || 0);
+		foundPartner.women.targetedWithoutUS =
+			foundPartner.women.targeted - (row.BenW || 0);
+		foundPartner.women.reachedWithoutUS =
+			foundPartner.women.reached - (row.AchW || 0);
+		foundPartner.men.targetedWithoutUS =
+			foundPartner.men.targeted - (row.BenM || 0);
+		foundPartner.men.reachedWithoutUS =
+			foundPartner.men.reached - (row.AchM || 0);
+	});
+
 	totalBeneficiariesBySector.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 
@@ -290,10 +456,6 @@ function processRawData({
 				row,
 				parsedRow.error.message,
 			);
-			return;
-		}
-
-		if (row.ProcessStatusId !== null) {
 			return;
 		}
 
@@ -317,6 +479,17 @@ function processRawData({
 			},
 		};
 
+		if (row.ImplementationYear >= firstNSFTYear) {
+			sectorsDatum.girls.targetedWithoutUS = row.BenG || 0;
+			sectorsDatum.girls.reachedWithoutUS = row.AchG || 0;
+			sectorsDatum.boys.targetedWithoutUS = row.BenB || 0;
+			sectorsDatum.boys.reachedWithoutUS = row.AchB || 0;
+			sectorsDatum.women.targetedWithoutUS = row.BenW || 0;
+			sectorsDatum.women.reachedWithoutUS = row.AchW || 0;
+			sectorsDatum.men.targetedWithoutUS = row.BenM || 0;
+			sectorsDatum.men.reachedWithoutUS = row.AchM || 0;
+		}
+
 		const foundYear =
 			totalBeneficiariesBySectorData[row.ImplementationYear];
 
@@ -332,6 +505,81 @@ function processRawData({
 				foundFund.push(sectorsDatum);
 			}
 		}
+	});
+
+	totalBeneficiariesBySectorUs.forEach(row => {
+		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(
+				"totalBeneficiariesBySectorUs",
+				row,
+				parsedRow.error.message,
+			);
+			//TODO: put the return back when the data has ImplementationYear
+			//return;
+		}
+
+		let foundYear;
+		if (row.ImplementationYear === null) {
+			foundYear = totalBeneficiariesBySectorData[firstNSFTYear];
+		} else {
+			foundYear = totalBeneficiariesBySectorData[row.ImplementationYear];
+		}
+
+		if (!foundYear) {
+			simpleWarn(
+				`No data found for totalBeneficiariesBySectorUs ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		const foundFund = foundYear[row.PFId];
+		if (!foundFund) {
+			simpleWarn(
+				`No data found for totalBeneficiariesBySectorUs PFId: ${row.PFId} in ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		const foundSector = foundFund.find(
+			sector => sector.sector === row.GlobalClusterId,
+		);
+		if (!foundSector) {
+			simpleWarn(
+				`No data found for totalBeneficiariesBySectorUs Sector: ${row.GlobalClusterId} in PFId: ${row.PFId} and ImplementationYear: ${
+					row.ImplementationYear === null
+						? firstNSFTYear
+						: row.ImplementationYear
+				}`,
+			);
+			return;
+		}
+
+		foundSector.girls.targetedWithoutUS =
+			foundSector.girls.targeted - (row.BenG || 0);
+		foundSector.girls.reachedWithoutUS =
+			foundSector.girls.reached - (row.AchG || 0);
+		foundSector.boys.targetedWithoutUS =
+			foundSector.boys.targeted - (row.BenB || 0);
+		foundSector.boys.reachedWithoutUS =
+			foundSector.boys.reached - (row.AchB || 0);
+		foundSector.women.targetedWithoutUS =
+			foundSector.women.targeted - (row.BenW || 0);
+		foundSector.women.reachedWithoutUS =
+			foundSector.women.reached - (row.AchW || 0);
+		foundSector.men.targetedWithoutUS =
+			foundSector.men.targeted - (row.BenM || 0);
+		foundSector.men.reachedWithoutUS =
+			foundSector.men.reached - (row.AchM || 0);
 	});
 
 	populateLocalizationData(

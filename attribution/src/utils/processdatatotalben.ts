@@ -2,13 +2,14 @@ import type { GenderAndAge, TotalBeneficiariesData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 import { constants } from "./constants";
 
-const { beneficiaryCategories } = constants;
+const { beneficiaryCategories, firstNSFTYear } = constants;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	funds: number[];
 	globalAttribution: number;
 	year: number;
+	hasUS: boolean;
 };
 
 export type TargetedAndReachedTotal = {
@@ -21,6 +22,7 @@ function processDataTotalBeneficiaries({
 	funds,
 	globalAttribution,
 	year,
+	hasUS,
 }: ProcessDataTotalBeneficiariesParams): TargetedAndReachedTotal {
 	const targeted = {
 		girls: 0,
@@ -37,6 +39,11 @@ function processDataTotalBeneficiaries({
 		total: 0,
 	};
 
+	const targetKey =
+		year >= firstNSFTYear && !hasUS ? "targetedWithoutUS" : "targeted";
+	const reachedKey =
+		year >= firstNSFTYear && !hasUS ? "reachedWithoutUS" : "reached";
+
 	funds.forEach(pf => {
 		if (!totalBeneficiariesData[year]) {
 			simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
@@ -51,11 +58,13 @@ function processDataTotalBeneficiaries({
 
 		const thisYearData = totalBeneficiariesData[year];
 
-		targeted.total += thisYearData[pf].total.targeted;
-		reached.total += thisYearData[pf].total.reached;
+		targeted.total += thisYearData[pf].total[targetKey] || 0;
+		reached.total += thisYearData[pf].total[reachedKey] || 0;
 		beneficiaryCategories.forEach(genderAndAge => {
-			targeted[genderAndAge] += thisYearData[pf][genderAndAge].targeted;
-			reached[genderAndAge] += thisYearData[pf][genderAndAge].reached;
+			targeted[genderAndAge] +=
+				thisYearData[pf][genderAndAge][targetKey] || 0;
+			reached[genderAndAge] +=
+				thisYearData[pf][genderAndAge][reachedKey] || 0;
 		});
 	});
 

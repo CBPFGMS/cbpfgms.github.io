@@ -115,8 +115,9 @@ function MainContainer({ donor }: MainContainerProps) {
 				funds,
 				globalAttribution: attributions.global.percentage,
 				year,
+				hasUS,
 			}),
-		[totalBeneficiariesData, funds, attributions, year],
+		[totalBeneficiariesData, funds, attributions, year, hasUS],
 	);
 
 	const { dataSector, dataOrganization } = useMemo(

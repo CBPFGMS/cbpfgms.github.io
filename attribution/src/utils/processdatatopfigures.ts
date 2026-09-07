@@ -24,7 +24,7 @@ export type DataTopFigures = {
 	reached: number;
 };
 
-const { USProjectsString } = constants;
+const { USProjectsString, firstNSFTYear } = constants;
 
 function processDataTopFigures({
 	allocationsData,
@@ -41,6 +41,11 @@ function processDataTopFigures({
 		targeted = 0,
 		reached = 0;
 
+	const targetKey =
+		year >= firstNSFTYear && !hasUS ? "targetedWithoutUS" : "targeted";
+	const reachedKey =
+		year >= firstNSFTYear && !hasUS ? "reachedWithoutUS" : "reached";
+
 	funds.forEach(pf => {
 		if (!totalBeneficiariesData[year]) {
 			simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
@@ -55,8 +60,8 @@ function processDataTopFigures({
 
 		const thisYearData = totalBeneficiariesData[year];
 
-		targeted += thisYearData[pf].total.targeted;
-		reached += thisYearData[pf].total.reached;
+		targeted += thisYearData[pf].total[targetKey] || 0;
+		reached += thisYearData[pf].total[reachedKey] || 0;
 	});
 
 	allocationsData.forEach(row => {

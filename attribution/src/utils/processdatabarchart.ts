@@ -26,7 +26,7 @@ type ProcessDataBarChartParams = {
 	hasUS: boolean;
 };
 
-const { beneficiaryCategories, USProjectsString } = constants;
+const { beneficiaryCategories, USProjectsString, firstNSFTYear } = constants;
 
 function processDataBarChart({
 	allocationsData,
@@ -42,6 +42,11 @@ function processDataBarChart({
 } {
 	const dataOrganization: DatumBarChart[] = [];
 	const dataSector: DatumBarChart[] = [];
+
+	const targetKey =
+		year >= firstNSFTYear && !hasUS ? "targetedWithoutUS" : "targeted";
+	const reachedKey =
+		year >= firstNSFTYear && !hasUS ? "reachedWithoutUS" : "reached";
 
 	allocationsData.forEach(datum => {
 		if (!hasUS && datum.projectCode.includes(USProjectsString)) {
@@ -146,14 +151,14 @@ function processDataBarChart({
 				totalPartners => totalPartners.partner === org.type,
 			);
 			if (foundPartner) {
-				org.targeted.girls += foundPartner.girls.targeted;
-				org.targeted.boys += foundPartner.boys.targeted;
-				org.targeted.women += foundPartner.women.targeted;
-				org.targeted.men += foundPartner.men.targeted;
-				org.reached.girls += foundPartner.girls.reached;
-				org.reached.boys += foundPartner.boys.reached;
-				org.reached.women += foundPartner.women.reached;
-				org.reached.men += foundPartner.men.reached;
+				org.targeted.girls += foundPartner.girls[targetKey] || 0;
+				org.targeted.boys += foundPartner.boys[targetKey] || 0;
+				org.targeted.women += foundPartner.women[targetKey] || 0;
+				org.targeted.men += foundPartner.men[targetKey] || 0;
+				org.reached.girls += foundPartner.girls[reachedKey] || 0;
+				org.reached.boys += foundPartner.boys[reachedKey] || 0;
+				org.reached.women += foundPartner.women[reachedKey] || 0;
+				org.reached.men += foundPartner.men[reachedKey] || 0;
 			}
 		});
 	});
@@ -177,18 +182,19 @@ function processDataBarChart({
 				return;
 			}
 
-			const foundPartner = totalBeneficiariesBySectorData[year][pf].find(
-				totalPartners => totalPartners.sector === sect.type,
+			const foundSector = totalBeneficiariesBySectorData[year][pf].find(
+				totalSectors => totalSectors.sector === sect.type,
 			);
-			if (foundPartner) {
-				sect.targeted.girls += foundPartner.girls.targeted;
-				sect.targeted.boys += foundPartner.boys.targeted;
-				sect.targeted.women += foundPartner.women.targeted;
-				sect.targeted.men += foundPartner.men.targeted;
-				sect.reached.girls += foundPartner.girls.reached;
-				sect.reached.boys += foundPartner.boys.reached;
-				sect.reached.women += foundPartner.women.reached;
-				sect.reached.men += foundPartner.men.reached;
+			
+			if (foundSector) {
+				sect.targeted.girls += foundSector.girls[targetKey] || 0;
+				sect.targeted.boys += foundSector.boys[targetKey] || 0;
+				sect.targeted.women += foundSector.women[targetKey] || 0;
+				sect.targeted.men += foundSector.men[targetKey] || 0;
+				sect.reached.girls += foundSector.girls[reachedKey] || 0;
+				sect.reached.boys += foundSector.boys[reachedKey] || 0;
+				sect.reached.women += foundSector.women[reachedKey] || 0;
+				sect.reached.men += foundSector.men[reachedKey] || 0;
 			}
 		});
 	});
