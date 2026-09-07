@@ -2925,17 +2925,10 @@
 						datum.numberOfProjects +
 						"</span></div></div>" +
 						divSpacer +
-						"<span class='pbimapTooltipTitle2'>" +
-						formatMoney0Decimals(datum.beneficiaries) +
-						" Targeted People</span><br>" +
-						"<span class='pbimapTooltipTitle2'>" +
-						formatMoney0Decimals(datum.beneficiariesReached) +
-						" Reached People (" +
-						reachedPercentage +
-						"%)</span><div id='pbimapTooltipSvgDiv'></div><div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>",
+						"<div class='pbimapTooltipButtonDiv'><button>Show Projects</button></div>",
 				);
 
-			createTooltipSvg();
+			//createTooltipSvg();
 
 			const thisBox = thisElement.getBoundingClientRect();
 
