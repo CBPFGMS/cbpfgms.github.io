@@ -74,7 +74,7 @@ function TopSelectors({
 	) {
 		setYear(value);
 		setFunds(Array.from(inContributionsDataLists.fundsPerYear[value]));
-		setHasUS(value < firstNSFTYear);
+		setHasUS(value < firstNSFTYear || donor === USCode);
 	}
 
 	function handleChangeHasUS(
