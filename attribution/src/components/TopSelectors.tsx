@@ -72,9 +72,11 @@ function TopSelectors({
 		_event: React.MouseEvent<HTMLElement, MouseEvent>,
 		value: typeof year,
 	) {
-		setYear(value);
-		setFunds(Array.from(inContributionsDataLists.fundsPerYear[value]));
-		setHasUS(value < firstNSFTYear || donor === USCode);
+		if (value !== null) {
+			setYear(value);
+			setFunds(Array.from(inContributionsDataLists.fundsPerYear[value]));
+			setHasUS(value < firstNSFTYear || donor === USCode);
+		}
 	}
 
 	function handleChangeHasUS(

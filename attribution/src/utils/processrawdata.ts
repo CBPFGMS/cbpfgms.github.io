@@ -249,11 +249,11 @@ function processRawData({
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			warnInvalidSchema(
-				"totalBeneficiariesDataUS",
-				row,
-				parsedRow.error.message,
-			);
+			// warnInvalidSchema(
+			// 	"totalBeneficiariesDataUS",
+			// 	row,
+			// 	parsedRow.error.message,
+			// );
 			//TODO: put the return back when the data has ImplementationYear
 			//return;
 		}
@@ -376,11 +376,11 @@ function processRawData({
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			warnInvalidSchema(
-				"totalBeneficiariesByPartnerUs",
-				row,
-				parsedRow.error.message,
-			);
+			// warnInvalidSchema(
+			// 	"totalBeneficiariesByPartnerUs",
+			// 	row,
+			// 	parsedRow.error.message,
+			// );
 			//TODO: put the return back when the data has ImplementationYear
 			//return;
 		}
@@ -511,11 +511,11 @@ function processRawData({
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			warnInvalidSchema(
-				"totalBeneficiariesBySectorUs",
-				row,
-				parsedRow.error.message,
-			);
+			// warnInvalidSchema(
+			// 	"totalBeneficiariesBySectorUs",
+			// 	row,
+			// 	parsedRow.error.message,
+			// );
 			//TODO: put the return back when the data has ImplementationYear
 			//return;
 		}
@@ -624,23 +624,39 @@ function processRawData({
 			} else {
 				const projectData = sectorsDataMap.get(row.ChfProjectCode);
 				if (projectData) {
-					projectData.sectors.push({
-						sectorId: row.GlobalClusterId,
-						percentage: row.Percentage / 100,
-						reached: {
-							girls: row.ActualGirls || 0,
-							boys: row.ActualBoys || 0,
-							women: row.ActualWomen || 0,
-							men: row.ActualMen || 0,
-						},
-						targeted: {
-							girls: row.TargetGirls || 0,
-							boys: row.TargetBoys || 0,
-							women: row.TargetWomen || 0,
-							men: row.TargetMen || 0,
-						},
-						budget: row.CALCBudgetByCluster,
-					});
+					const foundSector = projectData.sectors.find(
+						sector => sector.sectorId === row.GlobalClusterId,
+					);
+					if (!foundSector) {
+						projectData.sectors.push({
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage / 100,
+							reached: {
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
+							},
+							targeted: {
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
+							},
+							budget: row.CALCBudgetByCluster,
+						});
+					} else {
+						foundSector.percentage += row.Percentage / 100;
+						foundSector.reached.girls += row.ActualGirls || 0;
+						foundSector.reached.boys += row.ActualBoys || 0;
+						foundSector.reached.women += row.ActualWomen || 0;
+						foundSector.reached.men += row.ActualMen || 0;
+						foundSector.targeted.girls += row.TargetGirls || 0;
+						foundSector.targeted.boys += row.TargetBoys || 0;
+						foundSector.targeted.women += row.TargetWomen || 0;
+						foundSector.targeted.men += row.TargetMen || 0;
+						foundSector.budget += row.CALCBudgetByCluster;
+					}
 				} else {
 					warnProjectNotFound(
 						row.ChfProjectCode,
