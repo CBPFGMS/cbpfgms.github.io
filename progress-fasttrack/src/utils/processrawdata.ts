@@ -381,22 +381,37 @@ function processRawData({
 			} else {
 				const projectData = sectorsDataMap.get(row.ChfProjectCode);
 				if (projectData) {
-					projectData.sectors.push({
-						sectorId: row.GlobalClusterId,
-						percentage: row.Percentage,
-						reached: {
-							girls: row.ActualGirls || 0,
-							boys: row.ActualBoys || 0,
-							women: row.ActualWomen || 0,
-							men: row.ActualMen || 0,
-						},
-						targeted: {
-							girls: row.TargetGirls || 0,
-							boys: row.TargetBoys || 0,
-							women: row.TargetWomen || 0,
-							men: row.TargetMen || 0,
-						},
-					});
+					const foundSector = projectData.sectors.find(
+						sector => sector.sectorId === row.GlobalClusterId,
+					);
+					if (!foundSector) {
+						projectData.sectors.push({
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage,
+							reached: {
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
+							},
+							targeted: {
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
+							},
+						});
+					} else {
+						foundSector.percentage += row.Percentage;
+						foundSector.reached.girls += row.ActualGirls || 0;
+						foundSector.reached.boys += row.ActualBoys || 0;
+						foundSector.reached.women += row.ActualWomen || 0;
+						foundSector.reached.men += row.ActualMen || 0;
+						foundSector.targeted.girls += row.TargetGirls || 0;
+						foundSector.targeted.boys += row.TargetBoys || 0;
+						foundSector.targeted.women += row.TargetWomen || 0;
+						foundSector.targeted.men += row.TargetMen || 0;
+					}
 				} else {
 					warnProjectNotFound(
 						row.ChfProjectCode,
