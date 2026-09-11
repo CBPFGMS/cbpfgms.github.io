@@ -175,27 +175,42 @@ function processRawData({
 			} else {
 				const projectData = sectorsDataMap.get(row.ChfProjectCode);
 				if (projectData) {
-					projectData.sectors.push({
-						sectorId: row.GlobalClusterId,
-						percentage: row.Percentage,
-						reached: {
-							girls: row.ActualGirls || 0,
-							boys: row.ActualBoys || 0,
-							women: row.ActualWomen || 0,
-							men: row.ActualMen || 0,
-						},
-						targeted: {
-							girls: row.TargetGirls || 0,
-							boys: row.TargetBoys || 0,
-							women: row.TargetWomen || 0,
-							men: row.TargetMen || 0,
-						},
-					});
+					const foundSector = projectData.sectors.find(
+						sector => sector.sectorId === row.GlobalClusterId,
+					);
+					if (!foundSector) {
+						projectData.sectors.push({
+							sectorId: row.GlobalClusterId,
+							percentage: row.Percentage,
+							reached: {
+								girls: row.ActualGirls || 0,
+								boys: row.ActualBoys || 0,
+								women: row.ActualWomen || 0,
+								men: row.ActualMen || 0,
+							},
+							targeted: {
+								girls: row.TargetGirls || 0,
+								boys: row.TargetBoys || 0,
+								women: row.TargetWomen || 0,
+								men: row.TargetMen || 0,
+							},
+						});
+					} else {
+						foundSector.percentage += row.Percentage;
+						foundSector.reached.girls += row.ActualGirls || 0;
+						foundSector.reached.boys += row.ActualBoys || 0;
+						foundSector.reached.women += row.ActualWomen || 0;
+						foundSector.reached.men += row.ActualMen || 0;
+						foundSector.targeted.girls += row.TargetGirls || 0;
+						foundSector.targeted.boys += row.TargetBoys || 0;
+						foundSector.targeted.women += row.TargetWomen || 0;
+						foundSector.targeted.men += row.TargetMen || 0;
+					}
 				} else {
 					warnProjectNotFound(
 						row.ChfProjectCode,
 						row,
-						"Project not found in sectorsDataMap"
+						"Project not found in sectorsDataMap",
 					);
 				}
 			}
@@ -203,7 +218,7 @@ function processRawData({
 			warnInvalidSchema(
 				"sectorsData",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
@@ -243,7 +258,7 @@ function processRawData({
 					warnProjectNotFound(
 						row.ChfProjectCode,
 						row,
-						"Project not found in cvaDataMap"
+						"Project not found in cvaDataMap",
 					);
 				}
 			}
@@ -273,7 +288,7 @@ function processRawData({
 					warnProjectNotFound(
 						row.CHFId.toString(),
 						row,
-						"Emergency not found in emergenciesDataMap"
+						"Emergency not found in emergenciesDataMap",
 					);
 				}
 			}
@@ -281,7 +296,7 @@ function processRawData({
 			warnInvalidSchema(
 				"emergenciesData",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
@@ -304,7 +319,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in allocation types"
+					"Project not found in allocation types",
 				);
 			}
 
@@ -312,7 +327,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in organizations"
+					"Project not found in organizations",
 				);
 			}
 
@@ -320,7 +335,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in statuses"
+					"Project not found in statuses",
 				);
 			}
 
@@ -328,7 +343,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in sectors data"
+					"Project not found in sectors data",
 				);
 			}
 
@@ -353,7 +368,7 @@ function processRawData({
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
 				listsObj.projectDetails.set(row.ChfId, {
@@ -361,7 +376,7 @@ function processRawData({
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
@@ -383,7 +398,7 @@ function processRawData({
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
 					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
+						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
@@ -396,15 +411,15 @@ function processRawData({
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
 						row,
-						"targeted"
+						"targeted",
 					),
 					disabledReached: generateBeneficiariesObjectSummary(
 						row,
-						"disabledReached"
+						"disabledReached",
 					),
 					disabledTargeted: generateBeneficiariesObjectSummary(
 						row,
-						"disabledTargeted"
+						"disabledTargeted",
 					),
 					reachedByBeneficiaryType,
 					targetedByBeneficiaryType,
@@ -424,7 +439,7 @@ function processRawData({
 			warnInvalidSchema(
 				"projectSummary",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});
@@ -444,7 +459,7 @@ function processRawData({
 
 function generateBeneficiariesSplitObject(
 	row: ProjectSummaryObject,
-	type: "Ach" | "Ben"
+	type: "Ach" | "Ben",
 ): BeneficiaryTypes {
 	const zeroSplit = [0, 0, 0, 0, 0];
 	const girlsColumn = row[`${type}GSplit`],
@@ -480,7 +495,7 @@ function generateBeneficiariesSplitObject(
 
 function generateBeneficiariesObjectSummary(
 	row: ProjectSummaryObject,
-	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted"
+	type: "reached" | "targeted" | "disabledReached" | "disabledTargeted",
 ): BeneficiariesObject {
 	let girls = 0,
 		boys = 0,
