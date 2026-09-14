@@ -90,12 +90,12 @@ const pooledFundsMasterUrl =
 		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&$format=csv",
 	totalBeneficiariesBySectorUrl =
 		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&$format=csv",
-	totalBeneficiariesUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&group_name=US_Tranche_2026&$format=csv",
-	totalBeneficiariesByPartnerUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&group_name=US_Tranche_2026&$format=csv",
-	totalBeneficiariesBySectorUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&group_name=US_Tranche_2026&$format=csv";
+	totalBeneficiariesWithoutUsUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
+	totalBeneficiariesByPartnerWithoutUsUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
+	totalBeneficiariesBySectorWithoutUsUrl =
+		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv";
 
 export async function fetchAppData(
 	startYear: number | null,
@@ -170,18 +170,18 @@ export async function fetchAppData(
 			"csv",
 		),
 		fetchFileDB<TotalBeneficiariesObject[]>(
-			"totalBeneficiariesUs",
-			totalBeneficiariesUsUrl,
+			"totalBeneficiariesWithoutUs",
+			totalBeneficiariesWithoutUsUrl,
 			"csv",
 		),
 		fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
-			"totalBeneficiariesByPartnerUs",
-			totalBeneficiariesByPartnerUsUrl,
+			"totalBeneficiariesByPartnerWithoutUs",
+			totalBeneficiariesByPartnerWithoutUsUrl,
 			"csv",
 		),
 		fetchFileDB<TotalBeneficiariesBySectorObject[]>(
-			"totalBeneficiariesBySectorUs",
-			totalBeneficiariesBySectorUsUrl,
+			"totalBeneficiariesBySectorWithoutUs",
+			totalBeneficiariesBySectorWithoutUsUrl,
 			"csv",
 		),
 		fetchFileDB<AllocationsByYearAndFundObject[]>(
@@ -248,9 +248,9 @@ export async function fetchAppData(
 			totalBeneficiaries,
 			totalBeneficiariesByPartner,
 			totalBeneficiariesBySector,
-			totalBeneficiariesUs,
-			totalBeneficiariesByPartnerUs,
-			totalBeneficiariesBySectorUs,
+			totalBeneficiariesWithoutUs,
+			totalBeneficiariesByPartnerWithoutUs,
+			totalBeneficiariesBySectorWithoutUs,
 			allocationsByYearAndFundWithUS,
 			allocationsByYearAndFundWithoutUS,
 			allocationTypesMaster,
@@ -294,9 +294,9 @@ export async function fetchAppData(
 			totalBeneficiaries,
 			totalBeneficiariesByPartner,
 			totalBeneficiariesBySector,
-			totalBeneficiariesUs,
-			totalBeneficiariesByPartnerUs,
-			totalBeneficiariesBySectorUs,
+			totalBeneficiariesWithoutUs,
+			totalBeneficiariesByPartnerWithoutUs,
+			totalBeneficiariesBySectorWithoutUs,
 			allocationsByYearAndFundWithUS,
 			allocationsByYearAndFundWithoutUS,
 			lists,

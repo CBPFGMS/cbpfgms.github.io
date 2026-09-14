@@ -190,7 +190,7 @@ function Partners({
 				<Box
 					sx={{
 						width: "100%",
-						height: "22px",
+						height: "6px",
 						backgroundColor: "#f3f3f3",
 						borderTop: "1px solid #e0e0e0",
 					}}

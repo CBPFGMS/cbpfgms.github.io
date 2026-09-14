@@ -95,9 +95,9 @@ type ProcessRawDataParams = {
 	totalBeneficiaries: TotalBeneficiariesObject[];
 	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
-	totalBeneficiariesUs: TotalBeneficiariesObject[];
-	totalBeneficiariesByPartnerUs: TotalBeneficiariesByPartnerObject[];
-	totalBeneficiariesBySectorUs: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesWithoutUs: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartnerWithoutUs: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySectorWithoutUs: TotalBeneficiariesBySectorObject[];
 	allocationsByYearAndFundWithUS: AllocationsByYearAndFundObject[];
 	allocationsByYearAndFundWithoutUS: AllocationsByYearAndFundObject[];
 };
@@ -146,9 +146,9 @@ function processRawData({
 	totalBeneficiaries,
 	totalBeneficiariesByPartner,
 	totalBeneficiariesBySector,
-	totalBeneficiariesUs,
-	totalBeneficiariesByPartnerUs,
-	totalBeneficiariesBySectorUs,
+	totalBeneficiariesWithoutUs,
+	totalBeneficiariesByPartnerWithoutUs,
+	totalBeneficiariesBySectorWithoutUs,
 	allocationsByYearAndFundWithUS,
 	allocationsByYearAndFundWithoutUS,
 }: ProcessRawDataParams): {
@@ -245,17 +245,16 @@ function processRawData({
 		}
 	});
 
-	totalBeneficiariesUs.forEach(row => {
+	totalBeneficiariesWithoutUs.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			// warnInvalidSchema(
-			// 	"totalBeneficiariesDataUS",
-			// 	row,
-			// 	parsedRow.error.message,
-			// );
-			//TODO: put the return back when the data has ImplementationYear
-			//return;
+			warnInvalidSchema(
+				"totalBeneficiariesDataUS",
+				row,
+				parsedRow.error.message,
+			);
+			return;
 		}
 
 		let foundYear;
@@ -288,26 +287,16 @@ function processRawData({
 			return;
 		}
 
-		foundFund.total.targetedWithoutUS =
-			foundFund.total.targeted - (row.TotTarg || 0);
-		foundFund.total.reachedWithoutUS =
-			foundFund.total.reached - (row.TotAch || 0);
-		foundFund.girls.targetedWithoutUS =
-			foundFund.girls.targeted - (row.BenG || 0);
-		foundFund.girls.reachedWithoutUS =
-			foundFund.girls.reached - (row.AchG || 0);
-		foundFund.boys.targetedWithoutUS =
-			foundFund.boys.targeted - (row.BenB || 0);
-		foundFund.boys.reachedWithoutUS =
-			foundFund.boys.reached - (row.AchB || 0);
-		foundFund.women.targetedWithoutUS =
-			foundFund.women.targeted - (row.BenW || 0);
-		foundFund.women.reachedWithoutUS =
-			foundFund.women.reached - (row.AchW || 0);
-		foundFund.men.targetedWithoutUS =
-			foundFund.men.targeted - (row.BenM || 0);
-		foundFund.men.reachedWithoutUS =
-			foundFund.men.reached - (row.AchM || 0);
+		foundFund.total.targetedWithoutUS = row.TotTarg || 0;
+		foundFund.total.reachedWithoutUS = row.TotAch || 0;
+		foundFund.girls.targetedWithoutUS = row.BenG || 0;
+		foundFund.girls.reachedWithoutUS = row.AchG || 0;
+		foundFund.boys.targetedWithoutUS = row.BenB || 0;
+		foundFund.boys.reachedWithoutUS = row.AchB || 0;
+		foundFund.women.targetedWithoutUS = row.BenW || 0;
+		foundFund.women.reachedWithoutUS = row.AchW || 0;
+		foundFund.men.targetedWithoutUS = row.BenM || 0;
+		foundFund.men.reachedWithoutUS = row.AchM || 0;
 	});
 
 	totalBeneficiariesByPartner.forEach(row => {
@@ -371,18 +360,17 @@ function processRawData({
 		}
 	});
 
-	totalBeneficiariesByPartnerUs.forEach(row => {
+	totalBeneficiariesByPartnerWithoutUs.forEach(row => {
 		const parsedRow =
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			// warnInvalidSchema(
-			// 	"totalBeneficiariesByPartnerUs",
-			// 	row,
-			// 	parsedRow.error.message,
-			// );
-			//TODO: put the return back when the data has ImplementationYear
-			//return;
+			warnInvalidSchema(
+				"totalBeneficiariesByPartnerUs",
+				row,
+				parsedRow.error.message,
+			);
+			return;
 		}
 
 		let foundYear;
@@ -429,22 +417,14 @@ function processRawData({
 			return;
 		}
 
-		foundPartner.girls.targetedWithoutUS =
-			foundPartner.girls.targeted - (row.BenG || 0);
-		foundPartner.girls.reachedWithoutUS =
-			foundPartner.girls.reached - (row.AchG || 0);
-		foundPartner.boys.targetedWithoutUS =
-			foundPartner.boys.targeted - (row.BenB || 0);
-		foundPartner.boys.reachedWithoutUS =
-			foundPartner.boys.reached - (row.AchB || 0);
-		foundPartner.women.targetedWithoutUS =
-			foundPartner.women.targeted - (row.BenW || 0);
-		foundPartner.women.reachedWithoutUS =
-			foundPartner.women.reached - (row.AchW || 0);
-		foundPartner.men.targetedWithoutUS =
-			foundPartner.men.targeted - (row.BenM || 0);
-		foundPartner.men.reachedWithoutUS =
-			foundPartner.men.reached - (row.AchM || 0);
+		foundPartner.girls.targetedWithoutUS = row.BenG || 0;
+		foundPartner.girls.reachedWithoutUS = row.AchG || 0;
+		foundPartner.boys.targetedWithoutUS = row.BenB || 0;
+		foundPartner.boys.reachedWithoutUS = row.AchB || 0;
+		foundPartner.women.targetedWithoutUS = row.BenW || 0;
+		foundPartner.women.reachedWithoutUS = row.AchW || 0;
+		foundPartner.men.targetedWithoutUS = row.BenM || 0;
+		foundPartner.men.reachedWithoutUS = row.AchM || 0;
 	});
 
 	totalBeneficiariesBySector.forEach(row => {
@@ -507,17 +487,16 @@ function processRawData({
 		}
 	});
 
-	totalBeneficiariesBySectorUs.forEach(row => {
+	totalBeneficiariesBySectorWithoutUs.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 
 		if (!parsedRow.success) {
-			// warnInvalidSchema(
-			// 	"totalBeneficiariesBySectorUs",
-			// 	row,
-			// 	parsedRow.error.message,
-			// );
-			//TODO: put the return back when the data has ImplementationYear
-			//return;
+			warnInvalidSchema(
+				"totalBeneficiariesBySectorUs",
+				row,
+				parsedRow.error.message,
+			);
+			return;
 		}
 
 		let foundYear;
@@ -564,22 +543,14 @@ function processRawData({
 			return;
 		}
 
-		foundSector.girls.targetedWithoutUS =
-			foundSector.girls.targeted - (row.BenG || 0);
-		foundSector.girls.reachedWithoutUS =
-			foundSector.girls.reached - (row.AchG || 0);
-		foundSector.boys.targetedWithoutUS =
-			foundSector.boys.targeted - (row.BenB || 0);
-		foundSector.boys.reachedWithoutUS =
-			foundSector.boys.reached - (row.AchB || 0);
-		foundSector.women.targetedWithoutUS =
-			foundSector.women.targeted - (row.BenW || 0);
-		foundSector.women.reachedWithoutUS =
-			foundSector.women.reached - (row.AchW || 0);
-		foundSector.men.targetedWithoutUS =
-			foundSector.men.targeted - (row.BenM || 0);
-		foundSector.men.reachedWithoutUS =
-			foundSector.men.reached - (row.AchM || 0);
+		foundSector.girls.targetedWithoutUS = row.BenG || 0;
+		foundSector.girls.reachedWithoutUS = row.AchG || 0;
+		foundSector.boys.targetedWithoutUS = row.BenB || 0;
+		foundSector.boys.reachedWithoutUS = row.AchB || 0;
+		foundSector.women.targetedWithoutUS = row.BenW || 0;
+		foundSector.women.reachedWithoutUS = row.AchW || 0;
+		foundSector.men.targetedWithoutUS = row.BenM || 0;
+		foundSector.men.reachedWithoutUS = row.AchM || 0;
 	});
 
 	populateLocalizationData(
