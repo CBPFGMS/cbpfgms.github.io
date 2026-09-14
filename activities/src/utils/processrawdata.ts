@@ -2,9 +2,11 @@ import {
 	type ProjectSummaryObject,
 	type ProjectSummaryAggregatedObject,
 	type ActivitiesObject,
+	type TemplatesMasterJson,
 	projectSummaryObjectSchema,
 	projectSummaryAggregatedObjectSchema,
 	activitiesObjectSchema,
+	templatesMasterObjectSchema,
 } from "./schemas";
 import type { List } from "./makelists";
 import warnInvalidSchema, {
@@ -12,6 +14,7 @@ import warnInvalidSchema, {
 	simpleWarn,
 } from "./warninvalid";
 import { constants, projectStatusMapping } from "./constants";
+import type { Tranche, TrancheNumbers } from "../components/MainContainer";
 
 export type Datum = {
 	fund: number;
@@ -27,6 +30,7 @@ export type Datum = {
 	longitude: number;
 	sector: number;
 	activity: number;
+	tranche: TrancheNumbers;
 };
 
 export type Data = Datum[];
@@ -40,6 +44,15 @@ export type InDataLists = {
 	projectStatuses: Set<number>;
 	activities: Set<number>;
 	adminLevels: Set<number>;
+	yearsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	sectorsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	allocationSourcesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	fundsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	organizationTypesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	projectStatusesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	activitiesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	adminLevelsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
+	projectsPerTranche: { [tranche in TrancheNumbers]: Set<string> };
 };
 
 type SetType<T> = {
@@ -53,6 +66,7 @@ type ProcessRawDataParams = {
 	projectSummaryAggregated: ProjectSummaryAggregatedObject[];
 	activities: ActivitiesObject[];
 	lists: List;
+	templatesMaster: TemplatesMasterJson;
 };
 
 type ActivitiesPerLocationId = Map<
@@ -66,13 +80,14 @@ type ParentAdminLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
 const seenActivitySector = new Set<string>();
 
-const { lastAdminLevel } = constants;
+const { lastAdminLevel, tranche1Name, tranche2Name } = constants;
 
 function processRawData({
 	projectSummary,
 	projectSummaryAggregated,
 	activities,
 	lists,
+	templatesMaster,
 }: ProcessRawDataParams): {
 	data: Data;
 	inDataLists: InDataLists;
@@ -93,6 +108,79 @@ function processRawData({
 	const activitiesSet: Set<InDataListsValues["activities"]> = new Set();
 	const adminLevelsSet: Set<InDataListsValues["adminLevels"]> = new Set();
 
+	const yearsPerTranche: InDataLists["yearsPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+	const sectorsPerTranche: InDataLists["sectorsPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+	const allocationSourcesPerTranche: InDataLists["allocationSourcesPerTranche"] =
+		{
+			1: new Set(),
+			2: new Set(),
+		};
+	const organizationTypesPerTranche: InDataLists["organizationTypesPerTranche"] =
+		{
+			1: new Set(),
+			2: new Set(),
+		};
+	const projectStatusesPerTranche: InDataLists["projectStatusesPerTranche"] =
+		{
+			1: new Set(),
+			2: new Set(),
+		};
+	const activitiesPerTranche: InDataLists["activitiesPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+	const adminLevelsPerTranche: InDataLists["adminLevelsPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+	const fundsPerTranche: InDataLists["fundsPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+	const projectsPerTranche: InDataLists["projectsPerTranche"] = {
+		1: new Set(),
+		2: new Set(),
+	};
+
+	templatesMaster.data.forEach(row => {
+		const parsedRow = templatesMasterObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema("templatesMaster", row, parsedRow.error.message);
+			return;
+		}
+
+		const thisTranche: Tranche = row.GroupNames.includes(tranche1Name)
+			? 1
+			: row.GroupNames.includes(tranche2Name)
+				? 2
+				: "all";
+
+		if (thisTranche !== "all") {
+			(fundsPerTranche[thisTranche] ??= new Set([row.PFId])).add(
+				row.PFId,
+			);
+
+			if (projectsPerTranche[thisTranche] === undefined) {
+				projectsPerTranche[thisTranche] = new Set(row.ProjectCodes);
+			} else {
+				row.ProjectCodes.forEach(projectCode => {
+					projectsPerTranche[thisTranche].add(projectCode);
+				});
+			}
+		} else {
+			simpleWarn(
+				`Templates master GroupNames ${row.GroupNames} did not match any known tranche`,
+			);
+		}
+	});
+
 	activities.forEach(row => {
 		const parsedRow = activitiesObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -107,6 +195,18 @@ function processRawData({
 				return;
 			}
 
+			const thisTranche = getTrancheForProject(
+				row.CHFProjectCode,
+				projectsPerTranche,
+			);
+
+			if (!thisTranche) {
+				simpleWarn(
+					`Project code ${row.CHFProjectCode} in activities data did not match any known tranche`,
+				);
+				return;
+			}
+
 			if (lists.activitiesPerSector[row.GlobalClusterId]) {
 				lists.activitiesPerSector[row.GlobalClusterId].add(
 					row.GlobalStandardActivityID,
@@ -115,6 +215,20 @@ function processRawData({
 				lists.activitiesPerSector[row.GlobalClusterId] = new Set([
 					row.GlobalStandardActivityID,
 				]);
+			}
+
+			if (
+				lists.activitiesPerTrancheAndSector[thisTranche][
+					row.GlobalClusterId
+				]
+			) {
+				lists.activitiesPerTrancheAndSector[thisTranche][
+					row.GlobalClusterId
+				].add(row.GlobalStandardActivityID);
+			} else {
+				lists.activitiesPerTrancheAndSector[thisTranche][
+					row.GlobalClusterId
+				] = new Set([row.GlobalStandardActivityID]);
 			}
 
 			if (!seenActivitySector.has(compositeKey)) {
@@ -181,6 +295,11 @@ function processRawData({
 			const latitude = coord ? +coord.split(",")[0] : null;
 			const longitude = coord ? +coord.split(",")[1] : null;
 
+			const thisTranche = getTrancheForProject(
+				row.PrjCode,
+				projectsPerTranche,
+			);
+
 			if (!thisProject) {
 				warnProjectNotFound(
 					row.PrjCode,
@@ -205,6 +324,14 @@ function processRawData({
 				);
 			}
 
+			if (!thisTranche) {
+				warnProjectNotFound(
+					row.PrjCode,
+					row,
+					"Project not found in any tranche",
+				);
+			}
+
 			if (thisProject) {
 				lists.projectDetails.set(row.PrjCode, {
 					year: row.AYr,
@@ -216,20 +343,44 @@ function processRawData({
 				});
 			}
 
-			if (thisProject && thisActivity && latitude && longitude) {
+			if (
+				thisProject &&
+				thisActivity &&
+				latitude &&
+				longitude &&
+				thisTranche
+			) {
 				const sectors = thisActivity.map(a => a.sector);
 				const activitiesArray = thisActivity.map(a => a.activity);
 
 				yearsSet.add(row.AYr);
-				sectors.forEach(s => sectorsSet.add(s));
+				yearsPerTranche[thisTranche].add(row.AYr);
+				sectors.forEach(s => {
+					sectorsPerTranche[thisTranche].add(s);
+					sectorsSet.add(s);
+				});
 				fundsSet.add(row.PFId);
+				fundsPerTranche[thisTranche].add(row.PFId);
 				allocationSourcesSet.add(thisProject.AllSrc);
+				allocationSourcesPerTranche[thisTranche].add(
+					thisProject.AllSrc,
+				);
 				organizationTypesSet.add(thisProject.OrgTypeId);
+				organizationTypesPerTranche[thisTranche].add(
+					thisProject.OrgTypeId,
+				);
 				projectStatusesSet.add(
 					projectStatusMapping[thisProject.PrjStsId],
 				);
-				activitiesArray.forEach(a => activitiesSet.add(a));
+				projectStatusesPerTranche[thisTranche].add(
+					projectStatusMapping[thisProject.PrjStsId],
+				);
+				activitiesArray.forEach(a => {
+					activitiesPerTranche[thisTranche].add(a);
+					activitiesSet.add(a);
+				});
 				adminLevelsSet.add(thisAdminLevel);
+				adminLevelsPerTranche[thisTranche].add(thisAdminLevel);
 
 				thisActivity.forEach(activity => {
 					const objDatum: Datum = {
@@ -251,6 +402,7 @@ function processRawData({
 						longitude: longitude,
 						sector: activity.sector,
 						activity: activity.activity,
+						tranche: thisTranche,
 					};
 
 					data.push(objDatum);
@@ -274,9 +426,31 @@ function processRawData({
 		projectStatuses: projectStatusesSet,
 		activities: activitiesSet,
 		adminLevels: adminLevelsSet,
+		fundsPerTranche,
+		projectsPerTranche,
+		allocationSourcesPerTranche,
+		organizationTypesPerTranche,
+		projectStatusesPerTranche,
+		activitiesPerTranche,
+		adminLevelsPerTranche,
+		yearsPerTranche,
+		sectorsPerTranche,
 	};
 
 	return { data, inDataLists };
+}
+
+function getTrancheForProject(
+	projectCode: string,
+	projectsPerTranche: InDataLists["projectsPerTranche"],
+): TrancheNumbers | null {
+	if (projectsPerTranche[1].has(projectCode)) {
+		return 1;
+	} else if (projectsPerTranche[2].has(projectCode)) {
+		return 2;
+	} else {
+		return null;
+	}
 }
 
 export default processRawData;

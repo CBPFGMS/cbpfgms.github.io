@@ -12,6 +12,7 @@ import {
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { projectStatusMaster } from "./constants";
+import type { TrancheNumbers } from "../components/MainContainer";
 
 type MakeListParams = {
 	pooledFundsMaster: PooledFundsMasterObject[];
@@ -47,7 +48,12 @@ export type List = {
 	projectStatus: ListObj;
 	activities: ListObj;
 	activitiesPerSector: {
-		[key: number]: Set<number>;
+		[sector: number]: Set<number>;
+	};
+	activitiesPerTrancheAndSector: {
+		[tranche in TrancheNumbers]: {
+			[sector: number]: Set<number>;
+		};
 	};
 };
 
@@ -71,6 +77,10 @@ function makeLists({
 		projectStatus: projectStatusMaster,
 		activities: {},
 		activitiesPerSector: {},
+		activitiesPerTrancheAndSector: {
+			1: {},
+			2: {},
+		},
 	};
 
 	pooledFundsMaster.forEach(d => {

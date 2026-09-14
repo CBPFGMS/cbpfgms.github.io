@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import type { Data } from "../utils/processrawdata";
@@ -47,9 +47,21 @@ function MapSection({
 
 	const [showList, setShowList] = useState<boolean>(false);
 	const [projectsList, setProjectsList] = useState<string[]>([]);
+	const [scrollTrigger, setScrollTrigger] = useState(0);
 
 	const activityText = activities.length === 1 ? "activity" : "activities";
 	const sectorText = sectors.length === 1 ? "sector" : "sectors";
+
+	const listRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (scrollTrigger > 0) {
+			listRef.current?.scrollIntoView({
+				behavior: "smooth",
+				block: "start",
+			});
+		}
+	}, [scrollTrigger]);
 
 	const mapDataObject = useMemo(() => {
 		if (!showMap) {
@@ -173,6 +185,7 @@ function MapSection({
 								lists={lists}
 								setShowList={setShowList}
 								setProjectsList={setProjectsList}
+								setScrollTrigger={setScrollTrigger}
 							/>
 							<Chip
 								label={
@@ -216,6 +229,7 @@ function MapSection({
 								lists={lists}
 								projectsList={projectsList}
 								setShowList={setShowList}
+								listRef={listRef}
 							/>
 						)}
 					</Box>

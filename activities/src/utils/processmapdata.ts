@@ -20,6 +20,7 @@ export type MapDatum = {
 	fund: number;
 	year: number;
 	projects: Set<string>;
+	tranches: Set<number>;
 };
 
 function processMapData({
@@ -104,9 +105,11 @@ function processMapData({
 				fund: datum.fund,
 				year: datum.year,
 				projects: new Set([datum.projectCode]),
+				tranches: new Set([datum.tranche]),
 			});
 		} else {
 			foundLocation.projects.add(datum.projectCode);
+			foundLocation.tranches.add(datum.tranche);
 
 			const foundActivityAndSector = foundLocation.activities.find(
 				d => d.activity === datum.activity && d.sector === datum.sector,

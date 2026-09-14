@@ -1,4 +1,5 @@
-import type { Data } from "./processrawdata";
+import type { Tranche } from "../components/MainContainer";
+import type { Data, InDataLists } from "./processrawdata";
 
 export type InSelectionData = {
 	funds: Set<number>;
@@ -11,9 +12,17 @@ type FilterDataParams = {
 	data: Data;
 	sectors: number[];
 	activities: number[];
+	tranche: Tranche;
+	inDataLists: InDataLists;
 };
 
-function filterData({ data, sectors, activities }: FilterDataParams): {
+function filterData({
+	data,
+	sectors,
+	activities,
+	tranche,
+	inDataLists,
+}: FilterDataParams): {
 	filteredData: Data;
 	inSelectionData: InSelectionData;
 } {
@@ -24,6 +33,13 @@ function filterData({ data, sectors, activities }: FilterDataParams): {
 		adminLevels: new Set(),
 	};
 
+	if (sectors.length === 0 || activities.length === 0) {
+		return {
+			filteredData: [],
+			inSelectionData,
+		};
+	}
+
 	const sectorSet = new Set(sectors);
 	const activitySet = new Set(activities);
 
@@ -31,6 +47,13 @@ function filterData({ data, sectors, activities }: FilterDataParams): {
 	const hasActivities = activitySet.size > 0;
 
 	const filteredData = data.filter(datum => {
+		if (
+			tranche !== "all" &&
+			!inDataLists.projectsPerTranche[tranche]?.has(datum.projectCode)
+		) {
+			return;
+		}
+
 		const matchesSector = !hasSectors || sectorSet.has(datum.sector);
 		const matchesActivity =
 			!hasActivities || activitySet.has(datum.activity);

@@ -9,6 +9,7 @@ import type {
 	OrganizationTypesMasterObject,
 	AllocationSourcesMasterObject,
 	ActivitiesMasterObject,
+	TemplatesMasterJson,
 } from "./schemas";
 import makeLists, { type List } from "./makelists";
 import processRawData, { type InDataLists, type Data } from "./processrawdata";
@@ -28,6 +29,7 @@ type ReceiveDataArgs = [
 	OrganizationTypesMasterObject[],
 	AllocationSourcesMasterObject[],
 	ActivitiesMasterObject[],
+	TemplatesMasterJson,
 ];
 
 const baseUrl =
@@ -38,6 +40,9 @@ const pooledFundsMasterUrl = `${baseUrl}MstPooledFund.csv`,
 	organizationTypesMasterUrl = `${baseUrl}MstOrgType.csv`,
 	allocationSourcesMasterUrl = `${baseUrl}MstAllocationSource.csv`,
 	activitiesMasterUrl = `${baseUrl}MstActivities.csv`;
+
+const templatesMasterUrl =
+	"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/templates/?includeProjectCode=1";
 
 export async function fetchAppData(startYear: number | null): Promise<AppData> {
 	// const yearRange = startYear
@@ -87,6 +92,11 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 			activitiesMasterUrl,
 			"csv",
 		),
+		fetchFile<TemplatesMasterJson>(
+			"templatesMaster",
+			templatesMasterUrl,
+			"json",
+		),
 	])
 		.then(receiveData)
 		.catch((error: unknown) => {
@@ -103,6 +113,7 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 		organizationTypesMaster,
 		allocationSourcesMaster,
 		activitiesMaster,
+		templatesMaster,
 	]: ReceiveDataArgs): AppData {
 		const lists = makeLists({
 			pooledFundsMaster,
@@ -117,6 +128,7 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 			projectSummary,
 			activities,
 			lists,
+			templatesMaster,
 		});
 
 		return {

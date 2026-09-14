@@ -92,16 +92,35 @@ const createBlueClusterIcon = (cluster: MarkerClusterType): L.DivIcon => {
 
 const { mapHeight, minZoomValue, maxZoomValue } = constants;
 
+const chipStyle: React.CSSProperties = {
+	backgroundColor: "#e0e0e0",
+	borderRadius: "12px",
+	padding: "5px 8px",
+	display: "block",
+	width: "fit-content",
+	fontSize: "0.75rem",
+	fontWeight: "bold",
+	marginBottom: "12px",
+	lineHeight: "1",
+};
+
 type MapProps = {
 	mapData: MapDatum[];
 	lists: List;
 	setShowList: React.Dispatch<React.SetStateAction<boolean>>;
 	setProjectsList: React.Dispatch<React.SetStateAction<string[]>>;
+	setScrollTrigger: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const mapPadding = 10;
 
-function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
+function Map({
+	mapData,
+	lists,
+	setShowList,
+	setProjectsList,
+	setScrollTrigger,
+}: MapProps) {
 	const mapRef = useRef<MapType | null>(null);
 
 	return (
@@ -157,6 +176,11 @@ function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
 							// opacity={1}
 							// permanent={false}
 							interactive={true}
+							eventHandlers={{
+								remove: () => {
+									setShowList(false);
+								},
+							}}
 						>
 							<div
 								style={{
@@ -164,6 +188,14 @@ function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
 									textWrap: "wrap",
 								}}
 							>
+								<div style={chipStyle}>
+									<span>
+										Tranche
+										{datum.tranches.size > 1
+											? "s 1 and 2"
+											: ` ${Array.from(datum.tranches)[0]}`}
+									</span>
+								</div>
 								Location: <strong>{datum.locationName} </strong>
 								{datum.parentLocationName && (
 									<>(in {datum.parentLocationName})</>
@@ -217,6 +249,7 @@ function Map({ mapData, lists, setShowList, setProjectsList }: MapProps) {
 											Array.from(datum.projects),
 										);
 										setShowList(true);
+										setScrollTrigger(prev => prev + 1);
 									}}
 								>
 									View{" "}

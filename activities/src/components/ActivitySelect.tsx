@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import type { List } from "../utils/makelists";
-import type { SelectionLevel } from "./MainContainer";
+import type { SelectionLevel, Tranche } from "./MainContainer";
 import StepHeader from "./StepHeader";
 import Paper from "@mui/material/Paper";
 import colors from "../utils/colors";
@@ -16,6 +16,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import Button from "@mui/material/Button";
 
 type ActivitySelectProps = {
+	tranche: Tranche;
 	activities: number[];
 	setActivities: React.Dispatch<React.SetStateAction<number[]>>;
 	sectors: number[];
@@ -26,6 +27,7 @@ type ActivitySelectProps = {
 };
 
 function ActivitySelect({
+	tranche,
 	activities,
 	setActivities,
 	sectors,
@@ -36,9 +38,14 @@ function ActivitySelect({
 }: ActivitySelectProps) {
 	const [activityInput, setActivityInput] = useState<string>("");
 
+	const activitiesPerSectorSource =
+		tranche === "all"
+			? lists.activitiesPerSector
+			: lists.activitiesPerTrancheAndSector[tranche];
+
 	const activitiesPerSectorsSelected = Array.from(
 		sectors.reduce((acc, sector) => {
-			const activities = lists.activitiesPerSector[sector];
+			const activities = activitiesPerSectorSource[sector];
 			if (activities) {
 				activities.forEach(activity => acc.add(activity));
 			}
@@ -176,7 +183,7 @@ function ActivitySelect({
 								return (
 									<Box
 										component="li"
-										key={key}
+										key={key + option.toString()}
 										{...otherProps}
 										sx={{
 											"&.MuiAutocomplete-option": {

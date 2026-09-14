@@ -11,6 +11,7 @@ const colors = {
 	activeGradientEnd: "#f0914f",
 	inactiveBackground: "#4a5f78",
 	unColorChip: "#0c4783",
+	unBackground: "#f5f9fe",
 } as const;
 
 export default colors;

@@ -1,4 +1,4 @@
-import type { SelectionLevel } from "./MainContainer";
+import type { SelectionLevel, Tranche } from "./MainContainer";
 import type { InDataLists } from "../utils/processrawdata";
 import type { List } from "../utils/makelists";
 import Paper from "@mui/material/Paper";
@@ -20,6 +20,7 @@ type SectorSelectProps = {
 	inDataLists: InDataLists;
 	lists: List;
 	sectorsComplete: boolean;
+	tranche: Tranche;
 };
 
 type SectorCardProps = {
@@ -27,21 +28,34 @@ type SectorCardProps = {
 	selected: boolean;
 	onClick: () => void;
 	lists: List;
+	activitiesPerSectorSource: List["activitiesPerSector"];
 };
 
 function SectorSelect({
 	sectors,
 	setSectors,
 	selectionLevel,
+	tranche,
 	inDataLists,
 	lists,
 	sectorsComplete,
 	setActivities,
 }: SectorSelectProps) {
-	const sectorsArray = Array.from(inDataLists.sectors).sort((a, b) => a - b);
+	const sectorsSource =
+		tranche === "all"
+			? inDataLists.sectors
+			: inDataLists.sectorsPerTranche[tranche];
+	const activitiesPerSectorSource =
+		tranche === "all"
+			? lists.activitiesPerSector
+			: lists.activitiesPerTrancheAndSector[tranche];
+
+	const sectorsArray = Array.from(sectorsSource).sort((a, b) =>
+		lists.sectors[a].localeCompare(lists.sectors[b]),
+	);
 
 	const activitiesPerSectorsSelected = sectors.reduce((acc, sector) => {
-		const activities = lists.activitiesPerSector[sector];
+		const activities = activitiesPerSectorSource[sector];
 		if (activities) {
 			activities.forEach(activity => acc.add(activity));
 		}
@@ -56,7 +70,7 @@ function SectorSelect({
 			setActivities(prev =>
 				prev.filter(p =>
 					updatedSectors.some(upSector =>
-						lists.activitiesPerSector[upSector].has(p),
+						activitiesPerSectorSource[upSector].has(p),
 					),
 				),
 			);
@@ -119,6 +133,9 @@ function SectorSelect({
 							selected={sectors.includes(sector)}
 							onClick={() => toggleSector(sector)}
 							lists={lists}
+							activitiesPerSectorSource={
+								activitiesPerSectorSource
+							}
 						/>
 					))}
 				</Grid>
@@ -127,11 +144,17 @@ function SectorSelect({
 	);
 }
 
-function SectorCard({ sector, selected, onClick, lists }: SectorCardProps) {
+function SectorCard({
+	sector,
+	selected,
+	onClick,
+	lists,
+	activitiesPerSectorSource,
+}: SectorCardProps) {
 	return (
 		<Grid size={3}>
 			<Badge
-				badgeContent={lists.activitiesPerSector[sector]?.size}
+				badgeContent={activitiesPerSectorSource[sector]?.size}
 				sx={{
 					width: "100%",
 					display: "block",

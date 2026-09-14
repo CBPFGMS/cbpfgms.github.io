@@ -7,10 +7,16 @@ import ActivitySelect from "./ActivitySelect";
 import Box from "@mui/material/Box";
 import MapSection from "./MapContainer";
 import filterData, { type InSelectionData } from "../utils/filterData";
+import type { constants } from "../utils/constants";
+import CheckboxLabel from "./Checkbox";
 
 type MainContainerProps = {
 	dataPromise: Promise<AppData>;
 };
+
+export type Tranche = (typeof constants.tranches)[number];
+
+export type TrancheNumbers = Exclude<Tranche, "all">;
 
 export type SelectionLevel = "nothing" | "sector" | "sectorAndActivity";
 
@@ -18,7 +24,8 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 	const { data, inDataLists, lists } = use(dataPromise);
 
 	const [sectors, setSectors] = useState<number[]>([]),
-		[activities, setActivities] = useState<number[]>([]);
+		[activities, setActivities] = useState<number[]>([]),
+		[tranche, setTranche] = useState<Tranche>("all");
 
 	const sectorsComplete = sectors.length > 0;
 	const activitiesComplete = activities.length > 0;
@@ -36,8 +43,10 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				data,
 				sectors,
 				activities,
+				tranche,
+				inDataLists,
 			}),
-		[data, sectors, activities],
+		[data, sectors, activities, tranche, inDataLists],
 	);
 
 	return (
@@ -52,7 +61,14 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 				id="tooltip"
 				style={{ zIndex: 9999, maxWidth: "400px", textAlign: "center" }}
 			/>
+			<CheckboxLabel
+				tranche={tranche}
+				setTranche={setTranche}
+				setSectors={setSectors}
+				setActivities={setActivities}
+			/>
 			<SectorSelect
+				tranche={tranche}
 				sectors={sectors}
 				setSectors={setSectors}
 				setActivities={setActivities}
@@ -63,6 +79,7 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 			/>
 			<Box mb={4} />
 			<ActivitySelect
+				tranche={tranche}
 				activities={activities}
 				setActivities={setActivities}
 				sectors={sectors}

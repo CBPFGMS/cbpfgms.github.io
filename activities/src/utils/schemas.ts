@@ -202,6 +202,19 @@ export const activitiesMasterObjectSchema = z.object({
 	Year: z.number(),
 });
 
+export const templatesMasterObjectSchema = z.object({
+	AllocationTitles: z.array(z.string()),
+	AllocationTypeIds: z.array(z.number()),
+	GroupNames: z.array(z.string()).nonempty(),
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ProjectCodes: z.array(z.string()).nonempty(),
+	TemplateName: z.string().nullable(),
+	defaultAdminLevel: z.number().int().nonnegative().nullable(),
+	scope: z.string().nullable(),
+	status: z.string().nullable(),
+});
+
 // ********************
 // TYPES
 // ********************
@@ -231,3 +244,8 @@ export type AllocationSourcesMasterObject = z.infer<
 export type ActivitiesMasterObject = z.infer<
 	typeof activitiesMasterObjectSchema
 >;
+
+export type TemplatesMasterJson = {
+	count: number;
+	data: z.infer<typeof templatesMasterObjectSchema>[];
+};

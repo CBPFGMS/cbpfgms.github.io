@@ -14,9 +14,15 @@ type ProjectsListProps = {
 	lists: List;
 	projectsList: string[];
 	setShowList: React.Dispatch<React.SetStateAction<boolean>>;
+	listRef: React.RefObject<HTMLDivElement | null>;
 };
 
-function ProjectsList({ lists, projectsList, setShowList }: ProjectsListProps) {
+function ProjectsList({
+	lists,
+	projectsList,
+	setShowList,
+	listRef,
+}: ProjectsListProps) {
 	function handleClose() {
 		setShowList(false);
 	}
@@ -31,6 +37,7 @@ function ProjectsList({ lists, projectsList, setShowList }: ProjectsListProps) {
 				mt: 3,
 				flexDirection: "column",
 			}}
+			ref={listRef}
 		>
 			<Paper
 				elevation={1}
