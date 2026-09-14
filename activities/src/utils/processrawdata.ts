@@ -36,22 +36,8 @@ export type Datum = {
 export type Data = Datum[];
 
 export type InDataLists = {
-	years: Set<number>;
 	sectors: Set<number>;
-	allocationSources: Set<number>;
-	funds: Set<number>;
-	organizationTypes: Set<number>;
-	projectStatuses: Set<number>;
-	activities: Set<number>;
-	adminLevels: Set<number>;
-	yearsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
 	sectorsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	allocationSourcesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	fundsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	organizationTypesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	projectStatusesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	activitiesPerTranche: { [tranche in TrancheNumbers]: Set<number> };
-	adminLevelsPerTranche: { [tranche in TrancheNumbers]: Set<number> };
 	projectsPerTranche: { [tranche in TrancheNumbers]: Set<string> };
 };
 
@@ -96,50 +82,8 @@ function processRawData({
 
 	const activitiesPerLocationId: ActivitiesPerLocationId = new Map();
 
-	const yearsSet: Set<InDataListsValues["years"]> = new Set();
 	const sectorsSet: Set<InDataListsValues["sectors"]> = new Set();
-	const allocationSourcesSet: Set<InDataListsValues["allocationSources"]> =
-		new Set();
-	const fundsSet: Set<InDataListsValues["funds"]> = new Set();
-	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
-		new Set();
-	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
-		new Set();
-	const activitiesSet: Set<InDataListsValues["activities"]> = new Set();
-	const adminLevelsSet: Set<InDataListsValues["adminLevels"]> = new Set();
-
-	const yearsPerTranche: InDataLists["yearsPerTranche"] = {
-		1: new Set(),
-		2: new Set(),
-	};
 	const sectorsPerTranche: InDataLists["sectorsPerTranche"] = {
-		1: new Set(),
-		2: new Set(),
-	};
-	const allocationSourcesPerTranche: InDataLists["allocationSourcesPerTranche"] =
-		{
-			1: new Set(),
-			2: new Set(),
-		};
-	const organizationTypesPerTranche: InDataLists["organizationTypesPerTranche"] =
-		{
-			1: new Set(),
-			2: new Set(),
-		};
-	const projectStatusesPerTranche: InDataLists["projectStatusesPerTranche"] =
-		{
-			1: new Set(),
-			2: new Set(),
-		};
-	const activitiesPerTranche: InDataLists["activitiesPerTranche"] = {
-		1: new Set(),
-		2: new Set(),
-	};
-	const adminLevelsPerTranche: InDataLists["adminLevelsPerTranche"] = {
-		1: new Set(),
-		2: new Set(),
-	};
-	const fundsPerTranche: InDataLists["fundsPerTranche"] = {
 		1: new Set(),
 		2: new Set(),
 	};
@@ -163,10 +107,6 @@ function processRawData({
 				: "all";
 
 		if (thisTranche !== "all") {
-			(fundsPerTranche[thisTranche] ??= new Set([row.PFId])).add(
-				row.PFId,
-			);
-
 			if (projectsPerTranche[thisTranche] === undefined) {
 				projectsPerTranche[thisTranche] = new Set(row.ProjectCodes);
 			} else {
@@ -351,36 +291,11 @@ function processRawData({
 				thisTranche
 			) {
 				const sectors = thisActivity.map(a => a.sector);
-				const activitiesArray = thisActivity.map(a => a.activity);
 
-				yearsSet.add(row.AYr);
-				yearsPerTranche[thisTranche].add(row.AYr);
 				sectors.forEach(s => {
 					sectorsPerTranche[thisTranche].add(s);
 					sectorsSet.add(s);
 				});
-				fundsSet.add(row.PFId);
-				fundsPerTranche[thisTranche].add(row.PFId);
-				allocationSourcesSet.add(thisProject.AllSrc);
-				allocationSourcesPerTranche[thisTranche].add(
-					thisProject.AllSrc,
-				);
-				organizationTypesSet.add(thisProject.OrgTypeId);
-				organizationTypesPerTranche[thisTranche].add(
-					thisProject.OrgTypeId,
-				);
-				projectStatusesSet.add(
-					projectStatusMapping[thisProject.PrjStsId],
-				);
-				projectStatusesPerTranche[thisTranche].add(
-					projectStatusMapping[thisProject.PrjStsId],
-				);
-				activitiesArray.forEach(a => {
-					activitiesPerTranche[thisTranche].add(a);
-					activitiesSet.add(a);
-				});
-				adminLevelsSet.add(thisAdminLevel);
-				adminLevelsPerTranche[thisTranche].add(thisAdminLevel);
 
 				thisActivity.forEach(activity => {
 					const objDatum: Datum = {
@@ -418,22 +333,8 @@ function processRawData({
 	});
 
 	const inDataLists: InDataLists = {
-		years: yearsSet,
 		sectors: sectorsSet,
-		allocationSources: allocationSourcesSet,
-		funds: fundsSet,
-		organizationTypes: organizationTypesSet,
-		projectStatuses: projectStatusesSet,
-		activities: activitiesSet,
-		adminLevels: adminLevelsSet,
-		fundsPerTranche,
 		projectsPerTranche,
-		allocationSourcesPerTranche,
-		organizationTypesPerTranche,
-		projectStatusesPerTranche,
-		activitiesPerTranche,
-		adminLevelsPerTranche,
-		yearsPerTranche,
 		sectorsPerTranche,
 	};
 
