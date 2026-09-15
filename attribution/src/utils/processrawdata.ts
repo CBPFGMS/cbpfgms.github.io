@@ -221,19 +221,6 @@ function processRawData({
 			},
 		};
 
-		if (row.ImplementationYear >= firstNSFTYear) {
-			totalDatum.girls.targetedWithoutUS = row.BenG || 0;
-			totalDatum.girls.reachedWithoutUS = row.AchG || 0;
-			totalDatum.boys.targetedWithoutUS = row.BenB || 0;
-			totalDatum.boys.reachedWithoutUS = row.AchB || 0;
-			totalDatum.women.targetedWithoutUS = row.BenW || 0;
-			totalDatum.women.reachedWithoutUS = row.AchW || 0;
-			totalDatum.men.targetedWithoutUS = row.BenM || 0;
-			totalDatum.men.reachedWithoutUS = row.AchM || 0;
-			totalDatum.total.targetedWithoutUS = row.TotTarg || 0;
-			totalDatum.total.reachedWithoutUS = row.TotAch || 0;
-		}
-
 		const foundYear = totalBeneficiariesData[row.ImplementationYear];
 
 		if (!foundYear) {
@@ -331,17 +318,6 @@ function processRawData({
 				reached: row.AchM || 0,
 			},
 		};
-
-		if (row.ImplementationYear >= firstNSFTYear) {
-			partnersDatum.girls.targetedWithoutUS = row.BenG || 0;
-			partnersDatum.girls.reachedWithoutUS = row.AchG || 0;
-			partnersDatum.boys.targetedWithoutUS = row.BenB || 0;
-			partnersDatum.boys.reachedWithoutUS = row.AchB || 0;
-			partnersDatum.women.targetedWithoutUS = row.BenW || 0;
-			partnersDatum.women.reachedWithoutUS = row.AchW || 0;
-			partnersDatum.men.targetedWithoutUS = row.BenM || 0;
-			partnersDatum.men.reachedWithoutUS = row.AchM || 0;
-		}
 
 		const foundYear =
 			totalBeneficiariesByPartnerData[row.ImplementationYear];
@@ -458,17 +434,6 @@ function processRawData({
 				reached: row.AchM || 0,
 			},
 		};
-
-		if (row.ImplementationYear >= firstNSFTYear) {
-			sectorsDatum.girls.targetedWithoutUS = row.BenG || 0;
-			sectorsDatum.girls.reachedWithoutUS = row.AchG || 0;
-			sectorsDatum.boys.targetedWithoutUS = row.BenB || 0;
-			sectorsDatum.boys.reachedWithoutUS = row.AchB || 0;
-			sectorsDatum.women.targetedWithoutUS = row.BenW || 0;
-			sectorsDatum.women.reachedWithoutUS = row.AchW || 0;
-			sectorsDatum.men.targetedWithoutUS = row.BenM || 0;
-			sectorsDatum.men.reachedWithoutUS = row.AchM || 0;
-		}
 
 		const foundYear =
 			totalBeneficiariesBySectorData[row.ImplementationYear];
