@@ -127,7 +127,7 @@ function processRawData({
 			const locationId = row.LocationBeneficiaryId;
 			const compositeKey = `${locationId}|${row.GlobalStandardActivityID}|${row.GlobalClusterId}`;
 
-			//TEMPORARY FILTER CHECKING IF THE ACTIVITY ID EXISTS IN THE ACTIVITY MASTER
+			//TODO: REMOVE, TEMPORARY FILTER CHECKING IF THE ACTIVITY ID EXISTS IN THE ACTIVITY MASTER
 			if (!lists.activities[row.GlobalStandardActivityID]) {
 				simpleWarn(
 					`Activity ID ${row.GlobalStandardActivityID} not found in the Activity Master`,

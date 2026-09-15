@@ -52,10 +52,6 @@ function MainContainer({ dataPromise }: MainContainerProps) {
 	return (
 		<Container
 			disableGutters={true}
-			style={{
-				paddingLeft: "12px",
-				paddingRight: "12px",
-			}}
 		>
 			<Tooltip
 				id="tooltip"

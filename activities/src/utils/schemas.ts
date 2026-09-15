@@ -135,10 +135,10 @@ export const projectSummaryObjectSchema = z.object({
 	BdgSC: z.number().nonnegative(),
 	PrjSubDt: z.coerce.date(),
 	BenAgg: z.string(),
-	PrjGM: z.string(),
+	PrjGM: z.string().nullable(),
 	PrjStsNm: z.string(),
 	PrjStsId: z.number().int().nonnegative(),
-	PrjStsCode: z.string(),
+	PrjStsCode: z.string().nullable(),
 	PartCode: z.number(),
 	ApprDt: z.coerce.date(),
 });
