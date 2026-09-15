@@ -80,7 +80,7 @@ function UnsupportedScreenNotice() {
 				sx={{ maxWidth: 320 }}
 			>
 				This page is built for larger displays. Please open it on a
-				screen at least 1320px wide, or resize your browser window.
+				screen at least 1024px wide, or resize your browser window.
 			</Typography>
 		</Box>
 	);

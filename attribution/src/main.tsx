@@ -8,7 +8,7 @@ const rootElement = document.getElementById("attributionroot")!;
 const startYearString = rootElement.dataset.startyear,
 	defaultFundTypeString = rootElement?.dataset.fundtype;
 
-const isWideEnough = window.matchMedia("(min-width: 1320px)").matches;
+const isWideEnough = window.matchMedia("(min-width: 1024px)").matches;
 
 const startYear =
 	!startYearString || !parseInt(startYearString)
