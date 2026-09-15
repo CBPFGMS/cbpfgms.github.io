@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import toLocaleFixed from "../utils/localefixed";
+import { constants } from "../utils/constants";
 
 type AttributionCardsProps = {
 	donorValue: number;
@@ -18,6 +19,8 @@ type AttributionCardsProps = {
 	handleClickKeepOnly: (thisFund: number) => void;
 	isTheOnlyCard: boolean;
 };
+
+const { cardOpacity } = constants;
 
 function AttributionCards({
 	donorValue,
@@ -52,10 +55,13 @@ function AttributionCards({
 					display: "flex",
 					height: "100%",
 					borderRadius: "8px",
-					background: fundSelected ? "#f7fbff" : "#fafafa",
+					background: fundSelected ? "#f7fbff" : "#fcfcfc",
 					border: fundSelected
 						? "1px solid #b5d4f4"
-						: "1px solid #ccc",
+						: "1px solid #e1e1e1",
+					boxShadow: fundSelected
+						? "0 0 6px rgba(0, 0, 0, 0.2)"
+						: "none",
 				}}
 			>
 				<CardContent
@@ -128,7 +134,7 @@ function AttributionCards({
 						<Box
 							style={{
 								marginBottom: "1.3em",
-								opacity: fundSelected ? 1 : 0.5,
+								opacity: fundSelected ? 1 : cardOpacity,
 								filter: fundSelected
 									? "none"
 									: "grayscale(100%)",
@@ -150,7 +156,7 @@ function AttributionCards({
 								display: "flex",
 								flexDirection: "row",
 								alignItems: "center",
-								opacity: fundSelected ? 1 : 0.5,
+								opacity: fundSelected ? 1 : cardOpacity,
 								filter: fundSelected
 									? "none"
 									: "grayscale(100%)",
@@ -206,7 +212,7 @@ function AttributionCards({
 						<Box
 							sx={{
 								marginTop: "0.4em",
-								opacity: fundSelected ? 1 : 0.5,
+								opacity: fundSelected ? 1 : cardOpacity,
 								filter: fundSelected
 									? "none"
 									: "grayscale(100%)",

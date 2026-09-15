@@ -36,4 +36,5 @@ export const constants = {
 	hasGBVIds: [1, 2, 3],
 	hasGenderEqualityIds: [5, 6, 25],
 	localizationMarkers: ["1.1", "1.2", "1.4"],
+	cardOpacity: 0.4,
 } as const;

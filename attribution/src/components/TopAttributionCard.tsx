@@ -50,6 +50,7 @@ function TopAttributionCard({
 					borderRadius: "8px",
 					background: "#fffdf8",
 					border: "1px solid #fac775",
+					boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
 				}}
 			>
 				<CardContent>
