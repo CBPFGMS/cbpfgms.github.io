@@ -11,7 +11,7 @@ const rootElement = document.getElementById(constants.rootElementId),
 
 const isWideEnough =
 	typeof window !== "undefined"
-		? window.matchMedia("(min-width: 1200px)").matches
+		? window.matchMedia(`(min-width: ${constants.minWidth}px)`).matches
 		: true;
 
 const defaultFundType =

@@ -2,6 +2,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import SvgIcon from "@mui/material/SvgIcon";
 import type { SvgIconProps } from "@mui/material";
+import { constants } from "../utils/constants.ts";
 
 function ExpandIcon(props: SvgIconProps) {
 	return (
@@ -77,7 +78,8 @@ function UnsupportedScreenNotice() {
 				sx={{ maxWidth: 320 }}
 			>
 				This page is built for larger displays. Please open it on a
-				screen at least 1200px wide, or resize your browser window.
+				screen at least {constants.minWidth}px wide, or resize your
+				browser window.
 			</Typography>
 		</Stack>
 	);

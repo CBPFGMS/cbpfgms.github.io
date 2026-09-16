@@ -8,7 +8,7 @@ export const constants = {
 	cutOffDate: new Date("2026-06-01"),
 	tranches: [1, 2, "all"],
 	contributionTypes: ["total", "paid", "pledged"],
-	minWidth: 1200,
+	minWidth: 1024,
 	sortByOptions: ["contributions", "alphabetical"],
 	chartRowHeight: 36,
 	transitionDuration: 750,

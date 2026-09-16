@@ -38,6 +38,7 @@ const constants = {
 	tranches: [1, 2, "all"],
 	tranche1Name: "US_Tranche1_2026",
 	tranche2Name: "US_Tranche2_2026",
+	minWidth: 1024,
 } as const;
 
 const projectStatusMaster = {
