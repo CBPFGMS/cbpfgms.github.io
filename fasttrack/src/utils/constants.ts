@@ -39,6 +39,7 @@ const constants = {
 	tranche1Name: "US_Tranche1_2026",
 	tranche2Name: "US_Tranche2_2026",
 	minWidth: 1024,
+	cardOpacity: 0.3,
 } as const;
 
 const projectStatusMaster = {

@@ -37,6 +37,7 @@ const {
 	projectStatusDescription,
 	submissionAndUnderApprovalProjects,
 	implementationAndReportingProjects,
+	cardOpacity,
 } = constants;
 
 function ProjectStatuses({
@@ -290,7 +291,10 @@ function Status({
 					? cardClassName === "amber"
 						? "1px solid #fac775"
 						: "1px solid #b5d4f4"
-					: "1px solid #ccc",
+					: "1px solid #ddd",
+				boxShadow: statusSelected
+					? "0 0 6px rgba(0, 0, 0, 0.2)"
+					: "none",
 			}}
 		>
 			<CardContent>
@@ -305,7 +309,7 @@ function Status({
 				>
 					<Grid
 						sx={{
-							opacity: statusSelected ? 1 : 0.5,
+							opacity: statusSelected ? 1 : cardOpacity,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 						size={9}
@@ -345,7 +349,7 @@ function Status({
 				</Box>
 				<Typography
 					sx={{
-						opacity: statusSelected ? 1 : 0.5,
+						opacity: statusSelected ? 1 : cardOpacity,
 						filter: statusSelected ? "none" : "grayscale(100%)",
 					}}
 					data-tooltip-id="tooltip"
@@ -375,7 +379,7 @@ function Status({
 				</Typography>
 				<Box
 					sx={{
-						opacity: statusSelected ? 1 : 0.5,
+						opacity: statusSelected ? 1 : cardOpacity,
 						filter: statusSelected ? "none" : "grayscale(100%)",
 					}}
 					mt={1}
