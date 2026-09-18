@@ -19,6 +19,7 @@ import ChartsContainer from "./ChartsContainer";
 import Partners from "./Partners";
 import NoData from "./NoData";
 import getFlagSrc from "../utils/flagsrc";
+import NoAttribution from "./NoAttribution";
 
 export type Charts = (typeof constants.charts)[number];
 
@@ -142,6 +143,7 @@ function MainContainer({ donor }: MainContainerProps) {
 		],
 	);
 
+	const hasNoAttributions = attributions.global.percentage === 0;
 	const hasNoData = targetedAndReachedTotal.targeted.total === 0;
 
 	const { flagSrc, faviconFlag } = getFlagSrc({
@@ -181,61 +183,75 @@ function MainContainer({ donor }: MainContainerProps) {
 				flagSrc={flagSrc}
 				faviconFlag={faviconFlag}
 			/>
-			<TopAttributionCard
-				donor={donor}
-				attributions={attributions}
-				lists={lists}
-				funds={funds}
-				allFunds={allFunds}
-			/>
-			<AttributionCardsContainer
-				attributions={attributions}
-				lists={lists}
-				donor={donor}
-				funds={funds}
-				allFunds={allFunds}
-				setFunds={setFunds}
-			/>
+			{hasNoAttributions ? (
+				<NoAttribution
+					donor={donor}
+					year={year}
+					lists={lists}
+				/>
+			) : (
+				<>
+					<TopAttributionCard
+						donor={donor}
+						attributions={attributions}
+						lists={lists}
+						funds={funds}
+						allFunds={allFunds}
+					/>
+					<AttributionCardsContainer
+						attributions={attributions}
+						lists={lists}
+						donor={donor}
+						funds={funds}
+						allFunds={allFunds}
+						setFunds={setFunds}
+					/>
+				</>
+			)}
 			{hasNoData ? (
 				<>
 					<SectionDivider title="Allocations" />
 					<NoData />
 				</>
 			) : (
-				<>
-					<SectionDivider title="At a glance" />
-					<TopFigures
-						data={dataTopFigures}
-						attribution={attributions.global.percentage}
-						donorName={lists.donorGMSNames[donor]}
-					/>
-					<KeyFigures
-						data={dataKeyFigures}
-						attribution={attributions.global.percentage}
-						donorName={lists.donorGMSNames[donor]}
-					/>
-					<SectionDivider title="Allocated values" />
-					<ChartsContainer
-						targetedAndReachedTotal={targetedAndReachedTotal}
-						dataSector={dataSector}
-						dataOrganization={dataOrganization}
-						lists={lists}
-						attribution={attributions.global.percentage}
-						donorName={lists.donorGMSNames[donor]}
-					/>
-					<SectionDivider title="Partners" />
-					<Partners
-						allocationsData={allocationsData}
-						funds={funds}
-						year={year}
-						lists={lists}
-						inDataSectors={inAllocationsDataLists.sectorsPerYear}
-						attribution={attributions.global.percentage}
-						donorName={lists.donorGMSNames[donor]}
-						hasUS={hasUS}
-					/>
-					{/* <SectionDivider title="Locations" /> */}
-				</>
+				!hasNoAttributions && (
+					<>
+						<SectionDivider title="At a glance" />
+						<TopFigures
+							data={dataTopFigures}
+							attribution={attributions.global.percentage}
+							donorName={lists.donorGMSNames[donor]}
+						/>
+						<KeyFigures
+							data={dataKeyFigures}
+							attribution={attributions.global.percentage}
+							donorName={lists.donorGMSNames[donor]}
+						/>
+						<SectionDivider title="Allocated values" />
+						<ChartsContainer
+							targetedAndReachedTotal={targetedAndReachedTotal}
+							dataSector={dataSector}
+							dataOrganization={dataOrganization}
+							lists={lists}
+							attribution={attributions.global.percentage}
+							donorName={lists.donorGMSNames[donor]}
+						/>
+						<SectionDivider title="Partners" />
+						<Partners
+							allocationsData={allocationsData}
+							funds={funds}
+							year={year}
+							lists={lists}
+							inDataSectors={
+								inAllocationsDataLists.sectorsPerYear
+							}
+							attribution={attributions.global.percentage}
+							donorName={lists.donorGMSNames[donor]}
+							hasUS={hasUS}
+						/>
+						{/* <SectionDivider title="Locations" /> */}
+					</>
+				)
 			)}
 		</Container>
 	);

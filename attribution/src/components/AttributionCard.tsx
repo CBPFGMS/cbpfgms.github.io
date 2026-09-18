@@ -6,6 +6,7 @@ import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import toLocaleFixed from "../utils/localefixed";
 import { constants } from "../utils/constants";
+import truncatePercentage from "../utils/truncatepercentage";
 
 type AttributionCardsProps = {
 	donorValue: number;
@@ -36,6 +37,11 @@ function AttributionCards({
 }: AttributionCardsProps) {
 	const fundSelected = funds.includes(fund);
 	const isTheOnlySelectedFund = fundSelected && funds.length === 1;
+	const {
+		truncatedPercentage,
+		truncatedPercentageForDisplay,
+		lessThanMinimum,
+	} = truncatePercentage(percentage);
 
 	return (
 		<Box
@@ -168,12 +174,12 @@ function AttributionCards({
 									fontWeight: 500,
 								}}
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${donorName} attribution for ${fundName}: ${(percentage * 100).toFixed(1)}%`}
+								data-tooltip-content={`${donorName} attribution for ${fundName}: ${lessThanMinimum || truncatedPercentage}%`}
 								data-tooltip-place="top"
 								className={`attrib-cv-blue`}
 							>
 								<NumberAnimator
-									number={Math.round(percentage * 1000) / 10}
+									number={truncatedPercentageForDisplay}
 									type="decimal"
 								/>
 								{"%"}

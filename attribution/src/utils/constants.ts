@@ -38,4 +38,7 @@ export const constants = {
 	localizationMarkers: ["1.1", "1.2", "1.4"],
 	cardOpacity: 0.4,
 	minWidth: 1024,
+	percentageDecimalPlaces: 2,
+	minimumPercentageValueForDisplay: 0.1,
+	minimumPercentageValue: 0.01,
 } as const;

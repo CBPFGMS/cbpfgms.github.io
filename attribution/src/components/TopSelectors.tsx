@@ -11,6 +11,8 @@ import formatSIFloat from "../utils/formatsi";
 import Chip from "@mui/material/Chip";
 import LanguageIcon from "@mui/icons-material/Language";
 import colors from "../utils/colors";
+import truncatePercentage from "../utils/truncatepercentage";
+import toLocaleFixed from "../utils/localefixed";
 
 const { USCode, firstNSFTYear } = constants;
 
@@ -63,6 +65,12 @@ function TopSelectors({
 	flagSrc,
 }: TopSelectorsProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
+
+	const {
+		truncatedPercentage,
+		truncatedPercentageForDisplay,
+		lessThanMinimum,
+	} = truncatePercentage(attributions.global.percentage);
 
 	const years = Array.from(inContributionsDataLists.years).sort(
 		(a, b) => a - b,
@@ -149,12 +157,12 @@ function TopSelectors({
 					/>
 					<Chip
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`Global attribution of ${lists.donorGMSNames[donor]}`}
+						data-tooltip-content={`${lists.donorGMSNames[donor]} combined attributed allocation for the selected funds is $${toLocaleFixed(attributions.global.donor, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(attributions.global.total, 0, 2)} allocated for those funds.`}
 						data-tooltip-place="bottom"
 						icon={
 							<LanguageIcon sx={{ color: "#fff !important" }} />
 						}
-						label={`${Math.round(attributions.global.percentage * 1000) / 10}% ($${formatSIFloat(attributions.global.donor)})`}
+						label={`${truncatedPercentageForDisplay}% ($${formatSIFloat(attributions.global.donor)})`}
 						size="medium"
 						sx={{
 							color: "#fff",

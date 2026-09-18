@@ -10,6 +10,7 @@ import type { List } from "../utils/makelists";
 import toLocaleFixed from "../utils/localefixed";
 import InfoIcon from "@mui/icons-material/Info";
 import createFundsList from "../utils/createfundslist";
+import truncatePercentage from "../utils/truncatepercentage";
 
 type TopAttributionCardProps = {
 	donor: number;
@@ -29,6 +30,11 @@ function TopAttributionCard({
 	const percentage = attributions.global.percentage;
 	const totalValue = attributions.global.total;
 	const donorValue = attributions.global.donor;
+	const {
+		truncatedPercentage,
+		truncatedPercentageForDisplay,
+		lessThanMinimum,
+	} = truncatePercentage(percentage);
 
 	const allFundsSelected = allFunds.length === funds.length;
 
@@ -104,7 +110,7 @@ function TopAttributionCard({
 						>
 							<Box
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attributed allocation for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${(percentage * 100).toFixed(1)}% of the total $${toLocaleFixed(totalValue, 0, 2)} allocated for those funds.`}
+								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attributed allocation for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} allocated for those funds.`}
 								data-tooltip-place="top"
 								className={`attrib-info-btn attrib-rb-amber`}
 								sx={{
@@ -130,12 +136,12 @@ function TopAttributionCard({
 								fontWeight: 500,
 							}}
 							data-tooltip-id="tooltip"
-							data-tooltip-content={`Global attribution: ${(percentage * 100).toFixed(1)}%`}
+							data-tooltip-content={`Global attribution: ${lessThanMinimum || truncatedPercentage}%`}
 							data-tooltip-place="top"
 							className={`attrib-cv-amber`}
 						>
 							<NumberAnimator
-								number={Math.round(percentage * 1000) / 10}
+								number={truncatedPercentageForDisplay}
 								type="decimal"
 							/>
 							{"%"}
