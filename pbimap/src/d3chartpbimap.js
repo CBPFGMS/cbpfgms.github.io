@@ -3644,6 +3644,17 @@
 					numberOfBeneficiaries.total = 0;
 					let totalAllocation = 0;
 
+					//Quick check to see if latitude and longitude are swapped
+					if (
+						countriesCoordinates[row.key].split(",")[0] > 90 ||
+						countriesCoordinates[row.key].split(",")[0] < -90
+					) {
+						countriesCoordinates[row.key] =
+							countriesCoordinates[row.key].split(",")[1] +
+							"," +
+							countriesCoordinates[row.key].split(",")[0];
+					}
+
 					row.latitude = countriesCoordinates[row.key].split(",")[0];
 					row.longitude = countriesCoordinates[row.key].split(",")[1];
 					row.coordinates = new L.LatLng(row.latitude, row.longitude);
@@ -3702,6 +3713,19 @@
 					});
 					numberOfBeneficiaries.total = 0;
 					let totalAllocation = 0;
+
+					//Quick check to see if latitude and longitude are swapped
+					if (
+						row.key.split(",")[1] > 90 ||
+						row.key.split(",")[1] < -90
+					) {
+						row.key =
+							row.key.split(",")[0] +
+							"," +
+							row.key.split(",")[2] +
+							"," +
+							row.key.split(",")[1];
+					}
 
 					row.latitude = row.key.split(",")[1];
 					row.longitude = row.key.split(",")[2];
