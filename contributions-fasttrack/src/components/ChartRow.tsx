@@ -3,6 +3,7 @@ import type { Data } from "../utils/processcontributions";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import type { ContributionType } from "./MainContainer";
+import type { List } from "../utils/makelists";
 import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
@@ -10,6 +11,7 @@ import { constants } from "../utils/constants";
 
 type ChartRowProps = {
 	data: Data[number];
+	lists: List;
 	isStacked: boolean;
 	maxValue: number;
 	contributionType: ContributionType;
@@ -19,6 +21,7 @@ const { chartRowHeight } = constants;
 
 function ChartRow({
 	data,
+	lists,
 	isStacked,
 	maxValue,
 	contributionType,
@@ -69,7 +72,7 @@ function ChartRow({
 						paddingRight: "8px",
 					}}
 				>
-					{data.name}
+					{lists.fundNames[data.fund]}
 				</Typography>
 			</Box>
 			<Box

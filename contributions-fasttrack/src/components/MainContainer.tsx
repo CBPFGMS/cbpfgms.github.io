@@ -90,6 +90,7 @@ function MainContainer() {
 			<Box sx={{ mb: 5 }} />
 			<Chart
 				data={data}
+				lists={lists}
 				isStacked={isStacked}
 				contributionType={contributionType}
 			/>

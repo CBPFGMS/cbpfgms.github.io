@@ -13,7 +13,7 @@ export type Data = Datum[];
 type Datum = {
 	[type in (typeof constants.contributionTypes)[number]]: number;
 } & {
-	name: string;
+	fund: number;
 };
 
 function processContributions({
@@ -25,11 +25,26 @@ function processContributions({
 
 	contributionsData.forEach(datum => {
 		if (
-			datum.year === year &&
-			(tranche === "all" || datum.tranche === tranche)
+			datum.year !== year ||
+			(tranche !== "all" && datum.tranche !== tranche)
 		) {
+			return;
+		}
+
+		const foundFund = data.find(d => d.fund === datum.fund);
+
+		if (foundFund) {
+			constants.contributionTypes.forEach(type => {
+				foundFund[type] +=
+					type === "total"
+						? datum.totalAmount
+						: type === "paid"
+							? datum.paidAmount
+							: datum.pledgedAmount;
+			});
+		} else {
 			const obj: Datum = {
-				name: datum.fundName,
+				fund: datum.fund,
 			} as Datum;
 
 			constants.contributionTypes.forEach(type => {

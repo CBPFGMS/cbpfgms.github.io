@@ -10,9 +10,11 @@ import SortChart from "./SortChart";
 import { useTransition, animated } from "@react-spring/web";
 import Legend from "./Legend";
 import ChartAxis from "./ChartAxis";
+import type { List } from "../utils/makelists";
 
 type ChartProps = {
 	data: Data;
+	lists: List;
 	isStacked: boolean;
 	contributionType: ContributionType;
 };
@@ -24,7 +26,7 @@ export type SortBy = (typeof constants.sortByOptions)[number];
 const { chartRowHeight, transitionDuration, chartPadding, chartTopPadding } =
 	constants;
 
-function Chart({ data, isStacked, contributionType }: ChartProps) {
+function Chart({ data, lists, isStacked, contributionType }: ChartProps) {
 	const maxValue = max(data, row => row[contributionType]) || 0;
 
 	const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -32,7 +34,7 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 
 	const keyGetters: Record<SortBy, (d: Data[number]) => number | string> = {
 		contributions: d => d[contributionType],
-		alphabetical: d => d.name,
+		alphabetical: d => lists.fundNames[d.fund]!,
 	};
 
 	const getKey = keyGetters[sortBy] ?? ((d: number) => d.toString());
@@ -53,18 +55,18 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 		.filter(row => row[contributionType] > 0);
 
 	const transitions = useTransition(sortedFunds, {
-		keys: row => row.name,
+		keys: row => row.fund,
 		from: { y: 0, opacity: 0 },
 		enter: row => ({
 			y:
-				sortedFunds.findIndex(r => r.name === row.name) *
+				sortedFunds.findIndex(r => r.fund === row.fund) *
 					chartRowHeight +
 				chartTopPadding,
 			opacity: 1,
 		}),
 		update: row => ({
 			y:
-				sortedFunds.findIndex(r => r.name === row.name) *
+				sortedFunds.findIndex(r => r.fund === row.fund) *
 					chartRowHeight +
 				chartTopPadding,
 		}),
@@ -144,8 +146,9 @@ function Chart({ data, isStacked, contributionType }: ChartProps) {
 							}}
 						>
 							<ChartRow
-								key={row.name}
+								key={row.fund}
 								data={row}
+								lists={lists}
 								isStacked={isStacked}
 								maxValue={maxValue}
 								contributionType={contributionType}

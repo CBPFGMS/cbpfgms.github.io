@@ -1,6 +1,10 @@
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
-import type { ContributionsObject, RegionalFundsMasterObject } from "./schemas";
+import type {
+	ContributionsObject,
+	RegionalFundsMasterJson,
+	PooledFundsMasterObject,
+} from "./schemas";
 import makeLists, { type List } from "./makelists";
 import processRawData, {
 	type ContributionsData,
@@ -14,22 +18,32 @@ export type AppData = {
 	lists: List;
 };
 
-type ReceiveDataArgs = [ContributionsObject[], RegionalFundsMasterObject[]];
+type ReceiveDataArgs = [
+	ContributionsObject[],
+	RegionalFundsMasterJson,
+	PooledFundsMasterObject[],
+];
 
 const { currentYear } = constants;
 
 const regionalFundsMasterUrl =
-	"https://cbpfgms.github.io/pfbi-data/mst/MstRhpf.json";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/donor_attribution/api/public/regional-funds",
+	pooledFundsMasterUrl =
+		"https://cbpfapi.unocha.org/vo2/odata/MstPooledFund?$format=csv";
 
 export async function fetchAppData(startYear: number | null): Promise<AppData> {
 	if (!startYear) {
 		startYear = currentYear;
 	}
 
-	const toYearQueryString =
-		startYear < currentYear ? `&FiscalYearTo=${currentYear}` : "";
+	// const toYearQueryString =
+	// 	startYear < currentYear ? `&FiscalYearTo=${currentYear}` : "";
 
-	const contributionDataUrl = `https://cbpfapi.unocha.org/vo2/odata/ContributionTotal?FiscalYearFrom=${startYear}${toYearQueryString}&$format=csv`;
+	//TODO: Either have the API with YearFrom or get all years then filter in the client-side
+	// const contributionDataUrl = `https://cbpfapi.unocha.org/vo1/odata/Contribution?poolfundAbbrv=&year=${startYear}&$format=csv`;
+	void startYear;
+	//FIX: Change this to fetch from the actual API when ready
+	const contributionDataUrl = "contr.csv";
 
 	return Promise.all([
 		fetchFileDB<ContributionsObject[]>(
@@ -37,10 +51,15 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 			contributionDataUrl,
 			"csv",
 		),
-		fetchFile<RegionalFundsMasterObject[]>(
+		fetchFile<RegionalFundsMasterJson>(
 			"regionalFundsMaster",
 			regionalFundsMasterUrl,
 			"json",
+		),
+		fetchFile<PooledFundsMasterObject[]>(
+			"pooledFundsMaster",
+			pooledFundsMasterUrl,
+			"csv",
 		),
 	])
 		.then(receiveData)
@@ -52,9 +71,11 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 	function receiveData([
 		contributionsDataRaw,
 		regionalFundsMaster,
+		pooledFundsMaster,
 	]: ReceiveDataArgs): AppData {
 		const lists = makeLists({
 			regionalFundsMaster,
+			pooledFundsMaster,
 		});
 
 		const { contributionsData, inContributionsDataLists } = processRawData({

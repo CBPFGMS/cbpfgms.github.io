@@ -14,4 +14,5 @@ export const constants = {
 	transitionDuration: 750,
 	chartTopPadding: 18,
 	chartPadding: 16,
+	USCountryId: 102,
 } as const;

@@ -19,8 +19,8 @@ type RegionalFund = string;
 
 export type TopValuesDatum = {
 	value: number;
-	cbpfs: Set<string>;
-	fundsPerRegionalFund: Map<RegionalFund, Set<string>>;
+	cbpfs: Set<number>;
+	fundsPerRegionalFund: Map<RegionalFund, Set<number>>;
 };
 
 const { contributionTypes } = constants;
@@ -76,11 +76,10 @@ function populateValuesData(
 
 	topValuesDatum.value += thisValue;
 
-	const regionalFund =
-		lists.parentRegionalFundForFund[datum.fundName.toLowerCase()];
+	const regionalFund = lists.parentRegionalFundForFund[datum.fund];
 
 	if (regionalFund === undefined) {
-		topValuesDatum.cbpfs.add(datum.fundISOCode);
+		topValuesDatum.cbpfs.add(datum.fund);
 	} else {
 		let fundsInRegionalFund =
 			topValuesDatum.fundsPerRegionalFund.get(regionalFund);
@@ -91,7 +90,7 @@ function populateValuesData(
 				fundsInRegionalFund,
 			);
 		}
-		fundsInRegionalFund.add(datum.fundISOCode);
+		fundsInRegionalFund.add(datum.fund);
 	}
 }
 

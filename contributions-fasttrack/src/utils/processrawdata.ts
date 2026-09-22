@@ -1,6 +1,6 @@
 import { type ContributionsObject, contributionsObjectSchema } from "./schemas";
 import type { List } from "./makelists";
-import warnInvalidSchema from "./warninvalid";
+import warnInvalidSchema, { simpleWarn } from "./warninvalid";
 import { constants } from "./constants";
 import type { Tranche } from "../components/MainContainer";
 
@@ -13,8 +13,7 @@ export type TrancheNumbers = Exclude<Tranche, "all">;
 
 type ContributionsDatum = {
 	year: number;
-	fundISOCode: string;
-	fundName: string;
+	fund: number;
 	paidAmount: number;
 	pledgedAmount: number;
 	totalAmount: number;
@@ -27,8 +26,8 @@ type Year = number;
 
 export type InContributionsDataLists = {
 	years: Set<number>;
-	fundsPerYear: Map<Year, Set<string>>;
-	fundsPerYearAndRegionalFund: Map<Year, Map<string, Set<string>>>;
+	fundsPerYear: Map<Year, Set<number>>;
+	fundsPerYearAndRegionalFund: Map<Year, Map<string, Set<number>>>;
 };
 
 const { cutOffDate } = constants;
@@ -48,19 +47,13 @@ function processRawData({
 	};
 
 	contributionsDataRaw.forEach(datum => {
-		//FIX: temporaryly creating a date value
-		datum.DatePaid =
-			Math.random() > 0.5
-				? new Date("2026-08-01")
-				: new Date("2026-06-01");
-
 		const parsedDatum = contributionsObjectSchema.safeParse(datum);
 
 		if (!parsedDatum.success) {
 			const shouldWarn = parsedDatum.error.issues.some(issue => {
 				const isNotUsError =
 					issue.path.length === 1 &&
-					issue.path[0] === "GMSDonorISO2Code" &&
+					issue.path[0] === "GMSDonorID" &&
 					issue.message === "not-US";
 				return !isNotUsError;
 			});
@@ -75,22 +68,26 @@ function processRawData({
 			return;
 		}
 
-		inContributionsData.years.add(datum.FiscalYear);
+		const thisDate = new Date(datum.PaidDate);
 
-		lists.fundNames[datum.PooledFundISO2Code.toLowerCase()] =
-			datum.PooledFundName;
+		if (thisDate.getFullYear() === 2001) {
+			simpleWarn("Date is in the year 2001");
+			return;
+		}
+
+		inContributionsData.years.add(datum.FiscalYear);
 
 		let fundsInYear = inContributionsData.fundsPerYear.get(
 			datum.FiscalYear,
 		);
 		if (!fundsInYear) {
-			fundsInYear = new Set<string>();
+			fundsInYear = new Set<number>();
 			inContributionsData.fundsPerYear.set(datum.FiscalYear, fundsInYear);
 		}
-		fundsInYear.add(datum.PooledFundISO2Code.toLowerCase());
+		fundsInYear.add(datum.PooledFundId);
 
 		const parentRegionalFund =
-			lists.parentRegionalFundForFund[datum.PooledFundName.toLowerCase()];
+			lists.parentRegionalFundForFund[datum.PooledFundId];
 
 		if (parentRegionalFund) {
 			let fundsInYearAndRegionalFund =
@@ -98,7 +95,7 @@ function processRawData({
 					datum.FiscalYear,
 				);
 			if (!fundsInYearAndRegionalFund) {
-				fundsInYearAndRegionalFund = new Map<string, Set<string>>();
+				fundsInYearAndRegionalFund = new Map<string, Set<number>>();
 				inContributionsData.fundsPerYearAndRegionalFund.set(
 					datum.FiscalYear,
 					fundsInYearAndRegionalFund,
@@ -107,22 +104,20 @@ function processRawData({
 			let fundsForRegionalFund =
 				fundsInYearAndRegionalFund.get(parentRegionalFund);
 			if (!fundsForRegionalFund) {
-				fundsForRegionalFund = new Set<string>();
+				fundsForRegionalFund = new Set<number>();
 				fundsInYearAndRegionalFund.set(
 					parentRegionalFund,
 					fundsForRegionalFund,
 				);
 			}
-			fundsForRegionalFund.add(datum.PooledFundISO2Code.toLowerCase());
+			fundsForRegionalFund.add(datum.PooledFundId);
 		}
 
-		const thisTranche: TrancheNumbers =
-			datum.DatePaid <= cutOffDate ? 1 : 2;
+		const thisTranche: TrancheNumbers = thisDate <= cutOffDate ? 1 : 2;
 
 		contributionsData.push({
 			year: datum.FiscalYear,
-			fundISOCode: datum.PooledFundISO2Code.toLowerCase(),
-			fundName: datum.PooledFundName,
+			fund: datum.PooledFundId,
 			paidAmount: datum.PaidAmt,
 			pledgedAmount: datum.PledgeAmt,
 			totalAmount: datum.PaidAmt + datum.PledgeAmt,

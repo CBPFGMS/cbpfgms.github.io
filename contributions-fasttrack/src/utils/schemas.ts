@@ -1,27 +1,38 @@
 import { z } from "zod";
+import { constants } from "./constants";
+
+const { USCountryId } = constants;
 
 // ********************
 // DATA SCHEMAS
 // ********************
 
 export const contributionsObjectSchema = z.object({
+	PooledFundId: z.number().int().nonnegative(),
+	PooledFundName: z.string(),
+	PooledFundCodeAbbrv: z.string().nullable(),
+	ContributionCode: z.string().nullable(),
 	FiscalYear: z.number().int().nonnegative(),
-	GMSDonorName: z.string().nullish(),
-	GMSDonorISO2Code: z.literal("US", {
+	DonorName: z.string().nullable(),
+	DonorCode: z.number().nullable(),
+	GMSDonorID: z.literal(USCountryId, {
 		error: "not-US",
 	}),
-	PooledFundName: z.string(),
-	PooledFundISO2Code: z.string(),
-	PaidAmt: z.number().nonnegative(),
+	GMSDonorName: z.string().nullable(),
+	CountryCode: z.string().nullable(),
+	PledgeDate: z.string().nullable(),
 	PledgeAmt: z.number().nonnegative(),
-	PledgeAmtLocalCurrency: z.string().nullish(),
-	PledgeAmtCurrencyExchangeRate: z.number().nullish(),
-	PaidAmtLocalCurrency: z.string().nullish(),
-	PaidAmtCurrencyExchangeRate: z.number().nullish(),
-	PledgeAmtLocal: z.number().nullish(),
-	PaidAmtLocal: z.number().nullish(),
-	IsTransfer: z.number().nullish(),
-	DatePaid: z.coerce.date(), //FIX: this doesn't exist yet in the raw data
+	PipeLineDate: z.string().nullable(),
+	PaidDate: z.coerce.date(),
+	PaidAmt: z.number().nonnegative(),
+	ExpectedDate: z.string().nullable(),
+	PledgeAmtLocalCurrency: z.string().nullable(),
+	PledgeAmtCurrencyExchangeRate: z.number().nullable(),
+	PaidAmtLocalCurrency: z.string().nullable(),
+	PaidAmtCurrencyExchangeRate: z.number().nullable(),
+	PledgeAmtLocal: z.number().nullable(),
+	PaidAmtLocal: z.number().nullable(),
+	IsTransfer: z.number().nullable(),
 });
 
 // ********************
@@ -29,11 +40,26 @@ export const contributionsObjectSchema = z.object({
 // ********************
 
 export const regionalFundsMasterObjectSchema = z.object({
-	RFundTitle: z.string(),
+	CBPFId: z.number().int().nonnegative(),
+	FundLevel: z.number().nullable(),
+	ProgrammeCBPFId: z.number().nullable(),
+	ProgrammeParentAbbrv: z.any().nullable(),
 	RFundAbbrv: z.string(),
 	RFundName: z.string(),
-	StartYearDate: z.string().nullish(),
-	CBPFId: z.number().nullish(),
+	RFundTitle: z.string(),
+	StartYearDate: z.string().nullable(),
+});
+
+export const pooledFundsMasterObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	PFAbbrv: z.string(),
+	PFLat: z.number(),
+	PFLong: z.number(),
+	PFCountryCode: z.string().length(2),
+	MAAgent: z.string(),
+	AAgent: z.string(),
+	IsPublic: z.string(),
 });
 
 // ********************
@@ -42,6 +68,11 @@ export const regionalFundsMasterObjectSchema = z.object({
 
 export type ContributionsObject = z.infer<typeof contributionsObjectSchema>;
 
-export type RegionalFundsMasterObject = z.infer<
-	typeof regionalFundsMasterObjectSchema
+export type RegionalFundsMasterJson = {
+	count: number;
+	funds: z.infer<typeof regionalFundsMasterObjectSchema>[];
+};
+
+export type PooledFundsMasterObject = z.infer<
+	typeof pooledFundsMasterObjectSchema
 >;
