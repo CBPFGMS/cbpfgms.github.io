@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="/favicon.svg"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Coordinates to country</title>
+	</head>
+	<body>
+		<div id="app">
+			<p>Enter coordinates:</p>
+			<form id="coord-form">
+				<label for="latitude">Latitude:</label>
+				<input
+					type="text"
+					id="latitude"
+					name="latitude"
+					required
+				/>
+
+				<label for="longitude">Longitude:</label>
+				<input
+					type="text"
+					id="longitude"
+					name="longitude"
+					required
+				/>
+
+				<!-- Changed type to "button" to stop immediate native page reloads -->
+				<button
+					type="submit"
+					id="find-btn"
+				>
+					Find Country
+				</button>
+			</form>
+			<p id="result"></p>
+		</div>
+		<script
+			type="module"
+			src="/src/main.js"
+		></script>
+	</body>
+</html>
