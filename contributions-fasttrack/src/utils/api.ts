@@ -41,9 +41,6 @@ export async function fetchAppData(startYear: number | null): Promise<AppData> {
 
 	//TODO: Either have the API with YearFrom or get all years then filter in the client-side
 	const contributionDataUrl = `https://cbpfapi.unocha.org/vo1/odata/Contribution?poolfundAbbrv=&year=${startYear}&$format=csv`;
-	//void startYear;
-	//FIX: Change this to fetch from the actual API when ready
-	// const contributionDataUrl = "contr.csv";
 
 	return Promise.all([
 		fetchFileDB<ContributionsObject[]>(

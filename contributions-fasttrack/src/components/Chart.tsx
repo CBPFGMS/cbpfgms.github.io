@@ -17,6 +17,7 @@ type ChartProps = {
 	lists: List;
 	isStacked: boolean;
 	contributionType: ContributionType;
+	fundsInYearSize: number;
 };
 
 export type SortOrder = "asc" | "desc";
@@ -26,7 +27,13 @@ export type SortBy = (typeof constants.sortByOptions)[number];
 const { chartRowHeight, transitionDuration, chartPadding, chartTopPadding } =
 	constants;
 
-function Chart({ data, lists, isStacked, contributionType }: ChartProps) {
+function Chart({
+	data,
+	lists,
+	isStacked,
+	contributionType,
+	fundsInYearSize,
+}: ChartProps) {
 	const maxValue = max(data, row => row[contributionType]) || 0;
 
 	const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -53,6 +60,8 @@ function Chart({ data, lists, isStacked, contributionType }: ChartProps) {
 			return comparison * direction;
 		})
 		.filter(row => row[contributionType] > 0);
+
+	const minimumBoxHeight = fundsInYearSize * chartRowHeight + chartTopPadding;
 
 	const transitions = useTransition(sortedFunds, {
 		keys: row => row.fund,
@@ -87,7 +96,12 @@ function Chart({ data, lists, isStacked, contributionType }: ChartProps) {
 	}
 
 	return (
-		<>
+		<Box
+			sx={{
+				width: "100%",
+				minHeight: `${minimumBoxHeight}px`,
+			}}
+		>
 			<Box
 				style={{
 					display: "flex",
@@ -157,7 +171,7 @@ function Chart({ data, lists, isStacked, contributionType }: ChartProps) {
 					))}
 				</Box>
 			</Paper>
-		</>
+		</Box>
 	);
 }
 

@@ -53,6 +53,9 @@ function MainContainer() {
 		[contributionsData, year, tranche],
 	);
 
+	const fundsInYearSize =
+		inContributionsDataLists.fundsPerYear.get(year)?.size || 0;
+
 	return (
 		<Container
 			disableGutters={true}
@@ -93,6 +96,7 @@ function MainContainer() {
 				lists={lists}
 				isStacked={isStacked}
 				contributionType={contributionType}
+				fundsInYearSize={fundsInYearSize}
 			/>
 		</Container>
 	);
