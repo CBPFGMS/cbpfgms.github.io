@@ -39,7 +39,7 @@ function CardsContainer({
 						key={type}
 					>
 						<ContributionCard
-							topValuesDatum={topValuesData[type]}
+							topValuesData={topValuesData}
 							contributionType={contributionType}
 							type={type}
 							setContributionType={setContributionType}

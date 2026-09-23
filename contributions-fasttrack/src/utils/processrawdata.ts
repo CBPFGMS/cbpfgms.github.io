@@ -1,8 +1,9 @@
 import { type ContributionsObject, contributionsObjectSchema } from "./schemas";
 import type { List } from "./makelists";
-import warnInvalidSchema, { simpleWarn } from "./warninvalid";
+import warnInvalidSchema from "./warninvalid";
 import { constants } from "./constants";
 import type { Tranche } from "../components/MainContainer";
+import parseApiDate from "./parseapidate";
 
 type ProcessRawDataParams = {
 	contributionsDataRaw: ContributionsObject[];
@@ -68,12 +69,7 @@ function processRawData({
 			return;
 		}
 
-		const thisDate = new Date(datum.PaidDate);
-
-		if (thisDate.getFullYear() === 2001) {
-			simpleWarn("Date is in the year 2001");
-			return;
-		}
+		const thisDate = parseApiDate(datum.PaidDate);
 
 		inContributionsData.years.add(datum.FiscalYear);
 
@@ -113,14 +109,20 @@ function processRawData({
 			fundsForRegionalFund.add(datum.PooledFundId);
 		}
 
-		const thisTranche: TrancheNumbers = thisDate <= cutOffDate ? 1 : 2;
+		// This is the logic for determining the tranche based on the paid date and cut-off date:
+		// if the paid date is after the cut-off date and the paid amount is greater than 0, it belongs to tranche 2; otherwise, it belongs to tranche 1
+		const thisTranche: TrancheNumbers =
+			thisDate && datum.PaidAmt > 0 && thisDate > cutOffDate ? 2 : 1;
+
+		// In this API, pledged amounts are only considered if the paid amount is zero.
+		const thisPledgedAmount = datum.PaidAmt === 0 ? datum.PledgeAmt : 0;
 
 		contributionsData.push({
 			year: datum.FiscalYear,
 			fund: datum.PooledFundId,
 			paidAmount: datum.PaidAmt,
-			pledgedAmount: datum.PledgeAmt,
-			totalAmount: datum.PaidAmt + datum.PledgeAmt,
+			pledgedAmount: thisPledgedAmount,
+			totalAmount: datum.PaidAmt + thisPledgedAmount,
 			tranche: thisTranche,
 		});
 	});

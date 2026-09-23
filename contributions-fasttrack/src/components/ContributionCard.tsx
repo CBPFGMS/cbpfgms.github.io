@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Card from "@mui/material/Card";
-import type { TopValuesDatum } from "../utils/processtopvalues";
+import type { TopValuesData } from "../utils/processtopvalues";
 import type { ContributionType } from "./MainContainer";
 import type { List } from "../utils/makelists";
 import Box from "@mui/material/Box";
@@ -17,7 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
 type ContributionCardProps = {
-	topValuesDatum: TopValuesDatum;
+	topValuesData: TopValuesData;
 	contributionType: ContributionType;
 	type: ContributionType;
 	setContributionType: React.Dispatch<React.SetStateAction<ContributionType>>;
@@ -42,7 +42,7 @@ const smallTextStyle = {
 };
 
 function ContributionCard({
-	topValuesDatum,
+	topValuesData,
 	contributionType,
 	type,
 	setContributionType,
@@ -51,6 +51,13 @@ function ContributionCard({
 	setIsStacked,
 }: ContributionCardProps) {
 	const typeSelected = contributionType === type;
+
+	const topValuesDatum = topValuesData[type];
+
+	const isStackedDisabled =
+		topValuesData.paid.value === 0 || topValuesData.pledged.value === 0;
+
+	setIsStacked(prev => (isStackedDisabled ? false : prev));
 
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -290,6 +297,7 @@ function ContributionCard({
 														e.target.checked,
 													)
 												}
+												disabled={isStackedDisabled}
 											/>
 										}
 										label="Show breakdown"

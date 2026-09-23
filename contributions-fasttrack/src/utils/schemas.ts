@@ -23,7 +23,7 @@ export const contributionsObjectSchema = z.object({
 	PledgeDate: z.string().nullable(),
 	PledgeAmt: z.number().nonnegative(),
 	PipeLineDate: z.string().nullable(),
-	PaidDate: z.coerce.date(),
+	PaidDate: z.string(),
 	PaidAmt: z.number().nonnegative(),
 	ExpectedDate: z.string().nullable(),
 	PledgeAmtLocalCurrency: z.string().nullable(),
