@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 
-function Header({ year }: { year: number | null }) {
+function Header() {
 	return (
 		<Container
 			disableGutters={true}
@@ -66,7 +66,13 @@ function Header({ year }: { year: number | null }) {
 						color: "#212529e1",
 					}}
 				>
-					{`This page provides an overview of the generous United States' contributions to OCHA. Since ${year || new Date().getFullYear()} onwards, the United States has played a pivotal role in supporting humanitarian efforts worldwide.`}
+					This page provides an overview of the generous contributions
+					of the United States to OCHA's Country-Based Pooled Funds.
+					With the 2026 response hyper-prioritized around the 87
+					million people in most life-threatening need, the United
+					States made the largest single-donor contribution the funds
+					have ever received, substantially reducing the funding gap
+					and reaching people in urgent need.
 				</Typography>
 			</Box>
 		</Container>

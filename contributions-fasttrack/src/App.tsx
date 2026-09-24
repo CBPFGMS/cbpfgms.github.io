@@ -16,7 +16,7 @@ function App({ startYear }: AppProps) {
 
 	return (
 		<ErrorBoundary FallbackComponent={Error}>
-			<Header year={startYear} />
+			<Header />
 			<Suspense fallback={<Loading />}>
 				<DataContext.Provider value={dataPromise}>
 					<MainContainer />
