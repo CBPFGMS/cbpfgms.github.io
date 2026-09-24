@@ -70,9 +70,11 @@ export type InDataLists = {
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	projectStatuses: Set<number>;
-	statusesPerFund: { [key: number]: Set<number> };
-	fundsPerTranche: { [key: number]: Set<number> };
-	projectsPerTranche: { [key: number]: Set<string> };
+	statusesPerFund: { [fund: number]: Set<number> };
+	fundsPerTranche: { [tranche: number]: Set<number> };
+	projectsPerTranche: { [tranche: number]: Set<string> };
+	projectsPerFund: { [fund: number]: Set<string> };
+	projectsPerStatus: { [status: number]: Set<string> };
 };
 
 type SetType<T> = {
@@ -145,6 +147,8 @@ function processRawData({
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
 	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
 	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
+	const projectsPerFund: InDataLists["projectsPerFund"] = {};
+	const projectsPerStatus: InDataLists["projectsPerStatus"] = {};
 	const organizationIdsToChange: Set<number> = new Set();
 
 	templatesMaster.data.forEach(row => {
@@ -383,6 +387,23 @@ function processRawData({
 				]);
 			}
 
+			if (projectsPerFund[row.PooledFundId]) {
+				projectsPerFund[row.PooledFundId].add(row.ChfProjectCode);
+			} else {
+				projectsPerFund[row.PooledFundId] = new Set([
+					row.ChfProjectCode,
+				]);
+			}
+
+			if (projectsPerStatus[projectStatusMapping[row.ProcessSTatusID]]) {
+				projectsPerStatus[
+					projectStatusMapping[row.ProcessSTatusID]
+				].add(row.ChfProjectCode);
+			} else {
+				projectsPerStatus[projectStatusMapping[row.ProcessSTatusID]] =
+					new Set([row.ChfProjectCode]);
+			}
+
 			const objDatum: Datum = {
 				fund: row.PooledFundId,
 				year: thisAllocationType.AllocationYear,
@@ -420,6 +441,8 @@ function processRawData({
 		statusesPerFund,
 		fundsPerTranche,
 		projectsPerTranche,
+		projectsPerFund,
+		projectsPerStatus,
 	}));
 
 	return {

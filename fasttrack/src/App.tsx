@@ -20,6 +20,7 @@ function App({ defaultFundType, startYear }: AppProps) {
 		loading,
 		error,
 		progress,
+		allocationsLollipopData,
 	} = useData(defaultFundType, startYear);
 
 	return loading ? (
@@ -36,6 +37,7 @@ function App({ defaultFundType, startYear }: AppProps) {
 				totalBeneficiariesData,
 				totalBeneficiariesTranche1Data,
 				totalBeneficiariesTranche2Data,
+				allocationsLollipopData,
 			}}
 		>
 			<MainContainer />

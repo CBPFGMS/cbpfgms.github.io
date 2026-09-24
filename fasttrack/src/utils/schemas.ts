@@ -136,8 +136,6 @@ export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
-	defaultAdminLevel: z.number().int().nonnegative().nullish(),
-	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BenM: z.number().int().nonnegative().nullable(),
 	BenW: z.number().int().nonnegative().nullable(),
@@ -151,12 +149,24 @@ export const totalBeneficiariesObjectSchema = z.object({
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	TemplateId: z.number(),
-	Steps: z.string(),
-	Pcode: z.string().nullable(),
-	LocPath: z.string().nullable(),
-	AdminName: z.string().nullable(),
-	syncedAt: z.string(),
+});
+
+export const allocationsLollipopObjectSchema = z.object({
+	AllocationYear: z.number().int().nonnegative(),
+	OrganizationType: z.string(),
+	PooledFundName: z.string(),
+	CHFProjectCode: z.string(),
+	ApprovedReserveBudgetPercentage: z.number().nonnegative(),
+	ApprovedStandardBudgetPercentage: z.number().nonnegative(),
+	ApprovedBudget: z.number().nonnegative(),
+	ApprovedReserveBudget: z.number().nonnegative(),
+	ApprovedStandardBudget: z.number().nonnegative(),
+	PipelineReserveBudgetPercentage: z.number().nonnegative(),
+	PipelineStandardBudgetPercentage: z.number().nonnegative(),
+	PipelineBudget: z.number().nonnegative(),
+	PipelineReserveBudget: z.number().nonnegative(),
+	PipelineStandardBudget: z.number().nonnegative(),
+	FundingType: z.number().int().nonnegative(),
 });
 
 // ********************
@@ -422,3 +432,7 @@ export type TemplatesMasterJson = {
 	count: number;
 	data: z.infer<typeof templatesMasterObjectSchema>[];
 };
+
+export type AllocationsLollipopObject = z.infer<
+	typeof allocationsLollipopObjectSchema
+>;

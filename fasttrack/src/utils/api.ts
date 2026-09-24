@@ -23,6 +23,7 @@ import type {
 	TotalBeneficiariesObject,
 	OrganizationIdsMapObject,
 	TemplatesMasterJson,
+	AllocationsLollipopObject,
 } from "./schemas";
 import { constants } from "./constants";
 
@@ -44,6 +45,7 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesObject[],
 	OrganizationIdsMapObject[],
 	TemplatesMasterJson,
+	AllocationsLollipopObject[],
 ];
 
 const { fundType } = constants;
@@ -86,18 +88,21 @@ function useData(
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
 	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
+	allocationsLollipopData: AllocationsLollipopObject[];
 	loading: boolean;
 	error: string | null;
 	progress: number;
 } {
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
-		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
+		currentYear = new Date().getFullYear(),
+		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
 	const projectSummaryUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		globalIndicatorsUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
-		organizationMasterUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
+		organizationMasterUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`,
+		allocationsLollipopUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V3&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=0&AllocationYearTo=${currentYear}&FundingType=3`;
 
 	const [data, setData] = useState<Data>([] as Data),
 		[dataIndicators, setDataIndicators] = useState<
@@ -112,7 +117,10 @@ function useData(
 		[lists, setLists] = useState<List>({} as List),
 		[inDataLists, setInDataLists] = useState<InDataLists>(
 			{} as InDataLists,
-		);
+		),
+		[allocationsLollipopData, setAllocationsLollipopData] = useState<
+			AllocationsLollipopObject[]
+		>([] as AllocationsLollipopObject[]);
 
 	const [loading, setLoading] = useState<boolean>(true),
 		[error, setError] = useState<string | null>(null);
@@ -223,6 +231,12 @@ function useData(
 				"json",
 				setProgress,
 			),
+			fetchFile<AllocationsLollipopObject[]>(
+				"allocationsLollipop",
+				allocationsLollipopUrl,
+				"json",
+				setProgress,
+			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -252,6 +266,7 @@ function useData(
 			totalBeneficiariesTranche2,
 			organizationIdsMap,
 			templatesMaster,
+			allocationsLollipopData,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
@@ -289,6 +304,7 @@ function useData(
 			setTotalBeneficiariesTranche2Data(totalBeneficiariesTranche2Data);
 			setLists(listsObj);
 			setLoading(false);
+			setAllocationsLollipopData(allocationsLollipopData);
 		}
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -304,6 +320,7 @@ function useData(
 		loading,
 		error,
 		progress,
+		allocationsLollipopData,
 	};
 }
 

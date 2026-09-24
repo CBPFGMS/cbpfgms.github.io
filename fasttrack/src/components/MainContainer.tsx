@@ -24,9 +24,10 @@ import Partners from "./Partners";
 import Regions from "./Regions";
 import Sectors from "./Sectors";
 import ProjectStatuses from "./Statuses";
-import FlowContainer from "./FlowContainer";
+import LollipopContainer from "./LollipopContainer";
 import { processTotalBeneficiariesWithTranche } from "../utils/processtranche";
 import TranchesTopCheckbox from "./TranchesTopCheckbox";
+import processLollipopData from "../utils/processlollipopdata";
 
 const { charts } = constants;
 
@@ -54,6 +55,7 @@ function MainContainer() {
 		totalBeneficiariesTranche2Data,
 		inDataLists,
 		lists,
+		allocationsLollipopData,
 	} = useContext(DataContext) as DataContextType;
 
 	const [fund, setFund] = useState<number[]>([...inDataLists.funds]),
@@ -93,15 +95,23 @@ function MainContainer() {
 		[data, fund, tranche, inDataLists],
 	);
 
-	useEffect(() => {
-		window.dispatchEvent(new CustomEvent("updatefunds", { detail: fund }));
-	}, [fund]);
+	const lollipopData = useMemo(
+		() =>
+			processLollipopData({
+				allocationsLollipopData,
+				fund,
+				status,
+				tranche,
+				inDataLists,
+			}),
+		[allocationsLollipopData, fund, status, tranche, inDataLists],
+	);
 
 	useEffect(() => {
 		window.dispatchEvent(
-			new CustomEvent("updatestatuses", { detail: status }),
+			new CustomEvent("updatelollipopdata", { detail: lollipopData }),
 		);
-	}, [status]);
+	}, [lollipopData]);
 
 	const filteredDataIndicators = useMemo(
 		() =>
@@ -270,7 +280,7 @@ function MainContainer() {
 			<Box mb={8} />
 			<Explore />
 			<Box mb={8} />
-			<FlowContainer />
+			<LollipopContainer />
 			<Box mb={8} />
 			<IndicatorsContainer
 				dataIndicators={filteredDataIndicators}

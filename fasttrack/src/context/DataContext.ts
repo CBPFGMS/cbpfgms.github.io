@@ -4,7 +4,10 @@ import type {
 	InDataLists,
 	TotalBeneficiariesData,
 } from "../utils/processrawdata";
-import type { GlobalIndicatorsObject } from "../utils/schemas";
+import type {
+	GlobalIndicatorsObject,
+	AllocationsLollipopObject,
+} from "../utils/schemas";
 import type { List } from "../utils/makelists";
 
 export type DataContextType = {
@@ -15,6 +18,7 @@ export type DataContextType = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	totalBeneficiariesTranche1Data: TotalBeneficiariesData;
 	totalBeneficiariesTranche2Data: TotalBeneficiariesData;
+	allocationsLollipopData: AllocationsLollipopObject[];
 };
 
 const DataContext = createContext<DataContextType | null>(null);

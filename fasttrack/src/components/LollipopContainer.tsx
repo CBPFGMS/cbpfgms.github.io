@@ -2,12 +2,13 @@ import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-function FlowContainer() {
+
+function LollipopContainer() {
 	useEffect(() => {
 		const src =
-			"https://cbpfgms.github.io/pbinad_ft/src/d3chartpbinad_ft.js";
+			"https://cbpfgms.github.io/pbialp_ft/src/d3chartpbialp_ft.js";
 
-		// const src = "/d3chartpbinad_ft-stg.js";
+		// const src = "./d3chartpbialp_ft-stg.js";
 
 		if (document.querySelector(`script[src="${src}"]`)) return;
 
@@ -27,7 +28,7 @@ function FlowContainer() {
 			>
 				<Grid
 					size={12}
-					mb={3}
+					mb={2}
 				>
 					<Typography
 						style={{
@@ -39,7 +40,7 @@ function FlowContainer() {
 							fontFamily: "Montserrat",
 						}}
 					>
-						Allocations Flow
+						Allocations by Organization Type
 					</Typography>
 				</Grid>
 			</Grid>
@@ -50,15 +51,12 @@ function FlowContainer() {
 			>
 				<Grid size={12}>
 					<div
-						id="d3chartcontainerpbinad_ft"
-						data-year="2026"
-						data-cbpf="all"
-						data-aggregate="type"
-						data-minpercentage="3"
-						data-showhelp="false"
-						data-showlink="false"
+						id="d3chartcontainerpbialp_ft"
+						data-partner="total"
+						data-showaverage="true"
+						data-selectedcbpfs="none"
+						data-netfunding="true"
 						data-responsive="true"
-						data-lazyload="true"
 					></div>
 				</Grid>
 			</Grid>
@@ -66,6 +64,6 @@ function FlowContainer() {
 	);
 }
 
-const MemoisedFlowContainer = React.memo(FlowContainer);
+const MemoisedFlowContainer = React.memo(LollipopContainer);
 
 export default MemoisedFlowContainer;
