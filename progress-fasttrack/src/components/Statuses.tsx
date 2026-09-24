@@ -15,7 +15,7 @@ import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
-// import constants from "../utils/constants";
+import constants from "../utils/constants";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -46,7 +46,7 @@ const statusesDescription: StatusesDescription = {
 	"Project Closure": "Project Closure",
 };
 
-// const { limitScaleValueInPixels } = constants;
+const { opacityValue } = constants;
 
 function Statuses({
 	dataStatuses,
@@ -352,7 +352,10 @@ function Status({
 					background: statusSelected ? "#fffefc" : "#fafafa",
 					border: statusSelected
 						? "1px solid #fac775"
-						: "1px solid #ccc",
+						: "1px solid #e1e1e1",
+					boxShadow: statusSelected
+						? "0 0 6px rgba(0, 0, 0, 0.2)"
+						: "none",
 				}}
 			>
 				<CardContent>
@@ -367,7 +370,7 @@ function Status({
 					>
 						<Grid
 							sx={{
-								opacity: statusSelected ? 1 : 0.5,
+								opacity: statusSelected ? 1 : opacityValue,
 								filter: statusSelected
 									? "none"
 									: "grayscale(100%)",
@@ -411,7 +414,7 @@ function Status({
 					</Box>
 					<Typography
 						sx={{
-							opacity: statusSelected ? 1 : 0.5,
+							opacity: statusSelected ? 1 : opacityValue,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 						data-tooltip-id="tooltip"
@@ -443,7 +446,7 @@ function Status({
 					</Typography>
 					<Box
 						sx={{
-							opacity: statusSelected ? 1 : 0.5,
+							opacity: statusSelected ? 1 : opacityValue,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 						mt={1}

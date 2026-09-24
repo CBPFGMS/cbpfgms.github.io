@@ -232,13 +232,6 @@ export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	TemplateId: z.number().int().nonnegative().nullable(),
-	Steps: z.string().nullable(),
-	Pcode: z.string().nullable(),
-	LocPath: z.string().nullable(),
-	AdminName: z.string().nullable(),
-	syncedAt: z.string().nullable(),
-	DedupRunId: z.number().int().nonnegative().nullable(),
 });
 
 // ********************

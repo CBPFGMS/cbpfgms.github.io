@@ -106,6 +106,7 @@ const constants = {
 	tranches: [1, 2, "all"],
 	tranche1Name: "US_Tranche1_2026",
 	tranche2Name: "US_Tranche2_2026",
+	opacityValue: 0.3,
 } as const;
 
 export const projectStatusMaster = {
