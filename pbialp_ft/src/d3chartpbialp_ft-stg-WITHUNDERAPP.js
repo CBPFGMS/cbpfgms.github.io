@@ -105,7 +105,7 @@
 	}
 
 	function d3Chart() {
-		const containerDiv = d3.select("#d3chartcontainerpbialp_ft");
+		const containerDiv = d3.select("#d3chartcontainerpbialp");
 
 		const width = 900,
 			parallelPanelHeight = 400,
@@ -114,6 +114,7 @@
 			buttonPanelHeight = 30,
 			panelHorizontalPadding = 4,
 			panelVerticalPadding = 8,
+			windowHeight = window.innerHeight,
 			lollipopGroupHeight = 18,
 			stickHeight = 2,
 			lollipopRadius = 4,
@@ -138,6 +139,7 @@
 			unBlue = "#1F69B3",
 			highlightColor = "sandybrown",
 			currentDate = new Date(),
+			currentYear = currentDate.getFullYear(),
 			localStorageTime = 600000,
 			classPrefix = "pbialp",
 			partnerList = [
@@ -160,13 +162,19 @@
 			formatMoney0Decimals = d3.format(",.0f"),
 			formatPercent = d3.format(".0%"),
 			formatNumberSI = d3.format(".3s"),
+			localVariable = d3.local(),
+			buttonsNumber = 8,
 			file =
-				"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V3&PoolfundCodeAbbrv=&AllocationYearFrom=2026&ShowAllPooledFunds=0&AllocationYearTo=2026&FundingType=3&$format=csv",
+				"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=&ShowAllPooledFunds=0&AllocationYearTo=&FundingType=3&ShowNSFT=1&$format=csv",
+			launchedAllocationsDataUrl =
+				"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_V2&PoolfundCodeAbbrv=&ShowAllPooledFunds=0&AllocationYear=&FundTypeId=1&ShowNSFT=1&$format=csv",
 			duration = 1000,
 			shortDuration = 500,
 			titlePadding = 26,
+			yearsWithUnderApprovalAboveMin = {},
 			cbpfsCompleteList = [],
 			chartState = {
+				selectedYear: [],
 				selectedPartner: null,
 				selectedCbpfs: [],
 				netFunding: null,
@@ -179,13 +187,24 @@
 				buttonPanelHeight +
 				parallelPanelHeight +
 				2 * panelHorizontalPadding,
+			yearsArray,
 			isSnapshotTooltipVisible = false;
 
 		const selectedResponsiveness =
 			containerDiv.node().getAttribute("data-responsive") === "true";
 
+		const lazyLoad =
+			containerDiv.node().getAttribute("data-lazyload") === "true";
+
+		const minimumUnderApprovalPercentage =
+			+containerDiv.node().getAttribute("data-minpercentage") || 0;
+
 		let showAverage =
 			containerDiv.node().getAttribute("data-showaverage") === "true";
+
+		const selectedYearString = containerDiv
+			.node()
+			.getAttribute("data-year");
 
 		const selectedCbpfsString = containerDiv
 			.node()
@@ -224,6 +243,10 @@
 		if (isInternetExplorer) {
 			svg.attr("height", height);
 		}
+
+		const yearsDescriptionDiv = containerDiv
+			.append("div")
+			.attr("class", "pbialpYearsDescriptionDiv");
 
 		const selectionDescriptionDiv = containerDiv
 			.append("div")
@@ -441,6 +464,12 @@
 
 		Promise.all([
 			fetchFile(classPrefix + "data", file, "allocations data", "csv"),
+			fetchFile(
+				"launchedAllocationsData",
+				launchedAllocationsDataUrl,
+				"launched allocations data",
+				"csv",
+			),
 		]).then(allData => csvCallback(allData));
 
 		function fetchFile(fileName, url, warningString, method) {
@@ -492,18 +521,60 @@
 			}
 		}
 
-		function csvCallback([rawData]) {
+		function csvCallback([
+			rawData,
+			rawLaunchedAllocationsData,
+			masterRegionalFunds,
+		]) {
 			removeProgressWheel();
+
+			yearsArray = rawData
+				.map(function (d) {
+					if (cbpfsCompleteList.indexOf(d.PooledFundName) === -1)
+						cbpfsCompleteList.push(d.PooledFundName);
+					return +d.AllocationYear;
+				})
+				.filter(function (value, index, self) {
+					return self.indexOf(value) === index;
+				})
+				.sort();
+
+			validateYear(selectedYearString);
 
 			validateCbpfs(selectedCbpfsString);
 
-			draw(rawData);
+			if (!lazyLoad) {
+				draw(rawData, rawLaunchedAllocationsData, masterRegionalFunds);
+			} else {
+				d3.select(window).on("scroll.pbialp", checkPosition);
+				d3.select("body").on("d3ChartsYear.pbialp", function () {
+					chartState.selectedYear = [
+						validateCustomEventYear(+d3.event.detail),
+					];
+				});
+				checkPosition();
+			}
+
+			function checkPosition() {
+				const containerPosition = containerDiv
+					.node()
+					.getBoundingClientRect();
+				if (
+					!(
+						containerPosition.bottom < 0 ||
+						containerPosition.top - windowHeight > 0
+					)
+				) {
+					d3.select(window).on("scroll.pbialp", null);
+					draw(rawData, rawLaunchedAllocationsData);
+				}
+			}
 
 			//end of csvCallback
 		}
 
-		function draw(rawData) {
-			let data = processData(rawData);
+		function draw(rawData, rawLaunchedAllocationsData) {
+			let data = processData(rawData, rawLaunchedAllocationsData);
 
 			const allCbpfs = [];
 
@@ -551,6 +622,8 @@
 					});
 				highlightParallel(data);
 			}
+
+			setYearsDescriptionDiv();
 
 			function createLegend() {
 				const legendGroup = bottomButtonsGroup
@@ -621,12 +694,98 @@
 			}
 
 			function createButtonsPanel() {
+				buttonPanel.main
+					.append("clipPath")
+					.attr("id", "pbialpClipPathButtons")
+					.append("rect")
+					.attr(
+						"width",
+						Math.min(buttonsNumber, yearsArray.length) *
+							buttonPanel.buttonWidth,
+					)
+					.attr("height", buttonPanel.height);
+
+				const clipPathGroup = buttonPanel.main
+					.append("g")
+					.attr("class", "pbialpClipPathGroup")
+					.attr(
+						"transform",
+						"translate(" +
+							(buttonPanel.padding[3] +
+								buttonPanel.arrowPadding) +
+							",0)",
+					)
+					.attr("clip-path", "url(#pbialpClipPathButtons)");
+
+				const buttonsGroup = clipPathGroup
+					.append("g")
+					.attr("class", "pbialpbuttonsGroup")
+					.attr("transform", "translate(0,0)")
+					.style("cursor", "pointer");
+
+				const buttonsRects = buttonsGroup
+					.selectAll(null)
+					.data(yearsArray)
+					.enter()
+					.append("rect")
+					.attr("rx", "2px")
+					.attr("ry", "2px")
+					.attr("class", "pbialpbuttonsRects")
+					.attr(
+						"width",
+						buttonPanel.buttonWidth - buttonPanel.buttonPadding,
+					)
+					.attr(
+						"height",
+						buttonPanel.height -
+							buttonPanel.buttonVerticalPadding * 2,
+					)
+					.attr("y", buttonPanel.buttonVerticalPadding)
+					.attr("x", function (_, i) {
+						return (
+							i * buttonPanel.buttonWidth +
+							buttonPanel.buttonPadding / 2
+						);
+					})
+					.style("fill", function (d) {
+						return chartState.selectedYear.indexOf(d) > -1
+							? unBlue
+							: "#eaeaea";
+					});
+
+				buttonsGroup
+					.selectAll(null)
+					.data(yearsArray)
+					.enter()
+					.append("text")
+					.attr("text-anchor", "middle")
+					.attr("class", "pbialpbuttonsText")
+					.attr("y", buttonPanel.height / 1.6)
+					.attr("x", function (_, i) {
+						return (
+							i * buttonPanel.buttonWidth +
+							buttonPanel.buttonWidth / 2
+						);
+					})
+					.style("fill", function (d) {
+						return chartState.selectedYear.indexOf(d) > -1
+							? "white"
+							: "#444";
+					})
+					.text(function (d) {
+						return d;
+					});
+
 				const buttonsPartnersGroup = buttonPanel.main
 					.append("g")
 					.attr("class", "pbialpbuttonsPartnersGroup")
 					.attr(
 						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)",
+						"translate(" +
+							(buttonPanel.padding[3] +
+								3 * buttonPanel.arrowPadding +
+								buttonsNumber * buttonPanel.buttonWidth) +
+							",0)",
 					)
 					.style("cursor", "pointer");
 
@@ -713,10 +872,231 @@
 							: "#eaeaea";
 					});
 
+				const leftArrow = buttonPanel.main
+					.append("g")
+					.attr("class", "pbialpLeftArrowGroup")
+					.style("cursor", "pointer")
+					.attr(
+						"transform",
+						"translate(" + buttonPanel.padding[3] + ",0)",
+					);
+
+				leftArrow
+					.append("rect")
+					.style("fill", "white")
+					.attr("width", buttonPanel.arrowPadding)
+					.attr("height", buttonPanel.height);
+
+				leftArrow
+					.append("text")
+					.attr("class", "pbialpleftArrowText")
+					.attr("x", 0)
+					.attr(
+						"y",
+						buttonPanel.height -
+							buttonPanel.buttonVerticalPadding * 2.1,
+					)
+					.style("fill", "#666")
+					.text("\u25c4");
+
+				const rightArrow = buttonPanel.main
+					.append("g")
+					.attr("class", "pbialpRightArrowGroup")
+					.style("cursor", "pointer")
+					.attr(
+						"transform",
+						"translate(" +
+							(buttonPanel.padding[3] +
+								buttonPanel.arrowPadding +
+								Math.min(buttonsNumber, yearsArray.length) *
+									buttonPanel.buttonWidth) +
+							",0)",
+					);
+
+				rightArrow
+					.append("rect")
+					.style("fill", "white")
+					.attr("width", buttonPanel.arrowPadding)
+					.attr("height", buttonPanel.height);
+
+				rightArrow
+					.append("text")
+					.attr("class", "pbialprightArrowText")
+					.attr("x", -1)
+					.attr(
+						"y",
+						buttonPanel.height -
+							buttonPanel.buttonVerticalPadding * 2.1,
+					)
+					.style("fill", "#666")
+					.text("\u25ba");
+
+				buttonsRects
+					.on("mouseover", mouseOverButtonsRects)
+					.on("mouseout", mouseOutButtonsRects)
+					.on("click", function (d) {
+						const self = this;
+						if (d3.event.altKey) {
+							clickButtonsRects(d, false);
+							return;
+						}
+						if (localVariable.get(this) !== "clicked") {
+							localVariable.set(this, "clicked");
+							setTimeout(function () {
+								if (localVariable.get(self) === "clicked") {
+									clickButtonsRects(d, true);
+								}
+								localVariable.set(self, null);
+							}, 250);
+						} else {
+							clickButtonsRects(d, false);
+							localVariable.set(this, null);
+						}
+					});
+
+				d3.select("body").on("d3ChartsYear.pbialp", function () {
+					clickButtonsRects(
+						validateCustomEventYear(+d3.event.detail),
+						true,
+					);
+					repositionButtonsGroup();
+					checkArrows();
+				});
+
 				buttonsPartnersRects
 					.on("mouseover", mouseOverButtonsPartnersRects)
 					.on("mouseout", mouseOutButtonsPartnersRects)
 					.on("click", clickButtonsPartnersRects);
+
+				repositionButtonsGroup();
+
+				checkCurrentTranslate();
+
+				leftArrow.on("click", function () {
+					leftArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform"),
+					)[0];
+					rightArrow.select("text").style("fill", "#666");
+					rightArrow.attr("pointer-events", "all");
+					buttonsGroup
+						.transition()
+						.duration(duration)
+						.attr(
+							"transform",
+							"translate(" +
+								Math.min(
+									0,
+									currentTranslate +
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth,
+								) +
+								",0)",
+						)
+						.on("end", checkArrows);
+				});
+
+				rightArrow.on("click", function () {
+					rightArrow.attr("pointer-events", "none");
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform"),
+					)[0];
+					leftArrow.select("text").style("fill", "#666");
+					leftArrow.attr("pointer-events", "all");
+					buttonsGroup
+						.transition()
+						.duration(duration)
+						.attr(
+							"transform",
+							"translate(" +
+								Math.max(
+									-(
+										(yearsArray.length - buttonsNumber) *
+										buttonPanel.buttonWidth
+									),
+									-(
+										Math.abs(currentTranslate) +
+										Math.min(
+											buttonsNumber,
+											yearsArray.length,
+										) *
+											buttonPanel.buttonWidth
+									),
+								) +
+								",0)",
+						)
+						.on("end", checkArrows);
+				});
+
+				function checkArrows() {
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform"),
+					)[0];
+
+					if (currentTranslate === 0) {
+						leftArrow.select("text").style("fill", "#ccc");
+						leftArrow.attr("pointer-events", "none");
+					} else {
+						leftArrow.select("text").style("fill", "#666");
+						leftArrow.attr("pointer-events", "all");
+					}
+
+					if (
+						Math.abs(currentTranslate) >=
+						(yearsArray.length - buttonsNumber) *
+							buttonPanel.buttonWidth
+					) {
+						rightArrow.select("text").style("fill", "#ccc");
+						rightArrow.attr("pointer-events", "none");
+					} else {
+						rightArrow.select("text").style("fill", "#666");
+						rightArrow.attr("pointer-events", "all");
+					}
+				}
+
+				function checkCurrentTranslate() {
+					const currentTranslate = parseTransform(
+						buttonsGroup.attr("transform"),
+					)[0];
+
+					if (currentTranslate === 0) {
+						leftArrow.select("text").style("fill", "#ccc");
+						leftArrow.attr("pointer-events", "none");
+					}
+
+					if (
+						Math.abs(currentTranslate) >=
+						(yearsArray.length - buttonsNumber) *
+							buttonPanel.buttonWidth
+					) {
+						rightArrow.select("text").style("fill", "#ccc");
+						rightArrow.attr("pointer-events", "none");
+					}
+				}
+
+				function repositionButtonsGroup() {
+					const firstYearIndex =
+						yearsArray.length < buttonsNumber
+							? 0
+							: chartState.selectedYear[0] < yearsArray[5]
+								? 0
+								: chartState.selectedYear[0] >
+									  yearsArray[yearsArray.length - 4]
+									? yearsArray.length - 8
+									: yearsArray.indexOf(
+											chartState.selectedYear[0],
+										) - 4;
+
+					buttonsGroup.attr(
+						"transform",
+						"translate(" +
+							-(buttonPanel.buttonWidth * firstYearIndex) +
+							",0)",
+					);
+				}
 
 				//end of createButtonsPanel
 			}
@@ -1783,7 +2163,7 @@
 						chartState.netFunding === 1 ? 0 : 1,
 					);
 
-					data = processData(rawData);
+					data = processData(rawData, rawLaunchedAllocationsData);
 
 					data.forEach(function (d) {
 						if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
@@ -2143,6 +2523,68 @@
 				//end of highlightSelectedParallel
 			}
 
+			function clickButtonsRects(d, singleSelection) {
+				if (singleSelection) {
+					if (chartState.selectedYear[0] === d) return;
+					chartState.selectedYear = [d];
+				} else {
+					const index = chartState.selectedYear.indexOf(d);
+					if (index > -1) {
+						if (chartState.selectedYear.length === 1) {
+							return;
+						} else {
+							chartState.selectedYear.splice(index, 1);
+						}
+					} else {
+						chartState.selectedYear.push(d);
+					}
+				}
+
+				d3.selectAll(".pbialpbuttonsRects").style("fill", function (e) {
+					return chartState.selectedYear.indexOf(e) > -1
+						? unBlue
+						: "#eaeaea";
+				});
+
+				d3.selectAll(".pbialpbuttonsText").style("fill", function (e) {
+					return chartState.selectedYear.indexOf(e) > -1
+						? "white"
+						: "#444";
+				});
+
+				setYearsDescriptionDiv();
+
+				data = processData(rawData, rawLaunchedAllocationsData);
+
+				const allCbpfs = data.map(function (d) {
+					return d.cbpf;
+				});
+
+				chartState.selectedCbpfs = chartState.selectedCbpfs.filter(
+					function (d) {
+						return allCbpfs.indexOf(d) > -1;
+					},
+				);
+
+				data.forEach(function (d) {
+					if (chartState.selectedCbpfs.indexOf(d.cbpf) > -1) {
+						d.clicked = true;
+					}
+				});
+
+				populateSelectedCbpfsDescriptionDiv();
+
+				recalculateAndResize();
+
+				createLollipopPanel(data);
+
+				createParallelPanel(data);
+
+				highlightParallel(data);
+
+				//end of clickButtonsRects
+			}
+
 			function clickButtonsPartnersRects(d) {
 				if (chartState.selectedPartner === d) return;
 
@@ -2173,6 +2615,88 @@
 				highlightSelectedParallel();
 
 				//end of clickButtonsContributionsRects
+			}
+
+			function mouseOverButtonsRects(d) {
+				tooltip.style("display", "block").html(null);
+
+				const innerTooltip = tooltip
+					.append("div")
+					.style("max-width", "200px")
+					.attr("id", "pbialpInnerTooltipDiv");
+
+				innerTooltip.html(
+					"Click for selecting a single year. Double-click or ALT + click for selecting multiple years.",
+				);
+
+				const containerSize = containerDiv
+					.node()
+					.getBoundingClientRect();
+
+				const thisSize = this.getBoundingClientRect();
+
+				const tooltipSize = tooltip.node().getBoundingClientRect();
+
+				tooltip
+					.style(
+						"left",
+						thisSize.left +
+							thisSize.width / 2 -
+							containerSize.left >
+							containerSize.width -
+								tooltipSize.width / 2 -
+								padding[1]
+							? containerSize.width -
+									tooltipSize.width -
+									padding[1] +
+									"px"
+							: thisSize.left +
+										thisSize.width / 2 -
+										containerSize.left <
+								  tooltipSize.width / 2 +
+										buttonPanel.padding[3] +
+										padding[0]
+								? buttonPanel.padding[3] + padding[0] + "px"
+								: thisSize.left +
+									thisSize.width / 2 -
+									containerSize.left -
+									tooltipSize.width / 2 +
+									"px",
+					)
+					.style(
+						"top",
+						thisSize.top + thisSize.height / 2 - containerSize.top <
+							tooltipSize.height
+							? thisSize.top -
+									containerSize.top +
+									thisSize.height +
+									2 +
+									"px"
+							: thisSize.top -
+									containerSize.top -
+									tooltipSize.height -
+									4 +
+									"px",
+					);
+
+				d3.select(this).style("fill", unBlue);
+				d3.select(this.parentNode)
+					.selectAll("text")
+					.filter(function (e) {
+						return e === d;
+					})
+					.style("fill", "white");
+			}
+
+			function mouseOutButtonsRects(d) {
+				tooltip.style("display", "none");
+				if (chartState.selectedYear.indexOf(d) > -1) return;
+				d3.select(this).style("fill", "#eaeaea");
+				d3.selectAll(".pbialpbuttonsText")
+					.filter(function (e) {
+						return e === d;
+					})
+					.style("fill", "#444");
 			}
 
 			function mouseOverButtonsPartnersRects() {
@@ -2918,14 +3442,93 @@
 			return [matrix.e, matrix.f];
 		}
 
-		function processData(rawData) {
+		function setYearsDescriptionDiv() {
+			yearsDescriptionDiv.html(function () {
+				if (chartState.selectedYear.length === 1) return null;
+				const yearsList = chartState.selectedYear
+					.sort(function (a, b) {
+						return a - b;
+					})
+					.reduce(function (acc, curr, index) {
+						return (
+							acc +
+							(index >= chartState.selectedYear.length - 2
+								? index > chartState.selectedYear.length - 2
+									? curr
+									: curr + " and "
+								: curr + ", ")
+						);
+					}, "");
+				return "\u002ASelected years: " + yearsList;
+			});
+		}
+
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
+			return {
+				underApprovalPercent: (underApproval / launched) * 100,
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
+		}
+
+		function processData(rawData, rawLaunchedAllocationsData) {
+			for (const key in yearsWithUnderApprovalAboveMin)
+				delete yearsWithUnderApprovalAboveMin[key];
+
+			const aggregatedLaunchedValues = {};
+
+			rawLaunchedAllocationsData.forEach(function (row) {
+				if (
+					chartState.selectedYear.includes(row.AllocationYear) &&
+					(!chartState.selectedCbpfs.length ||
+						chartState.selectedCbpfs.includes(row.PooledFundName))
+				) {
+					aggregatedLaunchedValues[row.AllocationYear] = {
+						underApproval:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.underApproval
+								: 0) + row.TotalUnderApprovalBudget,
+						approved:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.approved
+								: 0) + row.TotalApprovedBudget,
+						launched:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.launched
+								: 0) + row.TotalUSDPlanned,
+					};
+				}
+			});
+
+			for (const year in aggregatedLaunchedValues) {
+				const { underApprovalPercent, underPlusApprovedPercent } =
+					safeDivide(
+						aggregatedLaunchedValues[year].underApproval,
+						aggregatedLaunchedValues[year].approved,
+						aggregatedLaunchedValues[year].launched,
+					);
+				yearsWithUnderApprovalAboveMin[year] =
+					underApprovalPercent > minimumUnderApprovalPercentage ||
+					underPlusApprovedPercent < minimumUnderApprovalPercentage;
+			}
+
 			const aggregatedAllocations = [];
 
 			const temporarySet = [];
 
-			rawData.forEach(function (row) {
-				if (+row.FundingType !== chartState.netFunding) return;
+			const filteredData = rawData.filter(function (d) {
+				return (
+					chartState.selectedYear.indexOf(+d.AllocationYear) > -1 &&
+					+d.FundingType === chartState.netFunding
+				);
+			});
 
+			filteredData.forEach(function (row) {
 				if (
 					row.OrganizationType === "Others" ||
 					row.OrganizationType === "Red Cross/Red Crescent Society"
@@ -3115,6 +3718,34 @@
 			const wheelGroup = d3.select(".pbialpd3chartwheelGroup");
 			wheelGroup.select("path").interrupt();
 			wheelGroup.remove();
+		}
+
+		function validateYear(yearString) {
+			const allYears = yearString
+				.split(",")
+				.map(function (d) {
+					return +d.trim();
+				})
+				.sort(function (a, b) {
+					return a - b;
+				});
+			allYears.forEach(function (d) {
+				if (d && yearsArray.indexOf(d) > -1)
+					chartState.selectedYear.push(d);
+			});
+			if (!chartState.selectedYear.length)
+				chartState.selectedYear.push(new Date().getFullYear());
+		}
+
+		function validateCustomEventYear(yearNumber) {
+			if (yearsArray.indexOf(yearNumber) > -1) {
+				return yearNumber;
+			}
+			while (yearsArray.indexOf(yearNumber) === -1) {
+				yearNumber =
+					yearNumber >= currentYear ? yearNumber - 1 : yearNumber + 1;
+			}
+			return yearNumber;
 		}
 
 		function validateCbpfs(cbpfString) {
