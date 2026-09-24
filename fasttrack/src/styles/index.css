@@ -301,3 +301,7 @@ button:focus-visible {
 .pbialpgroupXAxisParallel text {
 	font-size: 10px !important;
 }
+
+#pbialptooltipdiv {
+	max-width: none !important;
+}
