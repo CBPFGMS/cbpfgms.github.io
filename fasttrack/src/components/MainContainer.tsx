@@ -1,4 +1,11 @@
-import { useContext, useState, useMemo, useEffect, useCallback } from "react";
+import {
+	useContext,
+	useState,
+	useMemo,
+	useEffect,
+	useCallback,
+	useRef,
+} from "react";
 import DataContext, { type DataContextType } from "../context/DataContext";
 import { constants } from "../utils/constants";
 import Container from "@mui/material/Container";
@@ -28,8 +35,13 @@ import LollipopContainer from "./LollipopContainer";
 import { processTotalBeneficiariesWithTranche } from "../utils/processtranche";
 import TranchesTopCheckbox from "./TranchesTopCheckbox";
 import processLollipopData from "../utils/processlollipopdata";
+import type { AllocationsLollipopObject } from "../utils/schemas";
 
 const { charts } = constants;
+
+type CustomWindow = typeof window & {
+	lollipopData?: AllocationsLollipopObject[];
+};
 
 export type Charts = (typeof charts)[number];
 
@@ -107,10 +119,17 @@ function MainContainer() {
 		[allocationsLollipopData, fund, status, tranche, inDataLists],
 	);
 
+	const isFirstRender = useRef(true);
+
 	useEffect(() => {
-		window.dispatchEvent(
-			new CustomEvent("updatelollipopdata", { detail: lollipopData }),
-		);
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			(window as CustomWindow).lollipopData = lollipopData;
+		} else {
+			window.dispatchEvent(
+				new CustomEvent("updatelollipopdata", { detail: lollipopData }),
+			);
+		}
 	}, [lollipopData]);
 
 	const filteredDataIndicators = useMemo(

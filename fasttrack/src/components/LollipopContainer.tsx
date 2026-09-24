@@ -8,8 +8,6 @@ function LollipopContainer() {
 		const src =
 			"https://cbpfgms.github.io/pbialp_ft/src/d3chartpbialp_ft.js";
 
-		// const src = "./d3chartpbialp_ft-stg.js";
-
 		if (document.querySelector(`script[src="${src}"]`)) return;
 
 		const script = document.createElement("script");

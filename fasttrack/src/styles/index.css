@@ -297,3 +297,7 @@ button:focus-visible {
 		display: none;
 	}
 }
+
+.pbialpgroupXAxisParallel text {
+	font-size: 10px !important;
+}
