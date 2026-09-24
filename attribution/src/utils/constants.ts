@@ -8,7 +8,7 @@ export const constants = {
 	pageName: "CBPFAttribution",
 	localStorageTime: 60 * 60 * 1000, //1 hour
 	consoleStyle: "background-color: #0d6cb6; color: white; padding: 2px;",
-	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
+	isProdSite: window.location.hostname === "pfdata.unocha.org",
 	charts: [
 		"genderAndAge",
 		"organizations",
