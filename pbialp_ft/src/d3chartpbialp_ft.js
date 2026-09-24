@@ -395,6 +395,10 @@
 			draw(data);
 		});
 
+		if (window.lollipopData) {
+			draw(window.lollipopData);
+		}
+
 		function draw(rawData) {
 			let data = processData(rawData);
 
