@@ -151,7 +151,6 @@ export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
-	defaultAdminLevel: z.number().int().nonnegative().nullish(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BenM: z.number().int().nonnegative().nullable(),
@@ -166,19 +165,12 @@ export const totalBeneficiariesObjectSchema = z.object({
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	TemplateId: z.number(),
-	Steps: z.string().nullable(),
-	Pcode: z.string().nullable(),
-	LocPath: z.string().nullable(),
-	AdminName: z.string().nullable(),
-	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
-	defaultAdminLevel: z.number().int().nonnegative().nullish(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	PartnerType: z.string(),
@@ -195,19 +187,12 @@ export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	TemplateId: z.number(),
-	Steps: z.string().nullable(),
-	Pcode: z.string().nullable(),
-	LocPath: z.string().nullable(),
-	AdminName: z.string().nullable(),
-	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesBySectorObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
-	defaultAdminLevel: z.number().int().nonnegative().nullish(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	GlobalCluster: z.string(),
@@ -224,19 +209,12 @@ export const totalBeneficiariesBySectorObjectSchema = z.object({
 	AchG: z.number().int().nonnegative().nullable(),
 	TotAch: z.number().int().nonnegative().nullable(),
 	TotAchProjects: z.number().int().nonnegative().nullable(),
-	TemplateId: z.number(),
-	Steps: z.string().nullable(),
-	Pcode: z.string().nullable(),
-	LocPath: z.string().nullable(),
-	AdminName: z.string().nullable(),
-	syncedAt: z.string().nullable(),
 });
 
 export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative().nullable(),
-	defaultAdminLevel: z.number().int().nonnegative().nullish(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BeneficiaryTypeId: z.number().int().nonnegative(),
