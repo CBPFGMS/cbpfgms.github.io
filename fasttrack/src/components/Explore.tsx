@@ -142,6 +142,8 @@ function Explore() {
 									},
 								}}
 							>
+								{/* 
+								THIS IS THE "NEW" CHIP, IF NEEDED
 								{card.title === "Activities Map" && (
 									<Chip
 										label="New"
@@ -161,7 +163,7 @@ function Explore() {
 											p: 0.5,
 										}}
 									/>
-								)}
+								)} */}
 								<Box
 									sx={{
 										overflow: "hidden",
