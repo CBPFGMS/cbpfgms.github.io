@@ -33,6 +33,7 @@ type ReceiveDataArgs = [
 	GlobalIndicatorsObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
+	AllocationsLollipopObject[],
 	BeneficiaryTypesMasterObject[],
 	PooledFundsMasterObject[],
 	AllocationSourcesMasterObject[],
@@ -45,7 +46,6 @@ type ReceiveDataArgs = [
 	TotalBeneficiariesObject[],
 	OrganizationIdsMapObject[],
 	TemplatesMasterJson,
-	AllocationsLollipopObject[],
 ];
 
 const { fundType } = constants;
@@ -102,7 +102,7 @@ function useData(
 		globalIndicatorsUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`,
-		allocationsLollipopUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V3&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=0&AllocationYearTo=${currentYear}&FundingType=3`;
+		allocationsLollipopUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V3&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=0&AllocationYearTo=${currentYear}&FundingType=3&$format=csv`;
 
 	const [data, setData] = useState<Data>([] as Data),
 		[dataIndicators, setDataIndicators] = useState<
@@ -156,6 +156,12 @@ function useData(
 			fetchFileDB<OrganizationMasterObject[]>(
 				"organizationMaster",
 				organizationMasterUrl,
+				"csv",
+				setProgress,
+			),
+			fetchFileDB<AllocationsLollipopObject[]>(
+				"allocationsLollipop",
+				allocationsLollipopUrl,
 				"csv",
 				setProgress,
 			),
@@ -231,12 +237,6 @@ function useData(
 				"json",
 				setProgress,
 			),
-			fetchFile<AllocationsLollipopObject[]>(
-				"allocationsLollipop",
-				allocationsLollipopUrl,
-				"json",
-				setProgress,
-			),
 		])
 			.then(receiveData)
 			.catch((error: unknown) => {
@@ -254,6 +254,7 @@ function useData(
 			globalIndicatorsData,
 			allocationTypesMaster,
 			organizationMaster,
+			allocationsLollipopData,
 			beneficiaryTypesMaster,
 			pooledFundsMaster,
 			allocationSourcesMaster,
@@ -266,7 +267,6 @@ function useData(
 			totalBeneficiariesTranche2,
 			organizationIdsMap,
 			templatesMaster,
-			allocationsLollipopData,
 		]: ReceiveDataArgs): void {
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
