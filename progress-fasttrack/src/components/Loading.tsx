@@ -1,75 +1,117 @@
-import LinearProgress, {
-	LinearProgressProps,
-} from "@mui/material/LinearProgress";
+import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
-const HARDCODED_TOTAL_SIZE = 55757286;
+import { keyframes } from "@emotion/react";
+import colors from "../utils/colors";
+import Container from "@mui/material/Container";
 
 type LoadingProps = {
 	progress: number;
+	totalFiles: number;
 };
 
-function Loading({ progress }: LoadingProps) {
+const halo = keyframes`
+    0% { transform: scale(0.85); opacity: 0.45; }
+    70% { transform: scale(1.35); opacity: 0; }
+    100% { transform: scale(1.35); opacity: 0; }
+`;
+
+const ellipsis = keyframes`
+    0% { content: ""; }
+    25% { content: "."; }
+    50% { content: ".."; }
+    75% { content: "..."; }
+    100% { content: ""; }
+`;
+
+function Loading({ progress, totalFiles }: LoadingProps) {
 	return (
-		<div
+		<Container
+			disableGutters={true}
 			style={{
-				width: "100%",
-				height: "100%",
+				paddingLeft: "12px",
+				paddingRight: "12px",
+				justifyContent: "center",
+				alignItems: "center",
 				display: "flex",
 				flexDirection: "column",
-				justifyContent: "center",
-				justifySelf: "center",
-				alignItems: "center",
-				alignSelf: "center",
+				height: "50vh",
 			}}
 		>
 			<Box
 				sx={{
-					display: "flex",
-					justifyContent: "center",
-					width: "100%",
+					position: "relative",
+					display: "grid",
+					placeItems: "center",
+					width: 96,
+					height: 96,
 				}}
 			>
-				<Box sx={{ width: "80%" }}>
-					<LinearProgressWithLabel
-						sx={{ height: 10, borderRadius: 5 }}
-						value={Math.min(
-							100,
-							(100 * progress) / HARDCODED_TOTAL_SIZE
-						)}
-					/>
-				</Box>
-			</Box>
-			<Typography
-				variant="h6"
-				align="center"
-				mt={3}
-			>
-				Loading data
-			</Typography>
-		</div>
-	);
-}
-
-function LinearProgressWithLabel(
-	props: LinearProgressProps & { value: number }
-) {
-	return (
-		<Box sx={{ display: "flex", alignItems: "center" }}>
-			<Box sx={{ width: "100%", mr: 1 }}>
-				<LinearProgress
+				<Box
+					sx={{
+						position: "absolute",
+						width: 96,
+						height: 96,
+						borderRadius: "50%",
+						backgroundColor: colors.unColorLighter,
+						animation: `${halo} 2s ease-out infinite`,
+					}}
+				/>
+				<CircularProgress
 					variant="determinate"
-					{...props}
+					value={100}
+					size={72}
+					thickness={3}
+					sx={{
+						position: "absolute",
+						color: theme =>
+							theme.palette.mode === "dark"
+								? "rgba(255,255,255,0.12)"
+								: "rgba(0,0,0,0.08)",
+					}}
+				/>
+				<CircularProgress
+					disableShrink
+					size={72}
+					thickness={3}
+					sx={{
+						position: "absolute",
+						color: colors.unColor,
+						animationDuration: "1.1s",
+						"& .MuiCircularProgress-circle": {
+							strokeLinecap: "round",
+						},
+					}}
 				/>
 			</Box>
-			<Box sx={{ minWidth: 35 }}>
+			<Box sx={{ textAlign: "center", mt: 3 }}>
 				<Typography
-					variant="body2"
-					sx={{ color: "text.secondary" }}
-				>{`${Math.round(props.value)}%`}</Typography>
+					variant="h6"
+					sx={{
+						fontWeight: 600,
+						letterSpacing: "0.02em",
+						color: colors.unColorDarker,
+						"&::after": {
+							content: '""',
+							animation: `${ellipsis} 1.6s steps(1, end) infinite`,
+						},
+					}}
+				>
+					Loading data
+				</Typography>
+				<Typography
+					variant="body1"
+					mt={1}
+					sx={{ mt: 0.5, color: "text.secondary" }}
+				>
+					Fetching the latest allocations
+					<br />
+					{totalFiles > 0
+						? `(${progress} of ${totalFiles} files loaded)`
+						: "(Preparing\u2026)"}
+				</Typography>
 			</Box>
-		</Box>
+		</Container>
 	);
 }
 

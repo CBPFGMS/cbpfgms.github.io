@@ -1,8 +1,7 @@
 import { csvParse, csvFormat, autoType } from "d3";
-import { fetchWithProgress } from "./fetchwithprogress";
 import constants from "./constants";
 
-const { localStorageTime, pageName, consoleStyle } = constants;
+const { localStorageTime, pageName, consoleStyle, buildVersion } = constants;
 
 const currentDate = new Date();
 
@@ -10,10 +9,21 @@ async function fetchFile<T>(
 	fileName: string,
 	url: string,
 	method: "csv" | "json",
-	setProgress: React.Dispatch<React.SetStateAction<number>>,
 ): Promise<T> {
-	const combinedName = `${pageName}_${fileName}`;
+	const combinedName = `${pageName}_${fileName}_${buildVersion}`;
 	const localData = localStorage.getItem(combinedName);
+
+	//removing outdated localStorage data based on build version
+	const localStorageKeys = Object.keys(localStorage);
+	for (const key of localStorageKeys) {
+		if (
+			key.startsWith(`${pageName}_${fileName}`) &&
+			!key.includes(buildVersion)
+		) {
+			localStorage.removeItem(key);
+		}
+	}
+
 	if (
 		localData &&
 		JSON.parse(localData).timeStamp >
@@ -30,7 +40,7 @@ async function fetchFile<T>(
 		return fetchedData;
 	} else {
 		try {
-			const response = await fetchWithProgress(url, setProgress);
+			const response = await fetch(url);
 
 			let fetchedData: T;
 

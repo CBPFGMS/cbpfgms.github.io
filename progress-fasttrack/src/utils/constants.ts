@@ -1,5 +1,6 @@
 const constants = {
 	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	buildVersion: "v2.0",
 	implementationStatuses: [
 		"Submission of Proposal",
 		"Under Review",

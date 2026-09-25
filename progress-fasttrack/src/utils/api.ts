@@ -28,6 +28,7 @@ import {
 	TotalBeneficiariesByBeneficiaryTypeObject,
 	TemplatesMasterJson,
 } from "./schemas";
+import trackProgress from "./trackprogress";
 
 type ReceiveDataArgs = [
 	ProjectSummaryObject[],
@@ -117,6 +118,7 @@ function useData(
 	loading: boolean;
 	error: string | null;
 	progress: number;
+	totalFiles: number;
 } {
 	const fundType = defaultFundType ? defaultFundType : "",
 		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
@@ -193,149 +195,199 @@ function useData(
 		[error, setError] = useState<string | null>(null);
 
 	const [progress, setProgress] = useState<number>(0);
+	const [totalFiles, setTotalFiles] = useState<number>(0);
 
 	useEffect(() => {
-		Promise.all([
-			fetchFileDB<ProjectSummaryObject[]>(
-				"projectSummary",
-				projectSummaryUrl,
-				"csv",
+		const fetchPromises = [
+			trackProgress(
+				fetchFileDB<ProjectSummaryObject[]>(
+					"projectSummary",
+					projectSummaryUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<SectorBeneficiaryObject[]>(
-				"sectorsData",
-				sectorsDataUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<SectorBeneficiaryObject[]>(
+					"sectorsData",
+					sectorsDataUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<CvaObject[]>("CVAData", cvaDataUrl, "csv", setProgress),
-			fetchFile<AllocationTypesMasterObject[]>(
-				"allocationTypesMaster",
-				allocationTypesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<CvaObject[]>("CVAData", cvaDataUrl, "csv"),
 				setProgress,
 			),
-			fetchFile<OrganizationMasterObject[]>(
-				"organizationMaster",
-				organizationMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<AllocationTypesMasterObject[]>(
+					"allocationTypesMaster",
+					allocationTypesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<BeneficiaryTypesMasterObject[]>(
-				"beneficiaryTypesMaster",
-				beneficiaryTypesMasterUrl,
-				"json",
+			trackProgress(
+				fetchFileDB<OrganizationMasterObject[]>(
+					"organizationMaster",
+					organizationMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<PooledFundsMasterObject[]>(
-				"pooledFundsMaster",
-				pooledFundsMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<BeneficiaryTypesMasterObject[]>(
+					"beneficiaryTypesMaster",
+					beneficiaryTypesMasterUrl,
+					"json",
+				),
 				setProgress,
 			),
-			fetchFile<AllocationSourcesMasterObject[]>(
-				"allocationSourcesMaster",
-				allocationSourcesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<PooledFundsMasterObject[]>(
+					"pooledFundsMaster",
+					pooledFundsMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<OrganizationTypesMasterObject[]>(
-				"organizationTypesMaster",
-				organizationTypesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<AllocationSourcesMasterObject[]>(
+					"allocationSourcesMaster",
+					allocationSourcesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<SectorsMasterObject[]>(
-				"sectorsMaster",
-				sectorsMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<OrganizationTypesMasterObject[]>(
+					"organizationTypesMaster",
+					organizationTypesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<CvaMasterObject[]>(
-				"cvaMaster",
-				cvaMasterUrl,
-				"json",
+			trackProgress(
+				fetchFile<SectorsMasterObject[]>(
+					"sectorsMaster",
+					sectorsMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiaries",
-				totalBeneficiariesUrl,
-				"csv",
+			trackProgress(
+				fetchFile<CvaMasterObject[]>("cvaMaster", cvaMasterUrl, "json"),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiariesTranche1",
-				totalBeneficiariesTranche1Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiaries",
+					totalBeneficiariesUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiariesTranche2",
-				totalBeneficiariesTranche2Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiariesTranche1",
+					totalBeneficiariesTranche1Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByPartnerObject[]>(
-				"totalBeneficiariesByPartner",
-				totalBeneficiariesByPartnerUrl,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiariesTranche2",
+					totalBeneficiariesTranche2Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByPartnerObject[]>(
-				"totalBeneficiariesByPartnerTranche1",
-				totalBeneficiariesByPartnerTranche1Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+					"totalBeneficiariesByPartner",
+					totalBeneficiariesByPartnerUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByPartnerObject[]>(
-				"totalBeneficiariesByPartnerTranche2",
-				totalBeneficiariesByPartnerTranche2Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+					"totalBeneficiariesByPartnerTranche1",
+					totalBeneficiariesByPartnerTranche1Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesBySectorObject[]>(
-				"totalBeneficiariesBySector",
-				totalBeneficiariesBySectorUrl,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+					"totalBeneficiariesByPartnerTranche2",
+					totalBeneficiariesByPartnerTranche2Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesBySectorObject[]>(
-				"totalBeneficiariesBySectorTranche1",
-				totalBeneficiariesBySectorTranche1Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesBySectorObject[]>(
+					"totalBeneficiariesBySector",
+					totalBeneficiariesBySectorUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesBySectorObject[]>(
-				"totalBeneficiariesBySectorTranche2",
-				totalBeneficiariesBySectorTranche2Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesBySectorObject[]>(
+					"totalBeneficiariesBySectorTranche1",
+					totalBeneficiariesBySectorTranche1Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
-				"totalBeneficiariesByBeneficiaryType",
-				totalBeneficiariesByBeneficiaryTypeUrl,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesBySectorObject[]>(
+					"totalBeneficiariesBySectorTranche2",
+					totalBeneficiariesBySectorTranche2Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
-				"totalBeneficiariesByBeneficiaryTypeTranche1",
-				totalBeneficiariesByBeneficiaryTypeTranche1Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+					"totalBeneficiariesByBeneficiaryType",
+					totalBeneficiariesByBeneficiaryTypeUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
-				"totalBeneficiariesByBeneficiaryTypeTranche2",
-				totalBeneficiariesByBeneficiaryTypeTranche2Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+					"totalBeneficiariesByBeneficiaryTypeTranche1",
+					totalBeneficiariesByBeneficiaryTypeTranche1Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TemplatesMasterJson>(
-				"templatesMaster",
-				templatesMasterUrl,
-				"json",
+			trackProgress(
+				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+					"totalBeneficiariesByBeneficiaryTypeTranche2",
+					totalBeneficiariesByBeneficiaryTypeTranche2Url,
+					"csv",
+				),
 				setProgress,
 			),
-		])
+			trackProgress(
+				fetchFile<TemplatesMasterJson>(
+					"templatesMaster",
+					templatesMasterUrl,
+					"json",
+				),
+				setProgress,
+			),
+		] as const;
+
+		setTotalFiles(fetchPromises.length);
+
+		Promise.all(fetchPromises)
 			.then(receiveData)
 			.catch((error: unknown) => {
 				if (error instanceof Error) {
@@ -470,6 +522,7 @@ function useData(
 		loading,
 		error,
 		progress,
+		totalFiles,
 	};
 }
 

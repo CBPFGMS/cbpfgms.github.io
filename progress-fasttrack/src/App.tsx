@@ -30,10 +30,11 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		loading,
 		error,
 		progress,
+		totalFiles,
 	} = useData(defaultFundType, startYear);
 
 	return loading ? (
-		<Loading progress={progress} />
+		<Loading progress={progress} totalFiles={totalFiles} />
 	) : error ? (
 		<Error error={error} />
 	) : (
