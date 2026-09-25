@@ -1,6 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
 import { csvParse, autoType } from "d3";
-import { fetchWithProgress } from "./fetchwithprogress";
 import { constants } from "./constants";
 
 const { localStorageTime, pageName, consoleStyle, buildVersion } = constants;
@@ -29,10 +28,8 @@ async function fetchFileDB<T>(
 	fileName: string,
 	url: string,
 	method: string,
-	setProgress: React.Dispatch<React.SetStateAction<number>>,
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}_${buildVersion}`;
-	console.log(combinedName);
 	const keyPrefix = `${pageName}_${fileName}`;
 	const currentDate = new Date();
 	const db = await dbPromise;
@@ -60,7 +57,7 @@ async function fetchFileDB<T>(
 
 	// 3. Cache miss / expired / old version -> Fetch fresh data
 	try {
-		const response = await fetchWithProgress(url, setProgress);
+		const response = await fetch(url);
 		let fetchedData: T;
 
 		if (method === "csv") {

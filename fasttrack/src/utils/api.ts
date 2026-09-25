@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
+import trackProgress from "./trackprogress";
 import makeLists, { type List } from "./makelists";
 import processRawData, {
 	type Data,
@@ -92,6 +93,7 @@ function useData(
 	loading: boolean;
 	error: string | null;
 	progress: number;
+	totalFiles: number;
 } {
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		currentYear = new Date().getFullYear(),
@@ -126,118 +128,159 @@ function useData(
 		[error, setError] = useState<string | null>(null);
 
 	const [progress, setProgress] = useState<number>(0);
+	const [totalFiles, setTotalFiles] = useState<number>(0);
 
 	useEffect(() => {
-		Promise.all([
-			fetchFileDB<ProjectSummaryObject[]>(
-				"projectSummary",
-				projectSummaryUrl,
-				"csv",
+		const fetchPromises = [
+			trackProgress(
+				fetchFileDB<ProjectSummaryObject[]>(
+					"projectSummary",
+					projectSummaryUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<SectorBeneficiaryObject[]>(
-				"sectorsData",
-				sectorsDataUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<SectorBeneficiaryObject[]>(
+					"sectorsData",
+					sectorsDataUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<GlobalIndicatorsObject[]>(
-				"globalIndicators",
-				globalIndicatorsUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<GlobalIndicatorsObject[]>(
+					"globalIndicators",
+					globalIndicatorsUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<AllocationTypesMasterObject[]>(
-				"allocationTypesMaster",
-				allocationTypesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<AllocationTypesMasterObject[]>(
+					"allocationTypesMaster",
+					allocationTypesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<OrganizationMasterObject[]>(
-				"organizationMaster",
-				organizationMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<OrganizationMasterObject[]>(
+					"organizationMaster",
+					organizationMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFileDB<AllocationsLollipopObject[]>(
-				"allocationsLollipop",
-				allocationsLollipopUrl,
-				"csv",
+			trackProgress(
+				fetchFileDB<AllocationsLollipopObject[]>(
+					"allocationsLollipop",
+					allocationsLollipopUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<BeneficiaryTypesMasterObject[]>(
-				"beneficiaryTypesMaster",
-				beneficiaryTypesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<BeneficiaryTypesMasterObject[]>(
+					"beneficiaryTypesMaster",
+					beneficiaryTypesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<PooledFundsMasterObject[]>(
-				"pooledFundsMaster",
-				pooledFundsMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<PooledFundsMasterObject[]>(
+					"pooledFundsMaster",
+					pooledFundsMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<AllocationSourcesMasterObject[]>(
-				"allocationSourcesMaster",
-				allocationSourcesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<AllocationSourcesMasterObject[]>(
+					"allocationSourcesMaster",
+					allocationSourcesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<OrganizationTypesMasterObject[]>(
-				"organizationTypesMaster",
-				organizationTypesMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<OrganizationTypesMasterObject[]>(
+					"organizationTypesMaster",
+					organizationTypesMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<SectorsMasterObject[]>(
-				"sectorsMaster",
-				sectorsMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<SectorsMasterObject[]>(
+					"sectorsMaster",
+					sectorsMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<GlobalIndicatorsMasterObject[]>(
-				"globalIndicatorsMaster",
-				globalIndicatorsMasterUrl,
-				"csv",
+			trackProgress(
+				fetchFile<GlobalIndicatorsMasterObject[]>(
+					"globalIndicatorsMaster",
+					globalIndicatorsMasterUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<PooledFundsWithRegionMasterObject[]>(
-				"pooledFundsWithRegionMaster",
-				pooledFundWithRegionMasterUrl,
-				"json",
+			trackProgress(
+				fetchFile<PooledFundsWithRegionMasterObject[]>(
+					"pooledFundsWithRegionMaster",
+					pooledFundWithRegionMasterUrl,
+					"json",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiaries",
-				totalBeneficiariesUrl,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiaries",
+					totalBeneficiariesUrl,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiariesTranche1",
-				totalBeneficiariesTranche1Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiariesTranche1",
+					totalBeneficiariesTranche1Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<TotalBeneficiariesObject[]>(
-				"totalBeneficiariesTranche2",
-				totalBeneficiariesTranche2Url,
-				"csv",
+			trackProgress(
+				fetchFile<TotalBeneficiariesObject[]>(
+					"totalBeneficiariesTranche2",
+					totalBeneficiariesTranche2Url,
+					"csv",
+				),
 				setProgress,
 			),
-			fetchFile<OrganizationIdsMapObject[]>(
-				"organizationIdsMap",
-				organizationIdsMapUrl,
-				"json",
+			trackProgress(
+				fetchFile<OrganizationIdsMapObject[]>(
+					"organizationIdsMap",
+					organizationIdsMapUrl,
+					"json",
+				),
 				setProgress,
 			),
-			fetchFile<TemplatesMasterJson>(
-				"templatesMaster",
-				templatesMasterUrl,
-				"json",
+			trackProgress(
+				fetchFile<TemplatesMasterJson>(
+					"templatesMaster",
+					templatesMasterUrl,
+					"json",
+				),
 				setProgress,
 			),
-		])
+		] as const;
+
+		setTotalFiles(fetchPromises.length);
+
+		Promise.all(fetchPromises)
 			.then(receiveData)
 			.catch((error: unknown) => {
 				if (error instanceof Error) {
@@ -320,6 +363,7 @@ function useData(
 		loading,
 		error,
 		progress,
+		totalFiles,
 		allocationsLollipopData,
 	};
 }

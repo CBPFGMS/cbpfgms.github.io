@@ -17,14 +17,18 @@ function App({ defaultFundType, startYear }: AppProps) {
 		totalBeneficiariesData,
 		totalBeneficiariesTranche1Data,
 		totalBeneficiariesTranche2Data,
+		allocationsLollipopData,
 		loading,
 		error,
 		progress,
-		allocationsLollipopData,
+		totalFiles,
 	} = useData(defaultFundType, startYear);
 
 	return loading ? (
-		<Loading progress={progress} />
+		<Loading
+			progress={progress}
+			totalFiles={totalFiles}
+		/>
 	) : error ? (
 		<Error error={error} />
 	) : (
