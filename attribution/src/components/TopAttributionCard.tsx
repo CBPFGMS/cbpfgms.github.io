@@ -110,7 +110,7 @@ function TopAttributionCard({
 						>
 							<Box
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attributed allocation for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} allocated for those funds.`}
+								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} donated for those funds.`}
 								data-tooltip-place="top"
 								className={`attrib-info-btn attrib-rb-amber`}
 								sx={{

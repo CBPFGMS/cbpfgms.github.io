@@ -1,5 +1,7 @@
 import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
+import trackProgress from "./trackprogress";
+import progressStore from "./progressstore";
 import type {
 	PooledFundsMasterObject,
 	SectorsMasterObject,
@@ -133,104 +135,173 @@ export async function fetchAppData(
 		...contributionsUrlsWithUS,
 	];
 
-	const dynamicPromises = Promise.all(
-		combinedContributionsUrls.map((url, index) =>
+	const dynamicFetchPromises = combinedContributionsUrls.map((url, index) =>
+		trackProgress(
 			fetchFileDB<ContributionsJson>(
 				`donor${selectedDonor}_contributions${index}`,
 				url,
 				"json",
 			),
+			progressStore.increment,
 		),
 	);
 
-	const staticPromises = Promise.all([
-		fetchFileDB<ProjectSummaryObject[]>(
-			"projectSummary",
-			projectSummaryUrl,
-			"csv",
+	// `as const` keeps this a tuple, so Promise.all below still returns a
+	// strongly-typed ReceiveDataArgs tuple, and its .length gives us an
+	// accurate static file count for free.
+	const staticFetchPromises = [
+		trackProgress(
+			fetchFileDB<ProjectSummaryObject[]>(
+				"projectSummary",
+				projectSummaryUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<SectorBeneficiaryObject[]>(
-			"sectors",
-			sectorsDataUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<SectorBeneficiaryObject[]>(
+				"sectors",
+				sectorsDataUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesObject[]>(
-			"totalBeneficiaries",
-			totalBeneficiariesUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesObject[]>(
+				"totalBeneficiaries",
+				totalBeneficiariesUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
-			"totalBeneficiariesByPartner",
-			totalBeneficiariesByPartnerUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
+				"totalBeneficiariesByPartner",
+				totalBeneficiariesByPartnerUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesBySectorObject[]>(
-			"totalBeneficiariesBySector",
-			totalBeneficiariesBySectorUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesBySectorObject[]>(
+				"totalBeneficiariesBySector",
+				totalBeneficiariesBySectorUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesObject[]>(
-			"totalBeneficiariesWithoutUs",
-			totalBeneficiariesWithoutUsUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesObject[]>(
+				"totalBeneficiariesWithoutUs",
+				totalBeneficiariesWithoutUsUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
-			"totalBeneficiariesByPartnerWithoutUs",
-			totalBeneficiariesByPartnerWithoutUsUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
+				"totalBeneficiariesByPartnerWithoutUs",
+				totalBeneficiariesByPartnerWithoutUsUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<TotalBeneficiariesBySectorObject[]>(
-			"totalBeneficiariesBySectorWithoutUs",
-			totalBeneficiariesBySectorWithoutUsUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<TotalBeneficiariesBySectorObject[]>(
+				"totalBeneficiariesBySectorWithoutUs",
+				totalBeneficiariesBySectorWithoutUsUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<AllocationsByYearAndFundObject[]>(
-			"allocationsByYearAndFundWithUS",
-			allocationsByYearAndFundUrlWithUS,
-			"csv",
+		trackProgress(
+			fetchFileDB<AllocationsByYearAndFundObject[]>(
+				"allocationsByYearAndFundWithUS",
+				allocationsByYearAndFundUrlWithUS,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<AllocationsByYearAndFundObject[]>(
-			"allocationsByYearAndFundWithoutUS",
-			allocationsByYearAndFundUrlWithoutUS,
-			"csv",
+		trackProgress(
+			fetchFileDB<AllocationsByYearAndFundObject[]>(
+				"allocationsByYearAndFundWithoutUS",
+				allocationsByYearAndFundUrlWithoutUS,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<AllocationTypesMasterObject[]>(
-			"allocationTypesMaster",
-			allocationTypesMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<AllocationTypesMasterObject[]>(
+				"allocationTypesMaster",
+				allocationTypesMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFileDB<OrganizationMasterObject[]>(
-			"organizationMaster",
-			organizationMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFileDB<OrganizationMasterObject[]>(
+				"organizationMaster",
+				organizationMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFile<PooledFundsMasterObject[]>(
-			"pooledFundsMaster",
-			pooledFundsMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFile<PooledFundsMasterObject[]>(
+				"pooledFundsMaster",
+				pooledFundsMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFile<SectorsMasterObject[]>(
-			"sectorsMaster",
-			sectorsMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFile<SectorsMasterObject[]>(
+				"sectorsMaster",
+				sectorsMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFile<OrganizationTypesMasterObject[]>(
-			"organizationTypesMaster",
-			organizationTypesMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFile<OrganizationTypesMasterObject[]>(
+				"organizationTypesMaster",
+				organizationTypesMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFile<AllocationSourcesMasterObject[]>(
-			"allocationSourcesMaster",
-			allocationSourcesMasterUrl,
-			"csv",
+		trackProgress(
+			fetchFile<AllocationSourcesMasterObject[]>(
+				"allocationSourcesMaster",
+				allocationSourcesMasterUrl,
+				"csv",
+			),
+			progressStore.increment,
 		),
-		fetchFile<PooledFundsWithRegionMasterObject[]>(
-			"pooledFundsWithRegionMaster",
-			pooledFundWithRegionMasterUrl,
-			"json",
+		trackProgress(
+			fetchFile<PooledFundsWithRegionMasterObject[]>(
+				"pooledFundsWithRegionMaster",
+				pooledFundWithRegionMasterUrl,
+				"json",
+			),
+			progressStore.increment,
 		),
-		fetchFile<DonorsMasterObject[]>("donorsMaster", donorsMaster, "csv"),
-	]);
+		trackProgress(
+			fetchFile<DonorsMasterObject[]>(
+				"donorsMaster",
+				donorsMaster,
+				"csv",
+			),
+			progressStore.increment,
+		),
+	] as const;
+
+	progressStore.reset(
+		staticFetchPromises.length + dynamicFetchPromises.length,
+	);
+
+	const staticPromises = Promise.all(staticFetchPromises);
+	const dynamicPromises = Promise.all(dynamicFetchPromises);
 
 	return Promise.all([staticPromises, dynamicPromises])
 		.then(([staticResults, dynamicContributionsResults]) =>

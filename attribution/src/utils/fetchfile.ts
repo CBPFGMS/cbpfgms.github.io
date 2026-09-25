@@ -1,17 +1,29 @@
-import { csv, json, csvParse, csvFormat, autoType } from "d3";
+import { csvParse, csvFormat, autoType } from "d3";
 import { constants } from "./constants";
 
-const { localStorageTime, pageName, consoleStyle } = constants;
+const { localStorageTime, pageName, consoleStyle, buildVersion } = constants;
 
 const currentDate = new Date();
 
-async function fetchFile<T extends object[]>(
+async function fetchFile<T>(
 	fileName: string,
 	url: string,
 	method: "csv" | "json",
 ): Promise<T> {
-	const combinedName = `${pageName}_${fileName}`;
+	const combinedName = `${pageName}_${fileName}_${buildVersion}`;
 	const localData = localStorage.getItem(combinedName);
+
+	//removing outdated localStorage data based on build version
+	const localStorageKeys = Object.keys(localStorage);
+	for (const key of localStorageKeys) {
+		if (
+			key.startsWith(`${pageName}_${fileName}`) &&
+			!key.includes(buildVersion)
+		) {
+			localStorage.removeItem(key);
+		}
+	}
+
 	if (
 		localData &&
 		JSON.parse(localData).timeStamp >
@@ -19,26 +31,26 @@ async function fetchFile<T extends object[]>(
 	) {
 		const fetchedData: T =
 			method === "csv"
-				? (csvParse(
-						JSON.parse(localData).data,
-						autoType,
-					) as unknown as T)
-				: (JSON.parse(localData).data as T);
+				? csvParse(JSON.parse(localData).data, autoType)
+				: JSON.parse(localData).data;
 		console.info(
 			`%cInfo: data file ${fileName} retrieved from localStorage`,
 			consoleStyle,
 		);
 		return fetchedData;
 	} else {
-		const fetchMethod =
-			method === "csv"
-				? () =>
-						csv<T[number]>(url, autoType).then(
-							data => data as unknown as T,
-						)
-				: () => json<T>(url);
+		try {
+			const response = await fetch(url);
 
-		return fetchMethod().then(fetchedData => {
+			let fetchedData: T;
+
+			if (method === "csv") {
+				const text = await response.text();
+				fetchedData = csvParse(text, autoType) as unknown as T;
+			} else {
+				fetchedData = await response.json();
+			}
+
 			try {
 				localStorage.setItem(
 					combinedName,
@@ -60,12 +72,13 @@ async function fetchFile<T extends object[]>(
 				consoleStyle,
 			);
 
-			if (fetchedData === undefined || fetchedData === null) {
-				throw new Error(`Failed to fetch data for ${fileName}`);
-			}
-
 			return fetchedData;
-		});
+		} catch (error) {
+			console.warn(
+				`Error fetching the file ${fileName} from API. Error: ${error}.`,
+			);
+			return Promise.reject(error);
+		}
 	}
 }
 

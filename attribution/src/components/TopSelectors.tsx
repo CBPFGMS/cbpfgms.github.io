@@ -157,7 +157,7 @@ function TopSelectors({
 					/>
 					<Chip
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`${lists.donorGMSNames[donor]} combined attributed allocation for the selected funds is $${toLocaleFixed(attributions.global.donor, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(attributions.global.total, 0, 2)} allocated for those funds.`}
+						data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(attributions.global.donor, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(attributions.global.total, 0, 2)} donated for those funds.`}
 						data-tooltip-place="bottom"
 						icon={
 							<LanguageIcon sx={{ color: "#fff !important" }} />
