@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 function LollipopContainer() {
 	useEffect(() => {
 		const src =
-			"https://cbpfgms.github.io/pbialp_ft/src/d3chartpbialp_ft.js";
+			"https://cbpfgms.github.io/pbialp_ft/src/d3chartpbialp_ft_v2.js";
 
 		if (document.querySelector(`script[src="${src}"]`)) return;
 
