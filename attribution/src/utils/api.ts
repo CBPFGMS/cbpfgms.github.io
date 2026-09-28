@@ -87,17 +87,17 @@ const pooledFundsMasterUrl =
 	donorsMaster =
 		"https://cbpfapi.unocha.org/vo2/odata/DonorMaster?$format=csv",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&$format=csv",
 	totalBeneficiariesByPartnerUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&$format=csv",
 	totalBeneficiariesBySectorUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&$format=csv",
 	totalBeneficiariesWithoutUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
 	totalBeneficiariesByPartnerWithoutUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
 	totalBeneficiariesBySectorWithoutUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net//bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv";
 
 export async function fetchAppData(
 	startYear: number | null,
@@ -146,9 +146,6 @@ export async function fetchAppData(
 		),
 	);
 
-	// `as const` keeps this a tuple, so Promise.all below still returns a
-	// strongly-typed ReceiveDataArgs tuple, and its .length gives us an
-	// accurate static file count for free.
 	const staticFetchPromises = [
 		trackProgress(
 			fetchFileDB<ProjectSummaryObject[]>(
