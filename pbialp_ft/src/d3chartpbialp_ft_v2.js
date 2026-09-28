@@ -481,6 +481,9 @@
 
 			function createButtonsPanel() {
 				const buttonsPartnersGroup = buttonPanel.main
+					.selectAll(".pbialpbuttonsPartnersGroup")
+					.data([true])
+					.enter()
 					.append("g")
 					.attr("class", "pbialpbuttonsPartnersGroup")
 					.attr(
