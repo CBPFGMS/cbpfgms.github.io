@@ -283,6 +283,7 @@ function Explore() {
 										elevation={0}
 										sx={{
 											width: "100%",
+											position: "relative",
 											height: 74,
 											display: "flex",
 											flexDirection: "row",
@@ -311,6 +312,37 @@ function Explore() {
 												flexShrink: 0,
 											}}
 										>
+											{card.title ===
+												"Contributions Dashboard" && (
+												<Chip
+													label="New"
+													size="small"
+													sx={{
+														position: "absolute",
+														top: "9%",
+														left: "2%",
+														fontFamily:
+															"Montserrat",
+														fontWeight: 900,
+														fontSize: "0.65rem",
+														backgroundColor:
+															"#f02a2a",
+														color: "#fff",
+														letterSpacing: "0.05em",
+														textTransform:
+															"uppercase",
+														zIndex: 10,
+														p: 0.5,
+														"& .MuiChip-label": {
+															paddingTop: "0px",
+															paddingBottom:
+																"0px",
+															paddingLeft: "2px",
+															paddingRight: "2px",
+														},
+													}}
+												/>
+											)}
 											<CardMedia
 												component="img"
 												image={card.image}
