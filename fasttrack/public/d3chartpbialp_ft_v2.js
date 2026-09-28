@@ -85,7 +85,6 @@
 			parallelTickPadding = 20,
 			xScaleLollipopMargin = 1.1,
 			verticalLabelPadding = 4,
-			paidSymbolSize = 16,
 			percentNumberPadding = 8,
 			circleRadius = 4,
 			bottomButtonsGroupPadding = 16,
@@ -99,7 +98,6 @@
 			percentagePadding = 22,
 			labelTextMaximumLength = 12,
 			underApprovalColor = "#E56A54",
-			unBlue = "#1F69B3",
 			highlightColor = "sandybrown",
 			partnerList = [
 				"International NGO",
@@ -174,6 +172,10 @@
 				.style("height", height + "px");
 		}
 
+		const buttonsDiv = containerDiv
+			.append("div")
+			.attr("class", "pbialpButtonsDiv");
+
 		const svg = containerDiv
 			.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -192,24 +194,6 @@
 			.attr("id", "pbialptooltipdiv")
 			.style("display", "none");
 
-		const buttonPanel = {
-			main: svg
-				.append("g")
-				.attr("class", "pbialpButtonPanel")
-				.attr(
-					"transform",
-					"translate(" + padding[3] + "," + padding[0] + ")",
-				),
-			width: width - padding[1] - padding[3],
-			height: buttonPanelHeight,
-			padding: [0, 0, 0, 12],
-			buttonWidth: 50,
-			buttonPadding: 4,
-			buttonVerticalPadding: 4,
-			arrowPadding: 18,
-			buttonPartnersInnerPadding: 4,
-		};
-
 		const lollipopPanel = {
 			main: svg
 				.append("g")
@@ -219,9 +203,7 @@
 					"translate(" +
 						padding[3] +
 						"," +
-						(padding[0] +
-							buttonPanel.height +
-							2 * panelHorizontalPadding) +
+						(padding[0] + 2 * panelHorizontalPadding) +
 						")",
 				),
 			width:
@@ -242,9 +224,7 @@
 							lollipopPanel.width +
 							panelVerticalPadding) +
 						"," +
-						(padding[0] +
-							buttonPanel.height +
-							2 * panelHorizontalPadding) +
+						(padding[0] + 2 * panelHorizontalPadding) +
 						")",
 				),
 			width:
@@ -383,17 +363,16 @@
 			.append("g")
 			.attr("class", "pbialpgroupYAxisLollipop");
 
-		const paidSymbol = d3
-			.symbol()
-			.type(d3.symbolTriangle)
-			.size(paidSymbolSize);
-
 		validateCbpfs(selectedCbpfsString);
 
 		window.addEventListener("updatelollipopdata", event => {
 			const data = event.detail;
 			draw(data);
 		});
+
+		if (window.lollipopData) {
+			draw(window.lollipopData);
+		}
 
 		function draw(rawData) {
 			let data = processData(rawData);
@@ -464,41 +443,6 @@
 
 				legendGroup
 					.append("text")
-					.attr("class", "pbialpLegendText")
-					.attr("y", 5)
-					.text("Figures represent: ")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", "#666")
-					.text("Total Allocated ")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.text("(")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", underApprovalColor)
-					.text("Under Approval")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.style("fill", "#666")
-					.text(") \u2014 ")
-					.append("tspan")
-					.style("font-weight", "bold")
-					.style("fill", d3.color(highlightColor).darker(0.5))
-					.text("% of Partner")
-					.append("tspan")
-					.style("font-weight", "normal")
-					.style("fill", "#666")
-					.text(". The arrow (")
-					.append("tspan")
-					.style("fill", underApprovalColor)
-					.text("\u25B2")
-					.append("tspan")
-					.style("fill", "#666")
-					.text(") indicates Under Approval.");
-
-				legendGroup
-					.append("text")
 					.attr(
 						"class",
 						"pbialpLegendText pbialpLegendTextNetFunding",
@@ -517,33 +461,15 @@
 			}
 
 			function createButtonsPanel() {
-				const buttonsPartnersGroup = buttonPanel.main
-					.append("g")
-					.attr("class", "pbialpbuttonsPartnersGroup")
-					.attr(
-						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)",
-					)
-					.style("cursor", "pointer");
+				let buttonsPartners = buttonsDiv
+					.selectAll(".pbialpbuttonsPartners")
+					.data(partnerListWithTotal);
 
-				const buttonsPartnersContainer = buttonsPartnersGroup
-					.selectAll(null)
-					.data(partnerListWithTotal)
+				const buttonsPartnersEnter = buttonsPartners
 					.enter()
-					.append("g")
-					.attr("class", "pbialpButtonsPartnersContainer");
-
-				const buttonsPartnersText = buttonsPartnersContainer
-					.append("text")
-					.attr("class", "pbialpbuttonsPartnersText")
-					.attr("y", buttonPanel.height / 1.6)
-					.attr("x", buttonPanel.buttonPartnersInnerPadding)
-					.style("fill", function (d) {
-						return d === chartState.selectedPartner
-							? "white"
-							: "#444";
-					})
-					.text(function (d) {
+					.append("button")
+					.attr("class", "pbialpbuttonsPartners")
+					.html(function (d) {
 						if (d === "Red Cross/Crescent Movement") {
 							return "Red Cross/Cres. Mov.";
 						} else if (d === "International NGO") {
@@ -554,65 +480,27 @@
 							return "All partners";
 						}
 					});
-				buttonsPartnersText
+
+				buttonsPartners = buttonsPartnersEnter.merge(buttonsPartners);
+
+				buttonsPartners.classed("selected", function (d) {
+					return d === chartState.selectedPartner;
+				});
+
+				buttonsPartners
 					.filter(function (d) {
 						return d === "National NGO";
 					})
-					.text(
+					.html(
 						chartState.netFunding === 1
 							? "National NGO"
 							: "Nat. Partners",
 					)
 					.append("tspan")
-					.style("fill", underApprovalColor)
-					.text(chartState.netFunding === 1 ? "" : "*");
+					.style("color", underApprovalColor)
+					.html(chartState.netFunding === 1 ? "" : "*");
 
-				buttonsPartnersContainer.attr("transform", function (_, i) {
-					if (i) {
-						const previousTransform = parseTransform(
-							d3.select(this.previousSibling).attr("transform"),
-						)[0];
-						return (
-							"translate(" +
-							(previousTransform +
-								this.previousSibling.firstChild.getComputedTextLength() +
-								2 * buttonPanel.buttonPartnersInnerPadding +
-								buttonPanel.buttonPadding) +
-							",0)"
-						);
-					} else {
-						return "translate(0,0)";
-					}
-				});
-
-				const buttonsPartnersRects = buttonsPartnersContainer
-					.insert("rect", "text")
-					.attr("rx", "2px")
-					.attr("ry", "2px")
-					.attr("class", "pbialpbuttonsPartnersRects")
-					.attr("width", function () {
-						return (
-							this.nextSibling.getComputedTextLength() +
-							2 * buttonPanel.buttonPartnersInnerPadding
-						);
-					})
-					.attr(
-						"height",
-						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2,
-					)
-					.attr("y", buttonPanel.buttonVerticalPadding)
-					.attr("x", 0)
-					.style("fill", function (d) {
-						return d === chartState.selectedPartner
-							? unBlue
-							: "#eaeaea";
-					});
-
-				buttonsPartnersRects
-					.on("mouseover", mouseOverButtonsPartnersRects)
-					.on("mouseout", mouseOutButtonsPartnersRects)
-					.on("click", clickButtonsPartnersRects);
+				buttonsPartners.on("click", clickButtonsPartnersRects);
 
 				//end of createButtonsPanel
 			}
@@ -685,22 +573,6 @@
 					.classed("contributionColorFill", true);
 
 				cbpfGroupEnter
-					.append("path")
-					.attr("class", "pbialpCbpfStandardIndicator")
-					.attr("d", paidSymbol)
-					.style("fill", underApprovalColor)
-					.attr(
-						"transform",
-						"translate(" +
-							lollipopPanel.padding[3] +
-							"," +
-							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
-								2 +
-								stickHeight) +
-							")",
-					);
-
-				cbpfGroupEnter
 					.append("text")
 					.attr("class", "pbialpCbpfLabel")
 					.attr(
@@ -750,49 +622,6 @@
 					});
 
 				cbpfGroup
-					.select(".pbialpCbpfStandardIndicator")
-					.transition()
-					.duration(duration)
-					.style("opacity", function (d) {
-						const thisUnderApproval =
-							chartState.selectedPartner === "total"
-								? d.underApproval
-								: d[
-										"underApproval-" +
-											chartState.selectedPartner
-									];
-						return thisUnderApproval === 0 ? 0 : 1;
-					})
-					.attr("transform", function (d) {
-						const thisUnderApproval =
-							chartState.selectedPartner === "total"
-								? d.underApproval
-								: d[
-										"underApproval-" +
-											chartState.selectedPartner
-									];
-						const thisPadding =
-							xScaleLollipop(d[chartState.selectedPartner]) -
-								xScaleLollipop(thisUnderApproval) <
-							lollipopRadius
-								? lollipopRadius - stickHeight / 2
-								: 0;
-						return (
-							"translate(" +
-							Math.min(
-								xScaleLollipop(thisUnderApproval),
-								xScaleLollipop(d[chartState.selectedPartner]),
-							) +
-							"," +
-							(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) /
-								2 +
-								stickHeight +
-								thisPadding) +
-							")"
-						);
-					});
-
-				cbpfGroup
 					.select(".pbialpCbpfLabel")
 					.transition()
 					.duration(duration)
@@ -803,14 +632,6 @@
 						);
 					})
 					.tween("text", function (d) {
-						const node = this;
-						const thisUnderApproval =
-							chartState.selectedPartner === "total"
-								? d.underApproval
-								: d[
-										"underApproval-" +
-											chartState.selectedPartner
-									];
 						let thisPartner,
 							thisPartnerPercentage,
 							thisPartnerRoundPercentage;
@@ -823,124 +644,40 @@
 								thisPartner.roundPercentage;
 						}
 						const i = d3.interpolate(
-							reverseFormat(node.textContent) || 0,
+							reverseFormat(this.textContent) || 0,
 							d[chartState.selectedPartner],
 						);
 						return function (t) {
-							if (thisUnderApproval === 0) {
-								if (
-									chartState.selectedPartner === "total" ||
-									(chartState.selectedPartner !== "total" &&
-										thisPartnerPercentage === 0)
-								) {
-									d3.select(node).text(
-										formatNumberSI(i(t)).replace("G", "B"),
-									);
-								} else {
-									d3.select(node)
-										.text(
-											i(1)
-												? formatNumberSI(i(t)).replace(
-														"G",
-														"B",
-													)
-												: 0,
-										)
-										.append("tspan")
-										.text(" \u2014 ")
-										.append("tspan")
-										.attr(
-											"fill",
-											d3
-												.color(highlightColor)
-												.darker(0.5),
-										)
-										.text(
-											thisPartnerRoundPercentage
-												? thisPartnerRoundPercentage +
-														"%"
-												: "<1%",
-										);
-								}
+							if (
+								chartState.selectedPartner === "total" ||
+								(chartState.selectedPartner !== "total" &&
+									thisPartnerPercentage === 0)
+							) {
+								d3.select(this).text(
+									formatNumberSI(i(t)).replace("G", "B"),
+								);
 							} else {
-								if (
-									chartState.selectedPartner === "total" ||
-									(chartState.selectedPartner !== "total" &&
-										thisPartnerPercentage === 0)
-								) {
-									d3.select(node)
-										.text(
-											formatNumberSI(i(t)).replace(
-												"G",
-												"B",
-											),
-										)
-										.append("tspan")
-										.attr(
-											"class",
-											"pbialpCbpfLabelPercentage",
-										)
-										.attr("dy", "-0.5px")
-										.text(" (")
-										.append("tspan")
-										.style("fill", underApprovalColor)
-										.text(
-											d3
-												.formatPrefix(".0", thisUnderApproval)(
-													thisUnderApproval,
+								d3.select(this)
+									.text(
+										i(1)
+											? formatNumberSI(i(t)).replace(
+													"G",
+													"B",
 												)
-												.replace("G", "B"),
-										)
-										.append("tspan")
-										.style("fill", "#aaa")
-										.text(")");
-								} else {
-									d3.select(node)
-										.text(
-											i(1)
-												? formatNumberSI(i(t)).replace(
-														"G",
-														"B",
-													)
-												: 0,
-										)
-										.append("tspan")
-										.attr(
-											"class",
-											"pbialpCbpfLabelPercentage",
-										)
-										.attr("dy", "-0.5px")
-										.text(" (")
-										.append("tspan")
-										.style("fill", underApprovalColor)
-										.text(
-											d3
-												.formatPrefix(".0", thisUnderApproval)(
-													thisUnderApproval,
-												)
-												.replace("G", "B"),
-										)
-										.append("tspan")
-										.style("fill", "#aaa")
-										.text(")")
-										.append("tspan")
-										.attr("dy", null)
-										.style("font-size", "11px")
-										.text(" \u2014 ")
-										.append("tspan")
-										.attr(
-											"fill",
-											d3
-												.color(highlightColor)
-												.darker(0.5),
-										)
-										.text(
-											thisPartnerRoundPercentage
-												? thisPartnerRoundPercentage +
-														"%"
-												: "<1%",
-										);
-								}
+											: 0,
+									)
+									.append("tspan")
+									.text(" \u2014 ")
+									.append("tspan")
+									.attr(
+										"fill",
+										d3.color(highlightColor).darker(0.5),
+									)
+									.text(
+										thisPartnerRoundPercentage
+											? thisPartnerRoundPercentage + "%"
+											: "<1%",
+									);
 							}
 						};
 					});
@@ -1030,11 +767,6 @@
 							? "reserve"
 							: "reserve-" + chartState.selectedPartner;
 
-					const thisUnderApproval =
-						chartState.selectedPartner === "total"
-							? "underApproval"
-							: "underApproval-" + chartState.selectedPartner;
-
 					const tooltipChartTitle =
 						chartState.selectedPartner === "total"
 							? "Allocations by Partner Type and Modality:"
@@ -1080,10 +812,6 @@
 									) +
 									")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 									formatMoney0Decimals(datum[thisReserve]) +
-									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" +
-									formatMoney0Decimals(
-										datum[thisUnderApproval],
-									) +
 									"</span></div></div><div style='margin-top:6px;'>" +
 									tooltipChartTitle +
 									"<div><div id=pbialpLollipopTooltipChart></div>",
@@ -1117,10 +845,6 @@
 									lollipopTooltipWidth * 0.75 +
 									"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 									formatMoney0Decimals(datum[thisTotal]) +
-									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
-									formatMoney0Decimals(
-										datum[thisUnderApproval],
-									) +
 									"</span></div></div>",
 							);
 					}
@@ -1667,18 +1391,19 @@
 						chartState.netFunding === 2 ? "darkslategray" : "white",
 					);
 
-					svg.selectAll(".pbialpbuttonsPartnersText")
+					buttonsDiv
+						.selectAll(".pbialpbuttonsPartners")
 						.filter(function (d) {
 							return d === "National NGO";
 						})
-						.text(
+						.html(
 							chartState.netFunding === 1
 								? "National NGO"
 								: "Nat. Partners",
 						)
 						.append("tspan")
-						.style("fill", underApprovalColor)
-						.text(chartState.netFunding === 1 ? "" : "*");
+						.style("color", underApprovalColor)
+						.html(chartState.netFunding === 1 ? "" : "*");
 
 					svg.select(".pbialpLegendTextNetFunding").style(
 						"opacity",
@@ -2050,23 +1775,11 @@
 
 				chartState.selectedPartner = d;
 
-				d3.selectAll(".pbialpbuttonsPartnersRects").style(
-					"fill",
-					function (e) {
-						return e === chartState.selectedPartner
-							? unBlue
-							: "#eaeaea";
-					},
-				);
-
-				d3.selectAll(".pbialpbuttonsPartnersText").style(
-					"fill",
-					function (e) {
-						return e === chartState.selectedPartner
-							? "white"
-							: "#444";
-					},
-				);
+				buttonsDiv
+					.selectAll(".pbialpbuttonsPartners")
+					.classed("selected", function (e) {
+						return e === chartState.selectedPartner;
+					});
 
 				setDomains(data, chartState.selectedPartner);
 
@@ -2075,19 +1788,6 @@
 				highlightSelectedParallel();
 
 				//end of clickButtonsContributionsRects
-			}
-
-			function mouseOverButtonsPartnersRects() {
-				d3.select(this).style("fill", unBlue);
-				d3.select(this.parentNode)
-					.select("text")
-					.style("fill", "white");
-			}
-
-			function mouseOutButtonsPartnersRects(d) {
-				if (d === chartState.selectedPartner) return;
-				d3.select(this).style("fill", "#eaeaea");
-				d3.select(this.parentNode).select("text").style("fill", "#444");
 			}
 
 			function mouseOverSelectedCircles(datum) {
@@ -2118,9 +1818,7 @@
 								formatPercent(datum.reserve / datum.value) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 								formatMoney0Decimals(datum.reserve) +
-								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;margin-top:8px;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;margin-top:8px;'>$" +
-								formatMoney0Decimals(datum.underApproval) +
-								"</div></div>",
+								"</span></div></div>",
 						);
 
 					createTooltipBar(
@@ -2242,7 +1940,7 @@
 					tooltipSvgHeight = 100,
 					tooltipSvgpadding = [8, 130, 16, 4];
 
-				const modalities = ["standard", "reserve", "underApproval"];
+				const modalities = ["standard", "reserve"];
 
 				const tooltipSvg = d3
 					.select("#pbialpLollipopTooltipChart")
@@ -2288,13 +1986,12 @@
 					.range([
 						"contributionColorDarkerFill",
 						"contributionColorFill",
-						"pbialpUnderApprovalClass",
 					]);
 
 				const axisNameScale = d3
 					.scaleOrdinal()
 					.domain(modalities)
-					.range(["Standard", "Reserve", "Under Approval"]);
+					.range(["Standard", "Reserve"]);
 
 				const tooltipYAxis = d3
 					.axisRight(yScale)
@@ -2469,7 +2166,7 @@
 					.outerRadius(donutRadius - 4)
 					.innerRadius(donutRadius - 16);
 
-				const modalities = ["standard", "reserve", "underApproval"];
+				const modalities = ["standard", "reserve"];
 
 				const donutData = [];
 
@@ -2807,19 +2504,6 @@
 			);
 		}
 
-		function parseTransform(translate) {
-			const group = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"g",
-			);
-
-			group.setAttributeNS(null, "transform", translate);
-
-			const matrix = group.transform.baseVal.consolidate().matrix;
-
-			return [matrix.e, matrix.f];
-		}
-
 		function processData(rawData) {
 			const aggregatedAllocations = [];
 
@@ -2844,33 +2528,35 @@
 						return d.cbpf === row.PooledFundName;
 					});
 
-					tempObject.total += +row.ApprovedBudget;
-					tempObject.standard += +row.ApprovedStandardBudget;
-					tempObject.reserve += +row.ApprovedReserveBudget;
-					tempObject.underApproval += +row.PipelineBudget;
-					tempObject[row.OrganizationType] += +row.ApprovedBudget;
-					tempObject["underApproval-" + row.OrganizationType] +=
-						+row.PipelineBudget;
+					tempObject.total +=
+						+row.ApprovedBudget + row.PipelineBudget;
+					tempObject.standard +=
+						+row.ApprovedStandardBudget +
+						row.PipelineStandardBudget;
+					tempObject.reserve +=
+						+row.ApprovedReserveBudget + row.PipelineReserveBudget;
+					tempObject[row.OrganizationType] +=
+						+row.ApprovedBudget + row.PipelineBudget;
 					tempObject["reserve-" + row.OrganizationType] +=
-						+row.ApprovedReserveBudget;
+						+row.ApprovedReserveBudget + row.PipelineReserveBudget;
 					tempObject["standard-" + row.OrganizationType] +=
-						+row.ApprovedStandardBudget;
+						+row.ApprovedStandardBudget +
+						row.PipelineStandardBudget;
 				} else {
 					const temporaryOriginalObject = {
 						clicked: false,
 						cbpf: row.PooledFundName,
-						total: +row.ApprovedBudget,
-						standard: +row.ApprovedStandardBudget,
-						reserve: +row.ApprovedReserveBudget,
-						underApproval: +row.PipelineBudget,
+						total: +row.ApprovedBudget + row.PipelineBudget,
+						standard:
+							+row.ApprovedStandardBudget +
+							row.PipelineStandardBudget,
+						reserve:
+							+row.ApprovedReserveBudget +
+							row.PipelineReserveBudget,
 						"International NGO": 0,
 						"National NGO": 0,
 						"UN Agency": 0,
 						"Red Cross/Crescent Movement": 0,
-						"underApproval-International NGO": 0,
-						"underApproval-National NGO": 0,
-						"underApproval-UN Agency": 0,
-						"underApproval-Red Cross/Crescent Movement": 0,
 						"reserve-International NGO": 0,
 						"reserve-National NGO": 0,
 						"reserve-UN Agency": 0,
@@ -2882,16 +2568,15 @@
 					};
 
 					temporaryOriginalObject[row.OrganizationType] +=
-						+row.ApprovedBudget;
-					temporaryOriginalObject[
-						"underApproval-" + row.OrganizationType
-					] += +row.PipelineBudget;
+						+row.ApprovedBudget + row.PipelineBudget;
 					temporaryOriginalObject[
 						"reserve-" + row.OrganizationType
-					] += +row.ApprovedReserveBudget;
+					] += +row.ApprovedReserveBudget + row.PipelineReserveBudget;
 					temporaryOriginalObject[
 						"standard-" + row.OrganizationType
-					] += +row.ApprovedStandardBudget;
+					] +=
+						+row.ApprovedStandardBudget +
+						row.PipelineStandardBudget;
 
 					aggregatedAllocations.push(temporaryOriginalObject);
 
@@ -2912,7 +2597,6 @@
 						total: cbpf.total,
 						standard: cbpf["standard-" + partner],
 						reserve: cbpf["reserve-" + partner],
-						underApproval: cbpf["underApproval-" + partner],
 					});
 				});
 				roundToOneHundred(cbpf.parallelData);

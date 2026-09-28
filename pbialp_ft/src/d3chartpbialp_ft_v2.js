@@ -98,7 +98,6 @@
 			percentagePadding = 22,
 			labelTextMaximumLength = 12,
 			underApprovalColor = "#E56A54",
-			unBlue = "#1F69B3",
 			highlightColor = "sandybrown",
 			partnerList = [
 				"International NGO",
@@ -173,6 +172,10 @@
 				.style("height", height + "px");
 		}
 
+		const buttonsDiv = containerDiv
+			.append("div")
+			.attr("class", "pbialpButtonsDiv");
+
 		const svg = containerDiv
 			.append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
@@ -191,24 +194,6 @@
 			.attr("id", "pbialptooltipdiv")
 			.style("display", "none");
 
-		const buttonPanel = {
-			main: svg
-				.append("g")
-				.attr("class", "pbialpButtonPanel")
-				.attr(
-					"transform",
-					"translate(" + padding[3] + "," + padding[0] + ")",
-				),
-			width: width - padding[1] - padding[3],
-			height: buttonPanelHeight,
-			padding: [0, 0, 0, 12],
-			buttonWidth: 50,
-			buttonPadding: 4,
-			buttonVerticalPadding: 4,
-			arrowPadding: 18,
-			buttonPartnersInnerPadding: 4,
-		};
-
 		const lollipopPanel = {
 			main: svg
 				.append("g")
@@ -218,9 +203,7 @@
 					"translate(" +
 						padding[3] +
 						"," +
-						(padding[0] +
-							buttonPanel.height +
-							2 * panelHorizontalPadding) +
+						(padding[0] + 2 * panelHorizontalPadding) +
 						")",
 				),
 			width:
@@ -241,9 +224,7 @@
 							lollipopPanel.width +
 							panelVerticalPadding) +
 						"," +
-						(padding[0] +
-							buttonPanel.height +
-							2 * panelHorizontalPadding) +
+						(padding[0] + 2 * panelHorizontalPadding) +
 						")",
 				),
 			width:
@@ -480,36 +461,15 @@
 			}
 
 			function createButtonsPanel() {
-				const buttonsPartnersGroup = buttonPanel.main
-					.selectAll(".pbialpbuttonsPartnersGroup")
-					.data([true])
-					.enter()
-					.append("g")
-					.attr("class", "pbialpbuttonsPartnersGroup")
-					.attr(
-						"transform",
-						"translate(" + buttonPanel.padding[3] + ",0)",
-					)
-					.style("cursor", "pointer");
+				let buttonsPartners = buttonsDiv
+					.selectAll(".pbialpbuttonsPartners")
+					.data(partnerListWithTotal);
 
-				const buttonsPartnersContainer = buttonsPartnersGroup
-					.selectAll(null)
-					.data(partnerListWithTotal)
+				const buttonsPartnersEnter = buttonsPartners
 					.enter()
-					.append("g")
-					.attr("class", "pbialpButtonsPartnersContainer");
-
-				const buttonsPartnersText = buttonsPartnersContainer
-					.append("text")
-					.attr("class", "pbialpbuttonsPartnersText")
-					.attr("y", buttonPanel.height / 1.6)
-					.attr("x", buttonPanel.buttonPartnersInnerPadding)
-					.style("fill", function (d) {
-						return d === chartState.selectedPartner
-							? "white"
-							: "#444";
-					})
-					.text(function (d) {
+					.append("button")
+					.attr("class", "pbialpbuttonsPartners")
+					.html(function (d) {
 						if (d === "Red Cross/Crescent Movement") {
 							return "Red Cross/Cres. Mov.";
 						} else if (d === "International NGO") {
@@ -520,65 +480,27 @@
 							return "All partners";
 						}
 					});
-				buttonsPartnersText
+
+				buttonsPartners = buttonsPartnersEnter.merge(buttonsPartners);
+
+				buttonsPartners.classed("selected", function (d) {
+					return d === chartState.selectedPartner;
+				});
+
+				buttonsPartners
 					.filter(function (d) {
 						return d === "National NGO";
 					})
-					.text(
+					.html(
 						chartState.netFunding === 1
 							? "National NGO"
 							: "Nat. Partners",
 					)
 					.append("tspan")
-					.style("fill", underApprovalColor)
-					.text(chartState.netFunding === 1 ? "" : "*");
+					.style("color", underApprovalColor)
+					.html(chartState.netFunding === 1 ? "" : "*");
 
-				buttonsPartnersContainer.attr("transform", function (_, i) {
-					if (i) {
-						const previousTransform = parseTransform(
-							d3.select(this.previousSibling).attr("transform"),
-						)[0];
-						return (
-							"translate(" +
-							(previousTransform +
-								this.previousSibling.firstChild.getComputedTextLength() +
-								2 * buttonPanel.buttonPartnersInnerPadding +
-								buttonPanel.buttonPadding) +
-							",0)"
-						);
-					} else {
-						return "translate(0,0)";
-					}
-				});
-
-				const buttonsPartnersRects = buttonsPartnersContainer
-					.insert("rect", "text")
-					.attr("rx", "2px")
-					.attr("ry", "2px")
-					.attr("class", "pbialpbuttonsPartnersRects")
-					.attr("width", function () {
-						return (
-							this.nextSibling.getComputedTextLength() +
-							2 * buttonPanel.buttonPartnersInnerPadding
-						);
-					})
-					.attr(
-						"height",
-						buttonPanel.height -
-							buttonPanel.buttonVerticalPadding * 2,
-					)
-					.attr("y", buttonPanel.buttonVerticalPadding)
-					.attr("x", 0)
-					.style("fill", function (d) {
-						return d === chartState.selectedPartner
-							? unBlue
-							: "#eaeaea";
-					});
-
-				buttonsPartnersRects
-					.on("mouseover", mouseOverButtonsPartnersRects)
-					.on("mouseout", mouseOutButtonsPartnersRects)
-					.on("click", clickButtonsPartnersRects);
+				buttonsPartners.on("click", clickButtonsPartnersRects);
 
 				//end of createButtonsPanel
 			}
@@ -710,7 +632,6 @@
 						);
 					})
 					.tween("text", function (d) {
-						const node = this;
 						let thisPartner,
 							thisPartnerPercentage,
 							thisPartnerRoundPercentage;
@@ -723,7 +644,7 @@
 								thisPartner.roundPercentage;
 						}
 						const i = d3.interpolate(
-							reverseFormat(node.textContent) || 0,
+							reverseFormat(this.textContent) || 0,
 							d[chartState.selectedPartner],
 						);
 						return function (t) {
@@ -732,11 +653,11 @@
 								(chartState.selectedPartner !== "total" &&
 									thisPartnerPercentage === 0)
 							) {
-								d3.select(node).text(
+								d3.select(this).text(
 									formatNumberSI(i(t)).replace("G", "B"),
 								);
 							} else {
-								d3.select(node)
+								d3.select(this)
 									.text(
 										i(1)
 											? formatNumberSI(i(t)).replace(
@@ -1470,18 +1391,19 @@
 						chartState.netFunding === 2 ? "darkslategray" : "white",
 					);
 
-					svg.selectAll(".pbialpbuttonsPartnersText")
+					buttonsDiv
+						.selectAll(".pbialpbuttonsPartners")
 						.filter(function (d) {
 							return d === "National NGO";
 						})
-						.text(
+						.html(
 							chartState.netFunding === 1
 								? "National NGO"
 								: "Nat. Partners",
 						)
 						.append("tspan")
-						.style("fill", underApprovalColor)
-						.text(chartState.netFunding === 1 ? "" : "*");
+						.style("color", underApprovalColor)
+						.html(chartState.netFunding === 1 ? "" : "*");
 
 					svg.select(".pbialpLegendTextNetFunding").style(
 						"opacity",
@@ -1853,23 +1775,11 @@
 
 				chartState.selectedPartner = d;
 
-				d3.selectAll(".pbialpbuttonsPartnersRects").style(
-					"fill",
-					function (e) {
-						return e === chartState.selectedPartner
-							? unBlue
-							: "#eaeaea";
-					},
-				);
-
-				d3.selectAll(".pbialpbuttonsPartnersText").style(
-					"fill",
-					function (e) {
-						return e === chartState.selectedPartner
-							? "white"
-							: "#444";
-					},
-				);
+				buttonsDiv
+					.selectAll(".pbialpbuttonsPartners")
+					.classed("selected", function (e) {
+						return e === chartState.selectedPartner;
+					});
 
 				setDomains(data, chartState.selectedPartner);
 
@@ -1878,19 +1788,6 @@
 				highlightSelectedParallel();
 
 				//end of clickButtonsContributionsRects
-			}
-
-			function mouseOverButtonsPartnersRects() {
-				d3.select(this).style("fill", unBlue);
-				d3.select(this.parentNode)
-					.select("text")
-					.style("fill", "white");
-			}
-
-			function mouseOutButtonsPartnersRects(d) {
-				if (d === chartState.selectedPartner) return;
-				d3.select(this).style("fill", "#eaeaea");
-				d3.select(this.parentNode).select("text").style("fill", "#444");
 			}
 
 			function mouseOverSelectedCircles(datum) {
@@ -2605,19 +2502,6 @@
 				"transform",
 				"translate(" + lollipopPanel.padding[3] + ",0)",
 			);
-		}
-
-		function parseTransform(translate) {
-			const group = document.createElementNS(
-				"http://www.w3.org/2000/svg",
-				"g",
-			);
-
-			group.setAttributeNS(null, "transform", translate);
-
-			const matrix = group.transform.baseVal.consolidate().matrix;
-
-			return [matrix.e, matrix.f];
 		}
 
 		function processData(rawData) {

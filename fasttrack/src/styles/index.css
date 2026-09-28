@@ -30,8 +30,8 @@ h1 {
 
 button {
 	border-radius: 8px;
-	border: 1px solid transparent;
-	padding: 0.6em 1.2em;
+	border: 1px solid #dedede;
+	padding: 0.5em 1.2em;
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
@@ -45,6 +45,11 @@ button:hover {
 button:focus,
 button:focus-visible {
 	outline: none;
+}
+
+button.selected {
+	background-color: var(--ocha-blue);
+	color: white;
 }
 
 @media (prefers-color-scheme: light) {
@@ -304,4 +309,13 @@ button:focus-visible {
 
 #pbialptooltipdiv {
 	max-width: none !important;
+}
+
+.pbialpButtonsDiv {
+	display: flex;
+	flex-direction: row;
+	gap: 6px;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
 }
