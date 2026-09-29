@@ -28,26 +28,27 @@ h1 {
 	line-height: 1.1;
 }
 
-button {
+.pbialpbuttonsPartners {
 	border-radius: 8px;
 	border: 1px solid #dedede;
 	padding: 0.5em 1.2em;
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
-	background-color: #1a1a1a;
+	background-color: #fafafa;
 	cursor: pointer;
 	transition: border-color 0.25s;
 }
-button:hover {
+.pbialpbuttonsPartners:hover {
 	border-color: #646cff;
+	background-color: #f1f3f5;
 }
-button:focus,
-button:focus-visible {
+.pbialpbuttonsPartners:focus,
+.pbialpbuttonsPartners:focus-visible {
 	outline: none;
 }
 
-button.selected {
+.pbialpbuttonsPartners.selected {
 	background-color: var(--ocha-blue);
 	color: white;
 }
