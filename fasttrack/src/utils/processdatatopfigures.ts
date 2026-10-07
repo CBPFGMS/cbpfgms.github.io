@@ -60,7 +60,11 @@ function processDataTopFigures({
 			return;
 		}
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
+		const allStatuses = [
+			...((tranche === "all"
+				? inDataLists.statusesPerFund[pf]
+				: inDataLists.statusesPerFundPerTranche[tranche]?.[pf]) ?? []),
+		];
 		const fundHasAllStatuses = allStatuses.every(pfStatus =>
 			status.includes(pfStatus),
 		);
