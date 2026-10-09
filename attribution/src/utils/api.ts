@@ -13,12 +13,14 @@ import type {
 	AllocationTypesMasterObject,
 	OrganizationMasterObject,
 	ProjectSummaryObject,
+	ProjectClusterOneGmsObject,
 	SectorBeneficiaryObject,
 	TotalBeneficiariesObject,
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
 	AllocationsByYearAndFundObject,
 } from "./schemas";
+import { projectClusterOneGmsObjectSchema } from "./schemas";
 import makeLists, { type List } from "./makelists";
 import processRawData, {
 	type AllocationsData,
@@ -36,6 +38,7 @@ import processContributionsData, {
 // 	type LocationsData,
 // } from "../utils/processlocationsdata";
 import { constants } from "./constants";
+import warnInvalidSchema from "./warninvalid";
 import generateRange from "./generateRange";
 
 export type AppData = {
@@ -48,6 +51,7 @@ export type AppData = {
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	localizationDataWithUS: LocalizationData;
 	localizationDataWithoutUS: LocalizationData;
+	projectClusterData: ProjectClusterOneGmsObject[];
 	lists: List;
 };
 
@@ -70,6 +74,7 @@ type ReceiveDataArgs = [
 	AllocationSourcesMasterObject[],
 	PooledFundsWithRegionMasterObject[],
 	DonorsMasterObject[],
+	Record<string, unknown>[],
 ];
 
 const { fundType, currentYear } = constants;
@@ -97,7 +102,9 @@ const pooledFundsMasterUrl =
 	totalBeneficiariesByPartnerWithoutUsUrl =
 		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
 	totalBeneficiariesBySectorWithoutUsUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?isByLocation=false&process_status=all&allocation_category=NON_US&$format=csv",
+	projectClusterOneGmsUrl =
+		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PROJECT_CLUSTER_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=1&$format=csv";
 
 export async function fetchAppData(
 	startYear: number | null,
@@ -291,6 +298,14 @@ export async function fetchAppData(
 			),
 			progressStore.increment,
 		),
+		trackProgress(
+			fetchFileDB<Record<string, unknown>[]>(
+				"projectClusterOneGms",
+				projectClusterOneGmsUrl,
+				"csv",
+			),
+			progressStore.increment,
+		),
 	] as const;
 
 	progressStore.reset(
@@ -329,6 +344,7 @@ export async function fetchAppData(
 			allocationSourcesMaster,
 			pooledFundsWithRegionMaster,
 			donorsMaster,
+			projectClusterOneGms,
 		]: ReceiveDataArgs,
 		dynamicContributionsResults: ContributionsJson[],
 	): AppData {
@@ -380,7 +396,34 @@ export async function fetchAppData(
 			totalBeneficiariesBySectorData,
 			localizationDataWithUS,
 			localizationDataWithoutUS,
+			projectClusterData: parseProjectClusterData(projectClusterOneGms),
 			lists,
 		};
 	}
+}
+
+function parseProjectClusterData(
+	rows: Record<string, unknown>[],
+): ProjectClusterOneGmsObject[] {
+	const parsedRows: ProjectClusterOneGmsObject[] = [];
+
+	rows.forEach(row => {
+		const trimmedRow: Record<string, unknown> = {};
+		for (const [key, value] of Object.entries(row)) {
+			trimmedRow[key.trim()] = value;
+		}
+
+		const parsedRow = projectClusterOneGmsObjectSchema.safeParse(trimmedRow);
+		if (parsedRow.success) {
+			parsedRows.push(parsedRow.data);
+		} else {
+			warnInvalidSchema(
+				"projectClusterOneGms",
+				row,
+				parsedRow.error.message,
+			);
+		}
+	});
+
+	return parsedRows;
 }

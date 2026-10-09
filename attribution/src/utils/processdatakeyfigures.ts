@@ -1,6 +1,5 @@
-import type { List } from "./makelists";
 import type { AllocationsData, LocalizationData } from "./processrawdata";
-import { simpleWarn } from "./warninvalid";
+import type { ProjectClusterOneGmsObject } from "./schemas";
 import { constants } from "./constants";
 
 export type InSelectionData = {
@@ -10,11 +9,11 @@ export type InSelectionData = {
 
 type ProcessDataKeyFiguresParams = {
 	allocationsData: AllocationsData;
+	projectClusterData: ProjectClusterOneGmsObject[];
 	localizationDataWithUS: LocalizationData;
 	localizationDataWithoutUS: LocalizationData;
 	funds: number[];
 	globalAttribution: number;
-	lists: List;
 	year: number;
 	hasUS: boolean;
 };
@@ -38,11 +37,11 @@ const { USProjectsString } = constants;
 
 function processDataKeyFigures({
 	allocationsData,
+	projectClusterData,
 	localizationDataWithUS,
 	localizationDataWithoutUS,
 	funds,
 	globalAttribution,
-	lists,
 	year,
 	hasUS,
 }: ProcessDataKeyFiguresParams): DataKeyFigures {
@@ -53,38 +52,26 @@ function processDataKeyFigures({
 		totalWlo = 0,
 		totalProtection = 0;
 
-	const protectionId = +Object.keys(lists.sectors).find(
-		key => lists.sectors[+key] === "Protection",
-	)!;
-
-	//Check for missing "Protection" sector
-	if (isNaN(protectionId)) {
-		simpleWarn("Missing 'Protection' sector in the sector master table");
-	}
-
 	allocationsData.forEach(row => {
 		if (!hasUS && row.projectCode.includes(USProjectsString)) {
 			return;
 		}
 		if (funds.includes(row.fund) && row.year === year) {
-			if (row.hasDisabled) {
-				totalDisability += row.budget;
-			}
-			if (row.hasGBV) {
-				totalGbv += row.budget;
-			}
-			if (row.hasGenderEquality) {
-				totalGenderEquality += row.budget;
-			}
 			if (row.hasWomenLedOrgs) {
 				totalWlo += row.budget;
 			}
-			const thisProtection = row.sectorData.find(
-				sector => sector.sectorId === protectionId,
-			);
-			if (thisProtection) {
-				totalProtection += thisProtection.percentage * row.budget;
-			}
+		}
+	});
+
+	projectClusterData.forEach(row => {
+		if (!hasUS && row.CHFProjectCode.includes(USProjectsString)) {
+			return;
+		}
+		if (funds.includes(row.PooledFundId) && row.AllocationYear === year) {
+			totalDisability += row.DisabilityBudgetAmt ?? 0;
+			totalGbv += row.GBVBudgetAmt ?? 0;
+			totalGenderEquality += row.GenderEqBudgetAmt ?? 0;
+			totalProtection += row.ProtectionBudgetAmt ?? 0;
 		}
 	});
 

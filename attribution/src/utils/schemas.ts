@@ -102,6 +102,18 @@ export const projectSummaryObjectSchema = z.object({
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
 });
 
+const clusterBudgetAmountSchema = z.number().nonnegative().nullable();
+
+export const projectClusterOneGmsObjectSchema = z.object({
+	PooledFundId: z.number().int().nonnegative(),
+	CHFProjectCode: z.string(),
+	AllocationYear: z.number().int().nonnegative(),
+	GBVBudgetAmt: clusterBudgetAmountSchema,
+	GenderEqBudgetAmt: clusterBudgetAmountSchema,
+	DisabilityBudgetAmt: clusterBudgetAmountSchema,
+	ProtectionBudgetAmt: clusterBudgetAmountSchema,
+});
+
 export const sectorBeneficiaryObjectSchema = z.object({
 	PooledFundName: z.string(),
 	PooledFundId: z.number().int().nonnegative(),
@@ -357,6 +369,10 @@ export const donorsMasterObjectSchema = z.object({
 // ********************
 
 export type ProjectSummaryObject = z.infer<typeof projectSummaryObjectSchema>;
+
+export type ProjectClusterOneGmsObject = z.infer<
+	typeof projectClusterOneGmsObjectSchema
+>;
 
 export type SectorBeneficiaryObject = z.infer<
 	typeof sectorBeneficiaryObjectSchema

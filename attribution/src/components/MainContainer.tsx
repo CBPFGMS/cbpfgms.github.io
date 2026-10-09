@@ -41,6 +41,7 @@ function MainContainer({ donor }: MainContainerProps) {
 		totalBeneficiariesBySectorData,
 		localizationDataWithUS,
 		localizationDataWithoutUS,
+		projectClusterData,
 	} = useAppData();
 
 	const lastDonorYear = Array.from(inContributionsDataLists.years).sort(
@@ -89,21 +90,21 @@ function MainContainer({ donor }: MainContainerProps) {
 		() =>
 			processDataKeyFigures({
 				allocationsData,
+				projectClusterData,
 				localizationDataWithUS,
 				localizationDataWithoutUS,
 				funds,
 				globalAttribution: attributions.global.percentage,
-				lists,
 				year,
 				hasUS,
 			}),
 		[
 			allocationsData,
+			projectClusterData,
 			localizationDataWithUS,
 			localizationDataWithoutUS,
 			funds,
 			attributions,
-			lists,
 			year,
 			hasUS,
 		],
