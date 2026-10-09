@@ -1,6 +1,9 @@
 import { formatPrefix } from "d3";
 
 function formatSIFloat(value: number) {
+	//safeguard for zero and negative numbers
+	if (value <= 0) return "0";
+
 	const length = (~~Math.log10(value) + 1) % 3;
 	const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 	const result = formatPrefix(

@@ -173,7 +173,12 @@ function processDataBarChart({
 
 			const thisFundData = totalBeneficiariesByPartnerData[pf];
 
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const allStatuses = [
+				...((tranche === "all"
+					? inDataLists.statusesPerFund[pf]
+					: inDataLists.statusesPerFundPerTranche[tranche]?.[pf]) ??
+					[]),
+			];
 			const fundHasAllStatuses = allStatuses.every(pfStatus =>
 				statuses.includes(pfStatus),
 			);
@@ -235,7 +240,12 @@ function processDataBarChart({
 
 			const thisFundData = totalBeneficiariesBySectorData[pf];
 
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const allStatuses = [
+				...((tranche === "all"
+					? inDataLists.statusesPerFund[pf]
+					: inDataLists.statusesPerFundPerTranche[tranche]?.[pf]) ??
+					[]),
+			];
 			const fundHasAllStatuses = allStatuses.every(pfStatus =>
 				statuses.includes(pfStatus),
 			);
@@ -296,7 +306,12 @@ function processDataBarChart({
 			}
 
 			const thisFundData = totalBeneficiariesByBeneficiaryTypeData[pf];
-			const allStatuses = [...inDataLists.statusesPerFund[pf]];
+			const allStatuses = [
+				...((tranche === "all"
+					? inDataLists.statusesPerFund[pf]
+					: inDataLists.statusesPerFundPerTranche[tranche]?.[pf]) ??
+					[]),
+			];
 			const fundHasAllStatuses = allStatuses.every(pfStatus =>
 				statuses.includes(pfStatus),
 			);

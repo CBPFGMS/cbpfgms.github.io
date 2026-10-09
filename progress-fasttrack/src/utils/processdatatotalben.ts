@@ -1,4 +1,4 @@
-import { ImplementationStatuses } from "../components/MainContainer";
+import { ImplementationStatuses, Tranche } from "../components/MainContainer";
 import { List } from "./makelists";
 import {
 	GenderAndAge,
@@ -14,6 +14,7 @@ type ProcessDataTotalBeneficiariesParams = {
 	implementationStatus: ImplementationStatuses[];
 	inDataLists: InDataLists;
 	lists: List;
+	tranche: Tranche;
 };
 
 export type TargetedAndReachedTotal = {
@@ -27,6 +28,7 @@ function processDataTotalBeneficiaries({
 	implementationStatus,
 	inDataLists,
 	lists,
+	tranche,
 }: ProcessDataTotalBeneficiariesParams): TargetedAndReachedTotal {
 	const targeted = {
 		girls: 0,
@@ -59,7 +61,11 @@ function processDataTotalBeneficiaries({
 
 		const thisFundData = totalBeneficiariesData[pf];
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
+		const allStatuses = [
+			...((tranche === "all"
+				? inDataLists.statusesPerFund[pf]
+				: inDataLists.statusesPerFundPerTranche[tranche]?.[pf]) ?? []),
+		];
 		const fundHasAllStatuses = allStatuses.every(pfStatus =>
 			status.includes(pfStatus),
 		);

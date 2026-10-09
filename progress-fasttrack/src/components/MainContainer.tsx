@@ -135,6 +135,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				implementationStatus,
 				inDataLists,
 				lists,
+				tranche,
 			}),
 		[
 			totalBeneficiariesData,
@@ -142,6 +143,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			implementationStatus,
 			inDataLists,
 			lists,
+			tranche,
 		],
 	);
 
