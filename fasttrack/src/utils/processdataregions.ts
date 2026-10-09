@@ -68,6 +68,12 @@ function processDataRegions({
 		}
 	});
 
+	//total of each region's funds with all statuses (used for the cap)
+	const regionAllTotals = new Map<
+		RegionsDatum,
+		{ targeted: number; reached: number; reachedProjects: number }
+	>();
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			return;
@@ -89,6 +95,16 @@ function processDataRegions({
 			status.includes(pfStatus),
 		);
 
+		const regionAll = regionAllTotals.get(thisRegion) ?? {
+			targeted: 0,
+			reached: 0,
+			reachedProjects: 0,
+		};
+		regionAll.targeted += totalBeneficiariesData[pf].all.targeted;
+		regionAll.reached += totalBeneficiariesData[pf].all.reached;
+		regionAll.reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
+		regionAllTotals.set(thisRegion, regionAll);
+
 		if (fundHasAllStatuses) {
 			thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
 			thisRegion.reached += totalBeneficiariesData[pf].all.reached;
@@ -104,6 +120,20 @@ function processDataRegions({
 					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
 			});
 		}
+	});
+
+	//statuses can overlap (same people in several statuses): a subset
+	//of statuses can never be higher than the region total with all statuses
+	regionAllTotals.forEach((regionAll, region) => {
+		if (regionAll.targeted)
+			region.targeted = Math.min(region.targeted, regionAll.targeted);
+		if (regionAll.reached)
+			region.reached = Math.min(region.reached, regionAll.reached);
+		if (regionAll.reachedProjects)
+			region.reachedProjects = Math.min(
+				region.reachedProjects,
+				regionAll.reachedProjects,
+			);
 	});
 
 	return dataRegions;
