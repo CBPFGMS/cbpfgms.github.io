@@ -52,7 +52,7 @@ type ReceiveDataArgs = [
 const { fundType } = constants;
 
 //true: production API, false: staging API
-const isProdApi = false;
+const isProdApi = true;
 
 const prodApiUrl = "https://pfbi-eastus2-api-site.azurewebsites.net/",
 	stagingApiUrl = "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/",

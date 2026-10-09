@@ -57,6 +57,13 @@ type ReceiveDataArgs = [
 	TemplatesMasterJson,
 ];
 
+//true: production API, false: staging API
+const isProdApi = true;
+
+const prodApiUrl = "https://pfbi-eastus2-api-site.azurewebsites.net/",
+	stagingApiUrl = "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/",
+	bdtApiBaseUrl = isProdApi ? prodApiUrl : stagingApiUrl;
+
 const beneficiaryTypesMasterUrl =
 		"https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=BENEF_TYPE_MST",
 	pooledFundsMasterUrl =
@@ -70,31 +77,31 @@ const beneficiaryTypesMasterUrl =
 	cvaMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=MstCVAType",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv`,
 	totalBeneficiariesTranche1Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv`,
 	totalBeneficiariesTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv`,
 	totalBeneficiariesByPartnerUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche_2026&$format=csv`,
 	totalBeneficiariesByPartnerTranche1Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche1_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche1_2026&$format=csv`,
 	totalBeneficiariesByPartnerTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche2_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByPartnerType/?group_name=US_Tranche2_2026&$format=csv`,
 	totalBeneficiariesBySectorUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche_2026&$format=csv`,
 	totalBeneficiariesBySectorTranche1Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche1_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche1_2026&$format=csv`,
 	totalBeneficiariesBySectorTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche2_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByCluster/?group_name=US_Tranche2_2026&$format=csv`,
 	totalBeneficiariesByBeneficiaryTypeUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche_2026&$format=csv`,
 	totalBeneficiariesByBeneficiaryTypeTranche1Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche1_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche1_2026&$format=csv`,
 	totalBeneficiariesByBeneficiaryTypeTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche2_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiaryByBenType/?group_name=US_Tranche2_2026&$format=csv`,
 	templatesMasterUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/templates/?includeProjectCode=1";
+		`${bdtApiBaseUrl}bdt2/api/public/v1/templates/?includeProjectCode=1`;
 
 function useData(
 	defaultFundType: number | null,
