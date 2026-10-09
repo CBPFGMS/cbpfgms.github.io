@@ -51,6 +51,11 @@ function processDataTotalBeneficiaries({
 		implSt => +numericStatuses[implSt as ImplementationStatuses],
 	);
 
+	//total of the selected funds with all statuses (used for the cap)
+	const keys = ["total", "girls", "boys", "women", "men"] as const;
+	const allTargeted = { girls: 0, boys: 0, women: 0, men: 0, total: 0 };
+	const allReached = { girls: 0, boys: 0, women: 0, men: 0, total: 0 };
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			simpleWarn(
@@ -69,6 +74,11 @@ function processDataTotalBeneficiaries({
 		const fundHasAllStatuses = allStatuses.every(pfStatus =>
 			status.includes(pfStatus),
 		);
+
+		keys.forEach(key => {
+			allTargeted[key] += thisFundData.all[key].targeted;
+			allReached[key] += thisFundData.all[key].reached;
+		});
 
 		if (fundHasAllStatuses) {
 			targeted.total += thisFundData.all.total.targeted;
@@ -95,6 +105,15 @@ function processDataTotalBeneficiaries({
 				reached.men += thisFundData[st]?.men.reached || 0;
 			});
 		}
+	});
+
+	//statuses can overlap (same people in several statuses): a subset
+	//of statuses can never be higher than the total with all statuses
+	keys.forEach(key => {
+		if (allTargeted[key])
+			targeted[key] = Math.min(targeted[key], allTargeted[key]);
+		if (allReached[key])
+			reached[key] = Math.min(reached[key], allReached[key]);
 	});
 
 	return { targeted, reached };

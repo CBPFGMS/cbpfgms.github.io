@@ -52,6 +52,11 @@ function processDataTopFigures({
 		reached = 0,
 		reachedProjects = 0;
 
+	//total of the selected funds with all statuses (used for the cap)
+	let allTargeted = 0,
+		allReached = 0,
+		allReachedProjects = 0;
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			simpleWarn(
@@ -69,6 +74,10 @@ function processDataTopFigures({
 			status.includes(pfStatus),
 		);
 
+		allTargeted += totalBeneficiariesData[pf].all.targeted;
+		allReached += totalBeneficiariesData[pf].all.reached;
+		allReachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
+
 		if (fundHasAllStatuses) {
 			targeted += totalBeneficiariesData[pf].all.targeted;
 			reached += totalBeneficiariesData[pf].all.reached;
@@ -82,6 +91,13 @@ function processDataTopFigures({
 			});
 		}
 	});
+
+	//statuses can overlap (same people in several statuses): a subset
+	//of statuses can never be higher than the total with all statuses
+	if (allTargeted) targeted = Math.min(targeted, allTargeted);
+	if (allReached) reached = Math.min(reached, allReached);
+	if (allReachedProjects)
+		reachedProjects = Math.min(reachedProjects, allReachedProjects);
 
 	data.forEach(row => {
 		if (
