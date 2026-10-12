@@ -209,6 +209,48 @@ h1 {
 	font-size: 43px;
 	font-weight: 500;
 }
+.status-card-mid {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+.status-card-people {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.status-card-pt {
+	display: flex;
+	flex-direction: column;
+}
+.status-label-pt {
+	display: flex;
+	align-items: baseline;
+}
+.status-label-pt span {
+	font-size: 10px;
+	font-weight: 700;
+	margin-right: 10px;
+	letter-spacing:-1px;
+}
+.status-label-pt .status-label-pt-value {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0;
+	white-space: nowrap;
+}
+.status-label-pt .status-label-pt-value span {
+	font-size: inherit;
+	font-weight: inherit;
+	margin-right: 0;
+}
+.status-label-pt-targeted {
+	color: #f79a3b;
+}
+.status-label-pt-reached {
+	color: #418fde;
+}
 .status-card-footer {
 	display: flex;
 	align-items: center;
