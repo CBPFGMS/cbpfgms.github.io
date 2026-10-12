@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { DataStatuses } from "../utils/processdatastatuses";
+import {
+	DataStatuses,
+	DataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import { ImplementationStatuses } from "./MainContainer";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
@@ -16,9 +19,11 @@ import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
 import constants from "../utils/constants";
+import genderIcon from "../assets/gender-icon.svg";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
+	dataStatusesBeneficiaries: DataStatusesBeneficiaries;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
@@ -29,6 +34,8 @@ type StatusProps = {
 	handleClick: (status: ImplementationStatuses) => void;
 	status: ImplementationStatuses;
 	statusValue: number;
+	targeted: number;
+	reached: number;
 	total: number;
 	implementationStatus: ImplementationStatuses[];
 };
@@ -50,6 +57,7 @@ const { opacityValue } = constants;
 
 function Statuses({
 	dataStatuses,
+	dataStatusesBeneficiaries,
 	implementationStatus,
 	setImplementationStatus,
 }: StatusesProps) {
@@ -133,6 +141,14 @@ function Statuses({
 								handleClick={handleClick}
 								status={status}
 								statusValue={statusValue}
+								targeted={
+									dataStatusesBeneficiaries[status]
+										?.targeted ?? 0
+								}
+								reached={
+									dataStatusesBeneficiaries[status]
+										?.reached ?? 0
+								}
 								total={total}
 								implementationStatus={implementationStatus}
 							/>
@@ -332,6 +348,8 @@ function Status({
 	handleClick,
 	status,
 	statusValue,
+	targeted,
+	reached,
 	total,
 	implementationStatus,
 }: StatusProps) {
@@ -412,38 +430,95 @@ function Status({
 							</Box>
 						</Grid>
 					</Box>
-					<Typography
+					<Box
+						className="status-card-mid"
 						sx={{
 							opacity: statusSelected ? 1 : opacityValue,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
-						data-tooltip-place="top"
-						className={`status-cv-amber`}
-						style={{
-							fontSize: "43px",
-							fontWeight: 500,
-						}}
 					>
-						{"$"}
-						{statusValue < 1e3 ? (
-							<NumberAnimator
-								number={Math.floor(statusValue)}
-								type="integer"
-							/>
-						) : (
-							<span>
+						<Typography
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
+							data-tooltip-place="top"
+							className={`status-cv-amber`}
+							style={{
+								fontSize: "43px",
+								fontWeight: 500,
+							}}
+						>
+							{"$"}
+							{statusValue < 1e3 ? (
 								<NumberAnimator
-									number={parseFloat(
-										formatSIFloat(statusValue),
-									)}
-									type="decimal"
+									number={Math.floor(statusValue)}
+									type="integer"
 								/>
-								{formatSIFloat(statusValue).slice(-1)}
-							</span>
+							) : (
+								<span>
+									<NumberAnimator
+										number={parseFloat(
+											formatSIFloat(statusValue),
+										)}
+										type="decimal"
+									/>
+									{formatSIFloat(statusValue).slice(-1)}
+								</span>
+							)}
+						</Typography>
+						{(targeted > 0 || reached > 0) && (
+							<Box
+								className="status-card-people"
+								data-tooltip-id="tooltip"
+								data-tooltip-html={[
+									status,
+									targeted > 0 &&
+										`Targeted: ${targeted.toLocaleString()} people`,
+									reached > 0 &&
+										`Reached: ${reached.toLocaleString()} people`,
+								]
+									.filter(Boolean)
+									.join("<br />")}
+								data-tooltip-place="top"
+							>
+								<img
+									src={genderIcon}
+									width="16px"
+									height="29px"
+									alt=""
+								/>
+								<Box className="status-card-pt">
+									{targeted > 0 && (
+										<Box className="status-label-pt status-label-pt-targeted">
+											<span>Targeted</span>
+											<div className="status-label-pt-value">
+												<NumberAnimator
+													number={parseFloat(
+														formatSIFloat(targeted),
+													)}
+													type="decimal"
+												/>
+												{getSuffix(targeted)}
+											</div>
+										</Box>
+									)}
+									{reached > 0 && (
+										<Box className="status-label-pt status-label-pt-reached">
+											<span>Reached</span>
+											<div className="status-label-pt-value">
+												<NumberAnimator
+													number={parseFloat(
+														formatSIFloat(reached),
+													)}
+													type="decimal"
+												/>
+												{getSuffix(reached)}
+											</div>
+										</Box>
+									)}
+								</Box>
+							</Box>
 						)}
-					</Typography>
+					</Box>
 					<Box
 						sx={{
 							opacity: statusSelected ? 1 : opacityValue,
@@ -496,6 +571,12 @@ function Status({
 			</Card>
 		</Grid>
 	);
+}
+
+//unit next to the people numbers (M, k...)
+function getSuffix(value: number): string {
+	const lastChar = formatSIFloat(value).slice(-1);
+	return isNaN(+lastChar) ? lastChar : "";
 }
 
 export default Statuses;

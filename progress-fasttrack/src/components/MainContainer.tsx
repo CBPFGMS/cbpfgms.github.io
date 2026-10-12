@@ -10,7 +10,9 @@ import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
 import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
-import processDataStatuses from "../utils/processdatastatuses";
+import processDataStatuses, {
+	processDataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
 import processDataTotalBeneficiaries from "../utils/processdatatotalben";
@@ -171,6 +173,16 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		],
 	);
 
+	const dataStatusesBeneficiaries = useMemo(
+		() =>
+			processDataStatusesBeneficiaries({
+				totalBeneficiariesData,
+				fund,
+				lists,
+			}),
+		[totalBeneficiariesData, fund, lists],
+	);
+
 	const { dataSummary, dataCva, dataGBV, inSelectionData } = useMemo(
 		() =>
 			processDataSummary({
@@ -292,6 +304,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setImplementationStatus={setImplementationStatus}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
+				dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 				tranche={tranche}
 				setTranche={setTranche}
 			/>

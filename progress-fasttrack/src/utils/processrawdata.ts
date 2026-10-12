@@ -475,6 +475,11 @@ function processRawData({
 	});
 
 	projectSummary.forEach(row => {
+		//Temporary filter for draft projects:
+		if (row.ProjectStatusCode === "PRJ_DRFT") {
+			return;
+		}
+
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =

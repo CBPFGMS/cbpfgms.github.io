@@ -6,7 +6,10 @@ import { InSelectionData } from "../utils/processdatasummary";
 import Selectors from "./Selectors";
 import Statuses from "./Statuses";
 import { ImplementationStatuses, Tranche } from "./MainContainer";
-import { DataStatuses } from "../utils/processdatastatuses";
+import {
+	DataStatuses,
+	DataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import React from "react";
 
 type FiltersContainerProps = {
@@ -25,6 +28,7 @@ type FiltersContainerProps = {
 	inSelectionData: InSelectionData;
 	menusRef: (node?: Element | null | undefined) => void;
 	dataStatuses: DataStatuses;
+	dataStatusesBeneficiaries: DataStatusesBeneficiaries;
 	tranche: Tranche;
 	setTranche: React.Dispatch<React.SetStateAction<Tranche>>;
 };
@@ -43,6 +47,7 @@ function FiltersContainer({
 	implementationStatus,
 	setImplementationStatus,
 	dataStatuses,
+	dataStatusesBeneficiaries,
 	tranche,
 	setTranche,
 }: FiltersContainerProps) {
@@ -102,6 +107,7 @@ function FiltersContainer({
 				>
 					<Statuses
 						dataStatuses={dataStatuses}
+						dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 					/>
