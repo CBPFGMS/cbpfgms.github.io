@@ -1,5 +1,7 @@
 const constants = {
 	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	//projects skipped by their ProjectStatusCode
+	excludedProjectStatusCodes: ["PRJ_DRFT", "PRJ_REJECTED", "PRJ_TO_BE_DELETED"],
 	buildVersion: "v2.0",
 	implementationStatuses: [
 		"Submission of Proposal",

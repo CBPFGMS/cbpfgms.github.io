@@ -111,7 +111,7 @@ export type TotalBeneficiariesData = {
 	};
 };
 
-const { tranche1Name, tranche2Name } = constants;
+const { tranche1Name, tranche2Name, excludedProjectStatusCodes } = constants;
 
 function processRawData({
 	projectSummary,
@@ -305,8 +305,12 @@ function processRawData({
 			warnInvalidSchema("projectSummary", row, parsedRow.error.message);
 			return;
 		}
-		//Temporary filter for draft projects:
-		if (row.ProjectStatusCode === "PRJ_DRFT") {
+		//Temporary filter for draft, rejected and to be deleted projects:
+		if (
+			(excludedProjectStatusCodes as readonly string[]).includes(
+				row.ProjectStatusCode ?? "",
+			)
+		) {
 			return;
 		}
 
