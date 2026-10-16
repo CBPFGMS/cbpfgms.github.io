@@ -135,17 +135,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				totalBeneficiariesData,
 				fund,
 				implementationStatus,
-				inDataLists,
 				lists,
-				tranche,
 			}),
 		[
 			totalBeneficiariesData,
 			fund,
 			implementationStatus,
-			inDataLists,
 			lists,
-			tranche,
 		],
 	);
 
