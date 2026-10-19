@@ -72,16 +72,12 @@ const beneficiaryTypesMasterUrl =
 		"https://cbpfapib.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=GLB_INDIC_MST&GlobalIndicatorType=&$format=csv",
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
-	totalBeneficiariesUrl =
-		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv`,
-	totalBeneficiariesTranche1Url =
-		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv`,
-	totalBeneficiariesTranche2Url =
-		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv`,
+	totalBeneficiariesUrl = `${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv`,
+	totalBeneficiariesTranche1Url = `${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv`,
+	totalBeneficiariesTranche2Url = `${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv`,
 	organizationIdsMapUrl =
 		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json",
-	templatesMasterUrl =
-		`${bdtApiBaseUrl}bdt2/api/public/v1/templates/?includeProjectCode=1`;
+	templatesMasterUrl = `${bdtApiBaseUrl}bdt2/api/public/v1/templates/?includeProjectCode=1`;
 
 //fake data path on staging site: ./assets/stg-data/
 
@@ -135,7 +131,7 @@ function useData(
 		[error, setError] = useState<string | null>(null);
 
 	const [progress, setProgress] = useState<number>(0);
-	const [totalFiles, setTotalFiles] = useState<number>(0);
+	const totalFiles = 18; //IMPORTANT: Update this number if you add or remove files to fetch
 
 	useEffect(() => {
 		const fetchPromises = [
@@ -284,8 +280,6 @@ function useData(
 				setProgress,
 			),
 		] as const;
-
-		setTotalFiles(fetchPromises.length);
 
 		Promise.all(fetchPromises)
 			.then(receiveData)
