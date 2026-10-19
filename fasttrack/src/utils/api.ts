@@ -51,6 +51,13 @@ type ReceiveDataArgs = [
 
 const { fundType } = constants;
 
+//true: production API, false: staging API
+const isProdApi = true;
+
+const prodApiUrl = "https://pfbi-eastus2-api-site.azurewebsites.net/",
+	stagingApiUrl = "https://pfbi-eastus2-api-site-api-dev.azurewebsites.net/",
+	bdtApiBaseUrl = isProdApi ? prodApiUrl : stagingApiUrl;
+
 const beneficiaryTypesMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/cbpf/results/MstBeneficiaryType.csv",
 	pooledFundsMasterUrl =
@@ -66,15 +73,15 @@ const beneficiaryTypesMasterUrl =
 	pooledFundWithRegionMasterUrl =
 		"https://cbpfgms.github.io/pfbi-data/mst/MstCountry.json",
 	totalBeneficiariesUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche_2026&$format=csv`,
 	totalBeneficiariesTranche1Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche1_2026&$format=csv`,
 	totalBeneficiariesTranche2Url =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv",
+		`${bdtApiBaseUrl}bdt2/api/public/v1/beneficiary/?group_name=US_Tranche2_2026&$format=csv`,
 	organizationIdsMapUrl =
 		"https://raw.githubusercontent.com/CBPFGMS/cbpfgms-data/refs/heads/main/FT/organizationIdsMap.json",
 	templatesMasterUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/bdt2/api/public/v1/templates/?includeProjectCode=1";
+		`${bdtApiBaseUrl}bdt2/api/public/v1/templates/?includeProjectCode=1`;
 
 //fake data path on staging site: ./assets/stg-data/
 

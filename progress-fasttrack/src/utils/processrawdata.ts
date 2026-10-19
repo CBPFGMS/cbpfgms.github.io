@@ -96,6 +96,9 @@ export type InDataLists = {
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	statusesPerFund: { [fund: number]: Set<number> };
+	statusesPerFundPerTranche: {
+		[tranche: number]: { [fund: number]: Set<number> };
+	};
 	fundsPerTranche: { [tranche: number]: Set<number> };
 	projectsPerTranche: { [tranche: number]: Set<string> };
 	fundsPerBeneficiaryType: { [beneficiaryType: number]: Set<number> };
@@ -183,7 +186,7 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 	};
 };
 
-const { tranche1Name, tranche2Name } = constants;
+const { tranche1Name, tranche2Name, excludedProjectStatusCodes } = constants;
 
 function processRawData({
 	projectSummary,
@@ -254,6 +257,8 @@ function processRawData({
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+	const statusesPerFundPerTranche: InDataLists["statusesPerFundPerTranche"] =
+		{};
 	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
 	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
 	const fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"] = {};
@@ -470,6 +475,15 @@ function processRawData({
 	});
 
 	projectSummary.forEach(row => {
+		//Temporary filter for draft, rejected and to be deleted projects:
+		if (
+			(excludedProjectStatusCodes as readonly string[]).includes(
+				row.ProjectStatusCode ?? "",
+			)
+		) {
+			return;
+		}
+
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =
@@ -539,6 +553,18 @@ function processRawData({
 					]);
 				}
 
+				Object.entries(projectsPerTranche).forEach(
+					([tranche, projects]) => {
+						if (projects.has(row.ChfProjectCode)) {
+							((statusesPerFundPerTranche[+tranche] ??= {})[
+								row.PooledFundId
+							] ??= new Set()).add(
+								projectStatusMapping[row.ProcessSTatusID],
+							);
+						}
+					},
+				);
+
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
@@ -597,6 +623,7 @@ function processRawData({
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 		statusesPerFund,
+		statusesPerFundPerTranche,
 		fundsPerTranche,
 		projectsPerTranche,
 		fundsPerBeneficiaryType,
@@ -708,9 +735,29 @@ function populateTotalBeneficiariesData(
 		if (row.ProcessStatusId == null) {
 			target[fund].all = totalDatum;
 		} else {
-			target[fund][projectStatusMapping[row.ProcessStatusId]] =
-				totalDatum;
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			if (!target[fund][thisStatus]) {
+				target[fund][thisStatus] = totalDatum;
+			} else {
+				addTargetedAndReached(target[fund][thisStatus], totalDatum, [
+					...beneficiaryCategories,
+					"total",
+				]);
+			}
 		}
+	});
+
+	Object.values(target).forEach(fundData => {
+		Object.entries(fundData).forEach(([status, statusData]) => {
+			if (status !== "all" && fundData.all) {
+				capTargetedAndReached(statusData, fundData.all, [
+					...beneficiaryCategories,
+					"total",
+				]);
+			}
+		});
 	});
 }
 
@@ -761,13 +808,36 @@ function populateTotalBeneficiariesByPartnerData(
 				target[fund].all.push(partnersDatum);
 			}
 		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			if (!target[fund][thisStatus]) {
-				target[fund][thisStatus] = [partnersDatum];
+			const foundDatum = target[fund][thisStatus]?.find(
+				d => d.partner === partnersDatum.partner,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					partnersDatum,
+					beneficiaryCategories,
+				);
 			} else {
-				target[fund][thisStatus].push(partnersDatum);
+				(target[fund][thisStatus] ??= []).push(partnersDatum);
 			}
 		}
+	});
+
+	Object.values(target).forEach(fundData => {
+		Object.entries(fundData).forEach(([status, statusData]) => {
+			if (status === "all") return;
+			statusData.forEach(datum => {
+				const allDatum = fundData.all?.find(
+					d => d.partner === datum.partner,
+				);
+				if (allDatum) {
+					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+				}
+			});
+		});
 	});
 }
 
@@ -817,13 +887,36 @@ function populateTotalBeneficiariesBySectorData(
 				target[fund].all.push(sectorsDatum);
 			}
 		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			if (!target[fund][thisStatus]) {
-				target[fund][thisStatus] = [sectorsDatum];
+			const foundDatum = target[fund][thisStatus]?.find(
+				d => d.sector === sectorsDatum.sector,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					sectorsDatum,
+					beneficiaryCategories,
+				);
 			} else {
-				target[fund][thisStatus].push(sectorsDatum);
+				(target[fund][thisStatus] ??= []).push(sectorsDatum);
 			}
 		}
+	});
+
+	Object.values(target).forEach(fundData => {
+		Object.entries(fundData).forEach(([status, statusData]) => {
+			if (status === "all") return;
+			statusData.forEach(datum => {
+				const allDatum = fundData.all?.find(
+					d => d.sector === datum.sector,
+				);
+				if (allDatum) {
+					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+				}
+			});
+		});
 	});
 }
 
@@ -883,13 +976,64 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 				target[fund].all.push(beneficiaryTypeDatum);
 			}
 		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			if (!target[fund][thisStatus]) {
-				target[fund][thisStatus] = [beneficiaryTypeDatum];
+			const foundDatum = target[fund][thisStatus]?.find(
+				d => d.beneficiaryType === beneficiaryTypeDatum.beneficiaryType,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					beneficiaryTypeDatum,
+					beneficiaryCategories,
+				);
 			} else {
-				target[fund][thisStatus].push(beneficiaryTypeDatum);
+				(target[fund][thisStatus] ??= []).push(beneficiaryTypeDatum);
 			}
 		}
+	});
+
+	Object.values(target).forEach(fundData => {
+		Object.entries(fundData).forEach(([status, statusData]) => {
+			if (status === "all") return;
+			statusData.forEach(datum => {
+				const allDatum = fundData.all?.find(
+					d => d.beneficiaryType === datum.beneficiaryType,
+				);
+				if (allDatum) {
+					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+				}
+			});
+		});
+	});
+}
+
+type TargetedAndReachedRecord<K extends string> = {
+	[key in K]: TargetedAndReached;
+};
+
+function addTargetedAndReached<K extends string>(
+	target: TargetedAndReachedRecord<K>,
+	source: TargetedAndReachedRecord<K>,
+	keys: readonly K[],
+) {
+	keys.forEach(key => {
+		target[key].targeted += source[key].targeted;
+		target[key].reached += source[key].reached;
+	});
+}
+
+//the added statuses can overlap (same people in Disbursement and
+//Implementation): a status can never be higher than the fund total
+function capTargetedAndReached<K extends string>(
+	target: TargetedAndReachedRecord<K>,
+	cap: TargetedAndReachedRecord<K>,
+	keys: readonly K[],
+) {
+	keys.forEach(key => {
+		target[key].targeted = Math.min(target[key].targeted, cap[key].targeted);
+		target[key].reached = Math.min(target[key].reached, cap[key].reached);
 	});
 }
 

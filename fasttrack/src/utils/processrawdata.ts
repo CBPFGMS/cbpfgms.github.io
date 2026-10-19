@@ -71,6 +71,9 @@ export type InDataLists = {
 	organizations: Set<number>;
 	projectStatuses: Set<number>;
 	statusesPerFund: { [fund: number]: Set<number> };
+	statusesPerFundPerTranche: {
+		[tranche: number]: { [fund: number]: Set<number> };
+	};
 	fundsPerTranche: { [tranche: number]: Set<number> };
 	projectsPerTranche: { [tranche: number]: Set<string> };
 	projectsPerFund: { [fund: number]: Set<string> };
@@ -108,7 +111,7 @@ export type TotalBeneficiariesData = {
 	};
 };
 
-const { tranche1Name, tranche2Name } = constants;
+const { tranche1Name, tranche2Name, excludedProjectStatusCodes } = constants;
 
 function processRawData({
 	projectSummary,
@@ -145,6 +148,8 @@ function processRawData({
 	const projectStatusesSet: Set<InDataListsValues["projectStatuses"]> =
 		new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+	const statusesPerFundPerTranche: InDataLists["statusesPerFundPerTranche"] =
+		{};
 	const fundsPerTranche: InDataLists["fundsPerTranche"] = {};
 	const projectsPerTranche: InDataLists["projectsPerTranche"] = {};
 	const projectsPerFund: InDataLists["projectsPerFund"] = {};
@@ -300,8 +305,12 @@ function processRawData({
 			warnInvalidSchema("projectSummary", row, parsedRow.error.message);
 			return;
 		}
-		//Temporary filter for draft projects:
-		if (row.ProjectStatusCode === "PRJ_DRFT") {
+		//Temporary filter for draft, rejected and to be deleted projects:
+		if (
+			(excludedProjectStatusCodes as readonly string[]).includes(
+				row.ProjectStatusCode ?? "",
+			)
+		) {
 			return;
 		}
 
@@ -387,6 +396,14 @@ function processRawData({
 				]);
 			}
 
+			Object.entries(projectsPerTranche).forEach(([tranche, projects]) => {
+				if (projects.has(row.ChfProjectCode)) {
+					((statusesPerFundPerTranche[+tranche] ??= {})[
+						row.PooledFundId
+					] ??= new Set()).add(projectStatusMapping[row.ProcessSTatusID]);
+				}
+			});
+
 			if (projectsPerFund[row.PooledFundId]) {
 				projectsPerFund[row.PooledFundId].add(row.ChfProjectCode);
 			} else {
@@ -439,6 +456,7 @@ function processRawData({
 		organizations: organizationsSet,
 		projectStatuses: projectStatusesSet,
 		statusesPerFund,
+		statusesPerFundPerTranche,
 		fundsPerTranche,
 		projectsPerTranche,
 		projectsPerFund,
@@ -526,14 +544,36 @@ function populateTotalBeneficiariesData(
 		} else {
 			const thisMappedStatus = projectStatusMapping[row.ProcessStatusId];
 
-			if (!target[fund][thisMappedStatus]) {
-				target[fund][thisMappedStatus] = {
-					targeted: row.TotTarg || 0,
-					reached: row.TotAch || 0,
-					reachedProjects: row.TotAchProjects || 0,
-				};
-			}
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatusData = (target[fund][thisMappedStatus] ??= {
+				targeted: 0,
+				reached: 0,
+				reachedProjects: 0,
+			});
+
+			thisStatusData.targeted += row.TotTarg || 0;
+			thisStatusData.reached += row.TotAch || 0;
+			thisStatusData.reachedProjects += row.TotAchProjects || 0;
 		}
+	});
+
+	//the added statuses can overlap (same people in Disbursement and
+	//Implementation): a status can never be higher than the fund total
+	Object.values(target).forEach(fundData => {
+		const { all } = fundData;
+		Object.entries(fundData).forEach(([status, statusData]) => {
+			if (status === "all") return;
+			if (all.targeted)
+				statusData.targeted = Math.min(statusData.targeted, all.targeted);
+			if (all.reached)
+				statusData.reached = Math.min(statusData.reached, all.reached);
+			if (all.reachedProjects)
+				statusData.reachedProjects = Math.min(
+					statusData.reachedProjects,
+					all.reachedProjects,
+				);
+		});
 	});
 }
 

@@ -52,6 +52,15 @@ function processDataTopFigures({
 		reached = 0,
 		reachedProjects = 0;
 
+	//every status in the filter is selected (default): use the unique
+	//("all") figures. Otherwise always add the selected statuses
+	//individually, even if a fund has all of its own statuses selected.
+	//Statuses can overlap (same people in several statuses), so each fund's
+	//sum is limited to that fund's unique total
+	const allStatusesSelected = [...inDataLists.projectStatuses].every(st =>
+		status.includes(st),
+	);
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			simpleWarn(
@@ -60,22 +69,18 @@ function processDataTopFigures({
 			return;
 		}
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
-		const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			status.includes(pfStatus),
-		);
-
-		if (fundHasAllStatuses) {
+		if (allStatusesSelected) {
 			targeted += totalBeneficiariesData[pf].all.targeted;
 			reached += totalBeneficiariesData[pf].all.reached;
 			reachedProjects += totalBeneficiariesData[pf].all.reachedProjects;
 		} else {
-			status.forEach(st => {
-				targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
-				reached += totalBeneficiariesData[pf][st]?.reached || 0;
-				reachedProjects +=
-					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
-			});
+			const capped = capToFundTotal(
+				sumSelectedStatuses(totalBeneficiariesData, pf, status),
+				totalBeneficiariesData[pf].all,
+			);
+			targeted += capped.targeted;
+			reached += capped.reached;
+			reachedProjects += capped.reachedProjects;
 		}
 	});
 
@@ -111,6 +116,37 @@ function processDataTopFigures({
 	};
 
 	return { dataTopFigures, inSelectionData };
+}
+
+type Figures = { targeted: number; reached: number; reachedProjects: number };
+
+export function sumSelectedStatuses(
+	totalBeneficiariesData: TotalBeneficiariesData,
+	pf: number,
+	status: number[],
+): Figures {
+	const fundSum = { targeted: 0, reached: 0, reachedProjects: 0 };
+	status.forEach(st => {
+		fundSum.targeted += totalBeneficiariesData[pf][st]?.targeted || 0;
+		fundSum.reached += totalBeneficiariesData[pf][st]?.reached || 0;
+		fundSum.reachedProjects +=
+			totalBeneficiariesData[pf][st]?.reachedProjects || 0;
+	});
+	return fundSum;
+}
+
+export function capToFundTotal(sum: Figures, fundTotal: Figures): Figures {
+	return {
+		targeted: fundTotal.targeted
+			? Math.min(sum.targeted, fundTotal.targeted)
+			: sum.targeted,
+		reached: fundTotal.reached
+			? Math.min(sum.reached, fundTotal.reached)
+			: sum.reached,
+		reachedProjects: fundTotal.reachedProjects
+			? Math.min(sum.reachedProjects, fundTotal.reachedProjects)
+			: sum.reachedProjects,
+	};
 }
 
 export default processDataTopFigures;

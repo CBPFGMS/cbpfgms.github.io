@@ -1,18 +1,17 @@
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
-import {
-	GenderAndAge,
-	InDataLists,
-	TotalBeneficiariesData,
-} from "./processrawdata";
+import { GenderAndAge, TotalBeneficiariesData } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 import flipObject from "./flipobject";
+import constants from "./constants";
+import { isAllStatusesSelected, sumStatusesCapped } from "./sumstatuses";
+
+const totalKeys = ["total", ...constants.beneficiaryCategories] as const;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
 	fund: number[];
 	implementationStatus: ImplementationStatuses[];
-	inDataLists: InDataLists;
 	lists: List;
 };
 
@@ -25,7 +24,6 @@ function processDataTotalBeneficiaries({
 	totalBeneficiariesData,
 	fund,
 	implementationStatus,
-	inDataLists,
 	lists,
 }: ProcessDataTotalBeneficiariesParams): TargetedAndReachedTotal {
 	const targeted = {
@@ -49,6 +47,8 @@ function processDataTotalBeneficiaries({
 		implSt => +numericStatuses[implSt as ImplementationStatuses],
 	);
 
+	const allStatusesSelected = isAllStatusesSelected(implementationStatus);
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			simpleWarn(
@@ -59,36 +59,18 @@ function processDataTotalBeneficiaries({
 
 		const thisFundData = totalBeneficiariesData[pf];
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
-		const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			status.includes(pfStatus),
-		);
+		const fundFigures = allStatusesSelected
+			? thisFundData.all
+			: sumStatusesCapped(
+					status.map(st => thisFundData[st]),
+					thisFundData.all,
+					totalKeys,
+				);
 
-		if (fundHasAllStatuses) {
-			targeted.total += thisFundData.all.total.targeted;
-			targeted.girls += thisFundData.all.girls.targeted;
-			targeted.boys += thisFundData.all.boys.targeted;
-			targeted.women += thisFundData.all.women.targeted;
-			targeted.men += thisFundData.all.men.targeted;
-			reached.total += thisFundData.all.total.reached;
-			reached.girls += thisFundData.all.girls.reached;
-			reached.boys += thisFundData.all.boys.reached;
-			reached.women += thisFundData.all.women.reached;
-			reached.men += thisFundData.all.men.reached;
-		} else {
-			status.forEach(st => {
-				targeted.total += thisFundData[st]?.total.targeted || 0;
-				targeted.girls += thisFundData[st]?.girls.targeted || 0;
-				targeted.boys += thisFundData[st]?.boys.targeted || 0;
-				targeted.women += thisFundData[st]?.women.targeted || 0;
-				targeted.men += thisFundData[st]?.men.targeted || 0;
-				reached.total += thisFundData[st]?.total.reached || 0;
-				reached.girls += thisFundData[st]?.girls.reached || 0;
-				reached.boys += thisFundData[st]?.boys.reached || 0;
-				reached.women += thisFundData[st]?.women.reached || 0;
-				reached.men += thisFundData[st]?.men.reached || 0;
-			});
-		}
+		totalKeys.forEach(key => {
+			targeted[key] += fundFigures[key].targeted;
+			reached[key] += fundFigures[key].reached;
+		});
 	});
 
 	return { targeted, reached };

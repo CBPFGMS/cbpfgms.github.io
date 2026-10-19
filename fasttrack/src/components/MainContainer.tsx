@@ -17,7 +17,9 @@ import processDataTopFigures from "../utils/processdatatopfigures";
 import processDataPartners from "../utils/processdatapartners";
 import processDataRegions from "../utils/processdataregions";
 import processDataSectors from "../utils/processdatasectors";
-import processDataStatuses from "../utils/processdatastatuses";
+import processDataStatuses, {
+	processDataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import {
 	processPartnersDownload,
 	processRegionsDownload,
@@ -105,6 +107,15 @@ function MainContainer() {
 				inDataLists,
 			}),
 		[data, fund, tranche, inDataLists],
+	);
+
+	const dataStatusesBeneficiaries = useMemo(
+		() =>
+			processDataStatusesBeneficiaries({
+				totalBeneficiariesData,
+				fund,
+			}),
+		[totalBeneficiariesData, fund],
 	);
 
 	const lollipopData = useMemo(
@@ -290,6 +301,7 @@ function MainContainer() {
 			/>
 			<ProjectStatuses
 				dataStatuses={dataStatuses}
+				dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 				status={status}
 				setStatus={setStatus}
 				lists={lists}

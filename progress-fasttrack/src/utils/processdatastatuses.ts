@@ -1,4 +1,4 @@
-import { Data } from "./processrawdata";
+import { Data, TotalBeneficiariesData } from "./processrawdata";
 import { List } from "./makelists";
 import { InDataLists } from "./processrawdata";
 import { ImplementationStatuses, Tranche } from "../components/MainContainer";
@@ -6,6 +6,10 @@ import constants from "./constants";
 
 export type DataStatuses = {
 	[K in ImplementationStatuses]: number;
+};
+
+export type DataStatusesBeneficiaries = {
+	[K in ImplementationStatuses]?: { targeted: number; reached: number };
 };
 
 type ProcessDataStatusesParams = {
@@ -56,6 +60,37 @@ function processDataStatuses({
 	});
 
 	return dataStatuses;
+}
+
+export function processDataStatusesBeneficiaries({
+	totalBeneficiariesData,
+	fund,
+	lists,
+}: {
+	totalBeneficiariesData: TotalBeneficiariesData;
+	fund: number[];
+	lists: List;
+}): DataStatusesBeneficiaries {
+	const dataStatusesBeneficiaries: DataStatusesBeneficiaries = {};
+
+	fund.forEach(pf => {
+		const thisFundData = totalBeneficiariesData[pf];
+		if (!thisFundData) return;
+
+		Object.entries(thisFundData).forEach(([st, statusData]) => {
+			if (st === "all") return;
+			const status = lists.statuses[+st] as ImplementationStatuses;
+			if (!status) return;
+			const thisStatus = (dataStatusesBeneficiaries[status] ??= {
+				targeted: 0,
+				reached: 0,
+			});
+			thisStatus.targeted += statusData.total.targeted;
+			thisStatus.reached += statusData.total.reached;
+		});
+	});
+
+	return dataStatusesBeneficiaries;
 }
 
 export default processDataStatuses;

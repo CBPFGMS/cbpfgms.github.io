@@ -1,8 +1,16 @@
 import type { Tranche } from "../components/MainContainer";
-import type { Data, InDataLists } from "./processrawdata";
+import type {
+	Data,
+	InDataLists,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 
 export type DataStatuses = {
 	[key: number]: number;
+};
+
+export type DataStatusesBeneficiaries = {
+	[key: number]: { targeted: number; reached: number };
 };
 
 type ProcessDataStatusesParams = {
@@ -36,6 +44,33 @@ function processDataStatuses({
 	setStatus(Object.keys(dataStatuses).map(d => +d));
 
 	return dataStatuses;
+}
+
+export function processDataStatusesBeneficiaries({
+	totalBeneficiariesData,
+	fund,
+}: {
+	totalBeneficiariesData: TotalBeneficiariesData;
+	fund: number[];
+}): DataStatusesBeneficiaries {
+	const dataStatusesBeneficiaries: DataStatusesBeneficiaries = {};
+
+	fund.forEach(pf => {
+		const thisFundData = totalBeneficiariesData[pf];
+		if (!thisFundData) return;
+
+		Object.entries(thisFundData).forEach(([st, statusData]) => {
+			if (st === "all") return;
+			const thisStatus = (dataStatusesBeneficiaries[+st] ??= {
+				targeted: 0,
+				reached: 0,
+			});
+			thisStatus.targeted += statusData.targeted;
+			thisStatus.reached += statusData.reached;
+		});
+	});
+
+	return dataStatusesBeneficiaries;
 }
 
 export default processDataStatuses;

@@ -27,6 +27,8 @@ const constants = {
 		6: "Project Closure",
 	},
 	submissionAndUnderApprovalProjects: [1, 2, 3],
+	//projects skipped by their ProjectStatusCode
+	excludedProjectStatusCodes: ['PRJ_DRFT', 'PRJ_REJECTED','PRJ_TO_BE_DELETED', 'PRJ_WITHDRAWN', 'PRJ_TR_NON_RECOMM', 'PRJ_CANCELLED'],
 	implementationAndReportingProjects: [4, 5, 6],
 	disclaimerWarningColor: "#e07b00",
 	disclaimerText:

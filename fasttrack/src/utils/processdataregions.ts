@@ -5,6 +5,7 @@ import type {
 } from "./processrawdata";
 import type { List } from "./makelists";
 import { simpleWarn } from "./warninvalid";
+import { capToFundTotal, sumSelectedStatuses } from "./processdatatopfigures";
 import type { Tranche } from "../components/MainContainer";
 
 type ProcessDataRegionsParams = {
@@ -68,38 +69,63 @@ function processDataRegions({
 		}
 	});
 
+	//same rule as the top figures: unique ("all") figures only when every
+	//status in the filter is selected, otherwise the sum of the selected
+	//statuses, limited to each fund's unique total
+	const allStatusesSelected = [...inDataLists.projectStatuses].every(st =>
+		status.includes(st),
+	);
+
 	fund.forEach(pf => {
 		if (!totalBeneficiariesData[pf]) {
 			return;
 		}
 
-		const thisRegion = dataRegions.find(d => d.funds.has(pf));
+		//the region comes from the regions master list, not from the projects
+		//in the selection, so every fund counted in the top figures is also
+		//counted here and the regions always add up to the top figures
+		const thisRegionName = lists.regions.find(d =>
+			d.funds.has(pf),
+		)?.regionName;
 
-		if (!thisRegion) {
+		if (!thisRegionName) {
 			simpleWarn(`Pooled fund code ${pf} not found in the regions data`);
 			return;
 		}
 
-		const allStatuses = [...inDataLists.statusesPerFund[pf]];
-		const fundHasAllStatuses = allStatuses.every(pfStatus =>
-			status.includes(pfStatus),
-		);
+		const fundFigures = allStatusesSelected
+			? totalBeneficiariesData[pf].all
+			: capToFundTotal(
+					sumSelectedStatuses(totalBeneficiariesData, pf, status),
+					totalBeneficiariesData[pf].all,
+				);
 
-		if (fundHasAllStatuses) {
-			thisRegion.targeted += totalBeneficiariesData[pf].all.targeted;
-			thisRegion.reached += totalBeneficiariesData[pf].all.reached;
-			thisRegion.reachedProjects +=
-				totalBeneficiariesData[pf].all.reachedProjects;
-		} else {
-			status.forEach(st => {
-				thisRegion.targeted +=
-					totalBeneficiariesData[pf][st]?.targeted || 0;
-				thisRegion.reached +=
-					totalBeneficiariesData[pf][st]?.reached || 0;
-				thisRegion.reachedProjects +=
-					totalBeneficiariesData[pf][st]?.reachedProjects || 0;
-			});
+		if (
+			!fundFigures.targeted &&
+			!fundFigures.reached &&
+			!fundFigures.reachedProjects
+		) {
+			return;
 		}
+
+		let thisRegion = dataRegions.find(d => d.region === thisRegionName);
+
+		if (!thisRegion) {
+			thisRegion = {
+				region: thisRegionName,
+				funds: new Set(),
+				budget: 0,
+				targeted: 0,
+				reached: 0,
+				reachedProjects: 0,
+			};
+			dataRegions.push(thisRegion);
+		}
+
+		thisRegion.funds.add(pf);
+		thisRegion.targeted += fundFigures.targeted;
+		thisRegion.reached += fundFigures.reached;
+		thisRegion.reachedProjects += fundFigures.reachedProjects;
 	});
 
 	return dataRegions;
