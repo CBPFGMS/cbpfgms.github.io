@@ -396,13 +396,17 @@ function processRawData({
 				]);
 			}
 
-			Object.entries(projectsPerTranche).forEach(([tranche, projects]) => {
-				if (projects.has(row.ChfProjectCode)) {
-					((statusesPerFundPerTranche[+tranche] ??= {})[
-						row.PooledFundId
-					] ??= new Set()).add(projectStatusMapping[row.ProcessSTatusID]);
-				}
-			});
+			Object.entries(projectsPerTranche).forEach(
+				([tranche, projects]) => {
+					if (projects.has(row.ChfProjectCode)) {
+						((statusesPerFundPerTranche[+tranche] ??= {})[
+							row.PooledFundId
+						] ??= new Set()).add(
+							projectStatusMapping[row.ProcessSTatusID],
+						);
+					}
+				},
+			);
 
 			if (projectsPerFund[row.PooledFundId]) {
 				projectsPerFund[row.PooledFundId].add(row.ChfProjectCode);
@@ -565,7 +569,10 @@ function populateTotalBeneficiariesData(
 		Object.entries(fundData).forEach(([status, statusData]) => {
 			if (status === "all") return;
 			if (all.targeted)
-				statusData.targeted = Math.min(statusData.targeted, all.targeted);
+				statusData.targeted = Math.min(
+					statusData.targeted,
+					all.targeted,
+				);
 			if (all.reached)
 				statusData.reached = Math.min(statusData.reached, all.reached);
 			if (all.reachedProjects)
