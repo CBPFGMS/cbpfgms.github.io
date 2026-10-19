@@ -24,3 +24,6 @@ data/
 *.njsproj
 *.sln
 *.sw?
+
+# Yarn files
+.yarn/*
