@@ -24,3 +24,6 @@ data/
 *.njsproj
 *.sln
 *.sw?
+
+# Block all internal Yarn files by default
+.yarn/*
