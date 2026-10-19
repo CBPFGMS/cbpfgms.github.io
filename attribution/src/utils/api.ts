@@ -74,7 +74,7 @@ type ReceiveDataArgs = [
 	AllocationSourcesMasterObject[],
 	PooledFundsWithRegionMasterObject[],
 	DonorsMasterObject[],
-	Record<string, unknown>[],
+	ProjectClusterOneGmsObject[],
 ];
 
 const { fundType, currentYear } = constants;
@@ -299,7 +299,7 @@ export async function fetchAppData(
 			progressStore.increment,
 		),
 		trackProgress(
-			fetchFileDB<Record<string, unknown>[]>(
+			fetchFileDB<ProjectClusterOneGmsObject[]>(
 				"projectClusterOneGms",
 				projectClusterOneGmsUrl,
 				"csv",
@@ -403,17 +403,12 @@ export async function fetchAppData(
 }
 
 function parseProjectClusterData(
-	rows: Record<string, unknown>[],
+	rows: ProjectClusterOneGmsObject[],
 ): ProjectClusterOneGmsObject[] {
 	const parsedRows: ProjectClusterOneGmsObject[] = [];
 
 	rows.forEach(row => {
-		const trimmedRow: Record<string, unknown> = {};
-		for (const [key, value] of Object.entries(row)) {
-			trimmedRow[key.trim()] = value;
-		}
-
-		const parsedRow = projectClusterOneGmsObjectSchema.safeParse(trimmedRow);
+		const parsedRow = projectClusterOneGmsObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			parsedRows.push(parsedRow.data);
 		} else {
