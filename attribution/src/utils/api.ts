@@ -402,6 +402,7 @@ export async function fetchAppData(
 	}
 }
 
+//TODO: Instead of passing the cluster data to the component, pass it to processRawData and process it there, adding to the allocationsData.
 function parseProjectClusterData(
 	rows: ProjectClusterOneGmsObject[],
 ): ProjectClusterOneGmsObject[] {
