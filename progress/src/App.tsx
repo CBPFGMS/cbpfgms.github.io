@@ -19,15 +19,34 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		loading,
 		error,
 		progress,
+		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByDisabilityData,
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+		totalFiles,
 	} = useData(defaultFundType, startYear);
 
 	return loading ? (
-		<Loading progress={progress} />
+		<Loading
+			progress={progress}
+			totalFiles={totalFiles}
+		/>
 	) : error ? (
 		<Error error={error} />
 	) : (
 		<DataContext.Provider
-			value={{ data, dataIndicators, lists, inDataLists }}
+			value={{
+				data,
+				dataIndicators,
+				lists,
+				inDataLists,
+				totalBeneficiariesByBeneficiaryTypeData,
+				totalBeneficiariesByDisabilityData,
+				totalBeneficiariesData,
+				totalBeneficiariesByPartnerData,
+				totalBeneficiariesBySectorData,
+			}}
 		>
 			<MainContainer defaultYear={defaultYear} />
 		</DataContext.Provider>

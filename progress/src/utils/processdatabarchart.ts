@@ -1,4 +1,11 @@
-import { Data } from "./processrawdata";
+import {
+	Data,
+	InDataLists,
+	TotalBeneficiariesByBeneficiaryTypeData,
+	TotalBeneficiariesByPartnerData,
+	TotalBeneficiariesBySectorData,
+	TotalBeneficiariesData,
+} from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import calculateStatus from "./calculatestatus";
@@ -24,11 +31,16 @@ type ProcessDataBarChartParams = {
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	showFinanciallyClosed: boolean;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByDisabilityData: TotalBeneficiariesData;
+	inDataLists: InDataLists;
 };
 
 type BeneficiariesEntry = [
 	key: keyof BeneficiariesObject,
-	value: BeneficiariesObject[keyof BeneficiariesObject]
+	value: BeneficiariesObject[keyof BeneficiariesObject],
 ];
 
 const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
@@ -42,6 +54,11 @@ function processDataBarChart({
 	implementationStatus,
 	lists,
 	showFinanciallyClosed,
+	totalBeneficiariesByPartnerData,
+	totalBeneficiariesBySectorData,
+	totalBeneficiariesByBeneficiaryTypeData,
+	totalBeneficiariesByDisabilityData,
+	inDataLists,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -76,7 +93,7 @@ function processDataBarChart({
 		) {
 			for (const type in datum.reachedByBeneficiaryType) {
 				const foundType = dataBeneficiaryByType.find(
-					d => d.type === parseInt(type)
+					d => d.type === parseInt(type),
 				);
 				if (foundType) {
 					beneficiaryCategories.forEach(genderAndAge => {
@@ -89,7 +106,7 @@ function processDataBarChart({
 			}
 			for (const type in datum.targetedByBeneficiaryType) {
 				const foundType = dataBeneficiaryByType.find(
-					d => d.type === parseInt(type)
+					d => d.type === parseInt(type),
 				);
 				if (foundType) {
 					beneficiaryCategories.forEach(genderAndAge => {
@@ -102,7 +119,7 @@ function processDataBarChart({
 			}
 
 			const foundOrganization = dataOrganization.find(
-				d => d.type === datum.organizationType
+				d => d.type === datum.organizationType,
 			);
 
 			if (foundOrganization) {
@@ -135,7 +152,7 @@ function processDataBarChart({
 
 			datum.sectorData.forEach(sectorDatum => {
 				const foundSector = dataSector.find(
-					d => d.type === sectorDatum.sectorId
+					d => d.type === sectorDatum.sectorId,
 				);
 
 				if (foundSector) {
@@ -151,7 +168,7 @@ function processDataBarChart({
 					const type = sectorDatum.sectorId;
 					const targeted = (
 						Object.entries(
-							sectorDatum.targeted
+							sectorDatum.targeted,
 						) as BeneficiariesEntry[]
 					).reduce((acc, [key, value]) => {
 						acc[key] = value;
@@ -159,7 +176,7 @@ function processDataBarChart({
 					}, {} as BeneficiariesObject);
 					const reached = (
 						Object.entries(
-							sectorDatum.reached
+							sectorDatum.reached,
 						) as BeneficiariesEntry[]
 					).reduce((acc, [key, value]) => {
 						acc[key] = value;
@@ -178,13 +195,13 @@ function processDataBarChart({
 	});
 
 	dataBeneficiaryByType.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 	dataOrganization.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 	dataSector.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 
 	return { dataBeneficiaryByType, dataOrganization, dataSector };

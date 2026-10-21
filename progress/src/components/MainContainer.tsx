@@ -10,10 +10,13 @@ import TopIntro from "./TopIntro";
 import useUpdateQueryString from "../hooks/useupdatequerystring";
 import FiltersContainer from "./FiltersContainer";
 import processDataSummary from "../utils/processdatasummary";
-import processDataStatuses from "../utils/processdatastatuses";
+import processDataStatuses, {
+	processDataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
 import IndicatorsContainer from "./IndicatorsContainer";
+import processDataTotalBeneficiaries from "../utils/processdatatotalben";
 
 const { implementationStatuses, charts } = constants;
 
@@ -35,7 +38,7 @@ export type ImplementationStatuses = (typeof implementationStatuses)[number];
 
 const downloadStates = charts.reduce(
 	(acc, chart) => ((acc[chart] = false), acc),
-	{} as DownloadStates
+	{} as DownloadStates,
 );
 
 const refIdSuffix = "RefId";
@@ -50,9 +53,17 @@ const queryStringValues = new URLSearchParams(location.search);
 const showFinanciallyClosed = queryStringValues.has("showFinanciallyClosed");
 
 function MainContainer({ defaultYear }: MainContainerProps) {
-	const { data, dataIndicators, inDataLists, lists } = useContext(
-		DataContext
-	) as DataContextType;
+	const {
+		data,
+		dataIndicators,
+		inDataLists,
+		lists,
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByDisabilityData,
+	} = useContext(DataContext) as DataContextType;
 
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
@@ -68,8 +79,8 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			showFinanciallyClosed
 				? [...implementationStatuses]
 				: implementationStatuses.filter(
-						status => status !== "Financially Closed"
-				  )
+						status => status !== "Financially Closed",
+					),
 		),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
@@ -95,6 +106,18 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
 	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
+	const targetedAndReachedTotal = useMemo(
+		() =>
+			processDataTotalBeneficiaries({
+				totalBeneficiariesData,
+				year,
+				fund,
+				implementationStatus,
+				lists,
+			}),
+		[totalBeneficiariesData, year, fund, implementationStatus, lists],
+	);
+
 	const dataStatuses = useMemo(
 		() =>
 			processDataStatuses({
@@ -106,7 +129,18 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				lists,
 				showFinanciallyClosed,
 			}),
-		[data, year, fund, allocationSource, allocationType, lists]
+		[data, year, fund, allocationSource, allocationType, lists],
+	);
+
+	const dataStatusesBeneficiaries = useMemo(
+		() =>
+			processDataStatusesBeneficiaries({
+				totalBeneficiariesData,
+				year,
+				fund,
+				lists,
+			}),
+		[totalBeneficiariesData, year, fund, lists],
 	);
 
 	const {
@@ -138,7 +172,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			allocationType,
 			implementationStatus,
 			lists,
-		]
+		],
 	);
 
 	const { dataBeneficiaryByType, dataSector, dataOrganization } = useMemo(
@@ -161,7 +195,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			allocationType,
 			implementationStatus,
 			lists,
-		]
+		],
 	);
 
 	useUpdateQueryString({

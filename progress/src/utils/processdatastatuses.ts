@@ -1,4 +1,4 @@
-import { Data } from "./processrawdata";
+import { Data, TotalBeneficiariesData } from "./processrawdata";
 import { List } from "./makelists";
 import calculateStatus from "./calculatestatus";
 import { ImplementationStatuses } from "../components/MainContainer";
@@ -9,6 +9,10 @@ export type DataStatuses = {
 } & Partial<{
 	[K in Extract<ImplementationStatuses, "Financially Closed">]: number;
 }>;
+
+export type DataStatusesBeneficiaries = {
+	[K in ImplementationStatuses]?: { targeted: number; reached: number };
+};
 
 type ProcessDataStatusesParams = {
 	data: Data;
@@ -39,7 +43,7 @@ function processDataStatuses({
 			acc[curr] = 0;
 			return acc;
 		},
-		{} as DataStatuses
+		{} as DataStatuses,
 	);
 
 	data.forEach(datum => {
@@ -55,6 +59,41 @@ function processDataStatuses({
 	});
 
 	return dataStatuses;
+}
+
+export function processDataStatusesBeneficiaries({
+	totalBeneficiariesData,
+	year,
+	fund,
+	lists,
+}: {
+	totalBeneficiariesData: TotalBeneficiariesData;
+	year: number[];
+	fund: number[];
+	lists: List;
+}): DataStatusesBeneficiaries {
+	const dataStatusesBeneficiaries: DataStatusesBeneficiaries = {};
+
+	year.forEach(selectedYear => {
+		fund.forEach(pf => {
+			const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
+			if (!thisFundData) return;
+
+			Object.entries(thisFundData).forEach(([st, statusData]) => {
+				if (st === "all") return;
+				const status = lists.statuses[+st] as ImplementationStatuses;
+				if (!status) return;
+				const thisStatus = (dataStatusesBeneficiaries[status] ??= {
+					targeted: 0,
+					reached: 0,
+				});
+				thisStatus.targeted += statusData.total.targeted;
+				thisStatus.reached += statusData.total.reached;
+			});
+		});
+	});
+
+	return dataStatusesBeneficiaries;
 }
 
 export default processDataStatuses;
