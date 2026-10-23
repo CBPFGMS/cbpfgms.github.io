@@ -20,8 +20,12 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
 
-const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
-	constants;
+const {
+	beneficiariesSplitOrder,
+	beneficiaryCategories,
+	reportTypes,
+	implementationAndReportingProjects,
+} = constants;
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -133,6 +137,11 @@ type ProcessRawDataParams = {
 	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
 	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
 	totalBeneficiariesByDisability: TotalBeneficiariesObject[];
+	totalBeneficiariesWithAllocType: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartnerWithAllocType: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySectorWithAllocType: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesByBeneficiaryTypeWithAllocType: TotalBeneficiariesByBeneficiaryTypeObject[];
+	totalBeneficiariesByDisabilityWithAllocType: TotalBeneficiariesObject[];
 };
 
 type TargetedAndReached = {
@@ -147,6 +156,15 @@ export type TotalBeneficiariesBreakdown = {
 export type TotalBeneficiariesData = {
 	[year: number]: {
 		[fund: number]: {
+			[status: number]: TotalBeneficiariesBreakdown;
+			all: TotalBeneficiariesBreakdown;
+		};
+	};
+};
+
+export type TotalBeneficiariesWithAllocTypeData = {
+	[year: number]: {
+		[allocType: number]: {
 			[status: number]: TotalBeneficiariesBreakdown;
 			all: TotalBeneficiariesBreakdown;
 		};
@@ -168,6 +186,15 @@ export type TotalBeneficiariesByPartnerData = {
 	};
 };
 
+export type TotalBeneficiariesByPartnerWithAllocTypeData = {
+	[year: number]: {
+		[allocType: number]: {
+			[status: number]: TotalBeneficiariesByPartnerBreakdown[];
+			all: TotalBeneficiariesByPartnerBreakdown[];
+		};
+	};
+};
+
 type TotalBeneficiariesBySectorBreakdown = {
 	[key in GenderAndAge]: TargetedAndReached;
 } & {
@@ -177,6 +204,15 @@ type TotalBeneficiariesBySectorBreakdown = {
 export type TotalBeneficiariesBySectorData = {
 	[year: number]: {
 		[fund: number]: {
+			[status: number]: TotalBeneficiariesBySectorBreakdown[];
+			all: TotalBeneficiariesBySectorBreakdown[];
+		};
+	};
+};
+
+export type TotalBeneficiariesBySectorWithAllocTypeData = {
+	[year: number]: {
+		[allocType: number]: {
 			[status: number]: TotalBeneficiariesBySectorBreakdown[];
 			all: TotalBeneficiariesBySectorBreakdown[];
 		};
@@ -198,6 +234,15 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 	};
 };
 
+export type TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData = {
+	[year: number]: {
+		[allocType: number]: {
+			[status: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+			all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+		};
+	};
+};
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -210,6 +255,11 @@ function processRawData({
 	totalBeneficiariesBySector,
 	totalBeneficiariesByBeneficiaryType,
 	totalBeneficiariesByDisability,
+	totalBeneficiariesWithAllocType,
+	totalBeneficiariesByPartnerWithAllocType,
+	totalBeneficiariesBySectorWithAllocType,
+	totalBeneficiariesByBeneficiaryTypeWithAllocType,
+	totalBeneficiariesByDisabilityWithAllocType,
 }: ProcessRawDataParams): {
 	data: Data;
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -217,14 +267,31 @@ function processRawData({
 	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
 	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
 	totalBeneficiariesByDisabilityData: TotalBeneficiariesData;
+	totalBeneficiariesWithAllocTypeData: TotalBeneficiariesWithAllocTypeData;
+	totalBeneficiariesByPartnerWithAllocTypeData: TotalBeneficiariesByPartnerWithAllocTypeData;
+	totalBeneficiariesBySectorWithAllocTypeData: TotalBeneficiariesBySectorWithAllocTypeData;
+	totalBeneficiariesByBeneficiaryTypeWithAllocTypeData: TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData;
+	totalBeneficiariesByDisabilityWithAllocTypeData: TotalBeneficiariesWithAllocTypeData;
 } {
 	const data: Data = [];
+
 	const totalBeneficiariesData: TotalBeneficiariesData = {};
 	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
 	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
 	const totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData =
 		{};
 	const totalBeneficiariesByDisabilityData: TotalBeneficiariesData = {};
+
+	const totalBeneficiariesWithAllocTypeData: TotalBeneficiariesWithAllocTypeData =
+		{};
+	const totalBeneficiariesByPartnerWithAllocTypeData: TotalBeneficiariesByPartnerWithAllocTypeData =
+		{};
+	const totalBeneficiariesBySectorWithAllocTypeData: TotalBeneficiariesBySectorWithAllocTypeData =
+		{};
+	const totalBeneficiariesByBeneficiaryTypeWithAllocTypeData: TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData =
+		{};
+	const totalBeneficiariesByDisabilityWithAllocTypeData: TotalBeneficiariesWithAllocTypeData =
+		{};
 
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const emergenciesDataMap: Map<number, EmergencyDatum[]> = new Map();
@@ -402,18 +469,21 @@ function processRawData({
 		totalBeneficiaries,
 		totalBeneficiariesData,
 		"totalBeneficiaries",
+		false,
 	);
 
 	populateTotalBeneficiariesByPartnerData(
 		totalBeneficiariesByPartner,
 		totalBeneficiariesByPartnerData,
 		"totalBeneficiariesByPartner",
+		false,
 	);
 
 	populateTotalBeneficiariesBySectorData(
 		totalBeneficiariesBySector,
 		totalBeneficiariesBySectorData,
 		"totalBeneficiariesBySector",
+		false,
 	);
 
 	populateTotalBeneficiariesByBeneficiaryTypeData(
@@ -421,12 +491,50 @@ function processRawData({
 		totalBeneficiariesByBeneficiaryTypeData,
 		"totalBeneficiariesByBeneficiaryType",
 		fundsPerBeneficiaryType,
+		false,
 	);
 
 	populateTotalBeneficiariesData(
 		totalBeneficiariesByDisability,
 		totalBeneficiariesByDisabilityData,
 		"totalBeneficiariesByDisability",
+		false,
+	);
+
+	populateTotalBeneficiariesData(
+		totalBeneficiariesWithAllocType,
+		totalBeneficiariesWithAllocTypeData,
+		"totalBeneficiariesWithAllocType",
+		true,
+	);
+
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartnerWithAllocType,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		"totalBeneficiariesByPartnerWithAllocType",
+		true,
+	);
+
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySectorWithAllocType,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		"totalBeneficiariesBySectorWithAllocType",
+		true,
+	);
+
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryTypeWithAllocType,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		"totalBeneficiariesByBeneficiaryTypeWithAllocType",
+		fundsPerBeneficiaryType,
+		true,
+	);
+
+	populateTotalBeneficiariesData(
+		totalBeneficiariesByDisabilityWithAllocType,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
+		"totalBeneficiariesByDisabilityWithAllocType",
+		true,
 	);
 
 	projectSummary.forEach(row => {
@@ -590,6 +698,11 @@ function processRawData({
 		totalBeneficiariesBySectorData,
 		totalBeneficiariesByBeneficiaryTypeData,
 		totalBeneficiariesByDisabilityData,
+		totalBeneficiariesWithAllocTypeData,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
 	};
 }
 
@@ -674,10 +787,13 @@ function generateBeneficiariesObjectSummary(
 	};
 }
 
-function populateTotalBeneficiariesData(
+function populateTotalBeneficiariesData<
+	T extends TotalBeneficiariesData | TotalBeneficiariesWithAllocTypeData,
+>(
 	source: TotalBeneficiariesObject[],
-	target: TotalBeneficiariesData,
+	target: T,
 	sourceName: string,
+	isWithAllocType: boolean,
 ) {
 	source.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
@@ -687,13 +803,15 @@ function populateTotalBeneficiariesData(
 			return;
 		}
 		const year = row.ImplementationYear;
-		const fund = row.PFId;
+		const identifier = isWithAllocType
+			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			: row.PFId;
 
 		if (!target[year]) {
 			target[year] = {};
 		}
-		if (!target[year][fund]) {
-			target[year][fund] = {} as TotalBeneficiariesData[number][number];
+		if (!target[year][identifier]) {
+			target[year][identifier] = {} as T[number][number];
 		}
 
 		const totalDatum = {
@@ -720,16 +838,16 @@ function populateTotalBeneficiariesData(
 		};
 
 		if (row.ProcessStatusId == null) {
-			target[year][fund].all = totalDatum;
+			target[year][identifier].all = totalDatum;
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			if (!target[year][fund][thisStatus]) {
-				target[year][fund][thisStatus] = totalDatum;
+			if (!target[year][identifier][thisStatus]) {
+				target[year][identifier][thisStatus] = totalDatum;
 			} else {
 				addTargetedAndReached(
-					target[year][fund][thisStatus],
+					target[year][identifier][thisStatus],
 					totalDatum,
 					[...beneficiaryCategories, "total"],
 				);
@@ -738,10 +856,31 @@ function populateTotalBeneficiariesData(
 	});
 
 	Object.values(target).forEach(yearData => {
-		Object.values(yearData).forEach(fundData => {
-			Object.entries(fundData).forEach(([status, statusData]) => {
-				if (status !== "all" && fundData.all) {
-					capTargetedAndReached(statusData, fundData.all, [
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus => implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[Number(identifier)];
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (statusData && identifierData.all) {
+					capTargetedAndReached(statusData, identifierData.all, [
 						...beneficiaryCategories,
 						"total",
 					]);
@@ -751,10 +890,15 @@ function populateTotalBeneficiariesData(
 	});
 }
 
-function populateTotalBeneficiariesByPartnerData(
+function populateTotalBeneficiariesByPartnerData<
+	T extends
+		| TotalBeneficiariesByPartnerData
+		| TotalBeneficiariesByPartnerWithAllocTypeData,
+>(
 	source: TotalBeneficiariesByPartnerObject[],
-	target: TotalBeneficiariesByPartnerData,
+	target: T,
 	sourceName: string,
+	isWithAllocType: boolean,
 ) {
 	source.forEach(row => {
 		const parsedRow =
@@ -765,14 +909,15 @@ function populateTotalBeneficiariesByPartnerData(
 			return;
 		}
 		const year = row.ImplementationYear;
-		const fund = row.PFId;
+		const identifier = isWithAllocType
+			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			: row.PFId;
 
 		if (!target[year]) {
 			target[year] = {};
 		}
-		if (!target[year][fund]) {
-			target[year][fund] =
-				{} as TotalBeneficiariesByPartnerData[number][number];
+		if (!target[year][identifier]) {
+			target[year][identifier] = {} as T[number][number];
 		}
 
 		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
@@ -796,16 +941,16 @@ function populateTotalBeneficiariesByPartnerData(
 		};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][fund].all) {
-				target[year][fund].all = [partnersDatum];
+			if (!target[year][identifier].all) {
+				target[year][identifier].all = [partnersDatum];
 			} else {
-				target[year][fund].all.push(partnersDatum);
+				target[year][identifier].all.push(partnersDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][fund][thisStatus]?.find(
+			const foundDatum = target[year][identifier][thisStatus]?.find(
 				d => d.partner === partnersDatum.partner,
 			);
 			if (foundDatum) {
@@ -815,17 +960,40 @@ function populateTotalBeneficiariesByPartnerData(
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][fund][thisStatus] ??= []).push(partnersDatum);
+				(target[year][identifier][thisStatus] ??= []).push(
+					partnersDatum,
+				);
 			}
 		}
 	});
 
 	Object.values(target).forEach(yearData => {
-		Object.values(yearData).forEach(fundData => {
-			Object.entries(fundData).forEach(([status, statusData]) => {
-				if (status === "all") return;
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus => implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[Number(identifier)];
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (!statusData) return;
 				statusData.forEach(datum => {
-					const allDatum = fundData.all?.find(
+					const allDatum = identifierData.all?.find(
 						d => d.partner === datum.partner,
 					);
 					if (allDatum) {
@@ -841,10 +1009,15 @@ function populateTotalBeneficiariesByPartnerData(
 	});
 }
 
-function populateTotalBeneficiariesBySectorData(
+function populateTotalBeneficiariesBySectorData<
+	T extends
+		| TotalBeneficiariesBySectorData
+		| TotalBeneficiariesBySectorWithAllocTypeData,
+>(
 	source: TotalBeneficiariesBySectorObject[],
-	target: TotalBeneficiariesBySectorData,
+	target: T,
 	sourceName: string,
+	isWithAllocType: boolean,
 ) {
 	source.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
@@ -855,14 +1028,15 @@ function populateTotalBeneficiariesBySectorData(
 		}
 
 		const year = row.ImplementationYear;
-		const fund = row.PFId;
+		const identifier = isWithAllocType
+			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			: row.PFId;
 
 		if (!target[year]) {
 			target[year] = {};
 		}
-		if (!target[year][fund]) {
-			target[year][fund] =
-				{} as TotalBeneficiariesBySectorData[number][number];
+		if (!target[year][identifier]) {
+			target[year][identifier] = {} as T[number][number];
 		}
 
 		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
@@ -886,16 +1060,16 @@ function populateTotalBeneficiariesBySectorData(
 		};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][fund].all) {
-				target[year][fund].all = [sectorsDatum];
+			if (!target[year][identifier].all) {
+				target[year][identifier].all = [sectorsDatum];
 			} else {
-				target[year][fund].all.push(sectorsDatum);
+				target[year][identifier].all.push(sectorsDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][fund][thisStatus]?.find(
+			const foundDatum = target[year][identifier][thisStatus]?.find(
 				d => d.sector === sectorsDatum.sector,
 			);
 			if (foundDatum) {
@@ -905,17 +1079,40 @@ function populateTotalBeneficiariesBySectorData(
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][fund][thisStatus] ??= []).push(sectorsDatum);
+				(target[year][identifier][thisStatus] ??= []).push(
+					sectorsDatum,
+				);
 			}
 		}
 	});
 
 	Object.values(target).forEach(yearData => {
-		Object.values(yearData).forEach(fundData => {
-			Object.entries(fundData).forEach(([status, statusData]) => {
-				if (status === "all") return;
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus => implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[Number(identifier)];
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (!statusData) return;
 				statusData.forEach(datum => {
-					const allDatum = fundData.all?.find(
+					const allDatum = identifierData.all?.find(
 						d => d.sector === datum.sector,
 					);
 					if (allDatum) {
@@ -931,11 +1128,16 @@ function populateTotalBeneficiariesBySectorData(
 	});
 }
 
-function populateTotalBeneficiariesByBeneficiaryTypeData(
+function populateTotalBeneficiariesByBeneficiaryTypeData<
+	T extends
+		| TotalBeneficiariesByBeneficiaryTypeData
+		| TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+>(
 	source: TotalBeneficiariesByBeneficiaryTypeObject[],
-	target: TotalBeneficiariesByBeneficiaryTypeData,
+	target: T,
 	sourceName: string,
 	fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"],
+	isWithAllocType: boolean,
 ) {
 	source.forEach(row => {
 		const parsedRow =
@@ -946,7 +1148,9 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 			return;
 		}
 		const year = row.ImplementationYear;
-		const fund = row.PFId;
+		const identifier = isWithAllocType
+			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			: row.PFId;
 
 		if (!target[year]) {
 			target[year] = {};
@@ -955,11 +1159,10 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 			fundsPerBeneficiaryType[row.BeneficiaryTypeId] = new Set();
 		}
 
-		fundsPerBeneficiaryType[row.BeneficiaryTypeId].add(fund);
+		fundsPerBeneficiaryType[row.BeneficiaryTypeId].add(identifier);
 
-		if (!target[year][fund]) {
-			target[year][fund] =
-				{} as TotalBeneficiariesByBeneficiaryTypeData[number][number];
+		if (!target[year][identifier]) {
+			target[year][identifier] = {} as T[number][number];
 		}
 
 		const beneficiaryTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown =
@@ -984,16 +1187,16 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 			};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][fund].all) {
-				target[year][fund].all = [beneficiaryTypeDatum];
+			if (!target[year][identifier].all) {
+				target[year][identifier].all = [beneficiaryTypeDatum];
 			} else {
-				target[year][fund].all.push(beneficiaryTypeDatum);
+				target[year][identifier].all.push(beneficiaryTypeDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][fund][thisStatus]?.find(
+			const foundDatum = target[year][identifier][thisStatus]?.find(
 				d => d.beneficiaryType === beneficiaryTypeDatum.beneficiaryType,
 			);
 			if (foundDatum) {
@@ -1003,7 +1206,7 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][fund][thisStatus] ??= []).push(
+				(target[year][identifier][thisStatus] ??= []).push(
 					beneficiaryTypeDatum,
 				);
 			}
@@ -1011,11 +1214,11 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 	});
 
 	Object.values(target).forEach(yearData => {
-		Object.values(yearData).forEach(fundData => {
-			Object.entries(fundData).forEach(([status, statusData]) => {
+		Object.values(yearData).forEach(identifierData => {
+			Object.entries(identifierData).forEach(([status, statusData]) => {
 				if (status === "all") return;
 				statusData.forEach(datum => {
-					const allDatum = fundData.all?.find(
+					const allDatum = identifierData.all?.find(
 						d => d.beneficiaryType === datum.beneficiaryType,
 					);
 					if (allDatum) {

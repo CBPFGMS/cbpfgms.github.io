@@ -114,6 +114,7 @@ const constants = {
 	},
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
+	implementationAndReportingProjects: [4, 5, 6],
 } as const;
 
 export const projectStatusMaster = {

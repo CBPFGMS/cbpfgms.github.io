@@ -25,6 +25,11 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 		totalBeneficiariesByPartnerData,
 		totalBeneficiariesBySectorData,
 		totalFiles,
+		totalBeneficiariesWithAllocTypeData,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
 	} = useData(defaultFundType, startYear);
 
 	return loading ? (
@@ -46,6 +51,11 @@ function App({ defaultYear, defaultFundType, startYear }: AppProps) {
 				totalBeneficiariesData,
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
+				totalBeneficiariesWithAllocTypeData,
+				totalBeneficiariesByPartnerWithAllocTypeData,
+				totalBeneficiariesBySectorWithAllocTypeData,
+				totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+				totalBeneficiariesByDisabilityWithAllocTypeData,
 			}}
 		>
 			<MainContainer defaultYear={defaultYear} />

@@ -63,7 +63,27 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		totalBeneficiariesBySectorData,
 		totalBeneficiariesByBeneficiaryTypeData,
 		totalBeneficiariesByDisabilityData,
+		totalBeneficiariesWithAllocTypeData,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
 	} = useContext(DataContext) as DataContextType;
+
+	console.log(
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByDisabilityData,
+		totalBeneficiariesWithAllocTypeData,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
+	);
+
+	return;
 
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),

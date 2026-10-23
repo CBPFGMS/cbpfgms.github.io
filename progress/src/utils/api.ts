@@ -34,7 +34,7 @@ import {
 } from "./schemas";
 import trackProgress from "./trackprogress";
 
-type UseDataReturn = {
+export type UseDataReturn = {
 	data: Data;
 	dataIndicators: GlobalIndicatorsObject[];
 	lists: List;
@@ -125,7 +125,7 @@ function useData(
 	const fundType = defaultFundType ? defaultFundType : "",
 		yearRange = startYear ? `${startYear}_${new Date().getFullYear()}` : "";
 
-	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
+	const projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY_V4&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${fundType}&$format=csv`,
 		globalIndicatorsUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_INDIC&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=&IndicatorTypeId=&FundTypeId=${fundType}&$format=csv`,
 		emergenciesDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=${fundType}&$format=csv`,
@@ -480,6 +480,11 @@ function useData(
 				totalBeneficiariesBySector,
 				totalBeneficiariesByBeneficiaryType,
 				totalBeneficiariesByDisability,
+				totalBeneficiariesWithAllocType,
+				totalBeneficiariesByPartnerWithAllocType,
+				totalBeneficiariesBySectorWithAllocType,
+				totalBeneficiariesByBeneficiaryTypeWithAllocType,
+				totalBeneficiariesByDisabilityWithAllocType,
 			});
 
 			setData(data);

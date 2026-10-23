@@ -101,12 +101,15 @@ export const projectSummaryObjectSchema = z.object({
 	PrjApprDate: z.string().regex(dateRegex, "Invalid date format"),
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
+	ProjectStatusCode: z.string().nullable(),
+	ProcessStatus: z.string(),
+	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
 	PooledFundName: z.string(),
 	PooledFundId: z.number().int().nonnegative(),
-	AllocationTypeId: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ChfId: z.number().int().nonnegative(),
 	ChfProjectCode: z.string(),
 	CountryClusterId: z.number().int().nonnegative(),
@@ -164,6 +167,7 @@ export const totalBeneficiariesObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BenM: z.number().int().nonnegative().nullable(),
@@ -184,6 +188,7 @@ export const totalBeneficiariesByPartnerObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	PartnerType: z.string(),
@@ -206,6 +211,7 @@ export const totalBeneficiariesBySectorObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	GlobalCluster: z.string(),
@@ -228,6 +234,7 @@ export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
 	PFId: z.number().int().nonnegative(),
 	PFName: z.string(),
 	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ProcessStatus: z.string().nullable(),
 	ProcessStatusId: z.number().int().nonnegative().nullable(),
 	BeneficiaryTypeId: z.number().int().nonnegative(),
@@ -278,7 +285,7 @@ export const allocationTypesMasterObjectSchema = z.object({
 	TotalUnderApprovalBudget: z.number().nonnegative(),
 	TotalProjectsApproved: z.number().int().nonnegative(),
 	TotalApprovedBudget: z.number().nonnegative(),
-	AllocationTypeId: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	FundTypeId: z.union([z.literal(1), z.literal(2)]),
 });
 
