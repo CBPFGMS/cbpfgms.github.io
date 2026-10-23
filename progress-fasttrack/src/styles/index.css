@@ -12,6 +12,7 @@
 	--ocha-blue: #1f69b3;
 	--ocha-blue-lighter: #82b5e9;
 	--ocha-blue-darker: #144372;
+	--ocha-amber: #ba7517;
 }
 
 .xAxisTopChart path,
@@ -264,7 +265,6 @@ table td {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 10px;
 }
 .status-card-people {
 	display: flex;
@@ -278,16 +278,20 @@ table td {
 .status-label-pt {
 	display: flex;
 	align-items: baseline;
+	flex-direction: row;
+	justify-content: flex-end;
+	color: #333;
 }
 .status-label-pt span {
-	font-size: 10px;
-	font-weight: 700;
-	margin-right: 10px;
-	letter-spacing:-1px;
+	font-size: 0.95em;
+	font-weight: 400;
+	letter-spacing: -0.5px;
+	min-width: 4.2em;
+	text-align: right;
 }
 .status-label-pt .status-label-pt-value {
 	font-size: 18px;
-	font-weight: 600;
+	font-weight: 700;
 	margin: 0;
 	white-space: nowrap;
 }
@@ -297,10 +301,10 @@ table td {
 	margin-right: 0;
 }
 .status-label-pt-targeted {
-	color: #f79a3b;
+	color: var(--ocha-amber);
 }
 .status-label-pt-reached {
-	color: #418fde;
+	color: var(--ocha-blue);
 }
 .status-card-footer {
 	display: flex;
