@@ -5,7 +5,6 @@ import {
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
 	PooledFundsMasterObject,
-	ProjectStatusMasterObject,
 	SectorsMasterObject,
 	GlobalIndicatorsMasterObject,
 	pooledFundsMasterObjectSchema,
@@ -15,7 +14,6 @@ import {
 	organizationTypesMasterObjectSchema,
 	sectorsMasterObjectSchema,
 	organizationMasterObjectSchema,
-	projectStatusMasterObjectSchema,
 	globalIndicatorsMasterObjectSchema,
 	EmergenciesMasterObject,
 	emergenciesMasterObjectSchema,
@@ -24,11 +22,11 @@ import {
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
 import { GenderAndAge, ReportType } from "./processrawdata";
+import { projectStatusMaster } from "./constants";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
 	organizationMaster: OrganizationMasterObject[];
-	projectStatusMaster: ProjectStatusMasterObject[];
 	beneficiaryTypesMaster: BeneficiaryTypesMasterObject[];
 	pooledFundsMaster: PooledFundsMasterObject[];
 	allocationSourcesMaster: AllocationSourcesMasterObject[];
@@ -111,12 +109,12 @@ export type List = {
 		emergencyCategories: Map<number, EmergencyCategories>;
 	};
 	cvaTypeNames: ListObj;
+	allocTypesPerSource: { [allocationSource: number]: Set<number> };
 };
 
 function makeLists({
 	allocationTypesMaster,
 	organizationMaster,
-	projectStatusMaster,
 	beneficiaryTypesMaster,
 	pooledFundsMaster,
 	allocationSourcesMaster,
@@ -138,7 +136,7 @@ function makeLists({
 		organizations: {},
 		organizationsCompleteList: {},
 		sectors: {},
-		statuses: {},
+		statuses: projectStatusMaster,
 		globalIndicators: {},
 		globalIndicatorsDetails: new Map(),
 		projectDetails: new Map(),
@@ -151,6 +149,7 @@ function makeLists({
 			emergencyCategories: new Map(),
 		},
 		cvaTypeNames: {},
+		allocTypesPerSource: {},
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -163,7 +162,7 @@ function makeLists({
 			warnInvalidSchema(
 				"PooledFundsMaster",
 				d,
-				JSON.stringify(parsedFundMaster.error)
+				JSON.stringify(parsedFundMaster.error),
 			);
 		}
 	});
@@ -177,7 +176,7 @@ function makeLists({
 			warnInvalidSchema(
 				"BeneficiaryTypesMaster",
 				d,
-				JSON.stringify(parsedBeneficiariesMaster.error)
+				JSON.stringify(parsedBeneficiariesMaster.error),
 			);
 		}
 	});
@@ -192,11 +191,14 @@ function makeLists({
 			lists.allocationTypesCompleteList[
 				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
 			] = d;
+			(lists.allocTypesPerSource[d.AllocationSourceId] ??= new Set()).add(
+				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`),
+			);
 		} else {
 			warnInvalidSchema(
 				"AllocationTypeMaster",
 				d,
-				JSON.stringify(parsedAllocationTypeMaster.error)
+				JSON.stringify(parsedAllocationTypeMaster.error),
 			);
 		}
 	});
@@ -210,7 +212,7 @@ function makeLists({
 			warnInvalidSchema(
 				"AllocationSourcesMaster",
 				d,
-				JSON.stringify(parsedAllocationSourcesMaster.error)
+				JSON.stringify(parsedAllocationSourcesMaster.error),
 			);
 		}
 	});
@@ -224,7 +226,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationTypesMaster",
 				d,
-				JSON.stringify(parsedOrganizationTypesMaster.error)
+				JSON.stringify(parsedOrganizationTypesMaster.error),
 			);
 		}
 	});
@@ -237,7 +239,7 @@ function makeLists({
 			warnInvalidSchema(
 				"SectorsMaster",
 				d,
-				JSON.stringify(parsedSectorsMaster.error)
+				JSON.stringify(parsedSectorsMaster.error),
 			);
 		}
 	});
@@ -252,21 +254,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationMaster",
 				d,
-				JSON.stringify(parsedOrganizationMaster.error)
-			);
-		}
-	});
-
-	projectStatusMaster.forEach(d => {
-		const parsedProjectStatusMaster =
-			projectStatusMasterObjectSchema.safeParse(d);
-		if (parsedProjectStatusMaster.success) {
-			lists.statuses[d.GlobalInstanceStatusId] = d.StatusCode;
-		} else {
-			warnInvalidSchema(
-				"ProjectStatusMaster",
-				d,
-				JSON.stringify(parsedProjectStatusMaster.error)
+				JSON.stringify(parsedOrganizationMaster.error),
 			);
 		}
 	});
@@ -279,7 +267,7 @@ function makeLists({
 			warnInvalidSchema(
 				"CvaMaster",
 				d,
-				JSON.stringify(parsedCvaMaster.error)
+				JSON.stringify(parsedCvaMaster.error),
 			);
 		}
 	});
@@ -301,7 +289,7 @@ function makeLists({
 			warnInvalidSchema(
 				"GlobalIndicatorsMaster",
 				d,
-				JSON.stringify(parsedGlobalIndicatorsMaster.error)
+				JSON.stringify(parsedGlobalIndicatorsMaster.error),
 			);
 		}
 	});
@@ -324,7 +312,7 @@ function makeLists({
 			}
 
 			const emergencyGroup = lists.emergencyDetails.emergencyGroups.get(
-				d.EmergencyGroupId
+				d.EmergencyGroupId,
 			);
 
 			if (!emergencyGroup) {
@@ -339,7 +327,7 @@ function makeLists({
 
 			const emergencyCategory =
 				lists.emergencyDetails.emergencyCategories.get(
-					d.EmergencyCategoryId
+					d.EmergencyCategoryId,
 				);
 
 			if (!emergencyCategory) {
@@ -348,7 +336,7 @@ function makeLists({
 					{
 						emergencyTypes: new Set([d.EmergencyTypeId]),
 						emergencyGroup: d.EmergencyGroupId,
-					}
+					},
 				);
 			} else {
 				emergencyCategory.emergencyTypes.add(d.EmergencyTypeId);
@@ -357,7 +345,7 @@ function makeLists({
 			warnInvalidSchema(
 				"EmergenciesMaster",
 				d,
-				JSON.stringify(parsedEmergenciesMaster.error)
+				JSON.stringify(parsedEmergenciesMaster.error),
 			);
 		}
 	});

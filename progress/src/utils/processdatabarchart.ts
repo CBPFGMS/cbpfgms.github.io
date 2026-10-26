@@ -8,7 +8,6 @@ import {
 } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
-import calculateStatus from "./calculatestatus";
 import { BeneficiariesObject } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";

@@ -50,8 +50,6 @@ const refIds = charts.reduce((acc, curr) => {
 
 const queryStringValues = new URLSearchParams(location.search);
 
-const showFinanciallyClosed = queryStringValues.has("showFinanciallyClosed");
-
 function MainContainer({ defaultYear }: MainContainerProps) {
 	const {
 		data,
@@ -70,21 +68,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		totalBeneficiariesByDisabilityWithAllocTypeData,
 	} = useContext(DataContext) as DataContextType;
 
-	console.log(
-		totalBeneficiariesData,
-		totalBeneficiariesByPartnerData,
-		totalBeneficiariesBySectorData,
-		totalBeneficiariesByBeneficiaryTypeData,
-		totalBeneficiariesByDisabilityData,
-		totalBeneficiariesWithAllocTypeData,
-		totalBeneficiariesByPartnerWithAllocTypeData,
-		totalBeneficiariesBySectorWithAllocTypeData,
-		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
-		totalBeneficiariesByDisabilityWithAllocTypeData,
-	);
-
-	return;
-
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
 		[allocationType, setAllocationType] = useState<number[]>([
@@ -95,13 +78,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		]),
 		[implementationStatus, setImplementationStatus] = useState<
 			ImplementationStatuses[]
-		>(
-			showFinanciallyClosed
-				? [...implementationStatuses]
-				: implementationStatuses.filter(
-						status => status !== "Financially Closed",
-					),
-		),
+		>([...implementationStatuses]),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 
@@ -130,12 +107,24 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		() =>
 			processDataTotalBeneficiaries({
 				totalBeneficiariesData,
+				totalBeneficiariesWithAllocTypeData,
 				year,
 				fund,
 				implementationStatus,
 				lists,
+				allocationSource,
+				allocationType,
 			}),
-		[totalBeneficiariesData, year, fund, implementationStatus, lists],
+		[
+			totalBeneficiariesData,
+			totalBeneficiariesWithAllocTypeData,
+			year,
+			fund,
+			implementationStatus,
+			lists,
+			allocationSource,
+			allocationType,
+		],
 	);
 
 	const dataStatuses = useMemo(
@@ -234,7 +223,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		year,
 		downloadStates,
 		defaultYear,
-		showFinanciallyClosed,
 	});
 
 	const filterProps = {

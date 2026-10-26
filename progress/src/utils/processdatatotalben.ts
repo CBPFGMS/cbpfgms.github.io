@@ -1,6 +1,10 @@
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
-import { GenderAndAge, TotalBeneficiariesData } from "./processrawdata";
+import {
+	GenderAndAge,
+	TotalBeneficiariesData,
+	TotalBeneficiariesWithAllocTypeData,
+} from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 import flipObject from "./flipobject";
 import constants from "./constants";
@@ -10,10 +14,13 @@ const totalKeys = ["total", ...constants.beneficiaryCategories] as const;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesWithAllocTypeData?: TotalBeneficiariesWithAllocTypeData;
 	year: number[];
 	fund: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
+	allocationSource: number[];
+	allocationType: number[];
 };
 
 export type TargetedAndReachedTotal = {
@@ -23,10 +30,13 @@ export type TargetedAndReachedTotal = {
 
 function processDataTotalBeneficiaries({
 	totalBeneficiariesData,
+	totalBeneficiariesWithAllocTypeData,
 	year,
 	fund,
 	implementationStatus,
 	lists,
+	allocationSource,
+	allocationType,
 }: ProcessDataTotalBeneficiariesParams): TargetedAndReachedTotal {
 	const targeted = {
 		girls: 0,

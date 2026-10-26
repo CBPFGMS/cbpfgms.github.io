@@ -45,21 +45,14 @@ function useUpdateQueryString({
 	year,
 	downloadStates,
 	defaultYear,
-	showFinanciallyClosed,
 }: UpdateQueryStringParams): void {
-	const implementationStatusesFiltered = showFinanciallyClosed
-		? implementationStatuses
-		: implementationStatuses.filter(
-				status => status !== "Financially Closed"
-		  );
-
 	useEffect(() => {
 		const allocationTypesParam = getNumericArrayParam("allocationType");
 		const allocationSourcesParam = getNumericArrayParam("allocationSource");
 		const fundParam = getNumericArrayParam("fund");
 		const yearParam = getNumericArrayParam("year");
 		const implementationStatusParam = getStringArrayParam(
-			"implementationStatus"
+			"implementationStatus",
 		);
 
 		if (allocationTypesParam) setAllocationType(allocationTypesParam);
@@ -88,21 +81,16 @@ function useUpdateQueryString({
 		const yearParam =
 			year.length === 1 && year[0] === defaultYear ? "" : `year=${year}`;
 		const implementationStatusParam =
-			implementationStatus.length ===
-			implementationStatusesFiltered.length
+			implementationStatus.length === implementationStatuses.length
 				? ""
 				: `implementationStatus=${implementationStatus}`;
-		const showFinanciallyClosedParam = showFinanciallyClosed
-			? "showFinanciallyClosed"
-			: "";
 
 		if (
 			allocationTypesParam ||
 			allocationSourcesParam ||
 			fundParam ||
 			yearParam ||
-			implementationStatusParam ||
-			showFinanciallyClosed
+			implementationStatusParam
 		) {
 			const params = buildQueryStringParams([
 				allocationTypesParam,
@@ -110,7 +98,6 @@ function useUpdateQueryString({
 				fundParam,
 				yearParam,
 				implementationStatusParam,
-				showFinanciallyClosedParam,
 			]);
 
 			window.history.replaceState({}, "", `?${params}`);
@@ -125,7 +112,7 @@ function useUpdateQueryString({
 	}
 
 	function getStringArrayParam(
-		param: string
+		param: string,
 	): ImplementationStatuses[] | null {
 		return (
 			(queryStringValues

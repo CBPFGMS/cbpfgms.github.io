@@ -8,7 +8,6 @@ import constants from "./constants";
 import { List, GlobalIndicatorsDetails } from "./makelists";
 import { warnProjectNotFound } from "./warninvalid";
 import { ImplementationStatuses } from "../components/MainContainer";
-import calculateStatus from "./calculatestatus";
 
 export type DatumIndicators = {
 	sector: number;

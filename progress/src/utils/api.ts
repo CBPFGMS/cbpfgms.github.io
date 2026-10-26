@@ -17,7 +17,6 @@ import {
 	OrganizationMasterObject,
 	OrganizationTypesMasterObject,
 	PooledFundsMasterObject,
-	ProjectStatusMasterObject,
 	ProjectSummaryObject,
 	SectorBeneficiaryObject,
 	SectorsMasterObject,
@@ -63,7 +62,6 @@ type ReceiveDataArgs = [
 	CvaObject[],
 	AllocationTypesMasterObject[],
 	OrganizationMasterObject[],
-	ProjectStatusMasterObject[],
 	BeneficiaryTypesMasterObject[],
 	PooledFundsMasterObject[],
 	AllocationSourcesMasterObject[],
@@ -131,7 +129,6 @@ function useData(
 		emergenciesDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PROJECT_EMERGENCY_OneGMS&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=${fundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
 		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${fundType}&$format=csv`,
-		projectStatusMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_GLB_STATUS&PoolfundCodeAbbrv=&InstanceTypeId=&FundTypeId=${fundType}&$format=csv`,
 		cvaDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=APIDAT_CVA&PoolfundCodeAbbrv=&AllocationYear=&FundTypeId=${fundType}&$format=csv`;
 
 	const [data, setData] = useState<Data>([] as Data),
@@ -247,14 +244,6 @@ function useData(
 				fetchFile<OrganizationMasterObject[]>(
 					"organizationMaster",
 					organizationMasterUrl,
-					"csv",
-				),
-				setProgress,
-			),
-			trackProgress(
-				fetchFile<ProjectStatusMasterObject[]>(
-					"projectStatusMaster",
-					projectStatusMasterUrl,
 					"csv",
 				),
 				setProgress,
@@ -422,7 +411,6 @@ function useData(
 			cvaData,
 			allocationTypesMaster,
 			organizationMaster,
-			projectStatusMaster,
 			beneficiaryTypesMaster,
 			pooledFundsMaster,
 			allocationSourcesMaster,
@@ -445,7 +433,6 @@ function useData(
 			const listsObj: List = makeLists({
 				allocationTypesMaster,
 				organizationMaster,
-				projectStatusMaster,
 				beneficiaryTypesMaster,
 				pooledFundsMaster,
 				allocationSourcesMaster,

@@ -18,13 +18,17 @@ import {
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
-import constants, { projectStatusMapping } from "./constants";
+import constants, {
+	projectStatusMapping,
+	projectStatusMappingProjSumV4,
+} from "./constants";
 
 const {
 	beneficiariesSplitOrder,
 	beneficiaryCategories,
 	reportTypes,
 	implementationAndReportingProjects,
+	excludedProjectStatusCodes,
 } = constants;
 
 export type Datum = {
@@ -116,6 +120,10 @@ export type InDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	statusesPerFund: { [fund: number]: Set<number> };
+	statusesPerAllocationType: { [allocationType: number]: Set<number> };
+	statusesPerFundBDT2: { [fund: number]: Set<number> };
+	statusesPerAllocationTypeBDT2: { [allocationType: number]: Set<number> };
 	fundsPerBeneficiaryType: { [beneficiaryType: number]: Set<number> };
 };
 
@@ -243,6 +251,10 @@ export type TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData = {
 	};
 };
 
+const statusesPerFundBDT2: InDataLists["statusesPerFund"] = {};
+const statusesPerAllocationTypeBDT2: InDataLists["statusesPerAllocationType"] =
+	{};
+
 function processRawData({
 	projectSummary,
 	sectorsData,
@@ -308,6 +320,9 @@ function processRawData({
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"] = {};
+	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+	const statusesPerAllocationType: InDataLists["statusesPerAllocationType"] =
+		{};
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -538,6 +553,25 @@ function processRawData({
 	);
 
 	projectSummary.forEach(row => {
+		//Filter for excluding draft, rejected and to be deleted projects:
+		if (
+			(excludedProjectStatusCodes as readonly string[]).includes(
+				row.ProjectStatusCode ?? "",
+			)
+		) {
+			return;
+		}
+
+		//Removing any project with statuses that are not in the implementationAndReportingProjects list
+		const thisStatusId = projectStatusMappingProjSumV4[row.ProcessSTatusID];
+		if (
+			!(implementationAndReportingProjects as readonly number[]).includes(
+				thisStatusId,
+			)
+		) {
+			return;
+		}
+
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =
@@ -546,10 +580,10 @@ function processRawData({
 				];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
-			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 			const thisEmergenciesData = emergenciesDataMap.get(row.ChfId);
 			const thisCvaData = cvaDataMap.get(row.ChfProjectCode);
+			const thisStatus = listsObj.statuses[thisStatusId];
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -567,7 +601,7 @@ function processRawData({
 				);
 			}
 
-			if (!thisStatus) {
+			if (!thisStatusId) {
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
@@ -595,7 +629,7 @@ function processRawData({
 			if (
 				thisAllocationType &&
 				thisOrganization &&
-				thisStatus &&
+				thisStatusId &&
 				thisSectorData
 			) {
 				yearsSet.add(thisAllocationType.AllocationYear);
@@ -607,6 +641,14 @@ function processRawData({
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
 
+				//IMPORTANT: USE BDT2 FOR THE INDATALIST
+				(statusesPerFund[row.PooledFundId] ??= new Set()).add(
+					thisStatusId,
+				);
+				(statusesPerAllocationType[
+					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+				] ??= new Set()).add(thisStatusId);
+
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
@@ -616,7 +658,7 @@ function processRawData({
 					),
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: thisStatusId,
 					reportType: row.RptCode ?? 0,
 				});
 
@@ -641,7 +683,7 @@ function processRawData({
 					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
 					projectStatus: thisStatus,
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: thisStatusId,
 					sectorData: thisSectorData.sectors,
 					emergenciesData: thisEmergenciesData ?? [],
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
@@ -688,7 +730,11 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
-		fundsPerBeneficiaryType: fundsPerBeneficiaryType,
+		fundsPerBeneficiaryType,
+		statusesPerFund,
+		statusesPerAllocationType,
+		statusesPerFundBDT2,
+		statusesPerAllocationTypeBDT2,
 	}));
 
 	return {
@@ -852,6 +898,17 @@ function populateTotalBeneficiariesData<
 					[...beneficiaryCategories, "total"],
 				);
 			}
+
+			if (
+				(
+					implementationAndReportingProjects as readonly number[]
+				).includes(thisStatus)
+			) {
+				(statusesPerFundBDT2[row.PFId] ??= new Set()).add(thisStatus);
+				(statusesPerAllocationTypeBDT2[
+					parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
+				] ??= new Set()).add(thisStatus);
+			}
 		}
 	});
 
@@ -862,7 +919,8 @@ function populateTotalBeneficiariesData<
 			);
 			const retainedStatuses = statuses.filter(status =>
 				implementationAndReportingProjects.some(
-					implementationStatus => implementationStatus.toString() === status,
+					implementationStatus =>
+						implementationStatus.toString() === status,
 				),
 			);
 
@@ -974,7 +1032,8 @@ function populateTotalBeneficiariesByPartnerData<
 			);
 			const retainedStatuses = statuses.filter(status =>
 				implementationAndReportingProjects.some(
-					implementationStatus => implementationStatus.toString() === status,
+					implementationStatus =>
+						implementationStatus.toString() === status,
 				),
 			);
 
@@ -1093,7 +1152,8 @@ function populateTotalBeneficiariesBySectorData<
 			);
 			const retainedStatuses = statuses.filter(status =>
 				implementationAndReportingProjects.some(
-					implementationStatus => implementationStatus.toString() === status,
+					implementationStatus =>
+						implementationStatus.toString() === status,
 				),
 			);
 

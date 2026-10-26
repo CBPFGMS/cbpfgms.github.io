@@ -24,7 +24,7 @@ export const projectSummaryObjectSchema = z.object({
 	BenG: z.number().int().nonnegative(),
 	GMId: z.union([z.number(), z.string()]).nullable(),
 	GAMId: z.number().nullable(),
-	GlbPrjStatusId: z.number().int().nonnegative(),
+	GlbPrjStatusId: z.number().int().nonnegative().nullable(),
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
 	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
 	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
@@ -324,15 +324,6 @@ export const organizationMasterObjectSchema = z.object({
 	UNPPId: z.union([z.number(), z.string()]).nullable(),
 });
 
-export const projectStatusMasterObjectSchema = z.object({
-	GlobalInstanceStatusId: z.number().int().nonnegative(),
-	StatusName: z.string(),
-	StatusCode: z.string(),
-	AllocSrc: z.union([z.literal(1), z.literal(2)]),
-	InstanceTypeId: z.number().int().nonnegative(),
-	PooledFundId: z.number().int().nonnegative(),
-});
-
 export const beneficiaryTypesMasterObjectSchema = z.object({
 	BeneficiaryTypeId: z.number().int().nonnegative(),
 	BeneficiaryType: z.string(),
@@ -446,10 +437,6 @@ export type AllocationTypesMasterObject = z.infer<
 
 export type OrganizationMasterObject = z.infer<
 	typeof organizationMasterObjectSchema
->;
-
-export type ProjectStatusMasterObject = z.infer<
-	typeof projectStatusMasterObjectSchema
 >;
 
 export type BeneficiaryTypesMasterObject = z.infer<

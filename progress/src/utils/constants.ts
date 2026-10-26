@@ -1,9 +1,22 @@
 const constants = {
-	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	// closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	// implementationStatuses: [
+	// 	"Under Implementation",
+	// 	"Programmatically Closed",
+	// 	"Financially Closed",
+	// ],
 	implementationStatuses: [
 		"Under Implementation",
-		"Programmatically Closed",
-		"Financially Closed",
+		"Final Reporting",
+		"Project Closure",
+	],
+	excludedProjectStatusCodes: [
+		"PRJ_DRFT",
+		"PRJ_REJECTED",
+		"PRJ_TO_BE_DELETED",
+		"PRJ_WITHDRAWN",
+		"PRJ_TR_NON_RECOMM",
+		"PRJ_CANCELLED",
 	],
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	pageName: "CBPFProgress",
@@ -135,6 +148,21 @@ export const projectStatusMapping: Record<number, number> = {
 	6: 4,
 	7: 5,
 	8: 6,
+};
+
+export const projectStatusMappingProjSumV4: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+	13: 4,
+	14: 4,
+	15: 5,
+	16: 6,
 };
 
 export default constants;

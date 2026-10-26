@@ -1,7 +1,6 @@
 import { BeneficiariesObject, Data } from "./processrawdata";
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
-import calculateStatus from "./calculatestatus";
 import constants from "./constants";
 import { AllSectorsDatum } from "./processdataindicators";
 
