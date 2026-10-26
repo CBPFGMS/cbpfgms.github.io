@@ -22,6 +22,7 @@ import constants, {
 	projectStatusMapping,
 	projectStatusMappingProjSumV4,
 } from "./constants";
+import { ImplementationStatuses } from "../components/MainContainer";
 
 const {
 	beneficiariesSplitOrder,
@@ -120,6 +121,7 @@ export type InDataLists = {
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	statuses: Set<ImplementationStatuses>;
 	statusesPerFund: { [fund: number]: Set<number> };
 	statusesPerAllocationType: { [allocationType: number]: Set<number> };
 	statusesPerFundBDT2: { [fund: number]: Set<number> };
@@ -320,6 +322,7 @@ function processRawData({
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
 	const fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"] = {};
+	const statusesSet: Set<InDataListsValues["statuses"]> = new Set();
 	const statusesPerFund: InDataLists["statusesPerFund"] = {};
 	const statusesPerAllocationType: InDataLists["statusesPerAllocationType"] =
 		{};
@@ -648,6 +651,7 @@ function processRawData({
 				(statusesPerAllocationType[
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				] ??= new Set()).add(thisStatusId);
+				statusesSet.add(thisStatus as ImplementationStatuses);
 
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
@@ -735,6 +739,7 @@ function processRawData({
 		statusesPerAllocationType,
 		statusesPerFundBDT2,
 		statusesPerAllocationTypeBDT2,
+		statuses: statusesSet,
 	}));
 
 	return {
@@ -848,6 +853,7 @@ function populateTotalBeneficiariesData<
 			warnInvalidSchema(sourceName, row, parsedRow.error.message);
 			return;
 		}
+
 		const year = row.ImplementationYear;
 		const identifier = isWithAllocType
 			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)

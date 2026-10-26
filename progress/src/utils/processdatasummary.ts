@@ -2,14 +2,13 @@ import { Data } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import constants from "./constants";
-import capitalizeString from "./capitalizestring";
-import { GenderAndAge } from "./processrawdata";
 
 export type InSelectionData = {
 	years: Set<number>;
 	funds: Set<number>;
 	allocationSources: Set<number>;
 	allocationTypes: Set<number>;
+	statuses: Set<ImplementationStatuses>;
 };
 
 type ProcessDataSummaryParams = {
@@ -20,7 +19,6 @@ type ProcessDataSummaryParams = {
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
-	showFinanciallyClosed: boolean;
 };
 
 export type DatumSummary = {
@@ -30,14 +28,6 @@ export type DatumSummary = {
 	partners: Set<number>;
 	underImplementation: number;
 };
-
-export type DatumPictogram = {
-	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
-};
-
-export type DatumDisability = {
-	[K in (typeof beneficiariesStatuses)[number] as `${K}${Capitalize<GenderAndAge>}`]: number;
-} & Report;
 
 export type DatumGBV = {
 	allocations: number;
@@ -84,9 +74,6 @@ export type CvaTotalPeople = {
 };
 
 const {
-	beneficiariesStatuses,
-	beneficiaryCategories,
-	reportsForDisability,
 	reportsForGBV,
 	cvaChartTypes,
 } = constants;
@@ -99,14 +86,11 @@ function processDataSummary({
 	allocationType,
 	implementationStatus,
 	lists,
-	showFinanciallyClosed,
 }: ProcessDataSummaryParams): {
 	dataSummary: DatumSummary[];
 	dataEmergency: DatumEmergency[];
 	dataCva: DatumCva[];
 	dataCvaTotalPeople: CvaTotalPeople;
-	dataPictogram: DatumPictogram;
-	dataDisability: DatumDisability;
 	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
 } {
@@ -116,28 +100,6 @@ function processDataSummary({
 	const dataCvaTotalPeople: CvaTotalPeople = {
 		cvaTotalTargetedPeople: 0,
 		cvaTotalReachedPeople: 0,
-	};
-	const dataPictogram: DatumPictogram = {
-		targetedMen: 0,
-		targetedWomen: 0,
-		targetedBoys: 0,
-		targetedGirls: 0,
-		reachedMen: 0,
-		reachedWomen: 0,
-		reachedBoys: 0,
-		reachedGirls: 0,
-	};
-	const dataDisability: DatumDisability = {
-		targetedMen: 0,
-		targetedWomen: 0,
-		targetedBoys: 0,
-		targetedGirls: 0,
-		reachedMen: 0,
-		reachedWomen: 0,
-		reachedBoys: 0,
-		reachedGirls: 0,
-		totalReports: 0,
-		reportsWithData: 0,
 	};
 	const dataGBV: DatumGBV = {
 		allocations: 0,
@@ -155,10 +117,13 @@ function processDataSummary({
 		funds: new Set(),
 		allocationSources: new Set(),
 		allocationTypes: new Set(),
+		statuses: new Set(),
 	};
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			implementationStatus.includes(thisStatus) &&
 			year.includes(datum.year) &&
@@ -167,7 +132,7 @@ function processDataSummary({
 			allocationType.includes(datum.allocationType)
 		) {
 			const foundYear = dataSummary.find(
-				summary => summary.year === datum.year
+				summary => summary.year === datum.year,
 			);
 			if (foundYear) {
 				foundYear.allocations += datum.budget;
@@ -183,39 +148,11 @@ function processDataSummary({
 					projects: new Set([datum.projectId]),
 					partners: new Set([datum.organizationId]),
 					underImplementation: thisStatus.includes(
-						"Under Implementation"
+						"Under Implementation",
 					)
 						? datum.budget
 						: 0,
 				});
-			}
-
-			beneficiariesStatuses.forEach(status => {
-				const disabledKey = `disabled${capitalizeString(
-					status
-				)}` as keyof typeof datum;
-				beneficiaryCategories.forEach(category => {
-					dataPictogram[
-						`${status}${capitalizeString(
-							category
-						)}` as keyof DatumPictogram
-					] += datum[status][category];
-					dataDisability[
-						`${status}${capitalizeString(
-							category
-						)}` as keyof DatumDisability
-					] += (datum[disabledKey] as Record<GenderAndAge, number>)[
-						category
-					];
-				});
-			});
-			dataDisability.totalReports += 1;
-			if (
-				reportsForDisability.includes(
-					datum.reportType as (typeof reportsForDisability)[number]
-				)
-			) {
-				dataDisability.reportsWithData += 1;
 			}
 
 			dataGBV.allocations += datum.budget;
@@ -223,18 +160,18 @@ function processDataSummary({
 			dataGBV.allocationsGBVReached += datum.budgetGBVReached;
 			dataGBV.targeted += Object.values(datum.targeted).reduce(
 				(acc, curr) => acc + curr,
-				0
+				0,
 			);
 			dataGBV.targetedGBV += datum.targetedGBV;
 			dataGBV.reached += Object.values(datum.reached).reduce(
 				(acc, curr) => acc + curr,
-				0
+				0,
 			);
 			dataGBV.reachedGBV += datum.reachedGBV;
 			dataGBV.totalReports += 1;
 			if (
 				reportsForGBV.includes(
-					datum.reportType as (typeof reportsForGBV)[number]
+					datum.reportType as (typeof reportsForGBV)[number],
 				)
 			) {
 				dataGBV.reportsWithData += 1;
@@ -250,7 +187,7 @@ function processDataSummary({
 			if (datum.cvaData) {
 				datum.cvaData.forEach(cva => {
 					let cvaDatum = dataCva.find(
-						datum => datum.cvaType === cva.cvaId
+						datum => datum.cvaType === cva.cvaId,
 					);
 
 					if (!cvaDatum) {
@@ -267,7 +204,7 @@ function processDataSummary({
 					}
 
 					let sectorData = cvaDatum.sectorData.find(
-						sector => sector.sector === cva.sectorId
+						sector => sector.sector === cva.sectorId,
 					);
 
 					if (!sectorData) {
@@ -298,8 +235,8 @@ function processDataSummary({
 					approvalYear === datum.year
 						? datum.approvalDate
 						: approvalYear > datum.year
-						? new Date(datum.year, 11, 31)
-						: new Date(datum.year, 0, 1);
+							? new Date(datum.year, 11, 31)
+							: new Date(datum.year, 0, 1);
 
 				dataEmergency.push({
 					emergencyType: emergency.emergencyId,
@@ -312,7 +249,7 @@ function processDataSummary({
 							emergency.emergencyId
 						].emergencyGroup,
 					allocations: Math.floor(
-						(emergency.percentage / 100) * datum.budget
+						(emergency.percentage / 100) * datum.budget,
 					),
 					date: thisDate,
 				});
@@ -347,6 +284,15 @@ function processDataSummary({
 		) {
 			inSelectionData.years.add(datum.year);
 		}
+
+		if (
+			year.includes(datum.year) &&
+			fund.includes(datum.fund) &&
+			allocationSource.includes(datum.allocationSource) &&
+			allocationType.includes(datum.allocationType)
+		) {
+			inSelectionData.statuses.add(thisStatus);
+		}
 	});
 
 	dataSummary.sort((a, b) => b.year - a.year);
@@ -357,8 +303,6 @@ function processDataSummary({
 		dataEmergency,
 		dataCva,
 		dataCvaTotalPeople,
-		dataPictogram,
-		dataDisability,
 		dataGBV,
 		inSelectionData,
 	};

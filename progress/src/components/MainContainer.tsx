@@ -78,7 +78,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		]),
 		[implementationStatus, setImplementationStatus] = useState<
 			ImplementationStatuses[]
-		>([...implementationStatuses]),
+		>([...inDataLists.statuses]),
 		[clickedDownload, setClickedDownload] =
 			useState<DownloadStates>(downloadStates);
 
@@ -103,6 +103,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 	const [cashRef, inViewCash] = useInView(chartsThreshold);
 	const [indicatorsRef, inViewIndicators] = useInView(chartsThreshold);
 
+	const allStatusesSelected =
+		inDataLists.statuses.size === implementationStatus.length;
+	const allAllocationTypesSelected =
+		inDataLists.allocationTypes.size === allocationType.length;
+	const allSourcesSelected =
+		inDataLists.allocationSources.size === allocationSource.length;
+
 	const targetedAndReachedTotal = useMemo(
 		() =>
 			processDataTotalBeneficiaries({
@@ -114,6 +121,9 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				lists,
 				allocationSource,
 				allocationType,
+				allStatusesSelected,
+				allAllocationTypesSelected,
+				allSourcesSelected,
 			}),
 		[
 			totalBeneficiariesData,
@@ -124,6 +134,40 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			lists,
 			allocationSource,
 			allocationType,
+			allStatusesSelected,
+			allAllocationTypesSelected,
+			allSourcesSelected,
+		],
+	);
+
+	const targetedAndReachedTotalByDisability = useMemo(
+		() =>
+			processDataTotalBeneficiaries({
+				totalBeneficiariesData: totalBeneficiariesByDisabilityData,
+				totalBeneficiariesWithAllocTypeData:
+					totalBeneficiariesByDisabilityWithAllocTypeData,
+				year,
+				fund,
+				implementationStatus,
+				lists,
+				allocationSource,
+				allocationType,
+				allStatusesSelected,
+				allAllocationTypesSelected,
+				allSourcesSelected,
+			}),
+		[
+			totalBeneficiariesByDisabilityData,
+			totalBeneficiariesByDisabilityWithAllocTypeData,
+			year,
+			fund,
+			implementationStatus,
+			lists,
+			allocationSource,
+			allocationType,
+			allStatusesSelected,
+			allAllocationTypesSelected,
+			allSourcesSelected,
 		],
 	);
 
@@ -136,7 +180,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource,
 				allocationType,
 				lists,
-				showFinanciallyClosed,
 			}),
 		[data, year, fund, allocationSource, allocationType, lists],
 	);
@@ -145,11 +188,26 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		() =>
 			processDataStatusesBeneficiaries({
 				totalBeneficiariesData,
+				totalBeneficiariesWithAllocTypeData,
 				year,
 				fund,
+				allocationSource,
+				allocationType,
 				lists,
+				allAllocationTypesSelected,
+				allSourcesSelected,
 			}),
-		[totalBeneficiariesData, year, fund, lists],
+		[
+			totalBeneficiariesData,
+			totalBeneficiariesWithAllocTypeData,
+			year,
+			fund,
+			allocationSource,
+			allocationType,
+			lists,
+			allAllocationTypesSelected,
+			allSourcesSelected,
+		],
 	);
 
 	const {
@@ -157,8 +215,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		dataEmergency,
 		dataCva,
 		dataCvaTotalPeople,
-		dataPictogram,
-		dataDisability,
 		dataGBV,
 		inSelectionData,
 	} = useMemo(
@@ -171,7 +227,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
-				showFinanciallyClosed,
 			}),
 		[
 			data,
@@ -267,7 +322,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				inViewGBV={inViewGBV}
 				inViewCash={inViewCash}
 				refIds={refIds}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 			<TopIntro />
 			<FiltersContainer
@@ -276,7 +330,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setImplementationStatus={setImplementationStatus}
 				menusRef={menusRef}
 				dataStatuses={dataStatuses}
-				showFinanciallyClosed={showFinanciallyClosed}
+				dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 			/>
 			<Box
 				mt={4}
@@ -311,7 +365,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 			<IndicatorsContainer
 				dataIndicators={dataIndicators}
@@ -325,7 +378,6 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				setClickedDownload={setClickedDownload}
 				clickedDownload={clickedDownload}
 				implementationsStatus={implementationStatus}
-				showFinanciallyClosed={showFinanciallyClosed}
 			/>
 		</Container>
 	);

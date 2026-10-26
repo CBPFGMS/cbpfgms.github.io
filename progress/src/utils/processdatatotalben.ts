@@ -8,19 +8,22 @@ import {
 import { simpleWarn } from "./warninvalid";
 import flipObject from "./flipobject";
 import constants from "./constants";
-import { isAllStatusesSelected, sumStatusesCapped } from "./sumstatuses";
+import { sumStatusesCapped } from "./sumstatuses";
 
 const totalKeys = ["total", ...constants.beneficiaryCategories] as const;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
-	totalBeneficiariesWithAllocTypeData?: TotalBeneficiariesWithAllocTypeData;
+	totalBeneficiariesWithAllocTypeData: TotalBeneficiariesWithAllocTypeData;
 	year: number[];
 	fund: number[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	allocationSource: number[];
 	allocationType: number[];
+	allStatusesSelected: boolean;
+	allAllocationTypesSelected: boolean;
+	allSourcesSelected: boolean;
 };
 
 export type TargetedAndReachedTotal = {
@@ -37,6 +40,9 @@ function processDataTotalBeneficiaries({
 	lists,
 	allocationSource,
 	allocationType,
+	allStatusesSelected,
+	allAllocationTypesSelected,
+	allSourcesSelected,
 }: ProcessDataTotalBeneficiariesParams): TargetedAndReachedTotal {
 	const targeted = {
 		girls: 0,
@@ -59,35 +65,69 @@ function processDataTotalBeneficiaries({
 		implSt => +numericStatuses[implSt as ImplementationStatuses],
 	);
 
-	const allStatusesSelected = isAllStatusesSelected(implementationStatus);
-
-	fund.forEach(pf => {
-		let foundFundData = false;
-		year.forEach(selectedYear => {
-			const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
-			if (!thisFundData) return;
-			foundFundData = true;
-
-			const fundFigures = allStatusesSelected
-				? thisFundData.all
-				: sumStatusesCapped(
-						status.map(st => thisFundData[st]),
-						thisFundData.all,
-						totalKeys,
+	//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
+	if (allAllocationTypesSelected && allSourcesSelected) {
+		fund.forEach(pf => {
+			year.forEach(selectedYear => {
+				const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
+				if (!thisFundData) {
+					simpleWarn(
+						`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
 					);
+					return;
+				}
 
-			totalKeys.forEach(key => {
-				targeted[key] += fundFigures[key].targeted;
-				reached[key] += fundFigures[key].reached;
+				const fundFigures = allStatusesSelected
+					? thisFundData.all
+					: sumStatusesCapped(
+							status.map(st => thisFundData[st]),
+							thisFundData.all,
+							totalKeys,
+						);
+
+				totalKeys.forEach(key => {
+					targeted[key] += fundFigures[key].targeted;
+					reached[key] += fundFigures[key].reached;
+				});
 			});
 		});
+	} else {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		allocationType.forEach(allocType => {
+			//Check if it has the allocation source
+			const hasSource = allocationSource.some(source => {
+				lists.allocTypesPerSource[source].has(allocType);
+			});
 
-		if (!foundFundData) {
-			simpleWarn(
-				`Pooled fund code ${pf} not found in the totalBeneficiaries data`,
-			);
-		}
-	});
+			if (!hasSource) return;
+
+			year.forEach(selectedYear => {
+				const thisAllocData =
+					totalBeneficiariesWithAllocTypeData[selectedYear]?.[
+						allocType
+					];
+				if (!thisAllocData) {
+					simpleWarn(
+						`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
+					);
+					return;
+				}
+
+				const fundFigures = allStatusesSelected
+					? thisAllocData.all
+					: sumStatusesCapped(
+							status.map(st => thisAllocData[st]),
+							thisAllocData.all,
+							totalKeys,
+						);
+
+				totalKeys.forEach(key => {
+					targeted[key] += fundFigures[key].targeted;
+					reached[key] += fundFigures[key].reached;
+				});
+			});
+		});
+	}
 
 	return { targeted, reached };
 }

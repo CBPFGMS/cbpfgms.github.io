@@ -24,7 +24,6 @@ type UpdateQueryStringParams = {
 	implementationStatus: ImplementationStatuses[];
 	downloadStates: DownloadStates;
 	defaultYear: number;
-	showFinanciallyClosed: boolean;
 };
 
 const { implementationStatuses } = constants;
