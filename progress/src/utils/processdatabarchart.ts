@@ -45,11 +45,6 @@ type ProcessDataBarChartParams = {
 	allSourcesSelected: boolean;
 };
 
-type BeneficiariesEntry = [
-	key: keyof BeneficiariesObject,
-	value: BeneficiariesObject[keyof BeneficiariesObject],
-];
-
 const { beneficiaryCategories } = constants;
 
 function processDataBarChart({
@@ -231,13 +226,11 @@ function processDataBarChart({
 			//if there is selection of allocation type or allocation source, we use the call with allocation types
 			allocationType.forEach(allocType => {
 				//Check if it has the allocation source
-				const hasSource = allocationSource.some(source => {
-					lists.allocTypesPerSource[source].has(allocType);
-				});
+				const hasSource = allocationSource.some(source =>
+					lists.allocTypesPerSource[source].has(allocType),
+				);
 
-				if (!hasSource) return;
-
-				if (!org.alloctypesWithType.has(allocType)) {
+				if (!hasSource || !org.alloctypesWithType.has(allocType)) {
 					return;
 				}
 
@@ -268,60 +261,138 @@ function processDataBarChart({
 	});
 
 	dataSector.forEach(sect => {
-		fund.forEach(pf => {
-			if (!sect.fundsWithType.has(pf)) {
-				return;
-			}
-
-			year.forEach(selectedYear => {
-				const thisFund =
-					totalBeneficiariesBySectorData[selectedYear][pf];
-
-				if (!thisFund) {
-					simpleWarn(
-						`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data`,
-					);
+		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
+		if (allAllocationTypesSelected && allSourcesSelected) {
+			fund.forEach(pf => {
+				if (!sect.fundsWithType.has(pf)) {
 					return;
 				}
 
-				addFundFigures(
-					sect,
-					thisFund,
-					d => d.sector === sect.type,
-					statuses,
-					allStatusesSelected,
-					`Sector ${sect.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
-				);
+				year.forEach(selectedYear => {
+					const thisFund =
+						totalBeneficiariesBySectorData[selectedYear][pf];
+
+					if (!thisFund) {
+						simpleWarn(
+							`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						sect,
+						thisFund,
+						d => d.sector === sect.type,
+						statuses,
+						allStatusesSelected,
+						`Sector ${sect.type} not found in totalBeneficiariesBySector data for fund ${pf}`,
+					);
+				});
 			});
-		});
+		} else {
+			//if there is selection of allocation type or allocation source, we use the call with allocation types
+			allocationType.forEach(allocType => {
+				const hasSource = allocationSource.some(source =>
+					lists.allocTypesPerSource[source].has(allocType),
+				);
+
+				if (!hasSource || !sect.alloctypesWithType.has(allocType)) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesBySectorWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						simpleWarn(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						sect,
+						thisAllocType,
+						d => d.sector === sect.type,
+						statuses,
+						allStatusesSelected,
+						`Sector ${sect.type} not found in totalBeneficiariesBySector data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
 	});
 
 	dataBeneficiaryByType.forEach(benType => {
-		fund.forEach(pf => {
-			if (!inDataLists.fundsPerBeneficiaryType[benType.type].has(pf)) {
-				return;
-			}
-
-			year.forEach(selectedYear => {
-				const thisFund =
-					totalBeneficiariesByBeneficiaryTypeData[selectedYear][pf];
-				if (!thisFund) {
-					simpleWarn(
-						`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
-					);
+		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
+		if (allAllocationTypesSelected && allSourcesSelected) {
+			fund.forEach(pf => {
+				if (
+					!inDataLists.fundsPerBeneficiaryType[benType.type].has(pf)
+				) {
 					return;
 				}
 
-				addFundFigures(
-					benType,
-					thisFund,
-					d => d.beneficiaryType === benType.type,
-					statuses,
-					allStatusesSelected,
-					`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
-				);
+				year.forEach(selectedYear => {
+					const thisFund =
+						totalBeneficiariesByBeneficiaryTypeData[selectedYear][
+							pf
+						];
+					if (!thisFund) {
+						simpleWarn(
+							`Pooled fund code ${pf} not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						benType,
+						thisFund,
+						d => d.beneficiaryType === benType.type,
+						statuses,
+						allStatusesSelected,
+						`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
+					);
+				});
 			});
-		});
+		} else {
+			//if there is selection of allocation type or allocation source, we use the call with allocation types
+			allocationType.forEach(allocType => {
+				const hasSource = allocationSource.some(source =>
+					lists.allocTypesPerSource[source].has(allocType),
+				);
+
+				if (!hasSource || !benType.alloctypesWithType.has(allocType)) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesByBeneficiaryTypeWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						simpleWarn(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						benType,
+						thisAllocType,
+						d => d.beneficiaryType === benType.type,
+						statuses,
+						allStatusesSelected,
+						`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
 	});
 
 	dataBeneficiaryByType.sort(

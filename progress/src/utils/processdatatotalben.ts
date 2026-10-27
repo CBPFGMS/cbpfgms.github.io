@@ -95,9 +95,9 @@ function processDataTotalBeneficiaries({
 		//if there is selection of allocation type or allocation source, we use the call with allocation types
 		allocationType.forEach(allocType => {
 			//Check if it has the allocation source
-			const hasSource = allocationSource.some(source => {
-				lists.allocTypesPerSource[source].has(allocType);
-			});
+			const hasSource = allocationSource.some(source =>
+				lists.allocTypesPerSource[source].has(allocType),
+			);
 
 			if (!hasSource) return;
 
