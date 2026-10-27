@@ -19,7 +19,6 @@ import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
 import constants from "../utils/constants";
-import genderIcon from "../assets/gender-icon.svg";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -155,8 +154,6 @@ function Statuses({
 		</Box>
 	);
 }
-
-
 
 function Status({
 	handleClick,
@@ -294,17 +291,10 @@ function Status({
 									.join("<br />")}
 								data-tooltip-place="top"
 							>
-								<img
-									src={genderIcon}
-									width="16px"
-									height="29px"
-									alt=""
-								/>
 								<Box className="status-card-pt">
 									{targeted > 0 && (
-										<Box className="status-label-pt status-label-pt-targeted">
-											<span>Targeted</span>
-											<div className="status-label-pt-value">
+										<Box className="status-label-pt">
+											<div className="status-label-pt-value status-label-pt-targeted">
 												<NumberAnimator
 													number={parseFloat(
 														formatSIFloat(targeted),
@@ -313,12 +303,12 @@ function Status({
 												/>
 												{getSuffix(targeted)}
 											</div>
+											<span>Targeted</span>
 										</Box>
 									)}
 									{reached > 0 && (
-										<Box className="status-label-pt status-label-pt-reached">
-											<span>Reached</span>
-											<div className="status-label-pt-value">
+										<Box className="status-label-pt">
+											<div className="status-label-pt-value status-label-pt-reached">
 												<NumberAnimator
 													number={parseFloat(
 														formatSIFloat(reached),
@@ -327,6 +317,7 @@ function Status({
 												/>
 												{getSuffix(reached)}
 											</div>
+											<span>Reached</span>
 										</Box>
 									)}
 								</Box>

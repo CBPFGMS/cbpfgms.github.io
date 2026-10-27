@@ -331,7 +331,7 @@ function processDataBarChart({
 		if (allAllocationTypesSelected && allSourcesSelected) {
 			fund.forEach(pf => {
 				if (
-					!inDataLists.fundsPerBeneficiaryType[benType.type].has(pf)
+					!inDataLists.fundsPerBeneficiaryType[benType.type]?.has(pf)
 				) {
 					return;
 				}
