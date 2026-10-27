@@ -20,6 +20,7 @@ import { sumStatusesCapped } from "./sumstatuses";
 export type DatumBarChart = {
 	type: number;
 	fundsWithType: Set<number>;
+	alloctypesWithType: Set<number>;
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
 };
@@ -90,6 +91,7 @@ function processDataBarChart({
 		dataBeneficiaryByType.push({
 			type: beneficiaryType,
 			fundsWithType: new Set(),
+			alloctypesWithType: new Set(),
 			targeted: beneficiaryCategories.reduce((acc, genderAndAge) => {
 				acc[genderAndAge] = 0;
 				return acc;
@@ -118,6 +120,9 @@ function processDataBarChart({
 
 			if (foundOrganization) {
 				foundOrganization.fundsWithType.add(datum.fund);
+				foundOrganization.alloctypesWithType.add(
+					parseFloat(`${datum.fund}.${datum.allocationType}`),
+				);
 			} else {
 				const type = datum.organizationType;
 
@@ -141,6 +146,9 @@ function processDataBarChart({
 					targeted,
 					reached,
 					fundsWithType: new Set([datum.fund]),
+					alloctypesWithType: new Set([
+						parseFloat(`${datum.fund}.${datum.allocationType}`),
+					]),
 				};
 
 				dataOrganization.push(obj);
@@ -153,6 +161,9 @@ function processDataBarChart({
 
 				if (foundSector) {
 					foundSector.fundsWithType.add(datum.fund);
+					foundSector.alloctypesWithType.add(
+						parseFloat(`${datum.fund}.${datum.allocationType}`),
+					);
 				} else {
 					const type = sectorDatum.sectorId;
 
@@ -176,6 +187,9 @@ function processDataBarChart({
 						targeted,
 						reached,
 						fundsWithType: new Set([datum.fund]),
+						alloctypesWithType: new Set([
+							parseFloat(`${datum.fund}.${datum.allocationType}`),
+						]),
 					};
 
 					dataSector.push(obj);
@@ -185,27 +199,72 @@ function processDataBarChart({
 	});
 
 	dataOrganization.forEach(org => {
-		fund.forEach(pf => {
-			if (!org.fundsWithType.has(pf)) {
-				return;
-			}
+		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
+		if (allAllocationTypesSelected && allSourcesSelected) {
+			fund.forEach(pf => {
+				if (!org.fundsWithType.has(pf)) {
+					return;
+				}
 
-			if (!totalBeneficiariesByPartnerData[pf]) {
-				simpleWarn(
-					`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
-				);
-				return;
-			}
+				year.forEach(selectedYear => {
+					const thisFund =
+						totalBeneficiariesByPartnerData[selectedYear][pf];
 
-			addFundFigures(
-				org,
-				totalBeneficiariesByPartnerData[pf],
-				d => d.partner === org.type,
-				statuses,
-				allStatusesSelected,
-				`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
-			);
-		});
+					if (!thisFund) {
+						simpleWarn(
+							`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						org,
+						thisFund,
+						d => d.partner === org.type,
+						statuses,
+						allStatusesSelected,
+						`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+					);
+				});
+			});
+		} else {
+			//if there is selection of allocation type or allocation source, we use the call with allocation types
+			allocationType.forEach(allocType => {
+				//Check if it has the allocation source
+				const hasSource = allocationSource.some(source => {
+					lists.allocTypesPerSource[source].has(allocType);
+				});
+
+				if (!hasSource) return;
+
+				if (!org.alloctypesWithType.has(allocType)) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesByPartnerWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						simpleWarn(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						org,
+						thisAllocType,
+						d => d.partner === org.type,
+						statuses,
+						allStatusesSelected,
+						`Partner ${org.type} not found in totalBeneficiariesByPartner data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
 	});
 
 	dataSector.forEach(sect => {
@@ -214,21 +273,26 @@ function processDataBarChart({
 				return;
 			}
 
-			if (!totalBeneficiariesBySectorData[pf]) {
-				simpleWarn(
-					`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data`,
-				);
-				return;
-			}
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesBySectorData[selectedYear][pf];
 
-			addFundFigures(
-				sect,
-				totalBeneficiariesBySectorData[pf],
-				d => d.sector === sect.type,
-				statuses,
-				allStatusesSelected,
-				`Sector ${sect.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
-			);
+				if (!thisFund) {
+					simpleWarn(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data`,
+					);
+					return;
+				}
+
+				addFundFigures(
+					sect,
+					thisFund,
+					d => d.sector === sect.type,
+					statuses,
+					allStatusesSelected,
+					`Sector ${sect.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+				);
+			});
 		});
 	});
 
@@ -238,21 +302,25 @@ function processDataBarChart({
 				return;
 			}
 
-			if (!totalBeneficiariesByBeneficiaryTypeData[pf]) {
-				simpleWarn(
-					`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
-				);
-				return;
-			}
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesByBeneficiaryTypeData[selectedYear][pf];
+				if (!thisFund) {
+					simpleWarn(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data`,
+					);
+					return;
+				}
 
-			addFundFigures(
-				benType,
-				totalBeneficiariesByBeneficiaryTypeData[pf],
-				d => d.beneficiaryType === benType.type,
-				statuses,
-				allStatusesSelected,
-				`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
-			);
+				addFundFigures(
+					benType,
+					thisFund,
+					d => d.beneficiaryType === benType.type,
+					statuses,
+					allStatusesSelected,
+					`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
+				);
+			});
 		});
 	});
 
