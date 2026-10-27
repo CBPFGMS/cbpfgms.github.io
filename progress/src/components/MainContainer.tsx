@@ -217,6 +217,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 		dataCvaTotalPeople,
 		dataGBV,
 		inSelectionData,
+		disabilityReports,
 	} = useMemo(
 		() =>
 			processDataSummary({
@@ -249,7 +250,16 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationType,
 				implementationStatus,
 				lists,
-				showFinanciallyClosed,
+				totalBeneficiariesByPartnerData,
+				totalBeneficiariesBySectorData,
+				totalBeneficiariesByBeneficiaryTypeData,
+				totalBeneficiariesByPartnerWithAllocTypeData,
+				totalBeneficiariesBySectorWithAllocTypeData,
+				totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+				inDataLists,
+				allStatusesSelected,
+				allSourcesSelected,
+				allAllocationTypesSelected,
 			}),
 		[
 			data,
@@ -259,6 +269,16 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			allocationType,
 			implementationStatus,
 			lists,
+			totalBeneficiariesByPartnerData,
+			totalBeneficiariesBySectorData,
+			totalBeneficiariesByBeneficiaryTypeData,
+			totalBeneficiariesByPartnerWithAllocTypeData,
+			totalBeneficiariesBySectorWithAllocTypeData,
+			totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+			inDataLists,
+			allStatusesSelected,
+			allSourcesSelected,
+			allAllocationTypesSelected,
 		],
 	);
 
@@ -338,11 +358,13 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 			/>
 			<ChartsContainer
 				dataSummary={dataSummary}
-				dataPictogram={dataPictogram}
+				targetedAndReachedTotal={targetedAndReachedTotal}
 				dataBeneficiaryByType={dataBeneficiaryByType}
 				dataSector={dataSector}
 				dataOrganization={dataOrganization}
-				dataDisability={dataDisability}
+				targetedAndReachedTotalByDisability={
+					targetedAndReachedTotalByDisability
+				}
 				dataEmergency={dataEmergency}
 				dataGBV={dataGBV}
 				dataCva={dataCva}
@@ -365,6 +387,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				allocationSource={allocationSource}
 				allocationType={allocationType}
 				implementationsStatus={implementationStatus}
+				disabilityReports={disabilityReports}
 			/>
 			<IndicatorsContainer
 				dataIndicators={dataIndicators}

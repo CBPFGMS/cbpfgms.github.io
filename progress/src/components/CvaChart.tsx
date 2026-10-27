@@ -2,7 +2,6 @@ import React, { useContext, useRef, useState } from "react";
 import {
 	CvaTotalPeople,
 	DatumCva,
-	DatumPictogram,
 	DatumSummary,
 } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
@@ -19,6 +18,7 @@ import { sum } from "d3";
 import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import CvaTypesChart from "./CvaTypesChart";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
@@ -28,7 +28,6 @@ export type CvaGoal = (typeof beneficiariesStatuses)[number];
 
 type CvaChartProps = {
 	dataSummary: DatumSummary[];
-	dataPictogram: DatumPictogram;
 	dataCva: DatumCva[];
 	dataCvaTotalPeople: CvaTotalPeople;
 	clickedDownload: DownloadStates;
@@ -38,14 +37,13 @@ type CvaChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 };
 
 const { cvaChartModes, cvaChartTypes, beneficiariesStatuses } = constants;
 
 function CvaChart({
 	dataSummary,
-	dataPictogram,
 	dataCva,
 	dataCvaTotalPeople,
 	clickedDownload,
@@ -55,7 +53,7 @@ function CvaChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
+	targetedAndReachedTotal,
 }: CvaChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -71,19 +69,11 @@ function CvaChart({
 			acc.cvaReached += curr.reachedAllocations;
 			return acc;
 		},
-		{ cvaTargeted: 0, cvaReached: 0 }
+		{ cvaTargeted: 0, cvaReached: 0 },
 	);
 
-	const { totalPeopleTargeted, totalPeopleReached } = Object.entries(
-		dataPictogram
-	).reduce(
-		(acc, [key, value]) => {
-			acc.totalPeopleTargeted += key.includes("targeted") ? value : 0;
-			acc.totalPeopleReached += key.includes("reached") ? value : 0;
-			return acc;
-		},
-		{ totalPeopleTargeted: 0, totalPeopleReached: 0 }
-	);
+	const totalPeopleTargeted = targetedAndReachedTotal.targeted.total;
+	const totalPeopleReached = targetedAndReachedTotal.reached.total;
 
 	function handleDownloadClick() {
 		const dataCvaDownload = processCvaDownload({
@@ -94,14 +84,13 @@ function CvaChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataCvaDownload)[number]>(dataCvaDownload, "CVA");
 	}
 
 	function handleSwitchChange() {
 		setCvaChartMode(
-			cvaChartMode === "allocations" ? "people" : "allocations"
+			cvaChartMode === "allocations" ? "people" : "allocations",
 		);
 	}
 

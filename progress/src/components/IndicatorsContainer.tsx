@@ -25,7 +25,6 @@ type IndicatorsContainerProps = {
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	implementationsStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 function IndicatorsContainer({
@@ -40,7 +39,6 @@ function IndicatorsContainer({
 	clickedDownload,
 	setClickedDownload,
 	implementationsStatus,
-	showFinanciallyClosed,
 }: IndicatorsContainerProps) {
 	const [indicatorsFilteredData, setIndicatorsFilteredData] = useState<
 		DatumIndicators[]
@@ -55,7 +53,6 @@ function IndicatorsContainer({
 			allocationSource,
 			allocationType,
 			implementationsStatus,
-			showFinanciallyClosed,
 		});
 		setIndicatorsFilteredData(filteredIndicators);
 	}, [
@@ -66,7 +63,6 @@ function IndicatorsContainer({
 		allocationType,
 		lists,
 		implementationsStatus,
-		showFinanciallyClosed,
 	]);
 
 	return (

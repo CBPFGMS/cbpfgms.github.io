@@ -37,7 +37,6 @@ type TopPanelProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
-	showFinanciallyClosed: boolean;
 };
 
 function TopPanel({
@@ -66,7 +65,6 @@ function TopPanel({
 	implementationStatus,
 	setImplementationStatus,
 	inSelectionData,
-	showFinanciallyClosed,
 }: TopPanelProps) {
 	return (
 		<Grid
@@ -137,7 +135,6 @@ function TopPanel({
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}
-						showFinanciallyClosed={showFinanciallyClosed}
 					/>
 				)}
 			</Grid>

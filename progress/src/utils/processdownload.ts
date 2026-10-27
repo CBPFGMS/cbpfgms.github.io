@@ -95,7 +95,6 @@ type ProcessDownloadParams = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 type ProcessIndicatorsDownloadParams = {
@@ -113,12 +112,13 @@ export function processSummaryDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): SummaryDatumDownload[] {
 	const summaryDataDownload: SummaryDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -127,13 +127,13 @@ export function processSummaryDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			summaryDataDownload.push({
@@ -154,12 +154,13 @@ export function processPictogramDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): PictogramDatumDownload[] {
 	const pictogramDataDownload: PictogramDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -168,13 +169,13 @@ export function processPictogramDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			pictogramDataDownload.push({
@@ -202,12 +203,13 @@ export function processEmergenciesDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams) {
 	const emergenciesDataDownload: EmergenciesDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -216,13 +218,13 @@ export function processEmergenciesDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			if (datum.emergenciesData.length > 0) {
@@ -245,7 +247,7 @@ export function processEmergenciesDownload({
 							],
 						"Percent of Total Budget": emergency.percentage,
 						"Emergency Budget": Math.floor(
-							datum.budget * (emergency.percentage / 100)
+							datum.budget * (emergency.percentage / 100),
 						),
 					});
 				});
@@ -264,12 +266,13 @@ export function processDisabilityDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): DisabilityDatumDownload[] {
 	const disabilityDataDownload: DisabilityDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -278,13 +281,13 @@ export function processDisabilityDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			disabilityDataDownload.push({
@@ -312,12 +315,13 @@ export function processGBVDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): GBVDatumDownload[] {
 	const gbvDataDownload: GBVDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -326,13 +330,13 @@ export function processGBVDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			gbvDataDownload.push({
@@ -356,12 +360,13 @@ export function processBeneficiaryTypesDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): BeneficiaryTypesDatumDownload[] {
 	const beneficiaryTypesDataDownload: BeneficiaryTypesDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -370,22 +375,24 @@ export function processBeneficiaryTypesDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			beneficiariesSplitOrder.forEach(beneficiaryTypeAsNumber => {
 				if (
 					checkIfNonZero(
-						datum.targetedByBeneficiaryType[beneficiaryTypeAsNumber]
+						datum.targetedByBeneficiaryType[
+							beneficiaryTypeAsNumber
+						],
 					) ||
 					checkIfNonZero(
-						datum.reachedByBeneficiaryType[beneficiaryTypeAsNumber]
+						datum.reachedByBeneficiaryType[beneficiaryTypeAsNumber],
 					)
 				) {
 					beneficiaryTypesDataDownload.push({
@@ -441,12 +448,13 @@ export function processSectorsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): SectorsDatumDownload[] {
 	const sectorsDataDownload: SectorsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -455,13 +463,13 @@ export function processSectorsDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			datum.sectorData.forEach(sector => {
@@ -492,12 +500,13 @@ export function processOrganizationsDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): OrganizationsDatumDownload[] {
 	const organizationsDataDownload: OrganizationsDatumDownload[] = [];
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			checkRow(
 				thisStatus,
@@ -506,13 +515,13 @@ export function processOrganizationsDownload({
 				fund,
 				allocationSource,
 				allocationType,
-				implementationStatus
+				implementationStatus,
 			)
 		) {
 			const baseDownloadDatum = populateBaseDownloadDatum(
 				datum,
 				lists,
-				thisStatus
+				thisStatus,
 			);
 
 			organizationsDataDownload.push({
@@ -541,17 +550,14 @@ export function processCvaDownload({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: ProcessDownloadParams): CvaDatumDownload[] {
 	const cvaDataDownload: CvaDatumDownload[] = [];
 
 	data.forEach(datum => {
 		if (datum.cvaData !== null) {
-			const thisStatus = calculateStatus(
-				datum,
-				lists,
-				showFinanciallyClosed
-			);
+			const thisStatus = lists.statuses[
+				datum.projectStatusId
+			] as ImplementationStatuses;
 			if (
 				checkRow(
 					thisStatus,
@@ -560,13 +566,13 @@ export function processCvaDownload({
 					fund,
 					allocationSource,
 					allocationType,
-					implementationStatus
+					implementationStatus,
 				)
 			) {
 				const baseDownloadDatum = populateBaseDownloadDatum(
 					datum,
 					lists,
-					thisStatus
+					thisStatus,
 				);
 
 				datum.cvaData.forEach(cva => {
@@ -624,7 +630,7 @@ function checkIfNonZero(obj: BeneficiariesObject): boolean {
 function populateBaseDownloadDatum(
 	datum: Data[number],
 	lists: List,
-	thisStatus: ImplementationStatuses
+	thisStatus: ImplementationStatuses,
 ): BaseDownloadDatum {
 	return {
 		Year: datum.year,
@@ -644,7 +650,7 @@ function checkRow(
 	fund: number[],
 	allocationSource: number[],
 	allocationType: number[],
-	implementationStatus: ImplementationStatuses[]
+	implementationStatus: ImplementationStatuses[],
 ): boolean {
 	return (
 		implementationStatus.includes(thisStatus) &&

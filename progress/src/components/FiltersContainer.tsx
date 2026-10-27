@@ -1,4 +1,4 @@
-import Grid from '@mui/material/Grid2';
+import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import GradientPaper from "./GradientPaper";
@@ -6,7 +6,10 @@ import { InSelectionData } from "../utils/processdatasummary";
 import Selectors from "./Selectors";
 import Statuses from "./Statuses";
 import { ImplementationStatuses } from "./MainContainer";
-import { DataStatuses } from "../utils/processdatastatuses";
+import {
+	DataStatuses,
+	DataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import React from "react";
 
 type FiltersContainerProps = {
@@ -25,7 +28,7 @@ type FiltersContainerProps = {
 	inSelectionData: InSelectionData;
 	menusRef: (node?: Element | null | undefined) => void;
 	dataStatuses: DataStatuses;
-	showFinanciallyClosed: boolean;
+	dataStatusesBeneficiaries: DataStatusesBeneficiaries;
 };
 
 function FiltersContainer({
@@ -42,7 +45,7 @@ function FiltersContainer({
 	implementationStatus,
 	setImplementationStatus,
 	dataStatuses,
-	showFinanciallyClosed,
+	dataStatusesBeneficiaries,
 }: FiltersContainerProps) {
 	return (
 		<Grid
@@ -97,9 +100,9 @@ function FiltersContainer({
 				>
 					<Statuses
 						dataStatuses={dataStatuses}
+						dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
-						showFinanciallyClosed={showFinanciallyClosed}
 					/>
 				</Grid>
 			</Paper>

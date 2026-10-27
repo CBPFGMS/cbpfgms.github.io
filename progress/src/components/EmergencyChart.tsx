@@ -61,7 +61,6 @@ type EmergencyChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 function EmergencyChart({
@@ -73,7 +72,6 @@ function EmergencyChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: EmergencyChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -93,7 +91,7 @@ function EmergencyChart({
 			chartType === "overview"
 				? processOverviewData(dataEmergency, year, mode)
 				: null,
-		[dataEmergency, mode, chartType, year]
+		[dataEmergency, mode, chartType, year],
 	);
 
 	const timelineData: TimelineDatum[] | null = useMemo(
@@ -101,12 +99,12 @@ function EmergencyChart({
 			chartType === "timeline"
 				? processTimelineData(dataEmergency, mode, lists)
 				: null,
-		[dataEmergency, mode, chartType, lists]
+		[dataEmergency, mode, chartType, lists],
 	);
 
 	const handleType = (
 		_: React.MouseEvent<HTMLElement>,
-		newType: EmergencyChartTypes | null
+		newType: EmergencyChartTypes | null,
 	) => {
 		if (newType !== null) {
 			setChartType(newType);
@@ -115,7 +113,7 @@ function EmergencyChart({
 
 	const handleMode = (
 		_: React.MouseEvent<HTMLElement>,
-		newMode: EmergencyChartModes | null
+		newMode: EmergencyChartModes | null,
 	) => {
 		if (newMode !== null) {
 			setMode(newMode);
@@ -131,11 +129,10 @@ function EmergencyChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataEmergenciesDownload)[number]>(
 			dataEmergenciesDownload,
-			"emergencies"
+			"emergencies",
 		);
 	}
 
@@ -367,7 +364,7 @@ function EmergencyChart({
 									maxHeight={
 										calculateTimelineSVGHeight(
 											mode,
-											maxNumberOfYearsOnDisplay
+											maxNumberOfYearsOnDisplay,
 										) + 2
 									}
 								>

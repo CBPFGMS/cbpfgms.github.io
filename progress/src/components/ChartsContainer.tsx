@@ -5,12 +5,11 @@ import GradientPaper from "./GradientPaper";
 import Divider from "@mui/material/Divider";
 import {
 	DatumSummary,
-	DatumPictogram,
-	DatumDisability,
 	DatumGBV,
 	DatumEmergency,
 	DatumCva,
 	CvaTotalPeople,
+	Report,
 } from "../utils/processdatasummary";
 import {
 	DownloadStates,
@@ -26,16 +25,15 @@ import DisabilityChart from "./DisabilityChart";
 import GBVChart from "./GBVChart";
 import EmergencyChart from "./EmergencyChart";
 import CvaChart from "./CvaChart";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 
 type Ref = (node?: Element | null | undefined) => void;
 
 type ChartsContainerProps = {
 	dataSummary: DatumSummary[];
-	dataPictogram: DatumPictogram;
 	dataBeneficiaryByType: DatumBarChart[];
 	dataSector: DatumBarChart[];
 	dataOrganization: DatumBarChart[];
-	dataDisability: DatumDisability;
 	dataEmergency: DatumEmergency[];
 	dataGBV: DatumGBV;
 	dataCva: DatumCva[];
@@ -57,17 +55,17 @@ type ChartsContainerProps = {
 	fund: number[];
 	allocationSource: number[];
 	allocationType: number[];
+	targetedAndReachedTotal: TargetedAndReachedTotal;
+	targetedAndReachedTotalByDisability: TargetedAndReachedTotal;
 	implementationsStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
+	disabilityReports: Report;
 };
 
 function ChartsContainer({
 	dataSummary,
-	dataPictogram,
 	dataBeneficiaryByType,
 	dataSector,
 	dataOrganization,
-	dataDisability,
 	dataEmergency,
 	dataGBV,
 	dataCva,
@@ -89,8 +87,10 @@ function ChartsContainer({
 	fund,
 	allocationSource,
 	allocationType,
+	targetedAndReachedTotal,
+	targetedAndReachedTotalByDisability,
 	implementationsStatus,
-	showFinanciallyClosed,
+	disabilityReports,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -145,7 +145,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -162,7 +161,7 @@ function ChartsContainer({
 						id={refIds.pictogramRefId}
 					>
 						<PictogramChart
-							dataPictogram={dataPictogram}
+							targetedAndReachedTotal={targetedAndReachedTotal}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
 							year={year}
@@ -170,7 +169,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -210,7 +208,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 					<Divider
@@ -240,7 +237,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -286,7 +282,6 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
-								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>
@@ -316,7 +311,9 @@ function ChartsContainer({
 						id={refIds.disabilityRefId}
 					>
 						<DisabilityChart
-							dataDisability={dataDisability}
+							targetedAndReachedTotalByDisability={
+								targetedAndReachedTotalByDisability
+							}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
 							year={year}
@@ -324,7 +321,7 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
+							disabilityReports={disabilityReports}
 						/>
 					</Grid>
 					<Divider
@@ -349,7 +346,6 @@ function ChartsContainer({
 							allocationSource={allocationSource}
 							allocationType={allocationType}
 							implementationStatus={implementationsStatus}
-							showFinanciallyClosed={showFinanciallyClosed}
 						/>
 					</Grid>
 				</Grid>
@@ -392,7 +388,6 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
-								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>
@@ -429,7 +424,9 @@ function ChartsContainer({
 						>
 							<CvaChart
 								dataSummary={dataSummary}
-								dataPictogram={dataPictogram}
+								targetedAndReachedTotal={
+									targetedAndReachedTotal
+								}
 								dataCva={dataCva}
 								dataCvaTotalPeople={dataCvaTotalPeople}
 								clickedDownload={clickedDownload}
@@ -439,7 +436,6 @@ function ChartsContainer({
 								allocationSource={allocationSource}
 								allocationType={allocationType}
 								implementationStatus={implementationsStatus}
-								showFinanciallyClosed={showFinanciallyClosed}
 							/>
 						</Box>
 					</Grid>

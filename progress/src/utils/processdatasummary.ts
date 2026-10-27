@@ -73,10 +73,7 @@ export type CvaTotalPeople = {
 	cvaTotalReachedPeople: number;
 };
 
-const {
-	reportsForGBV,
-	cvaChartTypes,
-} = constants;
+const { reportsForGBV, cvaChartTypes, reportsForDisability } = constants;
 
 function processDataSummary({
 	data,
@@ -93,6 +90,7 @@ function processDataSummary({
 	dataCvaTotalPeople: CvaTotalPeople;
 	dataGBV: DatumGBV;
 	inSelectionData: InSelectionData;
+	disabilityReports: Report;
 } {
 	const dataSummary: DatumSummary[] = [];
 	const dataEmergency: DatumEmergency[] = [];
@@ -118,6 +116,10 @@ function processDataSummary({
 		allocationSources: new Set(),
 		allocationTypes: new Set(),
 		statuses: new Set(),
+	};
+	const disabilityReports: Report = {
+		reportsWithData: 0,
+		totalReports: 0,
 	};
 
 	data.forEach(datum => {
@@ -153,6 +155,15 @@ function processDataSummary({
 						? datum.budget
 						: 0,
 				});
+			}
+
+			disabilityReports.totalReports += 1;
+			if (
+				reportsForDisability.includes(
+					datum.reportType as (typeof reportsForDisability)[number],
+				)
+			) {
+				disabilityReports.reportsWithData += 1;
 			}
 
 			dataGBV.allocations += datum.budget;
@@ -305,6 +316,7 @@ function processDataSummary({
 		dataCvaTotalPeople,
 		dataGBV,
 		inSelectionData,
+		disabilityReports,
 	};
 }
 

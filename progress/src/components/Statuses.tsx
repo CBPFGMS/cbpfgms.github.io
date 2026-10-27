@@ -1,35 +1,41 @@
 import { useState } from "react";
-import { DataStatuses } from "../utils/processdatastatuses";
+import {
+	DataStatuses,
+	DataStatusesBeneficiaries,
+} from "../utils/processdatastatuses";
 import { ImplementationStatuses } from "./MainContainer";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
+// import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
-import colors from "../utils/colors";
+// import colors from "../utils/colors";
 import NumberAnimator from "./NumberAnimator";
 import { scaleLinear } from "d3";
 import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
 import constants from "../utils/constants";
+import genderIcon from "../assets/gender-icon.svg";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
+	dataStatusesBeneficiaries: DataStatusesBeneficiaries;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
-	showFinanciallyClosed: boolean;
 };
 
 type StatusProps = {
 	handleClick: (status: ImplementationStatuses) => void;
 	status: ImplementationStatuses;
 	statusValue: number;
+	targeted: number;
+	reached: number;
 	total: number;
 	implementationStatus: ImplementationStatuses[];
 };
@@ -39,27 +45,24 @@ type StatusesDescription = {
 };
 
 const statusesDescription: StatusesDescription = {
-	"Programmatically Closed":
-		"Project(s) which have completed the implementation and their project end date is over",
-	"Under Implementation":
-		"Project(s) which are still under implementation stage where Project Implementation End date is greater than today",
-	"Financially Closed":
-		"Project(s) which have closed all stage of Final Report(s) and other financial transaction(s). Based on the new Global guidance of CBPF, the audit for non-UN projects are due after 9 months of implementation. Final financial reports for UN Project(s) are due for end of June of the following year after the programmatic implementation",
+	"Under Implementation": "Under Implementation",
+	"Final Reporting": "Final Reporting",
+	"Project Closure": "Project Closure",
 };
 
-const { limitScaleValueInPixels } = constants;
+const { opacityValue } = constants;
 
 function Statuses({
 	dataStatuses,
+	dataStatusesBeneficiaries,
 	implementationStatus,
 	setImplementationStatus,
-	showFinanciallyClosed,
 }: StatusesProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const total = Object.values(dataStatuses).reduce(
 		(acc, curr) => acc + curr,
-		0
+		0,
 	);
 
 	function handleClick(status: ImplementationStatuses) {
@@ -73,7 +76,7 @@ function Statuses({
 		setImplementationStatus(
 			implementationStatus.includes(status)
 				? implementationStatus.filter(e => status !== e)
-				: [...implementationStatus, status]
+				: [...implementationStatus, status],
 		);
 	}
 
@@ -103,9 +106,7 @@ function Statuses({
 				<InfoIcon
 					data-tooltip-id="tooltip"
 					data-tooltip-html={
-						showFinanciallyClosed
-							? "Projects can fall into three implementation statuses: Under Implementation, Programmatically Closed, and Financially Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
-							: "Projects can fall into two implementation statuses: Under Implementation and Programmatically Closed.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
+						"Projects can fall into different implementation statuses.<br>Click 'Remove' to exclude a status from the calculated values, or 'Add' to include it back."
 					}
 					data-tooltip-place="top"
 					style={{
@@ -119,36 +120,50 @@ function Statuses({
 			</Grid>
 			<Grid
 				container
-				gap={2}
+				spacing={1}
 				sx={{
 					width: "100%",
-					flexWrap: "nowrap",
 				}}
 			>
 				{(
 					Object.entries(dataStatuses) as [
 						keyof typeof dataStatuses,
-						number
+						number,
 					][]
-				).map(([status, statusValue]) => (
-					<Status
-						key={status}
-						handleClick={handleClick}
-						status={status}
-						statusValue={statusValue}
-						total={total}
-						implementationStatus={implementationStatus}
-					/>
-				))}
+				).map(
+					([status, statusValue]) =>
+						statusValue > 0 && (
+							<Status
+								key={status}
+								handleClick={handleClick}
+								status={status}
+								statusValue={statusValue}
+								targeted={
+									dataStatusesBeneficiaries[status]
+										?.targeted ?? 0
+								}
+								reached={
+									dataStatusesBeneficiaries[status]
+										?.reached ?? 0
+								}
+								total={total}
+								implementationStatus={implementationStatus}
+							/>
+						),
+				)}
 			</Grid>
 		</Box>
 	);
 }
 
+
+
 function Status({
 	handleClick,
 	status,
 	statusValue,
+	targeted,
+	reached,
 	total,
 	implementationStatus,
 }: StatusProps) {
@@ -159,162 +174,206 @@ function Status({
 	const statusSelected = implementationStatus.includes(status);
 
 	return (
-		<Grid size={6}>
+		<Grid size={4}>
 			<Card
-				key={status}
 				variant="outlined"
 				sx={{
-					flexGrow: 1,
-					flex: "1 0 auto",
-					borderColor: statusSelected ? colors.contrastColor : null,
+					marginRight: 1.5,
+					flex: "1 1 auto",
+					borderRadius: "8px",
+					background: statusSelected ? "#fffefc" : "#fafafa",
+					border: statusSelected
+						? "1px solid #fac775"
+						: "1px solid #e1e1e1",
+					boxShadow: statusSelected
+						? "0 0 6px rgba(0, 0, 0, 0.2)"
+						: "none",
 				}}
 			>
-				<CardContent sx={{ padding: "8px 18px 8px 18px" }}>
-					<Grid
-						container
-						alignItems={"center"}
+				<CardContent>
+					<Box
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-between",
+							alignItems: "center",
+						}}
+						mb={1}
 					>
 						<Grid
-							size={8}
-							container
+							sx={{
+								opacity: statusSelected ? 1 : opacityValue,
+								filter: statusSelected
+									? "none"
+									: "grayscale(100%)",
+							}}
+							size={9}
 						>
 							<Typography
 								variant="h6"
 								fontSize={"1em"}
-								gutterBottom
 							>
+								{
+									<InfoIcon
+										data-tooltip-id="tooltip"
+										data-tooltip-content={
+											statusesDescription[status]
+										}
+										data-tooltip-place="top"
+										style={{
+											color: "#666",
+											fontSize: "18px",
+											marginRight: "0.3em",
+										}}
+									/>
+								}
 								{status}
 							</Typography>
-							<InfoIcon
-								data-tooltip-id="tooltip"
-								data-tooltip-content={
-									statusesDescription[status]
-								}
-								data-tooltip-place="top"
-								style={{
-									color: "#666",
-									fontSize: "16px",
-									marginLeft: "0.1em",
-									alignSelf: "flex-start",
-									marginTop: "-0.1em",
-								}}
-							/>
 						</Grid>
 						<Grid
-							container
-							size={4}
-							alignSelf={"flex-start"}
+							size={3}
 							justifyContent={"flex-end"}
 						>
-							<CardActions>
-								<Button
-									size="small"
-									style={{
-										backgroundColor: "whitesmoke",
-									}}
-									variant="text"
-									onClick={() => handleClick(status)}
-								>
-									{statusSelected ? "Remove" : "Add"}
-								</Button>
-							</CardActions>
+							<Box
+								onClick={() => handleClick(status)}
+								className={`status-remove-btn status-rb-amber`}
+								display={"flex"}
+								justifyContent={"center"}
+							>
+								{statusSelected ? "Remove" : "Add"}
+							</Box>
 						</Grid>
-					</Grid>
-					<Typography
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
-						data-tooltip-place="top"
-						color={colors.unColor}
-						style={{
-							fontSize: "2.5em",
-							fontWeight: 500,
-							display: "inline-block",
-							opacity: statusSelected ? 1 : 0.75,
+					</Box>
+					<Box
+						className="status-card-mid"
+						sx={{
+							opacity: statusSelected ? 1 : opacityValue,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
 					>
-						{"$"}
-						{statusValue < 1e3 ? (
-							<NumberAnimator
-								number={Math.floor(statusValue)}
-								type="integer"
-							/>
-						) : (
-							<span>
+						<Typography
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
+							data-tooltip-place="top"
+							className={`status-cv-amber`}
+							style={{
+								fontSize: "43px",
+								fontWeight: 500,
+							}}
+						>
+							{"$"}
+							{statusValue < 1e3 ? (
 								<NumberAnimator
-									number={parseFloat(
-										formatSIFloat(statusValue)
-									)}
-									type="decimal"
+									number={Math.floor(statusValue)}
+									type="integer"
 								/>
-								{formatSIFloat(statusValue).slice(-1)}
-							</span>
+							) : (
+								<span>
+									<NumberAnimator
+										number={parseFloat(
+											formatSIFloat(statusValue),
+										)}
+										type="decimal"
+									/>
+									{formatSIFloat(statusValue).slice(-1)}
+								</span>
+							)}
+						</Typography>
+						{(targeted > 0 || reached > 0) && (
+							<Box
+								className="status-card-people"
+								data-tooltip-id="tooltip"
+								data-tooltip-html={[
+									status,
+									targeted > 0 &&
+										`Targeted: ${targeted.toLocaleString()} people`,
+									reached > 0 &&
+										`Reached: ${reached.toLocaleString()} people`,
+								]
+									.filter(Boolean)
+									.join("<br />")}
+								data-tooltip-place="top"
+							>
+								<img
+									src={genderIcon}
+									width="16px"
+									height="29px"
+									alt=""
+								/>
+								<Box className="status-card-pt">
+									{targeted > 0 && (
+										<Box className="status-label-pt status-label-pt-targeted">
+											<span>Targeted</span>
+											<div className="status-label-pt-value">
+												<NumberAnimator
+													number={parseFloat(
+														formatSIFloat(targeted),
+													)}
+													type="decimal"
+												/>
+												{getSuffix(targeted)}
+											</div>
+										</Box>
+									)}
+									{reached > 0 && (
+										<Box className="status-label-pt status-label-pt-reached">
+											<span>Reached</span>
+											<div className="status-label-pt-value">
+												<NumberAnimator
+													number={parseFloat(
+														formatSIFloat(reached),
+													)}
+													type="decimal"
+												/>
+												{getSuffix(reached)}
+											</div>
+										</Box>
+									)}
+								</Box>
+							</Box>
 						)}
-					</Typography>
+					</Box>
 					<Box
-						mt={2}
-						mb={0}
-						style={{
-							display: "flex",
-							alignItems: "center",
-							width: "100%",
-							opacity: statusSelected ? 1 : 0.75,
+						sx={{
+							opacity: statusSelected ? 1 : opacityValue,
 							filter: statusSelected ? "none" : "grayscale(100%)",
 						}}
+						mt={1}
+						className="status-card-footer"
 						data-tooltip-id="tooltip"
 						data-tooltip-content={`The total amount of allocations for ${status} projects is $${toLocaleFixed(
 							statusValue,
 							0,
-							2
+							2,
 						)}, which represents ${(
 							(statusValue / total) *
 							100
 						).toFixed(
-							1
+							2,
 						)}% of the total allocations for all statuses (${toLocaleFixed(
 							total,
 							0,
-							2
+							2,
 						)}).`}
 						data-tooltip-place="top"
 					>
-						<Box
-							style={{
-								width: scale(statusValue) + "%",
-								minWidth: "1px",
-								height: "18px",
-								transitionProperty: "width",
-								transitionDuration: "0.75s",
-								display: "flex",
-								alignItems: "center",
-								backgroundColor: colors.contrastColorDarker,
-							}}
-						>
-							<Typography
-								fontSize={12}
-								fontWeight={700}
+						<Box className={`status-prog-track status-pt-amber`}>
+							<Box
+								className={`status-prog-fill status-pf-amber`}
 								style={{
-									position: "relative",
-									left:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "3px"
-											: "-3px",
-									marginLeft:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "100%"
-											: "auto",
-									color:
-										scale(statusValue) <
-										limitScaleValueInPixels
-											? "#444"
-											: "#fff",
+									width: scale(statusValue) + "%",
+									transitionProperty: "width",
+									transitionDuration: "0.75s",
 								}}
-							>
+							></Box>
+						</Box>
+						<Box className={`status-pct status-pct-amber`}>
+							<Typography fontWeight={500}>
 								<NumberAnimator
 									number={parseFloat(
-										((statusValue / total) * 100).toFixed(2)
+										((statusValue / total) * 100).toFixed(
+											1,
+										),
 									)}
 									type="decimal"
 								/>
@@ -326,6 +385,12 @@ function Status({
 			</Card>
 		</Grid>
 	);
+}
+
+//unit next to the people numbers (M, k...)
+function getSuffix(value: number): string {
+	const lastChar = formatSIFloat(value).slice(-1);
+	return isNaN(+lastChar) ? lastChar : "";
 }
 
 export default Statuses;

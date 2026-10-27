@@ -43,7 +43,6 @@ type BarChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 type Data = {
@@ -66,7 +65,6 @@ function BarChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: BarChartProps) {
 	const { data: completeData } = useContext(DataContext) as DataContextType;
 
@@ -82,10 +80,10 @@ function BarChart({
 		chartType === "beneficiaryTypes"
 			? "beneficiaryTypes"
 			: chartType === "sectors"
-			? "sectors"
-			: chartType === "organizations"
-			? "organizationTypes"
-			: ("" as never);
+				? "sectors"
+				: chartType === "organizations"
+					? "organizationTypes"
+					: ("" as never);
 
 	const data: Data[] = originalData.map(d => {
 		const targeted = Object.entries(d.targeted).reduce(
@@ -95,7 +93,7 @@ function BarChart({
 				}
 				return acc;
 			},
-			0
+			0,
 		);
 		const reached = Object.entries(d.reached).reduce(
 			(acc, [key, value]) => {
@@ -104,7 +102,7 @@ function BarChart({
 				}
 				return acc;
 			},
-			0
+			0,
 		);
 		return { type: d.type, targeted, reached };
 	});
@@ -112,7 +110,7 @@ function BarChart({
 	data.sort((a, b) => b.targeted - a.targeted);
 
 	const maxValue = max(
-		data.map(d => Math.max(d.reached, d.targeted))
+		data.map(d => Math.max(d.reached, d.targeted)),
 	) as number;
 
 	function handleDownloadClick() {
@@ -125,11 +123,10 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
-				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataBeneficiariesDownload)[number]>(
 				dataBeneficiariesDownload,
-				"beneficiary_types"
+				"beneficiary_types",
 			);
 		} else if (chartType === "sectors") {
 			const dataSectorsDownload = processSectorsDownload({
@@ -140,11 +137,10 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
-				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataSectorsDownload)[number]>(
 				dataSectorsDownload,
-				"sectors"
+				"sectors",
 			);
 		} else if (chartType === "organizations") {
 			const dataOrganizationsDownload = processOrganizationsDownload({
@@ -155,11 +151,10 @@ function BarChart({
 				allocationSource,
 				allocationType,
 				implementationStatus,
-				showFinanciallyClosed,
 			});
 			downloadData<(typeof dataOrganizationsDownload)[number]>(
 				dataOrganizationsDownload,
-				"organizations"
+				"organizations",
 			);
 		}
 	}
@@ -171,7 +166,7 @@ function BarChart({
 				return;
 			}
 			setBeneficiaryCategoryArray(
-				beneficiaryCategoryArray.filter(e => e !== category)
+				beneficiaryCategoryArray.filter(e => e !== category),
 			);
 		} else {
 			setBeneficiaryCategoryArray([
@@ -271,7 +266,7 @@ function BarChart({
 							control={
 								<Checkbox
 									checked={beneficiaryCategoryArray.includes(
-										category
+										category,
 									)}
 									onChange={() => handleOnChange(category)}
 									name={category}

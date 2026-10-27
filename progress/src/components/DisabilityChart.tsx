@@ -1,5 +1,4 @@
 import React, { useContext, useRef } from "react";
-import { DatumDisability } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import DataContext, { DataContextType } from "../context/DataContext";
@@ -11,16 +10,17 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import DisabilityChartRow from "./DisabilityChartRow";
-import capitalizeString from "../utils/capitalizestring";
 import { processDisabilityDownload } from "../utils/processdownload";
 import downloadData from "../utils/downloaddata";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import NumberAnimator from "./NumberAnimator";
 import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import { Report } from "../utils/processdatasummary";
 
 type DisabilityChartProps = {
-	dataDisability: DatumDisability;
+	targetedAndReachedTotalByDisability: TargetedAndReachedTotal;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
@@ -28,13 +28,13 @@ type DisabilityChartProps = {
 	allocationSource: number[];
 	allocationType: number[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
+	disabilityReports: Report;
 };
 
-const { beneficiaryCategories, beneficiariesStatuses } = constants;
+const { beneficiaryCategories } = constants;
 
 function DisabilityChart({
-	dataDisability,
+	targetedAndReachedTotalByDisability,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -42,26 +42,24 @@ function DisabilityChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
+	disabilityReports,
 }: DisabilityChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
-	const [totalTargeted, totalReached] = beneficiariesStatuses.map(type =>
-		beneficiaryCategories.reduce(
-			(acc, category) =>
-				acc +
-				dataDisability[
-					`${type}${capitalizeString(
-						category
-					)}` as keyof DatumDisability
-				],
-			0
-		)
-	);
+	const totalTargeted = targetedAndReachedTotalByDisability.targeted.total;
+	const totalReached = targetedAndReachedTotalByDisability.reached.total;
+
+	const maxValue =
+		max(
+			beneficiaryCategories.map(type =>
+				Math.max(
+					targetedAndReachedTotalByDisability.targeted[type],
+					targetedAndReachedTotalByDisability.reached[type],
+				),
+			),
+		) || 0;
 
 	const ref = useRef<HTMLDivElement>(null);
-
-	const maxValue = max(Object.values(dataDisability)) || 0;
 
 	function handleDownloadClick() {
 		const dataDisabilityDownload = processDisabilityDownload({
@@ -72,11 +70,10 @@ function DisabilityChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataDisabilityDownload)[number]>(
 			dataDisabilityDownload,
-			"people_with_disability"
+			"people_with_disability",
 		);
 	}
 
@@ -132,7 +129,7 @@ function DisabilityChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`Persons with disabilities, targeted: ${format(
-						",.0f"
+						",.0f",
 					)(totalTargeted)}`}
 					data-tooltip-place="top"
 				>
@@ -150,7 +147,7 @@ function DisabilityChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalTargeted)
+										formatSIFloat(totalTargeted),
 									)}
 									type="decimal"
 								/>
@@ -196,7 +193,7 @@ function DisabilityChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`Persons with disabilities, reached: ${format(
-						",.0f"
+						",.0f",
 					)(totalReached)}`}
 					data-tooltip-place="top"
 				>
@@ -215,7 +212,7 @@ function DisabilityChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalReached)
+										formatSIFloat(totalReached),
 									)}
 									type="decimal"
 								/>
@@ -238,7 +235,7 @@ function DisabilityChart({
 										: ~~(
 												(totalReached * 100) /
 												totalTargeted
-										  )
+											)
 								}
 								type="integer"
 							/>
@@ -307,18 +304,10 @@ function DisabilityChart({
 						key={type}
 						type={type}
 						targeted={
-							dataDisability[
-								`targeted${capitalizeString(
-									type
-								)}` as keyof DatumDisability
-							]
+							targetedAndReachedTotalByDisability.targeted[type]
 						}
 						reached={
-							dataDisability[
-								`reached${capitalizeString(
-									type
-								)}` as keyof DatumDisability
-							]
+							targetedAndReachedTotalByDisability.reached[type]
 						}
 						maxValue={maxValue}
 					/>
@@ -337,8 +326,8 @@ function DisabilityChart({
 					The data on people with disabilities reached, as reported in
 					the latest programmatic reports, was identified from{" "}
 					{format(".1~%")(
-						dataDisability.reportsWithData /
-							dataDisability.totalReports
+						disabilityReports.reportsWithData /
+							disabilityReports.totalReports,
 					)}{" "}
 					of the projects.
 				</Typography>
