@@ -20,9 +20,9 @@ type ShortNamesList = {
 };
 
 const shortNamesList: ShortNamesList = {
-	"Financially Closed": "Financ. Closed\u00A0",
+	"Final Reporting": "Final Rep.\u00A0",
 	"Under Implementation": "Under Impl.\u00A0",
-	"Programmatically Closed": "Prog. Closed\u00A0",
+	"Project Closure": "Proj. Closure\u00A0",
 };
 
 function DropdownStatus({ value, setValue, names }: DropdownStatusProps) {

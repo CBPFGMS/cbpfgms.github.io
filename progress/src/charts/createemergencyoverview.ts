@@ -348,10 +348,10 @@ function createEmergencyOverview({
 		.attr("width", xScale(maxValue))
 		.style("fill", "none")
 		.style("pointer-events", "all")
-		.on("mouseover", (e: PointerEvent, d) => {
+		.on("mouseover", (e: MouseEvent, d) => {
 			dispatchTooltipEvent(e, d, "mouseover");
 		})
-		.on("mouseout", (e: PointerEvent, d) => {
+		.on("mouseout", (e: MouseEvent, d) => {
 			dispatchTooltipEvent(e, d, "mouseout");
 		});
 

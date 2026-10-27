@@ -19,7 +19,9 @@ import { makeYearsList } from "../utils/makeyearslist";
 
 const { filterTypes } = constants;
 
-export type DataProperties = keyof InSelectionData;
+export type InSelectionDataWithoutStatuses = Omit<InSelectionData, "statuses">;
+
+export type DataProperties = keyof InSelectionDataWithoutStatuses;
 
 export type Type = (typeof filterTypes)[number];
 
@@ -31,6 +33,16 @@ type AccordionComponentProps = {
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
 };
+
+type InDataListsWithoutStatusesPerFund = Omit<
+	InDataLists,
+	| "statusesPerFund"
+	| "statusesPerFundBDT2"
+	| "statusesPerAllocationType"
+	| "statusesPerAllocationTypeBDT2"
+	| "fundsPerBeneficiaryType"
+	| "statuses"
+>;
 
 function AccordionComponent({
 	type,
@@ -45,7 +57,9 @@ function AccordionComponent({
 	const accordionRef = useRef<HTMLDivElement>(null);
 
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
-	const dataArray = [...inDataLists[dataProperty as keyof InDataLists]];
+	const dataArray = [
+		...inDataLists[dataProperty as keyof InDataListsWithoutStatusesPerFund],
+	];
 	let namesList: ListObj;
 
 	const handleAccordionExpand =
@@ -140,12 +154,12 @@ function AccordionComponent({
 							{value.length === dataArray.length
 								? `All ${type.toLocaleLowerCase()}s selected`
 								: value.length === 1
-								? isValidKey(value[0], namesList)
-									? namesList[value[0]]
-									: value[0].toString()
-								: `${
-										value.length
-								  } ${type.toLocaleLowerCase()}s selected`}
+									? isValidKey(value[0], namesList)
+										? namesList[value[0]]
+										: value[0].toString()
+									: `${
+											value.length
+										} ${type.toLocaleLowerCase()}s selected`}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>

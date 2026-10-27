@@ -5,7 +5,7 @@ import Snack from "./Snack";
 import { useState } from "react";
 import { InSelectionData } from "../utils/processdatasummary";
 import { ListObj } from "../utils/makelists";
-import { DataProperties } from "./Accordion";
+import { InSelectionDataWithoutStatuses } from "./Accordion";
 
 type CheckboxProps = {
 	value: number[];
@@ -13,7 +13,7 @@ type CheckboxProps = {
 	names: number[];
 	namesList: ListObj;
 	inSelectionData: InSelectionData;
-	dataProperty: DataProperties;
+	dataProperty: keyof InSelectionDataWithoutStatuses;
 };
 
 function CheckboxLabel({
@@ -42,10 +42,10 @@ function CheckboxLabel({
 							!inSelectionData[dataProperty].has(name)
 								? {
 										filter: "grayscale(100%)",
-								  }
+									}
 								: {
 										filter: "grayscale(0%)",
-								  }
+									}
 						}
 						control={
 							<Checkbox
@@ -60,7 +60,7 @@ function CheckboxLabel({
 									}
 									if (value.includes(name)) {
 										setValue(prev =>
-											prev.filter(d => d !== name)
+											prev.filter(d => d !== name),
 										);
 									} else {
 										setValue(prev => [...prev, name]);
