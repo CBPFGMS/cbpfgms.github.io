@@ -1,11 +1,14 @@
 import { formatPrefix } from "d3";
 
-function formatSIFloat(value: number) {
+function formatSIFloat(value: number): string {
+	//safeguard for zero, negative numbers and NaN
+	if (value <= 0 || isNaN(value)) return "0";
+
 	const length = (~~Math.log10(value) + 1) % 3;
 	const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
 	const result = formatPrefix(
 		"." + digits + "~",
-		value
+		value,
 	)(value).replace("G", "B");
 	if (parseInt(result) === 1000) {
 		const lastDigit = result[result.length - 1];

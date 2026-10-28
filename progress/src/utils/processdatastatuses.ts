@@ -6,7 +6,6 @@ import {
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import constants from "./constants";
-import { simpleWarn } from "./warninvalid";
 
 export type DataStatuses = {
 	[K in ImplementationStatuses]: number;
@@ -37,7 +36,7 @@ type ProcessDataStatusesBeneficiariesParams = {
 	allSourcesSelected: boolean;
 };
 
-const { implementationStatuses } = constants;
+const { implementationStatuses, isProdSite } = constants;
 
 function processDataStatuses({
 	data,
@@ -85,13 +84,15 @@ export function processDataStatusesBeneficiaries({
 }: ProcessDataStatusesBeneficiariesParams): DataStatusesBeneficiaries {
 	const dataStatusesBeneficiaries: DataStatusesBeneficiaries = {};
 
+	const warnings: string[] = [];
+
 	//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
 	if (allAllocationTypesSelected && allSourcesSelected) {
 		fund.forEach(pf => {
 			year.forEach(selectedYear => {
 				const thisFundData = totalBeneficiariesData[selectedYear][pf];
 				if (!thisFundData) {
-					simpleWarn(
+					warnings.push(
 						`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
 					);
 					return;
@@ -128,7 +129,7 @@ export function processDataStatusesBeneficiaries({
 						allocType
 					];
 				if (!thisAllocData) {
-					simpleWarn(
+					warnings.push(
 						`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
 					);
 					return;
@@ -149,6 +150,10 @@ export function processDataStatusesBeneficiaries({
 				});
 			});
 		});
+	}
+
+	if (!isProdSite) {
+		console.warn(warnings);
 	}
 
 	return dataStatusesBeneficiaries;

@@ -856,7 +856,7 @@ function populateTotalBeneficiariesData<
 
 		const year = row.ImplementationYear;
 		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
 			: row.PFId;
 
 		if (!target[year]) {
@@ -974,7 +974,7 @@ function populateTotalBeneficiariesByPartnerData<
 		}
 		const year = row.ImplementationYear;
 		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
 			: row.PFId;
 
 		if (!target[year]) {
@@ -1094,7 +1094,7 @@ function populateTotalBeneficiariesBySectorData<
 
 		const year = row.ImplementationYear;
 		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
 			: row.PFId;
 
 		if (!target[year]) {
@@ -1215,7 +1215,7 @@ function populateTotalBeneficiariesByBeneficiaryTypeData<
 		}
 		const year = row.ImplementationYear;
 		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}_${row.AllocationTypeId}`)
+			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
 			: row.PFId;
 
 		if (!target[year]) {

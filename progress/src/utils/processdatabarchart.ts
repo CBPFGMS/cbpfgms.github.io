@@ -13,7 +13,6 @@ import { ImplementationStatuses } from "../components/MainContainer";
 import { BeneficiariesObject, GenderAndAge } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";
-import { simpleWarn } from "./warninvalid";
 import flipObject from "./flipobject";
 import { sumStatusesCapped } from "./sumstatuses";
 
@@ -45,7 +44,11 @@ type ProcessDataBarChartParams = {
 	allSourcesSelected: boolean;
 };
 
-const { beneficiaryCategories } = constants;
+type GenderBreakdown = {
+	[key in GenderAndAge]: { targeted: number; reached: number };
+};
+
+const { beneficiaryCategories, isProdSite } = constants;
 
 function processDataBarChart({
 	data,
@@ -82,6 +85,8 @@ function processDataBarChart({
 
 	const beneficiaryTypes = Object.keys(lists.beneficiaryTypes).map(d => +d);
 
+	const warnings: string[] = [];
+
 	beneficiaryTypes.forEach(beneficiaryType => {
 		dataBeneficiaryByType.push({
 			type: beneficiaryType,
@@ -115,9 +120,7 @@ function processDataBarChart({
 
 			if (foundOrganization) {
 				foundOrganization.fundsWithType.add(datum.fund);
-				foundOrganization.alloctypesWithType.add(
-					parseFloat(`${datum.fund}.${datum.allocationType}`),
-				);
+				foundOrganization.alloctypesWithType.add(datum.allocationType);
 			} else {
 				const type = datum.organizationType;
 
@@ -141,9 +144,7 @@ function processDataBarChart({
 					targeted,
 					reached,
 					fundsWithType: new Set([datum.fund]),
-					alloctypesWithType: new Set([
-						parseFloat(`${datum.fund}.${datum.allocationType}`),
-					]),
+					alloctypesWithType: new Set([datum.allocationType]),
 				};
 
 				dataOrganization.push(obj);
@@ -156,9 +157,7 @@ function processDataBarChart({
 
 				if (foundSector) {
 					foundSector.fundsWithType.add(datum.fund);
-					foundSector.alloctypesWithType.add(
-						parseFloat(`${datum.fund}.${datum.allocationType}`),
-					);
+					foundSector.alloctypesWithType.add(datum.allocationType);
 				} else {
 					const type = sectorDatum.sectorId;
 
@@ -182,9 +181,7 @@ function processDataBarChart({
 						targeted,
 						reached,
 						fundsWithType: new Set([datum.fund]),
-						alloctypesWithType: new Set([
-							parseFloat(`${datum.fund}.${datum.allocationType}`),
-						]),
+						alloctypesWithType: new Set([datum.allocationType]),
 					};
 
 					dataSector.push(obj);
@@ -206,7 +203,7 @@ function processDataBarChart({
 						totalBeneficiariesByPartnerData[selectedYear][pf];
 
 					if (!thisFund) {
-						simpleWarn(
+						warnings.push(
 							`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data for year ${selectedYear}`,
 						);
 						return;
@@ -241,7 +238,7 @@ function processDataBarChart({
 						][allocType];
 
 					if (!thisAllocType) {
-						simpleWarn(
+						warnings.push(
 							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
 						);
 						return;
@@ -273,7 +270,7 @@ function processDataBarChart({
 						totalBeneficiariesBySectorData[selectedYear][pf];
 
 					if (!thisFund) {
-						simpleWarn(
+						warnings.push(
 							`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
 						);
 						return;
@@ -307,7 +304,7 @@ function processDataBarChart({
 						][allocType];
 
 					if (!thisAllocType) {
-						simpleWarn(
+						warnings.push(
 							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
 						);
 						return;
@@ -342,7 +339,7 @@ function processDataBarChart({
 							pf
 						];
 					if (!thisFund) {
-						simpleWarn(
+						warnings.push(
 							`Pooled fund code ${pf} not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
 						);
 						return;
@@ -365,7 +362,7 @@ function processDataBarChart({
 					lists.allocTypesPerSource[source].has(allocType),
 				);
 
-				if (!hasSource || !benType.alloctypesWithType.has(allocType)) {
+				if (!hasSource) {
 					return;
 				}
 
@@ -376,7 +373,7 @@ function processDataBarChart({
 						][allocType];
 
 					if (!thisAllocType) {
-						simpleWarn(
+						warnings.push(
 							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
 						);
 						return;
@@ -405,51 +402,51 @@ function processDataBarChart({
 		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 
-	return { dataBeneficiaryByType, dataOrganization, dataSector };
-}
-
-type GenderBreakdown = {
-	[key in GenderAndAge]: { targeted: number; reached: number };
-};
-
-//adds one fund's figures for one partner/sector/beneficiary type: the unique
-//("all") figures when every status is selected, otherwise the sum of the
-//selected statuses limited to the unique figures
-function addFundFigures<T extends GenderBreakdown>(
-	datum: DatumBarChart,
-	thisFundData: { [status: number]: T[]; all: T[] },
-	matches: (d: T) => boolean,
-	statuses: number[],
-	allStatusesSelected: boolean,
-	warnMessage: string,
-): void {
-	const allDatum = thisFundData.all.find(matches);
-
-	let fundFigures: GenderBreakdown;
-
-	if (allStatusesSelected) {
-		if (!allDatum) {
-			simpleWarn(warnMessage);
-			return;
-		}
-		fundFigures = allDatum;
-	} else {
-		const statusData = statuses.map(st => {
-			const found = thisFundData[st]?.find(matches);
-			if (!found) simpleWarn(`${warnMessage} and status ${st}`);
-			return found;
-		});
-		fundFigures = sumStatusesCapped(
-			statusData,
-			allDatum,
-			beneficiaryCategories,
-		);
+	if (!isProdSite) {
+		console.warn(warnings);
 	}
 
-	beneficiaryCategories.forEach(key => {
-		datum.targeted[key] += fundFigures[key].targeted;
-		datum.reached[key] += fundFigures[key].reached;
-	});
+	return { dataBeneficiaryByType, dataOrganization, dataSector };
+
+	//adds one fund's figures for one partner/sector/beneficiary type: the unique
+	//("all") figures when every status is selected, otherwise the sum of the
+	//selected statuses limited to the unique figures
+	function addFundFigures<T extends GenderBreakdown>(
+		datum: DatumBarChart,
+		thisFundData: { [status: number]: T[]; all: T[] },
+		matches: (d: T) => boolean,
+		statuses: number[],
+		allStatusesSelected: boolean,
+		warnMessage: string,
+	): void {
+		const allDatum = thisFundData.all.find(matches);
+
+		let fundFigures: GenderBreakdown;
+
+		if (allStatusesSelected) {
+			if (!allDatum) {
+				warnings.push(warnMessage);
+				return;
+			}
+			fundFigures = allDatum;
+		} else {
+			const statusData = statuses.map(st => {
+				const found = thisFundData[st]?.find(matches);
+				if (!found) warnings.push(`${warnMessage} and status ${st}`);
+				return found;
+			});
+			fundFigures = sumStatusesCapped(
+				statusData,
+				allDatum,
+				beneficiaryCategories,
+			);
+		}
+
+		beneficiaryCategories.forEach(key => {
+			datum.targeted[key] += fundFigures[key].targeted;
+			datum.reached[key] += fundFigures[key].reached;
+		});
+	}
 }
 
 export default processDataBarChart;

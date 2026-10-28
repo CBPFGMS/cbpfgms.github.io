@@ -5,12 +5,13 @@ import {
 	TotalBeneficiariesData,
 	TotalBeneficiariesWithAllocTypeData,
 } from "./processrawdata";
-import { simpleWarn } from "./warninvalid";
 import flipObject from "./flipobject";
 import constants from "./constants";
 import { sumStatusesCapped } from "./sumstatuses";
 
 const totalKeys = ["total", ...constants.beneficiaryCategories] as const;
+
+const { isProdSite } = constants;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -59,6 +60,8 @@ function processDataTotalBeneficiaries({
 		total: 0,
 	};
 
+	const warnings: string[] = [];
+
 	const numericStatuses = flipObject(lists.statuses);
 
 	const status = implementationStatus.map(
@@ -71,7 +74,7 @@ function processDataTotalBeneficiaries({
 			year.forEach(selectedYear => {
 				const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
 				if (!thisFundData) {
-					simpleWarn(
+					warnings.push(
 						`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
 					);
 					return;
@@ -107,7 +110,7 @@ function processDataTotalBeneficiaries({
 						allocType
 					];
 				if (!thisAllocData) {
-					simpleWarn(
+					warnings.push(
 						`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
 					);
 					return;
@@ -127,6 +130,10 @@ function processDataTotalBeneficiaries({
 				});
 			});
 		});
+	}
+
+	if (!isProdSite) {
+		console.warn(warnings);
 	}
 
 	return { targeted, reached };

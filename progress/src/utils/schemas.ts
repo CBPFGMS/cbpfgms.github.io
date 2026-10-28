@@ -325,8 +325,13 @@ export const organizationMasterObjectSchema = z.object({
 });
 
 export const beneficiaryTypesMasterObjectSchema = z.object({
-	BeneficiaryTypeId: z.number().int().nonnegative(),
-	BeneficiaryType: z.string(),
+	Id: z.number().int().nonnegative(),
+	BeneficiaryTypeName: z.string(),
+	BeneficiaryTypeCode: z.string(),
+	InstanceDatabaseId: z.number().int().nonnegative(),
+	InstanceDatabaseCode: z.string(),
+	LegacyId: z.number().int().nonnegative(),
+	DisplayOrder: z.number().int().nonnegative(),
 });
 
 export const pooledFundsMasterObjectSchema = z.object({
