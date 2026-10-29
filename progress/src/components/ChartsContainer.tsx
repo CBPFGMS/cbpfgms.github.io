@@ -26,6 +26,7 @@ import GBVChart from "./GBVChart";
 import EmergencyChart from "./EmergencyChart";
 import CvaChart from "./CvaChart";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type Ref = (node?: Element | null | undefined) => void;
 
@@ -54,7 +55,7 @@ type ChartsContainerProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 	targetedAndReachedTotalByDisability: TargetedAndReachedTotal;
 	implementationsStatus: ImplementationStatuses[];

@@ -3,12 +3,14 @@ import {
 	DownloadStates,
 	ImplementationStatuses,
 } from "../components/MainContainer";
-import { InDataLists } from "../utils/processrawdata";
+import { FundWithAllocType, InDataLists } from "../utils/processrawdata";
 import constants from "../utils/constants";
 
 type UpdateQueryStringParams = {
 	queryStringValues: URLSearchParams;
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
@@ -19,7 +21,7 @@ type UpdateQueryStringParams = {
 	inDataLists: InDataLists;
 	year: number[];
 	fund: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	allocationSource: number[];
 	implementationStatus: ImplementationStatuses[];
 	downloadStates: DownloadStates;
@@ -46,11 +48,11 @@ function useUpdateQueryString({
 	defaultYear,
 }: UpdateQueryStringParams): void {
 	useEffect(() => {
-		const allocationTypesParam = getNumericArrayParam("allocationType");
+		const allocationTypesParam = getAllocTypesArrayParam("allocationType");
 		const allocationSourcesParam = getNumericArrayParam("allocationSource");
 		const fundParam = getNumericArrayParam("fund");
 		const yearParam = getNumericArrayParam("year");
-		const implementationStatusParam = getStringArrayParam(
+		const implementationStatusParam = getStatusArrayParam(
 			"implementationStatus",
 		);
 
@@ -110,13 +112,22 @@ function useUpdateQueryString({
 		return queryStringValues.get(param)?.split(",").map(Number) ?? null;
 	}
 
-	function getStringArrayParam(
+	function getStatusArrayParam(
 		param: string,
 	): ImplementationStatuses[] | null {
 		return (
 			(queryStringValues
 				.get(param)
 				?.split(",") as ImplementationStatuses[]) ?? null
+		);
+	}
+
+	function getAllocTypesArrayParam(
+		param: string,
+	): FundWithAllocType[] | null {
+		return (
+			(queryStringValues.get(param)?.split(",") as FundWithAllocType[]) ??
+			null
 		);
 	}
 

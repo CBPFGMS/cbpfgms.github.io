@@ -16,6 +16,7 @@ import Divider from "@mui/material/Divider";
 import { processSummaryDownload } from "../utils/processdownload";
 import { ImplementationStatuses } from "./MainContainer";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type SummaryChartProps = {
 	dataSummary: DatumSummary[];
@@ -24,7 +25,7 @@ type SummaryChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 };
 

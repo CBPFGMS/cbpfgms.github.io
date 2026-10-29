@@ -17,6 +17,7 @@ import ChartsContainer from "./ChartsContainer";
 import processDataBarChart from "../utils/processdatabarchart";
 import IndicatorsContainer from "./IndicatorsContainer";
 import processDataTotalBeneficiaries from "../utils/processdatatotalben";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 const { implementationStatuses, charts } = constants;
 
@@ -70,7 +71,7 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 
 	const [year, setYear] = useState<number[]>([defaultYear]),
 		[fund, setFund] = useState<number[]>([...inDataLists.funds]),
-		[allocationType, setAllocationType] = useState<number[]>([
+		[allocationType, setAllocationType] = useState<FundWithAllocType[]>([
 			...inDataLists.allocationTypes,
 		]),
 		[allocationSource, setAllocationSource] = useState<number[]>([

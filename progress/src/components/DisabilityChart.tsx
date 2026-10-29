@@ -18,6 +18,7 @@ import formatSIFloat from "../utils/formatsi";
 import Divider from "@mui/material/Divider";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
 import { Report } from "../utils/processdatasummary";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type DisabilityChartProps = {
 	targetedAndReachedTotalByDisability: TargetedAndReachedTotal;
@@ -26,7 +27,7 @@ type DisabilityChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	disabilityReports: Report;
 };

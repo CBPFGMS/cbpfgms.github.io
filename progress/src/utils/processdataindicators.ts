@@ -2,7 +2,11 @@ import {
 	GlobalIndicatorsObject,
 	GlobalIndicatorsMasterObject,
 } from "./schemas";
-import { BeneficiariesObject, GenderAndAge } from "./processrawdata";
+import {
+	BeneficiariesObject,
+	FundWithAllocType,
+	GenderAndAge,
+} from "./processrawdata";
 import { sum, mean } from "d3";
 import constants from "./constants";
 import { List, GlobalIndicatorsDetails } from "./makelists";
@@ -57,7 +61,7 @@ type ProcessDataIndicatorsParams = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationsStatus: ImplementationStatuses[];
 };
 

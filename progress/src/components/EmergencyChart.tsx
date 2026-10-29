@@ -31,6 +31,7 @@ import { createEmergencyTimeline } from "../charts/createemergencytimeline";
 import { createEmergencyDefs } from "../charts/createEmergencyDefs";
 import { ScrollableContainer } from "./ScrollableContainer";
 import { calculateTimelineSVGHeight } from "../charts/emergencyutils";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 export type EmergencyChartModes = (typeof emergencyChartModes)[number];
 
@@ -59,7 +60,7 @@ type EmergencyChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 };
 

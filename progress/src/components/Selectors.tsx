@@ -1,14 +1,18 @@
 import AccordionComponent from "./Accordion";
 import Grid from "@mui/material/Grid2";
 import { InSelectionData } from "../utils/processdatasummary";
+import { FundWithAllocType } from "../utils/processrawdata";
+import AccordionAllocType from "./AccordionAllocType";
 
 type SelectorsProps = {
 	year: number[];
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: FundWithAllocType[];
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
@@ -51,10 +55,7 @@ function Selectors({
 				/>
 			</Grid>
 			<Grid sx={{ flexGrow: 1 }}>
-				<AccordionComponent
-					type="Allocation Name"
-					dataProperty="allocationTypes"
-					filterType="search"
+				<AccordionAllocType
 					value={allocationType}
 					setValue={setAllocationType}
 					inSelectionData={inSelectionData}

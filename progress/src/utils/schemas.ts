@@ -285,7 +285,7 @@ export const allocationTypesMasterObjectSchema = z.object({
 	TotalUnderApprovalBudget: z.number().nonnegative(),
 	TotalProjectsApproved: z.number().int().nonnegative(),
 	TotalApprovedBudget: z.number().nonnegative(),
-	AllocationTypeId: z.number().int().nonnegative().nullable(),
+	AllocationTypeId: z.number().int().nonnegative(),
 	FundTypeId: z.union([z.literal(1), z.literal(2)]),
 });
 

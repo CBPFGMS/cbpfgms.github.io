@@ -1,4 +1,4 @@
-import { BeneficiariesObject, Data } from "./processrawdata";
+import { BeneficiariesObject, Data, FundWithAllocType } from "./processrawdata";
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
 import constants from "./constants";
@@ -93,7 +93,7 @@ type ProcessDownloadParams = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 };
 
@@ -649,7 +649,7 @@ function checkRow(
 	year: number[],
 	fund: number[],
 	allocationSource: number[],
-	allocationType: number[],
+	allocationType: FundWithAllocType[],
 	implementationStatus: ImplementationStatuses[],
 ): boolean {
 	return (

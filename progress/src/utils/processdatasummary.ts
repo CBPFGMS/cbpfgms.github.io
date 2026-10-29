@@ -1,4 +1,4 @@
-import { Data } from "./processrawdata";
+import { Data, FundWithAllocType } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
 import constants from "./constants";
@@ -7,7 +7,7 @@ export type InSelectionData = {
 	years: Set<number>;
 	funds: Set<number>;
 	allocationSources: Set<number>;
-	allocationTypes: Set<number>;
+	allocationTypes: Set<FundWithAllocType>;
 	statuses: Set<ImplementationStatuses>;
 };
 
@@ -16,7 +16,7 @@ type ProcessDataSummaryParams = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 };

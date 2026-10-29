@@ -46,7 +46,7 @@ export type Datum = {
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
-	allocationType: number;
+	allocationType: FundWithAllocType;
 	allocationTypeId: number;
 	endDate: Date;
 	approvalDate: Date;
@@ -64,6 +64,8 @@ export type Datum = {
 	cvaTotalTargetedPeople: number | null;
 	cvaTotalReachedPeople: number | null;
 };
+
+export type FundWithAllocType = `${number}-${number}`;
 
 export type ReportType = (typeof reportTypes)[number];
 
@@ -116,16 +118,20 @@ export type BeneficiariesObject = {
 export type InDataLists = {
 	years: Set<number>;
 	sectors: Set<number>;
-	allocationTypes: Set<number>;
+	allocationTypes: Set<FundWithAllocType>;
 	allocationSources: Set<number>;
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	statuses: Set<ImplementationStatuses>;
 	statusesPerFund: { [fund: number]: Set<number> };
-	statusesPerAllocationType: { [allocationType: number]: Set<number> };
+	statusesPerAllocationType: {
+		[allocationType: FundWithAllocType]: Set<number>;
+	};
 	statusesPerFundBDT2: { [fund: number]: Set<number> };
-	statusesPerAllocationTypeBDT2: { [allocationType: number]: Set<number> };
+	statusesPerAllocationTypeBDT2: {
+		[allocationType: FundWithAllocType]: Set<number>;
+	};
 	fundsPerBeneficiaryType: { [beneficiaryType: number]: Set<number> };
 };
 
@@ -174,7 +180,7 @@ export type TotalBeneficiariesData = {
 
 export type TotalBeneficiariesWithAllocTypeData = {
 	[year: number]: {
-		[allocType: number]: {
+		[allocType: FundWithAllocType]: {
 			[status: number]: TotalBeneficiariesBreakdown;
 			all: TotalBeneficiariesBreakdown;
 		};
@@ -198,7 +204,7 @@ export type TotalBeneficiariesByPartnerData = {
 
 export type TotalBeneficiariesByPartnerWithAllocTypeData = {
 	[year: number]: {
-		[allocType: number]: {
+		[allocType: FundWithAllocType]: {
 			[status: number]: TotalBeneficiariesByPartnerBreakdown[];
 			all: TotalBeneficiariesByPartnerBreakdown[];
 		};
@@ -222,7 +228,7 @@ export type TotalBeneficiariesBySectorData = {
 
 export type TotalBeneficiariesBySectorWithAllocTypeData = {
 	[year: number]: {
-		[allocType: number]: {
+		[allocType: FundWithAllocType]: {
 			[status: number]: TotalBeneficiariesBySectorBreakdown[];
 			all: TotalBeneficiariesBySectorBreakdown[];
 		};
@@ -246,11 +252,40 @@ export type TotalBeneficiariesByBeneficiaryTypeData = {
 
 export type TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData = {
 	[year: number]: {
-		[allocType: number]: {
+		[allocType: FundWithAllocType]: {
 			[status: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 			all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
 		};
 	};
+};
+
+//CLAUDE TEST STARTS HERE
+
+type FundData = TotalBeneficiariesData[number][number];
+
+type BeneficiariesTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: FundData };
+};
+
+type PartnerFundData = TotalBeneficiariesByPartnerData[number][number];
+
+type BeneficiariesByPartnerTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: PartnerFundData };
+};
+
+type SectorFundData = TotalBeneficiariesBySectorData[number][number];
+
+type BeneficiariesBySectorTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: SectorFundData };
+};
+
+type BeneficiaryTypeFundData =
+	TotalBeneficiariesByBeneficiaryTypeData[number][number];
+
+type BeneficiariesByBeneficiaryTypeTarget<
+	K extends number | FundWithAllocType,
+> = {
+	[year: number]: { [key in K]: BeneficiaryTypeFundData };
 };
 
 const statusesPerFundBDT2: InDataLists["statusesPerFund"] = {};
@@ -487,21 +522,21 @@ function processRawData({
 		totalBeneficiaries,
 		totalBeneficiariesData,
 		"totalBeneficiaries",
-		false,
+		row => row.PFId,
 	);
 
 	populateTotalBeneficiariesByPartnerData(
 		totalBeneficiariesByPartner,
 		totalBeneficiariesByPartnerData,
 		"totalBeneficiariesByPartner",
-		false,
+		row => row.PFId,
 	);
 
 	populateTotalBeneficiariesBySectorData(
 		totalBeneficiariesBySector,
 		totalBeneficiariesBySectorData,
 		"totalBeneficiariesBySector",
-		false,
+		row => row.PFId,
 	);
 
 	populateTotalBeneficiariesByBeneficiaryTypeData(
@@ -509,35 +544,35 @@ function processRawData({
 		totalBeneficiariesByBeneficiaryTypeData,
 		"totalBeneficiariesByBeneficiaryType",
 		fundsPerBeneficiaryType,
-		false,
+		row => row.PFId,
 	);
 
 	populateTotalBeneficiariesData(
 		totalBeneficiariesByDisability,
 		totalBeneficiariesByDisabilityData,
 		"totalBeneficiariesByDisability",
-		false,
+		row => row.PFId,
 	);
 
 	populateTotalBeneficiariesData(
 		totalBeneficiariesWithAllocType,
 		totalBeneficiariesWithAllocTypeData,
 		"totalBeneficiariesWithAllocType",
-		true,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
 	);
 
 	populateTotalBeneficiariesByPartnerData(
 		totalBeneficiariesByPartnerWithAllocType,
 		totalBeneficiariesByPartnerWithAllocTypeData,
 		"totalBeneficiariesByPartnerWithAllocType",
-		true,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
 	);
 
 	populateTotalBeneficiariesBySectorData(
 		totalBeneficiariesBySectorWithAllocType,
 		totalBeneficiariesBySectorWithAllocTypeData,
 		"totalBeneficiariesBySectorWithAllocType",
-		true,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
 	);
 
 	populateTotalBeneficiariesByBeneficiaryTypeData(
@@ -545,14 +580,14 @@ function processRawData({
 		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
 		"totalBeneficiariesByBeneficiaryTypeWithAllocType",
 		fundsPerBeneficiaryType,
-		true,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
 	);
 
 	populateTotalBeneficiariesData(
 		totalBeneficiariesByDisabilityWithAllocType,
 		totalBeneficiariesByDisabilityWithAllocTypeData,
 		"totalBeneficiariesByDisabilityWithAllocType",
-		true,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
 	);
 
 	projectSummary.forEach(row => {
@@ -579,7 +614,7 @@ function processRawData({
 		if (parsedRow.success) {
 			const thisAllocationType =
 				listsObj.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+					`${row.PooledFundId}-${row.AllocationtypeId}`
 				];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
@@ -641,7 +676,7 @@ function processRawData({
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+					`${row.PooledFundId}-${row.AllocationtypeId}`,
 				);
 
 				//IMPORTANT: USE BDT2 FOR THE INDATALIST
@@ -649,7 +684,7 @@ function processRawData({
 					thisStatusId,
 				);
 				(statusesPerAllocationType[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+					`${row.PooledFundId}-${row.AllocationtypeId}`
 				] ??= new Set()).add(thisStatusId);
 				statusesSet.add(thisStatus as ImplementationStatuses);
 
@@ -657,9 +692,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
 					projectStatusId: thisStatusId,
@@ -679,9 +712,7 @@ function processRawData({
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
@@ -838,14 +869,16 @@ function generateBeneficiariesObjectSummary(
 	};
 }
 
-function populateTotalBeneficiariesData<
-	T extends TotalBeneficiariesData | TotalBeneficiariesWithAllocTypeData,
->(
+function populateTotalBeneficiariesData<K extends number | FundWithAllocType>(
 	source: TotalBeneficiariesObject[],
-	target: T,
+	target: BeneficiariesTarget<K>,
 	sourceName: string,
-	isWithAllocType: boolean,
+	getIdentifier: (row: TotalBeneficiariesObject) => K,
 ) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<number, Record<string | number, FundData>>;
+
 	source.forEach(row => {
 		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
 
@@ -855,15 +888,13 @@ function populateTotalBeneficiariesData<
 		}
 
 		const year = row.ImplementationYear;
-		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
-			: row.PFId;
+		const identifier = getIdentifier(row);
 
-		if (!target[year]) {
-			target[year] = {};
+		if (!data[year]) {
+			data[year] = {};
 		}
-		if (!target[year][identifier]) {
-			target[year][identifier] = {} as T[number][number];
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as FundData;
 		}
 
 		const totalDatum = {
@@ -890,16 +921,16 @@ function populateTotalBeneficiariesData<
 		};
 
 		if (row.ProcessStatusId == null) {
-			target[year][identifier].all = totalDatum;
+			data[year][identifier].all = totalDatum;
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			if (!target[year][identifier][thisStatus]) {
-				target[year][identifier][thisStatus] = totalDatum;
+			if (!data[year][identifier][thisStatus]) {
+				data[year][identifier][thisStatus] = totalDatum;
 			} else {
 				addTargetedAndReached(
-					target[year][identifier][thisStatus],
+					data[year][identifier][thisStatus],
 					totalDatum,
 					[...beneficiaryCategories, "total"],
 				);
@@ -911,14 +942,16 @@ function populateTotalBeneficiariesData<
 				).includes(thisStatus)
 			) {
 				(statusesPerFundBDT2[row.PFId] ??= new Set()).add(thisStatus);
-				(statusesPerAllocationTypeBDT2[
-					parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
-				] ??= new Set()).add(thisStatus);
+				if (row.AllocationTypeId) {
+					(statusesPerAllocationTypeBDT2[
+						`${row.PFId}-${row.AllocationTypeId}`
+					] ??= new Set()).add(thisStatus);
+				}
 			}
 		}
 	});
 
-	Object.values(target).forEach(yearData => {
+	Object.values(data).forEach(yearData => {
 		Object.entries(yearData).forEach(([identifier, identifierData]) => {
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
@@ -937,7 +970,7 @@ function populateTotalBeneficiariesData<
 			});
 
 			if (!retainedStatuses.length) {
-				delete yearData[Number(identifier)];
+				delete yearData[identifier];
 				return;
 			}
 
@@ -955,15 +988,20 @@ function populateTotalBeneficiariesData<
 }
 
 function populateTotalBeneficiariesByPartnerData<
-	T extends
-		| TotalBeneficiariesByPartnerData
-		| TotalBeneficiariesByPartnerWithAllocTypeData,
+	K extends number | FundWithAllocType,
 >(
 	source: TotalBeneficiariesByPartnerObject[],
-	target: T,
+	target: BeneficiariesByPartnerTarget<K>,
 	sourceName: string,
-	isWithAllocType: boolean,
+	getIdentifier: (row: TotalBeneficiariesByPartnerObject) => K,
 ) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, PartnerFundData>
+	>;
+
 	source.forEach(row => {
 		const parsedRow =
 			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
@@ -973,15 +1011,13 @@ function populateTotalBeneficiariesByPartnerData<
 			return;
 		}
 		const year = row.ImplementationYear;
-		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
-			: row.PFId;
+		const identifier = getIdentifier(row);
 
-		if (!target[year]) {
-			target[year] = {};
+		if (!data[year]) {
+			data[year] = {};
 		}
-		if (!target[year][identifier]) {
-			target[year][identifier] = {} as T[number][number];
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as PartnerFundData;
 		}
 
 		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
@@ -1005,16 +1041,16 @@ function populateTotalBeneficiariesByPartnerData<
 		};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][identifier].all) {
-				target[year][identifier].all = [partnersDatum];
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [partnersDatum];
 			} else {
-				target[year][identifier].all.push(partnersDatum);
+				data[year][identifier].all.push(partnersDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][identifier][thisStatus]?.find(
+			const foundDatum = data[year][identifier][thisStatus]?.find(
 				d => d.partner === partnersDatum.partner,
 			);
 			if (foundDatum) {
@@ -1024,14 +1060,12 @@ function populateTotalBeneficiariesByPartnerData<
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][identifier][thisStatus] ??= []).push(
-					partnersDatum,
-				);
+				(data[year][identifier][thisStatus] ??= []).push(partnersDatum);
 			}
 		}
 	});
 
-	Object.values(target).forEach(yearData => {
+	Object.values(data).forEach(yearData => {
 		Object.entries(yearData).forEach(([identifier, identifierData]) => {
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
@@ -1050,7 +1084,7 @@ function populateTotalBeneficiariesByPartnerData<
 			});
 
 			if (!retainedStatuses.length) {
-				delete yearData[Number(identifier)];
+				delete yearData[identifier]; // no Number() needed
 				return;
 			}
 
@@ -1075,15 +1109,20 @@ function populateTotalBeneficiariesByPartnerData<
 }
 
 function populateTotalBeneficiariesBySectorData<
-	T extends
-		| TotalBeneficiariesBySectorData
-		| TotalBeneficiariesBySectorWithAllocTypeData,
+	K extends number | FundWithAllocType,
 >(
 	source: TotalBeneficiariesBySectorObject[],
-	target: T,
+	target: BeneficiariesBySectorTarget<K>,
 	sourceName: string,
-	isWithAllocType: boolean,
+	getIdentifier: (row: TotalBeneficiariesBySectorObject) => K,
 ) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, SectorFundData>
+	>;
+
 	source.forEach(row => {
 		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
 
@@ -1093,15 +1132,13 @@ function populateTotalBeneficiariesBySectorData<
 		}
 
 		const year = row.ImplementationYear;
-		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
-			: row.PFId;
+		const identifier = getIdentifier(row);
 
-		if (!target[year]) {
-			target[year] = {};
+		if (!data[year]) {
+			data[year] = {};
 		}
-		if (!target[year][identifier]) {
-			target[year][identifier] = {} as T[number][number];
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as SectorFundData;
 		}
 
 		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
@@ -1125,16 +1162,16 @@ function populateTotalBeneficiariesBySectorData<
 		};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][identifier].all) {
-				target[year][identifier].all = [sectorsDatum];
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [sectorsDatum];
 			} else {
-				target[year][identifier].all.push(sectorsDatum);
+				data[year][identifier].all.push(sectorsDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][identifier][thisStatus]?.find(
+			const foundDatum = data[year][identifier][thisStatus]?.find(
 				d => d.sector === sectorsDatum.sector,
 			);
 			if (foundDatum) {
@@ -1144,14 +1181,12 @@ function populateTotalBeneficiariesBySectorData<
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][identifier][thisStatus] ??= []).push(
-					sectorsDatum,
-				);
+				(data[year][identifier][thisStatus] ??= []).push(sectorsDatum);
 			}
 		}
 	});
 
-	Object.values(target).forEach(yearData => {
+	Object.values(data).forEach(yearData => {
 		Object.entries(yearData).forEach(([identifier, identifierData]) => {
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
@@ -1170,7 +1205,7 @@ function populateTotalBeneficiariesBySectorData<
 			});
 
 			if (!retainedStatuses.length) {
-				delete yearData[Number(identifier)];
+				delete yearData[identifier]; // no Number() needed
 				return;
 			}
 
@@ -1195,16 +1230,21 @@ function populateTotalBeneficiariesBySectorData<
 }
 
 function populateTotalBeneficiariesByBeneficiaryTypeData<
-	T extends
-		| TotalBeneficiariesByBeneficiaryTypeData
-		| TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+	K extends number | FundWithAllocType,
 >(
 	source: TotalBeneficiariesByBeneficiaryTypeObject[],
-	target: T,
+	target: BeneficiariesByBeneficiaryTypeTarget<K>,
 	sourceName: string,
 	fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"],
-	isWithAllocType: boolean,
+	getIdentifier: (row: TotalBeneficiariesByBeneficiaryTypeObject) => K,
 ) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, BeneficiaryTypeFundData>
+	>;
+
 	source.forEach(row => {
 		const parsedRow =
 			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
@@ -1214,21 +1254,21 @@ function populateTotalBeneficiariesByBeneficiaryTypeData<
 			return;
 		}
 		const year = row.ImplementationYear;
-		const identifier = isWithAllocType
-			? parseFloat(`${row.PFId}.${row.AllocationTypeId}`)
-			: row.PFId;
+		const identifier = getIdentifier(row);
 
-		if (!target[year]) {
-			target[year] = {};
-		}
-		if (!fundsPerBeneficiaryType[row.BeneficiaryTypeId]) {
-			fundsPerBeneficiaryType[row.BeneficiaryTypeId] = new Set();
+		if (!data[year]) {
+			data[year] = {};
 		}
 
-		fundsPerBeneficiaryType[row.BeneficiaryTypeId].add(identifier);
+		// Only track plain fund IDs; alloc-type identifiers are skipped
+		if (typeof identifier === "number") {
+			(fundsPerBeneficiaryType[row.BeneficiaryTypeId] ??= new Set()).add(
+				identifier,
+			);
+		}
 
-		if (!target[year][identifier]) {
-			target[year][identifier] = {} as T[number][number];
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as BeneficiaryTypeFundData;
 		}
 
 		const beneficiaryTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown =
@@ -1253,16 +1293,16 @@ function populateTotalBeneficiariesByBeneficiaryTypeData<
 			};
 
 		if (row.ProcessStatusId === null) {
-			if (!target[year][identifier].all) {
-				target[year][identifier].all = [beneficiaryTypeDatum];
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [beneficiaryTypeDatum];
 			} else {
-				target[year][identifier].all.push(beneficiaryTypeDatum);
+				data[year][identifier].all.push(beneficiaryTypeDatum);
 			}
 		} else {
 			//several raw statuses can map to the same status (e.g. Disbursement
 			//and Implementation both map to Under Implementation): add their values
 			const thisStatus = projectStatusMapping[row.ProcessStatusId];
-			const foundDatum = target[year][identifier][thisStatus]?.find(
+			const foundDatum = data[year][identifier][thisStatus]?.find(
 				d => d.beneficiaryType === beneficiaryTypeDatum.beneficiaryType,
 			);
 			if (foundDatum) {
@@ -1272,14 +1312,14 @@ function populateTotalBeneficiariesByBeneficiaryTypeData<
 					beneficiaryCategories,
 				);
 			} else {
-				(target[year][identifier][thisStatus] ??= []).push(
+				(data[year][identifier][thisStatus] ??= []).push(
 					beneficiaryTypeDatum,
 				);
 			}
 		}
 	});
 
-	Object.values(target).forEach(yearData => {
+	Object.values(data).forEach(yearData => {
 		Object.values(yearData).forEach(identifierData => {
 			Object.entries(identifierData).forEach(([status, statusData]) => {
 				if (status === "all") return;

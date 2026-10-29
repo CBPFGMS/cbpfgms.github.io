@@ -16,6 +16,7 @@ import Donut from "./GBVDonut";
 import formatSIFloat from "../utils/formatsi";
 import { format } from "d3";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type GBVChartProps = {
 	dataGBV: DatumGBV;
@@ -24,7 +25,7 @@ type GBVChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 };
 

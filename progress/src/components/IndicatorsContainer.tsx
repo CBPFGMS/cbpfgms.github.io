@@ -12,13 +12,14 @@ import IndicatorsCarousel from "./IndicatorsCarousel";
 import { List } from "../utils/makelists";
 import processDataIndicators from "../utils/processdataindicators";
 import Alert from "@mui/material/Alert";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type IndicatorsContainerProps = {
 	dataIndicators: GlobalIndicatorsObject[];
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	indicatorsRef: (node?: Element | null | undefined) => void;
 	refIds: RefIds;
 	lists: List;

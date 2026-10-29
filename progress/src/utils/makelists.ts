@@ -21,7 +21,7 @@ import {
 	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
-import { GenderAndAge, ReportType } from "./processrawdata";
+import { FundWithAllocType, GenderAndAge, ReportType } from "./processrawdata";
 import { projectStatusMaster } from "./constants";
 
 type MakeListParams = {
@@ -42,7 +42,7 @@ export type ListObj = {
 };
 
 export type AllocationTypeListObj = {
-	[key: number]: AllocationTypesMasterObject;
+	[key: FundWithAllocType]: AllocationTypesMasterObject;
 };
 
 type OrganizationListObj = {
@@ -60,7 +60,7 @@ export type ProjectDetails = {
 	year: number;
 	fund: number;
 	allocationSource: number;
-	allocationType: number;
+	allocationType: FundWithAllocType;
 	endDate: Date;
 	approvalDate: Date;
 	projectStatusId: number;
@@ -89,7 +89,7 @@ export type List = {
 	fundAbbreviatedNames: ListObj;
 	fundIsoCodes: ListObj;
 	beneficiaryTypes: ListObj;
-	allocationTypes: ListObj;
+	allocationTypes: { [key: FundWithAllocType]: string };
 	allocationTypesCompleteList: AllocationTypeListObj;
 	allocationSources: ListObj;
 	organizationTypes: ListObj;
@@ -109,7 +109,7 @@ export type List = {
 		emergencyCategories: Map<number, EmergencyCategories>;
 	};
 	cvaTypeNames: ListObj;
-	allocTypesPerSource: { [allocationSource: number]: Set<number> };
+	allocTypesPerSource: { [allocationSource: number]: Set<FundWithAllocType> };
 };
 
 function makeLists({
@@ -186,14 +186,13 @@ function makeLists({
 		const parsedAllocationTypeMaster =
 			allocationTypesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
-			lists.allocationTypes[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
-			] = d.AllocationTitle;
+			lists.allocationTypes[`${d.PooledFundId}-${d.AllocationTypeId}`] =
+				d.AllocationTitle;
 			lists.allocationTypesCompleteList[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
+				`${d.PooledFundId}-${d.AllocationTypeId}`
 			] = d;
 			(lists.allocTypesPerSource[d.AllocationSourceId] ??= new Set()).add(
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`),
+				`${d.PooledFundId}-${d.AllocationTypeId}`,
 			);
 		} else {
 			warnInvalidSchema(

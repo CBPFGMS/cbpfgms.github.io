@@ -18,6 +18,7 @@ import constants from "../utils/constants";
 import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type PictogramChartProps = {
 	clickedDownload: DownloadStates;
@@ -25,7 +26,7 @@ type PictogramChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 };

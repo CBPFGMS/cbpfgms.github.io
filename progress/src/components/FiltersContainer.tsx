@@ -11,6 +11,7 @@ import {
 	DataStatusesBeneficiaries,
 } from "../utils/processdatastatuses";
 import React from "react";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type FiltersContainerProps = {
 	year: number[];
@@ -19,8 +20,10 @@ type FiltersContainerProps = {
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: FundWithAllocType[];
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
@@ -80,6 +83,7 @@ function FiltersContainer({
 				<Grid
 					ref={menusRef}
 					size={12}
+					mb={2}
 				>
 					<Selectors
 						year={year}

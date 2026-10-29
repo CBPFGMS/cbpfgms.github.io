@@ -28,7 +28,7 @@ import {
 	processBeneficiaryTypesDownload,
 	processOrganizationsDownload,
 } from "../utils/processdownload";
-import { GenderAndAge } from "../utils/processrawdata";
+import { FundWithAllocType, GenderAndAge } from "../utils/processrawdata";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
 
 type BarChartProps = {
@@ -41,7 +41,7 @@ type BarChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 };
 

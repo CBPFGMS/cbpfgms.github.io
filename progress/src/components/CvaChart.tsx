@@ -19,6 +19,7 @@ import CvaChartSwitch from "./CvaSwitch";
 import CvaDonuts from "./CvaDonuts";
 import CvaTypesChart from "./CvaTypesChart";
 import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 export type CvaChartModes = (typeof cvaChartModes)[number];
 
@@ -35,7 +36,7 @@ type CvaChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 };

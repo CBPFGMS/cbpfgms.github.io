@@ -1,5 +1,6 @@
 import {
 	Data,
+	FundWithAllocType,
 	TotalBeneficiariesData,
 	TotalBeneficiariesWithAllocTypeData,
 } from "./processrawdata";
@@ -20,7 +21,7 @@ type ProcessDataStatusesParams = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	lists: List;
 };
 
@@ -31,7 +32,7 @@ type ProcessDataStatusesBeneficiariesParams = {
 	lists: List;
 	year: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	allAllocationTypesSelected: boolean;
 	allSourcesSelected: boolean;
 };

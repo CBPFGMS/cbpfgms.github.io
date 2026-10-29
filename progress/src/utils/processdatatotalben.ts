@@ -1,6 +1,7 @@
 import { ImplementationStatuses } from "../components/MainContainer";
 import { List } from "./makelists";
 import {
+	FundWithAllocType,
 	GenderAndAge,
 	TotalBeneficiariesData,
 	TotalBeneficiariesWithAllocTypeData,
@@ -21,7 +22,7 @@ type ProcessDataTotalBeneficiariesParams = {
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	allStatusesSelected: boolean;
 	allAllocationTypesSelected: boolean;
 	allSourcesSelected: boolean;

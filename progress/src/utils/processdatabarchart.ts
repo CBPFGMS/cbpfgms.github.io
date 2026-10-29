@@ -7,6 +7,7 @@ import {
 	TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
 	TotalBeneficiariesByPartnerWithAllocTypeData,
 	TotalBeneficiariesBySectorWithAllocTypeData,
+	FundWithAllocType,
 } from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
@@ -19,7 +20,7 @@ import { sumStatusesCapped } from "./sumstatuses";
 export type DatumBarChart = {
 	type: number;
 	fundsWithType: Set<number>;
-	alloctypesWithType: Set<number>;
+	alloctypesWithType: Set<FundWithAllocType>;
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
 };
@@ -29,7 +30,7 @@ type ProcessDataBarChartParams = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
 	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
