@@ -129,6 +129,11 @@ const constants = {
 	cvaPopoverWidth: 760,
 	implementationAndReportingProjects: [4, 5, 6],
 	opacityValue: 0.3,
+	disclaimerWarningColor: "#e07b00",
+	disclaimerText:
+		"Disclaimer: Beneficiary figures are calculated using OCHA's standard beneficiary de-duplication methodology (BDT v.2) process to minimize double counting across activities and locations.",
+	disclaimerAltText:
+		"Disclaimer: this is a placeholder, actual disclaimer will show up here.",
 } as const;
 
 export const projectStatusMaster = {
