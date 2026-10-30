@@ -121,7 +121,7 @@ function processDataTotalBeneficiaries({
 					return;
 				}
 
-				const fundFigures = allStatusesSelected
+				const allocTypeFigures = allStatusesSelected
 					? thisAllocData.all
 					: sumStatusesCapped(
 							status.map(st => thisAllocData[st]),
@@ -129,13 +129,9 @@ function processDataTotalBeneficiaries({
 							totalKeys,
 						);
 
-						console.log(allocType);
-
-						console.log(fundFigures.total.targeted)
-
 				totalKeys.forEach(key => {
-					targeted[key] += fundFigures[key].targeted;
-					reached[key] += fundFigures[key].reached;
+					targeted[key] += allocTypeFigures[key].targeted;
+					reached[key] += allocTypeFigures[key].reached;
 				});
 			});
 		});
