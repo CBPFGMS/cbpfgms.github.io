@@ -61,6 +61,21 @@ function processDataTotalBeneficiaries({
 		total: 0,
 	};
 
+	const targetedForAllocType = {
+		girls: 0,
+		boys: 0,
+		women: 0,
+		men: 0,
+		total: 0,
+	};
+	const reachedForAllocType = {
+		girls: 0,
+		boys: 0,
+		women: 0,
+		men: 0,
+		total: 0,
+	};
+
 	const warnings: string[] = [];
 
 	const numericStatuses = flipObject(lists.statuses);
@@ -69,34 +84,34 @@ function processDataTotalBeneficiaries({
 		implSt => +numericStatuses[implSt as ImplementationStatuses],
 	);
 
-	//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
-	if (allAllocationTypesSelected && allSourcesSelected) {
-		fund.forEach(pf => {
-			year.forEach(selectedYear => {
-				const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
-				if (!thisFundData) {
-					warnings.push(
-						`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
+	//We always use the regular BDT2 API call because this fund-based object will be used to cap the alloctype object
+	fund.forEach(pf => {
+		year.forEach(selectedYear => {
+			const thisFundData = totalBeneficiariesData[selectedYear]?.[pf];
+			if (!thisFundData) {
+				warnings.push(
+					`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
+				);
+				return;
+			}
+
+			const fundFigures = allStatusesSelected
+				? thisFundData.all
+				: sumStatusesCapped(
+						status.map(st => thisFundData[st]),
+						thisFundData.all,
+						totalKeys,
 					);
-					return;
-				}
 
-				const fundFigures = allStatusesSelected
-					? thisFundData.all
-					: sumStatusesCapped(
-							status.map(st => thisFundData[st]),
-							thisFundData.all,
-							totalKeys,
-						);
-
-				totalKeys.forEach(key => {
-					targeted[key] += fundFigures[key].targeted;
-					reached[key] += fundFigures[key].reached;
-				});
+			totalKeys.forEach(key => {
+				targeted[key] += fundFigures[key].targeted;
+				reached[key] += fundFigures[key].reached;
 			});
 		});
-	} else {
-		//if there is selection of allocation type or allocation source, we use the call with allocation types
+	});
+
+	//if there is selection of allocation type or allocation source, we use the call with allocation types
+	if (!allAllocationTypesSelected || !allSourcesSelected) {
 		allocationType.forEach(allocType => {
 			//Check if it has the allocation source
 			const hasSource =
@@ -130,10 +145,22 @@ function processDataTotalBeneficiaries({
 						);
 
 				totalKeys.forEach(key => {
-					targeted[key] += allocTypeFigures[key].targeted;
-					reached[key] += allocTypeFigures[key].reached;
+					targetedForAllocType[key] += allocTypeFigures[key].targeted;
+					reachedForAllocType[key] += allocTypeFigures[key].reached;
 				});
 			});
+		});
+
+		//if if there is selection of allocation type or allocation source, cap using the fund total
+		totalKeys.forEach(key => {
+			targetedForAllocType[key] = Math.min(
+				targetedForAllocType[key],
+				targeted[key],
+			);
+			reachedForAllocType[key] = Math.min(
+				reachedForAllocType[key],
+				reached[key],
+			);
 		});
 	}
 
@@ -141,7 +168,9 @@ function processDataTotalBeneficiaries({
 		console.warn(warnings);
 	}
 
-	return { targeted, reached };
+	return allAllocationTypesSelected && allSourcesSelected
+		? { targeted, reached }
+		: { targeted: targetedForAllocType, reached: reachedForAllocType };
 }
 
 export default processDataTotalBeneficiaries;

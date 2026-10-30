@@ -84,38 +84,37 @@ export function processDataStatusesBeneficiaries({
 	allAllocationTypesSelected,
 }: ProcessDataStatusesBeneficiariesParams): DataStatusesBeneficiaries {
 	const dataStatusesBeneficiaries: DataStatusesBeneficiaries = {};
+	const dataStatusesBeneficiariesForAllocType: DataStatusesBeneficiaries = {};
 
 	const warnings: string[] = [];
 
-	//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
-	if (allAllocationTypesSelected && allSourcesSelected) {
-		fund.forEach(pf => {
-			year.forEach(selectedYear => {
-				const thisFundData = totalBeneficiariesData[selectedYear][pf];
-				if (!thisFundData) {
-					warnings.push(
-						`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
-					);
-					return;
-				}
+	//We always use the regular BDT2 API call because this fund-based object will be used to cap the alloctype object
+	fund.forEach(pf => {
+		year.forEach(selectedYear => {
+			const thisFundData = totalBeneficiariesData[selectedYear][pf];
+			if (!thisFundData) {
+				warnings.push(
+					`Pooled fund code ${pf} not found in the totalBeneficiaries data for year ${selectedYear}`,
+				);
+				return;
+			}
 
-				Object.entries(thisFundData).forEach(([st, statusData]) => {
-					if (st === "all") return;
-					const status = lists.statuses[
-						+st
-					] as ImplementationStatuses;
-					if (!status) return;
-					const thisStatus = (dataStatusesBeneficiaries[status] ??= {
-						targeted: 0,
-						reached: 0,
-					});
-					thisStatus.targeted += statusData.total.targeted;
-					thisStatus.reached += statusData.total.reached;
+			Object.entries(thisFundData).forEach(([st, statusData]) => {
+				if (st === "all") return;
+				const status = lists.statuses[+st] as ImplementationStatuses;
+				if (!status) return;
+				const thisStatus = (dataStatusesBeneficiaries[status] ??= {
+					targeted: 0,
+					reached: 0,
 				});
+				thisStatus.targeted += statusData.total.targeted;
+				thisStatus.reached += statusData.total.reached;
 			});
 		});
-	} else {
-		//if there is selection of allocation type or allocation source, we use the call with allocation types
+	});
+
+	//if there is selection of allocation type or allocation source, we use the call with allocation types
+	if (!allAllocationTypesSelected || !allSourcesSelected) {
 		allocationType.forEach(allocType => {
 			//Check if it has the allocation source
 			const hasSource =
@@ -146,7 +145,9 @@ export function processDataStatusesBeneficiaries({
 						+st
 					] as ImplementationStatuses;
 					if (!status) return;
-					const thisStatus = (dataStatusesBeneficiaries[status] ??= {
+					const thisStatus = (dataStatusesBeneficiariesForAllocType[
+						status
+					] ??= {
 						targeted: 0,
 						reached: 0,
 					});
@@ -155,13 +156,35 @@ export function processDataStatusesBeneficiaries({
 				});
 			});
 		});
+
+		(
+			Object.keys(
+				dataStatusesBeneficiariesForAllocType,
+			) as ImplementationStatuses[]
+		).forEach(key => {
+			if (
+				dataStatusesBeneficiariesForAllocType[key] &&
+				dataStatusesBeneficiaries[key]
+			) {
+				dataStatusesBeneficiariesForAllocType[key].targeted = Math.min(
+					dataStatusesBeneficiariesForAllocType[key].targeted,
+					dataStatusesBeneficiaries[key].targeted,
+				);
+				dataStatusesBeneficiariesForAllocType[key].reached = Math.min(
+					dataStatusesBeneficiariesForAllocType[key].reached,
+					dataStatusesBeneficiaries[key].reached,
+				);
+			}
+		});
 	}
 
 	if (!isProdSite && warnings.length) {
 		console.warn(warnings);
 	}
 
-	return dataStatusesBeneficiaries;
+	return allAllocationTypesSelected && allSourcesSelected
+		? dataStatusesBeneficiaries
+		: dataStatusesBeneficiariesForAllocType;
 }
 
 export default processDataStatuses;

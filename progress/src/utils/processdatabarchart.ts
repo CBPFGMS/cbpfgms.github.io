@@ -191,37 +191,46 @@ function processDataBarChart({
 		}
 	});
 
+	const dataOrganizationForAllocType = structuredClone(dataOrganization);
+	const dataSectorForAllocType = structuredClone(dataSector);
+	const dataBeneficiaryByTypeForAllocType = structuredClone(
+		dataBeneficiaryByType,
+	);
+
+	//we always compute the "regular" arrays, because they will be used to cap the allocation types arrays.
+
 	dataOrganization.forEach(org => {
-		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
-		if (allAllocationTypesSelected && allSourcesSelected) {
-			fund.forEach(pf => {
-				if (!org.fundsWithType.has(pf)) {
+		fund.forEach(pf => {
+			if (!org.fundsWithType.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesByPartnerData[selectedYear][pf];
+
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data for year ${selectedYear}`,
+					);
 					return;
 				}
 
-				year.forEach(selectedYear => {
-					const thisFund =
-						totalBeneficiariesByPartnerData[selectedYear][pf];
-
-					if (!thisFund) {
-						warnings.push(
-							`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data for year ${selectedYear}`,
-						);
-						return;
-					}
-
-					addFundFigures(
-						org,
-						thisFund,
-						d => d.partner === org.type,
-						statuses,
-						allStatusesSelected,
-						`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
-					);
-				});
+				addFundFigures(
+					org,
+					thisFund,
+					d => d.partner === org.type,
+					statuses,
+					allStatusesSelected,
+					`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+				);
 			});
-		} else {
-			//if there is selection of allocation type or allocation source, we use the call with allocation types
+		});
+	});
+
+	dataOrganizationForAllocType.forEach(org => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
 			allocationType.forEach(allocType => {
 				//Check if it has the allocation source
 				const hasSource =
@@ -267,36 +276,37 @@ function processDataBarChart({
 	});
 
 	dataSector.forEach(sect => {
-		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
-		if (allAllocationTypesSelected && allSourcesSelected) {
-			fund.forEach(pf => {
-				if (!sect.fundsWithType.has(pf)) {
+		fund.forEach(pf => {
+			if (!sect.fundsWithType.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesBySectorData[selectedYear][pf];
+
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
+					);
 					return;
 				}
 
-				year.forEach(selectedYear => {
-					const thisFund =
-						totalBeneficiariesBySectorData[selectedYear][pf];
-
-					if (!thisFund) {
-						warnings.push(
-							`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
-						);
-						return;
-					}
-
-					addFundFigures(
-						sect,
-						thisFund,
-						d => d.sector === sect.type,
-						statuses,
-						allStatusesSelected,
-						`Sector ${sect.type} not found in totalBeneficiariesBySector data for fund ${pf}`,
-					);
-				});
+				addFundFigures(
+					sect,
+					thisFund,
+					d => d.sector === sect.type,
+					statuses,
+					allStatusesSelected,
+					`Sector ${sect.type} not found in totalBeneficiariesBySector data for fund ${pf}`,
+				);
 			});
-		} else {
-			//if there is selection of allocation type or allocation source, we use the call with allocation types
+		});
+	});
+
+	dataSectorForAllocType.forEach(sect => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
 			allocationType.forEach(allocType => {
 				const hasSource =
 					allSourcesSelected ||
@@ -341,39 +351,36 @@ function processDataBarChart({
 	});
 
 	dataBeneficiaryByType.forEach(benType => {
-		//if there is no allocation type or allocation source selection, we use the regular BDT2 API call
-		if (allAllocationTypesSelected && allSourcesSelected) {
-			fund.forEach(pf => {
-				if (
-					!inDataLists.fundsPerBeneficiaryType[benType.type]?.has(pf)
-				) {
+		fund.forEach(pf => {
+			if (!inDataLists.fundsPerBeneficiaryType[benType.type]?.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesByBeneficiaryTypeData[selectedYear][pf];
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
+					);
 					return;
 				}
 
-				year.forEach(selectedYear => {
-					const thisFund =
-						totalBeneficiariesByBeneficiaryTypeData[selectedYear][
-							pf
-						];
-					if (!thisFund) {
-						warnings.push(
-							`Pooled fund code ${pf} not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
-						);
-						return;
-					}
-
-					addFundFigures(
-						benType,
-						thisFund,
-						d => d.beneficiaryType === benType.type,
-						statuses,
-						allStatusesSelected,
-						`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
-					);
-				});
+				addFundFigures(
+					benType,
+					thisFund,
+					d => d.beneficiaryType === benType.type,
+					statuses,
+					allStatusesSelected,
+					`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
+				);
 			});
-		} else {
-			//if there is selection of allocation type or allocation source, we use the call with allocation types
+		});
+	});
+
+	dataBeneficiaryByTypeForAllocType.forEach(benType => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
 			allocationType.forEach(allocType => {
 				const hasSource =
 					allSourcesSelected ||
@@ -413,6 +420,96 @@ function processDataBarChart({
 		}
 	});
 
+	if (!isProdSite && warnings.length) {
+		console.warn(warnings);
+	}
+
+	//if there is selection of allocation type or allocation source, we cap the results and return earlier
+	if (!allAllocationTypesSelected || !allSourcesSelected) {
+		dataOrganizationForAllocType.forEach(datumOrgAllocType => {
+			const thisFundEquivalent = dataOrganization.find(
+				datumOrg => datumOrg.type === datumOrgAllocType.type,
+			);
+			if (thisFundEquivalent) {
+				beneficiaryCategories.forEach(genderAndAge => {
+					datumOrgAllocType.targeted[genderAndAge] = Math.min(
+						datumOrgAllocType.targeted[genderAndAge],
+						thisFundEquivalent.targeted[genderAndAge],
+					);
+					datumOrgAllocType.reached[genderAndAge] = Math.min(
+						datumOrgAllocType.reached[genderAndAge],
+						thisFundEquivalent.reached[genderAndAge],
+					);
+				});
+			}
+		});
+
+		dataSectorForAllocType.forEach(datumSectorAllocType => {
+			const thisFundEquivalent = dataSector.find(
+				datumSector => datumSector.type === datumSectorAllocType.type,
+			);
+			if (thisFundEquivalent) {
+				beneficiaryCategories.forEach(genderAndAge => {
+					datumSectorAllocType.targeted[genderAndAge] = Math.min(
+						datumSectorAllocType.targeted[genderAndAge],
+						thisFundEquivalent.targeted[genderAndAge],
+					);
+					datumSectorAllocType.reached[genderAndAge] = Math.min(
+						datumSectorAllocType.reached[genderAndAge],
+						thisFundEquivalent.reached[genderAndAge],
+					);
+				});
+			}
+		});
+
+		dataBeneficiaryByTypeForAllocType.forEach(
+			datumBeneficiaryByTypeAllocType => {
+				const thisFundEquivalent = dataBeneficiaryByType.find(
+					datumBeneficiaryByType =>
+						datumBeneficiaryByType.type ===
+						datumBeneficiaryByTypeAllocType.type,
+				);
+				if (thisFundEquivalent) {
+					beneficiaryCategories.forEach(genderAndAge => {
+						datumBeneficiaryByTypeAllocType.targeted[genderAndAge] =
+							Math.min(
+								datumBeneficiaryByTypeAllocType.targeted[
+									genderAndAge
+								],
+								thisFundEquivalent.targeted[genderAndAge],
+							);
+						datumBeneficiaryByTypeAllocType.reached[genderAndAge] =
+							Math.min(
+								datumBeneficiaryByTypeAllocType.reached[
+									genderAndAge
+								],
+								thisFundEquivalent.reached[genderAndAge],
+							);
+					});
+				}
+			},
+		);
+
+		dataBeneficiaryByTypeForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+		dataOrganizationForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+		dataSectorForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+
+		return {
+			dataBeneficiaryByType: dataBeneficiaryByTypeForAllocType,
+			dataOrganization: dataOrganizationForAllocType,
+			dataSector: dataSectorForAllocType,
+		};
+	}
+
 	dataBeneficiaryByType.sort(
 		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
@@ -422,10 +519,6 @@ function processDataBarChart({
 	dataSector.sort(
 		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
-
-	if (!isProdSite && warnings.length) {
-		console.warn(warnings);
-	}
 
 	return { dataBeneficiaryByType, dataOrganization, dataSector };
 

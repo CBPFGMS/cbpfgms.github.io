@@ -44,7 +44,7 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
+			<Grid size={3}>
 				<AccordionComponent
 					type="Fund"
 					dataProperty="funds"
@@ -54,14 +54,14 @@ function Selectors({
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
+			<Grid size={4}>
 				<AccordionAllocType
 					value={allocationType}
 					setValue={setAllocationType}
 					inSelectionData={inSelectionData}
 				/>
 			</Grid>
-			<Grid sx={{ flexGrow: 1 }}>
+			<Grid size={3}>
 				<AccordionComponent
 					type="Allocation Source"
 					dataProperty="allocationSources"

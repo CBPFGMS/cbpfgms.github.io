@@ -132,7 +132,7 @@ function AccordionComponent({
 								color: "#144372",
 								fontWeight: "bold",
 								fontSize: "1rem",
-								width: "30%",
+								width: "20%",
 								alignSelf: "center",
 							}}
 						>
@@ -145,7 +145,7 @@ function AccordionComponent({
 								alignSelf: "center",
 								justifySelf: "flex-end",
 								fontSize: "0.8rem",
-								width: "45%",
+								width: "55%",
 								textAlign: "center",
 							}}
 						>
