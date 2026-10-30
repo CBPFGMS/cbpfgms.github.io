@@ -224,11 +224,19 @@ function processDataBarChart({
 			//if there is selection of allocation type or allocation source, we use the call with allocation types
 			allocationType.forEach(allocType => {
 				//Check if it has the allocation source
-				const hasSource = allocationSource.some(source =>
-					lists.allocTypesPerSource[source].has(allocType),
-				);
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
 
-				if (!hasSource || !org.alloctypesWithType.has(allocType)) {
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (
+					!hasSource ||
+					!hasFund ||
+					!org.alloctypesWithType.has(allocType)
+				) {
 					return;
 				}
 
@@ -290,11 +298,19 @@ function processDataBarChart({
 		} else {
 			//if there is selection of allocation type or allocation source, we use the call with allocation types
 			allocationType.forEach(allocType => {
-				const hasSource = allocationSource.some(source =>
-					lists.allocTypesPerSource[source].has(allocType),
-				);
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
 
-				if (!hasSource || !sect.alloctypesWithType.has(allocType)) {
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (
+					!hasSource ||
+					!hasFund ||
+					!sect.alloctypesWithType.has(allocType)
+				) {
 					return;
 				}
 
@@ -359,11 +375,15 @@ function processDataBarChart({
 		} else {
 			//if there is selection of allocation type or allocation source, we use the call with allocation types
 			allocationType.forEach(allocType => {
-				const hasSource = allocationSource.some(source =>
-					lists.allocTypesPerSource[source].has(allocType),
-				);
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
 
-				if (!hasSource) {
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (!hasSource || !hasFund) {
 					return;
 				}
 
@@ -403,7 +423,7 @@ function processDataBarChart({
 		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 
-	if (!isProdSite) {
+	if (!isProdSite && warnings.length) {
 		console.warn(warnings);
 	}
 

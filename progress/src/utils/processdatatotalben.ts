@@ -99,11 +99,15 @@ function processDataTotalBeneficiaries({
 		//if there is selection of allocation type or allocation source, we use the call with allocation types
 		allocationType.forEach(allocType => {
 			//Check if it has the allocation source
-			const hasSource = allocationSource.some(source =>
-				lists.allocTypesPerSource[source].has(allocType),
-			);
+			const hasSource =
+				allSourcesSelected ||
+				lists.allocTypesPerSource[allocationSource[0]].has(allocType);
 
-			if (!hasSource) return;
+			const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+			if (!hasSource || !hasFund) {
+				return;
+			}
 
 			year.forEach(selectedYear => {
 				const thisAllocData =
@@ -125,6 +129,10 @@ function processDataTotalBeneficiaries({
 							totalKeys,
 						);
 
+						console.log(allocType);
+
+						console.log(fundFigures.total.targeted)
+
 				totalKeys.forEach(key => {
 					targeted[key] += fundFigures[key].targeted;
 					reached[key] += fundFigures[key].reached;
@@ -133,7 +141,7 @@ function processDataTotalBeneficiaries({
 		});
 	}
 
-	if (!isProdSite) {
+	if (!isProdSite && warnings.length) {
 		console.warn(warnings);
 	}
 
