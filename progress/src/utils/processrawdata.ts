@@ -259,8 +259,6 @@ export type TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData = {
 	};
 };
 
-//CLAUDE TEST STARTS HERE
-
 type FundData = TotalBeneficiariesData[number][number];
 
 type BeneficiariesTarget<K extends number | FundWithAllocType> = {
