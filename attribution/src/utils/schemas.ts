@@ -229,6 +229,23 @@ export const allocationsByYearAndFundObjectSchema = z.object({
 	FundingType: z.literal(2),
 });
 
+export const allocationsLollipopObjectSchema = z.object({
+	AllocationYear: z.number().int().nonnegative(),
+	OrganizationType: z.string(),
+	PooledFundName: z.string(),
+	ApprovedReserveBudgetPercentage: z.number().nonnegative(),
+	ApprovedStandardBudgetPercentage: z.number().nonnegative(),
+	ApprovedBudget: z.number().nonnegative(),
+	ApprovedReserveBudget: z.number().nonnegative(),
+	ApprovedStandardBudget: z.number().nonnegative(),
+	PipelineReserveBudgetPercentage: z.number().nonnegative(),
+	PipelineStandardBudgetPercentage: z.number().nonnegative(),
+	PipelineBudget: z.number().nonnegative(),
+	PipelineReserveBudget: z.number().nonnegative(),
+	PipelineStandardBudget: z.number().nonnegative(),
+	FundingType: z.number().int().nonnegative(),
+});
+
 // ********************
 // MASTER TABLES SCHEMAS
 // ********************
@@ -443,4 +460,8 @@ export type TotalBeneficiariesBySectorObject = z.infer<
 
 export type AllocationsByYearAndFundObject = z.infer<
 	typeof allocationsByYearAndFundObjectSchema
+>;
+
+export type AllocationsLollipopObject = z.infer<
+	typeof allocationsLollipopObjectSchema
 >;

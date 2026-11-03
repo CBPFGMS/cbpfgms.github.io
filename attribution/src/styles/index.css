@@ -251,3 +251,58 @@ h1 {
 .topfigures-card:hover {
 	transform: translateY(-6px);
 }
+
+.pbialpgroupXAxisParallel text {
+	font-size: 10px !important;
+}
+
+#pbialptooltipdiv {
+	max-width: none !important;
+}
+
+.pbialpButtonsDiv {
+	display: flex;
+	flex-direction: row;
+	gap: 6px;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
+}
+
+.pbialpbuttonsPartners {
+	border-radius: 8px;
+	border: 1px solid #dedede;
+	padding: 0.5em 1.2em;
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+	background-color: #fafafa;
+	cursor: pointer;
+	transition: border-color 0.25s;
+}
+.pbialpbuttonsPartners:hover {
+	border-color: #646cff;
+	background-color: #f1f3f5;
+}
+.pbialpbuttonsPartners:focus,
+.pbialpbuttonsPartners:focus-visible {
+	outline: none;
+}
+
+.pbialpbuttonsPartners.selected {
+	background-color: var(--ocha-blue);
+	color: white;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		color: #213547;
+		background-color: #ffffff;
+	}
+	a:hover {
+		color: #747bff;
+	}
+	button {
+		background-color: #f9f9f9;
+	}
+}

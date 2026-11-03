@@ -19,8 +19,12 @@ import type {
 	TotalBeneficiariesByPartnerObject,
 	TotalBeneficiariesBySectorObject,
 	AllocationsByYearAndFundObject,
+	AllocationsLollipopObject,
 } from "./schemas";
-import { projectClusterOneGmsObjectSchema } from "./schemas";
+import {
+	allocationsLollipopObjectSchema,
+	projectClusterOneGmsObjectSchema,
+} from "./schemas";
 import makeLists, { type List } from "./makelists";
 import processRawData, {
 	type AllocationsData,
@@ -53,6 +57,8 @@ export type AppData = {
 	localizationDataWithoutUS: LocalizationData;
 	projectClusterData: ProjectClusterOneGmsObject[];
 	lists: List;
+	allocationsLollipopData: AllocationsLollipopObject[];
+	allocationsLollipopWithoutUSData: AllocationsLollipopObject[];
 };
 
 type ReceiveDataArgs = [
@@ -75,6 +81,8 @@ type ReceiveDataArgs = [
 	PooledFundsWithRegionMasterObject[],
 	DonorsMasterObject[],
 	ProjectClusterOneGmsObject[],
+	AllocationsLollipopObject[],
+	AllocationsLollipopObject[],
 ];
 
 const { fundType, currentYear } = constants;
@@ -114,12 +122,18 @@ export async function fetchAppData(
 	const selectedFundType = defaultFundType ? defaultFundType : fundType,
 		yearRange = startYear ? `${startYear}_${currentYear}` : "";
 
+	if (!startYear) {
+		startYear = currentYear;
+	}
+
 	const allocationsByYearAndFundUrlWithUS = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=1&AllocationYearTo=${currentYear}&FundingType=2&ShowNSFT=&$format=csv`,
 		allocationsByYearAndFundUrlWithoutUS = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&ShowAllPooledFunds=1&AllocationYearTo=${currentYear}&FundingType=2&ShowNSFT=0&$format=csv`,
 		projectSummaryUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_PROJ_SUMMARY&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		sectorsDataUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_RPT_CLST_BENEF&PoolfundCodeAbbrv=&ShowAllPooledFunds=&AllocationYears=${yearRange}&FundTypeId=${selectedFundType}&$format=csv`,
 		allocationTypesMasterUrl = `https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&AllocationYear=${yearRange}&$format=csv`,
-		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`;
+		organizationMasterUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=PF_ORG_SUMMARY&PoolfundCodeAbbrv=&FundTypeId=${selectedFundType}&$format=csv`,
+		allocationLollipopUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&AllocationYearTo=${currentYear}&FundingType=3&$format=csv`,
+		allocationLollipopWithoutUSUrl = `https://cbpfapi.unocha.org/vo3/odata/GlobalGenericDataExtract?SPCode=ALLOCATION_TOTAL_V2&PoolfundCodeAbbrv=&AllocationYearFrom=${startYear}&AllocationYearTo=${currentYear}&FundingType=3&ShowNSFT=0&$format=csv`;
 
 	const contributionsBaseUrl =
 		"https://pfbi-eastus2-api-site.azurewebsites.net/donor_attribution/api/public/donors?";
@@ -306,6 +320,22 @@ export async function fetchAppData(
 			),
 			progressStore.increment,
 		),
+		trackProgress(
+			fetchFileDB<AllocationsLollipopObject[]>(
+				"allocationLollipop",
+				allocationLollipopUrl,
+				"csv",
+			),
+			progressStore.increment,
+		),
+		trackProgress(
+			fetchFileDB<AllocationsLollipopObject[]>(
+				"allocationLollipopWithoutUS",
+				allocationLollipopWithoutUSUrl,
+				"csv",
+			),
+			progressStore.increment,
+		),
 	] as const;
 
 	progressStore.reset(
@@ -345,6 +375,8 @@ export async function fetchAppData(
 			pooledFundsWithRegionMaster,
 			donorsMaster,
 			projectClusterOneGms,
+			allocationsLollipop,
+			allocationsLollipopWithoutUS,
 		]: ReceiveDataArgs,
 		dynamicContributionsResults: ContributionsJson[],
 	): AppData {
@@ -397,6 +429,11 @@ export async function fetchAppData(
 			localizationDataWithUS,
 			localizationDataWithoutUS,
 			projectClusterData: parseProjectClusterData(projectClusterOneGms),
+			allocationsLollipopData:
+				parseAllocationsLollipopData(allocationsLollipop),
+			allocationsLollipopWithoutUSData: parseAllocationsLollipopData(
+				allocationsLollipopWithoutUS,
+			),
 			lists,
 		};
 	}
@@ -415,6 +452,27 @@ function parseProjectClusterData(
 		} else {
 			warnInvalidSchema(
 				"projectClusterOneGms",
+				row,
+				parsedRow.error.message,
+			);
+		}
+	});
+
+	return parsedRows;
+}
+
+function parseAllocationsLollipopData(
+	rows: AllocationsLollipopObject[],
+): AllocationsLollipopObject[] {
+	const parsedRows: AllocationsLollipopObject[] = [];
+
+	rows.forEach(row => {
+		const parsedRow = allocationsLollipopObjectSchema.safeParse(row);
+		if (parsedRow.success) {
+			parsedRows.push(parsedRow.data);
+		} else {
+			warnInvalidSchema(
+				"allocationsLollipop",
 				row,
 				parsedRow.error.message,
 			);

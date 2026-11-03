@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Container from "@mui/material/Container";
 import { useAppData } from "../hooks/useappdata";
 import { constants } from "../utils/constants";
@@ -20,8 +20,15 @@ import Partners from "./Partners";
 import NoData from "./NoData";
 import getFlagSrc from "../utils/flagsrc";
 import NoAttribution from "./NoAttribution";
+import processLollipopData from "../utils/processlollipopdata";
+import type { AllocationsLollipopObject } from "../utils/schemas";
+import LollipopContainer from "./LollipopContainer";
 
 export type Charts = (typeof constants.charts)[number];
+
+type CustomWindow = typeof window & {
+	lollipopData?: AllocationsLollipopObject[];
+};
 
 type MainContainerProps = {
 	donor: number;
@@ -42,6 +49,8 @@ function MainContainer({ donor }: MainContainerProps) {
 		localizationDataWithUS,
 		localizationDataWithoutUS,
 		projectClusterData,
+		allocationsLollipopData,
+		allocationsLollipopWithoutUSData,
 	} = useAppData();
 
 	const lastDonorYear = Array.from(inContributionsDataLists.years).sort(
@@ -152,6 +161,42 @@ function MainContainer({ donor }: MainContainerProps) {
 		lists,
 	});
 
+	const lollipopData = useMemo(
+		() =>
+			processLollipopData({
+				allocationsLollipopData,
+				allocationsLollipopWithoutUSData,
+				funds,
+				year,
+				hasUS,
+				lists,
+				globalAttribution: attributions.global.percentage,
+			}),
+		[
+			allocationsLollipopData,
+			allocationsLollipopWithoutUSData,
+			funds,
+			year,
+			hasUS,
+			lists,
+			attributions,
+		],
+	);
+
+	const isFirstRender = useRef(true);
+
+	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			(window as CustomWindow).lollipopData = lollipopData;
+		} else {
+			console.log("dispatched");
+			window.dispatchEvent(
+				new CustomEvent("updatelollipopdata", { detail: lollipopData }),
+			);
+		}
+	}, [lollipopData]);
+
 	return (
 		<Container
 			disableGutters={true}
@@ -227,6 +272,11 @@ function MainContainer({ donor }: MainContainerProps) {
 							data={dataKeyFigures}
 							attribution={attributions.global.percentage}
 							donorName={lists.donorGMSNames[donor]}
+						/>
+						<SectionDivider title="Net funding" />
+						<LollipopContainer
+							donorName={lists.donorGMSNames[donor]}
+							attribution={attributions.global.percentage}
 						/>
 						<SectionDivider title="Allocated values" />
 						<ChartsContainer
