@@ -105,8 +105,8 @@ type ProcessRawDataParams = {
 type TargetedAndReached = {
 	targeted: number;
 	reached: number;
-	targetedWithoutUS?: number;
-	reachedWithoutUS?: number;
+	targetedWithoutUS: number;
+	reachedWithoutUS: number;
 };
 
 export type TotalBeneficiariesBreakdown = {
@@ -202,22 +202,32 @@ function processRawData({
 			girls: {
 				targeted: row.BenG || 0,
 				reached: row.AchG || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			boys: {
 				targeted: row.BenB || 0,
 				reached: row.AchB || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			women: {
 				targeted: row.BenW || 0,
 				reached: row.AchW || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			men: {
 				targeted: row.BenM || 0,
 				reached: row.AchM || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			total: {
 				targeted: row.TotTarg || 0,
 				reached: row.TotAch || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 		};
 
@@ -304,18 +314,26 @@ function processRawData({
 			girls: {
 				targeted: row.BenG || 0,
 				reached: row.AchG || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			boys: {
 				targeted: row.BenB || 0,
 				reached: row.AchB || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			women: {
 				targeted: row.BenW || 0,
 				reached: row.AchW || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			men: {
 				targeted: row.BenM || 0,
 				reached: row.AchM || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 		};
 
@@ -420,18 +438,26 @@ function processRawData({
 			girls: {
 				targeted: row.BenG || 0,
 				reached: row.AchG || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			boys: {
 				targeted: row.BenB || 0,
 				reached: row.AchB || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			women: {
 				targeted: row.BenW || 0,
 				reached: row.AchW || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 			men: {
 				targeted: row.BenM || 0,
 				reached: row.AchM || 0,
+				targetedWithoutUS: 0,
+				reachedWithoutUS: 0,
 			},
 		};
 

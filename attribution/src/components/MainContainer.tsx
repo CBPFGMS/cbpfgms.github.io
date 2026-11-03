@@ -190,7 +190,6 @@ function MainContainer({ donor }: MainContainerProps) {
 			isFirstRender.current = false;
 			(window as CustomWindow).lollipopData = lollipopData;
 		} else {
-			console.log("dispatched");
 			window.dispatchEvent(
 				new CustomEvent("updatelollipopdata", { detail: lollipopData }),
 			);
