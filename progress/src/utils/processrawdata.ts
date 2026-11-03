@@ -7,13 +7,30 @@ import {
 	emergenciesObjectSchema,
 	cvaObjectSchema,
 	CvaObject,
+	TotalBeneficiariesObject,
+	TotalBeneficiariesByPartnerObject,
+	TotalBeneficiariesBySectorObject,
+	TotalBeneficiariesByBeneficiaryTypeObject,
+	totalBeneficiariesObjectSchema,
+	totalBeneficiariesByPartnerObjectSchema,
+	totalBeneficiariesBySectorObjectSchema,
+	totalBeneficiariesByBeneficiaryTypeObjectSchema,
 } from "./schemas";
 import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
-import constants from "./constants";
+import constants, {
+	projectStatusMapping,
+	projectStatusMappingProjSumV4,
+} from "./constants";
+import { ImplementationStatuses } from "../components/MainContainer";
 
-const { beneficiariesSplitOrder, beneficiaryCategories, reportTypes } =
-	constants;
+const {
+	beneficiariesSplitOrder,
+	beneficiaryCategories,
+	reportTypes,
+	implementationAndReportingProjects,
+	excludedProjectStatusCodes,
+} = constants;
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -29,7 +46,7 @@ export type Datum = {
 	allocationSource: number;
 	organizationType: number;
 	organizationId: number;
-	allocationType: number;
+	allocationType: FundWithAllocType;
 	allocationTypeId: number;
 	endDate: Date;
 	approvalDate: Date;
@@ -47,6 +64,8 @@ export type Datum = {
 	cvaTotalTargetedPeople: number | null;
 	cvaTotalReachedPeople: number | null;
 };
+
+export type FundWithAllocType = `${number}-${number}`;
 
 export type ReportType = (typeof reportTypes)[number];
 
@@ -99,11 +118,21 @@ export type BeneficiariesObject = {
 export type InDataLists = {
 	years: Set<number>;
 	sectors: Set<number>;
-	allocationTypes: Set<number>;
+	allocationTypes: Set<FundWithAllocType>;
 	allocationSources: Set<number>;
 	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
+	statuses: Set<ImplementationStatuses>;
+	statusesPerFund: { [fund: number]: Set<number> };
+	statusesPerAllocationType: {
+		[allocationType: FundWithAllocType]: Set<number>;
+	};
+	statusesPerFundBDT2: { [fund: number]: Set<number> };
+	statusesPerAllocationTypeBDT2: {
+		[allocationType: FundWithAllocType]: Set<number>;
+	};
+	fundsPerBeneficiaryType: { [beneficiaryType: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -119,7 +148,147 @@ type ProcessRawDataParams = {
 	cvaData: CvaObject[];
 	listsObj: List;
 	setInDataLists: React.Dispatch<React.SetStateAction<InDataLists>>;
+	totalBeneficiaries: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartner: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySector: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesByBeneficiaryType: TotalBeneficiariesByBeneficiaryTypeObject[];
+	totalBeneficiariesByDisability: TotalBeneficiariesObject[];
+	totalBeneficiariesWithAllocType: TotalBeneficiariesObject[];
+	totalBeneficiariesByPartnerWithAllocType: TotalBeneficiariesByPartnerObject[];
+	totalBeneficiariesBySectorWithAllocType: TotalBeneficiariesBySectorObject[];
+	totalBeneficiariesByBeneficiaryTypeWithAllocType: TotalBeneficiariesByBeneficiaryTypeObject[];
+	totalBeneficiariesByDisabilityWithAllocType: TotalBeneficiariesObject[];
 };
+
+type TargetedAndReached = {
+	targeted: number;
+	reached: number;
+};
+
+export type TotalBeneficiariesBreakdown = {
+	[key in GenderAndAge | "total"]: TargetedAndReached;
+};
+
+export type TotalBeneficiariesData = {
+	[year: number]: {
+		[fund: number]: {
+			[status: number]: TotalBeneficiariesBreakdown;
+			all: TotalBeneficiariesBreakdown;
+		};
+	};
+};
+
+export type TotalBeneficiariesWithAllocTypeData = {
+	[year: number]: {
+		[allocType: FundWithAllocType]: {
+			[status: number]: TotalBeneficiariesBreakdown;
+			all: TotalBeneficiariesBreakdown;
+		};
+	};
+};
+
+type TotalBeneficiariesByPartnerBreakdown = {
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	partner: number;
+};
+
+export type TotalBeneficiariesByPartnerData = {
+	[year: number]: {
+		[fund: number]: {
+			[status: number]: TotalBeneficiariesByPartnerBreakdown[];
+			all: TotalBeneficiariesByPartnerBreakdown[];
+		};
+	};
+};
+
+export type TotalBeneficiariesByPartnerWithAllocTypeData = {
+	[year: number]: {
+		[allocType: FundWithAllocType]: {
+			[status: number]: TotalBeneficiariesByPartnerBreakdown[];
+			all: TotalBeneficiariesByPartnerBreakdown[];
+		};
+	};
+};
+
+type TotalBeneficiariesBySectorBreakdown = {
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	sector: number;
+};
+
+export type TotalBeneficiariesBySectorData = {
+	[year: number]: {
+		[fund: number]: {
+			[status: number]: TotalBeneficiariesBySectorBreakdown[];
+			all: TotalBeneficiariesBySectorBreakdown[];
+		};
+	};
+};
+
+export type TotalBeneficiariesBySectorWithAllocTypeData = {
+	[year: number]: {
+		[allocType: FundWithAllocType]: {
+			[status: number]: TotalBeneficiariesBySectorBreakdown[];
+			all: TotalBeneficiariesBySectorBreakdown[];
+		};
+	};
+};
+
+export type TotalBeneficiariesByBeneficiaryTypeBreakdown = {
+	[key in GenderAndAge]: TargetedAndReached;
+} & {
+	beneficiaryType: number;
+};
+
+export type TotalBeneficiariesByBeneficiaryTypeData = {
+	[year: number]: {
+		[fund: number]: {
+			[status: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+			all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+		};
+	};
+};
+
+export type TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData = {
+	[year: number]: {
+		[allocType: FundWithAllocType]: {
+			[status: number]: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+			all: TotalBeneficiariesByBeneficiaryTypeBreakdown[];
+		};
+	};
+};
+
+type FundData = TotalBeneficiariesData[number][number];
+
+type BeneficiariesTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: FundData };
+};
+
+type PartnerFundData = TotalBeneficiariesByPartnerData[number][number];
+
+type BeneficiariesByPartnerTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: PartnerFundData };
+};
+
+type SectorFundData = TotalBeneficiariesBySectorData[number][number];
+
+type BeneficiariesBySectorTarget<K extends number | FundWithAllocType> = {
+	[year: number]: { [key in K]: SectorFundData };
+};
+
+type BeneficiaryTypeFundData =
+	TotalBeneficiariesByBeneficiaryTypeData[number][number];
+
+type BeneficiariesByBeneficiaryTypeTarget<
+	K extends number | FundWithAllocType,
+> = {
+	[year: number]: { [key in K]: BeneficiaryTypeFundData };
+};
+
+const statusesPerFundBDT2: InDataLists["statusesPerFund"] = {};
+const statusesPerAllocationTypeBDT2: InDataLists["statusesPerAllocationType"] =
+	{};
 
 function processRawData({
 	projectSummary,
@@ -128,8 +297,49 @@ function processRawData({
 	cvaData,
 	listsObj,
 	setInDataLists,
-}: ProcessRawDataParams): Data {
+	totalBeneficiaries,
+	totalBeneficiariesByPartner,
+	totalBeneficiariesBySector,
+	totalBeneficiariesByBeneficiaryType,
+	totalBeneficiariesByDisability,
+	totalBeneficiariesWithAllocType,
+	totalBeneficiariesByPartnerWithAllocType,
+	totalBeneficiariesBySectorWithAllocType,
+	totalBeneficiariesByBeneficiaryTypeWithAllocType,
+	totalBeneficiariesByDisabilityWithAllocType,
+}: ProcessRawDataParams): {
+	data: Data;
+	totalBeneficiariesData: TotalBeneficiariesData;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByDisabilityData: TotalBeneficiariesData;
+	totalBeneficiariesWithAllocTypeData: TotalBeneficiariesWithAllocTypeData;
+	totalBeneficiariesByPartnerWithAllocTypeData: TotalBeneficiariesByPartnerWithAllocTypeData;
+	totalBeneficiariesBySectorWithAllocTypeData: TotalBeneficiariesBySectorWithAllocTypeData;
+	totalBeneficiariesByBeneficiaryTypeWithAllocTypeData: TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData;
+	totalBeneficiariesByDisabilityWithAllocTypeData: TotalBeneficiariesWithAllocTypeData;
+} {
 	const data: Data = [];
+
+	const totalBeneficiariesData: TotalBeneficiariesData = {};
+	const totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData = {};
+	const totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData = {};
+	const totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData =
+		{};
+	const totalBeneficiariesByDisabilityData: TotalBeneficiariesData = {};
+
+	const totalBeneficiariesWithAllocTypeData: TotalBeneficiariesWithAllocTypeData =
+		{};
+	const totalBeneficiariesByPartnerWithAllocTypeData: TotalBeneficiariesByPartnerWithAllocTypeData =
+		{};
+	const totalBeneficiariesBySectorWithAllocTypeData: TotalBeneficiariesBySectorWithAllocTypeData =
+		{};
+	const totalBeneficiariesByBeneficiaryTypeWithAllocTypeData: TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData =
+		{};
+	const totalBeneficiariesByDisabilityWithAllocTypeData: TotalBeneficiariesWithAllocTypeData =
+		{};
+
 	const sectorsDataMap: Map<string, SectorMapValue> = new Map();
 	const emergenciesDataMap: Map<number, EmergencyDatum[]> = new Map();
 	const cvaDataMap: Map<string, CvaMapValue> = new Map();
@@ -144,6 +354,11 @@ function processRawData({
 	const organizationTypesSet: Set<InDataListsValues["organizationTypes"]> =
 		new Set();
 	const organizationsSet: Set<InDataListsValues["organizations"]> = new Set();
+	const fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"] = {};
+	const statusesSet: Set<InDataListsValues["statuses"]> = new Set();
+	const statusesPerFund: InDataLists["statusesPerFund"] = {};
+	const statusesPerAllocationType: InDataLists["statusesPerAllocationType"] =
+		{};
 
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
@@ -301,19 +516,110 @@ function processRawData({
 		}
 	});
 
+	populateTotalBeneficiariesData(
+		totalBeneficiaries,
+		totalBeneficiariesData,
+		"totalBeneficiaries",
+		row => row.PFId,
+	);
+
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartner,
+		totalBeneficiariesByPartnerData,
+		"totalBeneficiariesByPartner",
+		row => row.PFId,
+	);
+
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySector,
+		totalBeneficiariesBySectorData,
+		"totalBeneficiariesBySector",
+		row => row.PFId,
+	);
+
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryType,
+		totalBeneficiariesByBeneficiaryTypeData,
+		"totalBeneficiariesByBeneficiaryType",
+		fundsPerBeneficiaryType,
+		row => row.PFId,
+	);
+
+	populateTotalBeneficiariesData(
+		totalBeneficiariesByDisability,
+		totalBeneficiariesByDisabilityData,
+		"totalBeneficiariesByDisability",
+		row => row.PFId,
+	);
+
+	populateTotalBeneficiariesData(
+		totalBeneficiariesWithAllocType,
+		totalBeneficiariesWithAllocTypeData,
+		"totalBeneficiariesWithAllocType",
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
+	);
+
+	populateTotalBeneficiariesByPartnerData(
+		totalBeneficiariesByPartnerWithAllocType,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		"totalBeneficiariesByPartnerWithAllocType",
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
+	);
+
+	populateTotalBeneficiariesBySectorData(
+		totalBeneficiariesBySectorWithAllocType,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		"totalBeneficiariesBySectorWithAllocType",
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
+	);
+
+	populateTotalBeneficiariesByBeneficiaryTypeData(
+		totalBeneficiariesByBeneficiaryTypeWithAllocType,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		"totalBeneficiariesByBeneficiaryTypeWithAllocType",
+		fundsPerBeneficiaryType,
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
+	);
+
+	populateTotalBeneficiariesData(
+		totalBeneficiariesByDisabilityWithAllocType,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
+		"totalBeneficiariesByDisabilityWithAllocType",
+		(row): FundWithAllocType => `${row.PFId}-${row.AllocationTypeId!}`,
+	);
+
 	projectSummary.forEach(row => {
+		//Filter for excluding draft, rejected and to be deleted projects:
+		if (
+			(excludedProjectStatusCodes as readonly string[]).includes(
+				row.ProjectStatusCode ?? "",
+			)
+		) {
+			return;
+		}
+
+		//Removing any project with statuses that are not in the implementationAndReportingProjects list
+		const thisStatusId = projectStatusMappingProjSumV4[row.ProcessSTatusID];
+		if (
+			!(implementationAndReportingProjects as readonly number[]).includes(
+				thisStatusId,
+			)
+		) {
+			return;
+		}
+
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
 			const thisAllocationType =
 				listsObj.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+					`${row.PooledFundId}-${row.AllocationtypeId}`
 				];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
-			const thisStatus = listsObj.statuses[row.GlbPrjStatusId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 			const thisEmergenciesData = emergenciesDataMap.get(row.ChfId);
 			const thisCvaData = cvaDataMap.get(row.ChfProjectCode);
+			const thisStatus = listsObj.statuses[thisStatusId];
 
 			if (!thisAllocationType) {
 				warnProjectNotFound(
@@ -331,7 +637,7 @@ function processRawData({
 				);
 			}
 
-			if (!thisStatus) {
+			if (!thisStatusId) {
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
@@ -359,7 +665,7 @@ function processRawData({
 			if (
 				thisAllocationType &&
 				thisOrganization &&
-				thisStatus &&
+				thisStatusId &&
 				thisSectorData
 			) {
 				yearsSet.add(thisAllocationType.AllocationYear);
@@ -368,19 +674,26 @@ function processRawData({
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalUniqueId);
 				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+					`${row.PooledFundId}-${row.AllocationtypeId}`,
 				);
+
+				//IMPORTANT: USE BDT2 FOR THE INDATALIST
+				(statusesPerFund[row.PooledFundId] ??= new Set()).add(
+					thisStatusId,
+				);
+				(statusesPerAllocationType[
+					`${row.PooledFundId}-${row.AllocationtypeId}`
+				] ??= new Set()).add(thisStatusId);
+				statusesSet.add(thisStatus as ImplementationStatuses);
 
 				listsObj.projectDetails.set(row.ChfId, {
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: thisStatusId,
 					reportType: row.RptCode ?? 0,
 				});
 
@@ -397,15 +710,13 @@ function processRawData({
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalUniqueId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
 					budget: row.Budget,
 					projectStatus: thisStatus,
-					projectStatusId: row.GlbPrjStatusId,
+					projectStatusId: thisStatusId,
 					sectorData: thisSectorData.sectors,
 					emergenciesData: thisEmergenciesData ?? [],
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
@@ -452,9 +763,27 @@ function processRawData({
 		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
+		fundsPerBeneficiaryType,
+		statusesPerFund,
+		statusesPerAllocationType,
+		statusesPerFundBDT2,
+		statusesPerAllocationTypeBDT2,
+		statuses: statusesSet,
 	}));
 
-	return data;
+	return {
+		data,
+		totalBeneficiariesData,
+		totalBeneficiariesByPartnerData,
+		totalBeneficiariesBySectorData,
+		totalBeneficiariesByBeneficiaryTypeData,
+		totalBeneficiariesByDisabilityData,
+		totalBeneficiariesWithAllocTypeData,
+		totalBeneficiariesByPartnerWithAllocTypeData,
+		totalBeneficiariesBySectorWithAllocTypeData,
+		totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+		totalBeneficiariesByDisabilityWithAllocTypeData,
+	};
 }
 
 function generateBeneficiariesSplitObject(
@@ -536,6 +865,508 @@ function generateBeneficiariesObjectSummary(
 		women,
 		men,
 	};
+}
+
+function populateTotalBeneficiariesData<K extends number | FundWithAllocType>(
+	source: TotalBeneficiariesObject[],
+	target: BeneficiariesTarget<K>,
+	sourceName: string,
+	getIdentifier: (row: TotalBeneficiariesObject) => K,
+) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<number, Record<string | number, FundData>>;
+
+	source.forEach(row => {
+		const parsedRow = totalBeneficiariesObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+
+		const year = row.ImplementationYear;
+		const identifier = getIdentifier(row);
+
+		if (!data[year]) {
+			data[year] = {};
+		}
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as FundData;
+		}
+
+		const totalDatum = {
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+			total: {
+				targeted: row.TotTarg || 0,
+				reached: row.TotAch || 0,
+			},
+		};
+
+		if (row.ProcessStatusId == null) {
+			data[year][identifier].all = totalDatum;
+		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			if (!data[year][identifier][thisStatus]) {
+				data[year][identifier][thisStatus] = totalDatum;
+			} else {
+				addTargetedAndReached(
+					data[year][identifier][thisStatus],
+					totalDatum,
+					[...beneficiaryCategories, "total"],
+				);
+			}
+
+			if (
+				(
+					implementationAndReportingProjects as readonly number[]
+				).includes(thisStatus)
+			) {
+				(statusesPerFundBDT2[row.PFId] ??= new Set()).add(thisStatus);
+				if (row.AllocationTypeId) {
+					(statusesPerAllocationTypeBDT2[
+						`${row.PFId}-${row.AllocationTypeId}`
+					] ??= new Set()).add(thisStatus);
+				}
+			}
+		}
+	});
+
+	Object.values(data).forEach(yearData => {
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus =>
+						implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[identifier];
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (statusData && identifierData.all) {
+					capTargetedAndReached(statusData, identifierData.all, [
+						...beneficiaryCategories,
+						"total",
+					]);
+				}
+			});
+		});
+	});
+}
+
+function populateTotalBeneficiariesByPartnerData<
+	K extends number | FundWithAllocType,
+>(
+	source: TotalBeneficiariesByPartnerObject[],
+	target: BeneficiariesByPartnerTarget<K>,
+	sourceName: string,
+	getIdentifier: (row: TotalBeneficiariesByPartnerObject) => K,
+) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, PartnerFundData>
+	>;
+
+	source.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByPartnerObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+		const year = row.ImplementationYear;
+		const identifier = getIdentifier(row);
+
+		if (!data[year]) {
+			data[year] = {};
+		}
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as PartnerFundData;
+		}
+
+		const partnersDatum: TotalBeneficiariesByPartnerBreakdown = {
+			partner: row.PartnerTypeId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		if (row.ProcessStatusId === null) {
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [partnersDatum];
+			} else {
+				data[year][identifier].all.push(partnersDatum);
+			}
+		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			const foundDatum = data[year][identifier][thisStatus]?.find(
+				d => d.partner === partnersDatum.partner,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					partnersDatum,
+					beneficiaryCategories,
+				);
+			} else {
+				(data[year][identifier][thisStatus] ??= []).push(partnersDatum);
+			}
+		}
+	});
+
+	Object.values(data).forEach(yearData => {
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus =>
+						implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[identifier]; // no Number() needed
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (!statusData) return;
+				statusData.forEach(datum => {
+					const allDatum = identifierData.all?.find(
+						d => d.partner === datum.partner,
+					);
+					if (allDatum) {
+						capTargetedAndReached(
+							datum,
+							allDatum,
+							beneficiaryCategories,
+						);
+					}
+				});
+			});
+		});
+	});
+}
+
+function populateTotalBeneficiariesBySectorData<
+	K extends number | FundWithAllocType,
+>(
+	source: TotalBeneficiariesBySectorObject[],
+	target: BeneficiariesBySectorTarget<K>,
+	sourceName: string,
+	getIdentifier: (row: TotalBeneficiariesBySectorObject) => K,
+) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, SectorFundData>
+	>;
+
+	source.forEach(row => {
+		const parsedRow = totalBeneficiariesBySectorObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+
+		const year = row.ImplementationYear;
+		const identifier = getIdentifier(row);
+
+		if (!data[year]) {
+			data[year] = {};
+		}
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as SectorFundData;
+		}
+
+		const sectorsDatum: TotalBeneficiariesBySectorBreakdown = {
+			sector: row.GlobalClusterId,
+			girls: {
+				targeted: row.BenG || 0,
+				reached: row.AchG || 0,
+			},
+			boys: {
+				targeted: row.BenB || 0,
+				reached: row.AchB || 0,
+			},
+			women: {
+				targeted: row.BenW || 0,
+				reached: row.AchW || 0,
+			},
+			men: {
+				targeted: row.BenM || 0,
+				reached: row.AchM || 0,
+			},
+		};
+
+		if (row.ProcessStatusId === null) {
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [sectorsDatum];
+			} else {
+				data[year][identifier].all.push(sectorsDatum);
+			}
+		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			const foundDatum = data[year][identifier][thisStatus]?.find(
+				d => d.sector === sectorsDatum.sector,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					sectorsDatum,
+					beneficiaryCategories,
+				);
+			} else {
+				(data[year][identifier][thisStatus] ??= []).push(sectorsDatum);
+			}
+		}
+	});
+
+	Object.values(data).forEach(yearData => {
+		Object.entries(yearData).forEach(([identifier, identifierData]) => {
+			const statuses = Object.keys(identifierData).filter(
+				status => status !== "all",
+			);
+			const retainedStatuses = statuses.filter(status =>
+				implementationAndReportingProjects.some(
+					implementationStatus =>
+						implementationStatus.toString() === status,
+				),
+			);
+
+			statuses.forEach(status => {
+				if (!retainedStatuses.includes(status)) {
+					delete identifierData[Number(status)];
+				}
+			});
+
+			if (!retainedStatuses.length) {
+				delete yearData[identifier]; // no Number() needed
+				return;
+			}
+
+			retainedStatuses.forEach(status => {
+				const statusData = identifierData[Number(status)];
+				if (!statusData) return;
+				statusData.forEach(datum => {
+					const allDatum = identifierData.all?.find(
+						d => d.sector === datum.sector,
+					);
+					if (allDatum) {
+						capTargetedAndReached(
+							datum,
+							allDatum,
+							beneficiaryCategories,
+						);
+					}
+				});
+			});
+		});
+	});
+}
+
+function populateTotalBeneficiariesByBeneficiaryTypeData<
+	K extends number | FundWithAllocType,
+>(
+	source: TotalBeneficiariesByBeneficiaryTypeObject[],
+	target: BeneficiariesByBeneficiaryTypeTarget<K>,
+	sourceName: string,
+	fundsPerBeneficiaryType: InDataLists["fundsPerBeneficiaryType"],
+	getIdentifier: (row: TotalBeneficiariesByBeneficiaryTypeObject) => K,
+) {
+	// Loosely typed view of the same object for the generic-key bookkeeping.
+	// Same runtime object, so mutations go to `target`.
+	const data = target as Record<
+		number,
+		Record<string | number, BeneficiaryTypeFundData>
+	>;
+
+	source.forEach(row => {
+		const parsedRow =
+			totalBeneficiariesByBeneficiaryTypeObjectSchema.safeParse(row);
+
+		if (!parsedRow.success) {
+			warnInvalidSchema(sourceName, row, parsedRow.error.message);
+			return;
+		}
+		const year = row.ImplementationYear;
+		const identifier = getIdentifier(row);
+
+		if (!data[year]) {
+			data[year] = {};
+		}
+
+		// Only track plain fund IDs; alloc-type identifiers are skipped
+		if (typeof identifier === "number") {
+			(fundsPerBeneficiaryType[row.BeneficiaryTypeId] ??= new Set()).add(
+				identifier,
+			);
+		}
+
+		if (!data[year][identifier]) {
+			data[year][identifier] = {} as BeneficiaryTypeFundData;
+		}
+
+		const beneficiaryTypeDatum: TotalBeneficiariesByBeneficiaryTypeBreakdown =
+			{
+				beneficiaryType: row.BeneficiaryTypeId,
+				girls: {
+					targeted: row.BenG || 0,
+					reached: row.AchG || 0,
+				},
+				boys: {
+					targeted: row.BenB || 0,
+					reached: row.AchB || 0,
+				},
+				women: {
+					targeted: row.BenW || 0,
+					reached: row.AchW || 0,
+				},
+				men: {
+					targeted: row.BenM || 0,
+					reached: row.AchM || 0,
+				},
+			};
+
+		if (row.ProcessStatusId === null) {
+			if (!data[year][identifier].all) {
+				data[year][identifier].all = [beneficiaryTypeDatum];
+			} else {
+				data[year][identifier].all.push(beneficiaryTypeDatum);
+			}
+		} else {
+			//several raw statuses can map to the same status (e.g. Disbursement
+			//and Implementation both map to Under Implementation): add their values
+			const thisStatus = projectStatusMapping[row.ProcessStatusId];
+			const foundDatum = data[year][identifier][thisStatus]?.find(
+				d => d.beneficiaryType === beneficiaryTypeDatum.beneficiaryType,
+			);
+			if (foundDatum) {
+				addTargetedAndReached(
+					foundDatum,
+					beneficiaryTypeDatum,
+					beneficiaryCategories,
+				);
+			} else {
+				(data[year][identifier][thisStatus] ??= []).push(
+					beneficiaryTypeDatum,
+				);
+			}
+		}
+	});
+
+	Object.values(data).forEach(yearData => {
+		Object.values(yearData).forEach(identifierData => {
+			Object.entries(identifierData).forEach(([status, statusData]) => {
+				if (status === "all") return;
+				statusData.forEach(datum => {
+					const allDatum = identifierData.all?.find(
+						d => d.beneficiaryType === datum.beneficiaryType,
+					);
+					if (allDatum) {
+						capTargetedAndReached(
+							datum,
+							allDatum,
+							beneficiaryCategories,
+						);
+					}
+				});
+			});
+		});
+	});
+}
+
+type TargetedAndReachedRecord<K extends string> = {
+	[key in K]: TargetedAndReached;
+};
+
+function addTargetedAndReached<K extends string>(
+	target: TargetedAndReachedRecord<K>,
+	source: TargetedAndReachedRecord<K>,
+	keys: readonly K[],
+) {
+	keys.forEach(key => {
+		target[key].targeted += source[key].targeted;
+		target[key].reached += source[key].reached;
+	});
+}
+
+//the added statuses can overlap (same people in Disbursement and
+//Implementation): a status can never be higher than the fund total
+function capTargetedAndReached<K extends string>(
+	target: TargetedAndReachedRecord<K>,
+	cap: TargetedAndReachedRecord<K>,
+	keys: readonly K[],
+): void {
+	keys.forEach(key => {
+		target[key].targeted = Math.min(
+			target[key].targeted,
+			cap[key].targeted,
+		);
+		target[key].reached = Math.min(target[key].reached, cap[key].reached);
+	});
 }
 
 export default processRawData;

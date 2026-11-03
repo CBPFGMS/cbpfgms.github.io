@@ -24,7 +24,7 @@ export const projectSummaryObjectSchema = z.object({
 	BenG: z.number().int().nonnegative(),
 	GMId: z.union([z.number(), z.string()]).nullable(),
 	GAMId: z.number().nullable(),
-	GlbPrjStatusId: z.number().int().nonnegative(),
+	GlbPrjStatusId: z.number().int().nonnegative().nullable(),
 	GlobalUniqueOrgId: z.number().int().nonnegative(),
 	DisabilityMarkerId: z.number().int().nonnegative().nullable(),
 	GenderEqualityMarkerId: z.number().int().nonnegative().nullable(),
@@ -101,12 +101,15 @@ export const projectSummaryObjectSchema = z.object({
 	PrjApprDate: z.string().regex(dateRegex, "Invalid date format"),
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
+	ProjectStatusCode: z.string().nullable(),
+	ProcessStatus: z.string(),
+	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const sectorBeneficiaryObjectSchema = z.object({
 	PooledFundName: z.string(),
 	PooledFundId: z.number().int().nonnegative(),
-	AllocationTypeId: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
 	ChfId: z.number().int().nonnegative(),
 	ChfProjectCode: z.string(),
 	CountryClusterId: z.number().int().nonnegative(),
@@ -158,6 +161,97 @@ export const cvaObjectSchema = z.object({
 	PeopleTargeted: z.number().int().nonnegative().nullable(),
 	PeopleReached: z.number().int().nonnegative().nullable(),
 	GlobalClusterId: z.number().int().nonnegative(),
+});
+
+export const totalBeneficiariesObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
+	TotAch: z.number().int().nonnegative().nullable(),
+	TotAchProjects: z.number().int().nonnegative().nullable(),
+});
+
+export const totalBeneficiariesByPartnerObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	PartnerType: z.string(),
+	PartnerTypeId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
+	TotAch: z.number().int().nonnegative().nullable(),
+	TotAchProjects: z.number().int().nonnegative().nullable(),
+});
+
+export const totalBeneficiariesBySectorObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	GlobalCluster: z.string(),
+	GlobalClusterId: z.number().int().nonnegative(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
+	TotAch: z.number().int().nonnegative().nullable(),
+	TotAchProjects: z.number().int().nonnegative().nullable(),
+});
+
+export const totalBeneficiariesByBeneficiaryTypeObjectSchema = z.object({
+	PFId: z.number().int().nonnegative(),
+	PFName: z.string(),
+	ImplementationYear: z.number().int().nonnegative(),
+	AllocationTypeId: z.number().int().nonnegative().nullable(),
+	ProcessStatus: z.string().nullable(),
+	ProcessStatusId: z.number().int().nonnegative().nullable(),
+	BeneficiaryTypeId: z.number().int().nonnegative(),
+	BeneficiaryType: z.string(),
+	BeneficiaryTypeName: z.string(),
+	BenM: z.number().int().nonnegative().nullable(),
+	BenW: z.number().int().nonnegative().nullable(),
+	BenB: z.number().int().nonnegative().nullable(),
+	BenG: z.number().int().nonnegative().nullable(),
+	TotTarg: z.number().int().nonnegative().nullable(),
+	TotProjects: z.number().int().nonnegative().nullable(),
+	AchM: z.number().int().nonnegative().nullable(),
+	AchW: z.number().int().nonnegative().nullable(),
+	AchB: z.number().int().nonnegative().nullable(),
+	AchG: z.number().int().nonnegative().nullable(),
+	TotAch: z.number().int().nonnegative().nullable(),
+	TotAchProjects: z.number().int().nonnegative().nullable(),
 });
 
 // ********************
@@ -230,18 +324,14 @@ export const organizationMasterObjectSchema = z.object({
 	UNPPId: z.union([z.number(), z.string()]).nullable(),
 });
 
-export const projectStatusMasterObjectSchema = z.object({
-	GlobalInstanceStatusId: z.number().int().nonnegative(),
-	StatusName: z.string(),
-	StatusCode: z.string(),
-	AllocSrc: z.union([z.literal(1), z.literal(2)]),
-	InstanceTypeId: z.number().int().nonnegative(),
-	PooledFundId: z.number().int().nonnegative(),
-});
-
 export const beneficiaryTypesMasterObjectSchema = z.object({
-	BeneficiaryTypeId: z.number().int().nonnegative(),
-	BeneficiaryType: z.string(),
+	Id: z.number().int().nonnegative(),
+	BeneficiaryTypeName: z.string(),
+	BeneficiaryTypeCode: z.string(),
+	InstanceDatabaseId: z.number().int().nonnegative(),
+	InstanceDatabaseCode: z.string(),
+	LegacyId: z.number().int().nonnegative(),
+	DisplayOrder: z.number().int().nonnegative(),
 });
 
 export const pooledFundsMasterObjectSchema = z.object({
@@ -354,10 +444,6 @@ export type OrganizationMasterObject = z.infer<
 	typeof organizationMasterObjectSchema
 >;
 
-export type ProjectStatusMasterObject = z.infer<
-	typeof projectStatusMasterObjectSchema
->;
-
 export type BeneficiaryTypesMasterObject = z.infer<
 	typeof beneficiaryTypesMasterObjectSchema
 >;
@@ -393,3 +479,19 @@ export type EmergenciesMasterObject = z.infer<
 export type CvaObject = z.infer<typeof cvaObjectSchema>;
 
 export type CvaMasterObject = z.infer<typeof cvaMasterObjectSchema>;
+
+export type TotalBeneficiariesObject = z.infer<
+	typeof totalBeneficiariesObjectSchema
+>;
+
+export type TotalBeneficiariesByPartnerObject = z.infer<
+	typeof totalBeneficiariesByPartnerObjectSchema
+>;
+
+export type TotalBeneficiariesBySectorObject = z.infer<
+	typeof totalBeneficiariesBySectorObjectSchema
+>;
+
+export type TotalBeneficiariesByBeneficiaryTypeObject = z.infer<
+	typeof totalBeneficiariesByBeneficiaryTypeObjectSchema
+>;

@@ -32,7 +32,7 @@ const {
 function wrapText<T>(
 	text: d3.Selection<SVGTextElement, T, SVGGElement | null, unknown>,
 	width: number,
-	fromAxis: boolean = true
+	fromAxis: boolean = true,
 ) {
 	text.each(function () {
 		const text = select(this),
@@ -78,9 +78,9 @@ function wrapText<T>(
 }
 
 function dispatchTooltipEvent(
-	e: PointerEvent,
+	e: MouseEvent,
 	d: GroupValuesDatum,
-	type: "mouseover" | "mouseout"
+	type: "mouseover" | "mouseout",
 ): void {
 	const thisElement = e.currentTarget as SVGRectElement;
 	select(thisElement.parentNode as SVGGElement)
@@ -93,7 +93,7 @@ function calculateHeightOverview(
 	data: OverviewDatum[],
 	yearScaleRowHeight: number,
 	emergencyChartMargins: Margins,
-	emergencyOverviewGap: number
+	emergencyOverviewGap: number,
 ): number {
 	let height = emergencyChartMargins.top + emergencyChartMargins.bottom;
 
@@ -111,7 +111,7 @@ function calculateYearScaleRange(
 	size: number,
 	itemCount: number,
 	paddingInner: number,
-	paddingOuter: number
+	paddingOuter: number,
 ): number {
 	if (itemCount === 0) return 0;
 
@@ -126,7 +126,7 @@ function calculateOverviewRange(
 	data: OverviewDatum[],
 	yearScaleRowHeight: number,
 	emergencyChartMargins: Margins,
-	emergencyOverviewGap: number
+	emergencyOverviewGap: number,
 ): number[] {
 	const range: number[] = [emergencyChartMargins.top];
 
@@ -151,14 +151,14 @@ const getMaxFromValues = (values: GroupValuesDatum[]): number => {
 const getMaxFromGroupData = (groupData: GroupDatum[]): number => {
 	return Math.max(
 		...groupData.map(group => getMaxFromValues(group.values)),
-		0
+		0,
 	);
 };
 
 const getMaxValueOverview = (data: OverviewDatum[]): number => {
 	return Math.max(
 		...data.map(item => getMaxFromGroupData(item.groupData)),
-		0
+		0,
 	);
 };
 
@@ -167,18 +167,18 @@ function getMaxValueTimeline(data: TimelineDatum): number {
 		(acc, curr) =>
 			Math.max(
 				acc,
-				curr.values.reduce((acc, curr) => Math.max(acc, curr.total), 0)
+				curr.values.reduce((acc, curr) => Math.max(acc, curr.total), 0),
 			),
-		0
+		0,
 	);
 }
 
 function stackCustomOrder(
 	series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>[],
-	baseline: keyof TimelineEmergencyProperty
+	baseline: keyof TimelineEmergencyProperty,
 ): number[] {
 	function sum(
-		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>
+		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>,
 	) {
 		const n = series.length;
 		let s = 0,
@@ -191,7 +191,7 @@ function stackCustomOrder(
 	}
 
 	function none(
-		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>[]
+		series: Series<TimelineDatumValues, keyof TimelineEmergencyProperty>[],
 	): { value: number; key: keyof TimelineEmergencyProperty }[] {
 		let n = series.length;
 		const o = new Array(n);
@@ -204,8 +204,8 @@ function stackCustomOrder(
 			return a.key === baseline
 				? 1
 				: b.key === baseline
-				? -1
-				: sums[a.value] - sums[b.value];
+					? -1
+					: sums[a.value] - sums[b.value];
 		})
 		.reverse();
 	return result.map(d => d.value);
@@ -215,7 +215,7 @@ function createTooltipString(
 	datum: TimelineDatumValues,
 	thisGroup: TimelineYearValues,
 	lists: List,
-	hasMultipleYears: boolean
+	hasMultipleYears: boolean,
 ): string {
 	const tooltipFormat = format(",");
 
@@ -230,7 +230,7 @@ function createTooltipString(
 			}
 			return acc;
 		},
-		[] as Emergencies[]
+		[] as Emergencies[],
 	);
 
 	if (emergencies.length === 0) {
@@ -249,21 +249,21 @@ function createTooltipString(
 				: trimEmergencyName(lists.emergencyTypeNames[d.key])
 		}:</div>
 		<div style="flex: 0 30%;display:flex;align-items:flex-end;text-align:right;">$${tooltipFormat(
-			d.value
+			d.value,
 		)}</div>
-		</div>`
+		</div>`,
 	);
 
 	const string = `<div style="display:flex;flex-direction:row;width:100%;justify-content:center;align-items:center;">
 	<div style="flex: 0 40%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:1.8em;font-weight:bold;">$${formatSIFloat(
-		datum.total
+		datum.total,
 	)}</div>
 	<div style="flex: 0 60%;display:flex;align-items:flex-start;justify-content:flex-start;line-height:1.2;text-transform:uppercase;opacity:0.7;font-size:0.9em;text-align:left;">Total allocations in ${
 		fullMonthNames[datum.month]
 	}${hasMultipleYears ? " " + thisGroup.year : ""}</div>
 	</div>
 	<div style="max-width:300px;width:100%;display:flex;flex-direction:column;margin-top:10px;">${emergenciesList.join(
-		""
+		"",
 	)}</div>
 	`;
 
@@ -277,7 +277,7 @@ function trimEmergencyName(str: string): string {
 
 function calculateTimelineSVGHeight(
 	mode: EmergencyChartModes,
-	years: number
+	years: number,
 ): number {
 	const rowHeight =
 		mode === "aggregated"

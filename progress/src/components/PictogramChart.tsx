@@ -13,29 +13,27 @@ import AdsClickIcon from "@mui/icons-material/AdsClick";
 import DoneIcon from "@mui/icons-material/Done";
 import colors from "../utils/colors";
 import downloadData from "../utils/downloaddata";
-import { DatumPictogram } from "../utils/processdatasummary";
 import { DownloadStates, ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
-import capitalizeString from "../utils/capitalizestring";
 import { processPictogramDownload } from "../utils/processdownload";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type PictogramChartProps = {
-	dataPictogram: DatumPictogram;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 };
 
 const { beneficiaryCategories } = constants;
 
 function PictogramChart({
-	dataPictogram,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -43,25 +41,25 @@ function PictogramChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
+	targetedAndReachedTotal,
 }: PictogramChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
 	const ref = useRef<HTMLDivElement>(null);
 
-	const totalTargeted =
-		dataPictogram.targetedBoys +
-		dataPictogram.targetedGirls +
-		dataPictogram.targetedMen +
-		dataPictogram.targetedWomen;
+	const totalTargeted = targetedAndReachedTotal.targeted.total;
+	const totalReached = targetedAndReachedTotal.reached.total;
 
-	const totalReached =
-		dataPictogram.reachedBoys +
-		dataPictogram.reachedGirls +
-		dataPictogram.reachedMen +
-		dataPictogram.reachedWomen;
+	const maxValue =
+		max(
+			beneficiaryCategories.map(type =>
+				Math.max(
+					targetedAndReachedTotal.targeted[type],
+					targetedAndReachedTotal.reached[type],
+				),
+			),
+		) || 0;
 
-	const maxValue = max(Object.values(dataPictogram)) || 0;
 	const maxNumberOfPictograms = 22;
 
 	function handleDownloadClick() {
@@ -73,11 +71,10 @@ function PictogramChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataPictogramDownload)[number]>(
 			dataPictogramDownload,
-			"people_targeted_reached"
+			"people_targeted_reached",
 		);
 	}
 
@@ -123,7 +120,7 @@ function PictogramChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`People targeted: ${format(",.0f")(
-						totalTargeted
+						totalTargeted,
 					)}`}
 					data-tooltip-place="top"
 				>
@@ -141,7 +138,7 @@ function PictogramChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalTargeted)
+										formatSIFloat(totalTargeted),
 									)}
 									type="decimal"
 								/>
@@ -186,7 +183,7 @@ function PictogramChart({
 					gap={0}
 					data-tooltip-id="tooltip"
 					data-tooltip-content={`People reached: ${format(",.0f")(
-						totalReached
+						totalReached,
 					)}`}
 					data-tooltip-place="top"
 				>
@@ -205,7 +202,7 @@ function PictogramChart({
 							<span>
 								<NumberAnimator
 									number={parseFloat(
-										formatSIFloat(totalReached)
+										formatSIFloat(totalReached),
 									)}
 									type="decimal"
 								/>
@@ -290,22 +287,8 @@ function PictogramChart({
 					<PictogramRow
 						key={type}
 						type={type}
-						targeted={
-							dataPictogram[
-								("targeted" +
-									capitalizeString(
-										type
-									)) as keyof DatumPictogram
-							]
-						}
-						reached={
-							dataPictogram[
-								("reached" +
-									capitalizeString(
-										type
-									)) as keyof DatumPictogram
-							]
-						}
+						targeted={targetedAndReachedTotal.targeted[type]}
+						reached={targetedAndReachedTotal.reached[type]}
 						maxNumberOfPictograms={maxNumberOfPictograms}
 						maxValue={maxValue}
 					/>
@@ -342,7 +325,7 @@ function PictogramChart({
 					{
 						<NumberAnimator
 							number={parseFloat(
-								formatSIFloat(maxValue / maxNumberOfPictograms)
+								formatSIFloat(maxValue / maxNumberOfPictograms),
 							)}
 							type="decimal"
 						/>

@@ -3,12 +3,14 @@ import {
 	DownloadStates,
 	ImplementationStatuses,
 } from "../components/MainContainer";
-import { InDataLists } from "../utils/processrawdata";
+import { FundWithAllocType, InDataLists } from "../utils/processrawdata";
 import constants from "../utils/constants";
 
 type UpdateQueryStringParams = {
 	queryStringValues: URLSearchParams;
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
@@ -19,12 +21,11 @@ type UpdateQueryStringParams = {
 	inDataLists: InDataLists;
 	year: number[];
 	fund: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	allocationSource: number[];
 	implementationStatus: ImplementationStatuses[];
 	downloadStates: DownloadStates;
 	defaultYear: number;
-	showFinanciallyClosed: boolean;
 };
 
 const { implementationStatuses } = constants;
@@ -45,21 +46,14 @@ function useUpdateQueryString({
 	year,
 	downloadStates,
 	defaultYear,
-	showFinanciallyClosed,
 }: UpdateQueryStringParams): void {
-	const implementationStatusesFiltered = showFinanciallyClosed
-		? implementationStatuses
-		: implementationStatuses.filter(
-				status => status !== "Financially Closed"
-		  );
-
 	useEffect(() => {
-		const allocationTypesParam = getNumericArrayParam("allocationType");
+		const allocationTypesParam = getAllocTypesArrayParam("allocationType");
 		const allocationSourcesParam = getNumericArrayParam("allocationSource");
 		const fundParam = getNumericArrayParam("fund");
 		const yearParam = getNumericArrayParam("year");
-		const implementationStatusParam = getStringArrayParam(
-			"implementationStatus"
+		const implementationStatusParam = getStatusArrayParam(
+			"implementationStatus",
 		);
 
 		if (allocationTypesParam) setAllocationType(allocationTypesParam);
@@ -88,21 +82,16 @@ function useUpdateQueryString({
 		const yearParam =
 			year.length === 1 && year[0] === defaultYear ? "" : `year=${year}`;
 		const implementationStatusParam =
-			implementationStatus.length ===
-			implementationStatusesFiltered.length
+			implementationStatus.length === implementationStatuses.length
 				? ""
 				: `implementationStatus=${implementationStatus}`;
-		const showFinanciallyClosedParam = showFinanciallyClosed
-			? "showFinanciallyClosed"
-			: "";
 
 		if (
 			allocationTypesParam ||
 			allocationSourcesParam ||
 			fundParam ||
 			yearParam ||
-			implementationStatusParam ||
-			showFinanciallyClosed
+			implementationStatusParam
 		) {
 			const params = buildQueryStringParams([
 				allocationTypesParam,
@@ -110,7 +99,6 @@ function useUpdateQueryString({
 				fundParam,
 				yearParam,
 				implementationStatusParam,
-				showFinanciallyClosedParam,
 			]);
 
 			window.history.replaceState({}, "", `?${params}`);
@@ -124,13 +112,22 @@ function useUpdateQueryString({
 		return queryStringValues.get(param)?.split(",").map(Number) ?? null;
 	}
 
-	function getStringArrayParam(
-		param: string
+	function getStatusArrayParam(
+		param: string,
 	): ImplementationStatuses[] | null {
 		return (
 			(queryStringValues
 				.get(param)
 				?.split(",") as ImplementationStatuses[]) ?? null
+		);
+	}
+
+	function getAllocTypesArrayParam(
+		param: string,
+	): FundWithAllocType[] | null {
+		return (
+			(queryStringValues.get(param)?.split(",") as FundWithAllocType[]) ??
+			null
 		);
 	}
 

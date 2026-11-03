@@ -5,17 +5,16 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { SyntheticEvent, useMemo, useRef, useState } from "react";
 import Snack from "./Snack";
-import { ListObj } from "../utils/makelists";
 import { InSelectionData } from "../utils/processdatasummary";
-import { DataProperties } from "./Accordion";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type SearchProps = {
-	value: number[];
-	setValue: React.Dispatch<React.SetStateAction<number[]>>;
-	names: number[];
-	namesList: ListObj;
+	value: FundWithAllocType[];
+	setValue: React.Dispatch<React.SetStateAction<FundWithAllocType[]>>;
+	names: FundWithAllocType[];
+	namesList: { [key: FundWithAllocType]: string };
 	inSelectionData: InSelectionData;
-	dataProperty: DataProperties;
+	dataProperty: "allocationTypes";
 };
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -36,15 +35,15 @@ function Search({
 
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
-	function handleChange(_: SyntheticEvent, eventValue: number[]) {
+	function handleChange(_: SyntheticEvent, eventValue: FundWithAllocType[]) {
 		if (eventValue.length === 0) {
 			setValue(value);
 			setOpenSnack(true);
 			return;
 		}
 		if (isAllSelected) {
-			const missingItems: number[] = names.filter(
-				d => !eventValue.includes(d)
+			const missingItems: FundWithAllocType[] = names.filter(
+				d => !eventValue.includes(d),
 			);
 			setValue(missingItems);
 		} else {
@@ -97,11 +96,11 @@ function Search({
 							!inSelectionData[dataProperty].has(option)
 								? {
 										display: "none",
-								  }
+									}
 								: {
 										whiteSpace: "normal",
 										padding: "1px",
-								  }
+									}
 						}
 					>
 						<Checkbox

@@ -16,6 +16,7 @@ import Divider from "@mui/material/Divider";
 import { processSummaryDownload } from "../utils/processdownload";
 import { ImplementationStatuses } from "./MainContainer";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type SummaryChartProps = {
 	dataSummary: DatumSummary[];
@@ -24,9 +25,8 @@ type SummaryChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 function SummaryChart({
@@ -38,7 +38,6 @@ function SummaryChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: SummaryChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -53,7 +52,6 @@ function SummaryChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataSummaryDownload)[number]>(
 			dataSummaryDownload,

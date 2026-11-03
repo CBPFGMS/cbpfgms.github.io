@@ -16,6 +16,7 @@ import Donut from "./GBVDonut";
 import formatSIFloat from "../utils/formatsi";
 import { format } from "d3";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type GBVChartProps = {
 	dataGBV: DatumGBV;
@@ -24,9 +25,8 @@ type GBVChartProps = {
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 export type DonutDatum = {
@@ -53,7 +53,6 @@ function GBVChart({
 	allocationSource,
 	allocationType,
 	implementationStatus,
-	showFinanciallyClosed,
 }: GBVChartProps) {
 	const { data, lists } = useContext(DataContext) as DataContextType;
 
@@ -68,11 +67,10 @@ function GBVChart({
 			allocationSource,
 			allocationType,
 			implementationStatus,
-			showFinanciallyClosed,
 		});
 		downloadData<(typeof dataGBVDownload)[number]>(
 			dataGBVDownload,
-			"GBV_marker"
+			"GBV_marker",
 		);
 	}
 
@@ -222,8 +220,8 @@ function GBVChart({
 					{dataGBV.totalReports === 0
 						? "0%"
 						: format(".1~%")(
-								dataGBV.reportsWithData / dataGBV.totalReports
-						  )}{" "}
+								dataGBV.reportsWithData / dataGBV.totalReports,
+							)}{" "}
 					of the projects. Possible many project(s) have not reached
 					the due date of final reports based on the selected filters.
 				</Typography>
@@ -269,7 +267,7 @@ function GBVCell({
 			}${format(",.0f")(GBVSlice)}<br />(${
 				~~((GBVSlice * 10000) / totalSlice) / 100
 			}% of ${title.toLowerCase().includes("budget") ? "$" : ""}${format(
-				",.0f"
+				",.0f",
 			)(totalSlice)})</div>`}
 			data-tooltip-place="top"
 		>

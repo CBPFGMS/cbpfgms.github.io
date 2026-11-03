@@ -105,7 +105,7 @@ function createEmergencyTimeline({
 				emergencyChartMargins.left -
 				emergencyChartMargins.right -
 				emergencyTimelineLeftMargin,
-			0
+			0,
 		),
 	]);
 
@@ -146,7 +146,7 @@ function createEmergencyTimeline({
 			d =>
 				`translate(${
 					emergencyChartMargins.left + emergencyTimelineLeftMargin
-				},${yScaleOuterTimeline(d.year)!})`
+				},${yScaleOuterTimeline(d.year)!})`,
 		);
 
 	timelineGroup = timelineGroupEnter.merge(timelineGroup);
@@ -167,13 +167,13 @@ function createEmergencyTimeline({
 						const t = i / (values.length - 1);
 						return interpolateHsl(
 							rgb(baseColor).darker(
-								(~~d.stackedData.length / 2) * 0.2
+								(~~d.stackedData.length / 2) * 0.2,
 							),
 							rgb(baseColor).brighter(
-								(~~d.stackedData.length / 2) * 0.2
-							)
+								(~~d.stackedData.length / 2) * 0.2,
+							),
 						)(t);
-					})
+					}),
 				);
 
 			localColorScaleTimeline.set(n[i], thisScaleColor);
@@ -187,7 +187,7 @@ function createEmergencyTimeline({
 			d =>
 				`translate(${
 					emergencyChartMargins.left + emergencyTimelineLeftMargin
-				},${yScaleOuterTimeline(d.year)})`
+				},${yScaleOuterTimeline(d.year)})`,
 		);
 
 	let timelineXAxisGroup = timelineGroup
@@ -221,7 +221,7 @@ function createEmergencyTimeline({
 		.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
 		.data<StackedDatum>(
 			d => d.stackedData!,
-			d => d.key
+			d => d.key,
 		);
 
 	timelineArea.exit().remove();
@@ -233,7 +233,7 @@ function createEmergencyTimeline({
 		.style("fill", (d, i, n) =>
 			mode === "aggregated"
 				? emergencyColors[d.key as keyof typeof emergencyColors]
-				: localColorScaleTimeline.get(n[i])!(d.key)
+				: localColorScaleTimeline.get(n[i])!(d.key),
 		)
 		.attr("d", areaGeneratorZero);
 
@@ -246,7 +246,7 @@ function createEmergencyTimeline({
 			.y0((e, j) => {
 				for (let index = 0; index < d.index; index++) {
 					const foundData = timelineDatum.stackedData.find(
-						e => e.index === index
+						e => e.index === index,
 					)!;
 					if (
 						foundData[j][0] !== foundData[j][1] ||
@@ -263,7 +263,7 @@ function createEmergencyTimeline({
 			})
 			.y1(
 				(e, j) =>
-					yScaleInnerTimeline(e[1]) - stackGap * (thisIndex[j] || 0)
+					yScaleInnerTimeline(e[1]) - stackGap * (thisIndex[j] || 0),
 			);
 		return areaGenerator(d);
 	});
@@ -291,7 +291,7 @@ function createEmergencyTimeline({
 		.selectAll<SVGRectElement, TimelineDatumValues>(".timelineTooltipBars")
 		.data<TimelineDatumValues>(
 			d => d.values,
-			d => `${d.month}`
+			d => `${d.month}`,
 		);
 
 	timelineTooltipBars.exit().remove();
@@ -305,11 +305,11 @@ function createEmergencyTimeline({
 
 	timelineTooltipBars
 		.attr("x", (d, i) =>
-			i === 0 ? xScale(d.month)! : xScale(d.month)! - xScale.step() / 2
+			i === 0 ? xScale(d.month)! : xScale(d.month)! - xScale.step() / 2,
 		)
 		.attr("y", 0)
 		.attr("width", (_, i, n) =>
-			i === 0 || i === n.length - 1 ? xScale.step() / 2 : xScale.step()
+			i === 0 || i === n.length - 1 ? xScale.step() / 2 : xScale.step(),
 		)
 		.attr("height", yScaleOuterTimeline.bandwidth())
 		.style("fill", "none")
@@ -328,7 +328,7 @@ function createEmergencyTimeline({
 			timelineGroup,
 			lists,
 			yScaleOuterTimeline.bandwidth(),
-			hasMultipleYears
+			hasMultipleYears,
 		);
 
 		const legendGroupByGroup = timelineGroup.selectAll<
@@ -342,7 +342,7 @@ function createEmergencyTimeline({
 				() => {
 					isMouseMoving = true;
 				},
-				{ once: true }
+				{ once: true },
 			)
 			.on("click", (_: PointerEvent, d: StackedDatum) => {
 				isMouseMoving = false;
@@ -359,7 +359,7 @@ function createEmergencyTimeline({
 					mode,
 				});
 			})
-			.on("mouseover", (_: PointerEvent, d) => {
+			.on("mouseover", (_: MouseEvent, d) => {
 				if (!isMouseMoving) return;
 				const thisGroup =
 					lists.emergencyDetails.emergencyTypes[d.key].emergencyGroup;
@@ -367,10 +367,10 @@ function createEmergencyTimeline({
 					.filter(e => e.parentGroup === thisGroup)
 					.selectAll<SVGPathElement, StackedDatum>(".timelineArea")
 					.style("filter", e =>
-						e.key === d.key ? null : "grayscale(1)"
+						e.key === d.key ? null : "grayscale(1)",
 					)
 					.style("opacity", e =>
-						e.key === d.key ? 1 : timelineOpacity
+						e.key === d.key ? 1 : timelineOpacity,
 					);
 			})
 			.on("mouseout", () => {
@@ -385,7 +385,7 @@ function createEmergencyTimeline({
 			lists,
 			yScaleOuterTimeline.bandwidth(),
 			paddingHeight,
-			hasMultipleYears
+			hasMultipleYears,
 		);
 
 		if (legendGroupAggregated) {
@@ -400,7 +400,7 @@ function createEmergencyTimeline({
 						lists,
 						mode,
 					});
-				}
+				},
 			);
 		}
 	}
@@ -408,7 +408,7 @@ function createEmergencyTimeline({
 
 function recalculateData(
 	data: TimelineDatum,
-	baselineGroup: keyof TimelineEmergencyProperty
+	baselineGroup: keyof TimelineEmergencyProperty,
 ) {
 	data.yearsData.forEach(yearDatum => {
 		stackGenerator
@@ -419,7 +419,7 @@ function recalculateData(
 						acc.push(num);
 					}
 					return acc;
-				}, [] as number[])
+				}, [] as number[]),
 			)
 			.order(d =>
 				stackCustomOrder(
@@ -427,8 +427,8 @@ function recalculateData(
 						TimelineDatumValues,
 						keyof TimelineEmergencyProperty
 					>[],
-					baselineGroup
-				)
+					baselineGroup,
+				),
 			);
 		yearDatum.stackedData = stackGenerator(yearDatum.values);
 	});

@@ -1,37 +1,55 @@
-import { Data } from "./processrawdata";
+import {
+	Data,
+	InDataLists,
+	TotalBeneficiariesByBeneficiaryTypeData,
+	TotalBeneficiariesByPartnerData,
+	TotalBeneficiariesBySectorData,
+	TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+	TotalBeneficiariesByPartnerWithAllocTypeData,
+	TotalBeneficiariesBySectorWithAllocTypeData,
+	FundWithAllocType,
+} from "./processrawdata";
 import { List } from "./makelists";
 import { ImplementationStatuses } from "../components/MainContainer";
-import calculateStatus from "./calculatestatus";
-import { BeneficiariesObject } from "./processrawdata";
+import { BeneficiariesObject, GenderAndAge } from "./processrawdata";
 import constants from "./constants";
 import { sum } from "d3";
-import { GenderAndAge } from "./processrawdata";
+import flipObject from "./flipobject";
+import { sumStatusesCapped } from "./sumstatuses";
 
 export type DatumBarChart = {
 	type: number;
+	fundsWithType: Set<number>;
+	alloctypesWithType: Set<FundWithAllocType>;
 	targeted: BeneficiariesObject;
 	reached: BeneficiariesObject;
 };
-
-export type BeneficiaryTypesList = (typeof beneficiariesSplitOrder)[number];
 
 type ProcessDataBarChartParams = {
 	data: Data;
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	implementationStatus: ImplementationStatuses[];
 	lists: List;
-	showFinanciallyClosed: boolean;
+	totalBeneficiariesByPartnerData: TotalBeneficiariesByPartnerData;
+	totalBeneficiariesBySectorData: TotalBeneficiariesBySectorData;
+	totalBeneficiariesByBeneficiaryTypeData: TotalBeneficiariesByBeneficiaryTypeData;
+	totalBeneficiariesByPartnerWithAllocTypeData: TotalBeneficiariesByPartnerWithAllocTypeData;
+	totalBeneficiariesBySectorWithAllocTypeData: TotalBeneficiariesBySectorWithAllocTypeData;
+	totalBeneficiariesByBeneficiaryTypeWithAllocTypeData: TotalBeneficiariesByBeneficiaryTypeWithAllocTypeData;
+	inDataLists: InDataLists;
+	allStatusesSelected: boolean;
+	allAllocationTypesSelected: boolean;
+	allSourcesSelected: boolean;
 };
 
-type BeneficiariesEntry = [
-	key: keyof BeneficiariesObject,
-	value: BeneficiariesObject[keyof BeneficiariesObject]
-];
+type GenderBreakdown = {
+	[key in GenderAndAge]: { targeted: number; reached: number };
+};
 
-const { beneficiariesSplitOrder, beneficiaryCategories } = constants;
+const { beneficiaryCategories, isProdSite } = constants;
 
 function processDataBarChart({
 	data,
@@ -41,7 +59,16 @@ function processDataBarChart({
 	allocationType,
 	implementationStatus,
 	lists,
-	showFinanciallyClosed,
+	totalBeneficiariesByPartnerData,
+	totalBeneficiariesBySectorData,
+	totalBeneficiariesByBeneficiaryTypeData,
+	totalBeneficiariesByPartnerWithAllocTypeData,
+	totalBeneficiariesBySectorWithAllocTypeData,
+	totalBeneficiariesByBeneficiaryTypeWithAllocTypeData,
+	inDataLists,
+	allStatusesSelected,
+	allSourcesSelected,
+	allAllocationTypesSelected,
 }: ProcessDataBarChartParams): {
 	dataOrganization: DatumBarChart[];
 	dataSector: DatumBarChart[];
@@ -51,22 +78,36 @@ function processDataBarChart({
 	const dataOrganization: DatumBarChart[] = [];
 	const dataSector: DatumBarChart[] = [];
 
-	beneficiariesSplitOrder.forEach(type => {
-		const targeted = beneficiaryCategories.reduce((acc, genderAndAge) => {
-			acc[genderAndAge] = 0;
-			return acc;
-		}, {} as BeneficiariesObject);
-		const reached = beneficiaryCategories.reduce((acc, genderAndAge) => {
-			acc[genderAndAge] = 0;
-			return acc;
-		}, {} as BeneficiariesObject);
-		const obj: DatumBarChart = { type, targeted, reached };
+	const numericStatuses = flipObject(lists.statuses);
 
-		dataBeneficiaryByType.push(obj);
+	const statuses = implementationStatus.map(
+		implSt => +numericStatuses[implSt as ImplementationStatuses],
+	);
+
+	const beneficiaryTypes = Object.keys(lists.beneficiaryTypes).map(d => +d);
+
+	const warnings: string[] = [];
+
+	beneficiaryTypes.forEach(beneficiaryType => {
+		dataBeneficiaryByType.push({
+			type: beneficiaryType,
+			fundsWithType: new Set(),
+			alloctypesWithType: new Set(),
+			targeted: beneficiaryCategories.reduce((acc, genderAndAge) => {
+				acc[genderAndAge] = 0;
+				return acc;
+			}, {} as BeneficiariesObject),
+			reached: beneficiaryCategories.reduce((acc, genderAndAge) => {
+				acc[genderAndAge] = 0;
+				return acc;
+			}, {} as BeneficiariesObject),
+		});
 	});
 
 	data.forEach(datum => {
-		const thisStatus = calculateStatus(datum, lists, showFinanciallyClosed);
+		const thisStatus = lists.statuses[
+			datum.projectStatusId
+		] as ImplementationStatuses;
 		if (
 			implementationStatus.includes(thisStatus) &&
 			year.includes(datum.year) &&
@@ -74,101 +115,74 @@ function processDataBarChart({
 			allocationSource.includes(datum.allocationSource) &&
 			allocationType.includes(datum.allocationType)
 		) {
-			for (const type in datum.reachedByBeneficiaryType) {
-				const foundType = dataBeneficiaryByType.find(
-					d => d.type === parseInt(type)
-				);
-				if (foundType) {
-					beneficiaryCategories.forEach(genderAndAge => {
-						foundType.reached[genderAndAge] +=
-							datum.reachedByBeneficiaryType[
-								+type as BeneficiaryTypesList
-							][genderAndAge];
-					});
-				}
-			}
-			for (const type in datum.targetedByBeneficiaryType) {
-				const foundType = dataBeneficiaryByType.find(
-					d => d.type === parseInt(type)
-				);
-				if (foundType) {
-					beneficiaryCategories.forEach(genderAndAge => {
-						foundType.targeted[genderAndAge] +=
-							datum.targetedByBeneficiaryType[
-								+type as BeneficiaryTypesList
-							][genderAndAge];
-					});
-				}
-			}
-
 			const foundOrganization = dataOrganization.find(
-				d => d.type === datum.organizationType
+				d => d.type === datum.organizationType,
 			);
 
 			if (foundOrganization) {
-				for (const genderAndAge in datum.reached) {
-					foundOrganization.reached[genderAndAge as GenderAndAge] +=
-						datum.reached[genderAndAge as GenderAndAge];
-				}
-				for (const genderAndAge in datum.targeted) {
-					foundOrganization.targeted[genderAndAge as GenderAndAge] +=
-						datum.targeted[genderAndAge as GenderAndAge];
-				}
+				foundOrganization.fundsWithType.add(datum.fund);
+				foundOrganization.alloctypesWithType.add(datum.allocationType);
 			} else {
 				const type = datum.organizationType;
-				const targeted = (
-					Object.entries(datum.targeted) as BeneficiariesEntry[]
-				).reduce((acc, [key, value]) => {
-					acc[key] = value;
-					return acc;
-				}, {} as BeneficiariesObject);
-				const reached = (
-					Object.entries(datum.reached) as BeneficiariesEntry[]
-				).reduce((acc, [key, value]) => {
-					acc[key] = value;
-					return acc;
-				}, {} as BeneficiariesObject);
-				const obj: DatumBarChart = { type, targeted, reached };
+
+				const targeted = beneficiaryCategories.reduce(
+					(acc, genderAndAge) => {
+						acc[genderAndAge] = 0;
+						return acc;
+					},
+					{} as BeneficiariesObject,
+				);
+				const reached = beneficiaryCategories.reduce(
+					(acc, genderAndAge) => {
+						acc[genderAndAge] = 0;
+						return acc;
+					},
+					{} as BeneficiariesObject,
+				);
+
+				const obj: DatumBarChart = {
+					type,
+					targeted,
+					reached,
+					fundsWithType: new Set([datum.fund]),
+					alloctypesWithType: new Set([datum.allocationType]),
+				};
 
 				dataOrganization.push(obj);
 			}
 
 			datum.sectorData.forEach(sectorDatum => {
 				const foundSector = dataSector.find(
-					d => d.type === sectorDatum.sectorId
+					d => d.type === sectorDatum.sectorId,
 				);
 
 				if (foundSector) {
-					for (const genderAndAge in sectorDatum.reached) {
-						foundSector.reached[genderAndAge as GenderAndAge] +=
-							sectorDatum.reached[genderAndAge as GenderAndAge];
-					}
-					for (const genderAndAge in sectorDatum.targeted) {
-						foundSector.targeted[genderAndAge as GenderAndAge] +=
-							sectorDatum.targeted[genderAndAge as GenderAndAge];
-					}
+					foundSector.fundsWithType.add(datum.fund);
+					foundSector.alloctypesWithType.add(datum.allocationType);
 				} else {
 					const type = sectorDatum.sectorId;
-					const targeted = (
-						Object.entries(
-							sectorDatum.targeted
-						) as BeneficiariesEntry[]
-					).reduce((acc, [key, value]) => {
-						acc[key] = value;
-						return acc;
-					}, {} as BeneficiariesObject);
-					const reached = (
-						Object.entries(
-							sectorDatum.reached
-						) as BeneficiariesEntry[]
-					).reduce((acc, [key, value]) => {
-						acc[key] = value;
-						return acc;
-					}, {} as BeneficiariesObject);
+
+					const targeted = beneficiaryCategories.reduce(
+						(acc, genderAndAge) => {
+							acc[genderAndAge] = 0;
+							return acc;
+						},
+						{} as BeneficiariesObject,
+					);
+					const reached = beneficiaryCategories.reduce(
+						(acc, genderAndAge) => {
+							acc[genderAndAge] = 0;
+							return acc;
+						},
+						{} as BeneficiariesObject,
+					);
+
 					const obj: DatumBarChart = {
 						type,
 						targeted,
 						reached,
+						fundsWithType: new Set([datum.fund]),
+						alloctypesWithType: new Set([datum.allocationType]),
 					};
 
 					dataSector.push(obj);
@@ -177,17 +191,376 @@ function processDataBarChart({
 		}
 	});
 
+	const dataOrganizationForAllocType = structuredClone(dataOrganization);
+	const dataSectorForAllocType = structuredClone(dataSector);
+	const dataBeneficiaryByTypeForAllocType = structuredClone(
+		dataBeneficiaryByType,
+	);
+
+	//we always compute the "regular" arrays, because they will be used to cap the allocation types arrays.
+
+	dataOrganization.forEach(org => {
+		fund.forEach(pf => {
+			if (!org.fundsWithType.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesByPartnerData[selectedYear][pf];
+
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesByPartner data for year ${selectedYear}`,
+					);
+					return;
+				}
+
+				addFundFigures(
+					org,
+					thisFund,
+					d => d.partner === org.type,
+					statuses,
+					allStatusesSelected,
+					`Partner ${org.type} not found in totalBeneficiariesByPartner data for fund ${pf}`,
+				);
+			});
+		});
+	});
+
+	dataOrganizationForAllocType.forEach(org => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
+			allocationType.forEach(allocType => {
+				//Check if it has the allocation source
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
+
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (
+					!hasSource ||
+					!hasFund ||
+					!org.alloctypesWithType.has(allocType)
+				) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesByPartnerWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						warnings.push(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiaries data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						org,
+						thisAllocType,
+						d => d.partner === org.type,
+						statuses,
+						allStatusesSelected,
+						`Partner ${org.type} not found in totalBeneficiariesByPartner data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
+	});
+
+	dataSector.forEach(sect => {
+		fund.forEach(pf => {
+			if (!sect.fundsWithType.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesBySectorData[selectedYear][pf];
+
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
+					);
+					return;
+				}
+
+				addFundFigures(
+					sect,
+					thisFund,
+					d => d.sector === sect.type,
+					statuses,
+					allStatusesSelected,
+					`Sector ${sect.type} not found in totalBeneficiariesBySector data for fund ${pf}`,
+				);
+			});
+		});
+	});
+
+	dataSectorForAllocType.forEach(sect => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
+			allocationType.forEach(allocType => {
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
+
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (
+					!hasSource ||
+					!hasFund ||
+					!sect.alloctypesWithType.has(allocType)
+				) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesBySectorWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						warnings.push(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesBySector data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						sect,
+						thisAllocType,
+						d => d.sector === sect.type,
+						statuses,
+						allStatusesSelected,
+						`Sector ${sect.type} not found in totalBeneficiariesBySector data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
+	});
+
+	dataBeneficiaryByType.forEach(benType => {
+		fund.forEach(pf => {
+			if (!inDataLists.fundsPerBeneficiaryType[benType.type]?.has(pf)) {
+				return;
+			}
+
+			year.forEach(selectedYear => {
+				const thisFund =
+					totalBeneficiariesByBeneficiaryTypeData[selectedYear][pf];
+				if (!thisFund) {
+					warnings.push(
+						`Pooled fund code ${pf} not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
+					);
+					return;
+				}
+
+				addFundFigures(
+					benType,
+					thisFund,
+					d => d.beneficiaryType === benType.type,
+					statuses,
+					allStatusesSelected,
+					`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for fund ${pf}`,
+				);
+			});
+		});
+	});
+
+	dataBeneficiaryByTypeForAllocType.forEach(benType => {
+		//if there is selection of allocation type or allocation source, we use the call with allocation types
+		if (!allAllocationTypesSelected || !allSourcesSelected) {
+			allocationType.forEach(allocType => {
+				const hasSource =
+					allSourcesSelected ||
+					lists.allocTypesPerSource[allocationSource[0]].has(
+						allocType,
+					);
+
+				const hasFund = fund.some(f => f === +allocType.split("-")[0]);
+
+				if (!hasSource || !hasFund) {
+					return;
+				}
+
+				year.forEach(selectedYear => {
+					const thisAllocType =
+						totalBeneficiariesByBeneficiaryTypeWithAllocTypeData[
+							selectedYear
+						][allocType];
+
+					if (!thisAllocType) {
+						warnings.push(
+							`Allocation type code ${allocType} (pooled fund + "." +allocation type) not found in the totalBeneficiariesByBeneficiaryType data for year ${selectedYear}`,
+						);
+						return;
+					}
+
+					addFundFigures(
+						benType,
+						thisAllocType,
+						d => d.beneficiaryType === benType.type,
+						statuses,
+						allStatusesSelected,
+						`Beneficiary type ${benType.type} not found in totalBeneficiariesByBeneficiaryType data for allocation type code ${allocType} (pooled fund + "." +allocation type)`,
+					);
+				});
+			});
+		}
+	});
+
+	if (!isProdSite && warnings.length) {
+		console.warn(warnings);
+	}
+
+	//if there is selection of allocation type or allocation source, we cap the results and return earlier
+	if (!allAllocationTypesSelected || !allSourcesSelected) {
+		dataOrganizationForAllocType.forEach(datumOrgAllocType => {
+			const thisFundEquivalent = dataOrganization.find(
+				datumOrg => datumOrg.type === datumOrgAllocType.type,
+			);
+			if (thisFundEquivalent) {
+				beneficiaryCategories.forEach(genderAndAge => {
+					datumOrgAllocType.targeted[genderAndAge] = Math.min(
+						datumOrgAllocType.targeted[genderAndAge],
+						thisFundEquivalent.targeted[genderAndAge],
+					);
+					datumOrgAllocType.reached[genderAndAge] = Math.min(
+						datumOrgAllocType.reached[genderAndAge],
+						thisFundEquivalent.reached[genderAndAge],
+					);
+				});
+			}
+		});
+
+		dataSectorForAllocType.forEach(datumSectorAllocType => {
+			const thisFundEquivalent = dataSector.find(
+				datumSector => datumSector.type === datumSectorAllocType.type,
+			);
+			if (thisFundEquivalent) {
+				beneficiaryCategories.forEach(genderAndAge => {
+					datumSectorAllocType.targeted[genderAndAge] = Math.min(
+						datumSectorAllocType.targeted[genderAndAge],
+						thisFundEquivalent.targeted[genderAndAge],
+					);
+					datumSectorAllocType.reached[genderAndAge] = Math.min(
+						datumSectorAllocType.reached[genderAndAge],
+						thisFundEquivalent.reached[genderAndAge],
+					);
+				});
+			}
+		});
+
+		dataBeneficiaryByTypeForAllocType.forEach(
+			datumBeneficiaryByTypeAllocType => {
+				const thisFundEquivalent = dataBeneficiaryByType.find(
+					datumBeneficiaryByType =>
+						datumBeneficiaryByType.type ===
+						datumBeneficiaryByTypeAllocType.type,
+				);
+				if (thisFundEquivalent) {
+					beneficiaryCategories.forEach(genderAndAge => {
+						datumBeneficiaryByTypeAllocType.targeted[genderAndAge] =
+							Math.min(
+								datumBeneficiaryByTypeAllocType.targeted[
+									genderAndAge
+								],
+								thisFundEquivalent.targeted[genderAndAge],
+							);
+						datumBeneficiaryByTypeAllocType.reached[genderAndAge] =
+							Math.min(
+								datumBeneficiaryByTypeAllocType.reached[
+									genderAndAge
+								],
+								thisFundEquivalent.reached[genderAndAge],
+							);
+					});
+				}
+			},
+		);
+
+		dataBeneficiaryByTypeForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+		dataOrganizationForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+		dataSectorForAllocType.sort(
+			(a, b) =>
+				sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
+		);
+
+		return {
+			dataBeneficiaryByType: dataBeneficiaryByTypeForAllocType,
+			dataOrganization: dataOrganizationForAllocType,
+			dataSector: dataSectorForAllocType,
+		};
+	}
+
 	dataBeneficiaryByType.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 	dataOrganization.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 	dataSector.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached))
+		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
 	);
 
 	return { dataBeneficiaryByType, dataOrganization, dataSector };
+
+	//adds one fund's figures for one partner/sector/beneficiary type: the unique
+	//("all") figures when every status is selected, otherwise the sum of the
+	//selected statuses limited to the unique figures
+	function addFundFigures<T extends GenderBreakdown>(
+		datum: DatumBarChart,
+		thisFundData: { [status: number]: T[]; all: T[] },
+		matches: (d: T) => boolean,
+		statuses: number[],
+		allStatusesSelected: boolean,
+		warnMessage: string,
+	): void {
+		const allDatum = thisFundData.all.find(matches);
+
+		let fundFigures: GenderBreakdown;
+
+		if (allStatusesSelected) {
+			if (!allDatum) {
+				warnings.push(warnMessage);
+				return;
+			}
+			fundFigures = allDatum;
+		} else {
+			const statusData = statuses.map(st => {
+				const found = thisFundData[st]?.find(matches);
+				if (!found) warnings.push(`${warnMessage} and status ${st}`);
+				return found;
+			});
+			fundFigures = sumStatusesCapped(
+				statusData,
+				allDatum,
+				beneficiaryCategories,
+			);
+		}
+
+		beneficiaryCategories.forEach(key => {
+			datum.targeted[key] += fundFigures[key].targeted;
+			datum.reached[key] += fundFigures[key].reached;
+		});
+	}
 }
 
 export default processDataBarChart;

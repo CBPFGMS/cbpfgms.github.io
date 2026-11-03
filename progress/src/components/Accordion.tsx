@@ -10,7 +10,6 @@ import Dropdown from "./Dropdown";
 import CheckboxLabel from "./Checkbox";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import Search from "./Search";
 import { InSelectionData } from "../utils/processdatasummary";
 import { InDataLists } from "../utils/processrawdata";
 import { List, ListObj } from "../utils/makelists";
@@ -19,18 +18,36 @@ import { makeYearsList } from "../utils/makeyearslist";
 
 const { filterTypes } = constants;
 
-export type DataProperties = keyof InSelectionData;
+export type InSelectionDataWithoutStatuses = Omit<
+	InSelectionData,
+	"statuses" | "allocationTypes"
+>;
+
+export type DataProperties = keyof InSelectionDataWithoutStatuses;
 
 export type Type = (typeof filterTypes)[number];
 
+type TypeWithoutAlloc = Exclude<Type, "Allocation Name">;
+
 type AccordionComponentProps = {
-	type: Type;
+	type: TypeWithoutAlloc;
 	filterType: string;
 	dataProperty: DataProperties;
 	value: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
 	inSelectionData: InSelectionData;
 };
+
+type InDataListsWithoutStatusesPerFund = Omit<
+	InDataLists,
+	| "statusesPerFund"
+	| "statusesPerFundBDT2"
+	| "statusesPerAllocationType"
+	| "statusesPerAllocationTypeBDT2"
+	| "fundsPerBeneficiaryType"
+	| "statuses"
+	| "allocationTypes"
+>;
 
 function AccordionComponent({
 	type,
@@ -45,17 +62,15 @@ function AccordionComponent({
 	const accordionRef = useRef<HTMLDivElement>(null);
 
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
-	const dataArray = [...inDataLists[dataProperty as keyof InDataLists]];
+	const dataArray = [
+		...inDataLists[dataProperty as keyof InDataListsWithoutStatusesPerFund],
+	];
 	let namesList: ListObj;
 
 	const handleAccordionExpand =
 		(panel: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
 			setExpanded(isExpanded ? panel : false);
 		};
-
-	function handleDeselectAll() {
-		setValue([]);
-	}
 
 	function handleSelectAll() {
 		setValue(dataArray);
@@ -74,9 +89,6 @@ function AccordionComponent({
 			break;
 		case "Allocation Source":
 			namesList = lists.allocationSources;
-			break;
-		case "Allocation Name":
-			namesList = lists.allocationTypes;
 			break;
 		default:
 			namesList = lists[dataProperty as keyof List] as never;
@@ -120,7 +132,7 @@ function AccordionComponent({
 								color: "#144372",
 								fontWeight: "bold",
 								fontSize: "1rem",
-								width: "30%",
+								width: "20%",
 								alignSelf: "center",
 							}}
 						>
@@ -133,19 +145,19 @@ function AccordionComponent({
 								alignSelf: "center",
 								justifySelf: "flex-end",
 								fontSize: "0.8rem",
-								width: "45%",
+								width: "55%",
 								textAlign: "center",
 							}}
 						>
 							{value.length === dataArray.length
 								? `All ${type.toLocaleLowerCase()}s selected`
 								: value.length === 1
-								? isValidKey(value[0], namesList)
-									? namesList[value[0]]
-									: value[0].toString()
-								: `${
-										value.length
-								  } ${type.toLocaleLowerCase()}s selected`}
+									? isValidKey(value[0], namesList)
+										? namesList[value[0]]
+										: value[0].toString()
+									: `${
+											value.length
+										} ${type.toLocaleLowerCase()}s selected`}
 						</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
@@ -156,7 +168,7 @@ function AccordionComponent({
 						>
 							Select the {type.toLocaleLowerCase()}
 							{filterType === "dropdowncheck" &&
-								`. Multiple ${type.toLocaleLowerCase()}s are allowed`}
+								`. Multiple ${type.toLocaleLowerCase()}s are allowed.`}
 						</Typography>
 						{filterType === "dropdowncheck" && (
 							<Dropdown
@@ -170,16 +182,6 @@ function AccordionComponent({
 								fromQuickSelectors={false}
 							/>
 						)}
-						{filterType === "search" && (
-							<Search
-								value={value}
-								setValue={setValue}
-								names={dataArray}
-								namesList={namesList}
-								inSelectionData={inSelectionData}
-								dataProperty={dataProperty}
-							/>
-						)}
 						{filterType === "checkbox" && (
 							<CheckboxLabel
 								value={value}
@@ -190,8 +192,7 @@ function AccordionComponent({
 								dataProperty={dataProperty}
 							/>
 						)}
-						{(filterType === "dropdowncheck" ||
-							filterType === "search") && (
+						{filterType === "dropdowncheck" && (
 							<Box
 								style={{
 									display: "flex",
@@ -199,18 +200,6 @@ function AccordionComponent({
 										type === "Year" ? "column" : "row",
 								}}
 							>
-								<Button
-									variant="contained"
-									size="small"
-									onClick={handleDeselectAll}
-									style={{
-										marginLeft: "8px",
-										marginTop:
-											type === "Year" ? "8px" : "0px",
-									}}
-								>
-									Deselect all
-								</Button>
 								<Button
 									variant="contained"
 									size="small"

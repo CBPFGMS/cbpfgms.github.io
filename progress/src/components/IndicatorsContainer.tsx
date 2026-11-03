@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import { DatumIndicators } from "../utils/processdataindicators";
 import { GlobalIndicatorsObject } from "../utils/schemas";
 import {
@@ -12,20 +11,21 @@ import {
 import IndicatorsCarousel from "./IndicatorsCarousel";
 import { List } from "../utils/makelists";
 import processDataIndicators from "../utils/processdataindicators";
+import Alert from "@mui/material/Alert";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type IndicatorsContainerProps = {
 	dataIndicators: GlobalIndicatorsObject[];
 	year: number[];
 	fund: number[];
 	allocationSource: number[];
-	allocationType: number[];
+	allocationType: FundWithAllocType[];
 	indicatorsRef: (node?: Element | null | undefined) => void;
 	refIds: RefIds;
 	lists: List;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	implementationsStatus: ImplementationStatuses[];
-	showFinanciallyClosed: boolean;
 };
 
 function IndicatorsContainer({
@@ -40,16 +40,10 @@ function IndicatorsContainer({
 	clickedDownload,
 	setClickedDownload,
 	implementationsStatus,
-	showFinanciallyClosed,
 }: IndicatorsContainerProps) {
 	const [indicatorsFilteredData, setIndicatorsFilteredData] = useState<
-			DatumIndicators[]
-		>([]),
-		[generateTable, setGenerateTable] = useState<boolean>(false);
-
-	function handleClick() {
-		setGenerateTable(true);
-	}
+		DatumIndicators[]
+	>([]);
 
 	useEffect(() => {
 		const filteredIndicators = processDataIndicators({
@@ -60,11 +54,7 @@ function IndicatorsContainer({
 			allocationSource,
 			allocationType,
 			implementationsStatus,
-			showFinanciallyClosed,
 		});
-		if (filteredIndicators.length === 0) {
-			setGenerateTable(false);
-		}
 		setIndicatorsFilteredData(filteredIndicators);
 	}, [
 		dataIndicators,
@@ -74,7 +64,6 @@ function IndicatorsContainer({
 		allocationType,
 		lists,
 		implementationsStatus,
-		showFinanciallyClosed,
 	]);
 
 	return (
@@ -124,30 +113,32 @@ function IndicatorsContainer({
 					evaluating OCHA-funded projects, allowing for better
 					accountability and transparency
 				</Typography>
-				<Button
-					data-tooltip-id="tooltip"
-					data-tooltip-content={
-						"The table will be generated based on the selected filters"
-					}
-					data-tooltip-place="top"
-					variant="contained"
-					disabled={generateTable || !indicatorsFilteredData?.length}
-					onClick={handleClick}
-					style={{ marginTop: "2em", alignSelf: "center" }}
-				>
-					{indicatorsFilteredData?.length
-						? "Generate Table"
-						: "No Global Indicators for the filters selected"}
-				</Button>
 			</Grid>
 			<Grid size={12}>
-				{indicatorsFilteredData.length > 0 && generateTable && (
+				{indicatorsFilteredData.length > 0 && (
 					<IndicatorsCarousel
 						data={indicatorsFilteredData}
 						lists={lists}
 						clickedDownload={clickedDownload}
 						setClickedDownload={setClickedDownload}
 					/>
+				)}
+				{indicatorsFilteredData.length === 0 && (
+					<div
+						style={{
+							width: "100%",
+							display: "flex",
+							flexDirection: "column",
+							justifyContent: "center",
+							justifySelf: "center",
+							alignItems: "center",
+							alignSelf: "center",
+						}}
+					>
+						<Alert severity="warning">
+							No indicators available for the selected filters.
+						</Alert>
+					</div>
 				)}
 			</Grid>
 		</Grid>

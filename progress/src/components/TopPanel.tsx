@@ -8,6 +8,7 @@ import { InSelectionData } from "../utils/processdatasummary";
 import { ImplementationStatuses } from "./MainContainer";
 import QuickSelectors from "./QuickSelectors";
 import React from "react";
+import { FundWithAllocType } from "../utils/processrawdata";
 
 type TopPanelProps = {
 	titleRef: (node?: Element | null | undefined) => void;
@@ -30,14 +31,15 @@ type TopPanelProps = {
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: FundWithAllocType[];
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	implementationStatus: ImplementationStatuses[];
 	setImplementationStatus: React.Dispatch<
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
-	showFinanciallyClosed: boolean;
 };
 
 function TopPanel({
@@ -66,7 +68,6 @@ function TopPanel({
 	implementationStatus,
 	setImplementationStatus,
 	inSelectionData,
-	showFinanciallyClosed,
 }: TopPanelProps) {
 	return (
 		<Grid
@@ -137,7 +138,6 @@ function TopPanel({
 						implementationStatus={implementationStatus}
 						setImplementationStatus={setImplementationStatus}
 						inSelectionData={inSelectionData}
-						showFinanciallyClosed={showFinanciallyClosed}
 					/>
 				)}
 			</Grid>

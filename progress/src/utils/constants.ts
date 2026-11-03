@@ -1,12 +1,26 @@
 const constants = {
-	closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	// closedStatusNames: ["PRJ_PRJ_CLR", "PRJ_UND_CLSR"],
+	// implementationStatuses: [
+	// 	"Under Implementation",
+	// 	"Programmatically Closed",
+	// 	"Financially Closed",
+	// ],
 	implementationStatuses: [
 		"Under Implementation",
-		"Programmatically Closed",
-		"Financially Closed",
+		"Final Reporting",
+		"Project Closure",
+	],
+	excludedProjectStatusCodes: [
+		"PRJ_DRFT",
+		"PRJ_REJECTED",
+		"PRJ_TO_BE_DELETED",
+		"PRJ_WITHDRAWN",
+		"PRJ_TR_NON_RECOMM",
+		"PRJ_CANCELLED",
 	],
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
 	pageName: "CBPFProgress",
+	buildVersion: "v2.1",
 	localStorageTime: 60 * 60 * 1000, //1 hour
 	consoleStyle: "background-color: #0d6cb6; color: white; padding: 2px;",
 	isProdSite: window.location.hostname === "cbpf.data.unocha.org",
@@ -113,6 +127,48 @@ const constants = {
 	},
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
+	implementationAndReportingProjects: [4, 5, 6],
+	opacityValue: 0.3,
+	disclaimerWarningColor: "#e07b00",
+	disclaimerText:
+		"Disclaimer: Beneficiary figures are calculated using OCHA's standard beneficiary de-duplication methodology (BDT v.2) process to minimize double counting across activities and locations.",
+	disclaimerAltText:
+		"Disclaimer: this is a placeholder, actual disclaimer will show up here.",
 } as const;
+
+export const projectStatusMaster = {
+	1: "Submission of Proposal",
+	2: "Under Review",
+	3: "Under Final Approval",
+	4: "Under Implementation",
+	5: "Final Reporting",
+	6: "Project Closure",
+};
+
+export const projectStatusMapping: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+};
+
+export const projectStatusMappingProjSumV4: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+	13: 4,
+	14: 4,
+	15: 5,
+	16: 6,
+};
 
 export default constants;

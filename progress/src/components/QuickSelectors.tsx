@@ -7,6 +7,8 @@ import { makeYearsList } from "../utils/makeyearslist";
 import { ImplementationStatuses } from "./MainContainer";
 import constants from "../utils/constants";
 import DropdownStatus from "./DropdownStatus";
+import { FundWithAllocType } from "../utils/processrawdata";
+import DropdownAllocType from "./DropdownAllocType";
 
 const { implementationStatuses } = constants;
 
@@ -15,8 +17,10 @@ type SelectorsProps = {
 	setYear: React.Dispatch<React.SetStateAction<number[]>>;
 	fund: number[];
 	setFund: React.Dispatch<React.SetStateAction<number[]>>;
-	allocationType: number[];
-	setAllocationType: React.Dispatch<React.SetStateAction<number[]>>;
+	allocationType: FundWithAllocType[];
+	setAllocationType: React.Dispatch<
+		React.SetStateAction<FundWithAllocType[]>
+	>;
 	allocationSource: number[];
 	setAllocationSource: React.Dispatch<React.SetStateAction<number[]>>;
 	implementationStatus: ImplementationStatuses[];
@@ -24,7 +28,6 @@ type SelectorsProps = {
 		React.SetStateAction<ImplementationStatuses[]>
 	>;
 	inSelectionData: InSelectionData;
-	showFinanciallyClosed: boolean;
 };
 
 function QuickSelectors({
@@ -39,7 +42,6 @@ function QuickSelectors({
 	setFund,
 	setYear,
 	setImplementationStatus,
-	showFinanciallyClosed,
 }: SelectorsProps) {
 	const { lists, inDataLists } = useContext(DataContext) as DataContextType;
 
@@ -47,13 +49,9 @@ function QuickSelectors({
 	const dataArrayFunds = [...inDataLists.funds];
 	const dataArrayAllocationTypes = [...inDataLists.allocationTypes];
 	const dataArrayAllocationSources = [...inDataLists.allocationSources];
-	const dataArrayImplementationStatuses: ImplementationStatuses[] =
-		showFinanciallyClosed
-			? [...implementationStatuses]
-			: implementationStatuses.filter(
-					status => status !== "Financially Closed"
-			  );
-
+	const dataArrayImplementationStatuses: ImplementationStatuses[] = [
+		...implementationStatuses,
+	];
 	const yearsList = makeYearsList(dataArrayYears);
 	const namesListFunds = lists.fundNames;
 	const namesListAllocationTypes = lists.allocationTypes;
@@ -86,7 +84,7 @@ function QuickSelectors({
 				dataProperty={"funds"}
 				fromQuickSelectors={true}
 			/>
-			<Dropdown
+			<DropdownAllocType
 				value={allocationType}
 				setValue={setAllocationType}
 				names={dataArrayAllocationTypes}

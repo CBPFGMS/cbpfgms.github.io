@@ -1,14 +1,10 @@
 import { createContext } from "react";
-import { Data, InDataLists } from "../utils/processrawdata";
-import { GlobalIndicatorsObject } from "../utils/schemas";
-import { List } from "../utils/makelists";
+import type { UseDataReturn } from "../utils/api";
 
-export type DataContextType = {
-	data: Data;
-	dataIndicators: GlobalIndicatorsObject[];
-	lists: List;
-	inDataLists: InDataLists;
-};
+export type DataContextType = Omit<
+	UseDataReturn,
+	"loading" | "error" | "progress" | "totalFiles"
+>;
 
 const DataContext = createContext<DataContextType | null>(null);
 

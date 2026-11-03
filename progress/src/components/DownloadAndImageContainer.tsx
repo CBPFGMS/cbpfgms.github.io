@@ -1,8 +1,20 @@
 import { useRef, RefObject } from "react";
-import DownloadIcon from "./DownloadIcon";
+// import DownloadIcon from "./DownloadIcon";
 import ImageIcon from "./ImageIcon";
 import Box from "@mui/material/Box";
 import { DownloadStates, Charts } from "./MainContainer";
+import { WarningIcon } from "../assets/Warningicon";
+import constants from "../utils/constants";
+
+const { disclaimerWarningColor, disclaimerText, disclaimerAltText } = constants;
+
+const disclaimerChartTypes = new Set<Charts>([
+	"pictogram",
+	"beneficiaryTypes",
+	"organizations",
+	"sectors",
+	"disability",
+]);
 
 type DownloadAndImageContainerProps = {
 	handleDownloadClick: () => void;
@@ -11,6 +23,7 @@ type DownloadAndImageContainerProps = {
 	type: Charts;
 	refElement: RefObject<HTMLDivElement>;
 	fileName: string;
+	showDisclaimer?: boolean;
 };
 
 function DownloadAndImageContainer({
@@ -20,7 +33,17 @@ function DownloadAndImageContainer({
 	type,
 	refElement,
 	fileName,
+	showDisclaimer = true,
 }: DownloadAndImageContainerProps) {
+	void handleDownloadClick;
+	void clickedDownload;
+	void setClickedDownload;
+	void type;
+
+	const disclaimer = disclaimerChartTypes.has(type)
+		? disclaimerText
+		: disclaimerAltText;
+
 	const iconsRef = useRef<HTMLDivElement>(null);
 
 	return (
@@ -35,20 +58,40 @@ function DownloadAndImageContainer({
 				zIndex: 1000,
 				display: "flex",
 				flexDirection: "column",
+				alignItems: "center",
 			}}
 			ref={iconsRef}
 		>
-			<DownloadIcon
+			{/* <DownloadIcon
 				handleDownloadClick={handleDownloadClick}
 				clickedDownload={clickedDownload}
 				setClickedDownload={setClickedDownload}
 				type={type}
-			/>
+			/> */}
 			<ImageIcon
 				refElement={refElement}
 				iconsRef={iconsRef}
 				fileName={fileName}
 			/>
+			{showDisclaimer && (
+				// <WarningIcon
+				// 	data-tooltip-id="tooltip"
+				// 	data-tooltip-content={disclaimer}
+				// 	data-tooltip-place="bottom"
+				// 	style={{
+				// 		color: disclaimerWarningColor,
+				// 		verticalAlign: "text-bottom",
+				// 		fontSize: "1.2em",
+				// 	}}
+				// />
+				<WarningIcon
+					size={18}
+					color={disclaimerWarningColor}
+					data-tooltip-id="tooltip"
+					data-tooltip-content={disclaimer}
+					data-tooltip-place="top"
+				/>
+			)}
 		</Box>
 	);
 }
