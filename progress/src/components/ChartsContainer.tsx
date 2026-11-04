@@ -315,6 +315,7 @@ function ChartsContainer({
 							targetedAndReachedTotalByDisability={
 								targetedAndReachedTotalByDisability
 							}
+							targetedAndReachedTotal={targetedAndReachedTotal}
 							clickedDownload={clickedDownload}
 							setClickedDownload={setClickedDownload}
 							year={year}

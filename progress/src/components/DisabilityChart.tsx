@@ -22,6 +22,7 @@ import { FundWithAllocType } from "../utils/processrawdata";
 
 type DisabilityChartProps = {
 	targetedAndReachedTotalByDisability: TargetedAndReachedTotal;
+	targetedAndReachedTotal: TargetedAndReachedTotal;
 	clickedDownload: DownloadStates;
 	setClickedDownload: React.Dispatch<React.SetStateAction<DownloadStates>>;
 	year: number[];
@@ -36,6 +37,7 @@ const { beneficiaryCategories } = constants;
 
 function DisabilityChart({
 	targetedAndReachedTotalByDisability,
+	targetedAndReachedTotal,
 	clickedDownload,
 	setClickedDownload,
 	year,
@@ -49,6 +51,14 @@ function DisabilityChart({
 
 	const totalTargeted = targetedAndReachedTotalByDisability.targeted.total;
 	const totalReached = targetedAndReachedTotalByDisability.reached.total;
+
+	const grandTotalTargeted = targetedAndReachedTotal.targeted.total;
+	const grandTotalReached = targetedAndReachedTotal.reached.total;
+
+	const disabilityTargetedPercentage =
+		grandTotalTargeted > 0 ? (totalTargeted / grandTotalTargeted) * 100 : 0;
+	const disabilityReachedPercentage =
+		grandTotalReached > 0 ? (totalReached / grandTotalReached) * 100 : 0;
 
 	const maxValue =
 		max(
@@ -177,6 +187,25 @@ function DisabilityChart({
 							}}
 						/>
 					</Typography>
+					<Box
+						sx={{
+							mt: 0.5,
+						}}
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`${format(",.0f")(
+							totalTargeted,
+						)} represents ${disabilityTargetedPercentage.toFixed(
+							1,
+						)}% of all targeted people: ${format(",.0f")(
+							grandTotalTargeted,
+						)}`}
+						data-tooltip-place="top"
+					>
+						<Typography variant="body2">
+							({disabilityTargetedPercentage.toFixed(1)}% of all
+							targeted people)
+						</Typography>
+					</Box>
 				</Box>
 				<Divider
 					orientation="vertical"
@@ -264,6 +293,25 @@ function DisabilityChart({
 							}}
 						/>
 					</Typography>
+					<Box
+						sx={{
+							mt: 0.5,
+						}}
+						data-tooltip-id="tooltip"
+						data-tooltip-content={`${format(",.0f")(
+							totalReached,
+						)} represents ${disabilityReachedPercentage.toFixed(
+							1,
+						)}% of all reached people: ${format(",.0f")(
+							grandTotalReached,
+						)}`}
+						data-tooltip-place="top"
+					>
+						<Typography variant="body2">
+							({disabilityReachedPercentage.toFixed(1)}% of all
+							targeted people)
+						</Typography>
+					</Box>
 				</Box>
 			</Box>
 			<Box
