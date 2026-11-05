@@ -1,29 +1,43 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import PercentageIconLollipop from "./PercentageIconLollipop";
+import { d3Chart } from "../charts/d3chartpbialp_attribution";
+import type { AllocationsLollipopObject } from "../utils/schemas";
+import { select } from "d3";
 
 type LollipopContainerProps = {
 	donorName: string;
 	attribution: number;
+	lollipopData: AllocationsLollipopObject[];
 };
 
-function LollipopContainer({ donorName, attribution }: LollipopContainerProps) {
+function LollipopContainer({
+	donorName,
+	attribution,
+	lollipopData,
+}: LollipopContainerProps) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const drawRef = useRef<
+		((rawData: AllocationsLollipopObject[]) => void) | null
+	>(null);
+
 	useEffect(() => {
-		// const src =
-		// 	"https://cbpfgms.github.io/pbialp_attribution/src/d3chartpbialp_attribution.js";
+		const node = containerRef.current;
+		if (!node) return;
 
-		const src = "./d3chartpbialp_attribution.js";
+		drawRef.current = d3Chart(node);
 
-		if (document.querySelector(`script[src="${src}"]`)) return;
-
-		const script = document.createElement("script");
-		script.src = src;
-		script.async = true;
-
-		document.body.appendChild(script);
+		return () => {
+			select(node).selectAll("*").remove();
+		};
 	}, []);
+
+	useEffect(() => {
+		if (!drawRef.current) return;
+		drawRef.current(lollipopData);
+	}, [lollipopData]);
 
 	return (
 		<Box>
@@ -37,7 +51,7 @@ function LollipopContainer({ donorName, attribution }: LollipopContainerProps) {
 				<Grid
 					size={12}
 					sx={{
-						mb: 4,
+						mb: 3,
 					}}
 				>
 					<Box
@@ -57,7 +71,7 @@ function LollipopContainer({ donorName, attribution }: LollipopContainerProps) {
 								color: "var(--ocha-blue)",
 								fontWeight: 700,
 								textAlign: "center",
-								fontSize: "2rem",
+								fontSize: "1.8rem",
 								fontFamily: "Montserrat",
 								marginLeft: "16px",
 							}}
@@ -76,16 +90,12 @@ function LollipopContainer({ donorName, attribution }: LollipopContainerProps) {
 				}}
 			>
 				<Grid
-					size={11}
+					size={12}
 					sx={{ margin: "0 auto" }}
 				>
 					<div
+						ref={containerRef}
 						id="d3chartcontainerpbialp_attribution"
-						data-partner="total"
-						data-showaverage="true"
-						data-selectedcbpfs="none"
-						data-netfunding="true"
-						data-responsive="true"
 					></div>
 				</Grid>
 			</Grid>

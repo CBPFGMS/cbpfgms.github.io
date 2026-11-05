@@ -33,7 +33,7 @@ type DisabilityChartProps = {
 	disabilityReports: Report;
 };
 
-const { beneficiaryCategories } = constants;
+const { beneficiaryCategories, disabledPercentageGoal } = constants;
 
 function DisabilityChart({
 	targetedAndReachedTotalByDisability,
@@ -143,6 +143,7 @@ function DisabilityChart({
 						",.0f",
 					)(totalTargeted)}`}
 					data-tooltip-place="top"
+					width={"50%"}
 				>
 					<Typography
 						variant="h3"
@@ -189,22 +190,63 @@ function DisabilityChart({
 					</Typography>
 					<Box
 						sx={{
-							mt: 0.5,
+							mt: 1.5,
+							width: "90%",
 						}}
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${format(",.0f")(
-							totalTargeted,
-						)} represents ${disabilityTargetedPercentage.toFixed(
-							1,
-						)}% of all targeted people: ${format(",.0f")(
-							grandTotalTargeted,
-						)}`}
-						data-tooltip-place="top"
 					>
-						<Typography variant="body2">
-							({disabilityTargetedPercentage.toFixed(1)}% of all
-							targeted people)
+						<Typography
+							variant="caption"
+							sx={{
+								fontSize: "0.75rem",
+								letterSpacing: "-0.01em",
+							}}
+						>
+							Percentage of total targeted (goal:{" "}
+							{disabledPercentageGoal * 100}%)
 						</Typography>
+						<Box
+							className="status-card-footer"
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`${format(",.0f")(
+								totalTargeted,
+							)} represents ${disabilityTargetedPercentage.toFixed(
+								1,
+							)}% of all targeted people: ${format(",.0f")(
+								grandTotalTargeted,
+							)}`}
+							data-tooltip-place="top"
+						>
+							<Box
+								className={`status-prog-track status-pt-amber`}
+							>
+								<Box
+									className={`status-prog-fill status-pf-amber`}
+									style={{
+										width:
+											Math.min(
+												100,
+												disabilityTargetedPercentage /
+													disabledPercentageGoal,
+											) + "%",
+										transitionProperty: "width",
+										transitionDuration: "0.75s",
+									}}
+								></Box>
+							</Box>
+							<Box className={`status-pct status-pct-amber`}>
+								<Typography fontWeight={500}>
+									<NumberAnimator
+										number={parseFloat(
+											disabilityTargetedPercentage.toFixed(
+												1,
+											),
+										)}
+										type="decimal"
+									/>
+									{"%"}
+								</Typography>
+							</Box>
+						</Box>
 					</Box>
 				</Box>
 				<Divider
@@ -226,6 +268,7 @@ function DisabilityChart({
 						",.0f",
 					)(totalReached)}`}
 					data-tooltip-place="top"
+					width={"50%"}
 				>
 					<Typography
 						noWrap={true}
@@ -295,22 +338,61 @@ function DisabilityChart({
 					</Typography>
 					<Box
 						sx={{
-							mt: 0.5,
+							mt: 1.5,
+							width: "90%",
 						}}
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${format(",.0f")(
-							totalReached,
-						)} represents ${disabilityReachedPercentage.toFixed(
-							1,
-						)}% of all reached people: ${format(",.0f")(
-							grandTotalReached,
-						)}`}
-						data-tooltip-place="top"
 					>
-						<Typography variant="body2">
-							({disabilityReachedPercentage.toFixed(1)}% of all
-							targeted people)
+						<Typography
+							variant="caption"
+							sx={{
+								fontSize: "0.75rem",
+								letterSpacing: "-0.01em",
+							}}
+						>
+							Percentage of total reached (goal:{" "}
+							{disabledPercentageGoal * 100}%)
 						</Typography>
+						<Box
+							className="status-card-footer"
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`${format(",.0f")(
+								totalReached,
+							)} represents ${disabilityReachedPercentage.toFixed(
+								1,
+							)}% of all reached people: ${format(",.0f")(
+								grandTotalReached,
+							)}`}
+							data-tooltip-place="top"
+						>
+							<Box className={`status-prog-track status-pt-blue`}>
+								<Box
+									className={`status-prog-fill status-pf-blue`}
+									style={{
+										width:
+											Math.min(
+												100,
+												disabilityReachedPercentage /
+													disabledPercentageGoal,
+											) + "%",
+										transitionProperty: "width",
+										transitionDuration: "0.75s",
+									}}
+								></Box>
+							</Box>
+							<Box className={`status-pct status-pct-blue`}>
+								<Typography fontWeight={500}>
+									<NumberAnimator
+										number={parseFloat(
+											disabilityReachedPercentage.toFixed(
+												1,
+											),
+										)}
+										type="decimal"
+									/>
+									{"%"}
+								</Typography>
+							</Box>
+						</Box>
 					</Box>
 				</Box>
 			</Box>

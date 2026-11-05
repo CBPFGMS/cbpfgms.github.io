@@ -134,7 +134,7 @@ const constants = {
 		"Disclaimer: Beneficiary figures are calculated using OCHA's standard beneficiary de-duplication methodology (BDT v.2) process to minimize double counting across activities and locations.",
 	disclaimerAltText:
 		"Disclaimer: Beneficiary figures are calculated using OCHA's standard beneficiary de-duplication methodology (BDT v.2) process to minimize double counting across activities and locations.",
-	disabledPercentageGoal: 0.15,
+	disabledPercentageGoal: 0.16,
 } as const;
 
 export const projectStatusMaster = {

@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/index.css";
+import "./styles/d3chartstyles.css";
+import "./styles/d3chartstylespbialp.css";
 import App from "./App.tsx";
 import UnsupportedScreen from "./components/UnsupportedScreen.tsx";
 import { constants } from "./utils/constants.ts";

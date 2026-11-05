@@ -106,9 +106,8 @@ function Partners({
 					style={{
 						color: "var(--ocha-blue)",
 						fontWeight: 700,
-						marginBottom: "22px",
 						textAlign: "center",
-						fontSize: "2rem",
+						fontSize: "1.8rem",
 						fontFamily: "Montserrat",
 					}}
 				>

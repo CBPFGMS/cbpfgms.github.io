@@ -7,7 +7,7 @@ type PercentageIconProps = {
 };
 
 function PercentageIcon({ donorName, attribution }: PercentageIconProps) {
-	const size = 34;
+	const size = 30;
 	const iconSize = Math.round(size * 0.72);
 	const borderRadius = Math.round(size * 0.36);
 	const attributionPercentage = Math.round(attribution * 1000) / 10;

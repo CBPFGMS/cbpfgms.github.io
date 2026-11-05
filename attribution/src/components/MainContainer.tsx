@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Container from "@mui/material/Container";
 import { useAppData } from "../hooks/useappdata";
 import { constants } from "../utils/constants";
@@ -21,14 +21,14 @@ import NoData from "./NoData";
 import getFlagSrc from "../utils/flagsrc";
 import NoAttribution from "./NoAttribution";
 import processLollipopData from "../utils/processlollipopdata";
-import type { AllocationsLollipopObject } from "../utils/schemas";
+// import type { AllocationsLollipopObject } from "../utils/schemas";
 import LollipopContainer from "./LollipopContainer";
 
 export type Charts = (typeof constants.charts)[number];
 
-type CustomWindow = typeof window & {
-	lollipopData?: AllocationsLollipopObject[];
-};
+// type CustomWindow = typeof window & {
+// 	lollipopData?: AllocationsLollipopObject[];
+// };
 
 type MainContainerProps = {
 	donor: number;
@@ -183,18 +183,18 @@ function MainContainer({ donor }: MainContainerProps) {
 		],
 	);
 
-	const isFirstRender = useRef(true);
+	// const isFirstRender = useRef(true);
 
-	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-			(window as CustomWindow).lollipopData = lollipopData;
-		} else {
-			window.dispatchEvent(
-				new CustomEvent("updatelollipopdata", { detail: lollipopData }),
-			);
-		}
-	}, [lollipopData]);
+	// useEffect(() => {
+	// 	if (isFirstRender.current) {
+	// 		isFirstRender.current = false;
+	// 		(window as CustomWindow).lollipopData = lollipopData;
+	// 	} else {
+	// 		window.dispatchEvent(
+	// 			new CustomEvent("updatelollipopdata", { detail: lollipopData }),
+	// 		);
+	// 	}
+	// }, [lollipopData]);
 
 	return (
 		<Container
@@ -276,6 +276,7 @@ function MainContainer({ donor }: MainContainerProps) {
 						<LollipopContainer
 							donorName={lists.donorGMSNames[donor]}
 							attribution={attributions.global.percentage}
+							lollipopData={lollipopData}
 						/>
 						<SectionDivider title="Allocated values" />
 						<ChartsContainer
