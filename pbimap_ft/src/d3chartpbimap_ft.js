@@ -3718,6 +3718,14 @@
 					}
 				}
 
+				if (!foundSummaryObject) {
+					console.log(
+						"Project in Proj. Summary Agg. not found in Proj. Summary:" +
+							thisRow.PrjCode,
+					);
+					continue;
+				}
+
 				thisRow.cbpfName = cbpfsList[thisRow.PFId];
 				thisRow.PrjStsId = foundSummaryObject.PrjStsId;
 				thisRow.OrgTypeId = foundSummaryObject.OrgTypeId;

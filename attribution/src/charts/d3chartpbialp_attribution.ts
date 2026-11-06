@@ -1,8 +1,55 @@
-// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
+//// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
 import * as d3 from "d3";
 import type { AllocationsLollipopObject } from "../utils/schemas";
 
 type Draw = (rawData: AllocationsLollipopObject[]) => void;
+
+type OrgTypes = (typeof partnerList)[number];
+
+type AllOrgTypes = (typeof partnerList)[number] | "total";
+
+type ParallelDatum = {
+	partner: OrgTypes;
+	value: number;
+	percentage: number;
+	roundPercentage: number;
+	total: number;
+	standard: number;
+	reserve: number;
+	uniqueKey?: string;
+};
+
+type AverageDatum = Omit<ParallelDatum, "standard" | "reserve" | "value">;
+
+type Datum = {
+	clicked: boolean;
+	cbpf: string;
+	total: number;
+	standard: number;
+	reserve: number;
+	parallelData: ParallelDatum[];
+} & {
+	[key in OrgTypes]: number;
+} & {
+	[K in OrgTypes as `reserve-${K}`]: number;
+} & {
+	[K in OrgTypes as `standard-${K}`]: number;
+};
+
+type ChartState = {
+	selectedPartner: AllOrgTypes;
+	selectedCbpfs: string[];
+	netFunding: number;
+};
+
+const partnerList = [
+	"International NGO",
+	"National NGO",
+	"Red Cross/Crescent Movement",
+	"UN Agency",
+] as const;
+
+type Data = Datum[];
 
 export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 	const containerDiv = d3.select(containerDivNode);
@@ -10,7 +57,6 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 	const width = 1024,
 		parallelPanelHeight = 400,
 		padding = [4, 10, 28, 10],
-		buttonPanelHeight = 30,
 		panelHorizontalPadding = 8,
 		panelVerticalPadding = 52,
 		lollipopGroupHeight = 18,
@@ -35,13 +81,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		labelTextMaximumLength = 12,
 		underApprovalColor = "#E56A54",
 		highlightColor = "sandybrown",
-		partnerList = [
-			"International NGO",
-			"National NGO",
-			"Red Cross/Crescent Movement",
-			"UN Agency",
-		],
-		partnerListWithTotal = partnerList.concat("total"),
+		partnerListWithTotal: AllOrgTypes[] = [...partnerList, "total"],
 		formatSIaxes = d3.format("~s"),
 		formatMoney0Decimals = d3.format(",.0f"),
 		formatPercent = d3.format(".0%"),
@@ -49,29 +89,15 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		duration = 1000,
 		shortDuration = 500,
 		titlePadding = 36,
-		chartState = {
-			selectedPartner: null,
+		chartState: ChartState = {
+			selectedPartner: "total",
 			selectedCbpfs: [],
-			netFunding: null,
+			netFunding: 2,
 		};
 
 	let height = padding[0] + padding[2] + parallelPanelHeight;
 
-	const selectedResponsiveness = true;
-
 	let showAverage = true;
-
-	chartState.selectedPartner = "total";
-
-	const selectedNetFunding = 2;
-
-	chartState.netFunding = selectedNetFunding;
-
-	if (selectedResponsiveness === "false") {
-		containerDiv
-			.style("width", width + "px")
-			.style("height", height + "px");
-	}
 
 	const buttonsDiv = containerDiv
 		.append("div")
@@ -108,6 +134,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			lollipopWidthFactor,
 		padding: [56, 38, 4, 0],
 		labelPadding: 6,
+		height: 0,
 	};
 
 	const parallelPanel = {
@@ -220,18 +247,18 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		.tickPadding(8);
 
 	const lineGenerator = d3
-		.line()
+		.line<AverageDatum>()
 		.x(function (d) {
-			return xScaleParallel(d.partner);
+			return xScaleParallel(d.partner) || 0;
 		})
 		.y(function (d) {
 			return yScaleParallel(d.percentage);
 		});
 
 	const lineGeneratorBase = d3
-		.line()
+		.line<AverageDatum>()
 		.x(function (d) {
-			return xScaleParallel(d.partner);
+			return xScaleParallel(d.partner) || 0;
 		})
 		.y(yScaleParallel(0));
 
@@ -267,7 +294,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 	function draw(rawData: AllocationsLollipopObject[]) {
 		let data = processData(rawData);
 
-		const allCbpfs = [];
+		const allCbpfs: string[] = [];
 
 		data.forEach(function (d) {
 			allCbpfs.push(d.cbpf);
@@ -297,18 +324,20 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		createBottomButtons();
 
 		if (chartState.selectedCbpfs.length) {
-			lollipopPanel.main.selectAll(".pbialpCbpfGroup").each(function (d) {
-				d3.select(this)
-					.select("rect")
-					.style("fill", null)
-					.classed("contributionColorFill", !d.clicked)
-					.classed("contributionColorDarkerFill", d.clicked);
-				d3.select(this)
-					.select("circle")
-					.style("fill", null)
-					.classed("contributionColorFill", !d.clicked)
-					.classed("contributionColorDarkerFill", d.clicked);
-			});
+			lollipopPanel.main
+				.selectAll<SVGGElement, Datum>(".pbialpCbpfGroup")
+				.each(function (d) {
+					d3.select(this)
+						.select("rect")
+						.style("fill", null)
+						.classed("contributionColorFill", !d.clicked)
+						.classed("contributionColorDarkerFill", d.clicked);
+					d3.select(this)
+						.select("circle")
+						.style("fill", null)
+						.classed("contributionColorFill", !d.clicked)
+						.classed("contributionColorDarkerFill", d.clicked);
+				});
 			highlightParallel(data);
 		}
 
@@ -347,7 +376,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 		function createButtonsPanel() {
 			let buttonsPartners = buttonsDiv
-				.selectAll(".pbialpbuttonsPartners")
+				.selectAll<
+					HTMLButtonElement,
+					AllOrgTypes
+				>(".pbialpbuttonsPartners")
 				.data(partnerListWithTotal);
 
 			const buttonsPartnersEnter = buttonsPartners
@@ -390,7 +422,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of createButtonsPanel
 		}
 
-		function createLollipopPanel(cbpfsArray) {
+		function createLollipopPanel(cbpfsArray: Data) {
 			cbpfsArray.sort(function (a, b) {
 				return (
 					b[chartState.selectedPartner] -
@@ -409,8 +441,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				}),
 			);
 
-			let lollipopPanelTitle = lollipopPanel.main
-				.selectAll(".pbialpLollipopPanelTitle")
+			const lollipopPanelTitle = lollipopPanel.main
+				.selectAll<SVGTextElement, boolean>(".pbialpLollipopPanelTitle")
 				.data([true]);
 
 			lollipopPanelTitle
@@ -425,7 +457,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("x", lollipopPanel.padding[3]);
 
 			let cbpfGroup = lollipopPanel.main
-				.selectAll(".pbialpCbpfGroup")
+				.selectAll<SVGGElement, Datum>(".pbialpCbpfGroup")
 				.data(cbpfsArray, function (d) {
 					return d.cbpf;
 				});
@@ -517,32 +549,32 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					);
 				})
 				.tween("text", function (d) {
-					let thisPartner,
-						thisPartnerPercentage,
-						thisPartnerRoundPercentage;
+					const node = this as SVGTextElement;
+					let thisPartner: ParallelDatum,
+						thisPartnerPercentage: number,
+						thisPartnerRoundPercentage: number;
 					if (chartState.selectedPartner !== "total") {
 						thisPartner = d.parallelData.find(
 							e => e.partner === chartState.selectedPartner,
-						);
+						)!;
 						thisPartnerPercentage = thisPartner.percentage;
 						thisPartnerRoundPercentage =
 							thisPartner.roundPercentage;
 					}
 					const i = d3.interpolate(
-						reverseFormat(this.textContent) || 0,
+						reverseFormat(node.textContent) || 0,
 						d[chartState.selectedPartner],
 					);
 					return function (t) {
 						if (
-							chartState.selectedPartner === "total" ||
-							(chartState.selectedPartner !== "total" &&
-								thisPartnerPercentage === 0)
+							chartState.selectedPartner !== "total" &&
+							thisPartnerPercentage === 0
 						) {
-							d3.select(this).text(
+							d3.select(node).text(
 								formatNumberSI(i(t)).replace("G", "B"),
 							);
 						} else {
-							d3.select(this)
+							d3.select(node)
 								.text(
 									i(1)
 										? formatNumberSI(i(t)).replace("G", "B")
@@ -608,7 +640,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						: fadeOpacity;
 				});
 				groupYAxisLollipop
-					.selectAll(".tick")
+					.selectAll<SVGGElement, string>(".tick")
 					.style("opacity", function (d) {
 						return chartState.selectedCbpfs.indexOf(d) > -1
 							? 1
@@ -628,7 +660,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 				groupYAxisLollipop
-					.selectAll(".tick")
+					.selectAll<SVGGElement, string>(".tick")
 					.style("opacity", function (d) {
 						return chartState.selectedCbpfs.indexOf(d) > -1
 							? 1
@@ -735,10 +767,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				const thisBox = this.getBoundingClientRect();
 
 				const containerBox = containerDiv
-					.node()
+					.node()!
 					.getBoundingClientRect();
 
-				const tooltipBox = tooltip.node().getBoundingClientRect();
+				const tooltipBox = tooltip.node()!.getBoundingClientRect();
 
 				const thisOffsetTop = thisBox.top - containerBox.top;
 
@@ -776,7 +808,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 				groupYAxisLollipop
-					.selectAll(".tick")
+					.selectAll<SVGGElement, string>(".tick")
 					.style("opacity", function (d) {
 						return chartState.selectedCbpfs.indexOf(d) > -1
 							? 1
@@ -835,8 +867,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of createLollipopChannel
 		}
 
-		function createParallelPanel(cbpfsArray) {
-			const averageData = [];
+		function createParallelPanel(cbpfsArray: Data) {
+			const averageData: AverageDatum[] = [];
 
 			const totalAllocations = d3.sum(cbpfsArray, function (d) {
 				return d.total;
@@ -845,9 +877,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			partnerList.forEach(function (d) {
 				const total = d3.sum(
 					cbpfsArray.map(function (e) {
-						return e.parallelData.find(function (f) {
+						const foundPartner = e.parallelData.find(function (f) {
 							return f.partner === d;
-						}).value;
+						});
+						return foundPartner ? foundPartner.value : 0;
 					}),
 				);
 				averageData.push({
@@ -863,7 +896,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			if (totalAllocations) roundToOneHundred(averageData);
 
 			const parallelPanelTitle = parallelPanel.main
-				.selectAll(".pbialpParallelPanelTitle")
+				.selectAll<SVGTextElement, boolean>(".pbialpParallelPanelTitle")
 				.data([true]);
 
 			parallelPanelTitle
@@ -914,7 +947,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.text("0%");
 
 			let cbpfParallelGroup = parallelPanel.main
-				.selectAll(".pbialpCbpfParallelGroup")
+				.selectAll<SVGGElement, Datum>(".pbialpCbpfParallelGroup")
 				.data(cbpfsArray, function (d) {
 					return d.cbpf;
 				});
@@ -990,7 +1023,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			let cbpfParallelGroupAverage = parallelPanel.main
-				.selectAll(".pbialpCbpfParallelGroupAverage")
+				.selectAll<
+					SVGGElement,
+					AverageDatum[]
+				>(".pbialpCbpfParallelGroupAverage")
 				.data([averageData]);
 
 			const cbpfParallelGroupAverageEnter = cbpfParallelGroupAverage
@@ -1029,7 +1065,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("class", "pbialpParallelCircleAverage")
 				.attr("r", circleRadius)
 				.attr("cx", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("cy", yScaleParallel(0))
 				.style("fill", "#6d8383");
@@ -1049,7 +1085,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("class", "pbialpPercentagesText pbialpPercentagesAverage")
 				.attr("filter", "url(#backgroundFilter)")
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("y", yScaleParallel(0))
 				.attr("text-anchor", "middle")
@@ -1058,7 +1094,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				})
 				.append("tspan")
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("dy", "1.1em")
 				.text(function (d) {
@@ -1095,7 +1131,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.transition()
 				.duration(duration)
 				.attr("cx", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("cy", function (d) {
 					return yScaleParallel(d.percentage);
@@ -1116,7 +1152,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				})
 				.append("tspan")
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("dy", "1.1em")
 				.text(function (d) {
@@ -1124,11 +1160,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfParallelGroupAverage
-				.selectAll("text")
+				.selectAll<SVGTextElement, AverageDatum>("text")
 				.transition()
 				.duration(duration)
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("y", function (d) {
 					return d.percentage > 0.95
@@ -1303,7 +1339,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of createBottomButtons
 		}
 
-		function highlightParallel(data, thisCbpf) {
+		function highlightParallel(data: Data, thisCbpf?: boolean) {
 			parallelPanel.main
 				.selectAll(".pbialpPercentagesAverage")
 				.style(
@@ -2221,10 +2257,6 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			Math.max(lollipopPanel.height, parallelPanelHeight) +
 			bottomButtonsGroupPadding;
 
-		if (selectedResponsiveness === false) {
-			containerDiv.style("height", height + "px");
-		}
-
 		svg.transition()
 			.duration(shortDuration)
 			.attr("viewBox", "0 0 " + width + " " + height);
@@ -2331,10 +2363,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		);
 	}
 
-	function processData(rawData) {
-		const aggregatedAllocations = [];
+	function processData(rawData: AllocationsLollipopObject[]): Data {
+		const aggregatedAllocations = [] as Data;
 
-		const temporarySet = [];
+		const temporarySet: Set<string> = new Set();
 
 		rawData.forEach(function (row) {
 			if (+row.FundingType !== chartState.netFunding) return;
@@ -2350,24 +2382,24 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				row.OrganizationType = "National NGO";
 			}
 
-			if (temporarySet.indexOf(row.PooledFundName) > -1) {
+			if (temporarySet.has(row.PooledFundName)) {
 				const tempObject = aggregatedAllocations.find(function (d) {
 					return d.cbpf === row.PooledFundName;
-				});
+				})!;
 
 				tempObject.total += +row.ApprovedBudget + row.PipelineBudget;
 				tempObject.standard +=
 					+row.ApprovedStandardBudget + row.PipelineStandardBudget;
 				tempObject.reserve +=
 					+row.ApprovedReserveBudget + row.PipelineReserveBudget;
-				tempObject[row.OrganizationType] +=
+				tempObject[row.OrganizationType as OrgTypes] +=
 					+row.ApprovedBudget + row.PipelineBudget;
-				tempObject["reserve-" + row.OrganizationType] +=
+				tempObject[("reserve-" + row.OrganizationType) as OrgTypes] +=
 					+row.ApprovedReserveBudget + row.PipelineReserveBudget;
-				tempObject["standard-" + row.OrganizationType] +=
+				tempObject[("standard-" + row.OrganizationType) as OrgTypes] +=
 					+row.ApprovedStandardBudget + row.PipelineStandardBudget;
 			} else {
-				const temporaryOriginalObject = {
+				const temporaryOriginalObject: Datum = {
 					clicked: false,
 					cbpf: row.PooledFundName,
 					total: +row.ApprovedBudget + row.PipelineBudget,
@@ -2388,23 +2420,25 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					"standard-National NGO": 0,
 					"standard-UN Agency": 0,
 					"standard-Red Cross/Crescent Movement": 0,
+					parallelData: [],
 				};
 
-				temporaryOriginalObject[row.OrganizationType] +=
+				temporaryOriginalObject[row.OrganizationType as OrgTypes] +=
 					+row.ApprovedBudget + row.PipelineBudget;
-				temporaryOriginalObject["reserve-" + row.OrganizationType] +=
-					+row.ApprovedReserveBudget + row.PipelineReserveBudget;
-				temporaryOriginalObject["standard-" + row.OrganizationType] +=
-					+row.ApprovedStandardBudget + row.PipelineStandardBudget;
+				temporaryOriginalObject[
+					("reserve-" + row.OrganizationType) as OrgTypes
+				] += +row.ApprovedReserveBudget + row.PipelineReserveBudget;
+				temporaryOriginalObject[
+					("standard-" + row.OrganizationType) as OrgTypes
+				] += +row.ApprovedStandardBudget + row.PipelineStandardBudget;
 
 				aggregatedAllocations.push(temporaryOriginalObject);
 
-				temporarySet.push(row.PooledFundName);
+				temporarySet.add(row.PooledFundName);
 			}
 		});
 
 		aggregatedAllocations.forEach(function (cbpf) {
-			cbpf.parallelData = [];
 			partnerList.forEach(function (partner) {
 				const thisPercentage =
 					cbpf.total !== 0 ? cbpf[partner] / cbpf.total : 0;
@@ -2414,8 +2448,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					percentage: thisPercentage,
 					roundPercentage: Math.round(thisPercentage * 100),
 					total: cbpf.total,
-					standard: cbpf["standard-" + partner],
-					reserve: cbpf["reserve-" + partner],
+					standard: cbpf[`standard-${partner}`],
+					reserve: cbpf[`reserve-${partner}`],
 				});
 			});
 			roundToOneHundred(cbpf.parallelData);
@@ -2426,7 +2460,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		//end of processData
 	}
 
-	function roundToOneHundred(dataArray) {
+	function roundToOneHundred(dataArray: ParallelDatum[] | AverageDatum[]) {
 		let sum = d3.sum(dataArray, function (d) {
 			return d.roundPercentage;
 		});
@@ -2436,13 +2470,17 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				const intNGOObject = dataArray.find(function (d) {
 					return d.partner === "International NGO";
 				});
-				intNGOObject.roundPercentage -= 1;
+				if (intNGOObject) {
+					intNGOObject.roundPercentage -= 1;
+				}
 			}
 			if (sum < 100) {
 				const natNGOObject = dataArray.find(function (d) {
 					return d.partner === "National NGO";
 				});
-				natNGOObject.roundPercentage += 1;
+				if (natNGOObject) {
+					natNGOObject.roundPercentage += 1;
+				}
 			}
 			sum = d3.sum(dataArray, function (d) {
 				return d.roundPercentage;
@@ -2450,11 +2488,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		}
 	}
 
-	function capitalize(str) {
+	function capitalize(str: string) {
 		return str[0].toUpperCase() + str.substring(1);
 	}
 
-	function formatSIFloat(value) {
+	function formatSIFloat(value: number) {
 		if (value === 0) return "0";
 		const length = (~~Math.log10(value) + 1) % 3;
 		const digits = length === 1 ? 2 : length === 2 ? 1 : 0;
@@ -2462,12 +2500,17 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		if (parseInt(result) === 1000) {
 			const lastDigit = result[result.length - 1];
 			const units = { k: "M", M: "B" };
-			return 1 + (isNaN(lastDigit) ? units[lastDigit] : "");
+			return (
+				1 +
+				(isNaN(+lastDigit)
+					? units[lastDigit as keyof typeof units]
+					: "")
+			);
 		}
 		return result;
 	}
 
-	function reverseFormat(s) {
+	function reverseFormat(s: string) {
 		if (+s === 0) return 0;
 		let returnValue;
 		const transformation = {
@@ -2495,14 +2538,18 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		};
 		Object.keys(transformation).some(function (k) {
 			if (s.indexOf(k) > 0) {
-				returnValue = parseFloat(s.split(k)[0]) * transformation[k];
+				returnValue =
+					parseFloat(s.split(k)[0]) *
+					transformation[k as keyof typeof transformation];
 				return true;
 			}
 		});
 		return returnValue;
 	}
 
-	function wrapText(text) {
+	function wrapText(
+		text: d3.Selection<SVGTextElement, unknown, SVGGElement, unknown>,
+	) {
 		text.each(function () {
 			const text = d3.select(this),
 				words =
