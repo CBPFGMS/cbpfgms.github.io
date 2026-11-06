@@ -3719,7 +3719,7 @@
 				}
 
 				if (!foundSummaryObject) {
-					console.log(
+					console.warn(
 						"Project in Proj. Summary Agg. not found in Proj. Summary:" +
 							thisRow.PrjCode,
 					);
