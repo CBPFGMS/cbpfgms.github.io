@@ -567,7 +567,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					);
 					return function (t) {
 						if (
-							chartState.selectedPartner !== "total" ||
+							chartState.selectedPartner === "total" ||
 							thisPartnerPercentage === 0
 						) {
 							d3.select(node).text(
