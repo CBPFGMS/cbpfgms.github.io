@@ -26,10 +26,6 @@ import LollipopContainer from "./LollipopContainer";
 
 export type Charts = (typeof constants.charts)[number];
 
-// type CustomWindow = typeof window & {
-// 	lollipopData?: AllocationsLollipopObject[];
-// };
-
 type MainContainerProps = {
 	donor: number;
 };
@@ -182,19 +178,6 @@ function MainContainer({ donor }: MainContainerProps) {
 			attributions,
 		],
 	);
-
-	// const isFirstRender = useRef(true);
-
-	// useEffect(() => {
-	// 	if (isFirstRender.current) {
-	// 		isFirstRender.current = false;
-	// 		(window as CustomWindow).lollipopData = lollipopData;
-	// 	} else {
-	// 		window.dispatchEvent(
-	// 			new CustomEvent("updatelollipopdata", { detail: lollipopData }),
-	// 		);
-	// 	}
-	// }, [lollipopData]);
 
 	return (
 		<Container

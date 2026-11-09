@@ -56,9 +56,9 @@ function DropdownFunds({
 	}
 
 	const namesListMemo = useMemo(() => {
-		allFunds.sort((a, b) => a - b);
+		allFunds.sort((a, b) => namesList[a].localeCompare(namesList[b]));
 		return allFunds;
-	}, [allFunds]);
+	}, [allFunds, namesList]);
 
 	return (
 		<div ref={selectRef}>

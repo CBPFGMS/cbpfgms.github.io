@@ -1,4 +1,4 @@
-//// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
+// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
 import * as d3 from "d3";
 import type { AllocationsLollipopObject } from "../utils/schemas";
 
