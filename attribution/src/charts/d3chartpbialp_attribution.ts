@@ -567,9 +567,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					);
 					return function (t) {
 						if (
-							chartState.selectedPartner === "total" ||
-							(chartState.selectedPartner !== "total" &&
-								thisPartnerPercentage === 0)
+							chartState.selectedPartner !== "total" ||
+							thisPartnerPercentage === 0
 						) {
 							d3.select(node).text(
 								formatNumberSI(i(t)).replace("G", "B"),
@@ -2388,27 +2387,22 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					return d.cbpf === row.PooledFundName;
 				})!;
 
-				tempObject.total += +row.ApprovedBudget + row.PipelineBudget;
-				tempObject.standard +=
-					+row.ApprovedStandardBudget + row.PipelineStandardBudget;
-				tempObject.reserve +=
-					+row.ApprovedReserveBudget + row.PipelineReserveBudget;
+				tempObject.total += +row.ApprovedBudget;
+				tempObject.standard += +row.ApprovedStandardBudget;
+				tempObject.reserve += +row.ApprovedReserveBudget;
 				tempObject[row.OrganizationType as OrgTypes] +=
-					+row.ApprovedBudget + row.PipelineBudget;
+					+row.ApprovedBudget;
 				tempObject[("reserve-" + row.OrganizationType) as OrgTypes] +=
-					+row.ApprovedReserveBudget + row.PipelineReserveBudget;
+					+row.ApprovedReserveBudget;
 				tempObject[("standard-" + row.OrganizationType) as OrgTypes] +=
-					+row.ApprovedStandardBudget + row.PipelineStandardBudget;
+					+row.ApprovedStandardBudget;
 			} else {
 				const temporaryOriginalObject: Datum = {
 					clicked: false,
 					cbpf: row.PooledFundName,
-					total: +row.ApprovedBudget + row.PipelineBudget,
-					standard:
-						+row.ApprovedStandardBudget +
-						row.PipelineStandardBudget,
-					reserve:
-						+row.ApprovedReserveBudget + row.PipelineReserveBudget,
+					total: +row.ApprovedBudget,
+					standard: +row.ApprovedStandardBudget,
+					reserve: +row.ApprovedReserveBudget,
 					"International NGO": 0,
 					"National NGO": 0,
 					"UN Agency": 0,
@@ -2425,13 +2419,13 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				};
 
 				temporaryOriginalObject[row.OrganizationType as OrgTypes] +=
-					+row.ApprovedBudget + row.PipelineBudget;
+					+row.ApprovedBudget;
 				temporaryOriginalObject[
 					("reserve-" + row.OrganizationType) as OrgTypes
-				] += +row.ApprovedReserveBudget + row.PipelineReserveBudget;
+				] += +row.ApprovedReserveBudget;
 				temporaryOriginalObject[
 					("standard-" + row.OrganizationType) as OrgTypes
-				] += +row.ApprovedStandardBudget + row.PipelineStandardBudget;
+				] += +row.ApprovedStandardBudget;
 
 				aggregatedAllocations.push(temporaryOriginalObject);
 

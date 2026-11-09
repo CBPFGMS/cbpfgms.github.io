@@ -37,9 +37,6 @@ import processContributionsData, {
 	type ContributionsData,
 	type InContributionsDataLists,
 } from "./processcontributionsdata";
-// import processLocationsData, {
-// 	type LocationsData,
-// } from "../utils/processlocationsdata";
 import { constants } from "./constants";
 import warnInvalidSchema from "./warninvalid";
 import generateRange from "./generateRange";

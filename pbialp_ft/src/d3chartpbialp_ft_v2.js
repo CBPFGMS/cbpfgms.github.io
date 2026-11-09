@@ -2528,31 +2528,21 @@
 						return d.cbpf === row.PooledFundName;
 					});
 
-					tempObject.total +=
-						+row.ApprovedBudget + row.PipelineBudget;
-					tempObject.standard +=
-						+row.ApprovedStandardBudget +
-						row.PipelineStandardBudget;
-					tempObject.reserve +=
-						+row.ApprovedReserveBudget + row.PipelineReserveBudget;
-					tempObject[row.OrganizationType] +=
-						+row.ApprovedBudget + row.PipelineBudget;
+					tempObject.total += +row.ApprovedBudget;
+					tempObject.standard += +row.ApprovedStandardBudget;
+					tempObject.reserve += +row.ApprovedReserveBudget;
+					tempObject[row.OrganizationType] += +row.ApprovedBudget;
 					tempObject["reserve-" + row.OrganizationType] +=
-						+row.ApprovedReserveBudget + row.PipelineReserveBudget;
+						+row.ApprovedReserveBudget;
 					tempObject["standard-" + row.OrganizationType] +=
-						+row.ApprovedStandardBudget +
-						row.PipelineStandardBudget;
+						+row.ApprovedStandardBudget;
 				} else {
 					const temporaryOriginalObject = {
 						clicked: false,
 						cbpf: row.PooledFundName,
-						total: +row.ApprovedBudget + row.PipelineBudget,
-						standard:
-							+row.ApprovedStandardBudget +
-							row.PipelineStandardBudget,
-						reserve:
-							+row.ApprovedReserveBudget +
-							row.PipelineReserveBudget,
+						total: +row.ApprovedBudget,
+						standard: +row.ApprovedStandardBudget,
+						reserve: +row.ApprovedReserveBudget,
 						"International NGO": 0,
 						"National NGO": 0,
 						"UN Agency": 0,
@@ -2568,15 +2558,13 @@
 					};
 
 					temporaryOriginalObject[row.OrganizationType] +=
-						+row.ApprovedBudget + row.PipelineBudget;
+						+row.ApprovedBudget;
 					temporaryOriginalObject[
 						"reserve-" + row.OrganizationType
-					] += +row.ApprovedReserveBudget + row.PipelineReserveBudget;
+					] += +row.ApprovedReserveBudget;
 					temporaryOriginalObject[
 						"standard-" + row.OrganizationType
-					] +=
-						+row.ApprovedStandardBudget +
-						row.PipelineStandardBudget;
+					] += +row.ApprovedStandardBudget;
 
 					aggregatedAllocations.push(temporaryOriginalObject);
 
