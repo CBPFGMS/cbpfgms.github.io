@@ -1,6 +1,6 @@
 export const constants = {
 	rootElementId: "attributionroot",
-	buildVersion: "v1.0",
+	buildVersion: "v1.1",
 	fundType: 1,
 	currentYear: new Date().getFullYear(),
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others

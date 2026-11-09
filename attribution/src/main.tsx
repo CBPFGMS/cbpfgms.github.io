@@ -8,8 +8,7 @@ import UnsupportedScreen from "./components/UnsupportedScreen.tsx";
 import { constants } from "./utils/constants.ts";
 
 const rootElement = document.getElementById("attributionroot")!;
-const startYearString = rootElement.dataset.startyear,
-	defaultFundTypeString = rootElement?.dataset.fundtype;
+const startYearString = rootElement.dataset.startyear;
 
 const isWideEnough = window.matchMedia(
 	`(min-width: ${constants.minWidth}px)`,
@@ -20,20 +19,8 @@ const startYear =
 		? null
 		: parseInt(startYearString);
 
-const defaultFundType =
-	!defaultFundTypeString || !parseInt(defaultFundTypeString)
-		? null
-		: parseInt(defaultFundTypeString);
-
 createRoot(rootElement).render(
 	<StrictMode>
-		{isWideEnough ? (
-			<App
-				startYear={startYear}
-				defaultFundType={defaultFundType}
-			/>
-		) : (
-			<UnsupportedScreen />
-		)}
+		{isWideEnough ? <App startYear={startYear} /> : <UnsupportedScreen />}
 	</StrictMode>,
 );

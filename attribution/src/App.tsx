@@ -9,7 +9,6 @@ import InvalidDonor from "./components/InvalidDonor";
 
 type AppProps = {
 	startYear: number | null;
-	defaultFundType: number | null;
 };
 
 const queryStringDonor = new URLSearchParams(window.location.search).get(
@@ -17,11 +16,11 @@ const queryStringDonor = new URLSearchParams(window.location.search).get(
 );
 const selectedDonor = queryStringDonor ? parseInt(queryStringDonor) : null;
 
-function App({ startYear, defaultFundType }: AppProps) {
+function App({ startYear }: AppProps) {
 	const dataPromise = useMemo(() => {
 		if (selectedDonor === null) return null;
-		return fetchAppData(startYear, defaultFundType, selectedDonor);
-	}, [startYear, defaultFundType])!;
+		return fetchAppData(startYear, selectedDonor);
+	}, [startYear])!;
 
 	if (selectedDonor === null) {
 		return <InvalidDonor />;

@@ -27,7 +27,7 @@ const dbPromise: Promise<IDBPDatabase<LocalDatabase>> = openDB<LocalDatabase>(
 async function fetchFileDB<T>(
 	fileName: string,
 	url: string,
-	method: string,
+	method: "csv" | "json",
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}_${buildVersion}`;
 	const keyPrefix = `${pageName}_${fileName}`;
