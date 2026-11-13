@@ -14,6 +14,7 @@ export const projectSummaryObjectSchema = z.object({
 	ChfId: z.number().int().nonnegative(),
 	ChfProjectCode: z.string(),
 	OrgId: z.number().int().nonnegative(),
+	GlobalOrgId: z.number().int().nonnegative(),
 	PrjDuration: z.string(),
 	EndDate: z.coerce.date(),
 	Budget: z.number().nonnegative(),
@@ -100,6 +101,9 @@ export const projectSummaryObjectSchema = z.object({
 	PrjApprDate: z.coerce.date().nullable(), //TEMPORARY
 	CVATotPeople: z.number().int().nonnegative().nullable(),
 	AchCVATotPeople: z.number().int().nonnegative().nullable(),
+	ProjectStatusCode: z.string().nullable(),
+	ProcessStatus: z.string(),
+	ProcessSTatusID: z.number().int().nonnegative(),
 });
 
 export const projectClusterOneGmsObjectSchema = z.object({
@@ -291,7 +295,7 @@ export const organizationMasterObjectSchema = z.object({
 	IsEligible: z.string().nullable(),
 	EligibleSince: z.coerce.date().nullable(),
 	FirstAllocationDate: z.coerce.date().nullable(),
-	GlobalOrgId: z.number().int().nonnegative().nullable(),
+	GlobalOrgId: z.number().int().nonnegative(),
 	GlobalOrgName: z.string(),
 	GlobalOrgAcronym: z.string(),
 	GlobalUniqueId: z.number().int().nonnegative(),

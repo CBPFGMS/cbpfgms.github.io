@@ -5,7 +5,6 @@ import type {
 } from "./processrawdata";
 import type { BeneficiariesObject } from "./processrawdata";
 import { constants } from "./constants";
-import { sum } from "d3";
 // import { GenderAndAge } from "./processrawdata";
 import { simpleWarn } from "./warninvalid";
 
@@ -185,7 +184,7 @@ function processDataBarChart({
 			const foundSector = totalBeneficiariesBySectorData[year][pf].find(
 				totalSectors => totalSectors.sector === sect.type,
 			);
-			
+
 			if (foundSector) {
 				sect.targeted.girls += foundSector.girls[targetKey] || 0;
 				sect.targeted.boys += foundSector.boys[targetKey] || 0;
@@ -220,13 +219,6 @@ function processDataBarChart({
 		sect.targeted.women *= globalAttribution;
 		sect.targeted.men *= globalAttribution;
 	});
-
-	dataOrganization.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
-	);
-	dataSector.sort(
-		(a, b) => sum(Object.values(b.reached)) - sum(Object.values(a.reached)),
-	);
 
 	return { dataOrganization, dataSector };
 }

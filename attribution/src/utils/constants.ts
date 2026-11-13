@@ -1,6 +1,6 @@
 export const constants = {
 	rootElementId: "attributionroot",
-	buildVersion: "v1.1",
+	buildVersion: "v1.3",
 	fundType: 1,
 	currentYear: new Date().getFullYear(),
 	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
@@ -42,4 +42,20 @@ export const constants = {
 	percentageDecimalPlaces: 2,
 	minimumPercentageValueForDisplay: 0.1,
 	minimumPercentageValue: 0.01,
+	implementationAndReportingProjects: [4, 5, 6],
 } as const;
+
+export const projectStatusMappingProjSumV4: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+	13: 4,
+	14: 4,
+	15: 5,
+	16: 6,
+};

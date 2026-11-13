@@ -186,11 +186,9 @@ export const organizationMasterObjectSchema = z.object({
 	IsEligible: z.string().nullable(),
 	EligibleSince: z
 		.string()
-		.regex(dateRegex, "Invalid date format")
 		.nullable(),
 	FirstAllocationDate: z
 		.string()
-		.regex(dateRegex, "Invalid date format")
 		.nullable(),
 	GlobalOrgId: z.number().int().nonnegative(),
 	GlobalUniqueId: z.number().int().nonnegative(),

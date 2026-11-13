@@ -17,10 +17,15 @@ import warnInvalidSchema, {
 	simpleWarn,
 	warnProjectNotFound,
 } from "./warninvalid";
-import { constants } from "./constants";
+import { constants, projectStatusMappingProjSumV4 } from "./constants";
 
-const { hasDisabledIds, hasGBVIds, hasGenderEqualityIds, firstNSFTYear } =
-	constants;
+const {
+	hasDisabledIds,
+	hasGBVIds,
+	hasGenderEqualityIds,
+	firstNSFTYear,
+	implementationAndReportingProjects,
+} = constants;
 
 export type AllocationsDatum = {
 	fund: number;
@@ -635,12 +640,25 @@ function processRawData({
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			//This data comes from Project Summary V4, which contains statuses not used by the other datasets
+			//("Submission of Proposal", "Under Review" and "Under Final Approval"), so we filter out
+			// any row that have status 1, 2 or 3 (after mapping) by returning earlier
+			const thisStatusId =
+				projectStatusMappingProjSumV4[row.ProcessSTatusID];
+			if (
+				!(
+					implementationAndReportingProjects as readonly number[]
+				).includes(thisStatusId)
+			) {
+				return;
+			}
+
 			const thisAllocationType =
 				lists.allocationTypesCompleteList[
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
 				];
 			const thisOrganization =
-				lists.organizationsCompleteList[row.GlobalUniqueOrgId];
+				lists.organizationsCompleteList[row.GlobalOrgId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
 
 			if (!thisAllocationType) {
@@ -672,7 +690,7 @@ function processRawData({
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
-				organizationsSet.add(thisOrganization.GlobalUniqueId);
+				organizationsSet.add(thisOrganization.GlobalOrgId);
 				allocationTypesSet.add(
 					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
 				);
@@ -709,7 +727,7 @@ function processRawData({
 					projectId: row.ChfId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
-					organizationId: thisOrganization.GlobalUniqueId,
+					organizationId: thisOrganization.GlobalOrgId,
 					allocationType: parseFloat(
 						`${row.PooledFundId}.${row.AllocationtypeId}`,
 					),

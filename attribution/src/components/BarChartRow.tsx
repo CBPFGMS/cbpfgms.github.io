@@ -18,9 +18,6 @@ export type BarChartRowProps = {
 	maxValue: number;
 	list: ListObj;
 	chartType: Charts;
-	fromCva?: boolean;
-	isAllocation?: boolean;
-	totalCvaPercentage?: number | boolean;
 };
 
 const { limitScaleValueInPixels } = constants;
@@ -32,16 +29,10 @@ function BarChartRow({
 	targeted,
 	type,
 	chartType,
-	fromCva = false,
-	isAllocation = false,
-	totalCvaPercentage = false,
 }: BarChartRowProps) {
 	const scale = scaleLinear<number>()
 		.domain([0, maxValue || 1])
 		.range([0, 100]);
-
-	const calcAmount =
-		fromCva && typeof totalCvaPercentage === "number" ? "5%" : "0%";
 
 	return (
 		<Box
@@ -86,40 +77,9 @@ function BarChartRow({
 					/>
 				)}
 			</Box>
-			{fromCva && typeof totalCvaPercentage === "number" && (
-				<Box
-					style={{
-						flex: `0 ${calcAmount}`,
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center",
-					}}
-				>
-					<Typography
-						variant="body2"
-						style={{
-							fontSize: 13,
-							color: "#444",
-							border: "none",
-							fontStyle: "normal",
-							fontWeight: 600,
-						}}
-					>
-						{"("}
-						<NumberAnimator
-							number={totalCvaPercentage}
-							type="integer"
-						/>
-						{"%)"}
-					</Typography>
-				</Box>
-			)}
 			<Box
 				style={{
-					flex:
-						chartType === "sectors"
-							? `0 calc(62% - ${calcAmount})`
-							: `0 calc(66% - ${calcAmount})`,
+					flex: chartType === "sectors" ? `0 62%` : `0 66%`,
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
@@ -134,13 +94,17 @@ function BarChartRow({
 							alignItems: "center",
 						}}
 						key={i}
-						{...(!fromCva && {
+						{...{
 							"data-tooltip-id": "tooltip",
 							"data-tooltip-content": `${
 								i ? "Reached" : "Targeted"
-							}: ${isAllocation ? "$" : ""}${format(",.0f")(d)}`,
+							}: ${
+								d && d < 1
+									? "less than 1 person"
+									: format(",.0f")(d)
+							}`,
 							"data-tooltip-place": "top",
-						})}
+						}}
 					>
 						<Box
 							style={{
@@ -225,14 +189,21 @@ function BarChartRow({
 												: "#fff",
 									}}
 								>
-									{isAllocation ? "$" : ""}
-									<NumberAnimator
-										number={parseFloat(formatSIFloat(d))}
-										type="decimal"
-									/>
-									{isNaN(+formatSIFloat(d).slice(-1))
-										? formatSIFloat(d).slice(-1)
-										: ""}
+									{d && d < 1 ? (
+										"<1"
+									) : (
+										<>
+											<NumberAnimator
+												number={parseFloat(
+													formatSIFloat(d),
+												)}
+												type="decimal"
+											/>
+											{isNaN(+formatSIFloat(d).slice(-1))
+												? formatSIFloat(d).slice(-1)
+												: ""}
+										</>
+									)}
 								</Typography>
 							</Box>
 						</Box>
