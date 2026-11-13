@@ -18,6 +18,7 @@ import warnInvalidSchema, {
 	warnProjectNotFound,
 } from "./warninvalid";
 import { constants, projectStatusMappingProjSumV4 } from "./constants";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 const {
 	hasDisabledIds,
@@ -653,10 +654,12 @@ function processRawData({
 				return;
 			}
 
+			const thisAllocTypeId = makeAllocTypeId(
+				row.PooledFundId,
+				row.AllocationtypeId,
+			);
 			const thisAllocationType =
-				lists.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				];
+				lists.allocationTypesCompleteList[thisAllocTypeId];
 			const thisOrganization =
 				lists.organizationsCompleteList[row.GlobalOrgId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
@@ -691,9 +694,7 @@ function processRawData({
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalOrgId);
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
-				);
+				allocationTypesSet.add(thisAllocTypeId);
 
 				const thisYearSectors = sectorsPerYearMap.get(
 					thisAllocationType.AllocationYear,
@@ -713,9 +714,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: thisAllocTypeId,
 					endDate: new Date(row.EndDate),
 					projectName: row.ChfProjectCode,
 				});
@@ -728,9 +727,7 @@ function processRawData({
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalOrgId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: thisAllocTypeId,
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					budget: row.Budget,

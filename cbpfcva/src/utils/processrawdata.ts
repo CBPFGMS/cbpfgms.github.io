@@ -6,6 +6,7 @@ import {
 } from "./schemas";
 import { type List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 export type Datum = {
 	fund: number;
@@ -105,7 +106,7 @@ function processRawData({
 					warnProjectNotFound(
 						row.ChfProjectCode,
 						row,
-						"Project not found in cvaDataMap"
+						"Project not found in cvaDataMap",
 					);
 				}
 			}
@@ -117,10 +118,12 @@ function processRawData({
 	projectSummary.forEach(row => {
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			const thisAllocTypeId = makeAllocTypeId(
+				row.PooledFundId,
+				row.AllocationtypeId,
+			);
 			const thisAllocationType =
-				listsObj.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				];
+				listsObj.allocationTypesCompleteList[thisAllocTypeId];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalUniqueOrgId];
 			const thisCvaData = cvaDataMap.get(row.ChfProjectCode);
@@ -129,7 +132,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in allocation types"
+					"Project not found in allocation types",
 				);
 			}
 
@@ -137,7 +140,7 @@ function processRawData({
 				warnProjectNotFound(
 					row.ChfProjectCode,
 					row,
-					"Project not found in organizations"
+					"Project not found in organizations",
 				);
 			}
 
@@ -149,9 +152,7 @@ function processRawData({
 				if (thisOrganization.GlobalOrgId) {
 					organizationsSet.add(thisOrganization.GlobalOrgId);
 				}
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				);
+				allocationTypesSet.add(thisAllocTypeId);
 				thisCvaData?.cva.forEach(cva => {
 					sectorsSet.add(cva.sectorId);
 				});
@@ -160,9 +161,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
-					),
+					allocationType: thisAllocTypeId,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
 					projectStatusId: row.GlbPrjStatusId,
@@ -177,9 +176,7 @@ function processRawData({
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalOrgId,
 					organizationGlobalId: thisOrganization.GlobalUniqueId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`
-					),
+					allocationType: thisAllocTypeId,
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					approvalDate: new Date(row.PrjApprDate),
@@ -193,7 +190,7 @@ function processRawData({
 			warnInvalidSchema(
 				"projectSummary",
 				row,
-				JSON.stringify(parsedRow.error)
+				JSON.stringify(parsedRow.error),
 			);
 		}
 	});

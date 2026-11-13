@@ -30,6 +30,9 @@ function ChartsContainer({
 		<Grid
 			container
 			spacing={2}
+			sx={{
+				mb: 5,
+			}}
 		>
 			<Paper
 				elevation={0}

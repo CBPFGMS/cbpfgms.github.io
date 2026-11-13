@@ -1,6 +1,6 @@
 const constants = {
 	rootElementId: "fasttrackroot",
-	buildVersion: "v2.0",
+	buildVersion: "v2.1",
 	fundType: 1,
 	beneficiaryCategories: ["women", "girls", "men", "boys"],
 	beneficiariesStatuses: ["targeted", "reached"],

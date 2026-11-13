@@ -17,6 +17,7 @@ import {
 	donorsMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -159,12 +160,12 @@ function makeLists({
 		const parsedAllocationTypeMaster =
 			allocationTypesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
-			lists.allocationTypes[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
-			] = d.AllocationTitle;
-			lists.allocationTypesCompleteList[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
-			] = d;
+			const allocTypeId = makeAllocTypeId(
+				d.PooledFundId,
+				d.AllocationTypeId,
+			);
+			lists.allocationTypes[allocTypeId] = d.AllocationTitle;
+			lists.allocationTypesCompleteList[allocTypeId] = d;
 		} else {
 			warnInvalidSchema(
 				"AllocationTypeMaster",

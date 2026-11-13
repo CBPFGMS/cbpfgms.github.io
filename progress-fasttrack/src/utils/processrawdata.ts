@@ -20,6 +20,7 @@ import { List } from "./makelists";
 import warnInvalidSchema, { warnProjectNotFound } from "./warninvalid";
 import constants, { projectStatusMapping } from "./constants";
 import type { Tranche } from "../components/MainContainer";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 const { beneficiaryCategories, reportTypes } = constants;
 
@@ -486,10 +487,12 @@ function processRawData({
 
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			const thisAllocTypeId = makeAllocTypeId(
+				row.PooledFundId,
+				row.AllocationtypeId,
+			);
 			const thisAllocationType =
-				listsObj.allocationTypesCompleteList[
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
-				];
+				listsObj.allocationTypesCompleteList[thisAllocTypeId];
 			const thisOrganization =
 				listsObj.organizationsCompleteList[row.GlobalOrgId];
 			const thisStatus =
@@ -540,9 +543,7 @@ function processRawData({
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalOrgId);
-				allocationTypesSet.add(
-					parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
-				);
+				allocationTypesSet.add(thisAllocTypeId);
 				if (statusesPerFund[row.PooledFundId]) {
 					statusesPerFund[row.PooledFundId].add(
 						projectStatusMapping[row.ProcessSTatusID],
@@ -569,9 +570,7 @@ function processRawData({
 					year: thisAllocationType.AllocationYear,
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: thisAllocTypeId,
 					endDate: new Date(row.EndDate),
 					projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 					reportType: row.RptCode ?? 0,
@@ -585,9 +584,7 @@ function processRawData({
 					allocationSource: thisAllocationType.AllocationSourceId,
 					organizationType: thisOrganization.OrganizationTypeId,
 					organizationId: thisOrganization.GlobalOrgId,
-					allocationType: parseFloat(
-						`${row.PooledFundId}.${row.AllocationtypeId}`,
-					),
+					allocationType: thisAllocTypeId,
 					allocationTypeId: row.AllocationtypeId,
 					endDate: new Date(row.EndDate),
 					budget: row.Budget,
@@ -834,7 +831,11 @@ function populateTotalBeneficiariesByPartnerData(
 					d => d.partner === datum.partner,
 				);
 				if (allDatum) {
-					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+					capTargetedAndReached(
+						datum,
+						allDatum,
+						beneficiaryCategories,
+					);
 				}
 			});
 		});
@@ -913,7 +914,11 @@ function populateTotalBeneficiariesBySectorData(
 					d => d.sector === datum.sector,
 				);
 				if (allDatum) {
-					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+					capTargetedAndReached(
+						datum,
+						allDatum,
+						beneficiaryCategories,
+					);
 				}
 			});
 		});
@@ -1002,7 +1007,11 @@ function populateTotalBeneficiariesByBeneficiaryTypeData(
 					d => d.beneficiaryType === datum.beneficiaryType,
 				);
 				if (allDatum) {
-					capTargetedAndReached(datum, allDatum, beneficiaryCategories);
+					capTargetedAndReached(
+						datum,
+						allDatum,
+						beneficiaryCategories,
+					);
 				}
 			});
 		});
@@ -1032,7 +1041,10 @@ function capTargetedAndReached<K extends string>(
 	keys: readonly K[],
 ) {
 	keys.forEach(key => {
-		target[key].targeted = Math.min(target[key].targeted, cap[key].targeted);
+		target[key].targeted = Math.min(
+			target[key].targeted,
+			cap[key].targeted,
+		);
 		target[key].reached = Math.min(target[key].reached, cap[key].reached);
 	});
 }

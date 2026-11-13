@@ -15,6 +15,7 @@ import {
 	cvaMasterObjectSchema,
 } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -110,7 +111,7 @@ function makeLists({
 			warnInvalidSchema(
 				"PooledFundsMaster",
 				d,
-				JSON.stringify(parsedFundMaster.error)
+				JSON.stringify(parsedFundMaster.error),
 			);
 		}
 	});
@@ -119,17 +120,17 @@ function makeLists({
 		const parsedAllocationTypeMaster =
 			allocationTypesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
-			lists.allocationTypes[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
-			] = d.AllocationTitle;
-			lists.allocationTypesCompleteList[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
-			] = d;
+			const allocTypeId = makeAllocTypeId(
+				d.PooledFundId,
+				d.AllocationTypeId,
+			);
+			lists.allocationTypes[allocTypeId] = d.AllocationTitle;
+			lists.allocationTypesCompleteList[allocTypeId] = d;
 		} else {
 			warnInvalidSchema(
 				"AllocationTypeMaster",
 				d,
-				JSON.stringify(parsedAllocationTypeMaster.error)
+				JSON.stringify(parsedAllocationTypeMaster.error),
 			);
 		}
 	});
@@ -145,7 +146,7 @@ function makeLists({
 			warnInvalidSchema(
 				"AllocationSourcesMaster",
 				d,
-				JSON.stringify(parsedAllocationSourcesMaster.error)
+				JSON.stringify(parsedAllocationSourcesMaster.error),
 			);
 		}
 	});
@@ -159,7 +160,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationTypesMaster",
 				d,
-				JSON.stringify(parsedOrganizationTypesMaster.error)
+				JSON.stringify(parsedOrganizationTypesMaster.error),
 			);
 		}
 	});
@@ -172,7 +173,7 @@ function makeLists({
 			warnInvalidSchema(
 				"SectorsMaster",
 				d,
-				JSON.stringify(parsedSectorsMaster.error)
+				JSON.stringify(parsedSectorsMaster.error),
 			);
 		}
 	});
@@ -188,7 +189,7 @@ function makeLists({
 			warnInvalidSchema(
 				"OrganizationMaster",
 				d,
-				JSON.stringify(parsedOrganizationMaster.error)
+				JSON.stringify(parsedOrganizationMaster.error),
 			);
 		}
 	});
@@ -201,7 +202,7 @@ function makeLists({
 			warnInvalidSchema(
 				"CvaMaster",
 				d,
-				JSON.stringify(parsedCvaMaster.error)
+				JSON.stringify(parsedCvaMaster.error),
 			);
 		}
 	});

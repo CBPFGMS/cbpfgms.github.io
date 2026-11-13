@@ -329,10 +329,12 @@ function processRawData({
 			}
 		}
 
+		const thisAllocTypeId = makeAllocTypeId(
+			row.PooledFundId,
+			row.AllocationtypeId,
+		);
 		const thisAllocationType =
-			listsObj.allocationTypesCompleteList[
-				makeAllocTypeId(row.PooledFundId, row.AllocationtypeId)
-			];
+			listsObj.allocationTypesCompleteList[thisAllocTypeId];
 		const thisOrganization =
 			listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
 		const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
@@ -366,10 +368,7 @@ function processRawData({
 				year: thisAllocationType.AllocationYear,
 				fund: row.PooledFundId,
 				allocationSource: thisAllocationType.AllocationSourceId,
-				allocationType: makeAllocTypeId(
-					row.PooledFundId,
-					row.AllocationtypeId,
-				),
+				allocationType: thisAllocTypeId,
 				endDate: new Date(row.EndDate),
 				projectStatusId: projectStatusMapping[row.ProcessSTatusID],
 				reportType: row.RptCode ?? 0,
@@ -384,9 +383,7 @@ function processRawData({
 			organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 			organizationsSet.add(thisOrganization.GlobalOrgId);
 			projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
-			allocationTypesSet.add(
-				makeAllocTypeId(row.PooledFundId, row.AllocationtypeId),
-			);
+			allocationTypesSet.add(thisAllocTypeId);
 
 			if (statusesPerFund[row.PooledFundId]) {
 				statusesPerFund[row.PooledFundId].add(
@@ -436,10 +433,7 @@ function processRawData({
 				allocationSource: thisAllocationType.AllocationSourceId,
 				organizationType: thisOrganization.OrganizationTypeId,
 				organizationId: thisOrganization.GlobalOrgId,
-				allocationType: makeAllocTypeId(
-					row.PooledFundId,
-					row.AllocationtypeId,
-				),
+				allocationType: thisAllocTypeId,
 				allocationTypeId: row.AllocationtypeId,
 				endDate: new Date(row.EndDate),
 				budget: Math.floor(row.Budget),
