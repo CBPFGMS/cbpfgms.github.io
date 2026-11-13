@@ -21,6 +21,7 @@ import {
 import warnInvalidSchema from "./warninvalid";
 import type { GenderAndAge, ReportType } from "./processrawdata";
 import { constants, projectStatusMaster } from "./constants";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 type MakeListParams = {
 	allocationTypesMaster: AllocationTypesMasterObject[];
@@ -180,10 +181,10 @@ function makeLists({
 			allocationTypesMasterObjectSchema.safeParse(d);
 		if (parsedAllocationTypeMaster.success) {
 			lists.allocationTypes[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
+				makeAllocTypeId(d.PooledFundId, d.AllocationTypeId)
 			] = d.AllocationTitle;
 			lists.allocationTypesCompleteList[
-				parseFloat(`${d.PooledFundId}.${d.AllocationTypeId}`)
+				makeAllocTypeId(d.PooledFundId, d.AllocationTypeId)
 			] = d;
 		} else {
 			warnInvalidSchema(

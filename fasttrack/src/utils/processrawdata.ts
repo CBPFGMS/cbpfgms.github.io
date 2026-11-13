@@ -17,6 +17,7 @@ import warnInvalidSchema, {
 } from "./warninvalid";
 import { constants, projectStatusMapping } from "./constants";
 import type { Tranche } from "../components/MainContainer";
+import { makeAllocTypeId } from "./makealloctypeid";
 
 export type Datum = {
 	reached: BeneficiariesObject;
@@ -330,7 +331,7 @@ function processRawData({
 
 		const thisAllocationType =
 			listsObj.allocationTypesCompleteList[
-				parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`)
+				makeAllocTypeId(row.PooledFundId, row.AllocationtypeId)
 			];
 		const thisOrganization =
 			listsObj.organizationsCompleteList[row.GlobalOrgId]; //change to GlobalOrgID
@@ -365,8 +366,9 @@ function processRawData({
 				year: thisAllocationType.AllocationYear,
 				fund: row.PooledFundId,
 				allocationSource: thisAllocationType.AllocationSourceId,
-				allocationType: parseFloat(
-					`${row.PooledFundId}.${row.AllocationtypeId}`,
+				allocationType: makeAllocTypeId(
+					row.PooledFundId,
+					row.AllocationtypeId,
 				),
 				endDate: new Date(row.EndDate),
 				projectStatusId: projectStatusMapping[row.ProcessSTatusID],
@@ -383,7 +385,7 @@ function processRawData({
 			organizationsSet.add(thisOrganization.GlobalOrgId);
 			projectStatusesSet.add(projectStatusMapping[row.ProcessSTatusID]);
 			allocationTypesSet.add(
-				parseFloat(`${row.PooledFundId}.${row.AllocationtypeId}`),
+				makeAllocTypeId(row.PooledFundId, row.AllocationtypeId),
 			);
 
 			if (statusesPerFund[row.PooledFundId]) {
@@ -434,8 +436,9 @@ function processRawData({
 				allocationSource: thisAllocationType.AllocationSourceId,
 				organizationType: thisOrganization.OrganizationTypeId,
 				organizationId: thisOrganization.GlobalOrgId,
-				allocationType: parseFloat(
-					`${row.PooledFundId}.${row.AllocationtypeId}`,
+				allocationType: makeAllocTypeId(
+					row.PooledFundId,
+					row.AllocationtypeId,
 				),
 				allocationTypeId: row.AllocationtypeId,
 				endDate: new Date(row.EndDate),
