@@ -39,7 +39,7 @@
 			if (cssLink === fontAwesomeLink) {
 				externalCSS.setAttribute(
 					"integrity",
-					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+					"sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/",
 				);
 				externalCSS.setAttribute("crossorigin", "anonymous");
 			}
@@ -168,7 +168,7 @@
 						callback(
 							new Blob([arr], {
 								type: type || "image/png",
-							})
+							}),
 						);
 					});
 				},
@@ -320,7 +320,8 @@
 		const showHelp =
 			containerDiv.node().getAttribute("data-showhelp") === "true";
 
-		const minimumUnderApprovalPercentage = +containerDiv.node().getAttribute("data-minpercentage") || 0;
+		const minimumUnderApprovalPercentage =
+			+containerDiv.node().getAttribute("data-minpercentage") || 0;
 
 		const showLink =
 			containerDiv.node().getAttribute("data-showlink") === "true";
@@ -340,38 +341,38 @@
 		const selectedModality =
 			queryStringValues.has("modality") &&
 			modalities.indexOf(
-				queryStringValues.get("modality").toLowerCase()
+				queryStringValues.get("modality").toLowerCase(),
 			) > -1
 				? queryStringValues.get("modality").toLowerCase()
 				: modalities.indexOf(
-						containerDiv
+							containerDiv
+								.node()
+								.getAttribute("data-modality")
+								.toLowerCase(),
+					  ) > -1
+					? containerDiv
 							.node()
 							.getAttribute("data-modality")
 							.toLowerCase()
-				  ) > -1
-				? containerDiv
-						.node()
-						.getAttribute("data-modality")
-						.toLowerCase()
-				: "total";
+					: "total";
 
 		const selectedBeneficiary =
 			queryStringValues.has("persons") &&
 			beneficiaries.indexOf(
-				queryStringValues.get("persons").toLowerCase()
+				queryStringValues.get("persons").toLowerCase(),
 			) > -1
 				? queryStringValues.get("persons").toLowerCase()
 				: beneficiaries.indexOf(
-						containerDiv
+							containerDiv
+								.node()
+								.getAttribute("data-beneficiaries")
+								.toLowerCase(),
+					  ) > -1
+					? containerDiv
 							.node()
 							.getAttribute("data-beneficiaries")
 							.toLowerCase()
-				  ) > -1
-				? containerDiv
-						.node()
-						.getAttribute("data-beneficiaries")
-						.toLowerCase()
-				: "targeted";
+					: "targeted";
 
 		const selectedResponsiveness =
 			containerDiv.node().getAttribute("data-responsive") === "true";
@@ -468,7 +469,7 @@
 				.append("p")
 				.attr("id", "pbiolcTooltipBestVisualizedText")
 				.html(
-					"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+					"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 				)
 				.attr("pointer-events", "none")
 				.style("cursor", "default");
@@ -496,7 +497,7 @@
 				.attr("class", "pbiolcTopPanel")
 				.attr(
 					"transform",
-					"translate(" + padding[3] + "," + padding[0] + ")"
+					"translate(" + padding[3] + "," + padding[0] + ")",
 				),
 			width: width - padding[1] - padding[3],
 			height: topPanelHeight,
@@ -519,7 +520,7 @@
 						(padding[0] +
 							topPanel.height +
 							panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width: width - padding[1] - padding[3],
 			height: buttonsPanelHeight,
@@ -546,7 +547,7 @@
 							buttonsPanel.height +
 							topPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width:
 				(width - padding[1] - padding[3] - 2 * panelVerticalPadding) *
@@ -571,7 +572,7 @@
 							buttonsPanel.height +
 							topPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width:
 				(width - padding[1] - padding[3] - 2 * panelVerticalPadding) *
@@ -596,7 +597,7 @@
 							buttonsPanel.height +
 							topPanel.height +
 							2 * panelHorizontalPadding) +
-						")"
+						")",
 				),
 			width:
 				(width - padding[1] - padding[3] - 2 * panelVerticalPadding) *
@@ -614,7 +615,7 @@
 			.attr("height", allocationsPanel.height)
 			.attr(
 				"transform",
-				"translate(0," + -allocationsPanel.padding[0] + ")"
+				"translate(0," + -allocationsPanel.padding[0] + ")",
 			);
 
 		const beneficiariesPanelClip = beneficiariesPanel.main
@@ -625,7 +626,7 @@
 			.attr("height", beneficiariesPanel.height)
 			.attr(
 				"transform",
-				"translate(0," + -beneficiariesPanel.padding[0] + ")"
+				"translate(0," + -beneficiariesPanel.padding[0] + ")",
 			);
 
 		const xScaleAllocations = d3
@@ -674,7 +675,7 @@
 			.attr("clip-path", "url(#pbiolcAllocationsPanelClip)")
 			.attr(
 				"transform",
-				"translate(0," + allocationsPanel.padding[0] + ")"
+				"translate(0," + allocationsPanel.padding[0] + ")",
 			);
 
 		const groupXAxisBeneficiaries = beneficiariesPanel.main
@@ -683,7 +684,7 @@
 			.attr("clip-path", "url(#pbiolcBeneficiariesPanelClip)")
 			.attr(
 				"transform",
-				"translate(0," + beneficiariesPanel.padding[0] + ")"
+				"translate(0," + beneficiariesPanel.padding[0] + ")",
 			);
 
 		const symbolTriangle = d3
@@ -706,13 +707,13 @@
 					classPrefix + "data",
 					dataFileUrl,
 					"sectors data",
-					"csv"
+					"csv",
 				),
 				fetchFile(
 					"launchedAllocationsData",
 					launchedAllocationsDataUrl,
 					"launched allocations data",
-					"csv"
+					"csv",
 				),
 			]).then(allData => csvCallback(allData));
 		}
@@ -727,14 +728,14 @@
 					method === "csv"
 						? d3.csvParse(
 								JSON.parse(localStorage.getItem(fileName)).data,
-								d3.autoType
-						  )
+								d3.autoType,
+							)
 						: JSON.parse(localStorage.getItem(fileName)).data;
 				console.info(
 					classPrefix +
 						" chart info: " +
 						warningString +
-						" from local storage"
+						" from local storage",
 				);
 				return Promise.resolve(fetchedData);
 			} else {
@@ -750,7 +751,7 @@
 										? d3.csvFormat(fetchedData)
 										: fetchedData,
 								timestamp: currentDate.getTime(),
-							})
+							}),
 						);
 					} catch (error) {
 						console.info(classPrefix + " chart, " + error);
@@ -759,7 +760,7 @@
 						classPrefix +
 							" chart info: " +
 							warningString +
-							" from API"
+							" from API",
 					);
 					return fetchedData;
 				});
@@ -928,7 +929,7 @@
 						.append("span")
 						.attr(
 							"class",
-							d.clicked ? "fas fa-pause" : "fas fa-play"
+							d.clicked ? "fas fa-pause" : "fas fa-play",
 						);
 
 					if (d.clicked) {
@@ -941,7 +942,7 @@
 
 					function loopButtons() {
 						const index = yearsArray.indexOf(
-							chartState.selectedYear[0]
+							chartState.selectedYear[0],
 						);
 
 						chartState.selectedYear[0] =
@@ -961,15 +962,15 @@
 								yearsArray[buttonsNumber / 2]
 									? 0
 									: chartState.selectedYear[0] >
-									  yearsArray[
-											yearsArray.length -
-												buttonsNumber / 2
-									  ]
-									? yearsArray.length - buttonsNumber
-									: yearsArray.indexOf(
-											chartState.selectedYear[0]
-									  ) -
-									  buttonsNumber / 2;
+										  yearsArray[
+												yearsArray.length -
+													buttonsNumber / 2
+										  ]
+										? yearsArray.length - buttonsNumber
+										: yearsArray.indexOf(
+												chartState.selectedYear[0],
+											) -
+											buttonsNumber / 2;
 
 							const currentTranslate = -(
 								buttonsPanel.buttonWidth * firstYearIndex
@@ -981,7 +982,7 @@
 									.style("fill", "#ccc");
 								svg.select(".pbiolcLeftArrowGroup").attr(
 									"pointer-events",
-									"none"
+									"none",
 								);
 							} else {
 								svg.select(".pbiolcLeftArrowGroup")
@@ -989,7 +990,7 @@
 									.style("fill", "#666");
 								svg.select(".pbiolcLeftArrowGroup").attr(
 									"pointer-events",
-									"all"
+									"all",
 								);
 							}
 
@@ -1003,7 +1004,7 @@
 									.style("fill", "#ccc");
 								svg.select(".pbiolcRightArrowGroup").attr(
 									"pointer-events",
-									"none"
+									"none",
 								);
 							} else {
 								svg.select(".pbiolcRightArrowGroup")
@@ -1011,7 +1012,7 @@
 									.style("fill", "#666");
 								svg.select(".pbiolcRightArrowGroup").attr(
 									"pointer-events",
-									"all"
+									"all",
 								);
 							}
 
@@ -1021,7 +1022,7 @@
 								.attrTween("transform", function () {
 									return d3.interpolateString(
 										this.getAttribute("transform"),
-										"translate(" + currentTranslate + ",0)"
+										"translate(" + currentTranslate + ",0)",
 									);
 								});
 						}
@@ -1109,7 +1110,7 @@
 						.append("p")
 						.attr("id", "pbiolcBestVisualizedText")
 						.html(
-							"For best results use Chrome, Firefox, Opera or Chromium-based Edge."
+							"For best results use Chrome, Firefox, Opera or Chromium-based Edge.",
 						)
 						.attr("pointer-events", "none")
 						.style("cursor", "default");
@@ -1180,7 +1181,7 @@
 							padding[3] +
 							"," +
 							(height - padding[2] + legendVerticalPadding) +
-							")"
+							")",
 					)
 					.merge(allocationLegendGroup);
 
@@ -1201,7 +1202,7 @@
 								2 * panelVerticalPadding) +
 							"," +
 							(height - padding[2] + legendVerticalPadding) +
-							")"
+							")",
 					)
 					.merge(beneficiariesLegendGroup);
 
@@ -1224,7 +1225,7 @@
 						(chartState.selectedModality === "total"
 							? ""
 							: capitalize(chartState.selectedModality) + " ") +
-							"Allocations in sector "
+							"Allocations in sector ",
 					)
 					.append("tspan")
 					.style("font-weight", "normal")
@@ -1261,7 +1262,7 @@
 					.text(
 						(chartState.selectedBeneficiary === "actual"
 							? "Reached"
-							: "Targeted") + " people in sector "
+							: "Targeted") + " people in sector ",
 					)
 					.append("tspan")
 					.style("font-weight", "normal")
@@ -1342,7 +1343,7 @@
 
 				d3.select(allCbpfs.node().nextSibling).attr(
 					"class",
-					"pbiolcCheckboxTextAllCbpfs"
+					"pbiolcCheckboxTextAllCbpfs",
 				);
 
 				const cbpfsCheckboxes = checkboxDivs
@@ -1382,7 +1383,7 @@
 							}
 						} else {
 							const thisIndex = chartState.selectedCbpfs.indexOf(
-								this.value
+								this.value,
 							);
 							chartState.selectedCbpfs.splice(thisIndex, 1);
 						}
@@ -1438,7 +1439,7 @@
 				const yearsList = yearsListOriginal.reduce(function (
 					acc,
 					curr,
-					index
+					index,
 				) {
 					return (
 						acc +
@@ -1448,17 +1449,16 @@
 								: curr + " and "
 							: curr + ", ")
 					);
-				},
-				"");
+				}, "");
 
 				launchedValue
 					.style(
 						"opacity",
 						chartState.selectedYear.some(
-							e => yearsWithUnderApprovalAboveMin[e]
+							e => yearsWithUnderApprovalAboveMin[e],
 						)
 							? 1
-							: 0
+							: 0,
 					)
 					.html("Launched Allocations in " + yearsList + ": ");
 
@@ -1470,7 +1470,7 @@
 							formatSIFloat(topValuesLaunchedData.launched)
 								.replace("k", " Thousand")
 								.replace("M", " Million")
-								.replace("G", " Billion")
+								.replace("G", " Billion"),
 					);
 
 				const mainValue = d3.sum(data, function (d) {
@@ -1491,13 +1491,13 @@
 					.append("g")
 					.attr(
 						"class",
-						"pbiolctopPanelMoneyBag contributionColorFill"
+						"pbiolctopPanelMoneyBag contributionColorFill",
 					)
 					.attr(
 						"transform",
 						"translate(" +
 							topPanel.moneyBagPadding +
-							",6) scale(0.5)"
+							",6) scale(0.5)",
 					)
 					.each(function (_, i, n) {
 						moneyBagdAttribute.forEach(function (d) {
@@ -1534,7 +1534,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbiolctopPanelMainValue contributionColorFill"
+						"pbiolctopPanelMainValue contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelMainValue)
@@ -1543,7 +1543,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelMainValue
@@ -1560,8 +1560,8 @@
 									? ~~i(t)
 									: siString.substring(
 											0,
-											siString.length - 1
-									  ));
+											siString.length - 1,
+										));
 						};
 					})
 					.on("end", function () {
@@ -1574,7 +1574,7 @@
 						launchedValue.style(
 							"padding-left",
 							thisLeftPadding + "px",
-							"important"
+							"important",
 						);
 					});
 
@@ -1591,13 +1591,13 @@
 					.merge(topPanelMainText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 3.1
+						topPanel.height - topPanel.mainValueVerPadding * 3.1,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelMainText
@@ -1615,10 +1615,10 @@
 							(unit === "k"
 								? "Thousand"
 								: unit === "M"
-								? "Million"
-								: unit === "G"
-								? "Billion"
-								: "") +
+									? "Million"
+									: unit === "G"
+										? "Billion"
+										: "") +
 							" Allocated in " +
 							yearsText
 						);
@@ -1637,13 +1637,13 @@
 					.merge(topPanelSubText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.2
+						topPanel.height - topPanel.mainValueVerPadding * 1.2,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[0] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelSubText
@@ -1653,7 +1653,7 @@
 					.text(
 						"(" +
 							capitalize(chartState.selectedModality) +
-							" Allocations)"
+							" Allocations)",
 					);
 
 				let topPanelPersonsNumber = mainValueGroup
@@ -1665,7 +1665,7 @@
 					.append("text")
 					.attr(
 						"class",
-						"pbiolctopPanelPersonsNumber contributionColorFill"
+						"pbiolctopPanelPersonsNumber contributionColorFill",
 					)
 					.attr("text-anchor", "end")
 					.merge(topPanelPersonsNumber)
@@ -1674,7 +1674,7 @@
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] -
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelPersonsNumber
@@ -1690,8 +1690,8 @@
 									? ~~i(t)
 									: siString.substring(
 											0,
-											siString.length - 1
-									  );
+											siString.length - 1,
+										);
 						};
 					});
 
@@ -1708,13 +1708,13 @@
 					.merge(topPanelPersonsText)
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 3.1
+						topPanel.height - topPanel.mainValueVerPadding * 3.1,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					);
 
 				topPanelPersonsText
@@ -1728,10 +1728,10 @@
 							(unit === "k"
 								? "Thousand"
 								: unit === "M"
-								? "Million"
-								: unit === "G"
-								? "Billion"
-								: "") + " People"
+									? "Million"
+									: unit === "G"
+										? "Billion"
+										: "") + " People"
 						);
 					});
 
@@ -1745,13 +1745,13 @@
 					.attr("class", "pbiolctopPanelPersonsTextSubText")
 					.attr(
 						"y",
-						topPanel.height - topPanel.mainValueVerPadding * 1.2
+						topPanel.height - topPanel.mainValueVerPadding * 1.2,
 					)
 					.attr(
 						"x",
 						topPanel.moneyBagPadding +
 							topPanel.leftPadding[1] +
-							topPanel.mainValueHorPadding
+							topPanel.mainValueHorPadding,
 					)
 					.attr("text-anchor", "start")
 					.merge(topPanelPersonsTextSubText)
@@ -1788,7 +1788,7 @@
 						"translate(" +
 							(buttonsPanel.padding[3] +
 								buttonsPanel.arrowPadding) +
-							",0)"
+							",0)",
 					)
 					.attr("clip-path", "url(#pbiolcclipPathButtons)");
 
@@ -1808,18 +1808,18 @@
 					.attr("class", "pbiolcbuttonsRects")
 					.attr(
 						"width",
-						buttonsPanel.buttonWidth - buttonsPanel.buttonPadding
+						buttonsPanel.buttonWidth - buttonsPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonsPanel.height -
 							buttonsPanel.padding[0] -
-							buttonsPanel.buttonVerticalPadding * 2
+							buttonsPanel.buttonVerticalPadding * 2,
 					)
 					.attr(
 						"y",
 						buttonsPanel.padding[0] +
-							buttonsPanel.buttonVerticalPadding
+							buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -1843,7 +1843,7 @@
 					.attr(
 						"y",
 						buttonsPanel.height -
-							2.8 * buttonsPanel.buttonVerticalPadding
+							2.8 * buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -1868,7 +1868,7 @@
 					.attr("pointer-events", "none")
 					.attr(
 						"transform",
-						"translate(" + buttonsPanel.padding[3] + ",0)"
+						"translate(" + buttonsPanel.padding[3] + ",0)",
 					);
 
 				const leftArrowRect = leftArrow
@@ -1879,12 +1879,12 @@
 						"height",
 						buttonsPanel.height -
 							buttonsPanel.padding[0] -
-							buttonsPanel.buttonVerticalPadding * 2
+							buttonsPanel.buttonVerticalPadding * 2,
 					)
 					.attr(
 						"y",
 						buttonsPanel.padding[0] +
-							buttonsPanel.buttonVerticalPadding
+							buttonsPanel.buttonVerticalPadding,
 					);
 
 				const leftArrowText = leftArrow
@@ -1894,7 +1894,7 @@
 					.attr(
 						"y",
 						buttonsPanel.height -
-							buttonsPanel.buttonVerticalPadding * 2.1
+							buttonsPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25c4");
@@ -1911,7 +1911,7 @@
 							(buttonsPanel.padding[3] +
 								buttonsPanel.arrowPadding +
 								buttonsNumber * buttonsPanel.buttonWidth) +
-							",0)"
+							",0)",
 					);
 
 				const rightArrowRect = rightArrow
@@ -1922,12 +1922,12 @@
 						"height",
 						buttonsPanel.height -
 							buttonsPanel.padding[0] -
-							buttonsPanel.buttonVerticalPadding * 2
+							buttonsPanel.buttonVerticalPadding * 2,
 					)
 					.attr(
 						"y",
 						buttonsPanel.padding[0] +
-							buttonsPanel.buttonVerticalPadding
+							buttonsPanel.buttonVerticalPadding,
 					);
 
 				const rightArrowText = rightArrow
@@ -1937,7 +1937,7 @@
 					.attr(
 						"y",
 						buttonsPanel.height -
-							buttonsPanel.buttonVerticalPadding * 2.1
+							buttonsPanel.buttonVerticalPadding * 2.1,
 					)
 					.style("fill", "#666")
 					.text("\u25ba");
@@ -1956,7 +1956,7 @@
 					leftArrow.on("click", function () {
 						leftArrow.attr("pointer-events", "none");
 						const currentTranslate = parseTransform(
-							buttonsGroup.attr("transform")
+							buttonsGroup.attr("transform"),
 						)[0];
 						rightArrow.select("text").style("fill", "#666");
 						rightArrow.attr("pointer-events", "all");
@@ -1970,9 +1970,9 @@
 										0,
 										currentTranslate +
 											buttonsNumber *
-												buttonsPanel.buttonWidth
+												buttonsPanel.buttonWidth,
 									) +
-									",0)"
+									",0)",
 							)
 							.on("end", checkArrows);
 					});
@@ -1980,7 +1980,7 @@
 					rightArrow.on("click", function () {
 						rightArrow.attr("pointer-events", "none");
 						const currentTranslate = parseTransform(
-							buttonsGroup.attr("transform")
+							buttonsGroup.attr("transform"),
 						)[0];
 						leftArrow.select("text").style("fill", "#666");
 						leftArrow.attr("pointer-events", "all");
@@ -2000,9 +2000,9 @@
 											Math.abs(currentTranslate) +
 											buttonsNumber *
 												buttonsPanel.buttonWidth
-										)
+										),
 									) +
-									",0)"
+									",0)",
 							)
 							.on("end", checkArrows);
 					});
@@ -2024,18 +2024,18 @@
 					.attr(
 						"width",
 						buttonsPanel.buttonModalitiesWidth -
-							buttonsPanel.buttonPadding
+							buttonsPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonsPanel.height -
 							buttonsPanel.padding[0] -
-							buttonsPanel.buttonVerticalPadding * 2
+							buttonsPanel.buttonVerticalPadding * 2,
 					)
 					.attr(
 						"y",
 						buttonsPanel.padding[0] +
-							buttonsPanel.buttonVerticalPadding
+							buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -2059,7 +2059,7 @@
 					.attr(
 						"y",
 						buttonsPanel.height -
-							2.8 * buttonsPanel.buttonVerticalPadding
+							2.8 * buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -2082,7 +2082,7 @@
 						buttonsGroup.node().getBoundingClientRect().width,
 					buttonsPanel.padding[3] +
 						buttonsNumber * buttonsPanel.buttonWidth +
-						2 * buttonsPanel.arrowPadding
+						2 * buttonsPanel.arrowPadding,
 				);
 
 				const buttonsModalitiesSize = buttonsModalitiesGroup
@@ -2098,7 +2098,7 @@
 
 				buttonsModalitiesGroup.attr(
 					"transform",
-					"translate(" + modalitiesPosition + ",0)"
+					"translate(" + modalitiesPosition + ",0)",
 				);
 
 				const buttonsBeneficiariesGroup = buttonsPanel.main
@@ -2106,7 +2106,9 @@
 					.attr("class", "pbiolcbuttonsBeneficiariesGroup")
 					.attr(
 						"transform",
-						"translate(" + buttonsPanel.beneficiariesPadding + ",0)"
+						"translate(" +
+							buttonsPanel.beneficiariesPadding +
+							",0)",
 					)
 					.style("cursor", "pointer");
 
@@ -2121,18 +2123,18 @@
 					.attr(
 						"width",
 						buttonsPanel.buttonBeneficiariesWidth -
-							buttonsPanel.buttonPadding
+							buttonsPanel.buttonPadding,
 					)
 					.attr(
 						"height",
 						buttonsPanel.height -
 							buttonsPanel.padding[0] -
-							buttonsPanel.buttonVerticalPadding * 2
+							buttonsPanel.buttonVerticalPadding * 2,
 					)
 					.attr(
 						"y",
 						buttonsPanel.padding[0] +
-							buttonsPanel.buttonVerticalPadding
+							buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -2156,7 +2158,7 @@
 					.attr(
 						"y",
 						buttonsPanel.height -
-							2.8 * buttonsPanel.buttonVerticalPadding
+							2.8 * buttonsPanel.buttonVerticalPadding,
 					)
 					.attr("x", function (_, i) {
 						return (
@@ -2202,7 +2204,7 @@
 				d3.select("body").on("d3ChartsYear.pbiolc", function () {
 					clickButtonsRects(
 						validateCustomEventYear(+d3.event.detail),
-						true
+						true,
 					);
 					if (yearsArray.length > buttonsNumber) {
 						repositionButtonsGroup();
@@ -2226,7 +2228,7 @@
 
 				function checkArrows() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2252,7 +2254,7 @@
 
 				function checkCurrentTranslate() {
 					const currentTranslate = parseTransform(
-						buttonsGroup.attr("transform")
+						buttonsGroup.attr("transform"),
 					)[0];
 
 					if (currentTranslate === 0) {
@@ -2276,16 +2278,20 @@
 						yearsArray[buttonsNumber / 2]
 							? 0
 							: chartState.selectedYear[0] >
-							  yearsArray[yearsArray.length - buttonsNumber / 2]
-							? yearsArray.length - buttonsNumber
-							: yearsArray.indexOf(chartState.selectedYear[0]) -
-							  buttonsNumber / 2;
+								  yearsArray[
+										yearsArray.length - buttonsNumber / 2
+								  ]
+								? yearsArray.length - buttonsNumber
+								: yearsArray.indexOf(
+										chartState.selectedYear[0],
+									) -
+									buttonsNumber / 2;
 
 					buttonsGroup.attr(
 						"transform",
 						"translate(" +
 							-(buttonsPanel.buttonWidth * firstYearIndex) +
-							",0)"
+							",0)",
 					);
 				}
 
@@ -2298,7 +2304,7 @@
 				} else {
 					d3.select(".pbiolccovidDisclaimer").style(
 						"display",
-						"none"
+						"none",
 					);
 				}
 
@@ -2370,7 +2376,7 @@
 				labelGroup = labelGroupEnter.merge(labelGroup);
 
 				const labelTooltipRectangle = labelGroup.select(
-					".pbiolcLabelsTooltipRectangle"
+					".pbiolcLabelsTooltipRectangle",
 				);
 
 				labelTooltipRectangle
@@ -2422,7 +2428,7 @@
 					.merge(sortByAllocations)
 					.style(
 						"opacity",
-						chartState.sorting === "allocations" ? 1 : 0
+						chartState.sorting === "allocations" ? 1 : 0,
 					);
 
 				let allocationsGroup = allocationsPanel.main
@@ -2469,7 +2475,7 @@
 					.attr("d", symbolTriangle)
 					.style(
 						"opacity",
-						chartState.selectedModality === "total" ? 1 : 0
+						chartState.selectedModality === "total" ? 1 : 0,
 					)
 					.attr(
 						"transform",
@@ -2478,7 +2484,7 @@
 							"," +
 							(Math.sqrt((4 * symbolSize) / Math.sqrt(3)) / 2 +
 								stickHeight) +
-							")"
+							")",
 					);
 
 				const allocationsLabelEnter = allocationsGroupEnter
@@ -2487,7 +2493,7 @@
 					.attr("text-anchor", "end")
 					.attr(
 						"x",
-						xScaleAllocations(0) - allocationsPanel.labelPadding
+						xScaleAllocations(0) - allocationsPanel.labelPadding,
 					)
 					.attr("y", verticalLabelPadding)
 					.text(formatNumberSI(0));
@@ -2517,7 +2523,7 @@
 					.duration(duration)
 					.attr("x", function (d) {
 						return xScaleAllocations(
-							d[chartState.selectedModality]
+							d[chartState.selectedModality],
 						);
 					})
 					.attr("width", function (d) {
@@ -2533,7 +2539,7 @@
 					.duration(duration)
 					.attr("cx", function (d) {
 						return xScaleAllocations(
-							d[chartState.selectedModality]
+							d[chartState.selectedModality],
 						);
 					});
 
@@ -2543,7 +2549,7 @@
 					.duration(duration)
 					.style(
 						"opacity",
-						chartState.selectedModality === "total" ? 1 : 0
+						chartState.selectedModality === "total" ? 1 : 0,
 					)
 					.attr("transform", function (d) {
 						const thisPadding =
@@ -2576,34 +2582,33 @@
 					.tween("text", function (d) {
 						const node = this;
 						const percentOfTotalValue = formatPercent(
-							d[chartState.selectedModality] / totalAllocations
+							d[chartState.selectedModality] / totalAllocations,
 						);
 						const percentOfTotal =
 							d[chartState.selectedModality] === 0
 								? ""
 								: " (" +
-								  (percentOfTotalValue === "0%"
+									(percentOfTotalValue === "0%"
 										? "<1%"
 										: percentOfTotalValue) +
-								  ")";
+									")";
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
-							d[chartState.selectedModality]
+							d[chartState.selectedModality],
 						);
 						return function (t) {
 							d3.select(node)
 								.text(
 									d3
-										.formatPrefix(
-											".0",
-											d[chartState.selectedModality]
-										)(i(t))
-										.replace("G", "B")
+										.formatPrefix(".0", d[
+												chartState.selectedModality
+											])(i(t))
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.attr(
 									"class",
-									"pbiolcAllocationsLabelPercentage"
+									"pbiolcAllocationsLabelPercentage",
 								)
 								.attr("dy", "-0.5px")
 								.text(percentOfTotal);
@@ -2611,7 +2616,7 @@
 					});
 
 				const allocationsTooltipRectangle = allocationsGroup.select(
-					".pbiolcAllocationsTooltipRectangle"
+					".pbiolcAllocationsTooltipRectangle",
 				);
 
 				allocationsTooltipRectangle
@@ -2658,7 +2663,7 @@
 							(chartState.selectedBeneficiary === "actual"
 								? "Reached"
 								: "Targeted") +
-							" in numbers"
+							" in numbers",
 					);
 
 				let beneficiariesPanelTitleSpan = beneficiariesPanelTitle
@@ -2668,7 +2673,7 @@
 					.append("tspan")
 					.attr(
 						"class",
-						"pbiolcBeneficiariesPanelSubTitle pbiolcBeneficiariesPanelSubTitleSpan"
+						"pbiolcBeneficiariesPanelSubTitle pbiolcBeneficiariesPanelSubTitleSpan",
 					)
 					.text(" (% of total)");
 
@@ -2695,7 +2700,7 @@
 					.merge(sortByBeneficiaries)
 					.style(
 						"opacity",
-						chartState.sorting === "beneficiaries" ? 1 : 0
+						chartState.sorting === "beneficiaries" ? 1 : 0,
 					);
 
 				let beneficiariesGroup = beneficiariesPanel.main
@@ -2743,7 +2748,7 @@
 						.attr("d", symbolTriangle)
 						.style(
 							"opacity",
-							chartState.selectedModality === "total" ? 1 : 0
+							chartState.selectedModality === "total" ? 1 : 0,
 						)
 						.attr(
 							"transform",
@@ -2753,7 +2758,7 @@
 								(Math.sqrt((4 * symbolSize) / Math.sqrt(3)) /
 									2 +
 									stickHeight) +
-								")"
+								")",
 						);
 
 				const beneficiariesLabelEnter = beneficiariesGroupEnter
@@ -2761,7 +2766,8 @@
 					.attr("class", "pbiolcBeneficiariesLabel")
 					.attr(
 						"x",
-						xScaleBeneficiaries(0) + beneficiariesPanel.labelPadding
+						xScaleBeneficiaries(0) +
+							beneficiariesPanel.labelPadding,
 					)
 					.attr("y", verticalLabelPadding)
 					.text(formatNumberSI(0));
@@ -2796,7 +2802,7 @@
 								d[
 									chartState.selectedModality +
 										chartState.selectedBeneficiary
-								]
+								],
 							) - beneficiariesPanel.padding[3]
 						);
 					});
@@ -2810,7 +2816,7 @@
 							d[
 								chartState.selectedModality +
 									chartState.selectedBeneficiary
-							]
+							],
 						);
 					});
 
@@ -2820,15 +2826,15 @@
 					.duration(duration)
 					.style(
 						"opacity",
-						chartState.selectedBeneficiary === "targeted" ? 1 : 0
+						chartState.selectedBeneficiary === "targeted" ? 1 : 0,
 					)
 					.attr("transform", function (d) {
 						const thisPadding =
 							xScaleBeneficiaries(
-								d[chartState.selectedModality + "targeted"]
+								d[chartState.selectedModality + "targeted"],
 							) -
 								xScaleBeneficiaries(
-									d[chartState.selectedModality + "actual"]
+									d[chartState.selectedModality + "actual"],
 								) <
 							lollipopRadius
 								? lollipopRadius - stickHeight / 2
@@ -2837,11 +2843,11 @@
 							"translate(" +
 							Math.min(
 								xScaleBeneficiaries(
-									d[chartState.selectedModality + "actual"]
+									d[chartState.selectedModality + "actual"],
 								),
 								xScaleBeneficiaries(
-									d[chartState.selectedModality + "targeted"]
-								)
+									d[chartState.selectedModality + "targeted"],
+								),
 							) +
 							"," +
 							(Math.sqrt((4 * symbolSize) / Math.sqrt(3)) / 2 +
@@ -2861,7 +2867,7 @@
 								d[
 									chartState.selectedModality +
 										chartState.selectedBeneficiary
-								]
+								],
 							) + beneficiariesPanel.labelPadding
 						);
 					})
@@ -2871,7 +2877,7 @@
 							d[
 								chartState.selectedModality +
 									chartState.selectedBeneficiary
-							] / totalBeneficiaries
+							] / totalBeneficiaries,
 						);
 						const percentageText =
 							d[
@@ -2880,14 +2886,14 @@
 							] === 0
 								? ""
 								: " (" +
-								  (percentage === "0%" ? "<1%" : percentage) +
-								  ")";
+									(percentage === "0%" ? "<1%" : percentage) +
+									")";
 						const i = d3.interpolate(
 							reverseFormat(node.textContent) || 0,
 							d[
 								chartState.selectedModality +
 									chartState.selectedBeneficiary
-							]
+							],
 						);
 						return function (t) {
 							d3.select(node)
@@ -2898,14 +2904,14 @@
 											d[
 												chartState.selectedModality +
 													chartState.selectedBeneficiary
-											]
+											],
 										)(i(t))
-										.replace("G", "B")
+										.replace("G", "B"),
 								)
 								.append("tspan")
 								.attr(
 									"class",
-									"pbiolcBeneficiariesLabelPercentage"
+									"pbiolcBeneficiariesLabelPercentage",
 								)
 								.attr("dy", "-0.5px")
 								.text(percentageText);
@@ -2913,7 +2919,7 @@
 					});
 
 				const beneficiariesTooltipRectangle = beneficiariesGroup.select(
-					".pbiolcBeneficiariesTooltipRectangle"
+					".pbiolcBeneficiariesTooltipRectangle",
 				);
 
 				beneficiariesTooltipRectangle
@@ -3030,7 +3036,7 @@
 						return e === chartState.selectedModality
 							? unBlue
 							: "#eaeaea";
-					}
+					},
 				);
 
 				d3.selectAll(".pbiolcbuttonsModalitiesText").style(
@@ -3039,7 +3045,7 @@
 						return e === chartState.selectedModality
 							? "white"
 							: "#444";
-					}
+					},
 				);
 
 				createLegend();
@@ -3070,7 +3076,7 @@
 						return e === chartState.selectedBeneficiary
 							? unBlue
 							: "#eaeaea";
-					}
+					},
 				);
 
 				d3.selectAll(".pbiolcbuttonsBeneficiariesText").style(
@@ -3079,7 +3085,7 @@
 						return e === chartState.selectedBeneficiary
 							? "white"
 							: "#444";
-					}
+					},
 				);
 
 				createLegend();
@@ -3094,7 +3100,7 @@
 						1e3,
 						d3.max(data, function (d) {
 							return d["total" + chartState.selectedBeneficiary];
-						})
+						}),
 					) * xScaleDomainMargin,
 				]);
 
@@ -3114,13 +3120,13 @@
 					svg.select(".pbiolcSortByAllocations").style("opacity", 1);
 					svg.select(".pbiolcSortByBeneficiaries").style(
 						"opacity",
-						0
+						0,
 					);
 					sortData(data);
 					createAllocationsPanel();
 					createLabelsPanel();
 					createBeneficiariesPanel();
-				}
+				},
 			);
 
 			svg.selectAll(".pbiolcBeneficiariesPanelTitle").on(
@@ -3132,13 +3138,13 @@
 					svg.select(".pbiolcSortByAllocations").style("opacity", 0);
 					svg.select(".pbiolcSortByBeneficiaries").style(
 						"opacity",
-						1
+						1,
 					);
 					sortData(data);
 					createAllocationsPanel();
 					createLabelsPanel();
 					createBeneficiariesPanel();
-				}
+				},
 			);
 
 			function mouseOverButtonsRects(d, thisElement, type) {
@@ -3151,7 +3157,7 @@
 						.attr("id", "pbiolcInnerTooltipDiv");
 
 					innerTooltip.html(
-						"Click for selecting a single year. Double-click or ALT + click for selecting multiple years."
+						"Click for selecting a single year. Double-click or ALT + click for selecting multiple years.",
 					);
 
 					const containerSize = containerDiv
@@ -3176,17 +3182,19 @@
 										padding[1] +
 										"px"
 								: thisSize.left +
+											thisSize.width / 2 -
+											containerSize.left <
+									  tooltipSize.width / 2 +
+											buttonsPanel.padding[3] +
+											padding[0]
+									? buttonsPanel.padding[3] +
+										padding[0] +
+										"px"
+									: thisSize.left +
 										thisSize.width / 2 -
-										containerSize.left <
-								  tooltipSize.width / 2 +
-										buttonsPanel.padding[3] +
-										padding[0]
-								? buttonsPanel.padding[3] + padding[0] + "px"
-								: thisSize.left +
-								  thisSize.width / 2 -
-								  containerSize.left -
-								  tooltipSize.width / 2 +
-								  "px"
+										containerSize.left -
+										tooltipSize.width / 2 +
+										"px",
 						)
 						.style(
 							"top",
@@ -3203,7 +3211,7 @@
 										containerSize.top -
 										tooltipSize.height -
 										4 +
-										"px"
+										"px",
 						);
 				}
 
@@ -3253,7 +3261,7 @@
 					.html(
 						"<div style='max-width:190px;'>Click here to sort the sectors according to the " +
 							type +
-							"</div>"
+							"</div>",
 					);
 
 				const thisBox = self.getBoundingClientRect();
@@ -3284,7 +3292,7 @@
 				currentHoveredElem = this;
 
 				svg.selectAll(
-					".pbiolcLabelGroup, .pbiolcAllocationsGroup, .pbiolcBeneficiariesGroup"
+					".pbiolcLabelGroup, .pbiolcAllocationsGroup, .pbiolcBeneficiariesGroup",
 				).style("opacity", function (e) {
 					return d.cluster === e.cluster ? 1 : fadeOpacity;
 				});
@@ -3316,21 +3324,22 @@
 							"</div></div><div id='pbiolcBeneficiariesTargetedTooltipBar'></div>" +
 							(d.totaltargeted
 								? "<div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
-								  tooltipBarWidth +
-								  "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" +
-								  formatPercent(
+									tooltipBarWidth +
+									"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" +
+									formatPercent(
 										d.standardtargeted / d.totaltargeted ||
-											0
-								  ) +
-								  "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>" +
-								  formatComma(d.standardtargeted) +
-								  "</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" +
-								  formatPercent(
-										d.reservetargeted / d.totaltargeted || 0
-								  ) +
-								  "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>" +
-								  formatComma(d.reservetargeted) +
-								  "</span></div></div>"
+											0,
+									) +
+									"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>" +
+									formatComma(d.standardtargeted) +
+									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" +
+									formatPercent(
+										d.reservetargeted / d.totaltargeted ||
+											0,
+									) +
+									"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>" +
+									formatComma(d.reservetargeted) +
+									"</span></div></div>"
 								: "") +
 							"<br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 							tooltipBarWidth +
@@ -3338,29 +3347,29 @@
 							formatComma(d.totalactual) +
 							(d.totalactual
 								? "<span style='font-size:10px;white-space:pre;'> (" +
-								  formatPercent(
-										d.totalactual / d.totaltargeted
-								  ) +
-								  " of targeted)</span>"
+									formatPercent(
+										d.totalactual / d.totaltargeted,
+									) +
+									" of targeted)</span>"
 								: "") +
 							"</div></div><div id='pbiolcBeneficiariesReachedTooltipBar'></div>" +
 							(d.totalactual
 								? "<div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
-								  tooltipBarWidth +
-								  "px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" +
-								  formatPercent(
-										d.standardactual / d.totalactual || 0
-								  ) +
-								  "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>" +
-								  formatComma(d.standardactual) +
-								  "</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" +
-								  formatPercent(
-										d.reserveactual / d.totalactual || 0
-								  ) +
-								  "):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>" +
-								  formatComma(d.reserveactual) +
-								  "</span></div></div>"
-								: "")
+									tooltipBarWidth +
+									"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard (" +
+									formatPercent(
+										d.standardactual / d.totalactual || 0,
+									) +
+									"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>" +
+									formatComma(d.standardactual) +
+									"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve (" +
+									formatPercent(
+										d.reserveactual / d.totalactual || 0,
+									) +
+									"):</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>" +
+									formatComma(d.reserveactual) +
+									"</span></div></div>"
+								: ""),
 					);
 
 					createTooltipBar(
@@ -3369,7 +3378,7 @@
 						tooltipBarWidth,
 						"total",
 						"standard",
-						"reserve"
+						"reserve",
 					);
 
 					if (d.totaltargeted) {
@@ -3379,7 +3388,7 @@
 							tooltipBarWidth,
 							"totaltargeted",
 							"standardtargeted",
-							"reservetargeted"
+							"reservetargeted",
 						);
 					}
 
@@ -3390,7 +3399,7 @@
 							tooltipBarWidth,
 							"totalactual",
 							"standardactual",
-							"reserveactual"
+							"reserveactual",
 						);
 					}
 				} else {
@@ -3399,7 +3408,7 @@
 							d.cluster +
 							"</strong><br><br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 							tooltipBarWidth +
-							"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Total Allocated:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>No Value Allocated</div></div>"
+							"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Total Allocated:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>No Value Allocated</div></div>",
 					);
 				}
 
@@ -3421,7 +3430,7 @@
 						"top",
 						containerBox.bottom - thisBox.bottom < tooltipBox.height
 							? thisOffsetTop - tooltipBox.height - 6 + "px"
-							: thisOffsetTop + 28 + "px"
+							: thisOffsetTop + 28 + "px",
 					);
 
 				//end of clusterMouseOver
@@ -3433,7 +3442,7 @@
 				currentHoveredElem = null;
 
 				svg.selectAll(
-					".pbiolcLabelGroup, .pbiolcAllocationsGroup, .pbiolcBeneficiariesGroup"
+					".pbiolcLabelGroup, .pbiolcAllocationsGroup, .pbiolcBeneficiariesGroup",
 				).style("opacity", 1);
 
 				tooltip.style("display", "none");
@@ -3447,7 +3456,7 @@
 				containerWidth,
 				total,
 				property1,
-				property2
+				property2,
 			) {
 				const containerDiv = d3.select("#" + container);
 
@@ -3471,7 +3480,7 @@
 						"border-right",
 						scaleDiv(datum[property1]) < 1
 							? "0px solid white"
-							: "1px solid white"
+							: "1px solid white",
 					);
 
 				div1.transition()
@@ -3496,12 +3505,14 @@
 			//end of draw
 		}
 
-		function safeDivide(underApproval, approved, launched){
-			if (launched === 0) return {underApprovalPercent: 0, underPlusApprovedPercent: 0};
+		function safeDivide(underApproval, approved, launched) {
+			if (launched === 0)
+				return { underApprovalPercent: 0, underPlusApprovedPercent: 0 };
 			return {
 				underApprovalPercent: (underApproval / launched) * 100,
-				underPlusApprovedPercent: ((underApproval + approved) / launched) * 100
-			}
+				underPlusApprovedPercent:
+					((underApproval + approved) / launched) * 100,
+			};
 		}
 
 		function processData(rawData, rawLaunchedAllocationsData) {
@@ -3521,13 +3532,25 @@
 					chartState.selectedYear.includes(row.AllocationYear) &&
 					(allCbpfsSelected ||
 						chartState.selectedCbpfs.includes(
-							"id" + row.PooledFundId
+							"id" + row.PooledFundId,
 						))
 				) {
 					aggregatedLaunchedValues[row.AllocationYear] = {
-						underApproval: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].underApproval : 0) + row.TotalUnderApprovalBudget,
-						approved: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].approved : 0) + row.TotalApprovedBudget,
-						launched: (aggregatedLaunchedValues[row.AllocationYear] ? aggregatedLaunchedValues[row.AllocationYear].launched : 0) + row.TotalUSDPlanned
+						underApproval:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.underApproval
+								: 0) + row.TotalUnderApprovalBudget,
+						approved:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.approved
+								: 0) + row.TotalApprovedBudget,
+						launched:
+							(aggregatedLaunchedValues[row.AllocationYear]
+								? aggregatedLaunchedValues[row.AllocationYear]
+										.launched
+								: 0) + row.TotalUSDPlanned,
 					};
 					topValuesLaunchedData.launched += row.TotalUSDPlanned;
 					topValuesLaunchedData.underApproval +=
@@ -3536,9 +3559,16 @@
 			});
 
 			for (const year in aggregatedLaunchedValues) {
-				const {underApprovalPercent, underPlusApprovedPercent} = safeDivide(aggregatedLaunchedValues[year].underApproval, aggregatedLaunchedValues[year].approved, aggregatedLaunchedValues[year].launched);
-				yearsWithUnderApprovalAboveMin[year] = underApprovalPercent > minimumUnderApprovalPercentage || underPlusApprovedPercent < minimumUnderApprovalPercentage;
-			};
+				const { underApprovalPercent, underPlusApprovedPercent } =
+					safeDivide(
+						aggregatedLaunchedValues[year].underApproval,
+						aggregatedLaunchedValues[year].approved,
+						aggregatedLaunchedValues[year].launched,
+					);
+				yearsWithUnderApprovalAboveMin[year] =
+					underApprovalPercent > minimumUnderApprovalPercentage ||
+					underPlusApprovedPercent < minimumUnderApprovalPercentage;
+			}
 
 			chartState.cbpfsInData.length = 0;
 
@@ -3547,7 +3577,7 @@
 					? clusters
 					: clusters.filter(function (d) {
 							return d !== "COVID-19";
-					  });
+						});
 
 			const data = clustersFiltered.map(function (d) {
 				return {
@@ -3660,7 +3690,7 @@
 					1e3,
 					d3.max(data, function (d) {
 						return d.total;
-					})
+					}),
 				) * xScaleDomainMargin,
 			]);
 
@@ -3670,7 +3700,7 @@
 					1e3,
 					d3.max(data, function (d) {
 						return d["total" + chartState.selectedBeneficiary];
-					})
+					}),
 				) * xScaleDomainMargin,
 			]);
 		}
@@ -3752,7 +3782,7 @@
 		function parseTransform(translate) {
 			const group = document.createElementNS(
 				"http://www.w3.org/2000/svg",
-				"g"
+				"g",
 			);
 			group.setAttributeNS(null, "transform", translate);
 			const matrix = group.transform.baseVal.consolidate().matrix;
@@ -3822,14 +3852,14 @@
 					(a["CBPF Name"].toLowerCase() < b["CBPF Name"].toLowerCase()
 						? -1
 						: a["CBPF Name"].toLowerCase() >
-						  b["CBPF Name"].toLowerCase()
-						? 1
-						: 0) ||
+							  b["CBPF Name"].toLowerCase()
+							? 1
+							: 0) ||
 					(a.Cluster.toLowerCase() < b.Cluster.toLowerCase()
 						? -1
 						: a.Cluster.toLowerCase() > b.Cluster.toLowerCase()
-						? 1
-						: 0)
+							? 1
+							: 0)
 				);
 			});
 
@@ -3947,7 +3977,7 @@
 					"0 0 " +
 						width +
 						" " +
-						(height + topDivHeight + totalSelectHeight)
+						(height + topDivHeight + totalSelectHeight),
 				);
 
 			const helpButtons = [
@@ -4148,7 +4178,7 @@
 				.attr("y", 200 + topDivHeight + totalSelectHeight)
 				.attr("pointer-events", "none")
 				.text(
-					"Hover over the elements surrounded by a blue rectangle to get additional information"
+					"Hover over the elements surrounded by a blue rectangle to get additional information",
 				)
 				.call(wrapText2, 350);
 
@@ -4215,7 +4245,7 @@
 		function createSnapshot(type, fromContextMenu) {
 			if (isInternetExplorer) {
 				alert(
-					"This functionality is not supported by Internet Explorer"
+					"This functionality is not supported by Internet Explorer",
 				);
 				return;
 			}
@@ -4240,14 +4270,14 @@
 				downloadingDivSvg,
 				200,
 				175,
-				downloadingDivText
+				downloadingDivText,
 			);
 
 			const svgRealSize = svg.node().getBoundingClientRect();
 
 			svg.attr("width", svgRealSize.width).attr(
 				"height",
-				svgRealSize.height
+				svgRealSize.height,
 			);
 
 			const listOfStyles = [
@@ -4280,7 +4310,7 @@
 
 			svg.selectAll("image").attr("xlink:href", function (d) {
 				return localStorage.getItem(
-					"storedCluster" + d.clusterKey.toLowerCase()
+					"storedCluster" + d.clusterKey.toLowerCase(),
 				);
 			});
 
@@ -4355,7 +4385,7 @@
 			};
 
 			d3.image(
-				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png"
+				"https://raw.githubusercontent.com/CBPFGMS/cbpfgms.github.io/master/img/assets/bilogo.png",
 			).then(function (logo) {
 				let pdfTextPosition;
 
@@ -4368,7 +4398,7 @@
 					210 - pdfMargins.left - pdfMargins.right,
 					{
 						fontSize: 12,
-					}
+					},
 				);
 
 				const fullDate = d3.timeFormat("%A, %d %B %Y")(new Date());
@@ -4410,7 +4440,7 @@
 				const modality = capitalize(chartState.selectedModality);
 
 				const reachedPersons = capitalize(
-					chartState.selectedBeneficiary
+					chartState.selectedBeneficiary,
 				);
 
 				const selectedCountry = countriesList();
@@ -4438,7 +4468,7 @@
 					},
 					function (position) {
 						pdfTextPosition = position;
-					}
+					},
 				);
 
 				const sourceDimentions = containerDiv
@@ -4453,13 +4483,13 @@
 					pdfTextPosition.y + 2,
 					widthInMilimeters,
 					widthInMilimeters *
-						(sourceDimentions.height / sourceDimentions.width)
+						(sourceDimentions.height / sourceDimentions.width),
 				);
 
 				const currentDate = new Date();
 
 				pdf.save(
-					"SectorsOverview_" + csvDateFormat(currentDate) + ".pdf"
+					"SectorsOverview_" + csvDateFormat(currentDate) + ".pdf",
 				);
 
 				removeProgressWheel();
@@ -4487,7 +4517,7 @@
 						pdfMargins.top + 9,
 						5,
 						9,
-						"F"
+						"F",
 					);
 
 					pdf.addImage(
@@ -4496,7 +4526,7 @@
 						pdfMargins.left + 2,
 						pdfMargins.top,
 						90,
-						18
+						18,
 					);
 
 					pdf.setFillColor(236, 161, 84);
@@ -4509,7 +4539,7 @@
 					pdf.text(
 						footer,
 						pdfMargins.left,
-						297 - pdfMargins.bottom + 10
+						297 - pdfMargins.bottom + 10,
 					);
 				}
 
@@ -4524,15 +4554,15 @@
 							return a.toLowerCase() < b.toLowerCase()
 								? -1
 								: a.toLowerCase() > b.toLowerCase()
-								? 1
-								: 0;
+									? 1
+									: 0;
 						})
 						.reduce(function (acc, curr, index) {
 							return (
 								acc +
 								(index >= chartState.selectedCbpfs.length - 2
 									? index >
-									  chartState.selectedCbpfs.length - 2
+										chartState.selectedCbpfs.length - 2
 										? curr
 										: curr + " and "
 									: curr + ", ")
@@ -4551,7 +4581,7 @@
 				.attr("class", "pbiolcd3chartwheelGroup")
 				.attr(
 					"transform",
-					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")"
+					"translate(" + thiswidth / 2 + "," + thisheight / 4 + ")",
 				);
 
 			const loadingText = wheelGroup
