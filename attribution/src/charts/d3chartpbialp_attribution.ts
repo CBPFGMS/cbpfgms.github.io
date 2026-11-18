@@ -989,7 +989,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfParallelGroupEnter
-				.selectAll<SVGCircleElement, ParallelDatum>("")
+				.selectAll<SVGCircleElement, ParallelDatum>(null)
 				.data(
 					function (d) {
 						return d.parallelData;
@@ -1068,7 +1068,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfParallelGroupAverageEnter
-				.selectAll<SVGCircleElement, AverageDatum>("")
+				.selectAll<SVGCircleElement, AverageDatum>(null)
 				.data(
 					function (d) {
 						return d;
@@ -1088,7 +1088,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("fill", "#6d8383");
 
 			cbpfParallelGroupAverageEnter
-				.selectAll<SVGTextElement, AverageDatum>("")
+				.selectAll<SVGTextElement, AverageDatum>(null)
 				.data(
 					function (d) {
 						return d;
