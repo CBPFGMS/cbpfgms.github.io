@@ -1,4 +1,3 @@
-//// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
 import * as d3 from "d3";
 import type { AllocationsLollipopObject } from "../utils/schemas";
 
@@ -7,6 +6,8 @@ type Draw = (rawData: AllocationsLollipopObject[]) => void;
 type OrgTypes = (typeof partnerList)[number];
 
 type AllOrgTypes = (typeof partnerList)[number] | "total";
+
+type Modality = (typeof modalities)[number];
 
 type ParallelDatum = {
 	partner: OrgTypes;
@@ -17,6 +18,14 @@ type ParallelDatum = {
 	standard: number;
 	reserve: number;
 	uniqueKey?: string;
+};
+
+type DonutDatum = {
+	modality: Modality;
+	values: {
+		partner: OrgTypes;
+		value: number;
+	}[];
 };
 
 type AverageDatum = Omit<ParallelDatum, "standard" | "reserve" | "value">;
@@ -49,6 +58,11 @@ const partnerList = [
 	"Red Cross/Crescent Movement",
 	"UN Agency",
 ] as const;
+
+const modalities = [
+	"standard",
+	"reserve",
+] as const satisfies readonly (keyof Datum & keyof ParallelDatum)[];
 
 type Data = Datum[];
 
@@ -217,7 +231,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		]);
 
 	const partnersTextScale = d3
-		.scaleOrdinal()
+		.scaleOrdinal<string, string>()
 		.domain(partnerList)
 		.range(["Int. NGO", "Nat. NGO", "RC/CM", "UN"]);
 
@@ -679,21 +693,23 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 				const thisTotal = chartState.selectedPartner;
 
+				const thisTotalValue = datum[thisTotal];
+
 				const thisStandard =
 					chartState.selectedPartner === "total"
-						? datum.standard
-						: datum[
-								("standard-" +
-									chartState.selectedPartner) as `standard-${OrgTypes}`
-							];
+						? "standard"
+						: (("standard-" +
+								chartState.selectedPartner) as `standard-${OrgTypes}`);
+
+				const thisStandardValue = datum[thisStandard];
 
 				const thisReserve =
 					chartState.selectedPartner === "total"
-						? datum.reserve
-						: datum[
-								("reserve-" +
-									chartState.selectedPartner) as `reserve-${OrgTypes}`
-							];
+						? "reserve"
+						: (("reserve-" +
+								chartState.selectedPartner) as `reserve-${OrgTypes}`);
+
+				const thisReserveValue = datum[thisReserve];
 
 				const tooltipChartTitle =
 					chartState.selectedPartner === "total"
@@ -707,7 +723,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 									)) +
 							") by Modality, in %:";
 
-				if (datum[thisTotal]) {
+				if (thisTotalValue) {
 					tooltip
 						.style("display", "block")
 						.html(
@@ -724,29 +740,32 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 								")<br><div style='margin:0px 0px 6px 0px;display:flex;flex-wrap:wrap;width:" +
 								lollipopTooltipWidth +
 								"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" +
-								formatMoney0Decimals(datum[thisTotal]) +
+								formatMoney0Decimals(thisTotalValue) +
 								"</div></div>Allocation Modalities:<div id=pbialpLollipopTooltipBar></div><div style='margin:0px;display:flex;flex-wrap:wrap;width:" +
 								lollipopTooltipWidth +
 								"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Standard <span style='color: #888;'>(" +
-								formatPercent(thisStandard / datum[thisTotal]) +
+								formatPercent(
+									thisStandardValue / thisTotalValue,
+								) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
-								formatMoney0Decimals(thisStandard) +
+								formatMoney0Decimals(thisStandardValue) +
 								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Reserve <span style='color: #888;'>(" +
-								formatPercent(thisReserve / datum[thisTotal]) +
+								formatPercent(
+									thisReserveValue / thisTotalValue,
+								) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
-								formatMoney0Decimals(thisReserve) +
+								formatMoney0Decimals(thisReserveValue) +
 								"</span></div></div><div style='margin-top:6px;'>" +
 								tooltipChartTitle +
 								"<div><div id=pbialpLollipopTooltipChart></div>",
 						);
 
 					createTooltipBar(
-						datum,
 						"pbialpLollipopTooltipBar",
 						lollipopTooltipWidth,
-						thisTotal,
-						thisStandard,
-						thisReserve,
+						thisTotalValue,
+						thisStandardValue,
+						thisReserveValue,
 					);
 
 					if (chartState.selectedPartner === "total") {
@@ -1410,7 +1429,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("stroke-width", "2px");
 
 			selectedGroups
-				.selectAll("circle")
+				.selectAll<SVGCircleElement, ParallelDatum>("circle")
 				.style("fill", null)
 				.attr("class", "contributionColorFill")
 				.on("mouseover", mouseOverSelectedCircles)
@@ -1553,7 +1572,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			percentagesText.raise();
 
 			labelsGroup
-				.on("mouseover", function (event, d) {
+				.on("mouseover", function (_event, d) {
 					selectedGroups.style("opacity", function (e) {
 						return d.cbpf === e.cbpf ? 1 : fadeOpacity2;
 					});
@@ -1753,12 +1772,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					);
 
 				createTooltipBar(
-					datum,
 					"pbialpParallelTooltipBar",
 					parallelTooltipWidth,
-					"value",
-					"standard",
-					"reserve",
+					datum.value,
+					datum.standard,
+					datum.reserve,
 				);
 			} else {
 				tooltip
@@ -1810,12 +1828,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		}
 
 		function createTooltipBar(
-			datum,
-			container,
-			containerWidth,
-			total,
-			property1,
-			property2,
+			container: string,
+			containerWidth: number,
+			total: number,
+			property1: number,
+			property2: number,
 		) {
 			const containerDiv = d3.select("#" + container);
 
@@ -1826,7 +1843,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 			const scaleDiv = d3
 				.scaleLinear()
-				.domain([0, datum[total]])
+				.domain([0, total])
 				.range([0, containerWidth]);
 
 			const div1 = containerDiv
@@ -1837,14 +1854,14 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("width", "0px")
 				.style(
 					"border-right",
-					scaleDiv(datum[property1]) < 1
+					scaleDiv(property1) < 1
 						? "0px solid white"
 						: "1px solid white",
 				);
 
 			div1.transition()
 				.duration(shortDuration)
-				.style("width", scaleDiv(datum[property1]) + "px");
+				.style("width", scaleDiv(property1) + "px");
 
 			const div2 = containerDiv
 				.append("div")
@@ -1855,8 +1872,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 			div2.transition()
 				.duration(shortDuration)
-				.style("margin-left", scaleDiv(datum[property1]) + 1 + "px")
-				.style("width", scaleDiv(datum[property2]) + "px");
+				.style("margin-left", scaleDiv(property1) + 1 + "px")
+				.style("width", scaleDiv(property2) + "px");
 
 			//end of createTooltipBar
 		}
@@ -1865,8 +1882,6 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			const tooltipSvgWidth = lollipopTooltipWidth,
 				tooltipSvgHeight = 100,
 				tooltipSvgpadding = [8, 130, 16, 4];
-
-			const modalities = ["standard", "reserve"];
 
 			const tooltipSvg = d3
 				.select("#pbialpLollipopTooltipChart")
@@ -1900,14 +1915,16 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.domain([
 					0,
 					d3.max(datum, function (d) {
-						return d3.max(modalities, function (e) {
-							return d[e];
-						});
-					}),
+						return (
+							d3.max(modalities, function (e) {
+								return d[e];
+							}) || 0
+						);
+					}) || 0,
 				]);
 
 			const classScale = d3
-				.scaleOrdinal()
+				.scaleOrdinal<string, string>()
 				.domain(modalities)
 				.range([
 					"contributionColorDarkerFill",
@@ -1915,7 +1932,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				]);
 
 			const axisNameScale = d3
-				.scaleOrdinal()
+				.scaleOrdinal<string, string>()
 				.domain(modalities)
 				.range(["Standard", "Reserve"]);
 
@@ -1970,7 +1987,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.enter()
 				.append("rect")
 				.attr("x", function (d) {
-					return xScaleInner(d.key);
+					return xScaleInner(d.key) || 0;
 				})
 				.attr("width", xScaleInner.bandwidth())
 				.attr("class", function (d) {
@@ -2067,7 +2084,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					2;
 
 			const pie = d3
-				.pie()
+				.pie<DonutDatum["values"][number]>()
 				.sort(function (a, b) {
 					if (a.partner === chartState.selectedPartner) {
 						return -1;
@@ -2082,18 +2099,16 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			const arcSel = d3
-				.arc()
+				.arc<d3.PieArcDatum<DonutDatum["values"][number]>>()
 				.outerRadius(donutRadius)
 				.innerRadius(donutRadius - 20);
 
 			const arc = d3
-				.arc()
+				.arc<d3.PieArcDatum<DonutDatum["values"][number]>>()
 				.outerRadius(donutRadius - 4)
 				.innerRadius(donutRadius - 16);
 
-			const modalities = ["standard", "reserve"];
-
-			const donutData = [];
+			const donutData: DonutDatum[] = [];
 
 			modalities.forEach(function (d) {
 				donutData.push({
@@ -2159,7 +2174,6 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.transition()
 				.duration(shortDuration)
 				.attrTween("d", function (d) {
-					d.innerRadius = 0;
 					const i = d3.interpolate(
 						{
 							startAngle: 0,
@@ -2169,11 +2183,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					);
 					if (d.data.partner === chartState.selectedPartner) {
 						return function (t) {
-							return arcSel(i(t));
+							return arcSel(i(t))!;
 						};
 					} else {
 						return function (t) {
-							return arc(i(t));
+							return arc(i(t))!;
 						};
 					}
 				});
