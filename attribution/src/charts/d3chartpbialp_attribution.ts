@@ -1,4 +1,4 @@
-// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
+//// @ts-nocheck - legacy D3 chart originally authored in JavaScript; migrate incrementally.
 import * as d3 from "d3";
 import type { AllocationsLollipopObject } from "../utils/schemas";
 
@@ -28,6 +28,7 @@ type Datum = {
 	standard: number;
 	reserve: number;
 	parallelData: ParallelDatum[];
+	yPos?: number;
 } & {
 	[key in OrgTypes]: number;
 } & {
@@ -206,7 +207,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		]);
 
 	const partnersColorsScale = d3
-		.scaleOrdinal()
+		.scaleOrdinal<OrgTypes, string>()
 		.domain(partnerList)
 		.range([
 			"InternationalNGOPartnerColor",
@@ -989,13 +990,13 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfParallelGroupEnter
-				.selectAll<SVGCircleElement, ParallelDatum>(null)
+				.selectAll(null)
 				.data(
 					function (d) {
 						return d.parallelData;
 					},
 					function (d) {
-						return d.partner;
+						return d?.partner ?? "";
 					},
 				)
 				.enter()
@@ -1068,13 +1069,13 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfParallelGroupAverageEnter
-				.selectAll<SVGCircleElement, AverageDatum>(null)
+				.selectAll(null)
 				.data(
 					function (d) {
 						return d;
 					},
 					function (d) {
-						return d.partner;
+						return d?.partner ?? "";
 					},
 				)
 				.enter()
@@ -1088,13 +1089,13 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("fill", "#6d8383");
 
 			cbpfParallelGroupAverageEnter
-				.selectAll<SVGTextElement, AverageDatum>(null)
+				.selectAll(null)
 				.data(
 					function (d) {
 						return d;
 					},
 					function (d) {
-						return d.partner;
+						return d?.partner ?? "";
 					},
 				)
 				.enter()
@@ -1391,13 +1392,13 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			});
 
 			const selectedGroups = parallelPanel.main
-				.selectAll(".pbialpCbpfParallelGroup")
+				.selectAll<SVGGElement, Datum>(".pbialpCbpfParallelGroup")
 				.filter(function (d) {
 					return chartState.selectedCbpfs.indexOf(d.cbpf) > -1;
 				});
 
 			const unselectedGroups = parallelPanel.main
-				.selectAll(".pbialpCbpfParallelGroup")
+				.selectAll<SVGGElement, Datum>(".pbialpCbpfParallelGroup")
 				.filter(function (d) {
 					return chartState.selectedCbpfs.indexOf(d.cbpf) === -1;
 				});
@@ -1429,7 +1430,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.on("mouseout", null);
 
 			let labelsGroup = parallelPanel.main
-				.selectAll(".pbialpLabelsGroup")
+				.selectAll<SVGGElement, Datum>(".pbialpLabelsGroup")
 				.data(selectedData, function (d) {
 					return d.cbpf;
 				});
@@ -1444,11 +1445,12 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			labelsGroupEnter.attr("transform", function (d) {
 				const lastParter = d.parallelData.find(function (e) {
 					return e.partner === partnerList[partnerList.length - 1];
-				});
+				})!;
 				d.yPos = yScaleParallel(lastParter.percentage);
 				return (
 					"translate(" +
-					(xScaleParallel(partnerList[partnerList.length - 1]) +
+					((xScaleParallel(partnerList[partnerList.length - 1]) ||
+						0) +
 						selectedCbpfLabelPadding) +
 					"," +
 					d.yPos +
@@ -1476,11 +1478,12 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						return (
 							e.partner === partnerList[partnerList.length - 1]
 						);
-					});
+					})!;
 					d.yPos = yScaleParallel(lastParter.percentage);
 					return (
 						"translate(" +
-						(xScaleParallel(partnerList[partnerList.length - 1]) +
+						((xScaleParallel(partnerList[partnerList.length - 1]) ||
+							0) +
 							selectedCbpfLabelPadding) +
 						"," +
 						d.yPos +
@@ -1505,7 +1508,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("class", "pbialpPercentagesTextHighlight")
 				.attr("filter", "url(#backgroundFilter)")
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("y", function (d) {
 					return d.percentage > 0.95
@@ -1531,7 +1534,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				})
 				.append("tspan")
 				.attr("x", function (d) {
-					return xScaleParallel(d.partner);
+					return xScaleParallel(d.partner) || 0;
 				})
 				.attr("dy", "1.1em")
 				.text(function (d) {
@@ -1572,7 +1575,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						})
 						.append("tspan")
 						.attr("x", function (d) {
-							return xScaleParallel(d.partner);
+							return xScaleParallel(d.partner) || 0;
 						})
 						.attr("dy", "1.1em")
 						.text(function (d) {
@@ -1599,7 +1602,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						})
 						.append("tspan")
 						.attr("x", function (d) {
-							return xScaleParallel(d.partner);
+							return xScaleParallel(d.partner) || 0;
 						})
 						.attr("dy", "1.1em")
 						.text(function (d) {
@@ -1612,39 +1615,51 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 		function highlightSelectedParallel() {
 			const selectedPartnerGroups = parallelPanel.main
-				.selectAll(".pbialpgroupXAxisParallel .tick")
+				.selectAll<
+					SVGGElement,
+					OrgTypes
+				>(".pbialpgroupXAxisParallel .tick")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d) > -1;
 				});
 
 			const unselectedPartnerGroups = parallelPanel.main
-				.selectAll(".pbialpgroupXAxisParallel .tick")
+				.selectAll<
+					SVGGElement,
+					OrgTypes
+				>(".pbialpgroupXAxisParallel .tick")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d) === -1;
 				});
 
 			const selectedAverage = parallelPanel.main
 				.select(".pbialpCbpfParallelGroupAverage")
-				.selectAll("text")
+				.selectAll<SVGTextElement, AverageDatum>("text")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d.partner) > -1;
 				});
 
 			const unselectedAverage = parallelPanel.main
 				.select(".pbialpCbpfParallelGroupAverage")
-				.selectAll("text")
+				.selectAll<SVGTextElement, AverageDatum>("text")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d.partner) === -1;
 				});
 
 			const selectedPercentageText = parallelPanel.main
-				.selectAll(".pbialpPercentagesTextHighlight")
+				.selectAll<
+					SVGTextElement,
+					ParallelDatum
+				>(".pbialpPercentagesTextHighlight")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d.partner) > -1;
 				});
 
 			const unselectedPercentageText = parallelPanel.main
-				.selectAll(".pbialpPercentagesTextHighlight")
+				.selectAll<
+					SVGTextElement,
+					ParallelDatum
+				>(".pbialpPercentagesTextHighlight")
 				.filter(function (d) {
 					return chartState.selectedPartner.indexOf(d.partner) === -1;
 				});
@@ -1655,9 +1670,17 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 			selectedPartnerGroups
 				.select("text")
-				.style("fill", d3.color(highlightColor).darker(0.5));
+				.style(
+					"fill",
+					d3.color(highlightColor)?.darker(0.5).formatHex() ??
+						highlightColor,
+				);
 
-			selectedAverage.style("fill", d3.color(highlightColor).darker(0.5));
+			selectedAverage.style(
+				"fill",
+				d3.color(highlightColor)?.darker(0.5).formatHex() ??
+					highlightColor,
+			);
 
 			selectedPercentageText.style("fill", highlightColor);
 
@@ -1672,7 +1695,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of highlightSelectedParallel
 		}
 
-		function clickButtonsPartnersRects(event, d) {
+		function clickButtonsPartnersRects(_event: MouseEvent, d: AllOrgTypes) {
 			if (chartState.selectedPartner === d) return;
 
 			chartState.selectedPartner = d;
@@ -1692,8 +1715,14 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of clickButtonsContributionsRects
 		}
 
-		function mouseOverSelectedCircles(event, datum) {
-			const thisCbpf = d3.select(this.parentNode).datum().cbpf;
+		function mouseOverSelectedCircles(
+			this: SVGCircleElement,
+			event: MouseEvent,
+			datum: ParallelDatum,
+		) {
+			const thisCbpf = d3
+				.select<SVGGElement, Datum>(this.parentNode as SVGGElement)
+				.datum().cbpf;
 
 			if (datum.value) {
 				tooltip
@@ -1749,12 +1778,12 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			const thisBox = this.getBoundingClientRect();
 
 			const parallelPanelBox = parallelPanel.main
-				.node()
+				.node()!
 				.getBoundingClientRect();
 
-			const containerBox = containerDiv.node().getBoundingClientRect();
+			const containerBox = containerDiv.node()!.getBoundingClientRect();
 
-			const tooltipBox = tooltip.node().getBoundingClientRect();
+			const tooltipBox = tooltip.node()!.getBoundingClientRect();
 
 			const thisOffsetTop = thisBox.top - containerBox.top;
 
@@ -1832,7 +1861,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of createTooltipBar
 		}
 
-		function createTooltipChartGB(datum) {
+		function createTooltipChartGB(datum: ParallelDatum[]) {
 			const tooltipSvgWidth = lollipopTooltipWidth,
 				tooltipSvgHeight = 100,
 				tooltipSvgpadding = [8, 130, 16, 4];
@@ -2027,7 +2056,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			//end of createTooltipChartGB
 		}
 
-		function createTooltipChartDC(datum) {
+		function createTooltipChartDC(datum: ParallelDatum[]) {
 			const tooltipSvgWidth = lollipopTooltipWidth,
 				tooltipSvgHeight = 100,
 				tooltipSvgpadding = [4, 110, 16, 4],
@@ -2269,7 +2298,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		//end of draw
 	}
 
-	function resizeSVGHeight(cbpfsLength) {
+	function resizeSVGHeight(cbpfsLength: number) {
 		lollipopPanel.height =
 			cbpfsLength * lollipopGroupHeight +
 			lollipopPanel.padding[0] +
@@ -2319,7 +2348,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		//end of resizeSvg
 	}
 
-	function calculateBiggestLabel(dataArray) {
+	function calculateBiggestLabel(dataArray: Data) {
 		const allTexts = dataArray
 			.map(function (d) {
 				return d.cbpf;
@@ -2329,7 +2358,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			})
 			.slice(0, 5);
 
-		const textSizeArray = [];
+		const textSizeArray: number[] = [];
 
 		allTexts.forEach(function (d) {
 			const fakeText = svg
@@ -2339,7 +2368,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.text(d);
 
 			const fakeTextLength = Math.ceil(
-				fakeText.node().getComputedTextLength(),
+				fakeText.node()!.getComputedTextLength(),
 			);
 
 			textSizeArray.push(fakeTextLength);
@@ -2347,15 +2376,16 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			fakeText.remove();
 		});
 
-		return d3.max(textSizeArray);
+		return d3.max(textSizeArray) || 0;
 
 		//end of calculateBiggestLabel
 	}
 
-	function setDomains(cbpfs, property) {
-		const maxXValue = d3.max(cbpfs, function (d) {
-			return d[property];
-		});
+	function setDomains(cbpfs: Data, property: AllOrgTypes) {
+		const maxXValue =
+			d3.max(cbpfs, function (d) {
+				return d[property];
+			}) || 0;
 
 		xScaleLollipop.domain([
 			0,
@@ -2363,7 +2393,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		]);
 	}
 
-	function setRanges(labelSizeCbpfs) {
+	function setRanges(labelSizeCbpfs: number) {
 		const labelSize =
 			labelSizeCbpfs +
 			yAxisLollipop.tickPadding() +
