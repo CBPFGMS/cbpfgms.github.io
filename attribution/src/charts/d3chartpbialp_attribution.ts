@@ -1231,9 +1231,11 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		}
 
 		function createBottomButtons() {
-			const netFundingGroup = bottomButtonsGroup
-				.selectAll(".pbialpNetFundingGroup")
-				.data([true])
+			let netFundingGroup = bottomButtonsGroup
+				.selectAll<SVGGElement, boolean>(".pbialpNetFundingGroup")
+				.data([true]);
+
+			const netFundingGroupEnter = netFundingGroup
 				.enter()
 				.append("g")
 				.attr("class", "pbialpNetFundingGroup")
@@ -1248,7 +1250,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("cursor", "pointer")
 				.attr("pointer-events", "all");
 
-			netFundingGroup
+			netFundingGroupEnter
 				.append("rect")
 				.attr("width", 12)
 				.attr("height", 12)
@@ -1259,26 +1261,37 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("fill", "white")
 				.attr("stroke", "darkslategray");
 
-			const netFundingInnerCheck = netFundingGroup
-				.append("polyline")
-				.style("stroke-width", "2px")
-				.attr("points", "-4,1 -1,4 4,-3")
-				.style("fill", "none")
-				.style(
-					"stroke",
-					chartState.netFunding === 2 ? "darkslategray" : "white",
-				);
-
-			netFundingGroup
+			netFundingGroupEnter
 				.append("text")
 				.attr("class", "pbialpAverageTextControl")
 				.attr("x", 10)
 				.text("Net Funding*")
 				.attr("y", 5);
 
-			const showAverageGroup = bottomButtonsGroup
-				.selectAll(".pbialpShowAverageGroup")
-				.data([true])
+			netFundingGroup = netFundingGroupEnter.merge(netFundingGroup);
+
+			let netFundingInnerCheck = netFundingGroup
+				.selectAll<SVGPolylineElement, boolean>(".netFundingInnerCheck")
+				.data([true]);
+
+			netFundingInnerCheck = netFundingInnerCheck
+				.enter()
+				.append("polyline")
+				.attr("class", "netFundingInnerCheck")
+				.style("stroke-width", "2px")
+				.attr("points", "-4,1 -1,4 4,-3")
+				.style("fill", "none")
+				.merge(netFundingInnerCheck)
+				.style(
+					"stroke",
+					chartState.netFunding === 2 ? "darkslategray" : "white",
+				);
+
+			let showAverageGroup = bottomButtonsGroup
+				.selectAll<SVGGElement, boolean>(".pbialpShowAverageGroup")
+				.data([true]);
+
+			const showAverageGroupEnter = showAverageGroup
 				.enter()
 				.append("g")
 				.attr("class", "pbialpShowAverageGroup")
@@ -1293,7 +1306,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.style("cursor", "pointer")
 				.attr("pointer-events", "all");
 
-			showAverageGroup
+			showAverageGroupEnter
 				.append("rect")
 				.attr("width", 12)
 				.attr("height", 12)
@@ -1304,19 +1317,31 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.attr("fill", "white")
 				.attr("stroke", "darkslategray");
 
-			const innerCheck = showAverageGroup
-				.append("polyline")
-				.style("stroke-width", "2px")
-				.attr("points", "-4,1 -1,4 4,-3")
-				.style("fill", "none")
-				.style("stroke", showAverage ? "darkslategray" : "white");
-
-			showAverageGroup
+			showAverageGroupEnter
 				.append("text")
 				.attr("class", "pbialpAverageTextControl")
 				.attr("x", 10)
 				.text("Show Total")
 				.attr("y", 5);
+
+			showAverageGroup = showAverageGroupEnter.merge(showAverageGroup);
+
+			let showAverageInnerCheck = showAverageGroup
+				.selectAll<
+					SVGPolylineElement,
+					boolean
+				>(".showAverageInnerCheck")
+				.data([true]);
+
+			showAverageInnerCheck = showAverageInnerCheck
+				.enter()
+				.append("polyline")
+				.attr("class", "showAverageInnerCheck")
+				.style("stroke-width", "2px")
+				.attr("points", "-4,1 -1,4 4,-3")
+				.style("fill", "none")
+				.merge(showAverageInnerCheck)
+				.style("stroke", showAverage ? "darkslategray" : "white");
 
 			netFundingGroup.on("click", function () {
 				chartState.netFunding = 3 - chartState.netFunding;
@@ -1365,7 +1390,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 			showAverageGroup.on("click", function () {
 				showAverage = !showAverage;
 
-				innerCheck.style(
+				showAverageInnerCheck.style(
 					"stroke",
 					showAverage ? "darkslategray" : "white",
 				);

@@ -1,21 +1,36 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { d3Chart } from "../charts/d3chartpbialp_attribution";
+import type { AllocationsLollipopObject } from "../utils/schemas";
+import { select } from "d3";
 
-function LollipopContainer() {
+type LollipopContainerProps = {
+	lollipopData: AllocationsLollipopObject[];
+};
+
+function LollipopContainer({ lollipopData }: LollipopContainerProps) {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const drawRef = useRef<
+		((rawData: AllocationsLollipopObject[]) => void) | null
+	>(null);
+
 	useEffect(() => {
-		const src =
-			"https://cbpfgms.github.io/pbialp_ft/src/d3chartpbialp_ft_v2.js";
+		const node = containerRef.current;
+		if (!node) return;
 
-		if (document.querySelector(`script[src="${src}"]`)) return;
+		drawRef.current = d3Chart(node);
 
-		const script = document.createElement("script");
-		script.src = src;
-		script.async = true;
-
-		document.body.appendChild(script);
+		return () => {
+			select(node).selectAll("*").remove();
+		};
 	}, []);
+
+	useEffect(() => {
+		if (!drawRef.current) return;
+		drawRef.current(lollipopData);
+	}, [lollipopData]);
 
 	return (
 		<Box>
@@ -49,12 +64,8 @@ function LollipopContainer() {
 			>
 				<Grid size={12}>
 					<div
-						id="d3chartcontainerpbialp_ft"
-						data-partner="total"
-						data-showaverage="true"
-						data-selectedcbpfs="none"
-						data-netfunding="true"
-						data-responsive="true"
+						ref={containerRef}
+						id="d3chartcontainerpbialp_attribution"
 					></div>
 				</Grid>
 			</Grid>

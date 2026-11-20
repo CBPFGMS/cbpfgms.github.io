@@ -7,6 +7,7 @@ export default defineConfig({
 	build: {
 		rollupOptions: {
 			output: {
+				entryFileNames: "fasttrack.js",
 				// assetFileNames: "[name][extname]", // No hash, keeps original name
 				assetFileNames: assetInfo => {
 					let extType = assetInfo.name?.split(".").at(-1);
