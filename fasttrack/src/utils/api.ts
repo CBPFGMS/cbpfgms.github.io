@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import trackProgress from "./trackprogress";
 import makeLists, { type List } from "./makelists";
@@ -184,7 +183,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<BeneficiaryTypesMasterObject[]>(
+				fetchFileDB<BeneficiaryTypesMasterObject[]>(
 					"beneficiaryTypesMaster",
 					beneficiaryTypesMasterUrl,
 					"csv",
@@ -192,7 +191,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<PooledFundsMasterObject[]>(
+				fetchFileDB<PooledFundsMasterObject[]>(
 					"pooledFundsMaster",
 					pooledFundsMasterUrl,
 					"csv",
@@ -200,7 +199,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<AllocationSourcesMasterObject[]>(
+				fetchFileDB<AllocationSourcesMasterObject[]>(
 					"allocationSourcesMaster",
 					allocationSourcesMasterUrl,
 					"csv",
@@ -208,7 +207,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<OrganizationTypesMasterObject[]>(
+				fetchFileDB<OrganizationTypesMasterObject[]>(
 					"organizationTypesMaster",
 					organizationTypesMasterUrl,
 					"csv",
@@ -216,7 +215,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<SectorsMasterObject[]>(
+				fetchFileDB<SectorsMasterObject[]>(
 					"sectorsMaster",
 					sectorsMasterUrl,
 					"csv",
@@ -224,7 +223,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<GlobalIndicatorsMasterObject[]>(
+				fetchFileDB<GlobalIndicatorsMasterObject[]>(
 					"globalIndicatorsMaster",
 					globalIndicatorsMasterUrl,
 					"csv",
@@ -232,7 +231,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<PooledFundsWithRegionMasterObject[]>(
+				fetchFileDB<PooledFundsWithRegionMasterObject[]>(
 					"pooledFundsWithRegionMaster",
 					pooledFundWithRegionMasterUrl,
 					"json",
@@ -240,7 +239,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiaries",
 					totalBeneficiariesUrl,
 					"csv",
@@ -248,7 +247,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiariesTranche1",
 					totalBeneficiariesTranche1Url,
 					"csv",
@@ -256,7 +255,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiariesTranche2",
 					totalBeneficiariesTranche2Url,
 					"csv",
@@ -264,7 +263,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<OrganizationIdsMapObject[]>(
+				fetchFileDB<OrganizationIdsMapObject[]>(
 					"organizationIdsMap",
 					organizationIdsMapUrl,
 					"json",
@@ -272,7 +271,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TemplatesMasterJson>(
+				fetchFileDB<TemplatesMasterJson>(
 					"templatesMaster",
 					templatesMasterUrl,
 					"json",

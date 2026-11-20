@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"; //REMOVE LATER
-import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import makeLists, { List } from "./makelists";
 import processRawData, {
@@ -251,7 +250,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<PooledFundsMasterObject[]>(
+				fetchFileDB<PooledFundsMasterObject[]>(
 					"pooledFundsMaster",
 					pooledFundsMasterUrl,
 					"csv",
@@ -259,7 +258,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<AllocationSourcesMasterObject[]>(
+				fetchFileDB<AllocationSourcesMasterObject[]>(
 					"allocationSourcesMaster",
 					allocationSourcesMasterUrl,
 					"csv",
@@ -267,7 +266,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<OrganizationTypesMasterObject[]>(
+				fetchFileDB<OrganizationTypesMasterObject[]>(
 					"organizationTypesMaster",
 					organizationTypesMasterUrl,
 					"csv",
@@ -275,7 +274,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<SectorsMasterObject[]>(
+				fetchFileDB<SectorsMasterObject[]>(
 					"sectorsMaster",
 					sectorsMasterUrl,
 					"csv",
@@ -283,11 +282,11 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<CvaMasterObject[]>("cvaMaster", cvaMasterUrl, "json"),
+				fetchFileDB<CvaMasterObject[]>("cvaMaster", cvaMasterUrl, "json"),
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiaries",
 					totalBeneficiariesUrl,
 					"csv",
@@ -295,7 +294,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiariesTranche1",
 					totalBeneficiariesTranche1Url,
 					"csv",
@@ -303,7 +302,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesObject[]>(
+				fetchFileDB<TotalBeneficiariesObject[]>(
 					"totalBeneficiariesTranche2",
 					totalBeneficiariesTranche2Url,
 					"csv",
@@ -311,7 +310,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+				fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
 					"totalBeneficiariesByPartner",
 					totalBeneficiariesByPartnerUrl,
 					"csv",
@@ -319,7 +318,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+				fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
 					"totalBeneficiariesByPartnerTranche1",
 					totalBeneficiariesByPartnerTranche1Url,
 					"csv",
@@ -327,7 +326,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByPartnerObject[]>(
+				fetchFileDB<TotalBeneficiariesByPartnerObject[]>(
 					"totalBeneficiariesByPartnerTranche2",
 					totalBeneficiariesByPartnerTranche2Url,
 					"csv",
@@ -335,7 +334,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesBySectorObject[]>(
+				fetchFileDB<TotalBeneficiariesBySectorObject[]>(
 					"totalBeneficiariesBySector",
 					totalBeneficiariesBySectorUrl,
 					"csv",
@@ -343,7 +342,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesBySectorObject[]>(
+				fetchFileDB<TotalBeneficiariesBySectorObject[]>(
 					"totalBeneficiariesBySectorTranche1",
 					totalBeneficiariesBySectorTranche1Url,
 					"csv",
@@ -351,7 +350,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesBySectorObject[]>(
+				fetchFileDB<TotalBeneficiariesBySectorObject[]>(
 					"totalBeneficiariesBySectorTranche2",
 					totalBeneficiariesBySectorTranche2Url,
 					"csv",
@@ -359,7 +358,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				fetchFileDB<TotalBeneficiariesByBeneficiaryTypeObject[]>(
 					"totalBeneficiariesByBeneficiaryType",
 					totalBeneficiariesByBeneficiaryTypeUrl,
 					"csv",
@@ -367,7 +366,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				fetchFileDB<TotalBeneficiariesByBeneficiaryTypeObject[]>(
 					"totalBeneficiariesByBeneficiaryTypeTranche1",
 					totalBeneficiariesByBeneficiaryTypeTranche1Url,
 					"csv",
@@ -375,7 +374,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TotalBeneficiariesByBeneficiaryTypeObject[]>(
+				fetchFileDB<TotalBeneficiariesByBeneficiaryTypeObject[]>(
 					"totalBeneficiariesByBeneficiaryTypeTranche2",
 					totalBeneficiariesByBeneficiaryTypeTranche2Url,
 					"csv",
@@ -383,7 +382,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<TemplatesMasterJson>(
+				fetchFileDB<TemplatesMasterJson>(
 					"templatesMaster",
 					templatesMasterUrl,
 					"json",

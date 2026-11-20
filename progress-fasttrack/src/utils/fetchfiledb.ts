@@ -30,7 +30,7 @@ async function fetchFileDB<T>(
 	method: string,
 ): Promise<T> {
 	const combinedName = `${pageName}_${fileName}_${buildVersion}`;
-	const keyPrefix = `${pageName}_${fileName}`;
+	const keyPrefix = `${pageName}_${fileName}_`;
 	const currentDate = new Date();
 	const db = await dbPromise;
 
@@ -49,7 +49,7 @@ async function fetchFileDB<T>(
 		localData.timeStamp > currentDate.getTime() - localStorageTime
 	) {
 		console.info(
-			`%cInfo: data file ${fileName} retrieved from indexedDB`,
+			`%cInfo: data file ${fileName} retrieved from browser cache`,
 			consoleStyle,
 		);
 		return localData.data as T;
@@ -80,7 +80,7 @@ async function fetchFileDB<T>(
 			);
 		} catch (error) {
 			console.warn(
-				`Error saving the file ${fileName} in indexedDB. Error: ${error}.`,
+				`Error saving the file ${fileName} in browser cache (indexedDB). Error: ${error}.`,
 			);
 		}
 

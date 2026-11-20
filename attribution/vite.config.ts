@@ -8,6 +8,7 @@ export default defineConfig({
 	build: {
 		rollupOptions: {
 			output: {
+				entryFileNames: "attribution.js",
 				assetFileNames: "[name][extname]", // No hash, keeps original name
 			},
 		},

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"; //REMOVE LATER
-import fetchFile from "./fetchfile";
 import fetchFileDB from "./fetchfiledb";
 import makeLists, { List } from "./makelists";
 import processRawData, {
@@ -233,7 +232,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<AllocationTypesMasterObject[]>(
+				fetchFileDB<AllocationTypesMasterObject[]>(
 					"allocationTypesMaster",
 					allocationTypesMasterUrl,
 					"csv",
@@ -241,7 +240,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<OrganizationMasterObject[]>(
+				fetchFileDB<OrganizationMasterObject[]>(
 					"organizationMaster",
 					organizationMasterUrl,
 					"csv",
@@ -249,7 +248,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<BeneficiaryTypesMasterObject[]>(
+				fetchFileDB<BeneficiaryTypesMasterObject[]>(
 					"beneficiaryTypesMaster",
 					beneficiaryTypesMasterUrl,
 					"json",
@@ -257,7 +256,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<PooledFundsMasterObject[]>(
+				fetchFileDB<PooledFundsMasterObject[]>(
 					"pooledFundsMaster",
 					pooledFundsMasterUrl,
 					"csv",
@@ -265,7 +264,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<AllocationSourcesMasterObject[]>(
+				fetchFileDB<AllocationSourcesMasterObject[]>(
 					"allocationSourcesMaster",
 					allocationSourcesMasterUrl,
 					"csv",
@@ -273,7 +272,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<OrganizationTypesMasterObject[]>(
+				fetchFileDB<OrganizationTypesMasterObject[]>(
 					"organizationTypesMaster",
 					organizationTypesMasterUrl,
 					"csv",
@@ -281,7 +280,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<SectorsMasterObject[]>(
+				fetchFileDB<SectorsMasterObject[]>(
 					"sectorsMaster",
 					sectorsMasterUrl,
 					"csv",
@@ -289,7 +288,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<GlobalIndicatorsMasterObject[]>(
+				fetchFileDB<GlobalIndicatorsMasterObject[]>(
 					"globalIndicatorsMaster",
 					globalIndicatorsMasterUrl,
 					"csv",
@@ -297,7 +296,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<EmergenciesMasterObject[]>(
+				fetchFileDB<EmergenciesMasterObject[]>(
 					"emergenciesMaster",
 					emergenciesMasterUrl,
 					"csv",
@@ -305,7 +304,7 @@ function useData(
 				setProgress,
 			),
 			trackProgress(
-				fetchFile<CvaMasterObject[]>("cvaMaster", cvaMasterUrl, "json"),
+				fetchFileDB<CvaMasterObject[]>("cvaMaster", cvaMasterUrl, "json"),
 				setProgress,
 			),
 			trackProgress(
