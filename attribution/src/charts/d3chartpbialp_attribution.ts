@@ -17,6 +17,7 @@ type ParallelDatum = {
 	total: number;
 	standard: number;
 	reserve: number;
+	underApproval: number;
 	uniqueKey?: string;
 };
 
@@ -28,7 +29,10 @@ type DonutDatum = {
 	}[];
 };
 
-type AverageDatum = Omit<ParallelDatum, "standard" | "reserve" | "value">;
+type AverageDatum = Omit<
+	ParallelDatum,
+	"standard" | "reserve" | "value" | "underApproval"
+>;
 
 type Datum = {
 	clicked: boolean;
@@ -36,6 +40,7 @@ type Datum = {
 	total: number;
 	standard: number;
 	reserve: number;
+	underApproval: number;
 	parallelData: ParallelDatum[];
 	yPos?: number;
 } & {
@@ -44,6 +49,8 @@ type Datum = {
 	[K in OrgTypes as `reserve-${K}`]: number;
 } & {
 	[K in OrgTypes as `standard-${K}`]: number;
+} & {
+	[K in OrgTypes as `underApproval-${K}`]: number;
 };
 
 type ChartState = {
@@ -95,6 +102,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		percentagePadding = 22,
 		labelTextMaximumLength = 12,
 		underApprovalColor = "#E56A54",
+		paidSymbolSize = 16,
 		highlightColor = "sandybrown",
 		partnerListWithTotal: AllOrgTypes[] = [...partnerList, "total"],
 		formatSIaxes = d3.format("~s"),
@@ -297,14 +305,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 		.append("g")
 		.attr("class", "pbialpgroupYAxisLollipop");
 
-	// window.addEventListener("updatelollipopdata", event => {
-	// 	const data = event.detail;
-	// 	draw(data);
-	// });
-
-	// if (window.lollipopData) {
-	// 	draw(window.lollipopData);
-	// }
+	const paidSymbol = d3.symbol().type(d3.symbolTriangle).size(paidSymbolSize);
 
 	function draw(rawData: AllocationsLollipopObject[]) {
 		let data = processData(rawData);
@@ -372,6 +373,45 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						")",
 				)
 				.attr("pointer-events", "none");
+
+			legendGroup
+				.append("text")
+				.attr("class", "pbialpLegendText")
+				.attr("y", 5)
+				.text("Figures represent: ")
+				.append("tspan")
+				.style("font-weight", "bold")
+				.style("fill", "#666")
+				.text("Total Allocated ")
+				.append("tspan")
+				.style("font-weight", "normal")
+				.text("(")
+				.append("tspan")
+				.style("font-weight", "bold")
+				.style("fill", underApprovalColor)
+				.text("Under Approval")
+				.append("tspan")
+				.style("font-weight", "normal")
+				.style("fill", "#666")
+				.text(") \u2014 ")
+				.append("tspan")
+				.style("font-weight", "bold")
+				.style(
+					"fill",
+					d3.color(highlightColor)?.darker(0.5).formatHex() ??
+						highlightColor,
+				)
+				.text("% of Partner")
+				.append("tspan")
+				.style("font-weight", "normal")
+				.style("fill", "#666")
+				.text(". The arrow (")
+				.append("tspan")
+				.style("fill", underApprovalColor)
+				.text("\u25B2")
+				.append("tspan")
+				.style("fill", "#666")
+				.text(") indicates Under Approval.");
 
 			legendGroup
 				.append("text")
@@ -505,6 +545,21 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				.classed("contributionColorFill", true);
 
 			cbpfGroupEnter
+				.append("path")
+				.attr("class", "pbialpCbpfStandardIndicator")
+				.attr("d", paidSymbol)
+				.style("fill", underApprovalColor)
+				.attr(
+					"transform",
+					"translate(" +
+						lollipopPanel.padding[3] +
+						"," +
+						(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) / 2 +
+							stickHeight) +
+						")",
+				);
+
+			cbpfGroupEnter
 				.append("text")
 				.attr("class", "pbialpCbpfLabel")
 				.attr(
@@ -554,6 +609,48 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				});
 
 			cbpfGroup
+				.select(".pbialpCbpfStandardIndicator")
+				.transition()
+				.duration(duration)
+				.style("opacity", function (d) {
+					const thisUnderApproval =
+						chartState.selectedPartner === "total"
+							? d.underApproval
+							: d[
+									("underApproval-" +
+										chartState.selectedPartner) as OrgTypes
+								];
+					return thisUnderApproval === 0 ? 0 : 1;
+				})
+				.attr("transform", function (d) {
+					const thisUnderApproval =
+						chartState.selectedPartner === "total"
+							? d.underApproval
+							: d[
+									("underApproval-" +
+										chartState.selectedPartner) as OrgTypes
+								];
+					const thisPadding =
+						xScaleLollipop(d[chartState.selectedPartner]) -
+							xScaleLollipop(thisUnderApproval) <
+						lollipopRadius
+							? lollipopRadius - stickHeight / 2
+							: 0;
+					return (
+						"translate(" +
+						Math.min(
+							xScaleLollipop(thisUnderApproval),
+							xScaleLollipop(d[chartState.selectedPartner]),
+						) +
+						"," +
+						(Math.sqrt((4 * paidSymbolSize) / Math.sqrt(3)) / 2 +
+							stickHeight +
+							thisPadding) +
+						")"
+					);
+				});
+
+			cbpfGroup
 				.select(".pbialpCbpfLabel")
 				.transition()
 				.duration(duration)
@@ -565,6 +662,15 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				})
 				.tween("text", function (d) {
 					const node = this as SVGTextElement;
+
+					const thisUnderApproval =
+						chartState.selectedPartner === "total"
+							? d.underApproval
+							: d[
+									("underApproval-" +
+										chartState.selectedPartner) as OrgTypes
+								];
+
 					let thisPartner: ParallelDatum,
 						thisPartnerPercentage: number,
 						thisPartnerRoundPercentage: number;
@@ -581,35 +687,109 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 						d[chartState.selectedPartner],
 					);
 					return function (t) {
-						if (
-							chartState.selectedPartner === "total" ||
-							thisPartnerPercentage === 0
-						) {
-							d3.select(node).text(
-								formatNumberSI(i(t)).replace("G", "B"),
-							);
-						} else {
-							d3.select(node)
-								.text(
-									i(1)
-										? formatNumberSI(i(t)).replace("G", "B")
-										: 0,
-								)
-								.append("tspan")
-								.text(" \u2014 ")
-								.append("tspan")
-								.attr(
-									"fill",
-									d3
-										.color(highlightColor)
-										?.darker(0.5)
-										.formatHex() ?? highlightColor,
-								)
-								.text(
-									thisPartnerRoundPercentage
-										? thisPartnerRoundPercentage + "%"
-										: "<1%",
+						if (thisUnderApproval === 0) {
+							if (
+								chartState.selectedPartner === "total" ||
+								thisPartnerPercentage === 0
+							) {
+								d3.select(node).text(
+									formatNumberSI(i(t)).replace("G", "B"),
 								);
+							} else {
+								d3.select(node)
+									.text(
+										i(1)
+											? formatNumberSI(i(t)).replace(
+													"G",
+													"B",
+												)
+											: 0,
+									)
+									.append("tspan")
+									.text(" \u2014 ")
+									.append("tspan")
+									.attr(
+										"fill",
+										d3
+											.color(highlightColor)
+											?.darker(0.5)
+											.formatHex() ?? highlightColor,
+									)
+									.text(
+										thisPartnerRoundPercentage
+											? thisPartnerRoundPercentage + "%"
+											: "<1%",
+									);
+							}
+						} else {
+							if (
+								chartState.selectedPartner === "total" ||
+								thisPartnerPercentage === 0
+							) {
+								d3.select(node)
+									.text(
+										formatNumberSI(i(t)).replace("G", "B"),
+									)
+									.append("tspan")
+									.attr("class", "pbialpCbpfLabelPercentage")
+									.attr("dy", "-0.5px")
+									.text(" (")
+									.append("tspan")
+									.style("fill", underApprovalColor)
+									.text(
+										d3
+											.formatPrefix(".0", thisUnderApproval)(
+												thisUnderApproval,
+											)
+											.replace("G", "B"),
+									)
+									.append("tspan")
+									.style("fill", "#aaa")
+									.text(")");
+							} else {
+								d3.select(node)
+									.text(
+										i(1)
+											? formatNumberSI(i(t)).replace(
+													"G",
+													"B",
+												)
+											: 0,
+									)
+									.append("tspan")
+									.attr("class", "pbialpCbpfLabelPercentage")
+									.attr("dy", "-0.5px")
+									.text(" (")
+									.append("tspan")
+									.style("fill", underApprovalColor)
+									.text(
+										d3
+											.formatPrefix(".0", thisUnderApproval)(
+												thisUnderApproval,
+											)
+											.replace("G", "B"),
+									)
+									.append("tspan")
+									.style("fill", "#aaa")
+									.text(")")
+									.append("tspan")
+									.attr("dy", null)
+									.style("font-size", "11px")
+									.text(" \u2014 ")
+									.append("tspan")
+									.attr(
+										"fill",
+										d3
+											.color(highlightColor)
+											?.darker(0.5)
+											.formatHex() ?? highlightColor,
+									)
+									.text(
+										thisPartnerRoundPercentage
+											? thisPartnerRoundPercentage + "%"
+											: "<1%",
+									);
+							}
 						}
 					};
 				});
@@ -711,6 +891,14 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 
 				const thisReserveValue = datum[thisReserve];
 
+				const thisUnderApproval =
+					chartState.selectedPartner === "total"
+						? "underApproval"
+						: (("underApproval-" +
+								chartState.selectedPartner) as `underApproval-${OrgTypes}`);
+
+				const thisUnderApprovalValue = datum[thisUnderApproval];
+
 				const tooltipChartTitle =
 					chartState.selectedPartner === "total"
 						? "Allocations by Partner Type and Modality:"
@@ -755,6 +943,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 								) +
 								")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 								formatMoney0Decimals(thisReserveValue) +
+								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='pbialpUnderApprovalHTMLClass'>$" +
+								formatMoney0Decimals(thisUnderApprovalValue) +
 								"</span></div></div><div style='margin-top:6px;'>" +
 								tooltipChartTitle +
 								"<div><div id=pbialpLollipopTooltipChart></div>",
@@ -787,6 +977,8 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 								lollipopTooltipWidth * 0.75 +
 								"px;'><div style='display:flex;flex:0 54%;white-space:pre;'>Allocations:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
 								formatMoney0Decimals(datum[thisTotal]) +
+								"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorDarkerHTMLcolor'>$" +
+								formatMoney0Decimals(thisUnderApprovalValue) +
 								"</span></div></div>",
 						);
 				}
@@ -1793,7 +1985,9 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 							formatPercent(datum.reserve / datum.value) +
 							")</span>:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'><span class='contributionColorHTMLcolor'>$" +
 							formatMoney0Decimals(datum.reserve) +
-							"</span></div></div>",
+							"</span></div><div style='display:flex;flex:0 54%;white-space:pre;'>Under Approval:</div><div style='display:flex;flex:0 46%;justify-content:flex-end;'>$" +
+							formatMoney0Decimals(datum.underApproval) +
+							"</div></div>",
 					);
 
 				createTooltipBar(
@@ -2485,8 +2679,12 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 				tempObject.total += +row.ApprovedBudget;
 				tempObject.standard += +row.ApprovedStandardBudget;
 				tempObject.reserve += +row.ApprovedReserveBudget;
+				tempObject.underApproval += +row.PipelineBudget;
 				tempObject[row.OrganizationType as OrgTypes] +=
 					+row.ApprovedBudget;
+				tempObject[
+					("underApproval-" + row.OrganizationType) as OrgTypes
+				] += +row.PipelineBudget;
 				tempObject[("reserve-" + row.OrganizationType) as OrgTypes] +=
 					+row.ApprovedReserveBudget;
 				tempObject[("standard-" + row.OrganizationType) as OrgTypes] +=
@@ -2498,6 +2696,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					total: +row.ApprovedBudget,
 					standard: +row.ApprovedStandardBudget,
 					reserve: +row.ApprovedReserveBudget,
+					underApproval: +row.PipelineBudget,
 					"International NGO": 0,
 					"National NGO": 0,
 					"UN Agency": 0,
@@ -2510,6 +2709,10 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					"standard-National NGO": 0,
 					"standard-UN Agency": 0,
 					"standard-Red Cross/Crescent Movement": 0,
+					"underApproval-International NGO": 0,
+					"underApproval-National NGO": 0,
+					"underApproval-UN Agency": 0,
+					"underApproval-Red Cross/Crescent Movement": 0,
 					parallelData: [],
 				};
 
@@ -2540,6 +2743,7 @@ export function d3Chart(containerDivNode: HTMLDivElement): Draw {
 					total: cbpf.total,
 					standard: cbpf[`standard-${partner}`],
 					reserve: cbpf[`reserve-${partner}`],
+					underApproval: cbpf[`underApproval-${partner}`],
 				});
 			});
 			roundToOneHundred(cbpf.parallelData);
