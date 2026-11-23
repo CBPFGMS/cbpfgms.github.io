@@ -2,9 +2,11 @@ async function trackProgress<T>(
 	promise: Promise<T>,
 	onSettled: () => void,
 ): Promise<T> {
-	const result = await promise;
-	onSettled();
-	return result;
+	try {
+		return await promise;
+	} finally {
+		onSettled();
+	}
 }
 
 export default trackProgress;

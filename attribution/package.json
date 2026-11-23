@@ -8,8 +8,8 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"copy-to-prod": "cp dist/attribution.js \"../../../OCHA Prod/pfdata-unocha-org/assets/js/\"",
-		"copy-to-stag": "cp dist/attribution.js \"../../cbpf-bi-stag/assets/js/\""
+		"copy-to-prod": "cp dist/attribution.js \"../../../OCHA Prod/pfdata-unocha-org/assets/js/\" && cp dist/attribution.css \"../../../OCHA Prod/pfdata-unocha-org/assets/css/\"",
+		"copy-to-stag": "cp dist/attribution.js \"../../cbpf-bi-stag/assets/js/\" && cp dist/attribution.css \"../../cbpf-bi-stag/assets/css/\""
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",

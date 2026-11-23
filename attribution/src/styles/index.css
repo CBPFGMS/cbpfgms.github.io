@@ -252,6 +252,14 @@ h1 {
 	transform: translateY(-6px);
 }
 
+.keyfigures-card {
+	transition: transform 0.3s ease;
+}
+
+.keyfigures-card:hover {
+	transform: translateY(-6px);
+}
+
 .pbialpgroupXAxisParallel text {
 	font-size: 10px !important;
 }

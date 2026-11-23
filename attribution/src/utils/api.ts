@@ -81,6 +81,27 @@ type ReceiveDataArgs = [
 	AllocationsLollipopObject[],
 ];
 
+type SettledFetches<T extends readonly Promise<unknown>[]> = {
+	values: { -readonly [K in keyof T]: Awaited<T[K]> };
+	errors: unknown[];
+};
+
+async function settleFetches<T extends readonly Promise<unknown>[]>(
+	promises: T,
+): Promise<SettledFetches<T>> {
+	const results = await Promise.allSettled(promises);
+	const errors: unknown[] = [];
+	const values = results.map(result => {
+		if (result.status === "rejected") {
+			errors.push(result.reason);
+			return undefined;
+		}
+		return result.value;
+	}) as SettledFetches<T>["values"];
+
+	return { values, errors };
+}
+
 const { currentYear } = constants;
 
 const baseUrl =
@@ -330,17 +351,19 @@ export async function fetchAppData(
 		staticFetchPromises.length + dynamicFetchPromises.length,
 	);
 
-	const staticPromises = Promise.all(staticFetchPromises);
-	const dynamicPromises = Promise.all(dynamicFetchPromises);
-
-	return Promise.all([staticPromises, dynamicPromises])
-		.then(([staticResults, dynamicContributionsResults]) =>
-			receiveData(staticResults, dynamicContributionsResults),
-		)
-		.catch((error: unknown) => {
-			console.error("Error fetching app data:", error);
-			throw error;
-		});
+	return Promise.all([
+		settleFetches(staticFetchPromises),
+		settleFetches(dynamicFetchPromises),
+	]).then(([staticResults, dynamicResults]) => {
+		const errors = [...staticResults.errors, ...dynamicResults.errors];
+		if (errors.length) {
+			throw new AggregateError(
+				errors,
+				"One or more data sources could not be loaded.",
+			);
+		}
+		return receiveData(staticResults.values, dynamicResults.values);
+	});
 
 	function receiveData(
 		[

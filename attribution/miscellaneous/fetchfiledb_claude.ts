@@ -64,12 +64,18 @@ function openCache(): Promise<CacheDb | null> {
 				}
 			},
 		}).catch(error => {
-			console.warn("IndexedDB is not available; data will not be cached.", error);
+			console.warn(
+				"IndexedDB is not available; data will not be cached.",
+				error,
+			);
 			return null;
 		});
 		return withTimeout(opening, DB_OPEN_TIMEOUT_MS, null);
 	} catch (error) {
-		console.warn("IndexedDB is not available; data will not be cached.", error);
+		console.warn(
+			"IndexedDB is not available; data will not be cached.",
+			error,
+		);
 		return Promise.resolve(null);
 	}
 }
@@ -298,13 +304,13 @@ async function download<T>(
 			throw timer.timedOut
 				? timeoutError(fileName, url, timeoutMs, cause)
 				: new DataSourceError(
-					  fileName,
-					  url,
-					  "interrupted",
-					  "The connection was interrupted while the data was downloading.",
-					  undefined,
-					  cause,
-				  );
+						fileName,
+						url,
+						"interrupted",
+						"The connection was interrupted while the data was downloading.",
+						undefined,
+						cause,
+					);
 		}
 
 		return parseBody<T>(fileName, url, method, text);

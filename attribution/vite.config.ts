@@ -9,7 +9,12 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				entryFileNames: "attribution.js",
-				assetFileNames: "[name][extname]", // No hash, keeps original name
+				assetFileNames: assetInfo => {
+					if (assetInfo.names?.some(name => name.endsWith(".css"))) {
+						return "attribution.css";
+					}
+					return "[name][extname]"; // No hash, keeps original name
+				},
 			},
 		},
 	},

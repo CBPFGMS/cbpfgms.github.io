@@ -108,6 +108,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 				return (
 					<Grid
 						key={index}
+						className="keyfigures-card"
 						size={2}
 						sx={{
 							zIndex: 10,
@@ -121,9 +122,6 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 								borderRadius: "8px",
 								boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
 								overflow: "visible",
-								"&:hover .card-icon": {
-									transform: "scale(1.2)",
-								},
 							}}
 							data-tooltip-id="tooltip"
 							data-tooltip-content={`$${toLocaleFixed(card.value, 0, 2)}`}

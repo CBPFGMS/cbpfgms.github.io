@@ -352,17 +352,16 @@ export async function fetchAppData(
 	return Promise.all([
 		settleFetches(staticFetchPromises),
 		settleFetches(dynamicFetchPromises),
-	])
-		.then(([staticResults, dynamicResults]) => {
-			const errors = [...staticResults.errors, ...dynamicResults.errors];
-			if (errors.length) {
-				throw new AggregateError(
-					errors,
-					"One or more data sources could not be loaded.",
-				);
-			}
-			return receiveData(staticResults.values, dynamicResults.values);
-		});
+	]).then(([staticResults, dynamicResults]) => {
+		const errors = [...staticResults.errors, ...dynamicResults.errors];
+		if (errors.length) {
+			throw new AggregateError(
+				errors,
+				"One or more data sources could not be loaded.",
+			);
+		}
+		return receiveData(staticResults.values, dynamicResults.values);
+	});
 
 	function receiveData(
 		[
