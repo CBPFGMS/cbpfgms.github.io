@@ -1,7 +1,4 @@
 import Grid from "@mui/material/Grid2";
-import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import GradientPaper from "./GradientPaper";
 import { InSelectionData } from "../utils/processdatasummary";
 import Selectors from "./Selectors";
 import Statuses from "./Statuses";
@@ -55,64 +52,39 @@ function FiltersContainer({
 		<Grid
 			container
 			spacing={2}
+			mt={2}
 		>
-			<Paper
-				elevation={0}
-				style={{
-					width: "100%",
-					padding: "1em",
-					backgroundColor: "#f5f8ff",
-					borderRadius: "8px",
-					position: "relative",
-				}}
+			<Grid
+				ref={menusRef}
+				size={12}
+				mb={2}
 			>
-				<Box
-					style={{
-						width: "100%",
-						height: "100%",
-						overflow: "hidden",
-						position: "absolute",
-						borderRadius: "8px",
-						boxSizing: "border-box",
-						top: "0px",
-						left: "0px",
-						pointerEvents: "none",
-					}}
-				>
-					<GradientPaper />
-				</Box>
-				<Grid
-					ref={menusRef}
-					size={12}
-					mb={3}
-				>
-					<Selectors
-						// year={year}
-						// setYear={setYear}
-						fund={fund}
-						setFund={setFund}
-						// allocationSource={allocationSource}
-						// setAllocationSource={setAllocationSource}
-						// allocationType={allocationType}
-						// setAllocationType={setAllocationType}
-						inSelectionData={inSelectionData}
-						tranche={tranche}
-						setTranche={setTranche}
-					/>
-				</Grid>
-				<Grid
-					size={12}
-					display={"flex"}
-					justifyContent={"flex-start"}
-				>
-					<Statuses
-						dataStatuses={dataStatuses}
-						dataStatusesBeneficiaries={dataStatusesBeneficiaries}
-						implementationStatus={implementationStatus}
-						setImplementationStatus={setImplementationStatus}
-					/>
-				</Grid>
-			</Paper>
+				<Selectors
+					// year={year}
+					// setYear={setYear}
+					fund={fund}
+					setFund={setFund}
+					// allocationSource={allocationSource}
+					// setAllocationSource={setAllocationSource}
+					// allocationType={allocationType}
+					// setAllocationType={setAllocationType}
+					inSelectionData={inSelectionData}
+					tranche={tranche}
+					setTranche={setTranche}
+				/>
+			</Grid>
+			<Grid
+				size={12}
+				display={"flex"}
+				justifyContent={"flex-start"}
+			>
+				<Statuses
+					dataStatuses={dataStatuses}
+					dataStatusesBeneficiaries={dataStatusesBeneficiaries}
+					implementationStatus={implementationStatus}
+					setImplementationStatus={setImplementationStatus}
+				/>
+			</Grid>
 		</Grid>
 	);
 }
