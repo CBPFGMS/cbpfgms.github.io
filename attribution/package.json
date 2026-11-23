@@ -8,7 +8,7 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"copy-to-prod": "cp dist/attribution.js \"../../../OCHA Prod/cbpfdata-unocha-org/assets/js/\"",
+		"copy-to-prod": "cp dist/attribution.js \"../../../OCHA Prod/pfdata-unocha-org/assets/js/\"",
 		"copy-to-stag": "cp dist/attribution.js \"../../cbpf-bi-stag/assets/js/\""
 	},
 	"dependencies": {
