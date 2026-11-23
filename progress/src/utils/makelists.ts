@@ -61,8 +61,8 @@ export type ProjectDetails = {
 	fund: number;
 	allocationSource: number;
 	allocationType: FundWithAllocType;
-	endDate: Date;
-	approvalDate: Date;
+	endDate: Date | null;
+	approvalDate: Date | null;
 	projectStatusId: number;
 	reportType: ReportType;
 };

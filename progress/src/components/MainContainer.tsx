@@ -354,9 +354,21 @@ function MainContainer({ defaultYear }: MainContainerProps) {
 				dataStatusesBeneficiaries={dataStatusesBeneficiaries}
 			/>
 			<Box
-				mt={4}
-				mb={4}
-			/>
+				mt={5}
+				mb={5}
+				sx={{
+					display: "flex",
+					width: "100%",
+				}}
+			>
+				<Box
+					sx={{
+						flex: 1,
+						height: "1px",
+						background: "#ccc",
+					}}
+				/>
+			</Box>
 			<ChartsContainer
 				dataSummary={dataSummary}
 				targetedAndReachedTotal={targetedAndReachedTotal}

@@ -7,7 +7,9 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"copy-to-prod": "cp dist/progress-fasttrack.js \"../../../OCHA Prod/cbpfdata-unocha-org/assets/js/\" && cp dist/progress-fasttrack.css \"../../../OCHA Prod/cbpfdata-unocha-org/assets/css/\"",
+		"copy-to-stag": "cp dist/progress-fasttrack.js \"../../cbpf-bi-stag/assets/js/\" && cp dist/progress-fasttrack.css \"../../cbpf-bi-stag/assets/css/\""
 	},
 	"dependencies": {
 		"@emotion/react": "^11.11.4",

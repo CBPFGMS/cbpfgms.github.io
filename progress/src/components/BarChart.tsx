@@ -30,6 +30,7 @@ import {
 } from "../utils/processdownload";
 import { FundWithAllocType, GenderAndAge } from "../utils/processrawdata";
 import DownloadAndImageContainer from "./DownloadAndImageContainer";
+import Alert from "@mui/material/Alert";
 
 type BarChartProps = {
 	originalData: DatumBarChart[];
@@ -251,89 +252,111 @@ function BarChart({
 					{<span style={{ color: colors.unColor }}> reached)</span>}
 				</Typography>
 			</Box>
-			<Box
-				display={"flex"}
-				flexDirection={"row"}
-				mt={2}
-				mb={2}
-				alignItems={"center"}
-				justifyContent={"center"}
-			>
-				<FormGroup row>
-					{beneficiaryCategories.map((category, i) => (
-						<FormControlLabel
-							key={i}
-							control={
-								<Checkbox
-									checked={beneficiaryCategoryArray.includes(
-										category,
-									)}
-									onChange={() => handleOnChange(category)}
-									name={category}
-									color="primary"
-								/>
-							}
-							label={
-								<Typography
-									style={{
-										fontSize: "0.9em",
-										fontWeight: 500,
-									}}
-									sx={{ marginLeft: -0.5 }}
-								>
-									{capitalizeString(category)}
-								</Typography>
-							}
-						/>
-					))}
-				</FormGroup>
-			</Box>
-			<Box
-				display={"flex"}
-				flexDirection={"column"}
-				width={"95%"}
-				marginLeft={"3%"}
-				alignItems={"center"}
-				gap={2}
-				marginTop={2}
-			>
+			{data.length === 0 ? (
 				<Box
-					mb={-2}
-					style={{
+					mt={4}
+					mb={4}
+					sx={{
 						display: "flex",
-						flexDirection: "row",
-						alignItems: "center",
-						justifyContent: "flex-end",
-						textAlign: "right",
-						width: "100%",
+						justifyContent: "center",
 					}}
 				>
-					<Typography
-						variant="body2"
-						fontSize={12}
-						style={{
-							color: "#222",
-							border: "none",
-							fontStyle: "italic",
-							letterSpacing: "-0.05em",
-						}}
+					<Alert
+						severity="warning"
+						sx={{ width: "fit-content" }}
 					>
-						Reached as %<br />
-						of targeted
-					</Typography>
+						No data for the selected filters
+					</Alert>
 				</Box>
-				{data.map(d => (
-					<BarChartRow
-						key={d.type}
-						type={d.type}
-						targeted={d.targeted}
-						reached={d.reached}
-						maxValue={maxValue}
-						list={lists[listProperty]}
-						chartType={chartType}
-					/>
-				))}
-			</Box>
+			) : (
+				<>
+					<Box
+						display={"flex"}
+						flexDirection={"row"}
+						mt={2}
+						mb={2}
+						alignItems={"center"}
+						justifyContent={"center"}
+					>
+						<FormGroup row>
+							{beneficiaryCategories.map((category, i) => (
+								<FormControlLabel
+									key={i}
+									control={
+										<Checkbox
+											checked={beneficiaryCategoryArray.includes(
+												category,
+											)}
+											onChange={() =>
+												handleOnChange(category)
+											}
+											name={category}
+											color="primary"
+										/>
+									}
+									label={
+										<Typography
+											style={{
+												fontSize: "0.9em",
+												fontWeight: 500,
+											}}
+											sx={{ marginLeft: -0.5 }}
+										>
+											{capitalizeString(category)}
+										</Typography>
+									}
+								/>
+							))}
+						</FormGroup>
+					</Box>
+					<Box
+						display={"flex"}
+						flexDirection={"column"}
+						width={"95%"}
+						marginLeft={"3%"}
+						alignItems={"center"}
+						gap={2}
+						marginTop={2}
+					>
+						<Box
+							mb={-2}
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								alignItems: "center",
+								justifyContent: "flex-end",
+								textAlign: "right",
+								width: "100%",
+							}}
+						>
+							<Typography
+								variant="body2"
+								fontSize={12}
+								style={{
+									color: "#222",
+									border: "none",
+									fontStyle: "italic",
+									letterSpacing: "-0.05em",
+								}}
+							>
+								Reached as %<br />
+								of targeted
+							</Typography>
+						</Box>
+						{data.map(d => (
+							<BarChartRow
+								key={d.type}
+								type={d.type}
+								targeted={d.targeted}
+								reached={d.reached}
+								maxValue={maxValue}
+								list={lists[listProperty]}
+								chartType={chartType}
+							/>
+						))}
+					</Box>
+				</>
+			)}
 		</Container>
 	);
 }

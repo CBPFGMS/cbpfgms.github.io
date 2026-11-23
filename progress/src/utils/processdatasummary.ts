@@ -241,6 +241,9 @@ function processDataSummary({
 			}
 
 			datum.emergenciesData.forEach(emergency => {
+				if (!datum.approvalDate) {
+					return;
+				}
 				const approvalYear = datum.approvalDate.getFullYear();
 				const thisDate =
 					approvalYear === datum.year

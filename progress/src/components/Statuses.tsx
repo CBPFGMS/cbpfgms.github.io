@@ -19,6 +19,7 @@ import toLocaleFixed from "../utils/localefixed";
 import formatSIFloat from "../utils/formatsi";
 import Snack from "./Snack";
 import constants from "../utils/constants";
+import { projectStatusMaster } from "../utils/constants";
 
 type StatusesProps = {
 	dataStatuses: DataStatuses;
@@ -37,6 +38,7 @@ type StatusProps = {
 	reached: number;
 	total: number;
 	implementationStatus: ImplementationStatuses[];
+	cardClassName: "amber" | "blue";
 };
 
 type StatusesDescription = {
@@ -44,12 +46,19 @@ type StatusesDescription = {
 };
 
 const statusesDescription: StatusesDescription = {
+	"Submission of Proposal": "Submission of Proposal",
+	"Under Review": "Under Review",
+	"Under Final Approval": "Under Final Approval",
 	"Under Implementation": "Under Implementation",
 	"Final Reporting": "Final Reporting",
 	"Project Closure": "Project Closure",
 };
 
-const { opacityValue } = constants;
+const {
+	opacityValue,
+	submissionAndUnderApprovalProjects,
+	implementationAndReportingProjects,
+} = constants;
 
 function Statuses({
 	dataStatuses,
@@ -57,11 +66,29 @@ function Statuses({
 	implementationStatus,
 	setImplementationStatus,
 }: StatusesProps) {
+	console.log(dataStatuses);
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const total = Object.values(dataStatuses).reduce(
 		(acc, curr) => acc + curr,
 		0,
+	);
+
+	const dataStatusesArray = Object.entries(dataStatuses) as [
+		keyof typeof dataStatuses,
+		number,
+	][];
+
+	const submissionAndUnderApproval = dataStatusesArray.filter(d =>
+		submissionAndUnderApprovalProjects.some(
+			statusNumber => projectStatusMaster[statusNumber] === d[0],
+		),
+	);
+
+	const implementationAndReporting = dataStatusesArray.filter(d =>
+		implementationAndReportingProjects.some(
+			statusNumber => projectStatusMaster[statusNumber] === d[0],
+		),
 	);
 
 	function handleClick(status: ImplementationStatuses) {
@@ -92,12 +119,15 @@ function Statuses({
 				size={12}
 				display={"flex"}
 				alignItems={"center"}
-				justifyContent={"flex-start"}
+				justifyContent={"center"}
 			>
 				<Typography
-					variant={"h6"}
 					style={{
-						color: "darkslategray",
+						color: "var(--ocha-blue)",
+						fontWeight: 700,
+						textAlign: "center",
+						fontSize: "1.5rem",
+						fontFamily: "Montserrat",
 					}}
 				>
 					Implementation Statuses
@@ -119,36 +149,148 @@ function Statuses({
 			</Grid>
 			<Grid
 				container
+				justifyContent={"flex-end"}
+			>
+				<Box className="status-legend">
+					<Box className="status-legend-pill status-lp-amber">
+						{/* <span className="status-lp-dot status-lpd-amber"></span> */}
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-html={
+								"<div style='text-align: left;'>These are the statuses in the 'Submission and Under Approval' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Submission of Proposal</li><li>Under Review</li><li>Under Final Approval</li></ul></div>"
+							}
+							data-tooltip-place="top"
+							style={{
+								fontSize: "16px",
+								alignSelf: "flex-start",
+							}}
+						/>
+						Submission and under approval
+					</Box>
+					<Box className="status-legend-pill status-lp-blue">
+						{/* <span className="status-lp-dot status-lpd-blue"></span> */}
+						<InfoIcon
+							data-tooltip-id="tooltip"
+							data-tooltip-html={
+								"<div style='text-align: left;'>These are the statuses in the 'Implementation and Reporting' category:<ul style='margin-top: 10px; padding-left: 20px; list-style-type: disc;'><li>Under Implementation</li><li>Final Reporting</li><li>Project Closure</li></ul></div>"
+							}
+							data-tooltip-place="top"
+							style={{
+								fontSize: "16px",
+								alignSelf: "flex-start",
+							}}
+						/>
+						Implementation and reporting
+					</Box>
+				</Box>
+			</Grid>
+			<Grid
+				container
 				spacing={1}
 				sx={{
 					width: "100%",
 				}}
 			>
-				{(
-					Object.entries(dataStatuses) as [
-						keyof typeof dataStatuses,
-						number,
-					][]
-				).map(
-					([status, statusValue]) =>
-						statusValue > 0 && (
-							<Status
-								key={status}
-								handleClick={handleClick}
-								status={status}
-								statusValue={statusValue}
-								targeted={
-									dataStatusesBeneficiaries[status]
-										?.targeted ?? 0
-								}
-								reached={
-									dataStatusesBeneficiaries[status]
-										?.reached ?? 0
-								}
-								total={total}
-								implementationStatus={implementationStatus}
-							/>
-						),
+				{submissionAndUnderApproval.length > 0 && (
+					<>
+						<Box sx={{ width: "100%" }}>
+							<Box className="status-section-divider">
+								<Box className="status-divider-label">
+									Submission and under approval
+								</Box>
+								<Box className="status-divider-line status-dline-amber"></Box>
+							</Box>
+						</Box>
+						<Grid
+							container
+							mb={2}
+							style={{
+								display: "inline-flex",
+								width:
+									submissionAndUnderApproval.length >= 3
+										? "100%"
+										: `${(submissionAndUnderApproval.length / 3) * 100}%`,
+							}}
+							// alignItems={"stretch"}
+						>
+							{submissionAndUnderApproval.map(
+								([status, statusValue]) =>
+									statusValue > 0 && (
+										<Status
+											key={status}
+											handleClick={handleClick}
+											status={status}
+											statusValue={statusValue}
+											targeted={
+												dataStatusesBeneficiaries[
+													status
+												]?.targeted ?? 0
+											}
+											reached={
+												dataStatusesBeneficiaries[
+													status
+												]?.reached ?? 0
+											}
+											total={total}
+											implementationStatus={
+												implementationStatus
+											}
+											cardClassName="amber"
+										/>
+									),
+							)}
+						</Grid>
+					</>
+				)}
+				{implementationAndReporting.length > 0 && (
+					<>
+						<Box sx={{ width: "100%" }}>
+							<Box className="status-section-divider">
+								<Box className="status-divider-label">
+									Implementation and reporting
+								</Box>
+								<Box className="status-divider-line status-dline-blue"></Box>
+							</Box>
+						</Box>
+						<Grid
+							container
+							style={{
+								display: "inline-flex",
+								width:
+									implementationAndReporting.length >= 3
+										? "100%"
+										: `${(implementationAndReporting.length / 3) * 100}%`,
+							}}
+							// alignItems={"stretch"}
+						>
+							{implementationAndReporting.map(
+								([status, statusValue]) =>
+									statusValue > 0 && (
+										<Status
+											key={status}
+											handleClick={handleClick}
+											status={status}
+											statusValue={statusValue}
+											targeted={
+												dataStatusesBeneficiaries[
+													status
+												]?.targeted ?? 0
+											}
+											reached={
+												dataStatusesBeneficiaries[
+													status
+												]?.reached ?? 0
+											}
+											total={total}
+											implementationStatus={
+												implementationStatus
+											}
+											cardClassName="blue"
+										/>
+									),
+							)}
+						</Grid>
+					</>
 				)}
 			</Grid>
 		</Box>
@@ -163,6 +305,7 @@ function Status({
 	reached,
 	total,
 	implementationStatus,
+	cardClassName,
 }: StatusProps) {
 	const scale = scaleLinear<number, number>()
 		.domain([0, total])
@@ -178,10 +321,16 @@ function Status({
 					marginRight: 1.5,
 					flex: "1 1 auto",
 					borderRadius: "8px",
-					background: statusSelected ? "#fffefc" : "#fafafa",
+					background: statusSelected
+						? cardClassName === "amber"
+							? "#fffdf8"
+							: "#f7fbff"
+						: "#fafafa",
 					border: statusSelected
-						? "1px solid #fac775"
-						: "1px solid #e1e1e1",
+						? cardClassName === "amber"
+							? "1px solid #fac775"
+							: "1px solid #b5d4f4"
+						: "1px solid #ddd",
 					boxShadow: statusSelected
 						? "0 0 6px rgba(0, 0, 0, 0.2)"
 						: "none",
@@ -233,7 +382,7 @@ function Status({
 						>
 							<Box
 								onClick={() => handleClick(status)}
-								className={`status-remove-btn status-rb-amber`}
+								className={`status-remove-btn status-rb-${cardClassName}`}
 								display={"flex"}
 								justifyContent={"center"}
 							>
@@ -252,7 +401,7 @@ function Status({
 							data-tooltip-id="tooltip"
 							data-tooltip-content={`${status}: $${statusValue.toLocaleString()}`}
 							data-tooltip-place="top"
-							className={`status-cv-amber`}
+							className={`status-cv-${cardClassName}`}
 							style={{
 								fontSize: "43px",
 								fontWeight: 500,
@@ -348,9 +497,11 @@ function Status({
 						)}).`}
 						data-tooltip-place="top"
 					>
-						<Box className={`status-prog-track status-pt-amber`}>
+						<Box
+							className={`status-prog-track status-pt-${cardClassName}`}
+						>
 							<Box
-								className={`status-prog-fill status-pf-amber`}
+								className={`status-prog-fill status-pf-${cardClassName}`}
 								style={{
 									width: scale(statusValue) + "%",
 									transitionProperty: "width",
@@ -358,7 +509,9 @@ function Status({
 								}}
 							></Box>
 						</Box>
-						<Box className={`status-pct status-pct-amber`}>
+						<Box
+							className={`status-pct status-pct-${cardClassName}`}
+						>
 							<Typography fontWeight={500}>
 								<NumberAnimator
 									number={parseFloat(

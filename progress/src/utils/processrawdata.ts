@@ -28,7 +28,7 @@ const {
 	beneficiariesSplitOrder,
 	beneficiaryCategories,
 	reportTypes,
-	implementationAndReportingProjects,
+	// implementationAndReportingProjects,
 	excludedProjectStatusCodes,
 } = constants;
 
@@ -48,8 +48,8 @@ export type Datum = {
 	organizationId: number;
 	allocationType: FundWithAllocType;
 	allocationTypeId: number;
-	endDate: Date;
-	approvalDate: Date;
+	endDate: Date | null;
+	approvalDate: Date | null;
 	budget: number;
 	budgetGBVPlanned: number;
 	budgetGBVReached: number;
@@ -598,15 +598,15 @@ function processRawData({
 			return;
 		}
 
-		//Removing any project with statuses that are not in the implementationAndReportingProjects list
 		const thisStatusId = projectStatusMappingProjSumV4[row.ProcessSTatusID];
-		if (
-			!(implementationAndReportingProjects as readonly number[]).includes(
-				thisStatusId,
-			)
-		) {
-			return;
-		}
+		//Removing any project with statuses that are not in the implementationAndReportingProjects list
+		// if (
+		// 	!(implementationAndReportingProjects as readonly number[]).includes(
+		// 		thisStatusId,
+		// 	)
+		// ) {
+		// 	return;
+		// }
 
 		const parsedRow = projectSummaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
@@ -645,13 +645,13 @@ function processRawData({
 				);
 			}
 
-			if (!thisSectorData) {
-				warnProjectNotFound(
-					row.ChfProjectCode,
-					row,
-					"Project not found in sectors data",
-				);
-			}
+			// if (!thisSectorData) {
+			// 	warnProjectNotFound(
+			// 		row.ChfProjectCode,
+			// 		row,
+			// 		"Project not found in sectors data",
+			// 	);
+			// }
 
 			//In case we need to check what projects are missing from emergencies data
 			// if (!thisEmergenciesData) {
@@ -662,12 +662,7 @@ function processRawData({
 			// 	);
 			// }
 
-			if (
-				thisAllocationType &&
-				thisOrganization &&
-				thisStatusId &&
-				thisSectorData
-			) {
+			if (thisAllocationType && thisOrganization && thisStatusId) {
 				yearsSet.add(thisAllocationType.AllocationYear);
 				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
@@ -691,8 +686,10 @@ function processRawData({
 					fund: row.PooledFundId,
 					allocationSource: thisAllocationType.AllocationSourceId,
 					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
-					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
+					endDate: row.EndDate ? new Date(row.EndDate) : null,
+					approvalDate: row.PrjApprDate
+						? new Date(row.PrjApprDate)
+						: null,
 					projectStatusId: thisStatusId,
 					reportType: row.RptCode ?? 0,
 				});
@@ -712,12 +709,14 @@ function processRawData({
 					organizationId: thisOrganization.GlobalUniqueId,
 					allocationType: `${row.PooledFundId}-${row.AllocationtypeId}`,
 					allocationTypeId: row.AllocationtypeId,
-					endDate: new Date(row.EndDate),
-					approvalDate: new Date(row.PrjApprDate),
+					endDate: row.EndDate ? new Date(row.EndDate) : null,
+					approvalDate: row.PrjApprDate
+						? new Date(row.PrjApprDate)
+						: null,
 					budget: row.Budget,
 					projectStatus: thisStatus,
 					projectStatusId: thisStatusId,
-					sectorData: thisSectorData.sectors,
+					sectorData: thisSectorData ? thisSectorData.sectors : [],
 					emergenciesData: thisEmergenciesData ?? [],
 					reached: generateBeneficiariesObjectSummary(row, "reached"),
 					targeted: generateBeneficiariesObjectSummary(
@@ -934,17 +933,11 @@ function populateTotalBeneficiariesData<K extends number | FundWithAllocType>(
 				);
 			}
 
-			if (
-				(
-					implementationAndReportingProjects as readonly number[]
-				).includes(thisStatus)
-			) {
-				(statusesPerFundBDT2[row.PFId] ??= new Set()).add(thisStatus);
-				if (row.AllocationTypeId) {
-					(statusesPerAllocationTypeBDT2[
-						`${row.PFId}-${row.AllocationTypeId}`
-					] ??= new Set()).add(thisStatus);
-				}
+			(statusesPerFundBDT2[row.PFId] ??= new Set()).add(thisStatus);
+			if (row.AllocationTypeId) {
+				(statusesPerAllocationTypeBDT2[
+					`${row.PFId}-${row.AllocationTypeId}`
+				] ??= new Set()).add(thisStatus);
 			}
 		}
 	});
@@ -954,25 +947,13 @@ function populateTotalBeneficiariesData<K extends number | FundWithAllocType>(
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
 			);
-			const retainedStatuses = statuses.filter(status =>
-				implementationAndReportingProjects.some(
-					implementationStatus =>
-						implementationStatus.toString() === status,
-				),
-			);
 
-			statuses.forEach(status => {
-				if (!retainedStatuses.includes(status)) {
-					delete identifierData[Number(status)];
-				}
-			});
-
-			if (!retainedStatuses.length) {
+			if (!statuses.length) {
 				delete yearData[identifier];
 				return;
 			}
 
-			retainedStatuses.forEach(status => {
+			statuses.forEach(status => {
 				const statusData = identifierData[Number(status)];
 				if (statusData && identifierData.all) {
 					capTargetedAndReached(statusData, identifierData.all, [
@@ -1068,25 +1049,13 @@ function populateTotalBeneficiariesByPartnerData<
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
 			);
-			const retainedStatuses = statuses.filter(status =>
-				implementationAndReportingProjects.some(
-					implementationStatus =>
-						implementationStatus.toString() === status,
-				),
-			);
 
-			statuses.forEach(status => {
-				if (!retainedStatuses.includes(status)) {
-					delete identifierData[Number(status)];
-				}
-			});
-
-			if (!retainedStatuses.length) {
+			if (!statuses.length) {
 				delete yearData[identifier]; // no Number() needed
 				return;
 			}
 
-			retainedStatuses.forEach(status => {
+			statuses.forEach(status => {
 				const statusData = identifierData[Number(status)];
 				if (!statusData) return;
 				statusData.forEach(datum => {
@@ -1189,25 +1158,13 @@ function populateTotalBeneficiariesBySectorData<
 			const statuses = Object.keys(identifierData).filter(
 				status => status !== "all",
 			);
-			const retainedStatuses = statuses.filter(status =>
-				implementationAndReportingProjects.some(
-					implementationStatus =>
-						implementationStatus.toString() === status,
-				),
-			);
 
-			statuses.forEach(status => {
-				if (!retainedStatuses.includes(status)) {
-					delete identifierData[Number(status)];
-				}
-			});
-
-			if (!retainedStatuses.length) {
+			if (!statuses.length) {
 				delete yearData[identifier]; // no Number() needed
 				return;
 			}
 
-			retainedStatuses.forEach(status => {
+			statuses.forEach(status => {
 				const statusData = identifierData[Number(status)];
 				if (!statusData) return;
 				statusData.forEach(datum => {

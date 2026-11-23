@@ -20,7 +20,10 @@ type ShortNamesList = {
 };
 
 const shortNamesList: ShortNamesList = {
-	"Final Reporting": "Final Rep.\u00A0",
+	"Submission of Proposal": "Sub. Proposal\u00A0",
+	"Under Review": "Under Review\u00A0",
+	"Under Final Approval": "Final Approval\u00A0",
+	"Final Reporting": "Final Report\u00A0",
 	"Under Implementation": "Under Impl.\u00A0",
 	"Project Closure": "Proj. Closure\u00A0",
 };
@@ -45,7 +48,7 @@ function DropdownStatus({ value, setValue, names }: DropdownStatusProps) {
 		if (isAllSelected) {
 			isAllSelected = eventArray.length !== names.length;
 			const missingItems: ImplementationStatuses[] = names.filter(
-				d => !eventArray.includes(d)
+				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
 		} else {

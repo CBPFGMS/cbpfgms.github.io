@@ -6,6 +6,9 @@ const constants = {
 	// 	"Financially Closed",
 	// ],
 	implementationStatuses: [
+		"Submission of Proposal",
+		"Under Review",
+		"Under Final Approval",
 		"Under Implementation",
 		"Final Reporting",
 		"Project Closure",
@@ -127,6 +130,7 @@ const constants = {
 	},
 	limitScaleValueInPixels: 90,
 	cvaPopoverWidth: 760,
+	submissionAndUnderApprovalProjects: [1, 2, 3],
 	implementationAndReportingProjects: [4, 5, 6],
 	opacityValue: 0.3,
 	disclaimerWarningColor: "#e07b00",
