@@ -1,3 +1,7 @@
+:root {
+	--donor-color: #418FDE;
+}
+
 #attributionroot {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
@@ -155,10 +159,10 @@ h1 {
 	padding: 0;
 }
 .attrib-pt-amber {
-	background: #fac775;
+	background: #ddd;
 }
 .attrib-pt-blue {
-	background: #b5d4f4;
+	background: #ddd;
 }
 .attrib-prog-track {
 	flex: 1;
@@ -289,7 +293,7 @@ h1 {
 	transition: border-color 0.25s;
 }
 .pbialpbuttonsPartners:hover {
-	border-color: #646cff;
+	border-color: color-mix(in srgb, var(--donor-color) 75%, black);
 	background-color: #f1f3f5;
 }
 .pbialpbuttonsPartners:focus,
@@ -298,7 +302,7 @@ h1 {
 }
 
 .pbialpbuttonsPartners.selected {
-	background-color: var(--ocha-blue);
+	background-color: color-mix(in srgb, var(--donor-color) 80%, black);
 	color: white;
 }
 
@@ -313,4 +317,39 @@ h1 {
 	button {
 		background-color: #f9f9f9;
 	}
+}
+
+.attrib-dl-donor {
+	color: color-mix(in srgb, var(--donor-color) 70%, black);
+}
+.attrib-dline-donor {
+	background: color-mix(in srgb, var(--donor-color) 50%, white);
+}
+.attrib-cl-donor {
+	color: color-mix(in srgb, var(--donor-color) 70%, black);
+}
+.attrib-rb-donor {
+	color: color-mix(in srgb, var(--donor-color) 70%, black);
+	border-color: color-mix(in srgb, var(--donor-color) 50%, white) !important;
+	background: color-mix(in srgb, var(--donor-color) 12%, white);
+}
+.attrib-cv-donor {
+	color: color-mix(in srgb, var(--donor-color) 35%, black);
+}
+.attrib-pf-donor {
+	background: var(--donor-color);
+}
+.attrib-pt-donor {
+	background: #ddd;
+}
+.attrib-pct-donor {
+	color: color-mix(in srgb, var(--donor-color) 50%, black);
+}
+.attrib-lp-donor {
+	background: color-mix(in srgb, var(--donor-color) 12%, white);
+	color: color-mix(in srgb, var(--donor-color) 50%, black);
+	border: 1px solid color-mix(in srgb, var(--donor-color) 50%, white);
+}
+.attrib-lpd-donor {
+	background: color-mix(in srgb, var(--donor-color) 80%, white);
 }

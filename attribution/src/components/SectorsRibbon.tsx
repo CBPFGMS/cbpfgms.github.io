@@ -56,7 +56,7 @@ function SectorsRibbon({
 							alignItems: "flex-start",
 							padding: "8px",
 							background: "#f8f9fa",
-							borderRadius: "4px",
+							borderRadius: "5px",
 							flexDirection: "column",
 							justifyContent: "space-between",
 							cursor: "pointer",
@@ -148,7 +148,8 @@ function SectorsRibbon({
 								sx={{
 									width: "100%",
 									height: "6px",
-									background: "#ccc",
+									background: "#ddd",
+									borderRadius: "3px",
 								}}
 							>
 								<Box
@@ -157,6 +158,7 @@ function SectorsRibbon({
 											datum.percentage * 100,
 										)}%`,
 										height: "100%",
+										borderRadius: "inherit",
 										background: "#146eb4",
 									}}
 								/>

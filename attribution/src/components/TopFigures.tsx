@@ -11,6 +11,7 @@ import { constants } from "../utils/constants";
 import GradientPaper from "./GradientPaper";
 import AbsoluteIcon from "./AbsoluteIcon";
 import PercentageIcon from "./PercentageIcon";
+import colors from "../utils/colors";
 
 const { disclaimerWarningColor, disclaimerText } = constants;
 
@@ -173,7 +174,9 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 									border: "0.5px solid rgba(0,0,0,0.1)",
 									borderLeft: isTargeted
 										? "3px solid var(--ocha-amber)"
-										: "3px solid var(--ocha-blue)",
+										: isReached
+											? "3px solid var(--ocha-blue)"
+											: `3px solid ${colors.donorColor}`,
 								}}
 								{...tooltipProps}
 							>
@@ -193,7 +196,9 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 											fontWeight: 700,
 											color: isTargeted
 												? "var(--ocha-amber)"
-												: "var(--ocha-blue)",
+												: isReached
+													? "var(--ocha-blue)"
+													: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
 											fontFamily: "Montserrat",
 											lineHeight: 1.1,
 										}}

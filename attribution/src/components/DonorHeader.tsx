@@ -58,7 +58,7 @@ function DonorHeader({ donor, lists, flagSrc, faviconFlag }: DonorHeaderProps) {
 					color: "#212529bf",
 				}}
 			>
-				Donor attribution overview
+				Attribution overview
 			</Typography>
 		</Box>
 	);

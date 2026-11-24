@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import colors from "../utils/colors";
 
 function SectionDivider({ title }: { title: string }) {
 	return (
@@ -15,9 +16,10 @@ function SectionDivider({ title }: { title: string }) {
 		>
 			<Typography
 				sx={{
-					fontSize: "18px",
+					fontSize: "20px",
 					fontWeight: "500",
 					whiteSpace: "nowrap",
+					color: `color-mix(in srgb, ${colors.donorColor} 50%, black)`,
 				}}
 			>
 				{title}
@@ -26,7 +28,7 @@ function SectionDivider({ title }: { title: string }) {
 				sx={{
 					flex: 1,
 					height: "1px",
-					background: "#b5d4f4",
+					background: colors.donorColor,
 				}}
 			/>
 		</Box>

@@ -122,7 +122,7 @@ function PartnersTableHead({
 										"&.Mui-active": {
 											color:
 												header === sortingCriterion
-													? colors.unColor
+													? `color-mix(in srgb, ${colors.donorColor} 75%, black)`
 													: null,
 											fontWeight:
 												header === sortingCriterion

@@ -13,6 +13,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import colors from "../utils/colors";
 import truncatePercentage from "../utils/truncatepercentage";
 import toLocaleFixed from "../utils/localefixed";
+import DonorChip from "./DonorChip";
 
 const { USCode, firstNSFTYear } = constants;
 
@@ -101,90 +102,108 @@ function TopSelectors({
 			ref={stickyRef}
 			sx={{
 				display: "flex",
-				flexDirection: "row",
-				justifyContent: "space-between",
-				alignItems: "center",
+				flexDirection: "column",
 				width: "100%",
 				position: "sticky",
 				top: -1,
 				backgroundColor: "rgba(255,255,255,0.95)",
+				borderLeft: "5px solid rgba(255,255,255,0.95)",
+				borderRight: "5px solid rgba(255,255,255,0.95)",
+				marginLeft: "-5px",
+				marginRight: "-5px",
 				zIndex: 1200,
-				borderBottom: isSticky ? "1px solid #ccc" : "none",
+				paddingBottom: 4,
+				paddingTop: 3,
 				boxShadow: isSticky
-					? "0px 10px 10px -10px rgba(0,0,0,0.2)"
+					? "0px 18px 18px -18px rgba(0,0,0,0.2)"
 					: "none",
-				paddingBottom: 2,
-				paddingTop: 2,
 			}}
 		>
-			<ToggleButtonGroup
-				value={year}
-				exclusive
-				sx={buttonsStyle}
-				onChange={handleChangeYear}
+			<Box
+				sx={{
+					display: "flex",
+					flexDirection: "row",
+					justifyContent: "space-between",
+					alignItems: "center",
+					width: "100%",
+				}}
 			>
-				{years.map(year => (
-					<ToggleButton
-						value={year}
-						key={year}
-					>
-						{year}
-					</ToggleButton>
-				))}
-			</ToggleButtonGroup>
-			{isSticky && (
-				<DropdownFunds
-					funds={funds}
-					setValue={setFunds}
-					allFunds={Array.from(
-						inContributionsDataLists.fundsPerYear[year],
-					)}
-					namesList={lists.fundNames}
-				/>
-			)}
-			{isSticky && (
-				<Box
-					sx={{ display: "flex", alignItems: "center", gap: "0.4em" }}
-				>
-					<img
-						src={flagSrc}
-						width="48px"
-						style={{
-							borderRadius: "0.3rem",
-							boxShadow: "0 0.5rem 0.5rem rgba(0, 0, 0, 0.1)",
-						}}
-						alt={`${lists.donorGMSNames[donor]} flag`}
-					/>
-					<Chip
-						data-tooltip-id="tooltip"
-						data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(attributions.global.donor, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(attributions.global.total, 0, 2)} donated for those funds.`}
-						data-tooltip-place="bottom"
-						icon={
-							<LanguageIcon sx={{ color: "#fff !important" }} />
-						}
-						label={`${truncatedPercentageForDisplay}% ($${formatSIFloat(attributions.global.donor)})`}
-						size="medium"
-						sx={{
-							color: "#fff",
-							backgroundColor: colors.unColorChipLighter,
-							fontWeight: 600,
-							fontSize: "1rem",
-							height: 36,
-						}}
-					/>
-				</Box>
-			)}
-			{donor !== USCode && year >= firstNSFTYear && (
 				<ToggleButtonGroup
-					value={hasUS}
+					value={year}
 					exclusive
 					sx={buttonsStyle}
-					onChange={handleChangeHasUS}
+					onChange={handleChangeYear}
 				>
-					<ToggleButton value={false}>Without U.S.</ToggleButton>
-					<ToggleButton value={true}>With U.S.</ToggleButton>
+					{years.map(year => (
+						<ToggleButton
+							value={year}
+							key={year}
+						>
+							{year}
+						</ToggleButton>
+					))}
 				</ToggleButtonGroup>
-			)}
+				{isSticky && (
+					<DropdownFunds
+						funds={funds}
+						setValue={setFunds}
+						allFunds={Array.from(
+							inContributionsDataLists.fundsPerYear[year],
+						)}
+						namesList={lists.fundNames}
+					/>
+				)}
+				{donor !== USCode && year >= firstNSFTYear && (
+					<ToggleButtonGroup
+						value={hasUS}
+						exclusive
+						sx={buttonsStyle}
+						onChange={handleChangeHasUS}
+					>
+						<ToggleButton value={false}>Without U.S.</ToggleButton>
+						<ToggleButton value={true}>With U.S.</ToggleButton>
+					</ToggleButtonGroup>
+				)}
+				{isSticky && (
+					<Box
+						sx={{
+							display: "flex",
+							alignItems: "center",
+							gap: "0.4em",
+						}}
+					>
+						<img
+							src={flagSrc}
+							width="48px"
+							style={{
+								borderRadius: "0.3rem",
+								boxShadow: "0 0.5rem 0.5rem rgba(0, 0, 0, 0.1)",
+							}}
+							alt={`${lists.donorGMSNames[donor]} flag`}
+						/>
+						<Chip
+							data-tooltip-id="tooltip"
+							data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(attributions.global.donor, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(attributions.global.total, 0, 2)} donated for those funds.`}
+							data-tooltip-place="bottom"
+							icon={
+								<LanguageIcon
+									sx={{ color: "#fff !important" }}
+								/>
+							}
+							label={`${truncatedPercentageForDisplay}% ($${formatSIFloat(attributions.global.donor)})`}
+							size="medium"
+							sx={{
+								color: "#fff",
+								backgroundColor: colors.donorColor,
+								fontWeight: 600,
+								fontSize: "1rem",
+								height: 36,
+							}}
+						/>
+					</Box>
+				)}
+			</Box>
+			<DonorChip isSticky={isSticky} />
 		</Box>
 	);
 }

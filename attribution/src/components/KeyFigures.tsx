@@ -14,6 +14,7 @@ import EqualityIcon from "../assets/EqualityIcon";
 import ProtectionIcon from "../assets/ProtectionIcon";
 import WloIcon from "../assets/WloIcon";
 import SvgIcon from "@mui/material/SvgIcon";
+import colors from "../utils/colors";
 
 type KeyFiguresProps = {
 	data: DataKeyFigures;
@@ -154,7 +155,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 							</Box>
 							<Box
 								sx={{
-									background: "var(--ocha-blue)",
+									background: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
 									borderRadius: "12px 12px 0 0",
 									minHeight: "78px",
 									display: "flex",
@@ -186,7 +187,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 									style={{
 										fontSize: "2.2rem",
 										fontWeight: 700,
-										color: "var(--ocha-blue)",
+										color: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
 										lineHeight: 1,
 										marginBottom: "8px",
 									}}

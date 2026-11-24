@@ -79,10 +79,23 @@
 						style="
 							font-size: 1em;
 							line-height: 1.6;
-							color: #1f3a5f;
-							background: #eef5fc;
-							border: 1px solid #cfe2f5;
-							border-left: 4px solid #418fde;
+							color: color-mix(
+								in srgb,
+								var(--donor-color) 50%,
+								black
+							);
+							background: color-mix(
+								in srgb,
+								var(--donor-color) 5%,
+								white
+							);
+							border: 1px solid
+								color-mix(
+									in srgb,
+									var(--donor-color) 25%,
+									white
+								);
+							border-left: 4px solid var(--donor-color);
 							border-radius: 8px;
 							padding: 14px 18px;
 							margin: 16px 12px;

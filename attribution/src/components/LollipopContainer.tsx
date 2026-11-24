@@ -68,7 +68,7 @@ function LollipopContainer({
 						/>
 						<Typography
 							style={{
-								color: "var(--ocha-blue)",
+								color: "#444",
 								fontWeight: 700,
 								textAlign: "center",
 								fontSize: "1.8rem",

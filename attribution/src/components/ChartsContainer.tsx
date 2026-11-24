@@ -8,6 +8,7 @@ import PictogramChart from "./PictogramChart";
 import BarChart from "./BarChart";
 import type { DatumBarChart } from "../utils/processdatabarchart";
 import type { TargetedAndReachedTotal } from "../utils/processdatatotalben";
+import colors from "../utils/colors";
 
 type ChartsContainerProps = {
 	targetedAndReachedTotal: TargetedAndReachedTotal;
@@ -39,7 +40,7 @@ function ChartsContainer({
 				style={{
 					width: "100%",
 					padding: "1em",
-					backgroundColor: "#f5f8ff",
+					backgroundColor: `color-mix(in srgb, ${colors.donorColor} 3.5%, white)`,
 					borderRadius: "8px",
 					position: "relative",
 				}}
