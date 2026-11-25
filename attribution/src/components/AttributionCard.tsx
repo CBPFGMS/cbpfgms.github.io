@@ -7,6 +7,7 @@ import formatSIFloat from "../utils/formatsi";
 import toLocaleFixed from "../utils/localefixed";
 import { constants } from "../utils/constants";
 import truncatePercentage from "../utils/truncatepercentage";
+import LaunchIcon from "@mui/icons-material/Launch";
 
 type AttributionCardsProps = {
 	donorValue: number;
@@ -135,6 +136,28 @@ function AttributionCards({
 								{isTheOnlySelectedFund && !isTheOnlyCard
 									? "Add all"
 									: "Keep Only"}
+							</Box>
+							<Box
+								component={"a"}
+								href={`fundattribution.html?fund=${fund}`}
+								data-tooltip-id="tooltip"
+								data-tooltip-content={`Click to navigate to ${fundName} attribution page`}
+								data-tooltip-place="bottom"
+								className={`attrib-remove-btn attrib-rb-blue`}
+								sx={{
+									display: "flex",
+									justifyContent: "center",
+									opacity: isTheOnlyCard ? 0.5 : 1,
+									filter: isTheOnlyCard
+										? "grayscale(100%)"
+										: "none",
+									pointerEvents: isTheOnlyCard
+										? "none"
+										: "auto",
+									padding: "3px",
+								}}
+							>
+								<LaunchIcon fontSize="small" />
 							</Box>
 						</Box>
 						<Box
