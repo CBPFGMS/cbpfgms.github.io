@@ -1,0 +1,61 @@
+export const constants = {
+	rootElementId: "fundattributionroot",
+	buildVersion: "v1.0",
+	fundType: 1,
+	currentYear: new Date().getFullYear(),
+	beneficiariesSplitOrder: [3, 5, 6, 2, 4], //IDP|Refugees|Returnees|Host Communities|Others
+	beneficiaryCategories: ["women", "girls", "men", "boys"],
+	beneficiariesStatuses: ["targeted", "reached"],
+	pageName: "CBPFAttribution", //same name of donor attribution page, so we share files
+	localStorageTime: 60 * 60 * 1000, //1 hour
+	consoleStyle: "background-color: #0d6cb6; color: white; padding: 2px;",
+	isProdSite: window.location.hostname === "pfdata.unocha.org",
+	charts: [
+		"genderAndAge",
+		"organizations",
+		"sectors",
+		"partners",
+		"regions",
+		"locations",
+	],
+	partnersHeader: ["partner", "sector", "budget", "projects", "funds"],
+	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
+	partnerBarMaxWidth: 82,
+	partnerBarHeight: 24,
+	limitScaleValueInPixels: 90,
+	disclaimerWarningColor: "#e07b00",
+	disclaimerText:
+		"Disclaimer: Beneficiary figures are calculated using a hybrid methodology designed to minimize double counting across activities and locations. As a result, totals may not fully reconcile when applying different filters or comparing across views.",
+	totalBeneficiairesText:
+		"Calculation of unique beneficiaries are underway, will be published soon.",
+	USCode: 102,
+	firstNSFTYear: 2026,
+	USProjectsString: "-NSFT-",
+	sortByOptions: ["attribution", "donation", "total", "alphabetical"],
+	partnersSplitOrder: [3, 2, 1, 4],
+	hasDisabledIds: [7, 8, 9],
+	hasGBVIds: [1, 2, 3],
+	hasGenderEqualityIds: [5, 6, 25],
+	localizationMarkers: ["1.1", "1.2", "1.4"],
+	cardOpacity: 0.4,
+	minWidth: 1024,
+	percentageDecimalPlaces: 2,
+	minimumPercentageValueForDisplay: 0.1,
+	minimumPercentageValue: 0.01,
+	implementationAndReportingProjects: [4, 5, 6],
+} as const;
+
+export const projectStatusMappingProjSumV4: Record<number, number> = {
+	1: 1,
+	2: 1,
+	3: 2,
+	4: 3,
+	5: 4,
+	6: 4,
+	7: 5,
+	8: 6,
+	13: 4,
+	14: 4,
+	15: 5,
+	16: 6,
+};

@@ -1,0 +1,241 @@
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import formatSIFloat from "../utils/formatsi";
+import NumberAnimator from "./NumberAnimator";
+import { scaleLinear, format } from "d3";
+import AdsClickIcon from "@mui/icons-material/AdsClick";
+import DoneIcon from "@mui/icons-material/Done";
+import colors from "../utils/colors";
+import type { ListObj } from "../utils/makelists";
+import type { Charts } from "./MainContainer";
+import { clustersIconsData } from "../assets/clustericons";
+import { constants } from "../utils/constants";
+
+export type BarChartRowProps = {
+	type: number;
+	targeted: number;
+	reached: number;
+	maxValue: number;
+	list: ListObj;
+	chartType: Charts;
+};
+
+const { limitScaleValueInPixels } = constants;
+
+function BarChartRow({
+	list,
+	maxValue,
+	reached,
+	targeted,
+	type,
+	chartType,
+}: BarChartRowProps) {
+	const scale = scaleLinear<number>()
+		.domain([0, maxValue || 1])
+		.range([0, 100]);
+
+	return (
+		<Box
+			style={{
+				display: "flex",
+				flexDirection: "row",
+				alignItems: "center",
+				width: "100%",
+			}}
+		>
+			<Box
+				style={{
+					flex: chartType === "sectors" ? "0 26% " : "0 22% ",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "flex-end",
+					textAlign: "right",
+					overflow: "hidden",
+				}}
+			>
+				<Typography
+					variant="body2"
+					sx={{
+						color: "#444",
+						border: "none",
+						fontSize: 13,
+						fontWeight: 400,
+					}}
+				>
+					{list[type]}
+				</Typography>
+				{chartType === "sectors" && (
+					<img
+						src={clustersIconsData[type]}
+						style={{
+							width: "32px",
+							height: "32px",
+							marginLeft: "12px",
+							marginRight: "0px",
+							padding: "4px",
+						}}
+					/>
+				)}
+			</Box>
+			<Box
+				style={{
+					flex: chartType === "sectors" ? `0 62%` : `0 66%`,
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+				}}
+			>
+				{[targeted, reached].map((d, i) => (
+					<Box
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							width: "100%",
+							alignItems: "center",
+						}}
+						key={i}
+						{...{
+							"data-tooltip-id": "tooltip",
+							"data-tooltip-content": `${
+								i ? "Reached" : "Targeted"
+							}: ${
+								d && d < 1
+									? "less than 1 person"
+									: format(",.0f")(d)
+							}`,
+							"data-tooltip-place": "top",
+						}}
+					>
+						<Box
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								justifyContent: "flex-end",
+								alignItems: "baseline",
+								marginRight: "12px",
+								marginLeft:
+									chartType === "sectors" ? "12px" : "4px",
+							}}
+						>
+							<Typography
+								variant="body2"
+								sx={{
+									fontWeight: 400,
+									border: "none",
+									display: "flex",
+									alignItems: "center",
+								}}
+							>
+								{i ? (
+									<DoneIcon
+										style={{
+											fontSize: 18,
+											marginLeft: 3,
+											color: "#777",
+											opacity: 0.6,
+										}}
+									/>
+								) : (
+									<AdsClickIcon
+										style={{
+											fontSize: 18,
+											marginLeft: 3,
+											color: "#777",
+											opacity: 0.6,
+										}}
+									/>
+								)}
+							</Typography>
+						</Box>
+						<Box
+							style={{
+								marginTop: "2px",
+								marginBottom: "2px",
+								display: "flex",
+								alignItems: "center",
+								width: "100%",
+							}}
+						>
+							<Box
+								style={{
+									width: scale(d) + "%",
+									minWidth: "1px",
+									height: "18px",
+									transitionProperty: "width",
+									transitionDuration: "0.75s",
+									display: "flex",
+									alignItems: "center",
+									backgroundColor: i
+										? colors.unColor
+										: colors.contrastColorLighter,
+								}}
+							>
+								<Typography
+									sx={{
+										fontSize: 12,
+										fontWeight: 700,
+										position: "relative",
+										left:
+											scale(d) < limitScaleValueInPixels
+												? "3px"
+												: "-3px",
+										marginLeft:
+											scale(d) < limitScaleValueInPixels
+												? "100%"
+												: "auto",
+										color:
+											scale(d) < limitScaleValueInPixels
+												? "#444"
+												: "#fff",
+									}}
+								>
+									{d && d < 1 ? (
+										"<1"
+									) : (
+										<>
+											<NumberAnimator
+												number={parseFloat(
+													formatSIFloat(d),
+												)}
+												type="decimal"
+											/>
+											{isNaN(+formatSIFloat(d).slice(-1))
+												? formatSIFloat(d).slice(-1)
+												: ""}
+										</>
+									)}
+								</Typography>
+							</Box>
+						</Box>
+					</Box>
+				))}
+			</Box>
+			<Box
+				style={{
+					flex: "0 12%",
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Typography
+					variant="body2"
+					style={{
+						fontSize: 12,
+						color: "#444",
+						border: "none",
+						fontStyle: "italic",
+					}}
+				>
+					<NumberAnimator
+						number={~~((reached * 100) / targeted)}
+						type="integer"
+					/>
+					%
+				</Typography>
+			</Box>
+		</Box>
+	);
+}
+
+export default BarChartRow;

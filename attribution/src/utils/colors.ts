@@ -12,7 +12,7 @@ const colors = {
 	inactiveBackground: "#4a5f78",
 	unColorChip: "#0c4783",
 	unColorChipLighter: "#185fa5",
-	donorColor: "#9063CD",
+	donorColor: "#9063CD", //IMPORTANT: change index.css as well
 } as const;
 
 export default colors;

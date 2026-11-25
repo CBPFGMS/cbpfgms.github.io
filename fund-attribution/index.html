@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link
+			rel="icon"
+			type="image/x-icon"
+			href="/favicon.ico"
+		/>
+		<link
+			rel="stylesheet"
+			crossorigin="anonymous"
+			href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i"
+		/>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+			integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<title>Attributions</title>
+	</head>
+	<body
+		style="
+			margin: 0;
+			display: flex;
+			min-height: 100vh;
+			flex-direction: column;
+		"
+	>
+		<div
+			style="
+				display: flex;
+				background-color: #ffffff;
+				justify-content: start;
+				align-items: center;
+				flex-direction: column;
+				flex-grow: 1;
+				width: 100%;
+			"
+		>
+			<div
+				style="
+					font-family: Montserrat;
+					margin-top: 48px;
+					margin-bottom: 48px;
+					max-width: 1320px;
+					display: flex;
+					flex-grow: 1;
+					flex-direction: column;
+				"
+			>
+				<div>
+					<p
+						style="
+							font-size: 0.95em;
+							line-height: 1.4;
+							color: #444;
+							padding: 14px 22px;
+							margin: 16px 12px;
+						"
+					>
+						This dashboard illustrates the results of donors'
+						contributions to Humanitarian Funds by attributing a
+						proportional share of each donor's contribution towards
+						allocations. Please note that the dashboard is based on
+						live data, and attribution calculations are therefore
+						subject to change throughout the year as contribution
+						and allocation data evolves. Please hover over the
+						figures for explanatory notes.
+					</p>
+
+					<p
+						style="
+							font-size: 1em;
+							line-height: 1.6;
+							color: color-mix(
+								in srgb,
+								var(--donor-color) 50%,
+								black
+							);
+							background: color-mix(
+								in srgb,
+								var(--donor-color) 5%,
+								white
+							);
+							border: 1px solid
+								color-mix(
+									in srgb,
+									var(--donor-color) 25%,
+									white
+								);
+							border-left: 4px solid var(--donor-color);
+							border-radius: 8px;
+							padding: 14px 18px;
+							margin: 16px 12px;
+						"
+					>
+						The results presented are estimates attributed
+						proportionally based on the donor's share of total
+						contributions to the pooled fund(s). Contributions are
+						pooled and allocated collectively according to
+						humanitarian priorities; they are not earmarked to, or
+						directly traceable to, specific projects, activities,
+						beneficiaries, or results. Accordingly, the figures
+						should be understood as the donor's proportional share
+						of collective results enabled by the pooled fund, rather
+						than results directly attributable to that donor.
+					</p>
+				</div>
+				<div
+					style="
+						background-color: #ffffff;
+						padding-top: 2em;
+						padding-bottom: 4em;
+						flex-grow: 1;
+						display: flex;
+						width: 100%;
+					"
+					id="attributionroot"
+					data-startyear="2024"
+					data-fundtype="1"
+				></div>
+			</div>
+		</div>
+		<script
+			type="module"
+			src="/src/main.tsx"
+		></script>
+	</body>
+</html>

@@ -1,0 +1,47 @@
+{
+	"name": "fund-attribution",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "eslint .",
+		"preview": "vite preview",
+		"copy-to-prod-inactive": "cp dist/fund-attribution.js \"../../../OCHA Prod/pfdata-unocha-org/assets/js/\" && cp dist/fund-attribution.css \"../../../OCHA Prod/pfdata-unocha-org/assets/css/\"",
+		"copy-to-stag": "cp dist/fund-attribution.js \"../../cbpf-bi-stag/assets/js/\" && cp dist/fund-attribution.css \"../../cbpf-bi-stag/assets/css/\""
+	},
+	"dependencies": {
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
+		"@mui/icons-material": "^7.3.8",
+		"@mui/material": "^9.1.2",
+		"@react-spring/web": "^10.1.2",
+		"d3": "^7.9.0",
+		"idb": "^8.0.3",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"react-error-boundary": "^6.1.2",
+		"react-tooltip": "^6.0.8",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.29.7",
+		"@eslint/js": "^10.0.1",
+		"@rolldown/plugin-babel": "^0.2.3",
+		"@types/babel__core": "^7.20.5",
+		"@types/d3": "^7",
+		"@types/node": "^24.13.2",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.3",
+		"babel-plugin-react-compiler": "^1.0.0",
+		"eslint": "^10.6.0",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-react-refresh": "^0.5.3",
+		"globals": "^17.7.0",
+		"typescript": "~6.0.2",
+		"typescript-eslint": "^8.62.0",
+		"vite": "^8.1.1"
+	}
+}

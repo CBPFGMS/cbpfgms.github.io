@@ -1,5 +1,6 @@
 :root {
-	--donor-color: #9063CD;
+	--donor-color: #9063cd;
+	/* IMPORTANT: change colors.ts as well */
 }
 
 #attributionroot {
