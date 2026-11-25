@@ -234,7 +234,7 @@
 			chartTitleDefault = "Sankey diagram",
 			vizNameQueryString = "sankey",
 			contributionsDataUrl =
-				"https://cbpfgms.github.io/pfbi-data/contributionSummarySankey.csv",
+				"https://pfbi-webjob-contribution-prod-g7b3h4b9ftfahnbk.eastus2-01.azurewebsites.net/download/loadContribution/contributionSummarySankey.csv",
 			launchedAllocationsDataUrl =
 				"https://cbpfapi.unocha.org/vo2/odata/AllocationTypes?PoolfundCodeAbbrv=&$format=csv",
 			masterDonorsUrl =
