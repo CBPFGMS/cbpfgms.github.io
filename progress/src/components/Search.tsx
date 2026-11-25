@@ -99,7 +99,9 @@ function Search({
 									}
 								: {
 										whiteSpace: "normal",
-										padding: "1px",
+										display: "flex",
+										alignItems: "flex-start",
+										padding: "10px 4px",
 									}
 						}
 					>
@@ -113,7 +115,18 @@ function Search({
 								!inSelectionData[dataProperty].has(option)
 							}
 						/>
-						{namesList[option]}
+						<span
+							style={{
+								fontSize: "0.875rem",
+								lineHeight: 1.3,
+								display: "-webkit-box",
+								WebkitBoxOrient: "vertical",
+								WebkitLineClamp: 3,
+								overflow: "hidden",
+							}}
+						>
+							{namesList[option]}
+						</span>
 					</li>
 				)}
 				style={{ maxHeight: dropdownHeight }}

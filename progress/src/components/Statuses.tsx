@@ -66,7 +66,6 @@ function Statuses({
 	implementationStatus,
 	setImplementationStatus,
 }: StatusesProps) {
-	console.log(dataStatuses);
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
 	const total = Object.values(dataStatuses).reduce(
@@ -81,13 +80,15 @@ function Statuses({
 
 	const submissionAndUnderApproval = dataStatusesArray.filter(d =>
 		submissionAndUnderApprovalProjects.some(
-			statusNumber => projectStatusMaster[statusNumber] === d[0],
+			statusNumber =>
+				projectStatusMaster[statusNumber] === d[0] && d[1] > 0,
 		),
 	);
 
 	const implementationAndReporting = dataStatusesArray.filter(d =>
 		implementationAndReportingProjects.some(
-			statusNumber => projectStatusMaster[statusNumber] === d[0],
+			statusNumber =>
+				projectStatusMaster[statusNumber] === d[0] && d[1] > 0,
 		),
 	);
 
@@ -203,41 +204,36 @@ function Statuses({
 						</Box>
 						<Grid
 							container
+							spacing={1.5}
 							mb={2}
 							style={{
 								display: "inline-flex",
-								width:
-									submissionAndUnderApproval.length >= 3
-										? "100%"
-										: `${(submissionAndUnderApproval.length / 3) * 100}%`,
+								width: "100%",
 							}}
 							// alignItems={"stretch"}
 						>
 							{submissionAndUnderApproval.map(
-								([status, statusValue]) =>
-									statusValue > 0 && (
-										<Status
-											key={status}
-											handleClick={handleClick}
-											status={status}
-											statusValue={statusValue}
-											targeted={
-												dataStatusesBeneficiaries[
-													status
-												]?.targeted ?? 0
-											}
-											reached={
-												dataStatusesBeneficiaries[
-													status
-												]?.reached ?? 0
-											}
-											total={total}
-											implementationStatus={
-												implementationStatus
-											}
-											cardClassName="amber"
-										/>
-									),
+								([status, statusValue]) => (
+									<Status
+										key={status}
+										handleClick={handleClick}
+										status={status}
+										statusValue={statusValue}
+										targeted={
+											dataStatusesBeneficiaries[status]
+												?.targeted ?? 0
+										}
+										reached={
+											dataStatusesBeneficiaries[status]
+												?.reached ?? 0
+										}
+										total={total}
+										implementationStatus={
+											implementationStatus
+										}
+										cardClassName="amber"
+									/>
+								),
 							)}
 						</Grid>
 					</>
@@ -254,40 +250,35 @@ function Statuses({
 						</Box>
 						<Grid
 							container
+							spacing={1.5}
 							style={{
 								display: "inline-flex",
-								width:
-									implementationAndReporting.length >= 3
-										? "100%"
-										: `${(implementationAndReporting.length / 3) * 100}%`,
+								width: "100%",
 							}}
 							// alignItems={"stretch"}
 						>
 							{implementationAndReporting.map(
-								([status, statusValue]) =>
-									statusValue > 0 && (
-										<Status
-											key={status}
-											handleClick={handleClick}
-											status={status}
-											statusValue={statusValue}
-											targeted={
-												dataStatusesBeneficiaries[
-													status
-												]?.targeted ?? 0
-											}
-											reached={
-												dataStatusesBeneficiaries[
-													status
-												]?.reached ?? 0
-											}
-											total={total}
-											implementationStatus={
-												implementationStatus
-											}
-											cardClassName="blue"
-										/>
-									),
+								([status, statusValue]) => (
+									<Status
+										key={status}
+										handleClick={handleClick}
+										status={status}
+										statusValue={statusValue}
+										targeted={
+											dataStatusesBeneficiaries[status]
+												?.targeted ?? 0
+										}
+										reached={
+											dataStatusesBeneficiaries[status]
+												?.reached ?? 0
+										}
+										total={total}
+										implementationStatus={
+											implementationStatus
+										}
+										cardClassName="blue"
+									/>
+								),
 							)}
 						</Grid>
 					</>
@@ -318,7 +309,6 @@ function Status({
 			<Card
 				variant="outlined"
 				sx={{
-					marginRight: 1.5,
 					flex: "1 1 auto",
 					borderRadius: "8px",
 					background: statusSelected

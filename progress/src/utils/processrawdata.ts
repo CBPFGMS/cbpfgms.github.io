@@ -645,13 +645,13 @@ function processRawData({
 				);
 			}
 
-			// if (!thisSectorData) {
-			// 	warnProjectNotFound(
-			// 		row.ChfProjectCode,
-			// 		row,
-			// 		"Project not found in sectors data",
-			// 	);
-			// }
+			if (!thisSectorData) {
+				warnProjectNotFound(
+					row.ChfProjectCode,
+					row,
+					"Project not found in sectors data",
+				);
+			}
 
 			//In case we need to check what projects are missing from emergencies data
 			// if (!thisEmergenciesData) {
