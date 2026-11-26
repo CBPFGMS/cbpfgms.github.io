@@ -38,7 +38,7 @@ import processContributionsData, {
 	type InContributionsDataLists,
 } from "./processcontributionsdata";
 import { constants } from "./constants";
-import warnInvalidSchema from "./warninvalid";
+import warnInvalidSchema, { simpleWarn } from "./warninvalid";
 import generateRange from "./generateRange";
 
 export type AppData = {
@@ -138,26 +138,25 @@ const pooledFundsMasterUrl = baseUrl + "MstPooledFund.csv",
 
 export async function fetchAppData(
 	startYear: number | null,
-	selectedDonor: number,
+	selectedFund: number,
 ): Promise<AppData> {
-	if (!startYear) {
-		startYear = currentYear;
-	}
+	const effectiveStartYear = startYear ?? currentYear;
 
 	const contributionsBaseUrl =
-		"https://pfbi-eastus2-api-site.azurewebsites.net/donor_attribution/api/public/donors?";
+		"https://pfbi-eastus2-api-site.azurewebsites.net/donor_attribution/api/public/contributions?";
 
-	const yearsRangeArray = startYear
-		? generateRange(startYear, currentYear, 1)
+	const yearsRangeArray = effectiveStartYear
+		? generateRange(effectiveStartYear, currentYear, 1)
 		: [currentYear];
 
 	const contributionsUrlsWithoutUS = yearsRangeArray.map(
 		year =>
-			`${contributionsBaseUrl}year=${year}&donorId=${selectedDonor}&excludeUsa=1`,
+			`${contributionsBaseUrl}year=${year}&pooledFundId=${selectedFund}&excludeUsa=1`,
 	);
 
 	const contributionsUrlsWithUS = yearsRangeArray.map(
-		year => `${contributionsBaseUrl}year=${year}&donorId=${selectedDonor}`,
+		year =>
+			`${contributionsBaseUrl}year=${year}&pooledFundId=${selectedFund}`,
 	);
 
 	const combinedContributionsUrls = [
@@ -168,7 +167,7 @@ export async function fetchAppData(
 	const dynamicFetchPromises = combinedContributionsUrls.map((url, index) =>
 		trackProgress(
 			fetchFileDB<ContributionsJson>(
-				`donor${selectedDonor}_contributions${index}`,
+				`fund${selectedFund}_contributions${index}`,
 				url,
 				"json",
 			),
@@ -427,6 +426,8 @@ export async function fetchAppData(
 			allocationsByYearAndFundWithUS,
 			allocationsByYearAndFundWithoutUS,
 			lists,
+			selectedFund,
+			effectiveStartYear,
 		});
 
 		return {
@@ -439,11 +440,22 @@ export async function fetchAppData(
 			totalBeneficiariesBySectorData,
 			localizationDataWithUS,
 			localizationDataWithoutUS,
-			projectClusterData: parseProjectClusterData(projectClusterOneGms),
-			allocationsLollipopData:
-				parseAllocationsLollipopData(allocationsLollipop),
+			projectClusterData: parseProjectClusterData(
+				projectClusterOneGms,
+				selectedFund,
+				effectiveStartYear,
+			),
+			allocationsLollipopData: parseAllocationsLollipopData(
+				allocationsLollipop,
+				selectedFund,
+				effectiveStartYear,
+				lists,
+			),
 			allocationsLollipopWithoutUSData: parseAllocationsLollipopData(
 				allocationsLollipopWithoutUS,
+				selectedFund,
+				effectiveStartYear,
+				lists,
 			),
 			lists,
 		};
@@ -453,12 +465,22 @@ export async function fetchAppData(
 //TODO: Instead of passing the cluster data to the component, pass it to processRawData and process it there, adding to the allocationsData.
 function parseProjectClusterData(
 	rows: ProjectClusterOneGmsObject[],
+	selectedFund: number,
+	effectiveStartYear: number,
 ): ProjectClusterOneGmsObject[] {
 	const parsedRows: ProjectClusterOneGmsObject[] = [];
 
 	rows.forEach(row => {
 		const parsedRow = projectClusterOneGmsObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			//keep just the fund of the attribution page. Also, remove year data before the selected start year
+			if (
+				row.PooledFundId !== selectedFund &&
+				row.AllocationYear < effectiveStartYear
+			) {
+				return;
+			}
+
 			parsedRows.push(parsedRow.data);
 		} else {
 			warnInvalidSchema(
@@ -472,14 +494,35 @@ function parseProjectClusterData(
 	return parsedRows;
 }
 
+//TODO: Instead of passing the lollipo data to the component, pass it to processRawData and process it there, adding to the allocationsData.
 function parseAllocationsLollipopData(
 	rows: AllocationsLollipopObject[],
+	selectedFund: number,
+	effectiveStartYear: number,
+	lists: List,
 ): AllocationsLollipopObject[] {
 	const parsedRows: AllocationsLollipopObject[] = [];
 
 	rows.forEach(row => {
 		const parsedRow = allocationsLollipopObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			const thisFundId = lists.fundIdsByName[row.PooledFundName];
+
+			if (!thisFundId) {
+				simpleWarn(
+					`Fund with name ${row.PooledFundName} not found in the funds master`,
+				);
+				return;
+			}
+
+			//keep just the fund of the attribution page. Also, remove year data before the selected start year
+			if (
+				thisFundId !== selectedFund ||
+				row.AllocationYear < effectiveStartYear
+			) {
+				return;
+			}
+
 			parsedRows.push(parsedRow.data);
 		} else {
 			warnInvalidSchema(

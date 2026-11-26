@@ -24,12 +24,10 @@ const {
 	hasDisabledIds,
 	hasGBVIds,
 	hasGenderEqualityIds,
-	firstNSFTYear,
 	implementationAndReportingProjects,
 } = constants;
 
 export type AllocationsDatum = {
-	fund: number;
 	year: number;
 	projectCode: string;
 	projectId: number;
@@ -50,7 +48,6 @@ export type AllocationsDatum = {
 export type AllocationsData = AllocationsDatum[];
 
 type LocalizationDatum = {
-	fund: number;
 	year: number;
 	budget: number;
 };
@@ -82,7 +79,6 @@ export type InAllocationsDataLists = {
 	sectors: Set<number>;
 	allocationTypes: Set<number>;
 	allocationSources: Set<number>;
-	funds: Set<number>;
 	organizationTypes: Set<number>;
 	organizations: Set<number>;
 	sectorsPerYear: Map<number, Set<number>>;
@@ -106,6 +102,8 @@ type ProcessRawDataParams = {
 	totalBeneficiariesBySectorWithoutUs: TotalBeneficiariesBySectorObject[];
 	allocationsByYearAndFundWithUS: AllocationsByYearAndFundObject[];
 	allocationsByYearAndFundWithoutUS: AllocationsByYearAndFundObject[];
+	selectedFund: number;
+	effectiveStartYear: number;
 };
 
 type TargetedAndReached = {
@@ -120,7 +118,7 @@ export type TotalBeneficiariesBreakdown = {
 };
 
 export type TotalBeneficiariesData = {
-	[year: number]: { [fundId: number]: TotalBeneficiariesBreakdown };
+	[year: number]: TotalBeneficiariesBreakdown;
 };
 
 type TotalBeneficiariesByPartnerBreakdown = {
@@ -130,9 +128,7 @@ type TotalBeneficiariesByPartnerBreakdown = {
 };
 
 export type TotalBeneficiariesByPartnerData = {
-	[year: number]: {
-		[fundId: number]: TotalBeneficiariesByPartnerBreakdown[];
-	};
+	[year: number]: TotalBeneficiariesByPartnerBreakdown[];
 };
 
 type TotalBeneficiariesBySectorBreakdown = {
@@ -142,7 +138,7 @@ type TotalBeneficiariesBySectorBreakdown = {
 };
 
 export type TotalBeneficiariesBySectorData = {
-	[year: number]: { [fundId: number]: TotalBeneficiariesBySectorBreakdown[] };
+	[year: number]: TotalBeneficiariesBySectorBreakdown[];
 };
 
 function processRawData({
@@ -157,6 +153,8 @@ function processRawData({
 	totalBeneficiariesBySectorWithoutUs,
 	allocationsByYearAndFundWithUS,
 	allocationsByYearAndFundWithoutUS,
+	selectedFund,
+	effectiveStartYear,
 }: ProcessRawDataParams): {
 	allocationsData: AllocationsData;
 	totalBeneficiariesData: TotalBeneficiariesData;
@@ -183,7 +181,6 @@ function processRawData({
 	const allocationSourcesSet: Set<
 		InAllocationsDataListsValues["allocationSources"]
 	> = new Set();
-	const fundsSet: Set<InAllocationsDataListsValues["funds"]> = new Set();
 	const organizationTypesSet: Set<
 		InAllocationsDataListsValues["organizationTypes"]
 	> = new Set();
@@ -201,6 +198,14 @@ function processRawData({
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
 			return;
 		}
 
@@ -237,15 +242,7 @@ function processRawData({
 			},
 		};
 
-		const foundYear = totalBeneficiariesData[row.ImplementationYear];
-
-		if (!foundYear) {
-			totalBeneficiariesData[row.ImplementationYear] = {
-				[row.PFId]: totalDatum,
-			};
-		} else {
-			foundYear[row.PFId] = totalDatum;
-		}
+		totalBeneficiariesData[row.ImplementationYear] = totalDatum;
 	});
 
 	totalBeneficiariesWithoutUs.forEach(row => {
@@ -260,46 +257,33 @@ function processRawData({
 			return;
 		}
 
-		let foundYear;
-		if (row.ImplementationYear === null) {
-			foundYear = totalBeneficiariesData[firstNSFTYear];
-		} else {
-			foundYear = totalBeneficiariesData[row.ImplementationYear];
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
+			return;
 		}
+
+		const foundYear = totalBeneficiariesData[row.ImplementationYear];
 
 		if (!foundYear) {
 			simpleWarn(
-				`No data found for totalBeneficiariesUs ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
-				}`,
+				`No data found for totalBeneficiariesUs ImplementationYear: ${row.ImplementationYear}`,
 			);
 			return;
 		}
 
-		const foundFund = foundYear[row.PFId];
-		if (!foundFund) {
-			simpleWarn(
-				`No data found for totalBeneficiariesUs PFId: ${row.PFId} in ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
-				}`,
-			);
-			return;
-		}
-
-		foundFund.total.targetedWithoutUS = row.TotTarg || 0;
-		foundFund.total.reachedWithoutUS = row.TotAch || 0;
-		foundFund.girls.targetedWithoutUS = row.BenG || 0;
-		foundFund.girls.reachedWithoutUS = row.AchG || 0;
-		foundFund.boys.targetedWithoutUS = row.BenB || 0;
-		foundFund.boys.reachedWithoutUS = row.AchB || 0;
-		foundFund.women.targetedWithoutUS = row.BenW || 0;
-		foundFund.women.reachedWithoutUS = row.AchW || 0;
-		foundFund.men.targetedWithoutUS = row.BenM || 0;
-		foundFund.men.reachedWithoutUS = row.AchM || 0;
+		foundYear.total.targetedWithoutUS = row.TotTarg || 0;
+		foundYear.total.reachedWithoutUS = row.TotAch || 0;
+		foundYear.girls.targetedWithoutUS = row.BenG || 0;
+		foundYear.girls.reachedWithoutUS = row.AchG || 0;
+		foundYear.boys.targetedWithoutUS = row.BenB || 0;
+		foundYear.boys.reachedWithoutUS = row.AchB || 0;
+		foundYear.women.targetedWithoutUS = row.BenW || 0;
+		foundYear.women.reachedWithoutUS = row.AchW || 0;
+		foundYear.men.targetedWithoutUS = row.BenM || 0;
+		foundYear.men.reachedWithoutUS = row.AchM || 0;
 	});
 
 	totalBeneficiariesByPartner.forEach(row => {
@@ -312,6 +296,14 @@ function processRawData({
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
 			return;
 		}
 
@@ -347,16 +339,11 @@ function processRawData({
 			totalBeneficiariesByPartnerData[row.ImplementationYear];
 
 		if (!foundYear) {
-			totalBeneficiariesByPartnerData[row.ImplementationYear] = {
-				[row.PFId]: [partnersDatum],
-			};
+			totalBeneficiariesByPartnerData[row.ImplementationYear] = [
+				partnersDatum,
+			];
 		} else {
-			const foundFund = foundYear[row.PFId];
-			if (!foundFund) {
-				foundYear[row.PFId] = [partnersDatum];
-			} else {
-				foundFund.push(partnersDatum);
-			}
+			foundYear.push(partnersDatum);
 		}
 	});
 
@@ -373,45 +360,32 @@ function processRawData({
 			return;
 		}
 
-		let foundYear;
-		if (row.ImplementationYear === null) {
-			foundYear = totalBeneficiariesByPartnerData[firstNSFTYear];
-		} else {
-			foundYear = totalBeneficiariesByPartnerData[row.ImplementationYear];
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
+			return;
 		}
+
+		const foundYear =
+			totalBeneficiariesByPartnerData[row.ImplementationYear];
 
 		if (!foundYear) {
 			simpleWarn(
-				`No data found for totalBeneficiariesByPartnersUs ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
-				}`,
+				`No data found for totalBeneficiariesByPartnersUs ImplementationYear: ${row.ImplementationYear}`,
 			);
 			return;
 		}
 
-		const foundFund = foundYear[row.PFId];
-		if (!foundFund) {
-			simpleWarn(
-				`No data found for totalBeneficiariesByPartnersUs PFId: ${row.PFId} in ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
-				}`,
-			);
-			return;
-		}
-
-		const foundPartner = foundFund.find(
+		const foundPartner = foundYear.find(
 			partner => partner.partner === row.PartnerTypeId,
 		);
+
 		if (!foundPartner) {
 			simpleWarn(
 				`No data found for totalBeneficiariesByPartnersUs PartnerTypeId: ${row.PartnerTypeId} in PFId: ${row.PFId} and ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
+					row.ImplementationYear
 				}`,
 			);
 			return;
@@ -436,6 +410,14 @@ function processRawData({
 				row,
 				parsedRow.error.message,
 			);
+			return;
+		}
+
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
 			return;
 		}
 
@@ -471,16 +453,11 @@ function processRawData({
 			totalBeneficiariesBySectorData[row.ImplementationYear];
 
 		if (!foundYear) {
-			totalBeneficiariesBySectorData[row.ImplementationYear] = {
-				[row.PFId]: [sectorsDatum],
-			};
+			totalBeneficiariesBySectorData[row.ImplementationYear] = [
+				sectorsDatum,
+			];
 		} else {
-			const foundFund = foundYear[row.PFId];
-			if (!foundFund) {
-				foundYear[row.PFId] = [sectorsDatum];
-			} else {
-				foundFund.push(sectorsDatum);
-			}
+			foundYear.push(sectorsDatum);
 		}
 	});
 
@@ -496,45 +473,34 @@ function processRawData({
 			return;
 		}
 
-		let foundYear;
-		if (row.ImplementationYear === null) {
-			foundYear = totalBeneficiariesBySectorData[firstNSFTYear];
-		} else {
-			foundYear = totalBeneficiariesBySectorData[row.ImplementationYear];
+		//keep just the fund of the attribution page. Also, remove year data before the selected start year
+		if (
+			row.PFId !== selectedFund ||
+			row.ImplementationYear < effectiveStartYear
+		) {
+			return;
 		}
+
+		const foundYear =
+			totalBeneficiariesBySectorData[row.ImplementationYear];
 
 		if (!foundYear) {
 			simpleWarn(
 				`No data found for totalBeneficiariesBySectorUs ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
+					row.ImplementationYear
 				}`,
 			);
 			return;
 		}
 
-		const foundFund = foundYear[row.PFId];
-		if (!foundFund) {
-			simpleWarn(
-				`No data found for totalBeneficiariesBySectorUs PFId: ${row.PFId} in ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
-				}`,
-			);
-			return;
-		}
-
-		const foundSector = foundFund.find(
+		const foundSector = foundYear.find(
 			sector => sector.sector === row.GlobalClusterId,
 		);
+
 		if (!foundSector) {
 			simpleWarn(
 				`No data found for totalBeneficiariesBySectorUs Sector: ${row.GlobalClusterId} in PFId: ${row.PFId} and ImplementationYear: ${
-					row.ImplementationYear === null
-						? firstNSFTYear
-						: row.ImplementationYear
+					row.ImplementationYear
 				}`,
 			);
 			return;
@@ -564,6 +530,11 @@ function processRawData({
 	sectorsData.forEach(row => {
 		const parsedRow = sectorBeneficiaryObjectSchema.safeParse(row);
 		if (parsedRow.success) {
+			//keep just the fund of the attribution page.
+			if (row.PooledFundId !== selectedFund) {
+				return;
+			}
+
 			sectorsSet.add(row.GlobalClusterId);
 			if (!sectorsDataMap.has(row.ChfProjectCode)) {
 				sectorsDataMap.set(row.ChfProjectCode, {
@@ -658,8 +629,18 @@ function processRawData({
 				row.PooledFundId,
 				row.AllocationtypeId,
 			);
+
 			const thisAllocationType =
 				lists.allocationTypesCompleteList[thisAllocTypeId];
+
+			//keep just the fund of the attribution page. Also, remove year data before the selected start year
+			if (
+				row.PooledFundId !== selectedFund ||
+				thisAllocationType.AllocationYear < effectiveStartYear
+			) {
+				return;
+			}
+
 			const thisOrganization =
 				lists.organizationsCompleteList[row.GlobalOrgId];
 			const thisSectorData = sectorsDataMap.get(row.ChfProjectCode);
@@ -690,7 +671,6 @@ function processRawData({
 
 			if (thisAllocationType && thisOrganization && thisSectorData) {
 				yearsSet.add(thisAllocationType.AllocationYear);
-				fundsSet.add(row.PooledFundId);
 				allocationSourcesSet.add(thisAllocationType.AllocationSourceId);
 				organizationTypesSet.add(thisOrganization.OrganizationTypeId);
 				organizationsSet.add(thisOrganization.GlobalOrgId);
@@ -720,7 +700,6 @@ function processRawData({
 				});
 
 				const objDatum: AllocationsDatum = {
-					fund: row.PooledFundId,
 					year: thisAllocationType.AllocationYear,
 					projectCode: row.ChfProjectCode,
 					projectId: row.ChfId,
@@ -764,7 +743,6 @@ function processRawData({
 		sectors: sectorsSet,
 		allocationTypes: allocationTypesSet,
 		allocationSources: allocationSourcesSet,
-		funds: fundsSet,
 		organizationTypes: organizationTypesSet,
 		organizations: organizationsSet,
 		sectorsPerYear: sectorsPerYearMap,
@@ -789,13 +767,22 @@ function processRawData({
 			const parsedRow =
 				allocationsByYearAndFundObjectSchema.safeParse(row);
 			if (parsedRow.success) {
-				const thisYear = row.AllocationYear;
 				const thisFundId = lists.fundIdsByName[row.PooledFundName];
 
 				if (!thisFundId) {
 					simpleWarn(
 						`Fund with name ${row.PooledFundName} not found in the funds master`,
 					);
+					return;
+				}
+
+				const thisYear = row.AllocationYear;
+
+				//keep just the fund of the attribution page. Also, remove year data before the selected start year
+				if (
+					thisFundId !== selectedFund ||
+					thisYear < effectiveStartYear
+				) {
 					return;
 				}
 
@@ -807,15 +794,12 @@ function processRawData({
 					return;
 				}
 
-				const foundYearAndFund = target.find(
-					e => e.fund === thisFundId && e.year === thisYear,
-				);
+				const foundYear = target.find(e => e.year === thisYear);
 
-				if (foundYearAndFund) {
-					foundYearAndFund.budget += row.ApprovedBudget;
+				if (foundYear) {
+					foundYear.budget += row.ApprovedBudget;
 				} else {
 					target.push({
-						fund: thisFundId,
 						year: thisYear,
 						budget: row.ApprovedBudget,
 					});

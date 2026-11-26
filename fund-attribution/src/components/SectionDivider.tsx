@@ -19,7 +19,7 @@ function SectionDivider({ title }: { title: string }) {
 					fontSize: "20px",
 					fontWeight: "500",
 					whiteSpace: "nowrap",
-					color: `color-mix(in srgb, ${colors.donorColor} 50%, black)`,
+					color: `color-mix(in srgb, ${colors.fundColor} 50%, black)`,
 				}}
 			>
 				{title}
@@ -28,7 +28,7 @@ function SectionDivider({ title }: { title: string }) {
 				sx={{
 					flex: 1,
 					height: "1px",
-					background: colors.donorColor,
+					background: colors.fundColor,
 				}}
 			/>
 		</Box>

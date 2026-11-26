@@ -13,13 +13,14 @@ type AttributionCardsProps = {
 	donorValue: number;
 	totalValue: number;
 	percentage: number;
-	fund: number;
+	donor: number;
 	fundName: string;
 	donorName: string;
-	funds: number[];
+	donors: number[];
 	handleClick: (thisFund: number) => void;
 	handleClickKeepOnly: (thisFund: number) => void;
 	isTheOnlyCard: boolean;
+	flagSrc: string;
 };
 
 const { cardOpacity } = constants;
@@ -28,16 +29,17 @@ function AttributionCards({
 	donorValue,
 	totalValue,
 	percentage,
-	fund,
+	donor,
 	fundName,
 	donorName,
-	funds,
+	donors,
 	handleClick,
 	handleClickKeepOnly,
 	isTheOnlyCard,
+	flagSrc,
 }: AttributionCardsProps) {
-	const fundSelected = funds.includes(fund);
-	const isTheOnlySelectedFund = fundSelected && funds.length === 1;
+	const donorSelected = donors.includes(donor);
+	const isTheOnlySelectedDonor = donorSelected && donors.length === 1;
 	const {
 		truncatedPercentage,
 		truncatedPercentageForDisplay,
@@ -62,11 +64,11 @@ function AttributionCards({
 					display: "flex",
 					height: "100%",
 					borderRadius: "8px",
-					background: fundSelected ? "#f7fbff" : "#fcfcfc",
-					border: fundSelected
+					background: donorSelected ? "#f7fbff" : "#fcfcfc",
+					border: donorSelected
 						? "1px solid #b5d4f4"
 						: "1px solid #e1e1e1",
-					boxShadow: fundSelected
+					boxShadow: donorSelected
 						? "0 0 6px rgba(0, 0, 0, 0.2)"
 						: "none",
 				}}
@@ -95,31 +97,31 @@ function AttributionCards({
 								width: "100%",
 								flexDirection: "row",
 								alignItems: "center",
-								marginBottom: "1em",
+								marginBottom: "1.2em",
 								gap: "0.5em",
 							}}
 						>
 							<Box
 								className={`attrib-remove-btn attrib-rb-blue`}
-								onClick={() => handleClick(fund)}
+								onClick={() => handleClick(donor)}
 								sx={{
 									display: "flex",
 									flex: 1,
 									justifyContent: "center",
-									opacity: isTheOnlySelectedFund ? 0.5 : 1,
-									filter: isTheOnlySelectedFund
+									opacity: isTheOnlySelectedDonor ? 0.5 : 1,
+									filter: isTheOnlySelectedDonor
 										? "grayscale(100%)"
 										: "none",
-									pointerEvents: isTheOnlySelectedFund
+									pointerEvents: isTheOnlySelectedDonor
 										? "none"
 										: "auto",
 								}}
 							>
-								{fundSelected ? "Remove" : "Add"}
+								{donorSelected ? "Remove" : "Add"}
 							</Box>
 							<Box
 								className={`attrib-remove-btn attrib-rb-blue`}
-								onClick={() => handleClickKeepOnly(fund)}
+								onClick={() => handleClickKeepOnly(donor)}
 								sx={{
 									display: "flex",
 									flex: 1,
@@ -133,15 +135,15 @@ function AttributionCards({
 										: "auto",
 								}}
 							>
-								{isTheOnlySelectedFund && !isTheOnlyCard
+								{isTheOnlySelectedDonor && !isTheOnlyCard
 									? "Add all"
 									: "Keep Only"}
 							</Box>
 							<Box
 								component={"a"}
-								href={`fundattribution.html?fund=${fund}`}
+								href={`attribution.html?donor=${donor}`}
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`Click to navigate to ${fundName} attribution page`}
+								data-tooltip-content={`Click to navigate to ${donorName} attribution page`}
 								data-tooltip-place="bottom"
 								className={`attrib-remove-btn attrib-rb-blue`}
 								sx={{
@@ -162,31 +164,59 @@ function AttributionCards({
 						</Box>
 						<Box
 							style={{
-								marginBottom: "1.3em",
-								opacity: fundSelected ? 1 : cardOpacity,
-								filter: fundSelected
+								marginBottom: "1em",
+								opacity: donorSelected ? 1 : cardOpacity,
+								filter: donorSelected
 									? "none"
 									: "grayscale(100%)",
 							}}
 						>
-							<Typography
-								variant="h6"
+							<Box
+								{...(donorName.length > 25 && {
+									"data-tooltip-id": "tooltip",
+									"data-tooltip-content": `${donorName}`,
+									"data-tooltip-place": "bottom",
+								})}
 								sx={{
-									fontSize: "18px",
-									lineHeight: "1.2em",
+									height: "32px",
+									display: "flex",
+									alignItems: "center",
 								}}
-								className="attrib-cl-blue"
 							>
-								{fundName}
-							</Typography>
+								<img
+									src={flagSrc}
+									width="32px"
+									style={{
+										borderRadius: "3px",
+										boxShadow:
+											"0 0.5rem 0.5rem rgba(0, 0, 0, 0.1)",
+									}}
+									alt={`${donorName} flag`}
+								/>
+								<Typography
+									variant="h6"
+									sx={{
+										fontSize: "18px",
+										lineHeight: "1.1em",
+										marginLeft: "0.4em",
+										display: "-webkit-box",
+										WebkitBoxOrient: "vertical",
+										WebkitLineClamp: 2,
+										overflow: "hidden",
+									}}
+									className="attrib-cl-blue"
+								>
+									{donorName}
+								</Typography>
+							</Box>
 						</Box>
 						<Box
 							sx={{
 								display: "flex",
 								flexDirection: "row",
 								alignItems: "center",
-								opacity: fundSelected ? 1 : cardOpacity,
-								filter: fundSelected
+								opacity: donorSelected ? 1 : cardOpacity,
+								filter: donorSelected
 									? "none"
 									: "grayscale(100%)",
 							}}
@@ -197,7 +227,7 @@ function AttributionCards({
 									fontWeight: 500,
 								}}
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${donorName} attribution for ${fundName}: ${lessThanMinimum || truncatedPercentage}%`}
+								data-tooltip-content={`${fundName} attribution from ${donorName}: ${lessThanMinimum || truncatedPercentage}%`}
 								data-tooltip-place="top"
 								className={`attrib-cv-blue`}
 							>
@@ -214,7 +244,7 @@ function AttributionCards({
 									paddingLeft: "0.5em",
 								}}
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`Donated: $${toLocaleFixed(donorValue, 0, 2)}`}
+								data-tooltip-content={`Received: $${toLocaleFixed(donorValue, 0, 2)}`}
 								data-tooltip-place="top"
 								className={`attrib-cv-blue`}
 							>
@@ -240,9 +270,8 @@ function AttributionCards({
 						</Box>
 						<Box
 							sx={{
-								marginTop: "0.4em",
-								opacity: fundSelected ? 1 : cardOpacity,
-								filter: fundSelected
+								opacity: donorSelected ? 1 : cardOpacity,
+								filter: donorSelected
 									? "none"
 									: "grayscale(100%)",
 							}}

@@ -9,7 +9,6 @@ type GetFlagSrcProps = {
 
 function getFlagSrc({ donor, lists }: GetFlagSrcProps): {
 	flagSrc: string;
-	faviconFlag: string;
 } {
 	const donorIsoCode = lists.donorISO2Codes[donor]!.toLowerCase();
 
@@ -23,12 +22,7 @@ function getFlagSrc({ donor, lists }: GetFlagSrcProps): {
 				? flags60[donorIsoCode]
 				: `https://flagcdn.com/${donorIsoCode}.svg`;
 
-	const faviconFlag =
-		donor === 200 || missingFlag
-			? flagSrc
-			: `https://flagcdn.com/w40/${donorIsoCode}.png`;
-
-	return { flagSrc, faviconFlag };
+	return { flagSrc };
 }
 
 export default getFlagSrc;

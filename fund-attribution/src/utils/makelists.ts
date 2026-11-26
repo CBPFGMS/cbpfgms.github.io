@@ -79,7 +79,7 @@ export type List = {
 	donorISO2Codes: NullableListObj;
 	donorISO3Codes: NullableListObj;
 	fundIdsByName: { [key: string]: number };
-	validDonors: Set<number>;
+	validFunds: Set<number>;
 };
 
 function makeLists({
@@ -111,7 +111,7 @@ function makeLists({
 		donorISO2Codes: {},
 		donorISO3Codes: {},
 		fundIdsByName: {},
-		validDonors: new Set(),
+		validFunds: new Set(),
 	};
 
 	pooledFundsMaster.forEach(d => {
@@ -121,6 +121,7 @@ function makeLists({
 			lists.fundAbbreviatedNames[d.PFId] = d.PFAbbrv;
 			lists.fundIsoCodes[d.PFId] = d.PFCountryCode;
 			lists.fundIdsByName[d.PFName] = d.PFId;
+			lists.validFunds.add(d.PFId);
 		} else {
 			warnInvalidSchema(
 				"PooledFundsMaster",
@@ -237,7 +238,6 @@ function makeLists({
 			lists.donorGMSNames[d.DonorID] = d.DonorName;
 			lists.donorISO2Codes[d.DonorID] = d.CountryISO2;
 			lists.donorISO3Codes[d.DonorID] = d.CountryISO3;
-			lists.validDonors.add(d.DonorID);
 		} else {
 			warnInvalidSchema(
 				"DonorsMaster",

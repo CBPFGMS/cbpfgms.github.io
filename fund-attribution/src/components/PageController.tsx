@@ -1,28 +1,26 @@
-import InvalidDonor from "./InvalidDonor";
+import InvalidFund from "./InvalidFund";
 import { useAppData } from "../hooks/useappdata";
 import MainContainer from "./MainContainer";
-import DonorWithoutData from "./DonorWithoutData";
+import FundWithoutData from "./FundWithoutData";
 
 type PageControllerProps = {
-	selectedDonor: number;
+	selectedFund: number;
 };
 
-function PageController({ selectedDonor }: PageControllerProps) {
+function PageController({ selectedFund }: PageControllerProps) {
 	const { lists, contributionsData } = useAppData();
 
-	const validDonor = lists.validDonors.has(selectedDonor);
+	const validFund = lists.validFunds.has(selectedFund);
 
-	if (!validDonor) {
-		return <InvalidDonor />;
+	if (!validFund) {
+		return <InvalidFund />;
 	}
 
 	if (contributionsData.length === 0) {
-		return (
-			<DonorWithoutData donorName={lists.donorGMSNames[selectedDonor]} />
-		);
+		return <FundWithoutData fundName={lists.donorGMSNames[selectedFund]} />;
 	}
 
-	return <MainContainer donor={selectedDonor} />;
+	return <MainContainer fund={selectedFund} />;
 }
 
 export default PageController;

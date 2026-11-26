@@ -1,9 +1,9 @@
 :root {
-	--donor-color: #9063cd;
+	--fund-color: #e56a54;
 	/* IMPORTANT: change colors.ts as well */
 }
 
-#attributionroot {
+#fundattributionroot {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
@@ -240,11 +240,11 @@ h1 {
 	}
 }
 
-#attributionroot button,
-#attributionroot input[type="button"],
-#attributionroot input[type="submit"],
-#attributionroot input[type="reset"],
-#attributionroot a {
+#fundattributionroot button,
+#fundattributionroot input[type="button"],
+#fundattributionroot input[type="submit"],
+#fundattributionroot input[type="reset"],
+#fundattributionroot a {
 	outline: none;
 	box-shadow: none; /* Some frameworks/browsers use box-shadow for focus */
 }
@@ -294,7 +294,7 @@ h1 {
 	transition: border-color 0.25s;
 }
 .pbialpbuttonsPartners:hover {
-	border-color: color-mix(in srgb, var(--donor-color) 75%, black);
+	border-color: color-mix(in srgb, var(--fund-color) 75%, black);
 	background-color: #f1f3f5;
 }
 .pbialpbuttonsPartners:focus,
@@ -303,7 +303,7 @@ h1 {
 }
 
 .pbialpbuttonsPartners.selected {
-	background-color: color-mix(in srgb, var(--donor-color) 80%, black);
+	background-color: color-mix(in srgb, var(--fund-color) 80%, black);
 	color: white;
 }
 
@@ -320,37 +320,37 @@ h1 {
 	}
 }
 
-.attrib-dl-donor {
-	color: color-mix(in srgb, var(--donor-color) 70%, black);
+.attrib-dl-fund {
+	color: color-mix(in srgb, var(--fund-color) 70%, black);
 }
-.attrib-dline-donor {
-	background: color-mix(in srgb, var(--donor-color) 50%, white);
+.attrib-dline-fund {
+	background: color-mix(in srgb, var(--fund-color) 50%, white);
 }
-.attrib-cl-donor {
-	color: color-mix(in srgb, var(--donor-color) 70%, black);
+.attrib-cl-fund {
+	color: color-mix(in srgb, var(--fund-color) 70%, black);
 }
-.attrib-rb-donor {
-	color: color-mix(in srgb, var(--donor-color) 70%, black);
-	border-color: color-mix(in srgb, var(--donor-color) 50%, white) !important;
-	background: color-mix(in srgb, var(--donor-color) 12%, white);
+.attrib-rb-fund {
+	color: color-mix(in srgb, var(--fund-color) 70%, black);
+	border-color: color-mix(in srgb, var(--fund-color) 50%, white) !important;
+	background: color-mix(in srgb, var(--fund-color) 12%, white);
 }
-.attrib-cv-donor {
-	color: color-mix(in srgb, var(--donor-color) 35%, black);
+.attrib-cv-fund {
+	color: color-mix(in srgb, var(--fund-color) 35%, black);
 }
-.attrib-pf-donor {
-	background: var(--donor-color);
+.attrib-pf-fund {
+	background: var(--fund-color);
 }
-.attrib-pt-donor {
+.attrib-pt-fund {
 	background: #ddd;
 }
-.attrib-pct-donor {
-	color: color-mix(in srgb, var(--donor-color) 50%, black);
+.attrib-pct-fund {
+	color: color-mix(in srgb, var(--fund-color) 50%, black);
 }
-.attrib-lp-donor {
-	background: color-mix(in srgb, var(--donor-color) 12%, white);
-	color: color-mix(in srgb, var(--donor-color) 50%, black);
-	border: 1px solid color-mix(in srgb, var(--donor-color) 50%, white);
+.attrib-lp-fund {
+	background: color-mix(in srgb, var(--fund-color) 12%, white);
+	color: color-mix(in srgb, var(--fund-color) 50%, black);
+	border: 1px solid color-mix(in srgb, var(--fund-color) 50%, white);
 }
-.attrib-lpd-donor {
-	background: color-mix(in srgb, var(--donor-color) 80%, white);
+.attrib-lpd-fund {
+	background: color-mix(in srgb, var(--fund-color) 80%, white);
 }

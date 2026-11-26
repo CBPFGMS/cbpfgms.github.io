@@ -5,16 +5,14 @@ import ErrorFallback from "./components/ErrorFallback";
 import PageController from "./components/PageController";
 import { fetchAppData, type AppData } from "./utils/api";
 import DataContext from "./context/DataContext";
-import InvalidDonor from "./components/InvalidDonor";
+import InvalidFund from "./components/InvalidFund";
 
 type AppProps = {
 	startYear: number | null;
 };
 
-const queryStringDonor = new URLSearchParams(window.location.search).get(
-	"donor",
-);
-const selectedDonor = queryStringDonor ? parseInt(queryStringDonor) : null;
+const queryStringFund = new URLSearchParams(window.location.search).get("fund");
+const selectedFund = queryStringFund ? parseInt(queryStringFund) : null;
 
 let latestAppDataRequest: {
 	key: string;
@@ -23,14 +21,14 @@ let latestAppDataRequest: {
 
 function getAppDataRequest(
 	startYear: number | null,
-	selectedDonor: number,
+	selectedFund: number,
 	attempt: number,
 ): Promise<AppData> {
-	const key = `${startYear ?? "current"}:${selectedDonor}:${attempt}`;
+	const key = `${startYear ?? "current"}:${selectedFund}:${attempt}`;
 	if (latestAppDataRequest?.key !== key) {
 		latestAppDataRequest = {
 			key,
-			promise: fetchAppData(startYear, selectedDonor),
+			promise: fetchAppData(startYear, selectedFund),
 		};
 	}
 	return latestAppDataRequest.promise;
@@ -39,12 +37,12 @@ function getAppDataRequest(
 function App({ startYear }: AppProps) {
 	const [attempt, setAttempt] = useState(0);
 	const dataPromise = useMemo(() => {
-		if (selectedDonor === null) return null;
-		return getAppDataRequest(startYear, selectedDonor, attempt);
+		if (selectedFund === null) return null;
+		return getAppDataRequest(startYear, selectedFund, attempt);
 	}, [startYear, attempt]);
 
-	if (selectedDonor === null || dataPromise === null) {
-		return <InvalidDonor />;
+	if (selectedFund === null || dataPromise === null) {
+		return <InvalidFund />;
 	}
 
 	return (
@@ -55,7 +53,7 @@ function App({ startYear }: AppProps) {
 		>
 			<Suspense fallback={<Loading />}>
 				<DataContext.Provider value={dataPromise}>
-					<PageController selectedDonor={selectedDonor} />
+					<PageController selectedFund={selectedFund} />
 				</DataContext.Provider>
 			</Suspense>
 		</ErrorBoundary>

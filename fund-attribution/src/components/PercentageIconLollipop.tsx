@@ -2,11 +2,11 @@ import Box from "@mui/material/Box";
 import PercentIcon from "@mui/icons-material/Percent";
 
 type PercentageIconProps = {
-	donorName: string;
+	fundName: string;
 	attribution: number;
 };
 
-function PercentageIcon({ donorName, attribution }: PercentageIconProps) {
+function PercentageIcon({ fundName, attribution }: PercentageIconProps) {
 	const size = 30;
 	const iconSize = Math.round(size * 0.72);
 	const borderRadius = Math.round(size * 0.36);
@@ -25,7 +25,7 @@ function PercentageIcon({ donorName, attribution }: PercentageIconProps) {
 				color: "#085041",
 			}}
 			data-tooltip-id="tooltip"
-			data-tooltip-content={`These allocated values are ${attributionPercentage}% (which is ${donorName}'s attribution percentage) of the total values.`}
+			data-tooltip-content={`These allocated values are ${attributionPercentage}% (which is ${fundName}'s attribution percentage) of the total values.`}
 			data-tooltip-place="top"
 		>
 			<PercentIcon

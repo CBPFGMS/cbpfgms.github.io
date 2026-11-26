@@ -4,11 +4,11 @@ import TagIcon from "@mui/icons-material/Tag";
 type TooltipProps =
 	| {
 			showTooltip: true;
-			donorName: string;
+			fundName: string;
 	  }
 	| {
 			showTooltip?: false;
-			donorName?: never;
+			fundName?: never;
 	  };
 
 type AbsoluteIconProps = {
@@ -18,7 +18,7 @@ type AbsoluteIconProps = {
 function AbsoluteIcon({
 	size = 22,
 	showTooltip = false,
-	donorName = "",
+	fundName = "",
 }: AbsoluteIconProps) {
 	const iconSize = Math.round(size * 0.72);
 	const borderRadius = Math.round(size * 0.36);
@@ -27,7 +27,7 @@ function AbsoluteIcon({
 		<Box
 			{...(showTooltip && {
 				"data-tooltip-id": "tooltip",
-				"data-tooltip-content": `This is an absolute value, independent of ${donorName}'s attribution percentage.`,
+				"data-tooltip-content": `This is an absolute value, independent of ${fundName}'s attribution percentage.`,
 				"data-tooltip-place": "top",
 			})}
 			sx={{

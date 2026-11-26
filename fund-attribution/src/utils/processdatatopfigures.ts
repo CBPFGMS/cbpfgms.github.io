@@ -9,7 +9,6 @@ export type InSelectionData = {
 
 type ProcessDataTopFiguresParams = {
 	allocationsData: AllocationsData;
-	funds: number[];
 	totalBeneficiariesData: TotalBeneficiariesData;
 	globalAttribution: number;
 	year: number;
@@ -28,7 +27,6 @@ const { USProjectsString, firstNSFTYear } = constants;
 
 function processDataTopFigures({
 	allocationsData,
-	funds,
 	totalBeneficiariesData,
 	globalAttribution,
 	year,
@@ -46,33 +44,22 @@ function processDataTopFigures({
 	const reachedKey =
 		year >= firstNSFTYear && !hasUS ? "reachedWithoutUS" : "reached";
 
-	funds.forEach(pf => {
-		if (!totalBeneficiariesData[year]) {
-			simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
-			return;
-		}
-		if (!totalBeneficiariesData[year][pf]) {
-			simpleWarn(
-				`Pooled fund code ${pf}, present in the attributions data, was not found in the totalBeneficiaries data (allocations) for year ${year}`,
-			);
-			return;
-		}
-
+	if (!totalBeneficiariesData[year]) {
+		simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
+	} else {
 		const thisYearData = totalBeneficiariesData[year];
 
-		targeted += thisYearData[pf].total[targetKey] || 0;
-		reached += thisYearData[pf].total[reachedKey] || 0;
-	});
+		targeted += thisYearData.total[targetKey] || 0;
+		reached += thisYearData.total[reachedKey] || 0;
+	}
 
 	allocationsData.forEach(row => {
 		if (!hasUS && row.projectCode.includes(USProjectsString)) {
 			return;
 		}
-		if (funds.includes(row.fund) && row.year === year) {
-			numberOfProjectsSet.add(row.projectId);
-			numberOfPartnersSet.add(row.organizationId);
-			allocations += row.budget;
-		}
+		numberOfProjectsSet.add(row.projectId);
+		numberOfPartnersSet.add(row.organizationId);
+		allocations += row.budget;
 	});
 
 	//multiply by global attribution

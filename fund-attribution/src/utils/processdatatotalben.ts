@@ -6,7 +6,6 @@ const { beneficiaryCategories, firstNSFTYear } = constants;
 
 type ProcessDataTotalBeneficiariesParams = {
 	totalBeneficiariesData: TotalBeneficiariesData;
-	funds: number[];
 	globalAttribution: number;
 	year: number;
 	hasUS: boolean;
@@ -19,7 +18,6 @@ export type TargetedAndReachedTotal = {
 
 function processDataTotalBeneficiaries({
 	totalBeneficiariesData,
-	funds,
 	globalAttribution,
 	year,
 	hasUS,
@@ -44,37 +42,28 @@ function processDataTotalBeneficiaries({
 	const reachedKey =
 		year >= firstNSFTYear && !hasUS ? "reachedWithoutUS" : "reached";
 
-	funds.forEach(pf => {
-		if (!totalBeneficiariesData[year]) {
-			simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
-			return;
-		}
-		if (!totalBeneficiariesData[year][pf]) {
-			simpleWarn(
-				`Pooled fund code ${pf}, present in the attributions data, was not found in the totalBeneficiaries data (allocations) for year ${year}`,
-			);
-			return;
-		}
-
+	if (!totalBeneficiariesData[year]) {
+		simpleWarn(`Year ${year} not found in the totalBeneficiaries data`);
+	} else {
 		const thisYearData = totalBeneficiariesData[year];
 
-		targeted.total += thisYearData[pf].total[targetKey] || 0;
-		reached.total += thisYearData[pf].total[reachedKey] || 0;
+		targeted.total += thisYearData.total[targetKey] || 0;
+		reached.total += thisYearData.total[reachedKey] || 0;
 		beneficiaryCategories.forEach(genderAndAge => {
 			targeted[genderAndAge] +=
-				thisYearData[pf][genderAndAge][targetKey] || 0;
+				thisYearData[genderAndAge][targetKey] || 0;
 			reached[genderAndAge] +=
-				thisYearData[pf][genderAndAge][reachedKey] || 0;
+				thisYearData[genderAndAge][reachedKey] || 0;
 		});
-	});
 
-	//multiply by global attribution
-	targeted.total *= globalAttribution;
-	reached.total *= globalAttribution;
-	beneficiaryCategories.forEach(genderAndAge => {
-		targeted[genderAndAge] *= globalAttribution;
-		reached[genderAndAge] *= globalAttribution;
-	});
+		//multiply by global attribution
+		targeted.total *= globalAttribution;
+		reached.total *= globalAttribution;
+		beneficiaryCategories.forEach(genderAndAge => {
+			targeted[genderAndAge] *= globalAttribution;
+			reached[genderAndAge] *= globalAttribution;
+		});
+	}
 
 	return { targeted, reached };
 }

@@ -92,12 +92,6 @@ function PartnersTableBody({
 		<>
 			<TableBody>
 				{data.map((row, index) => {
-					const tooltipFundTitle =
-						row.funds.size > 1 ? "Funds" : "Fund";
-					const tooltipFunds = [...row.funds]
-						.map(d => lists.fundNames[d])
-						.join(", ");
-					const tooltipFundText = `<div style='text-align:center;'><span style='font-weight:bold'>${tooltipFundTitle}: </span>${tooltipFunds}</div>`;
 					return (
 						<TableRow
 							key={index}
@@ -156,12 +150,6 @@ function PartnersTableBody({
 												fontSize: "16px",
 												fontWeight: 500,
 											}}
-											{...(header === "funds" && {
-												"data-tooltip-id": "tooltip",
-												"data-tooltip-html":
-													tooltipFundText,
-												"data-tooltip-place": "top",
-											})}
 										>
 											{header === "partner"
 												? lists.organizations[
@@ -348,7 +336,6 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 								<TableHead>
 									<TableRow>
 										<TableCell>Sector</TableCell>
-										<TableCell>Funds</TableCell>
 										<TableCell align="right">
 											Budget
 										</TableCell>
@@ -372,16 +359,6 @@ function RowModal({ selectedRow, lists, handleClose }: RowModalProps) {
 													scope="row"
 												>
 													{lists.sectors[row.sector]}
-												</TableCell>
-												<TableCell>
-													{[...row.fund]
-														.map(
-															f =>
-																lists.fundNames[
-																	f
-																],
-														)
-														.join(", ")}
 												</TableCell>
 												<TableCell align="right">
 													{"$" +
@@ -454,7 +431,6 @@ function RowModalProjects({ selectedRow, lists, handleClose }: RowModalProps) {
 									<TableRow>
 										<TableCell>Project Code</TableCell>
 										<TableCell>Sector</TableCell>
-										<TableCell>Fund</TableCell>
 										<TableCell align="right">
 											Budget
 										</TableCell>
@@ -490,9 +466,6 @@ function RowModalProjects({ selectedRow, lists, handleClose }: RowModalProps) {
 													scope="row"
 												>
 													{lists.sectors[row.sector]}
-												</TableCell>
-												<TableCell>
-													{lists.fundNames[row.fund]}
 												</TableCell>
 												<TableCell align="right">
 													{"$" +

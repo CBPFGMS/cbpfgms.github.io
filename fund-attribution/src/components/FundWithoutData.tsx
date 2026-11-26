@@ -3,9 +3,9 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import FolderOffIcon from "@mui/icons-material/FolderOff";
 
-function InvalidDonor() {
+function FundWithoutData({ fundName }: { fundName: string }) {
 	return (
 		<Container
 			maxWidth="sm"
@@ -48,7 +48,12 @@ function InvalidDonor() {
 							marginBottom: 2,
 						}}
 					>
-						<ErrorOutlineIcon sx={{ fontSize: 36 }} />
+						<FolderOffIcon
+							sx={{
+								fontSize: 32,
+								color: "text.secondary",
+							}}
+						/>
 					</Box>
 
 					<Typography
@@ -61,7 +66,7 @@ function InvalidDonor() {
 							fontWeight: 600,
 						}}
 					>
-						Invalid Donor
+						No data for {fundName}
 					</Typography>
 
 					<Typography
@@ -69,8 +74,9 @@ function InvalidDonor() {
 						color="text.secondary"
 						sx={{ maxWidth: "360px", lineHeight: 1.6 }}
 					>
-						The donor you are looking for is not in our database.
-						Please contact support to obtain a valid page link.
+						The fund you are looking for has no contributions data
+						for the selected period, therefore having no attribution
+						value.
 					</Typography>
 				</CardContent>
 			</Card>
@@ -78,4 +84,4 @@ function InvalidDonor() {
 	);
 }
 
-export default InvalidDonor;
+export default FundWithoutData;

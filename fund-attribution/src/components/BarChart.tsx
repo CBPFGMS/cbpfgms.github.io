@@ -25,7 +25,7 @@ type BarChartProps = {
 	title: string;
 	chartType: Charts;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 type Data = {
@@ -42,7 +42,7 @@ function BarChart({
 	title,
 	chartType,
 	attribution,
-	donorName,
+	fundName,
 }: BarChartProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
@@ -129,7 +129,7 @@ function BarChart({
 					<PercentageIcon
 						size={34}
 						showTooltip={true}
-						donorName={donorName}
+						fundName={fundName}
 						attribution={Math.round(attribution * 1000) / 10}
 						plural={true}
 					/>

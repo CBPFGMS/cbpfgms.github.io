@@ -12,7 +12,6 @@ type ProcessDataKeyFiguresParams = {
 	projectClusterData: ProjectClusterOneGmsObject[];
 	localizationDataWithUS: LocalizationData;
 	localizationDataWithoutUS: LocalizationData;
-	funds: number[];
 	globalAttribution: number;
 	year: number;
 	hasUS: boolean;
@@ -40,7 +39,6 @@ function processDataKeyFigures({
 	projectClusterData,
 	localizationDataWithUS,
 	localizationDataWithoutUS,
-	funds,
 	globalAttribution,
 	year,
 	hasUS,
@@ -56,7 +54,7 @@ function processDataKeyFigures({
 		if (!hasUS && row.projectCode.includes(USProjectsString)) {
 			return;
 		}
-		if (funds.includes(row.fund) && row.year === year) {
+		if (row.year === year) {
 			if (row.hasWomenLedOrgs) {
 				totalWlo += row.budget;
 			}
@@ -67,7 +65,7 @@ function processDataKeyFigures({
 		if (!hasUS && row.CHFProjectCode.includes(USProjectsString)) {
 			return;
 		}
-		if (funds.includes(row.PooledFundId) && row.AllocationYear === year) {
+		if (row.AllocationYear === year) {
 			totalDisability += row.DisabilityBudgetAmt ?? 0;
 			totalGbv += row.GBVBudgetAmt ?? 0;
 			totalGenderEquality += row.GenderEqBudgetAmt ?? 0;
@@ -80,7 +78,7 @@ function processDataKeyFigures({
 		: localizationDataWithoutUS;
 
 	localizationData.forEach(row => {
-		if (funds.includes(row.fund) && row.year === year) {
+		if (row.year === year) {
 			totalLocalization += row.budget;
 		}
 	});

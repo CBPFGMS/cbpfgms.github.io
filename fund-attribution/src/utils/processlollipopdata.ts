@@ -1,23 +1,18 @@
-import type { List } from "./makelists";
 import type { AllocationsLollipopObject } from "./schemas";
 
 type ProcessLollipopDataParams = {
 	allocationsLollipopData: AllocationsLollipopObject[];
 	allocationsLollipopWithoutUSData: AllocationsLollipopObject[];
-	funds: number[];
 	year: number;
 	hasUS: boolean;
-	lists: List;
 	globalAttribution: number;
 };
 
 function processLollipopData({
 	allocationsLollipopData,
 	allocationsLollipopWithoutUSData,
-	funds,
 	year,
 	hasUS,
-	lists,
 	globalAttribution,
 }: ProcessLollipopDataParams): AllocationsLollipopObject[] {
 	const lollipopData = [] as AllocationsLollipopObject[];
@@ -27,13 +22,7 @@ function processLollipopData({
 		: allocationsLollipopWithoutUSData;
 
 	dataToIterate.forEach(row => {
-		const hasFund = funds.some(
-			f => lists.fundNames[f] === row.PooledFundName,
-		);
-
-		const hasYear = row.AllocationYear === year;
-
-		if (hasFund && hasYear) {
+		if (row.AllocationYear === year) {
 			const copiedRow = { ...row };
 
 			copiedRow.ApprovedReserveBudget *= globalAttribution;

@@ -140,16 +140,10 @@ export const sectorBeneficiaryObjectSchema = z.object({
 
 export const contributionsObjectSchema = z.object({
 	attributedAmount: z.number().nonnegative(),
-	directAmount: z.number().nullable(),
-	isPassThrough: z.boolean(),
-	passedOnwardAmount: z.number().nullable(),
-	pooledFundId: z.number().int().nonnegative(),
-	pooledFundName: z.string().nullable(),
-	pooledFundTotal: z.number().nonnegative(),
-	retainedAmount: z.number().nullable(),
-	shareOfDonorPercent: z.number().nullable(),
-	shareOfFundPercent: z.number().nonnegative(),
-	viaTransferAmount: z.number().nullable(),
+	attributedPercent: z.number().nonnegative(),
+	donorId: z.number().int().nonnegative(),
+	donorName: z.string().nullable(),
+	donorTotal: z.number().nonnegative(),
 });
 
 export const totalBeneficiariesObjectSchema = z.object({
@@ -398,19 +392,16 @@ export type SectorBeneficiaryObject = z.infer<
 >;
 
 export type ContributionsJson = {
-	donors: [
+	pooledFunds: [
 		{
-			attributedToDestinationFunds: number;
-			contributedAmount: number;
-			destinationFundCount: number;
-			donorId: string;
-			donorName: string;
-			pooledFundCount: number;
-			pooledFunds: z.infer<typeof contributionsObjectSchema>[];
+			pooledFundId: string;
+			pooledFundName: string;
+			donorCount: number;
+			donors: z.infer<typeof contributionsObjectSchema>[];
 		}?,
 	];
 	filters: {
-		donorId: string;
+		pooledFundId: number;
 	};
 	meta: {
 		excludesUsa: boolean;

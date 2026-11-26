@@ -18,7 +18,7 @@ const { disclaimerWarningColor, disclaimerText } = constants;
 type TopFiguresProps = {
 	data: DataTopFigures;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 type CardsDatum = {
@@ -34,7 +34,7 @@ type CardsDatum = {
 	subLabel?: string;
 };
 
-function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
+function TopFigures({ data, attribution, fundName }: TopFiguresProps) {
 	const cardsData: CardsDatum[] = [
 		{
 			label: "# of Projects",
@@ -121,13 +121,13 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 							<AbsoluteIcon
 								size={28}
 								showTooltip={true}
-								donorName={donorName}
+								fundName={fundName}
 							/>
 						) : (
 							<PercentageIcon
 								size={28}
 								showTooltip={true}
-								donorName={donorName}
+								fundName={fundName}
 								attribution={
 									Math.round(attribution * 1000) / 10
 								}
@@ -176,7 +176,7 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 										? "3px solid var(--ocha-amber)"
 										: isReached
 											? "3px solid var(--ocha-blue)"
-											: `3px solid ${colors.donorColor}`,
+											: `3px solid ${colors.fundColor}`,
 								}}
 								{...tooltipProps}
 							>
@@ -198,7 +198,7 @@ function TopFigures({ data, attribution, donorName }: TopFiguresProps) {
 												? "var(--ocha-amber)"
 												: isReached
 													? "var(--ocha-blue)"
-													: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
+													: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 											fontFamily: "Montserrat",
 											lineHeight: 1.1,
 										}}

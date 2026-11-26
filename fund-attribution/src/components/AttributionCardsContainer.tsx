@@ -11,14 +11,15 @@ import ToggleButton from "@mui/material/ToggleButton";
 import { constants } from "../utils/constants";
 import NorthIcon from "@mui/icons-material/North";
 import IconsLegend from "./IconsLegend";
+import getFlagSrc from "../utils/flagsrc";
 
 type AttributionCardsContainerProps = {
 	attributions: Attributions;
 	lists: List;
-	donor: number;
-	funds: number[];
-	allFunds: number[];
-	setFunds: React.Dispatch<React.SetStateAction<number[]>>;
+	fund: number;
+	donors: number[];
+	allDonors: number[];
+	setDonors: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 type SortOrder = "asc" | "desc";
@@ -30,10 +31,10 @@ const { sortByOptions } = constants;
 function AttributionCardsContainer({
 	attributions,
 	lists,
-	donor,
-	funds,
-	allFunds,
-	setFunds,
+	fund,
+	donors,
+	allDonors,
+	setDonors,
 }: AttributionCardsContainerProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 	const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
@@ -42,14 +43,14 @@ function AttributionCardsContainer({
 	const keyGetters: Record<SortBy, (d: number) => number | string> = {
 		attribution: d => attributions[d].percentage,
 		total: d => attributions[d].total,
-		donation: d => attributions[d].donor,
+		donation: d => attributions[d].fund,
 		alphabetical: d => lists.fundNames[d],
 	};
 
 	const getKey = keyGetters[sortBy] ?? ((d: number) => d.toString());
 	const direction = sortOrder === "asc" ? 1 : -1;
 
-	const sortedFunds = allFunds.toSorted((a, b) => {
+	const sortedDonors = allDonors.toSorted((a, b) => {
 		const keyA = getKey(a);
 		const keyB = getKey(b);
 
@@ -61,23 +62,23 @@ function AttributionCardsContainer({
 		return comparison * direction;
 	});
 
-	function handleClick(thisFund: number) {
-		if (funds.length === 1 && funds.includes(thisFund)) {
+	function handleClick(thisDonor: number) {
+		if (donors.length === 1 && donors.includes(thisDonor)) {
 			setOpenSnack(true);
 			return;
 		}
-		setFunds(
-			funds.includes(thisFund)
-				? funds.filter(e => thisFund !== e)
-				: [...funds, thisFund],
+		setDonors(
+			donors.includes(thisDonor)
+				? donors.filter(e => thisDonor !== e)
+				: [...donors, thisDonor],
 		);
 	}
 
-	function handleClickKeepOnly(thisFund: number) {
-		if (funds.length === 1 && funds.includes(thisFund)) {
-			setFunds(allFunds);
+	function handleClickKeepOnly(thisDonor: number) {
+		if (donors.length === 1 && donors.includes(thisDonor)) {
+			setDonors(allDonors);
 		} else {
-			setFunds([thisFund]);
+			setDonors([thisDonor]);
 		}
 	}
 
@@ -121,7 +122,7 @@ function AttributionCardsContainer({
 					variant="h6"
 					sx={{ fontWeight: 400, color: "#333" }}
 				>
-					Attribution per fund
+					Attribution per donor
 				</Typography>
 				<Box
 					sx={{
@@ -190,29 +191,35 @@ function AttributionCardsContainer({
 					width: "100%",
 				}}
 			>
-				{sortedFunds.map(fund => {
+				{sortedDonors.map(donor => {
+					const { flagSrc } = getFlagSrc({
+						donor,
+						lists,
+					});
+
 					return (
 						<Grid
 							size={2.4}
-							key={fund}
+							key={donor}
 						>
 							<AttributionCard
-								donorValue={attributions[fund].donor}
-								totalValue={attributions[fund].total}
-								percentage={attributions[fund].percentage}
-								fund={fund}
+								donorValue={attributions[donor].fund}
+								totalValue={attributions[donor].total}
+								percentage={attributions[donor].percentage}
+								donor={donor}
 								fundName={lists.fundNames[fund]}
 								donorName={lists.donorGMSNames[donor]}
-								funds={funds}
+								donors={donors}
 								handleClick={handleClick}
 								handleClickKeepOnly={handleClickKeepOnly}
-								isTheOnlyCard={allFunds.length === 1}
+								isTheOnlyCard={allDonors.length === 1}
+								flagSrc={flagSrc}
 							/>
 						</Grid>
 					);
 				})}
 			</Grid>
-			<IconsLegend donorName={lists.donorGMSNames[donor]} />
+			<IconsLegend fundName={lists.fundNames[fund]} />
 		</Box>
 	);
 }

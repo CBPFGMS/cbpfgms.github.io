@@ -9,35 +9,35 @@ import formatSIFloat from "../utils/formatsi";
 import type { List } from "../utils/makelists";
 import toLocaleFixed from "../utils/localefixed";
 import InfoIcon from "@mui/icons-material/Info";
-import createFundsList from "../utils/createfundslist";
+import createDonorsList from "../utils/createdonorslist";
 import truncatePercentage from "../utils/truncatepercentage";
 import colors from "../utils/colors";
 
 type TopAttributionCardProps = {
-	donor: number;
+	fund: number;
 	attributions: Attributions;
 	lists: List;
-	funds: number[];
-	allFunds: number[];
+	donors: number[];
+	allDonors: number[];
 };
 
 function TopAttributionCard({
-	donor,
+	fund,
 	attributions,
 	lists,
-	funds,
-	allFunds,
+	donors,
+	allDonors,
 }: TopAttributionCardProps) {
 	const percentage = attributions.global.percentage;
 	const totalValue = attributions.global.total;
-	const donorValue = attributions.global.donor;
+	const fundValue = attributions.global.fund;
 	const {
 		truncatedPercentage,
 		truncatedPercentageForDisplay,
 		lessThanMinimum,
 	} = truncatePercentage(percentage);
 
-	const allFundsSelected = allFunds.length === funds.length;
+	const allDonorsSelected = allDonors.length === donors.length;
 
 	return (
 		<Box
@@ -55,8 +55,8 @@ function TopAttributionCard({
 				sx={{
 					width: "50%",
 					borderRadius: "8px",
-					background: `color-mix(in srgb, ${colors.donorColor} 3.5%, white)`,
-					border: `1px solid color-mix(in srgb, ${colors.donorColor} 50%, white)`,
+					background: `color-mix(in srgb, ${colors.fundColor} 3.5%, white)`,
+					border: `1px solid color-mix(in srgb, ${colors.fundColor} 50%, white)`,
 					boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
 				}}
 			>
@@ -83,14 +83,14 @@ function TopAttributionCard({
 									sx={{
 										fontSize: "1.1em",
 									}}
-									className="attrib-cl-donor"
+									className="attrib-cl-fund"
 								>
 									Global attribution
 								</Typography>
-								{!allFundsSelected && (
+								{!allDonorsSelected && (
 									<InfoIcon
 										data-tooltip-id="tooltip"
-										data-tooltip-content={`Global attribution refers only to the selected fund${funds.length > 1 ? "s" : ""}: ${createFundsList({ funds, lists })}`}
+										data-tooltip-content={`Global attribution refers only to the selected donor${donors.length > 1 ? "s" : ""}: ${createDonorsList({ donors, lists })}`}
 										data-tooltip-place="top"
 										style={{
 											color: "#666",
@@ -111,9 +111,9 @@ function TopAttributionCard({
 						>
 							<Box
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} donated for those funds.`}
+								data-tooltip-content={`${lists.fundNames[fund]} combined attribution for the selected donors is $${toLocaleFixed(fundValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} donated from those donors.`}
 								data-tooltip-place="top"
-								className={`attrib-info-btn attrib-rb-donor`}
+								className={`attrib-info-btn attrib-rb-fund`}
 								sx={{
 									display: "flex",
 									justifyContent: "center",
@@ -139,7 +139,7 @@ function TopAttributionCard({
 							data-tooltip-id="tooltip"
 							data-tooltip-content={`Global attribution: ${lessThanMinimum || truncatedPercentage}%`}
 							data-tooltip-place="top"
-							className={`attrib-cv-donor`}
+							className={`attrib-cv-fund`}
 						>
 							<NumberAnimator
 								number={truncatedPercentageForDisplay}
@@ -154,25 +154,25 @@ function TopAttributionCard({
 								paddingLeft: "0.5em",
 							}}
 							data-tooltip-id="tooltip"
-							data-tooltip-content={`Donated: $${toLocaleFixed(donorValue, 0, 2)}`}
+							data-tooltip-content={`Received: $${toLocaleFixed(fundValue, 0, 2)}`}
 							data-tooltip-place="top"
-							className={`attrib-cv-donor`}
+							className={`attrib-cv-fund`}
 						>
 							{"($"}
-							{donorValue < 1e3 ? (
+							{fundValue < 1e3 ? (
 								<NumberAnimator
-									number={Math.floor(donorValue)}
+									number={Math.floor(fundValue)}
 									type="integer"
 								/>
 							) : (
 								<span>
 									<NumberAnimator
 										number={parseFloat(
-											formatSIFloat(donorValue),
+											formatSIFloat(fundValue),
 										)}
 										type="decimal"
 									/>
-									{formatSIFloat(donorValue).slice(-1)}
+									{formatSIFloat(fundValue).slice(-1)}
 								</span>
 							)}
 							{")"}
@@ -184,12 +184,12 @@ function TopAttributionCard({
 						}}
 						className="attrib-card-footer"
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`Total donated: $${toLocaleFixed(totalValue, 0, 2)}`}
+						data-tooltip-content={`Total received: $${toLocaleFixed(totalValue, 0, 2)}`}
 						data-tooltip-place="top"
 					>
-						<Box className={`attrib-prog-track attrib-pt-donor`}>
+						<Box className={`attrib-prog-track attrib-pt-fund`}>
 							<Box
-								className={`attrib-prog-fill attrib-pf-donor`}
+								className={`attrib-prog-fill attrib-pf-fund`}
 								style={{
 									width: percentage * 100 + "%",
 									transitionProperty: "width",
@@ -197,7 +197,7 @@ function TopAttributionCard({
 								}}
 							></Box>
 						</Box>
-						<Box className={`attrib-pct attrib-pct-donor`}>
+						<Box className={`attrib-pct attrib-pct-fund`}>
 							<Typography sx={{ fontWeight: 500 }}>
 								{"$"}
 								{totalValue < 1e3 ? (

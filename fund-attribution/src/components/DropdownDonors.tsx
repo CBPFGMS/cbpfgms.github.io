@@ -9,34 +9,34 @@ import Checkbox from "@mui/material/Checkbox";
 import Snack from "./Snack";
 import type { ListObj } from "../utils/makelists";
 
-type DropdownFundsProps = {
-	funds: number[];
+type DropdownDonorsProps = {
+	donors: number[];
 	setValue: React.Dispatch<React.SetStateAction<number[]>>;
-	allFunds: number[];
+	allDonors: number[];
 	namesList: ListObj;
 };
 
-function DropdownFunds({
-	funds,
+function DropdownDonors({
+	donors,
 	setValue,
-	allFunds,
+	allDonors,
 	namesList,
-}: DropdownFundsProps) {
+}: DropdownDonorsProps) {
 	const selectRef = useRef<HTMLDivElement | null>(null);
 	const [dropdownHeight, setDropdownHeight] = useState<number>(450);
-	const isAllSelected = allFunds.length === funds.length;
+	const isAllSelected = allDonors.length === donors.length;
 
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
 
-	function handleChange(event: SelectChangeEvent<typeof funds>) {
+	function handleChange(event: SelectChangeEvent<typeof donors>) {
 		const eventArray: number[] = [event.target.value as number[]].flat();
 		if (eventArray.length === 0) {
-			setValue(funds);
+			setValue(donors);
 			setOpenSnack(true);
 			return;
 		}
 		if (isAllSelected) {
-			const missingItems: number[] = allFunds.filter(
+			const missingItems: number[] = allDonors.filter(
 				d => !eventArray.includes(d),
 			);
 			setValue(missingItems);
@@ -56,9 +56,9 @@ function DropdownFunds({
 	}
 
 	const namesListMemo = useMemo(() => {
-		allFunds.sort((a, b) => namesList[a].localeCompare(namesList[b]));
-		return allFunds;
-	}, [allFunds, namesList]);
+		allDonors.sort((a, b) => namesList[a].localeCompare(namesList[b]));
+		return allDonors;
+	}, [allDonors, namesList]);
 
 	return (
 		<div ref={selectRef}>
@@ -79,10 +79,10 @@ function DropdownFunds({
 					labelId="multiple-checkbox-label"
 					id="multiple-checkbox"
 					multiple
-					value={funds}
+					value={donors}
 					onChange={handleChange}
 					onMouseEnter={calculateHeight}
-					input={<OutlinedInput label="Funds" />}
+					input={<OutlinedInput label="Donors" />}
 					renderValue={selected =>
 						isAllSelected
 							? "All selected"
@@ -111,11 +111,23 @@ function DropdownFunds({
 							}}
 						>
 							<Checkbox
-								checked={funds.includes(name)}
+								checked={donors.includes(name)}
 								sx={{ padding: "6px" }}
 							/>
 							<ListItemText
-								style={{ maxWidth: "500px" }}
+								sx={{
+									maxWidth: "280px",
+									paddingRight: "1em",
+									"& .MuiListItemText-primary": {
+										display: "-webkit-box",
+										WebkitBoxOrient: "vertical",
+										WebkitLineClamp: 1,
+										overflow: "hidden",
+										overflowWrap: "anywhere",
+										whiteSpace: "normal",
+										lineHeight: 1.2,
+									},
+								}}
 								primary={namesList[name]}
 							/>
 						</MenuItem>
@@ -126,4 +138,4 @@ function DropdownFunds({
 	);
 }
 
-export default DropdownFunds;
+export default DropdownDonors;

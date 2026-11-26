@@ -3,13 +3,11 @@ import Typography from "@mui/material/Typography";
 import type { List } from "../utils/makelists";
 
 type DonorHeaderProps = {
-	donor: number;
+	fund: number;
 	lists: List;
-	flagSrc: string;
-	faviconFlag: string;
 };
 
-function DonorHeader({ donor, lists, flagSrc, faviconFlag }: DonorHeaderProps) {
+function DonorHeader({ fund, lists }: DonorHeaderProps) {
 	return (
 		<Box
 			sx={{
@@ -21,21 +19,7 @@ function DonorHeader({ donor, lists, flagSrc, faviconFlag }: DonorHeaderProps) {
 				marginTop: "5em",
 			}}
 		>
-			<title>{`${lists.donorGMSNames[donor]} attribution overview`}</title>
-			<link
-				rel="icon"
-				type="image/png"
-				href={faviconFlag}
-			/>
-			<img
-				src={flagSrc}
-				width="76px"
-				style={{
-					borderRadius: "0.3rem",
-					boxShadow: "0 0.5rem 0.5rem rgba(0, 0, 0, 0.1)",
-				}}
-				alt={`${lists.donorGMSNames[donor]} flag`}
-			/>
+			<title>{`${lists.fundNames[fund]} attribution overview`}</title>
 			<Typography
 				sx={{
 					fontSize: "3.5em",
@@ -47,7 +31,7 @@ function DonorHeader({ donor, lists, flagSrc, faviconFlag }: DonorHeaderProps) {
 					textAlign: "center",
 				}}
 			>
-				{lists.donorGMSNames[donor]}
+				{lists.fundNames[fund]}
 			</Typography>
 			<Typography
 				sx={{

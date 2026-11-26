@@ -4,13 +4,13 @@ import PercentIcon from "@mui/icons-material/Percent";
 type TooltipProps =
 	| {
 			showTooltip: true;
-			donorName: string;
+			fundName: string;
 			attribution: number;
 			plural?: boolean;
 	  }
 	| {
 			showTooltip?: false;
-			donorName?: never;
+			fundName?: never;
 			attribution?: never;
 			plural?: never;
 	  };
@@ -22,7 +22,7 @@ type PercentageIconProps = {
 function PercentageIcon({
 	size = 22,
 	showTooltip = false,
-	donorName,
+	fundName,
 	attribution,
 	plural = false,
 }: PercentageIconProps) {
@@ -35,7 +35,7 @@ function PercentageIcon({
 		<Box
 			{...(showTooltip && {
 				"data-tooltip-id": "tooltip",
-				"data-tooltip-content": `${valuesText} ${attribution}% (which is ${donorName}'s attribution percentage) of the total value${plural ? "s" : ""}.`,
+				"data-tooltip-content": `${valuesText} ${attribution}% (which is ${fundName}'s attribution percentage) of the total value${plural ? "s" : ""}.`,
 				"data-tooltip-place": "top",
 			})}
 			sx={{

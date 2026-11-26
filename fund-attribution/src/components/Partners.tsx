@@ -23,11 +23,10 @@ import processDataPartners, {
 type PartnersProps = {
 	allocationsData: AllocationsData;
 	lists: List;
-	funds: number[];
 	year: number;
 	inDataSectors: InAllocationsDataLists["sectorsPerYear"];
 	attribution: number;
-	donorName: string;
+	fundName: string;
 	hasUS: boolean;
 };
 
@@ -39,12 +38,11 @@ type SortAccessor = (e: PartnersDatum) => string | number;
 
 function Partners({
 	allocationsData,
-	funds,
 	year,
 	lists,
 	inDataSectors,
 	attribution,
-	donorName,
+	fundName,
 	hasUS,
 }: PartnersProps) {
 	const [sortingCriterion, setSortingCriterion] =
@@ -56,26 +54,24 @@ function Partners({
 		() =>
 			processDataPartners({
 				allocationsData,
-				funds,
 				sector,
 				year,
 				globalAttribution: attribution,
 				hasUS,
 			}),
-		[allocationsData, funds, sector, year, attribution, hasUS],
+		[allocationsData, sector, year, attribution, hasUS],
 	);
 
 	const dataSectors = useMemo(
 		() =>
 			processDataSectors({
 				allocationsData,
-				funds,
 				year,
 				setSector,
 				globalAttribution: attribution,
 				hasUS,
 			}),
-		[allocationsData, funds, year, attribution, hasUS],
+		[allocationsData, year, attribution, hasUS],
 	);
 
 	const sortMethod = sortingOrder === "asc" ? ascending : descending,
@@ -84,7 +80,6 @@ function Partners({
 				partner: lists.organizations[e.partner],
 				projects: e.projects.size,
 				budget: e.budget,
-				funds: e.funds.size,
 				sector: e.sectors.size,
 			};
 			return criteriaMap[sortingCriterion];
@@ -143,7 +138,7 @@ function Partners({
 				sector={sector}
 				setSector={setSector}
 				attribution={attribution}
-				donorName={donorName}
+				fundName={fundName}
 			/>
 			<Box style={{ display: "flex", marginBottom: 1 }}>
 				<Typography
@@ -177,7 +172,7 @@ function Partners({
 							setSortingOrder={setSortingOrder}
 							sortingOrder={sortingOrder}
 							attribution={attribution}
-							donorName={donorName}
+							fundName={fundName}
 						/>
 						<PartnersTableBody
 							data={sortedData}

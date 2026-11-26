@@ -4,18 +4,18 @@ import FolderOffIcon from "@mui/icons-material/FolderOff";
 import type { List } from "../utils/makelists";
 
 type NoAttributionProps = {
-	donor: number;
+	fund: number;
 	year: number;
 	lists: List;
 };
 
 export default function NoAttribution({
-	donor,
+	fund,
 	year,
 	lists,
 }: NoAttributionProps) {
 	const title = "No attribution",
-		subtitle = `No attribution data for ${lists.donorGMSNames[donor]} in ${year}. Please try to change the year or the donor.`;
+		subtitle = `No attribution data for ${lists.fundNames[fund]} in ${year}. Please try to change the year or the donor.`;
 	return (
 		<Box
 			sx={{

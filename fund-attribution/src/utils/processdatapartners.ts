@@ -4,7 +4,6 @@ import { constants } from "./constants";
 
 type ProcessDataPartnersParams = {
 	allocationsData: AllocationsData;
-	funds: number[];
 	sector: number[];
 	year: number;
 	globalAttribution: number;
@@ -14,12 +13,10 @@ type ProcessDataPartnersParams = {
 type SectorDetailsDatum = {
 	sector: number;
 	budget: number;
-	fund: Set<number>;
 };
 type SectorDetailsDatumProject = {
 	sector: number;
 	budget: number;
-	fund: number;
 	project: number;
 };
 
@@ -28,7 +25,6 @@ export type PartnersDatum = {
 	sectors: Set<number>;
 	budget: number;
 	projects: Set<number>;
-	funds: Set<number>;
 	sectorsDetailsForProjects: SectorDetailsDatumProject[];
 	sectorsDetails: SectorDetailsDatum[];
 };
@@ -37,7 +33,6 @@ const { USProjectsString } = constants;
 
 function processDataPartners({
 	allocationsData,
-	funds,
 	sector,
 	year,
 	globalAttribution,
@@ -53,11 +48,7 @@ function processDataPartners({
 			return;
 		}
 		const sectors = datum.sectorData.map(d => d.sectorId);
-		if (
-			funds.includes(datum.fund) &&
-			sectors.some(d => sector.includes(d)) &&
-			year === datum.year
-		) {
+		if (sectors.some(d => sector.includes(d)) && year === datum.year) {
 			const foundPartner = data.find(
 				d => d.partner === datum.organizationId,
 			);
@@ -76,12 +67,10 @@ function processDataPartners({
 							);
 						if (foundSectorInDetails) {
 							foundSectorInDetails.budget += attributedBudget;
-							foundSectorInDetails.fund.add(datum.fund);
 						} else {
 							foundPartner.sectorsDetails.push({
 								sector: d.sectorId,
 								budget: attributedBudget,
-								fund: new Set([datum.fund]),
 							});
 						}
 
@@ -94,19 +83,16 @@ function processDataPartners({
 						if (foundSectorInDetailsForProjects) {
 							foundSectorInDetailsForProjects.budget +=
 								attributedBudget;
-							foundSectorInDetailsForProjects.fund = datum.fund;
 						} else {
 							foundPartner.sectorsDetailsForProjects.push({
 								sector: d.sectorId,
 								budget: attributedBudget,
-								fund: datum.fund,
 								project: datum.projectId,
 							});
 						}
 					}
 				});
 				foundPartner.projects.add(datum.projectId);
-				foundPartner.funds.add(datum.fund);
 			} else {
 				let thisBudget = 0;
 				const thisSectors = new Set<number>();
@@ -125,12 +111,10 @@ function processDataPartners({
 						);
 						if (foundSectorInDetails) {
 							foundSectorInDetails.budget += attributedBudget;
-							foundSectorInDetails.fund.add(datum.fund);
 						} else {
 							thisSectorDetails.push({
 								sector: d.sectorId,
 								budget: attributedBudget,
-								fund: new Set([datum.fund]),
 							});
 						}
 						const foundSectorInDetailsForProjects =
@@ -142,12 +126,10 @@ function processDataPartners({
 						if (foundSectorInDetailsForProjects) {
 							foundSectorInDetailsForProjects.budget +=
 								attributedBudget;
-							foundSectorInDetailsForProjects.fund = datum.fund;
 						} else {
 							thisSectorDetailsForProjects.push({
 								sector: d.sectorId,
 								budget: attributedBudget,
-								fund: datum.fund,
 								project: datum.projectId,
 							});
 						}
@@ -157,7 +139,6 @@ function processDataPartners({
 					partner: datum.organizationId,
 					sectors: thisSectors,
 					budget: thisBudget,
-					funds: new Set([datum.fund]),
 					projects: new Set([datum.projectId]),
 					sectorsDetailsForProjects: thisSectorDetailsForProjects,
 					sectorsDetails: thisSectorDetails,

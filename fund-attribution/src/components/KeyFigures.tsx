@@ -19,7 +19,7 @@ import colors from "../utils/colors";
 type KeyFiguresProps = {
 	data: DataKeyFigures;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 type CardsDatum = {
@@ -37,14 +37,14 @@ type CardsDatum = {
 	icon: typeof SvgIcon;
 };
 
-function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
+function KeyFigures({ data, attribution, fundName }: KeyFiguresProps) {
 	const cardsData: CardsDatum[] = [
 		{
 			label: "Localization",
 			value: data.localization,
 			total: data.totalLocalization,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalLocalization).toLocaleString()} granted to local partners is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalLocalization).toLocaleString()} granted to local partners is attributed to ${fundName}`,
 			icon: LocalizationIcon,
 		},
 		{
@@ -52,7 +52,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 			value: data.disability,
 			total: data.totalDisability,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalDisability).toLocaleString()} granted to projects with a disability component is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalDisability).toLocaleString()} granted to projects with a disability component is attributed to ${fundName}`,
 			icon: DisabilityIcon,
 		},
 		{
@@ -60,7 +60,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 			value: data.gbv,
 			total: data.totalGbv,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalGbv).toLocaleString()} provided for projects with GBV component or focus is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalGbv).toLocaleString()} provided for projects with GBV component or focus is attributed to ${fundName}`,
 			icon: GbvIcon,
 		},
 		{
@@ -68,7 +68,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 			value: data.genderEquality,
 			total: data.totalGenderEquality,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalGenderEquality).toLocaleString()} granted towards gender equality is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalGenderEquality).toLocaleString()} granted towards gender equality is attributed to ${fundName}`,
 			icon: EqualityIcon,
 		},
 		{
@@ -76,7 +76,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 			value: data.wlo,
 			total: data.totalWlo,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalWlo).toLocaleString()} provided to WLO is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalWlo).toLocaleString()} provided to WLO is attributed to ${fundName}`,
 			icon: WloIcon,
 		},
 		{
@@ -84,7 +84,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 			value: data.protection,
 			total: data.totalProtection,
 			type: "decimal",
-			subTitle: `out of a total of $${Math.floor(data.totalProtection).toLocaleString()} granted to protection activities is attributed to ${donorName}`,
+			subTitle: `out of a total of $${Math.floor(data.totalProtection).toLocaleString()} granted to protection activities is attributed to ${fundName}`,
 			icon: ProtectionIcon,
 		},
 	];
@@ -155,7 +155,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 							</Box>
 							<Box
 								sx={{
-									background: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
+									background: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 									borderRadius: "12px 12px 0 0",
 									minHeight: "78px",
 									display: "flex",
@@ -187,7 +187,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 									style={{
 										fontSize: "2.2rem",
 										fontWeight: 700,
-										color: `color-mix(in srgb, ${colors.donorColor} 80%, black)`,
+										color: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 										lineHeight: 1,
 										marginBottom: "8px",
 									}}
@@ -202,7 +202,7 @@ function KeyFigures({ data, attribution, donorName }: KeyFiguresProps) {
 								<PercentageIcon
 									size={34}
 									showTooltip={true}
-									donorName={donorName}
+									fundName={fundName}
 									attribution={
 										Math.round(attribution * 1000) / 10
 									}

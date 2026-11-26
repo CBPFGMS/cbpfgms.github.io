@@ -14,7 +14,7 @@ type SectorsRibbonProps = {
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	lists: List;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 function SectorsRibbon({
@@ -23,7 +23,7 @@ function SectorsRibbon({
 	setSector,
 	lists,
 	attribution,
-	donorName,
+	fundName,
 }: SectorsRibbonProps) {
 	function handleClick(d: number) {
 		if (sector.includes(d)) {
@@ -124,7 +124,7 @@ function SectorsRibbon({
 								<PercentageIcon
 									size={18}
 									showTooltip={true}
-									donorName={donorName}
+									fundName={fundName}
 									attribution={
 										Math.round(attribution * 1000) / 10
 									}

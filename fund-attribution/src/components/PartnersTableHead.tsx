@@ -16,7 +16,7 @@ type PartnersTableHeadProps = {
 	sortingOrder: SortingOrder;
 	setSortingOrder: React.Dispatch<React.SetStateAction<SortingOrder>>;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 type Titles = {
@@ -33,14 +33,13 @@ function PartnersTableHead({
 	sortingCriterion,
 	sortingOrder,
 	attribution,
-	donorName,
+	fundName,
 }: PartnersTableHeadProps) {
 	const titles: Titles = {
 		partner: "Organization Name",
 		sector: "Sectors",
 		budget: "Approved Amount, in USD",
 		projects: "# of Projects",
-		funds: "# of CBPFs",
 	};
 
 	function handleClick(header: SortingCriterion) {
@@ -66,7 +65,7 @@ function PartnersTableHead({
 								<PercentageIcon
 									size={22}
 									showTooltip={true}
-									donorName={donorName}
+									fundName={fundName}
 									attribution={
 										Math.round(attribution * 1000) / 10
 									}
@@ -75,15 +74,13 @@ function PartnersTableHead({
 								<AbsoluteIcon
 									size={22}
 									showTooltip={true}
-									donorName={donorName}
+									fundName={fundName}
 								/>
 							)}
 						</Box>
 					);
 					const showIcon =
-						header === "budget" ||
-						header === "projects" ||
-						header === "funds";
+						header === "budget" || header === "projects";
 					return (
 						<TableCell
 							key={header}
@@ -122,7 +119,7 @@ function PartnersTableHead({
 										"&.Mui-active": {
 											color:
 												header === sortingCriterion
-													? `color-mix(in srgb, ${colors.donorColor} 75%, black)`
+													? `color-mix(in srgb, ${colors.fundColor} 75%, black)`
 													: null,
 											fontWeight:
 												header === sortingCriterion

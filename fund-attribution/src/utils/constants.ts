@@ -1,5 +1,5 @@
 export const constants = {
-	rootElementId: "fundattributionroot",
+	rootElementId: "fundfundattributionroot",
 	buildVersion: "v1.0",
 	fundType: 1,
 	currentYear: new Date().getFullYear(),
@@ -18,7 +18,7 @@ export const constants = {
 		"regions",
 		"locations",
 	],
-	partnersHeader: ["partner", "sector", "budget", "projects", "funds"],
+	partnersHeader: ["partner", "sector", "budget", "projects"],
 	columnWidthsPartners: ["35%", "15%", "36%", "7%", "7%"],
 	partnerBarMaxWidth: 82,
 	partnerBarHeight: 24,

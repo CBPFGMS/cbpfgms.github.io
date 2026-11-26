@@ -2,7 +2,7 @@ import type { ContributionsData } from "./processcontributionsdata";
 
 type AttributionObject = {
 	total: number;
-	donor: number;
+	fund: number;
 	percentage: number;
 };
 
@@ -14,19 +14,19 @@ type CalculateAttributionsParams = {
 	contributionsData: ContributionsData;
 	year: number;
 	hasUS: boolean;
-	funds: number[];
-	allFunds: number[];
+	donors: number[];
+	allDonors: number[];
 };
 
 function calculateAttributions({
 	contributionsData,
 	year,
 	hasUS,
-	funds,
-	allFunds,
+	donors,
+	allDonors,
 }: CalculateAttributionsParams): Attributions {
 	const attributions: Attributions = {
-		global: { total: 0, donor: 0, percentage: 0 },
+		global: { total: 0, fund: 0, percentage: 0 },
 	};
 
 	contributionsData.forEach(datum => {
@@ -35,15 +35,15 @@ function calculateAttributions({
 		}
 		if (year === datum.year) {
 			const decimalPercentage = datum.percentage / 100;
-			if (funds.includes(datum.fund)) {
+			if (donors.includes(datum.donor)) {
 				attributions.global.total += datum.totalContribution;
-				attributions.global.donor += datum.contribution;
+				attributions.global.fund += datum.contribution;
 			}
 
-			if (allFunds.includes(datum.fund)) {
-				attributions[datum.fund] = {
+			if (allDonors.includes(datum.donor)) {
+				attributions[datum.donor] = {
 					total: datum.totalContribution,
-					donor: datum.contribution,
+					fund: datum.contribution,
 					percentage: decimalPercentage,
 				};
 			}
@@ -51,8 +51,9 @@ function calculateAttributions({
 	});
 
 	attributions.global.percentage = attributions.global.total
-		? attributions.global.donor / attributions.global.total
+		? attributions.global.fund / attributions.global.total
 		: 0;
+
 
 	return attributions;
 }

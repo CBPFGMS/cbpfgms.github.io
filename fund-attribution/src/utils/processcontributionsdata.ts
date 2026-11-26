@@ -5,8 +5,8 @@ type ProcessContributionsDataParams = {
 	dynamicContributionsResults: ContributionsJson[];
 };
 
-type donorDatum = {
-	fund: number;
+type fundDatum = {
+	donor: number;
 	year: number;
 	contribution: number;
 	totalContribution: number;
@@ -14,11 +14,11 @@ type donorDatum = {
 	hasUS: boolean;
 };
 
-export type ContributionsData = donorDatum[];
+export type ContributionsData = fundDatum[];
 
 export type InContributionsDataLists = {
 	years: Set<number>;
-	fundsPerYear: { [year: number]: Set<number> };
+	donorsPerYear: { [year: number]: Set<number> };
 };
 
 type SetType<T> = {
@@ -36,21 +36,21 @@ function processContributionsData({
 	const contributionsData: ContributionsData = [];
 
 	const yearsSet: Set<InContributionsDataListsValues["years"]> = new Set();
-	const fundsPerYear: InContributionsDataLists["fundsPerYear"] = {};
+	const donorsPerYear: InContributionsDataLists["donorsPerYear"] = {};
 
 	dynamicContributionsResults.forEach(contribution => {
 		const thisYear = contribution.meta.fiscalYear;
 
-		if (contribution.donors[0] === undefined) {
+		if (contribution.pooledFunds[0] === undefined) {
 			console.warn(
-				`No contribution found for donor ${contribution.filters.donorId} in year ${thisYear}`,
+				`No contribution found for fund ${contribution.filters.pooledFundId} in year ${thisYear}`,
 			);
 			return;
 		}
 
 		yearsSet.add(thisYear);
 
-		contribution.donors[0].pooledFunds.forEach(row => {
+		contribution.pooledFunds[0].donors.forEach(row => {
 			const parsedContributions =
 				contributionsObjectSchema.safeParse(row);
 
@@ -63,22 +63,20 @@ function processContributionsData({
 				return;
 			}
 
-			if (row.isPassThrough) {
-				return;
-			}
-
-			if (!fundsPerYear[thisYear]) {
-				fundsPerYear[thisYear] = new Set([row.pooledFundId]);
+			if (!donorsPerYear[thisYear]) {
+				donorsPerYear[thisYear] = new Set([row.donorId]);
 			} else {
-				fundsPerYear[thisYear].add(row.pooledFundId);
+				donorsPerYear[thisYear].add(row.donorId);
 			}
 
 			contributionsData.push({
-				fund: row.pooledFundId,
+				donor: row.donorId,
 				year: thisYear,
 				contribution: row.attributedAmount,
-				totalContribution: row.pooledFundTotal,
-				percentage: row.shareOfFundPercent,
+				totalContribution: row.donorTotal,
+				percentage: row.donorTotal
+					? (row.attributedAmount / row.donorTotal) * 100
+					: 0, //TODO: change for a calculated property
 				hasUS: !contribution.meta.excludesUsa,
 			});
 		});
@@ -86,7 +84,7 @@ function processContributionsData({
 
 	const inContributionsDataLists: InContributionsDataLists = {
 		years: yearsSet,
-		fundsPerYear,
+		donorsPerYear: donorsPerYear,
 	};
 
 	return {

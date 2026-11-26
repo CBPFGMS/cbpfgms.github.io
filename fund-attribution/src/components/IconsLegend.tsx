@@ -18,7 +18,7 @@ const textStyle: React.CSSProperties = {
 	fontSize: "0.875em",
 };
 
-function IconsLegend({ donorName }: { donorName: string }) {
+function IconsLegend({ fundName }: { fundName: string }) {
 	return (
 		<Box
 			sx={{
@@ -42,7 +42,7 @@ function IconsLegend({ donorName }: { donorName: string }) {
 					component="span"
 					sx={{ ...textStyle, marginLeft: "0.5em" }}
 				>
-					Absolute values, independent of {donorName}'s attribution
+					Absolute values, independent of {fundName}'s attribution
 					percentage.
 				</Typography>
 			</Box>
@@ -52,7 +52,7 @@ function IconsLegend({ donorName }: { donorName: string }) {
 					component="span"
 					sx={{ ...textStyle, marginLeft: "0.5em" }}
 				>
-					Values calculated based on {donorName}'s attribution
+					Values calculated based on {fundName}'s attribution
 					percentage.
 				</Typography>
 			</Box>

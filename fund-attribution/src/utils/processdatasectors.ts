@@ -3,7 +3,6 @@ import { constants } from "./constants";
 
 type ProcessDataSectorsParams = {
 	allocationsData: AllocationsData;
-	funds: number[];
 	year: number;
 	setSector: React.Dispatch<React.SetStateAction<number[]>>;
 	globalAttribution: number;
@@ -23,7 +22,6 @@ const { USProjectsString } = constants;
 
 function processDataSectors({
 	allocationsData,
-	funds,
 	year,
 	setSector,
 	globalAttribution,
@@ -38,7 +36,7 @@ function processDataSectors({
 		if (!hasUS && datum.projectCode.includes(USProjectsString)) {
 			return;
 		}
-		if (funds.includes(datum.fund) && year === datum.year) {
+		if (year === datum.year) {
 			sectorsData.total += datum.budget * globalAttribution;
 
 			datum.sectorData.forEach(sectorDatum => {

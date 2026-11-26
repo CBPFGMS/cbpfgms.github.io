@@ -2,11 +2,11 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import colors from "../utils/colors";
 
-type DonorChipProps = {
+type FundChipProps = {
 	isSticky: boolean;
 };
 
-function DonorChip({ isSticky }: DonorChipProps) {
+function FundChip({ isSticky }: FundChipProps) {
 	return (
 		<Box
 			sx={{
@@ -14,17 +14,17 @@ function DonorChip({ isSticky }: DonorChipProps) {
 				bottom: "0px",
 				width: "100%",
 				height: "1px",
-				background: colors.donorColor,
+				background: colors.fundColor,
 			}}
 		>
 			<Chip
-				label="Donor Attribution"
+				label="Fund Attribution"
 				size="medium"
 				sx={{
 					position: "absolute",
 					top: "-16px",
 					left: "26px",
-					backgroundColor: colors.donorColor,
+					backgroundColor: colors.fundColor,
 					color: "#fff",
 					fontWeight: 500,
 					fontSize: "1em",
@@ -37,4 +37,4 @@ function DonorChip({ isSticky }: DonorChipProps) {
 	);
 }
 
-export default DonorChip;
+export default FundChip;

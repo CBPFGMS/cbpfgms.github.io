@@ -18,7 +18,7 @@ import processDataBarChart from "../utils/processdatabarchart";
 import ChartsContainer from "./ChartsContainer";
 import Partners from "./Partners";
 import NoData from "./NoData";
-import getFlagSrc from "../utils/flagsrc";
+// import getFlagSrc from "../utils/flagsrc";
 import NoAttribution from "./NoAttribution";
 import processLollipopData from "../utils/processlollipopdata";
 // import type { AllocationsLollipopObject } from "../utils/schemas";
@@ -27,12 +27,12 @@ import LollipopContainer from "./LollipopContainer";
 export type Charts = (typeof constants.charts)[number];
 
 type MainContainerProps = {
-	donor: number;
+	fund: number;
 };
 
 const { USCode } = constants;
 
-function MainContainer({ donor }: MainContainerProps) {
+function MainContainer({ fund }: MainContainerProps) {
 	const {
 		contributionsData,
 		inContributionsDataLists,
@@ -49,15 +49,19 @@ function MainContainer({ donor }: MainContainerProps) {
 		allocationsLollipopWithoutUSData,
 	} = useAppData();
 
-	const lastDonorYear = Array.from(inContributionsDataLists.years).sort(
+	const lastFundYear = Array.from(inContributionsDataLists.years).sort(
 		(a, b) => b - a,
 	)[0];
 
-	const [hasUS, setHasUS] = useState<boolean>(donor === USCode);
-	const [year, setYear] = useState<number>(lastDonorYear);
+	const [hasUS, setHasUS] = useState<boolean>(false);
+	const [year, setYear] = useState<number>(lastFundYear);
 
-	const allFunds = Array.from(inContributionsDataLists.fundsPerYear[year]);
-	const [funds, setFunds] = useState<number[]>(allFunds);
+	const allDonors = hasUS
+		? Array.from(inContributionsDataLists.donorsPerYear[year])
+		: Array.from(inContributionsDataLists.donorsPerYear[year]).filter(
+				d => d !== USCode,
+			);
+	const [donors, setDonors] = useState<number[]>(allDonors);
 
 	const attributions = useMemo(
 		() =>
@@ -65,10 +69,10 @@ function MainContainer({ donor }: MainContainerProps) {
 				contributionsData,
 				year,
 				hasUS,
-				funds,
-				allFunds,
+				donors,
+				allDonors,
 			}),
-		[contributionsData, year, hasUS, funds, allFunds],
+		[contributionsData, year, hasUS, donors, allDonors],
 	);
 
 	const dataTopFigures = useMemo(
@@ -76,19 +80,11 @@ function MainContainer({ donor }: MainContainerProps) {
 			processDataTopFigures({
 				allocationsData,
 				totalBeneficiariesData,
-				funds,
 				globalAttribution: attributions.global.percentage,
 				year,
 				hasUS,
 			}),
-		[
-			allocationsData,
-			totalBeneficiariesData,
-			funds,
-			attributions,
-			year,
-			hasUS,
-		],
+		[allocationsData, totalBeneficiariesData, attributions, year, hasUS],
 	);
 
 	const dataKeyFigures = useMemo(
@@ -98,7 +94,6 @@ function MainContainer({ donor }: MainContainerProps) {
 				projectClusterData,
 				localizationDataWithUS,
 				localizationDataWithoutUS,
-				funds,
 				globalAttribution: attributions.global.percentage,
 				year,
 				hasUS,
@@ -108,7 +103,6 @@ function MainContainer({ donor }: MainContainerProps) {
 			projectClusterData,
 			localizationDataWithUS,
 			localizationDataWithoutUS,
-			funds,
 			attributions,
 			year,
 			hasUS,
@@ -119,12 +113,11 @@ function MainContainer({ donor }: MainContainerProps) {
 		() =>
 			processDataTotalBeneficiaries({
 				totalBeneficiariesData,
-				funds,
 				globalAttribution: attributions.global.percentage,
 				year,
 				hasUS,
 			}),
-		[totalBeneficiariesData, funds, attributions, year, hasUS],
+		[totalBeneficiariesData, attributions, year, hasUS],
 	);
 
 	const { dataSector, dataOrganization } = useMemo(
@@ -132,7 +125,6 @@ function MainContainer({ donor }: MainContainerProps) {
 			processDataBarChart({
 				allocationsData,
 				year,
-				funds,
 				totalBeneficiariesByPartnerData,
 				totalBeneficiariesBySectorData,
 				globalAttribution: attributions.global.percentage,
@@ -141,7 +133,6 @@ function MainContainer({ donor }: MainContainerProps) {
 		[
 			allocationsData,
 			year,
-			funds,
 			totalBeneficiariesByPartnerData,
 			totalBeneficiariesBySectorData,
 			attributions,
@@ -152,29 +143,25 @@ function MainContainer({ donor }: MainContainerProps) {
 	const hasNoAttributions = attributions.global.percentage === 0;
 	const hasNoData = targetedAndReachedTotal.targeted.total === 0;
 
-	const { flagSrc, faviconFlag } = getFlagSrc({
-		donor,
-		lists,
-	});
+	// const { flagSrc, faviconFlag } = getFlagSrc({
+	// 	fund,
+	// 	lists,
+	// });
 
 	const lollipopData = useMemo(
 		() =>
 			processLollipopData({
 				allocationsLollipopData,
 				allocationsLollipopWithoutUSData,
-				funds,
 				year,
 				hasUS,
-				lists,
 				globalAttribution: attributions.global.percentage,
 			}),
 		[
 			allocationsLollipopData,
 			allocationsLollipopWithoutUSData,
-			funds,
 			year,
 			hasUS,
-			lists,
 			attributions,
 		],
 	);
@@ -198,41 +185,38 @@ function MainContainer({ donor }: MainContainerProps) {
 				hasUS={hasUS}
 				setHasUS={setHasUS}
 				inContributionsDataLists={inContributionsDataLists}
-				donor={donor}
-				setFunds={setFunds}
+				fund={fund}
+				setDonors={setDonors}
 				lists={lists}
-				funds={funds}
+				donors={donors}
 				attributions={attributions}
-				flagSrc={flagSrc}
 			/>
 			<DonorHeader
-				donor={donor}
+				fund={fund}
 				lists={lists}
-				flagSrc={flagSrc}
-				faviconFlag={faviconFlag}
 			/>
 			{hasNoAttributions ? (
 				<NoAttribution
-					donor={donor}
+					fund={fund}
 					year={year}
 					lists={lists}
 				/>
 			) : (
 				<>
 					<TopAttributionCard
-						donor={donor}
+						fund={fund}
 						attributions={attributions}
 						lists={lists}
-						funds={funds}
-						allFunds={allFunds}
+						donors={donors}
+						allDonors={allDonors}
 					/>
 					<AttributionCardsContainer
 						attributions={attributions}
 						lists={lists}
-						donor={donor}
-						funds={funds}
-						allFunds={allFunds}
-						setFunds={setFunds}
+						fund={fund}
+						donors={donors}
+						allDonors={allDonors}
+						setDonors={setDonors}
 					/>
 				</>
 			)}
@@ -248,16 +232,16 @@ function MainContainer({ donor }: MainContainerProps) {
 						<TopFigures
 							data={dataTopFigures}
 							attribution={attributions.global.percentage}
-							donorName={lists.donorGMSNames[donor]}
+							fundName={lists.fundNames[fund]}
 						/>
 						<KeyFigures
 							data={dataKeyFigures}
 							attribution={attributions.global.percentage}
-							donorName={lists.donorGMSNames[donor]}
+							fundName={lists.fundNames[fund]}
 						/>
 						<SectionDivider title="Net funding" />
 						<LollipopContainer
-							donorName={lists.donorGMSNames[donor]}
+							fundName={lists.fundNames[fund]}
 							attribution={attributions.global.percentage}
 							lollipopData={lollipopData}
 						/>
@@ -268,19 +252,18 @@ function MainContainer({ donor }: MainContainerProps) {
 							dataOrganization={dataOrganization}
 							lists={lists}
 							attribution={attributions.global.percentage}
-							donorName={lists.donorGMSNames[donor]}
+							fundName={lists.fundNames[fund]}
 						/>
 						<SectionDivider title="Partners" />
 						<Partners
 							allocationsData={allocationsData}
-							funds={funds}
 							year={year}
 							lists={lists}
 							inDataSectors={
 								inAllocationsDataLists.sectorsPerYear
 							}
 							attribution={attributions.global.percentage}
-							donorName={lists.donorGMSNames[donor]}
+							fundName={lists.fundNames[fund]}
 							hasUS={hasUS}
 						/>
 						{/* <SectionDivider title="Locations" /> */}

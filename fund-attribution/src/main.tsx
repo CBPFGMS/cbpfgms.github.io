@@ -7,7 +7,7 @@ import App from "./App.tsx";
 import UnsupportedScreen from "./components/UnsupportedScreen.tsx";
 import { constants } from "./utils/constants.ts";
 
-const rootElement = document.getElementById("attributionroot")!;
+const rootElement = document.getElementById("fundattributionroot")!;
 const startYearString = rootElement.dataset.startyear;
 
 const isWideEnough = window.matchMedia(

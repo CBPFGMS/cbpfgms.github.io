@@ -15,7 +15,7 @@ type ChartsContainerProps = {
 	dataOrganization: DatumBarChart[];
 	lists: List;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 function ChartsContainer({
@@ -24,7 +24,7 @@ function ChartsContainer({
 	dataOrganization,
 	lists,
 	attribution,
-	donorName,
+	fundName,
 }: ChartsContainerProps) {
 	return (
 		<Grid
@@ -77,7 +77,7 @@ function ChartsContainer({
 						<PictogramChart
 							targetedAndReachedTotal={targetedAndReachedTotal}
 							attribution={attribution}
-							donorName={donorName}
+							fundName={fundName}
 						/>
 					</Grid>
 					<Divider
@@ -100,7 +100,7 @@ function ChartsContainer({
 							}
 							chartType={"organizations"}
 							attribution={attribution}
-							donorName={donorName}
+							fundName={fundName}
 						/>
 					</Grid>
 				</Grid>
@@ -143,7 +143,7 @@ function ChartsContainer({
 								title={"People targeted and reached by sector"}
 								chartType={"sectors"}
 								attribution={attribution}
-								donorName={donorName}
+								fundName={fundName}
 							/>
 						</Box>
 					</Grid>

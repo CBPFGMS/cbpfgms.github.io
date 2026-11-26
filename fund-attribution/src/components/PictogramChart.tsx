@@ -19,7 +19,7 @@ import PercentageIcon from "./PercentageIcon";
 type PictogramChartProps = {
 	targetedAndReachedTotal: TargetedAndReachedTotal;
 	attribution: number;
-	donorName: string;
+	fundName: string;
 };
 
 const { beneficiaryCategories } = constants;
@@ -27,7 +27,7 @@ const { beneficiaryCategories } = constants;
 function PictogramChart({
 	targetedAndReachedTotal,
 	attribution,
-	donorName,
+	fundName,
 }: PictogramChartProps) {
 	//using data from new APIs
 
@@ -63,7 +63,7 @@ function PictogramChart({
 				<PercentageIcon
 					size={34}
 					showTooltip={true}
-					donorName={donorName}
+					fundName={fundName}
 					attribution={Math.round(attribution * 1000) / 10}
 					plural={true}
 				/>

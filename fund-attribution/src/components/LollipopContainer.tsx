@@ -8,13 +8,13 @@ import type { AllocationsLollipopObject } from "../utils/schemas";
 import { select } from "d3";
 
 type LollipopContainerProps = {
-	donorName: string;
+	fundName: string;
 	attribution: number;
 	lollipopData: AllocationsLollipopObject[];
 };
 
 function LollipopContainer({
-	donorName,
+	fundName,
 	attribution,
 	lollipopData,
 }: LollipopContainerProps) {
@@ -63,7 +63,7 @@ function LollipopContainer({
 						}}
 					>
 						<PercentageIconLollipop
-							donorName={donorName}
+							fundName={fundName}
 							attribution={attribution}
 						/>
 						<Typography
