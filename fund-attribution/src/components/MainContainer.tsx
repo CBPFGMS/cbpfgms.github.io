@@ -56,11 +56,10 @@ function MainContainer({ fund }: MainContainerProps) {
 	const [hasUS, setHasUS] = useState<boolean>(false);
 	const [year, setYear] = useState<number>(lastFundYear);
 
-	const allDonors = hasUS
-		? Array.from(inContributionsDataLists.donorsPerYear[year])
-		: Array.from(inContributionsDataLists.donorsPerYear[year]).filter(
-				d => d !== USCode,
-			);
+	const allDonors = Array.from(
+		inContributionsDataLists.donorsPerYear[year],
+	).filter(donor => hasUS || donor !== USCode);
+	
 	const [donors, setDonors] = useState<number[]>(allDonors);
 
 	const attributions = useMemo(

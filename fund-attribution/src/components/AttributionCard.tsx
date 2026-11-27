@@ -244,7 +244,7 @@ function AttributionCards({
 									paddingLeft: "0.5em",
 								}}
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`Received: $${toLocaleFixed(donorValue, 0, 2)}`}
+								data-tooltip-content={`Total received from ${donorName}: $${toLocaleFixed(donorValue, 0, 2)}`}
 								data-tooltip-place="top"
 								className={`attrib-cv-blue`}
 							>
@@ -277,7 +277,7 @@ function AttributionCards({
 							}}
 							className="attrib-card-footer"
 							data-tooltip-id="tooltip"
-							data-tooltip-content={`Total donated: $${toLocaleFixed(totalValue, 0, 2)}`}
+							data-tooltip-content={`Total donated by ${donorName} to all funds, including ${fundName}: $${toLocaleFixed(totalValue, 0, 2)}`}
 							data-tooltip-place="top"
 						>
 							<Box className={`attrib-prog-track attrib-pt-blue`}>

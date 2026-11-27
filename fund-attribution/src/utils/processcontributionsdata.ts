@@ -11,6 +11,7 @@ type fundDatum = {
 	contribution: number;
 	totalContribution: number;
 	percentage: number;
+	fundPercentage: number;
 	hasUS: boolean;
 };
 
@@ -74,9 +75,8 @@ function processContributionsData({
 				year: thisYear,
 				contribution: row.attributedAmount,
 				totalContribution: row.donorTotal,
-				percentage: row.donorTotal
-					? (row.attributedAmount / row.donorTotal) * 100
-					: 0, //TODO: change for a calculated property
+				percentage: row.attributedPercent,
+				fundPercentage: row.shareOfFundPercent,
 				hasUS: !contribution.meta.excludesUsa,
 			});
 		});

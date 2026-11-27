@@ -39,6 +39,8 @@ function TopAttributionCard({
 
 	const allFundsSelected = allFunds.length === funds.length;
 
+	const donorName = lists.donorGMSNames[donor];
+
 	return (
 		<Box
 			sx={{
@@ -111,7 +113,7 @@ function TopAttributionCard({
 						>
 							<Box
 								data-tooltip-id="tooltip"
-								data-tooltip-content={`${lists.donorGMSNames[donor]} combined attribution for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} donated for those funds.`}
+								data-tooltip-content={`${donorName} combined attribution for the selected funds is $${toLocaleFixed(donorValue, 0, 2)}, which corresponds to ${lessThanMinimum || truncatedPercentage}% of the total $${toLocaleFixed(totalValue, 0, 2)} donated for those funds.`}
 								data-tooltip-place="top"
 								className={`attrib-info-btn attrib-rb-donor`}
 								sx={{
@@ -154,7 +156,7 @@ function TopAttributionCard({
 								paddingLeft: "0.5em",
 							}}
 							data-tooltip-id="tooltip"
-							data-tooltip-content={`Donated: $${toLocaleFixed(donorValue, 0, 2)}`}
+							data-tooltip-content={`Total donated by ${donorName}: $${toLocaleFixed(donorValue, 0, 2)}`}
 							data-tooltip-place="top"
 							className={`attrib-cv-donor`}
 						>
@@ -184,7 +186,7 @@ function TopAttributionCard({
 						}}
 						className="attrib-card-footer"
 						data-tooltip-id="tooltip"
-						data-tooltip-content={`Total donated: $${toLocaleFixed(totalValue, 0, 2)}`}
+						data-tooltip-content={`Total donated by all donors, including ${donorName}: $${toLocaleFixed(totalValue, 0, 2)}`}
 						data-tooltip-place="top"
 					>
 						<Box className={`attrib-prog-track attrib-pt-donor`}>

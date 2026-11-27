@@ -74,7 +74,7 @@ function DropdownDonors({
 				}}
 				size={"small"}
 			>
-				<InputLabel id="multiple-checkbox-label">Funds</InputLabel>
+				<InputLabel id="multiple-checkbox-label">Donors</InputLabel>
 				<Select
 					labelId="multiple-checkbox-label"
 					id="multiple-checkbox"

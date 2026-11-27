@@ -12,6 +12,8 @@ import { constants } from "../utils/constants";
 import NorthIcon from "@mui/icons-material/North";
 import IconsLegend from "./IconsLegend";
 import getFlagSrc from "../utils/flagsrc";
+import colors from "../utils/colors";
+import AttributionCardExplanation from "./AttributionCardExplanation";
 
 type AttributionCardsContainerProps = {
 	attributions: Attributions;
@@ -37,6 +39,7 @@ function AttributionCardsContainer({
 	setDonors,
 }: AttributionCardsContainerProps) {
 	const [openSnack, setOpenSnack] = useState<boolean>(false);
+	const [openExplanation, setOpenExplanation] = useState<boolean>(false);
 	const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 	const [sortBy, setSortBy] = useState<SortBy>("attribution");
 
@@ -110,6 +113,10 @@ function AttributionCardsContainer({
 				setOpenSnack={setOpenSnack}
 				message={`At least one fund must be selected`}
 			/>
+			<AttributionCardExplanation
+				open={openExplanation}
+				onClose={() => setOpenExplanation(false)}
+			/>
 			<Box
 				sx={{
 					width: "100%",
@@ -118,12 +125,45 @@ function AttributionCardsContainer({
 					flexDirection: "column",
 				}}
 			>
-				<Typography
-					variant="h6"
-					sx={{ fontWeight: 400, color: "#333" }}
+				<Box
+					sx={{
+						width: "100%",
+						display: "flex",
+						alignItems: "baseline",
+						flexDirection: "row",
+					}}
 				>
-					Attribution per donor
-				</Typography>
+					<Typography
+						variant="h6"
+						sx={{ fontWeight: 400, color: "#333" }}
+					>
+						Attribution per donor
+					</Typography>
+					<Typography
+						component="button"
+						type="button"
+						aria-haspopup="dialog"
+						aria-expanded={openExplanation}
+						onClick={() => setOpenExplanation(true)}
+						sx={{
+							fontWeight: 400,
+							fontSize: "0.85em",
+							color: `color-mix(in srgb, ${colors.fundColor} 85%, black)`,
+							marginLeft: "0.5em",
+							padding: 0,
+							border: 0,
+							background: "none",
+							cursor: "pointer",
+							"&:hover": { textDecoration: "underline" },
+							"&:focus-visible": {
+								outline: "2px solid currentColor",
+								outlineOffset: 3,
+							},
+						}}
+					>
+						(click here for explanation)
+					</Typography>
+				</Box>
 				<Box
 					sx={{
 						width: "100%",

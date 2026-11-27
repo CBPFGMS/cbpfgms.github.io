@@ -18,6 +18,10 @@ type CalculateAttributionsParams = {
 	allFunds: number[];
 };
 
+function roundWithEpsilon(num: number): number {
+	return Math.round((num + Number.EPSILON) * 1e4) / 1e4;
+}
+
 function calculateAttributions({
 	contributionsData,
 	year,
@@ -34,7 +38,6 @@ function calculateAttributions({
 			return;
 		}
 		if (year === datum.year) {
-			const decimalPercentage = datum.percentage / 100;
 			if (funds.includes(datum.fund)) {
 				attributions.global.total += datum.totalContribution;
 				attributions.global.donor += datum.contribution;
@@ -44,14 +47,16 @@ function calculateAttributions({
 				attributions[datum.fund] = {
 					total: datum.totalContribution,
 					donor: datum.contribution,
-					percentage: decimalPercentage,
+					percentage: roundWithEpsilon(datum.percentage / 100),
 				};
 			}
 		}
 	});
 
 	attributions.global.percentage = attributions.global.total
-		? attributions.global.donor / attributions.global.total
+		? roundWithEpsilon(
+				attributions.global.donor / attributions.global.total,
+			)
 		: 0;
 
 	return attributions;

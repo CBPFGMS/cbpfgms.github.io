@@ -144,6 +144,8 @@ export const contributionsObjectSchema = z.object({
 	donorId: z.number().int().nonnegative(),
 	donorName: z.string().nullable(),
 	donorTotal: z.number().nonnegative(),
+	shareOfDonorPercent: z.number().nonnegative(),
+	shareOfFundPercent: z.number().nonnegative(),
 });
 
 export const totalBeneficiariesObjectSchema = z.object({
