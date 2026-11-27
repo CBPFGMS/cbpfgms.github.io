@@ -248,7 +248,7 @@ function AttributionCards({
 							}}
 							className="attrib-card-footer"
 							data-tooltip-id="tooltip"
-							data-tooltip-content={`Total received from all donors, including ${fundName}: $${toLocaleFixed(totalValue, 0, 2)}`}
+							data-tooltip-content={`Total received from all donors, including ${donorName}: $${toLocaleFixed(totalValue, 0, 2)}`}
 							data-tooltip-place="top"
 						>
 							<Box className={`attrib-prog-track attrib-pt-blue`}>

@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import LaunchIcon from "@mui/icons-material/Launch";
+import colors from "../utils/colors";
 
 type AttributionCardExplanationProps = {
 	open: boolean;
@@ -22,7 +23,7 @@ const exampleButtonMarkerStyles = {
 	display: "grid",
 	placeItems: "center",
 	flexShrink: 0,
-	backgroundColor: "#185fa5",
+	backgroundColor: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 	color: "white",
 	fontSize: 11,
 	fontWeight: 700,
@@ -51,7 +52,7 @@ const explanations = [
 	},
 	{
 		number: "5",
-		title: "Share attributed to this fund",
+		title: "Share attributed to the fund being viewed",
 		text: "This percentage shows how much of the donor's total contribution went to the fund being viewed. The calculation is done dividing the amount donated to the fund being viewed by the total donations from this donor to all other funds.",
 	},
 	{
@@ -81,7 +82,10 @@ function AttributionCardExplanation({
 		>
 			<DialogTitle
 				id="attribution-card-explanation-title"
-				sx={{ pr: 7 }}
+				sx={{
+					pr: 7,
+					color: `color-mix(in srgb, ${colors.fundColor} 60%, black)`,
+				}}
 			>
 				How to read an attribution card
 				<IconButton
@@ -227,7 +231,7 @@ function AttributionCardExplanation({
 										borderRadius: "50%",
 										display: "grid",
 										placeItems: "center",
-										backgroundColor: "#185fa5",
+										backgroundColor: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 										color: "white",
 										fontSize: 13,
 										fontWeight: 700,
@@ -258,7 +262,7 @@ function AttributionCardExplanation({
 										borderRadius: "50%",
 										display: "grid",
 										placeItems: "center",
-										backgroundColor: "#185fa5",
+										backgroundColor: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 										color: "white",
 										fontSize: 13,
 										fontWeight: 700,
@@ -270,7 +274,7 @@ function AttributionCardExplanation({
 									variant="body1"
 									sx={{ color: "#185fa5" }}
 								>
-									($350,000)
+									($350k)
 								</Typography>
 								<Box
 									component="span"
@@ -280,7 +284,7 @@ function AttributionCardExplanation({
 										borderRadius: "50%",
 										display: "grid",
 										placeItems: "center",
-										backgroundColor: "#185fa5",
+										backgroundColor: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 										color: "white",
 										fontSize: 13,
 										fontWeight: 700,
@@ -293,38 +297,49 @@ function AttributionCardExplanation({
 							<Box>
 								<Box
 									sx={{
-										height: 10,
-										borderRadius: 5,
-										backgroundColor: "#e1e1e1",
-										overflow: "hidden",
+										display: "flex",
+										flexDirection: "row",
+										width: "100%",
+										alignItems: "center",
 									}}
 								>
 									<Box
 										sx={{
-											width: "35%",
-											height: "100%",
+											width: "100%",
+											height: 10,
 											borderRadius: 5,
-											backgroundColor: "#1f69b3",
+											backgroundColor: "#e1e1e1",
+											overflow: "hidden",
 										}}
-									/>
-								</Box>
-								<Box
-									sx={{
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "space-between",
-										mt: 0.75,
-									}}
-								>
+									>
+										<Box
+											sx={{
+												width: "35%",
+												height: "100%",
+												borderRadius: 5,
+												backgroundColor: "#1f69b3",
+											}}
+										/>
+									</Box>
 									<Typography
 										variant="body2"
 										sx={{
 											color: "#185fa5",
 											fontWeight: 600,
+											marginLeft: "0.5em",
 										}}
 									>
-										$1,000,000
+										$1M
 									</Typography>
+								</Box>
+								<Box
+									sx={{
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "flex-end",
+										mt: 0.75,
+									}}
+								>
 									<Box
 										component="span"
 										sx={{
@@ -333,7 +348,7 @@ function AttributionCardExplanation({
 											borderRadius: "50%",
 											display: "grid",
 											placeItems: "center",
-											backgroundColor: "#185fa5",
+											backgroundColor: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 											color: "white",
 											fontSize: 13,
 											fontWeight: 700,
@@ -368,8 +383,8 @@ function AttributionCardExplanation({
 										display: "grid",
 										placeItems: "center",
 										flexShrink: 0,
-										backgroundColor: "#eaf3fb",
-										color: "#185fa5",
+										backgroundColor: "#f3f3f3",
+										color: `color-mix(in srgb, ${colors.fundColor} 80%, black)`,
 										fontWeight: 700,
 									}}
 								>
@@ -378,7 +393,10 @@ function AttributionCardExplanation({
 								<Box>
 									<Typography
 										variant="subtitle2"
-										sx={{ mb: 0.25 }}
+										sx={{
+											mb: 0.25,
+											color: `color-mix(in srgb, ${colors.fundColor} 60%, black)`,
+										}}
 									>
 										{explanation.title}
 									</Typography>
