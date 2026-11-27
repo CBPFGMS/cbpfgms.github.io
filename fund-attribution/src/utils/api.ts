@@ -55,6 +55,7 @@ export type AppData = {
 	lists: List;
 	allocationsLollipopData: AllocationsLollipopObject[];
 	allocationsLollipopWithoutUSData: AllocationsLollipopObject[];
+	dataHasNSFT: boolean;
 };
 
 type ReceiveDataArgs = [
@@ -401,7 +402,7 @@ export async function fetchAppData(
 			donorsMaster,
 		});
 
-		const { contributionsData, inContributionsDataLists } =
+		const { contributionsData, inContributionsDataLists, dataHasNSFT } =
 			processContributionsData({
 				dynamicContributionsResults,
 			});
@@ -458,6 +459,7 @@ export async function fetchAppData(
 				lists,
 			),
 			lists,
+			dataHasNSFT,
 		};
 	}
 }

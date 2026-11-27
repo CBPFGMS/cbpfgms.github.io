@@ -28,6 +28,7 @@ type TopSelectorsProps = {
 	lists: List;
 	donors: number[];
 	attributions: Attributions;
+	dataHasNSFT: boolean;
 };
 
 const buttonsStyle = {
@@ -62,6 +63,7 @@ function TopSelectors({
 	lists,
 	donors,
 	attributions,
+	dataHasNSFT,
 }: TopSelectorsProps) {
 	const [stickyRef, isSticky] = useSticky<HTMLDivElement>();
 
@@ -158,7 +160,7 @@ function TopSelectors({
 						namesList={lists.donorGMSNames}
 					/>
 				)}
-				{year >= firstNSFTYear && (
+				{year >= firstNSFTYear && dataHasNSFT && (
 					<ToggleButtonGroup
 						value={hasUS}
 						exclusive

@@ -1,5 +1,8 @@
 import { type ContributionsJson, contributionsObjectSchema } from "./schemas";
 import warnInvalidSchema from "./warninvalid";
+import { constants } from "./constants";
+
+const { firstNSFTYear } = constants;
 
 type ProcessContributionsDataParams = {
 	dynamicContributionsResults: ContributionsJson[];
@@ -28,13 +31,20 @@ type SetType<T> = {
 
 type InContributionsDataListsValues = SetType<InContributionsDataLists>;
 
+type DataSizeTRacker = {
+	[year: number]: number[];
+};
+
 function processContributionsData({
 	dynamicContributionsResults,
 }: ProcessContributionsDataParams): {
 	contributionsData: ContributionsData;
 	inContributionsDataLists: InContributionsDataLists;
+	dataHasNSFT: boolean;
 } {
 	const contributionsData: ContributionsData = [];
+
+	const dataSizeTracker: DataSizeTRacker = {};
 
 	const yearsSet: Set<InContributionsDataListsValues["years"]> = new Set();
 	const donorsPerYear: InContributionsDataLists["donorsPerYear"] = {};
@@ -50,6 +60,9 @@ function processContributionsData({
 		}
 
 		yearsSet.add(thisYear);
+
+		const tracker = (dataSizeTracker[thisYear] ??= []);
+		tracker.push(contribution.pooledFunds[0].donors.length);
 
 		contribution.pooledFunds[0].donors.forEach(row => {
 			const parsedContributions =
@@ -82,6 +95,10 @@ function processContributionsData({
 		});
 	});
 
+	const dataHasNSFT = Object.entries(dataSizeTracker).some(
+		([key, value]) => +key >= firstNSFTYear && value[0] !== value[1],
+	);
+
 	const inContributionsDataLists: InContributionsDataLists = {
 		years: yearsSet,
 		donorsPerYear: donorsPerYear,
@@ -90,6 +107,7 @@ function processContributionsData({
 	return {
 		contributionsData,
 		inContributionsDataLists,
+		dataHasNSFT,
 	};
 }
 

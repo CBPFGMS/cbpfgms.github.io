@@ -47,6 +47,7 @@ function MainContainer({ fund }: MainContainerProps) {
 		projectClusterData,
 		allocationsLollipopData,
 		allocationsLollipopWithoutUSData,
+		dataHasNSFT,
 	} = useAppData();
 
 	const lastFundYear = Array.from(inContributionsDataLists.years).sort(
@@ -59,7 +60,7 @@ function MainContainer({ fund }: MainContainerProps) {
 	const allDonors = Array.from(
 		inContributionsDataLists.donorsPerYear[year],
 	).filter(donor => hasUS || donor !== USCode);
-	
+
 	const [donors, setDonors] = useState<number[]>(allDonors);
 
 	const attributions = useMemo(
@@ -189,6 +190,7 @@ function MainContainer({ fund }: MainContainerProps) {
 				lists={lists}
 				donors={donors}
 				attributions={attributions}
+				dataHasNSFT={dataHasNSFT}
 			/>
 			<DonorHeader
 				fund={fund}
